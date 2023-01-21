@@ -23,7 +23,7 @@
 
 using namespace std;
 
-/* The following defs are for obj_data  */
+/* The following defs are for Object  */
 
 /* For 'type_flag' */
 
@@ -189,14 +189,14 @@ struct tab_data;
 struct table_data;
 struct machine_data;
 struct wheel_data;
-struct obj_data;
+class Object;
 class Character;
 typedef uint64_t vnum_t;
 typedef uint64_t room_t;
 
 struct active_object
 {
-    struct obj_data *obj = {};
+    class Object *obj = {};
     struct active_object *next = {};
 };
 
@@ -233,8 +233,9 @@ struct obj_affected_type
 };
 
 /* ======================== Structure for object ========================= */
-struct obj_data
+class Object
 {
+public:
     int32_t item_number = {};     /* Where in data-base               */
     room_t in_room = {};          /* In what room -1 when conta/carr  */
     int vroom = {};               /* for corpse saving */
@@ -250,12 +251,12 @@ struct obj_data
     Character *carried_by = {};            /* Carried by :NULL in room/conta   */
     Character *equipped_by = {};           /* so I can access the player :)    */
 
-    obj_data *in_obj = {};   /* In what object NULL when none    */
-    obj_data *contains = {}; /* Contains objects                 */
+    Object *in_obj = {};   /* In what object NULL when none    */
+    Object *contains = {}; /* Contains objects                 */
 
-    obj_data *next_content = {}; /* For 'contains' lists             */
-    obj_data *next = {};         /* For the object list              */
-    obj_data *next_skill = {};
+    Object *next_content = {}; /* For 'contains' lists             */
+    Object *next = {};         /* For the object list              */
+    Object *next_skill = {};
     table_data *table = {};
     machine_data *slot = {};
     wheel_data *wheel = {};
@@ -310,18 +311,18 @@ struct obj_file_elem
 };
 
 // functions from objects.cpp
-int eq_max_damage(obj_data *obj);
-int damage_eq_once(obj_data *obj);
-int eq_current_damage(obj_data *obj);
-void eq_remove_damage(obj_data *obj);
-void add_obj_affect(obj_data *obj, int loc, int mod);
-void remove_obj_affect_by_index(obj_data *obj, int index);
-void remove_obj_affect_by_type(obj_data *obj, int loc);
+int eq_max_damage(Object *obj);
+int damage_eq_once(Object *obj);
+int eq_current_damage(Object *obj);
+void eq_remove_damage(Object *obj);
+void add_obj_affect(Object *obj, int loc, int mod);
+void remove_obj_affect_by_index(Object *obj, int index);
+void remove_obj_affect_by_type(Object *obj, int loc);
 int recheck_height_wears(Character *ch);
-bool fullSave(obj_data *obj);
+bool fullSave(Object *obj);
 void heightweight(Character *ch, bool add);
-void wear(Character *ch, struct obj_data *obj_object, int keyword);
-int obj_from(obj_data *obj);
+void wear(Character *ch, class Object *obj_object, int keyword);
+int obj_from(Object *obj);
 
 typedef QStringList item_types_t;
 

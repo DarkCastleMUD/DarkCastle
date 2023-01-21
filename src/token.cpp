@@ -19,7 +19,7 @@ extern "C"
 #include "db.h"
 #include "room.h"
 #include "character.h" // Character
-#include "obj.h"       // obj_data
+#include "obj.h"       // Object
 #include "levels.h"    // MIN_GOD
 #include "utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "terminal.h"  // colors
@@ -142,7 +142,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-string TokenList::Interpret(Character *from, obj_data *obj, void *vict_obj, Character *send_to, int flags)
+string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
 {
 
   // Reset the string
@@ -374,22 +374,22 @@ string TokenList::Interpret(Character *from, obj_data *obj, void *vict_obj, Char
         }
         break;
       case 'O':
-        if (send_to == nullptr || vict_obj == nullptr || ((obj_data *)vict_obj)->name == nullptr)
+        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->name == nullptr)
         {
           break;
         }
-        if (!CAN_SEE_OBJ(send_to, (obj_data *)vict_obj))
+        if (!CAN_SEE_OBJ(send_to, (Object *)vict_obj))
         {
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += fname(((obj_data *)vict_obj)->name);
+            interp += fname(((Object *)vict_obj)->name);
           else
             interp += "something";
         }
         else
         {
-          interp += fname(((obj_data *)vict_obj)->name);
+          interp += fname(((Object *)vict_obj)->name);
         }
         break;
       case 'p':
@@ -413,23 +413,23 @@ string TokenList::Interpret(Character *from, obj_data *obj, void *vict_obj, Char
         }
         break;
       case 'P':
-        if (send_to == nullptr || vict_obj == nullptr || ((obj_data *)vict_obj)->short_description == nullptr)
+        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->short_description == nullptr)
         {
           break;
         }
 
-        if (!CAN_SEE_OBJ(send_to, (obj_data *)vict_obj))
+        if (!CAN_SEE_OBJ(send_to, (Object *)vict_obj))
         {
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += ((obj_data *)vict_obj)->short_description;
+            interp += ((Object *)vict_obj)->short_description;
           else
             interp += "something";
         }
         else
         {
-          interp += ((obj_data *)vict_obj)->short_description;
+          interp += ((Object *)vict_obj)->short_description;
         }
         break;
       case 'a':
@@ -460,9 +460,9 @@ string TokenList::Interpret(Character *from, obj_data *obj, void *vict_obj, Char
         }
         break;
       case 'A':
-        if (vict_obj != nullptr && ((obj_data *)vict_obj)->name != nullptr)
+        if (vict_obj != nullptr && ((Object *)vict_obj)->name != nullptr)
         {
-          switch (*((obj_data *)vict_obj)->name)
+          switch (*((Object *)vict_obj)->name)
           {
           case 'a':
           case 'A':

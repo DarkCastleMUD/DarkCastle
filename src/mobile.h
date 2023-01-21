@@ -19,7 +19,7 @@ using namespace std;
 
 void rebuild_rnum_references(int startAt, int type);
 void mprog_driver(char *com_list, Character *mob,
-                  Character *actor, struct obj_data *obj,
+                  Character *actor, class Object *obj,
                   void *vo, struct mprog_throw_type *thrw, Character *rndm);
 char *mprog_next_command(char *clist);
 
@@ -168,7 +168,7 @@ struct mob_matrix_data
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
                      char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb, Character *mob, Character *actor,
-                     obj_data *obj, void *vo, Character *rndm);
+                     Object *obj, void *vo, Character *rndm);
 
 void save_golem_data(Character *ch);
 void save_charmie_data(Character *ch);

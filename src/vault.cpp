@@ -71,7 +71,7 @@ extern CWorld world;
 int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 
-void item_remove(obj_data *obj, struct vault_data *vault);
+void item_remove(Object *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
 Character *find_owner(const char *name);
@@ -80,7 +80,7 @@ char *clanVName(int c);
 void vault_search_usage(Character *ch);
 
 extern struct index_data *obj_index;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 
 struct vault_data *has_vault(const char *name)
 {
@@ -103,9 +103,9 @@ struct vault_data *has_vault(const char *name)
   return 0;
 }
 
-void remove_from_object_list(obj_data *obj)
+void remove_from_object_list(Object *obj)
 {
-  obj_data *tObj, *pObj = nullptr;
+  Object *tObj, *pObj = nullptr;
   for (tObj = object_list; tObj; tObj = tObj->next)
   {
     if (tObj == obj)
@@ -151,7 +151,7 @@ void save_vault(char *name)
 
   for (items = vault->items; items; items = items->next)
   {
-    obj_data *obj = items->obj ? items->obj : get_obj(items->item_vnum);
+    Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
     if (obj == 0)
       continue;
 
@@ -452,7 +452,7 @@ void vault_stats(Character *ch, char *name)
   struct vault_data *vault = nullptr;
   struct vault_items_data *item;
   struct vault_access_data *access;
-  struct obj_data *obj;
+  class Object *obj;
   int items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = 0;
   char buf[MAX_STRING_LENGTH * 4], buf1[MAX_STRING_LENGTH];
 
@@ -739,7 +739,7 @@ void load_vaults(void)
   struct vault_data *vault;
   struct vault_access_data *access;
   struct vault_items_data *items;
-  struct obj_data *obj = nullptr;
+  class Object *obj = nullptr;
   struct stat statbuf = {};
   FILE *fl = nullptr, *index = nullptr;
   int vnum = 0, full = 0, count = 0;
@@ -1099,7 +1099,7 @@ int has_vault_access(char *who, struct vault_data *vault)
 struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num)
 {
   struct vault_items_data *items;
-  struct obj_data *obj;
+  class Object *obj;
   int i = 1;
 
   for (items = vault->items; items; items = items->next)
@@ -1117,10 +1117,10 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
   return 0;
 }
 
-struct obj_data *get_unique_obj_in_vault(struct vault_data *vault, char *object, int num)
+class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, int num)
 {
   struct vault_items_data *items;
-  struct obj_data *obj;
+  class Object *obj;
   int i = 1;
 
   for (items = vault->items; items; items = items->next)
@@ -1142,7 +1142,7 @@ struct obj_data *get_unique_obj_in_vault(struct vault_data *vault, char *object,
 struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *object, int num)
 {
   struct vault_items_data *items;
-  struct obj_data *obj;
+  class Object *obj;
   int i = 1, j;
 
   for (items = vault->items; items; items = items->next)
@@ -1170,10 +1170,10 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
   return 0;
 }
 
-struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int num)
+class Object *get_obj_in_vault(struct vault_data *vault, char *object, int num)
 {
   struct vault_items_data *items;
-  struct obj_data *obj;
+  class Object *obj;
   int i = 1, j;
 
   for (items = vault->items; items; items = items->next)
@@ -1198,7 +1198,7 @@ struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int nu
   return 0;
 }
 
-struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
+class Object *exists_in_vault(struct vault_data *vault, Object *obj)
 {
   struct vault_items_data *items;
   if (!obj)
@@ -1216,7 +1216,7 @@ void vault_get(Character *ch, char *object, char *owner)
 {
   std::string sbuf;
   char obj_list[50][100];
-  struct obj_data *obj, *tmp_obj;
+  class Object *obj, *tmp_obj;
   struct vault_items_data *items;
   struct vault_data *vault;
   int self = 0, num = 1, i;
@@ -1432,7 +1432,7 @@ void item_add(int vnum, struct vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(get_obj(vnum));
 }
 
-void item_add(obj_data *obj, struct vault_data *vault)
+void item_add(Object *obj, struct vault_data *vault)
 {
   struct vault_items_data *item;
   int vnum = GET_OBJ_VNUM(obj);
@@ -1458,7 +1458,7 @@ void item_add(obj_data *obj, struct vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(obj);
 }
 
-void item_remove(obj_data *obj, struct vault_data *vault)
+void item_remove(Object *obj, struct vault_data *vault)
 {
   struct vault_items_data *item, *next_item, *prev_item = nullptr;
   int vnum = GET_OBJ_VNUM(obj);
@@ -1612,9 +1612,9 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   }
 }
 
-int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, Character *ch)
+int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Character *ch)
 {
-  //  struct obj_data *tmp_obj;
+  //  class Object *tmp_obj;
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
@@ -1680,7 +1680,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, C
 
 void vault_put(Character *ch, char *object, char *owner)
 {
-  struct obj_data *obj, *tmp_obj;
+  class Object *obj, *tmp_obj;
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
@@ -1833,7 +1833,7 @@ void vault_put(Character *ch, char *object, char *owner)
 struct sorted_vault
 {
   // This stores the quantity of each item found in a vault
-  map<string, pair<obj_data *, uint32_t>> vault_content_qty{};
+  map<string, pair<Object *, uint32_t>> vault_content_qty{};
 
   // This stores the order in which vault items are found
   vector<string> vault_contents{};
@@ -1843,7 +1843,7 @@ struct sorted_vault
 
 void sort_vault(const vault_data &vault, sorted_vault &sv)
 {
-  struct obj_data *obj;
+  class Object *obj;
 
   for (vault_items_data *items = vault.items; items; items = items->next)
   {
@@ -1872,7 +1872,7 @@ void vault_list(Character *ch, char *owner)
 {
   struct vault_items_data *items;
   struct vault_data *vault;
-  struct obj_data *obj;
+  class Object *obj;
   int objects = 0, self = 0;
   char sectionbuf[MAX_STRING_LENGTH * 4];
   char linebuf[MAX_INPUT_LENGTH];
@@ -2181,7 +2181,7 @@ void vlog(const char *message, const char *name)
   // system(cmd);
 }
 
-int sleazy_vault_guy(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
                      Character *owner)
 {
   if (cmd != 59 && cmd != 56)

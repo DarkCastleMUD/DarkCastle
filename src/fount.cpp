@@ -34,7 +34,7 @@ extern CWorld world;
 
 int FOUNTAINisPresent (Character *ch)
 {
-  struct obj_data *tmp;
+  class Object *tmp;
   bool found = false;
 
   for (tmp = world[ch->in_room].contents;
@@ -55,8 +55,8 @@ int FOUNTAINisPresent (Character *ch)
 int do_fill(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *to_obj;
-  void name_to_drinkcon(struct obj_data *obj, int type);
+  class Object *to_obj;
+  void name_to_drinkcon(class Object *obj, int type);
   
   one_argument(argument, buf);
 

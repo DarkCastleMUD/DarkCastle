@@ -642,7 +642,7 @@ int meta_get_ki_plat_cost(Character *ch)
 	return (int)(cost * 0.9);
 }
 
-int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			  Character *owner)
 {
 	char argument[MAX_INPUT_LENGTH];
@@ -1205,7 +1205,7 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n", ch);
 				return eSUCCESS;
 			}
-			struct obj_data *obj = clone_object(real_object(10003));
+			class Object *obj = clone_object(real_object(10003));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
 				send_to_char("You can't carry that many items.\r\n", ch);
@@ -1587,7 +1587,7 @@ char *race_message(Character *ch, int race)
 	return &buf[0];
 }
 
-int cardinal(Character *ch, struct obj_data *obj, int cmd, const char *argument, Character *owner)
+int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Character *owner)
 {
 	if (cmd == 59) // list
 	{
@@ -1749,7 +1749,7 @@ int cardinal(Character *ch, struct obj_data *obj, int cmd, const char *argument,
 				send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n", ch);
 				return eSUCCESS;
 			}
-			struct obj_data *obj = clone_object(real_object(10004));
+			class Object *obj = clone_object(real_object(10004));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
 				send_to_char("You can't carry that many items.\r\n", ch);

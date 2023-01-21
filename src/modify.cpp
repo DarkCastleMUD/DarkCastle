@@ -172,7 +172,7 @@ int do_string(Character *ch, char *arg, int cmd)
 	char message[100];
 	int field, type, ctr;
 	Character *mob = nullptr;
-	struct obj_data *obj;
+	class Object *obj;
 	struct extra_descr_data *ed, *tmp;
 
 	if (IS_NPC(ch))

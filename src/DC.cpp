@@ -36,7 +36,7 @@ void DC::removeDead(void)
 
 	while (!obj_free_list.empty())
 	{
-		obj_data *obj = *(obj_free_list.cbegin());
+		Object *obj = *(obj_free_list.cbegin());
 		active_obj_list.erase(obj);
 		obj_free_list.erase(obj);
 		delete obj;

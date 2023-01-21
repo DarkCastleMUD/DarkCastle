@@ -235,7 +235,7 @@ int innate_bloodlust(Character *ch, char *arg, int cmd)
 
 int innate_repair(Character *ch, char *arg, int cmd)
 {
-  struct obj_data *obj;
+  class Object *obj;
   char buf[MAX_STRING_LENGTH];
   int i, chance = 60-GET_LEVEL(ch);
   bool found = false;

@@ -46,11 +46,11 @@ char *valid_fields[] = {
     "brownie",
     nullptr};
 
-extern int keywordfind(obj_data *);
-extern void wear(Character *, obj_data *, int);
+extern int keywordfind(Object *);
+extern void wear(Character *, Object *, int);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern char *gl_item(obj_data *obj, int number, Character *ch, bool platinum);
+extern char *gl_item(Object *obj, int number, Character *ch, bool platinum);
 
 int load_quests(void)
 {
@@ -522,7 +522,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 {
    int count = 0;
    uint16_t price;
-   obj_data *obj, *brownie = 0;
+   Object *obj, *brownie = 0;
    Character *mob;
    char buf[MAX_STRING_LENGTH];
    Character *qmaster = get_mob_vnum(QUEST_MASTER);
@@ -661,7 +661,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
 int complete_quest(Character *ch, struct quest_info *quest)
 {
    int count = 0;
-   obj_data *obj;
+   Object *obj;
    char buf[MAX_STRING_LENGTH];
 
    if (!quest)
@@ -702,7 +702,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
 int stop_current_quest(Character *ch, struct quest_info *quest)
 {
    int count = 0;
-   obj_data *obj;
+   Object *obj;
    char buf[MAX_STRING_LENGTH];
 
    if (!quest)
@@ -753,7 +753,7 @@ void quest_update()
 {
    char buf[MAX_STRING_LENGTH];
    Character *mob;
-   obj_data *obj;
+   Object *obj;
    struct quest_info *quest;
 
    auto &character_list = DC::getInstance()->character_list;
@@ -919,7 +919,7 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
 }
 
 // Not used currently. Use quest list or quest start <name> instead of list or buy.
-int quest_master(Character *ch, obj_data *obj, int cmd, char *arg, Character *owner)
+int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owner)
 {
    int choice;
    char buf[MAX_STRING_LENGTH];
@@ -1070,7 +1070,7 @@ int do_quest(Character *ch, char *arg, int cmd)
          return eEXTRA_VAL2;
       }
 
-      obj_data *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
+      Object *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
       if (!brownie)
       {
          csendf(ch, "You need a brownie point to reset all quests!\n\r");
@@ -1432,7 +1432,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Character *owner)
+int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character *owner)
 {
    char buf[MAX_STRING_LENGTH];
    int rnum = 0;
@@ -1470,7 +1470,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((obj_data *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
             send_to_char(buffer, ch);
             dc_free(buffer);
          }
@@ -1480,7 +1480,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((obj_data *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
             send_to_char(buffer, ch);
             dc_free(buffer);
          }
@@ -1490,7 +1490,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((obj_data *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
             send_to_char(buffer, ch);
             dc_free(buffer);
          }
@@ -1552,7 +1552,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
          return eSUCCESS;
       }
 
-      struct obj_data *obj;
+      class Object *obj;
       obj = clone_object(rnum);
 
       /*      if (class_restricted(ch, obj)) {
@@ -1599,7 +1599,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
 
-      obj_data *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
+      Object *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
       if (!obj)
       {
          sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
@@ -1607,7 +1607,7 @@ int quest_vendor(Character *ch, obj_data *obj, int cmd, const char *arg, Charact
          return eSUCCESS;
       }
 
-      if (!isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) &&
+      if (!isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) &&
           obj_index[obj->item_number].virt != 3124 &&
           obj_index[obj->item_number].virt != 3125 &&
           obj_index[obj->item_number].virt != 3126 &&

@@ -1551,7 +1551,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -2978,7 +2978,7 @@ int do_cbalance(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-void remove_totem(obj_data *altar, obj_data *totem)
+void remove_totem(Object *altar, Object *totem)
 {
   auto &character_list = DC::getInstance()->character_list;
 
@@ -2998,7 +2998,7 @@ void remove_totem(obj_data *altar, obj_data *totem)
            });
 }
 
-void add_totem(obj_data *altar, obj_data *totem)
+void add_totem(Object *altar, Object *totem)
 {
   auto &character_list = DC::getInstance()->character_list;
 
@@ -3017,7 +3017,7 @@ void add_totem(obj_data *altar, obj_data *totem)
 
 void remove_totem_stats(Character *ch, int stat)
 {
-  obj_data *a;
+  Object *a;
   if (!ch->altar)
     return;
   for (a = ch->altar->contains; a; a = a->next_content)
@@ -3043,7 +3043,7 @@ void remove_totem_stats(Character *ch, int stat)
 
 void add_totem_stats(Character *ch, int stat)
 {
-  obj_data *a;
+  Object *a;
   if (!ch->altar)
     return;
   for (a = ch->altar->contains; a; a = a->next_content)

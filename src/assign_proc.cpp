@@ -18,7 +18,7 @@
 #include "player.h"
 #include "utility.h"
 
-typedef int SPEC_FUN(Character *ch, obj_data *obj, int cmd, const char *argument,
+typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument,
                      Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, char *arg);
 

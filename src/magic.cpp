@@ -216,7 +216,7 @@ bool resist_spell(Character *ch, int skill)
 
 /* MAGIC MISSILE */
 
-int spell_magic_missile(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_magic_missile(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int count = 1;
@@ -245,7 +245,7 @@ int spell_magic_missile(uint8_t level, Character *ch, Character *victim, struct 
 
 /* CHILL TOUCH */
 
-int spell_chill_touch(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int dam = 300;
@@ -293,7 +293,7 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* BURNING HANDS */
 
-int spell_burning_hands(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_burning_hands(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   set_cantquit(ch, victim);
@@ -306,7 +306,7 @@ int spell_burning_hands(uint8_t level, Character *ch, Character *victim, struct 
 
 /* SHOCKING GRASP */
 
-int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   dam = 130;
@@ -315,7 +315,7 @@ int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, struct
 
 /* LIGHTNING BOLT */
 
-int spell_lightning_bolt(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_lightning_bolt(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -330,7 +330,7 @@ int spell_lightning_bolt(uint8_t level, Character *ch, Character *victim, struct
 /* COLOUR SPRAY */
 
 int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
-                       struct obj_data *obj, int skill)
+                       class Object *obj, int skill)
 {
   bool victim_dazzled = false;
   int dam;
@@ -371,7 +371,7 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
 
 /* DROWN */
 
-int spell_drown(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   char buf[256];
   int dam, retval;
@@ -418,7 +418,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, struct obj_data
 /* ENERGY DRAIN */
 // Drains XP, MANA, HP - caster gains HP and MANA -- Currently MOB ONLY
 
-int spell_energy_drain(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int mult = GET_EXP(victim) / 20;
   mult = MIN(10000, mult);
@@ -439,7 +439,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, struct o
 /* SOULDRAIN */
 // Drains MANA - caster gains MANA
 
-int spell_souldrain(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int mana;
   set_cantquit(ch, victim);
@@ -498,7 +498,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* VAMPIRIC TOUCH */
 
-int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -531,7 +531,7 @@ int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, struct
 
 /* METEOR SWARM */
 
-int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -560,7 +560,7 @@ int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, struct o
 
 /* FIREBALL */
 
-int spell_fireball(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -595,7 +595,7 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* SPARKS */
 
-int spell_sparks(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_sparks(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -606,7 +606,7 @@ int spell_sparks(uint8_t level, Character *ch, Character *victim, struct obj_dat
 
 /* HOWL */
 
-int spell_howl(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   Character *tmp_char;
   int retval;
@@ -662,7 +662,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, struct obj_data 
 
 /* HOLY AEGIS/UNHOLY AEGIS*/
 
-int spell_aegis(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int spl = GET_CLASS(ch) == CLASS_ANTI_PAL ? SPELL_U_AEGIS : SPELL_AEGIS;
@@ -690,7 +690,7 @@ int spell_aegis(uint8_t level, Character *ch, Character *victim, struct obj_data
 
 /* ARMOUR */
 
-int spell_armor(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_armor(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   if (affected_by_spell(victim, SPELL_ARMOR))
@@ -714,7 +714,7 @@ int spell_armor(uint8_t level, Character *ch, Character *victim, struct obj_data
 
 /* STONE SHIELD */
 
-int spell_stone_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   char buf[160];
@@ -745,7 +745,7 @@ int spell_stone_shield(uint8_t level, Character *ch, Character *victim, struct o
   return eSUCCESS;
 }
 
-int cast_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -781,7 +781,7 @@ int cast_stone_shield(uint8_t level, Character *ch, char *arg, int type, Charact
   return eFAILURE;
 }
 
-int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -853,7 +853,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
 
 /* GREATER STONE SHIELD */
 
-int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   char buf[160];
@@ -884,7 +884,7 @@ int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, 
   return eSUCCESS;
 }
 
-int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -922,11 +922,11 @@ int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type,
 
 /* EARTHQUAKE */
 
-int spell_earthquake(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   bool capsize = false, underwater = false;
   int dam = 0, retval = eSUCCESS, weap_spell = obj ? WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
-  obj_data *tmp_obj = 0, *obj_next = 0;
+  Object *tmp_obj = 0, *obj_next = 0;
 
   switch (world[ch->in_room].sector_type)
   {
@@ -1043,7 +1043,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* LIFE LEECH */
 
-int spell_life_leech(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam, retval = eSUCCESS;
   int weap_spell = obj ? WIELD : 0;
@@ -1126,7 +1126,7 @@ void do_solar_blind(Character *ch, Character *tmp_victim, int skill)
 
 /* SOLAR GATE */
 
-int spell_solar_gate(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int i;
   int dam;
@@ -1261,7 +1261,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* GROUP RECALL */
 
-int spell_group_recall(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int chance = 0;
 
@@ -1317,7 +1317,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, struct o
 
 /* GROUP FLY */
 
-int spell_group_fly(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
@@ -1344,7 +1344,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* HEROES FEAST */
 
-int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int result = 15 + skill / 6;
 
@@ -1378,7 +1378,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, struct o
 
 /* GROUP SANCTUARY */
 
-int spell_group_sanc(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
 
   auto &character_list = DC::getInstance()->character_list;
@@ -1404,7 +1404,7 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* HEAL SPRAY */
 
-int spell_heal_spray(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
 
   auto &character_list = DC::getInstance()->character_list;
@@ -1426,7 +1426,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* FIRESTORM */
 
-int spell_firestorm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam = 0;
   int retval = eSUCCESS;
@@ -1506,7 +1506,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* DISPEL EVIL */
 
-int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE)
   { // desecrate object
@@ -1555,7 +1555,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* DISPEL GOOD */
 
-int spell_dispel_good(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE)
   { // consecrate object
@@ -1604,7 +1604,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* CALL LIGHTNING */
 
-int spell_call_lightning(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_call_lightning(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   extern struct weather_data weather_info;
@@ -1620,7 +1620,7 @@ int spell_call_lightning(uint8_t level, Character *ch, Character *victim, struct
 
 /* HARM */
 
-int spell_harm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_harm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -1632,7 +1632,7 @@ int spell_harm(uint8_t level, Character *ch, Character *victim, struct obj_data 
 
 /* POWER HARM */
 
-int spell_power_harm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_power_harm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -1650,7 +1650,7 @@ int spell_power_harm(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* DIVINE FURY */
 
-int spell_divine_fury(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_divine_fury(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   set_cantquit(ch, victim);
@@ -1667,7 +1667,7 @@ int spell_divine_fury(uint8_t level, Character *ch, Character *victim, struct ob
 /* TELEPORT */
 
 // TODO - make this spell have an effect based on skill level
-int spell_teleport(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int to_room;
   char buf[100];
@@ -1756,7 +1756,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* BLESS */
 
-int spell_bless(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   if (!ch && (!victim || !obj))
@@ -1800,7 +1800,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, struct obj_data
 
 /* PARALYZE */
 
-int spell_paralyze(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   char buf[180];
@@ -1944,7 +1944,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* BLINDNESS */
 
-int spell_blindness(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_blindness(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int retval;
@@ -2010,9 +2010,9 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* CREATE FOOD */
 
-int spell_create_food(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_create_food(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct obj_data *tmp_obj;
+  class Object *tmp_obj;
 
   if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN)
     tmp_obj = clone_object(real_object(8));
@@ -2030,7 +2030,7 @@ int spell_create_food(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* CREATE WATER */
 
-int spell_create_water(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_create_water(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int water;
   if (!ch || !obj)
@@ -2065,7 +2065,7 @@ int spell_create_water(uint8_t level, Character *ch, Character *victim, struct o
 
 /* REMOVE PARALYSIS */
 
-int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (!victim)
   {
@@ -2088,7 +2088,7 @@ int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, stru
 
 /* REMOVE BLIND */
 
-int spell_remove_blind(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_remove_blind(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (!victim)
   {
@@ -2137,7 +2137,7 @@ int spell_remove_blind(uint8_t level, Character *ch, Character *victim, struct o
 
 /* CURE CRITIC */
 
-int spell_cure_critic(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int healpoints;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -2201,7 +2201,7 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* CURE LIGHT */
 
-int spell_cure_light(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int healpoints;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -2261,7 +2261,7 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* CURSE */
 
-int spell_curse(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int retval;
@@ -2389,7 +2389,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, struct obj_data
 
 /* DETECT EVIL */
 
-int spell_detect_evil(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2422,7 +2422,7 @@ int spell_detect_evil(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* DETECT GOOD */
 
-int spell_detect_good(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2455,7 +2455,7 @@ int spell_detect_good(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* true SIGHT */
 
-int spell_true_sight(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2484,7 +2484,7 @@ int spell_true_sight(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* DETECT INVISIBILITY */
 
-int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2515,7 +2515,7 @@ int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, s
 
 /* INFRAVISION */
 
-int spell_infravision(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_infravision(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2547,7 +2547,7 @@ int spell_infravision(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* DETECT MAGIC */
 
-int spell_detect_magic(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2575,7 +2575,7 @@ int spell_detect_magic(uint8_t level, Character *ch, Character *victim, struct o
 
 /* HASTE */
 
-int spell_haste(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_haste(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -2605,7 +2605,7 @@ int spell_haste(uint8_t level, Character *ch, Character *victim, struct obj_data
 /* DETECT POISON */
 
 // TODO - make this use skill for addtional effects
-int spell_detect_poison(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_detect_poison(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (!ch && (!victim || !obj))
   {
@@ -2649,7 +2649,7 @@ int spell_detect_poison(uint8_t level, Character *ch, Character *victim, struct 
 
 /* ENCHANT ARMOR - CURRENTLY INACTIVE */
 
-int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   /*int i;*/
 
@@ -2684,7 +2684,7 @@ int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, struct 
 
 /* ENCHANT WEAPON - CURRENTLY INACTIVE */
 
-int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (!ch || !obj)
   {
@@ -2746,7 +2746,7 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, struct
 
 /* MANA - Potion & Immortal Only */
 
-int spell_mana(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_mana(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int mana;
 
@@ -2768,7 +2768,7 @@ int spell_mana(uint8_t level, Character *ch, Character *victim, struct obj_data 
 
 /* HEAL */
 
-int spell_heal(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int healy;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -2834,7 +2834,7 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, struct obj_data 
 
 /* POWER HEAL */
 
-int spell_power_heal(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int healy;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -2894,7 +2894,7 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* FULL HEAL */
 
-int spell_full_heal(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   assert(victim);
   int healamount = 0;
@@ -2955,7 +2955,7 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* INVISIBILITY */
 
-int spell_invisibility(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   assert((ch && obj) || victim);
@@ -3000,9 +3000,9 @@ int spell_invisibility(uint8_t level, Character *ch, Character *victim, struct o
 
 /* LOCATE OBJECT */
 
-int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *victim, struct obj_data *obj, int skill)
+int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *victim, class Object *obj, int skill)
 {
-  struct obj_data *i;
+  class Object *i;
   char name[256];
   char buf[MAX_STRING_LENGTH];
   char tmpname[256];
@@ -3156,7 +3156,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
 /* POISON */
 
-int spell_poison(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int retval = eSUCCESS;
@@ -3224,7 +3224,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, struct obj_dat
 
 /* PROTECTION FROM EVIL */
 
-int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   assert(victim);
@@ -3264,7 +3264,7 @@ int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, 
 
 /* PROTECTION FROM GOOD */
 
-int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   assert(victim);
@@ -3297,7 +3297,7 @@ int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, 
 
 /* REMOVE CURSE */
 
-int spell_remove_curse(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int j;
   assert(ch && (victim || obj));
@@ -3404,7 +3404,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, struct o
 
 /* REMOVE POISON */
 
-int spell_remove_poison(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_remove_poison(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   assert(ch && (victim || obj));
 
@@ -3484,7 +3484,7 @@ bool find_spell_shield(Character *ch, Character *victim)
 
 /* FIRESHIELD */
 
-int spell_fireshield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_fireshield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -3508,7 +3508,7 @@ int spell_fireshield(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* MEND GOLEM */
 
-int spell_mend_golem(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int heal;
   char dammsg[30];
@@ -3541,7 +3541,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, struct obj
 /* CAMOUFLAGE (for items) */
 
 int cast_camouflague(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3579,7 +3579,7 @@ int cast_camouflague(uint8_t level, Character *ch, char *arg, int type,
 /* FARSIGHT (for items) */
 
 int cast_farsight(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3617,7 +3617,7 @@ int cast_farsight(uint8_t level, Character *ch, char *arg, int type,
 /* FREEFLOAT (for items) */
 
 int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3656,7 +3656,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
 /* INSOMNIA (for items) */
 
 int cast_insomnia(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3693,7 +3693,7 @@ int cast_insomnia(uint8_t level, Character *ch, char *arg, int type,
 /* SHADOWSLIP (for items) */
 
 int cast_shadowslip(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3731,7 +3731,7 @@ int cast_shadowslip(uint8_t level, Character *ch, char *arg, int type,
 /* SANCTUARY (for items) */
 
 int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -3817,7 +3817,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
 /* CAMOUFLAGE */
 
 // TODO - make this have effects based on skill
-int spell_camouflague(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   if (affected_by_spell(victim, SPELL_CAMOUFLAGE))
@@ -3841,7 +3841,7 @@ int spell_camouflague(uint8_t level, Character *ch, Character *victim, struct ob
 /* FARSIGHT */
 
 // TODO - make this gain effects based on skill
-int spell_farsight(uint8_t level, Character *ch, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
   if (affected_by_spell(victim, SPELL_FARSIGHT))
@@ -3864,7 +3864,7 @@ int spell_farsight(uint8_t level, Character *ch, Character *victim, struct obj_d
 /* FREEFLOAT */
 
 // TODO - make this gain effects based on skill
-int spell_freefloat(uint8_t level, Character *ch, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_freefloat(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
   if (affected_by_spell(victim, SPELL_FREEFLOAT))
@@ -3887,7 +3887,7 @@ int spell_freefloat(uint8_t level, Character *ch, Character *victim, struct obj_
 /* INSOMNIA */
 
 // TODO - make this use skill
-int spell_insomnia(uint8_t level, Character *ch, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
 
@@ -3911,7 +3911,7 @@ int spell_insomnia(uint8_t level, Character *ch, Character *victim, struct obj_d
 /* SHADOWSLIP */
 
 // TODO - make this use skill
-int spell_shadowslip(uint8_t level, Character *ch, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_shadowslip(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
   if (affected_by_spell(victim, SPELL_SHADOWSLIP))
@@ -3933,7 +3933,7 @@ int spell_shadowslip(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* SANCTUARY */
 
-int spell_sanctuary(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_sanctuary(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -3964,7 +3964,7 @@ int spell_sanctuary(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* SLEEP */
 
-int spell_sleep(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   char buf[100];
@@ -4076,7 +4076,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, struct obj_data
 
 /* STRENGTH */
 
-int spell_strength(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_strength(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   struct affected_type *cur_af;
@@ -4132,7 +4132,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* VENTRILOQUATE */
 
-int spell_ventriloquate(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_ventriloquate(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   /* Actual spell resides in cast_ventriloquate */
   return eSUCCESS;
@@ -4140,7 +4140,7 @@ int spell_ventriloquate(uint8_t level, Character *ch, Character *victim, struct 
 
 /* WORD OF RECALL */
 
-int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int location;
   char buf[200];
@@ -4295,7 +4295,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, struct
 
 /* WIZARD EYE */
 
-int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int target;
   int original_loc;
@@ -4342,7 +4342,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* EAGLE EYE */
 
-int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int target;
   int original_loc;
@@ -4391,7 +4391,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* SUMMON */
 
-int spell_summon(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   unsigned target;
   int retval;
@@ -4494,10 +4494,10 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, struct obj_dat
 
 /* CHARM PERSON - no longer operational */
 
-int spell_charm_person(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  struct obj_data *tempobj;
+  class Object *tempobj;
 
   void add_follower(Character * ch, Character * leader, int cmd);
   void stop_follower(Character * ch, int cmd);
@@ -4580,7 +4580,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, struct o
 
 /* SENSE LIFE */
 
-int spell_sense_life(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_sense_life(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   assert(victim);
@@ -4599,7 +4599,7 @@ int spell_sense_life(uint8_t level, Character *ch, Character *victim, struct obj
   return eSUCCESS;
 }
 
-void show_obj_class_size_mini(obj_data *obj, Character *ch)
+void show_obj_class_size_mini(Object *obj, Character *ch)
 {
   for (int i = 12; i < 23; i++)
     if (IS_SET(obj->obj_flags.extra_flags, 1 << i))
@@ -4609,7 +4609,7 @@ void show_obj_class_size_mini(obj_data *obj, Character *ch)
 /* IDENFITY */
 
 // TODO - make this use skill to affect amount of information provided
-int spell_identify(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_identify(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   char buf[MAX_STRING_LENGTH], buf2[256];
   int i;
@@ -4632,7 +4632,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, struct obj_d
       }
       send_to_char("You probe the contents of the corpse magically....\r\n", ch);
       // it's a corpse
-      struct obj_data *iobj;
+      class Object *iobj;
       for (iobj = obj->contains; iobj; iobj = iobj->next_content)
       {
         if (!CAN_SEE_OBJ(ch, iobj))
@@ -4836,12 +4836,12 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, struct obj_d
  *                      NPC Spells (Breath Weapons)                          *
  * ************************************************************************* */
 
-int spell_frost_breath(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_frost_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int hpch;
   int retval;
-  /*struct obj_data *frozen;*/
+  /*class Object *frozen;*/
 
   set_cantquit(ch, victim);
 
@@ -4886,7 +4886,7 @@ int spell_frost_breath(uint8_t level, Character *ch, Character *victim, struct o
   return eSUCCESS;
 }
 
-int spell_acid_breath(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int hpch;
@@ -4937,7 +4937,7 @@ int spell_acid_breath(uint8_t level, Character *ch, Character *victim, struct ob
   return eSUCCESS;
 }
 
-int spell_fire_breath(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int retval;
@@ -4977,7 +4977,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, struct ob
   return eSUCCESS;
 }
 
-int spell_gas_breath(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int retval;
@@ -5012,7 +5012,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, struct obj
   return eSUCCESS;
 }
 
-int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int hpch;
@@ -5037,7 +5037,7 @@ int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, stru
 
 // TODO - make this use skill
 int spell_fear(uint8_t level, Character *ch, Character *victim,
-               struct obj_data *obj, int skill)
+               class Object *obj, int skill)
 {
   if (!victim || !ch)
     return eFAILURE;
@@ -5142,7 +5142,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
 
 /* REFRESH */
 
-int spell_refresh(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_refresh(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   if (!ch || !victim)
@@ -5172,7 +5172,7 @@ int spell_refresh(uint8_t level, Character *ch, Character *victim, struct obj_da
 
 /* FLY */
 
-int spell_fly(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_fly(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   struct affected_type *cur_af;
@@ -5206,9 +5206,9 @@ int spell_fly(uint8_t level, Character *ch, Character *victim, struct obj_data *
 /* CONTINUAL LIGHT */
 // TODO - make this use skill for multiple effects
 
-int spell_cont_light(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct obj_data *tmp_obj;
+  class Object *tmp_obj;
 
   if (!ch)
   {
@@ -5251,10 +5251,10 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, struct obj
 /* ANIMATE DEAD */
 // TODO - make skill level have an affect on this
 
-int spell_animate_dead(uint8_t level, Character *ch, Character *victim, struct obj_data *corpse, int skill)
+int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Object *corpse, int skill)
 {
   Character *mob;
-  struct obj_data *obj_object, *next_obj;
+  class Object *obj_object, *next_obj;
   struct affected_type af;
   int number, r_num;
 
@@ -5383,7 +5383,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, struct o
 
 /* KNOW ALIGNMENT */
 
-int spell_know_alignment(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_know_alignment(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int duration = 0;
   struct affected_type af, *cur_af;
@@ -5423,7 +5423,7 @@ int spell_know_alignment(uint8_t level, Character *ch, Character *victim, struct
 
 /* DISPEL MINOR */
 
-int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int rots = 0;
   int done = false;
@@ -5718,7 +5718,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, struct o
 
 /* DISPEL MAGIC */
 
-int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill, int spell)
+int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill, int spell)
 {
   int rots = 0;
   int done = false;
@@ -5957,7 +5957,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, struct o
 
 /* CURE SERIOUS */
 
-int spell_cure_serious(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int healpoints;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -6020,7 +6020,7 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, struct o
 
 /* CAUSE LIGHT */
 
-int spell_cause_light(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cause_light(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -6038,7 +6038,7 @@ int spell_cause_light(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* CAUSE CRITICAL */
 
-int spell_cause_critical(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cause_critical(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -6058,7 +6058,7 @@ int spell_cause_critical(uint8_t level, Character *ch, Character *victim, struct
 
 /* CAUSE SERIOUS */
 
-int spell_cause_serious(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_cause_serious(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   if (!ch || !victim)
@@ -6076,7 +6076,7 @@ int spell_cause_serious(uint8_t level, Character *ch, Character *victim, struct 
 
 /* FLAMESTRIKE */
 
-int spell_flamestrike(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam, retval;
   int weap_spell = obj ? WIELD : 0;
@@ -6118,7 +6118,7 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, struct ob
 }
 
 /* IRIDESCENT AURA */
-int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6142,7 +6142,7 @@ int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, struc
 
 /* RESIST COLD */
 
-int spell_resist_cold(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_resist_cold(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
@@ -6171,7 +6171,7 @@ int spell_resist_cold(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* RESIST FIRE */
 
-int spell_resist_fire(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_resist_fire(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6200,7 +6200,7 @@ int spell_resist_fire(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* RESIST MAGIC */
 
-int spell_resist_magic(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_resist_magic(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6229,7 +6229,7 @@ int spell_resist_magic(uint8_t level, Character *ch, Character *victim, struct o
 
 /* STAUNCHBLOOD */
 
-int spell_staunchblood(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_staunchblood(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6257,7 +6257,7 @@ int spell_staunchblood(uint8_t level, Character *ch, Character *victim, struct o
 
 /* RESIST ENERGY */
 
-int spell_resist_energy(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_resist_energy(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6285,7 +6285,7 @@ int spell_resist_energy(uint8_t level, Character *ch, Character *victim, struct 
 
 /* STONE SKIN */
 
-int spell_stone_skin(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6317,7 +6317,7 @@ int spell_stone_skin(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* SHIELD */
 
-int spell_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -6353,7 +6353,7 @@ int spell_shield(uint8_t level, Character *ch, Character *victim, struct obj_dat
 
 /* WEAKEN */
 
-int spell_weaken(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   struct affected_type *cur_af;
@@ -6478,7 +6478,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, struct obj_dat
 /* MASS INVISIBILITY */
 
 // TODO - make this use skill
-int spell_mass_invis(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   Character *tmp_victim;
   struct affected_type af;
@@ -6513,7 +6513,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* ACID BLAST */
 
-int spell_acid_blast(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_acid_blast(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int weap_spell = obj ? WIELD : 0;
@@ -6524,7 +6524,7 @@ int spell_acid_blast(uint8_t level, Character *ch, Character *victim, struct obj
 
 /* HELLSTREAM */
 
-int spell_hellstream(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_hellstream(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
 
@@ -6540,15 +6540,15 @@ int spell_hellstream(uint8_t level, Character *ch, Character *victim, struct obj
 
 void make_portal(Character *ch, Character *vict)
 {
-  struct obj_data *ch_portal, *vict_portal;
-  extern struct obj_data *object_list;
+  class Object *ch_portal, *vict_portal;
+  extern class Object *object_list;
   extern int top_of_world;
   char buf[250];
   int chance, destination;
   bool good_destination = false;
 
-  ch_portal = new obj_data;
-  vict_portal = new obj_data;
+  ch_portal = new Object;
+  vict_portal = new Object;
 
   clear_object(ch_portal);
   clear_object(vict_portal);
@@ -6637,9 +6637,9 @@ void make_portal(Character *ch, Character *vict)
 /* PORTAL (Actual spell) */
 // TODO - make this use skill
 
-int spell_portal(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  struct obj_data *portal = 0;
+  class Object *portal = 0;
 
   if (IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
       IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
@@ -6702,7 +6702,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, struct obj_dat
 
   for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
-      portal = (obj_data *)1; // Makes the below produce an error. And yeah, I'm lazy. Go away.
+      portal = (Object *)1; // Makes the below produce an error. And yeah, I'm lazy. Go away.
 
   if (portal || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
   {
@@ -6719,7 +6719,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, struct obj_dat
 /* BURNING HANDS (scroll, wand) */
 
 int cast_burning_hands(uint8_t level, Character *ch, char *arg, int type,
-                       Character *victim, struct obj_data *tar_obj, int skill)
+                       Character *victim, class Object *tar_obj, int skill)
 {
   int retval;
   char arg1[MAX_STRING_LENGTH];
@@ -6759,7 +6759,7 @@ int cast_burning_hands(uint8_t level, Character *ch, char *arg, int type,
 /* CALL LIGHTNING (potion, scroll, staff) */
 
 int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
-                        Character *victim, struct obj_data *tar_obj, int skill)
+                        Character *victim, class Object *tar_obj, int skill)
 {
   extern struct weather_data weather_info;
   int retval;
@@ -6813,7 +6813,7 @@ int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
 /* CHILL TOUCH (scroll, wand) */
 
 int cast_chill_touch(uint8_t level, Character *ch, char *arg, int type,
-                     Character *victim, struct obj_data *tar_obj, int skill)
+                     Character *victim, class Object *tar_obj, int skill)
 {
 
   switch (type)
@@ -6841,7 +6841,7 @@ int cast_chill_touch(uint8_t level, Character *ch, char *arg, int type,
 /* SHOCKING GRASP (scroll, wand) */
 
 int cast_shocking_grasp(uint8_t level, Character *ch, char *arg, int type,
-                        Character *victim, struct obj_data *tar_obj, int skill)
+                        Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6868,7 +6868,7 @@ int cast_shocking_grasp(uint8_t level, Character *ch, char *arg, int type,
 /* COLOUR SPRAY (scroll, wand) */
 
 int cast_colour_spray(uint8_t level, Character *ch, char *arg, int type,
-                      Character *victim, struct obj_data *tar_obj, int skill)
+                      Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6895,7 +6895,7 @@ int cast_colour_spray(uint8_t level, Character *ch, char *arg, int type,
 /* DROWN (scroll, potion, wand) */
 
 int cast_drown(uint8_t level, Character *ch, char *arg, int type,
-               Character *victim, struct obj_data *tar_obj, int skill)
+               Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6924,7 +6924,7 @@ int cast_drown(uint8_t level, Character *ch, char *arg, int type,
 /* EARTHQUAKE (scroll, staff) */
 
 int cast_earthquake(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6943,7 +6943,7 @@ int cast_earthquake(uint8_t level, Character *ch, char *arg, int type,
 /* LIFE LEECH (scroll, staff) */
 
 int cast_life_leech(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6962,7 +6962,7 @@ int cast_life_leech(uint8_t level, Character *ch, char *arg, int type,
 /* HEROES FEAST (staff, scroll, potion, wand) */
 
 int cast_heroes_feast(uint8_t level, Character *ch, char *arg, int type,
-                      Character *victim, struct obj_data *tar_obj, int skill)
+                      Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -6983,7 +6983,7 @@ int cast_heroes_feast(uint8_t level, Character *ch, char *arg, int type,
 /* HEAL SPRAY (scroll, staff) */
 
 int cast_heal_spray(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7002,7 +7002,7 @@ int cast_heal_spray(uint8_t level, Character *ch, char *arg, int type,
 /* GROUP SANCTUARY (scroll, staff) */
 
 int cast_group_sanc(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7021,7 +7021,7 @@ int cast_group_sanc(uint8_t level, Character *ch, char *arg, int type,
 /* GROUP RECALL (scroll, staff) */
 
 int cast_group_recall(uint8_t level, Character *ch, char *arg, int type,
-                      Character *victim, struct obj_data *tar_obj, int skill)
+                      Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7040,7 +7040,7 @@ int cast_group_recall(uint8_t level, Character *ch, char *arg, int type,
 /* GROUP FLY (scroll, staff) */
 
 int cast_group_fly(uint8_t level, Character *ch, char *arg, int type,
-                   Character *victim, struct obj_data *tar_obj, int skill)
+                   Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7059,7 +7059,7 @@ int cast_group_fly(uint8_t level, Character *ch, char *arg, int type,
 /* FIRESTORM (scroll, staff) */
 
 int cast_firestorm(uint8_t level, Character *ch, char *arg, int type,
-                   Character *victim, struct obj_data *tar_obj, int skill)
+                   Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7078,7 +7078,7 @@ int cast_firestorm(uint8_t level, Character *ch, char *arg, int type,
 /* SOLAR GATE (scroll, staff) */
 
 int cast_solar_gate(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7097,7 +7097,7 @@ int cast_solar_gate(uint8_t level, Character *ch, char *arg, int type,
 /* ENERGY DRAIN (potion, scroll, wand, staff) */
 
 int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
-                      Character *victim, struct obj_data *tar_obj, int skill)
+                      Character *victim, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -7144,7 +7144,7 @@ int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
 /* SOULDRAIN (potion, scroll, wand, staff) */
 
 int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
-                   Character *victim, struct obj_data *tar_obj, int skill)
+                   Character *victim, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -7191,7 +7191,7 @@ int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
 /* VAMPIRIC TOUCH (scroll, wand) */
 
 int cast_vampiric_touch(uint8_t level, Character *ch, char *arg, int type,
-                        Character *victim, struct obj_data *tar_obj, int skill)
+                        Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7218,7 +7218,7 @@ int cast_vampiric_touch(uint8_t level, Character *ch, char *arg, int type,
 /* METEOR SWARM (scroll, wand) */
 
 int cast_meteor_swarm(uint8_t level, Character *ch, char *arg, int type,
-                      Character *victim, struct obj_data *tar_obj, int skill)
+                      Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7245,7 +7245,7 @@ int cast_meteor_swarm(uint8_t level, Character *ch, char *arg, int type,
 /* FIREBALL (scroll, wand) */
 
 int cast_fireball(uint8_t level, Character *ch, char *arg, int type,
-                  Character *victim, struct obj_data *tar_obj, int skill)
+                  Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7272,7 +7272,7 @@ int cast_fireball(uint8_t level, Character *ch, char *arg, int type,
 /* SPARKS (scroll, wand) */
 
 int cast_sparks(uint8_t level, Character *ch, char *arg, int type,
-                Character *victim, struct obj_data *tar_obj, int skill)
+                Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7299,7 +7299,7 @@ int cast_sparks(uint8_t level, Character *ch, char *arg, int type,
 /* HOWL (scroll, wand) */
 
 int cast_howl(uint8_t level, Character *ch, char *arg, int type,
-              Character *victim, struct obj_data *tar_obj, int skill)
+              Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7326,7 +7326,7 @@ int cast_howl(uint8_t level, Character *ch, char *arg, int type,
 /* HARM (potion, staff, scroll) */
 
 int cast_harm(uint8_t level, Character *ch, char *arg, int type,
-              Character *victim, struct obj_data *tar_obj, int skill)
+              Character *victim, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -7369,7 +7369,7 @@ int cast_harm(uint8_t level, Character *ch, char *arg, int type,
 /* POWER HARM (potion, wand, staff) */
 
 int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
-                    Character *victim, struct obj_data *tar_obj, int skill)
+                    Character *victim, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -7417,7 +7417,7 @@ int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
 /* DIVINE FURY (potion, staff) */
 
 int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
-                     Character *victim, struct obj_data *tar_obj, int skill)
+                     Character *victim, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -7454,7 +7454,7 @@ int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
 /* LIGHTNING BOLT (scroll, wand) */
 
 int cast_lightning_bolt(uint8_t level, Character *ch, char *arg, int type,
-                        Character *victim, struct obj_data *tar_obj, int skill)
+                        Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7481,7 +7481,7 @@ int cast_lightning_bolt(uint8_t level, Character *ch, char *arg, int type,
 /* MAGIC MISSILE (scroll, wand) */
 
 int cast_magic_missile(uint8_t level, Character *ch, char *arg, int type,
-                       Character *victim, struct obj_data *tar_obj, int skill)
+                       Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7508,7 +7508,7 @@ int cast_magic_missile(uint8_t level, Character *ch, char *arg, int type,
 /* ARMOR (potion, scroll, wand) */
 
 int cast_armor(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7592,7 +7592,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
 /* HOLY AEGIS/UNHOLY AEGIS (potion, scroll, wand) */
 
 int cast_aegis(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -7625,7 +7625,7 @@ int cast_aegis(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int targetted_teleport(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int targetted_teleport(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (player_resist_reallocation(victim, skill))
   {
@@ -7641,7 +7641,7 @@ int targetted_teleport(uint8_t level, Character *ch, Character *victim, struct o
 /* TELEPORT (potion, scroll, wand, staff) */
 
 int cast_teleport(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
 
@@ -7681,7 +7681,7 @@ int cast_teleport(uint8_t level, Character *ch, char *arg, int type,
 /* BLESS (potion, scroll, wand) */
 
 int cast_bless(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
 
   switch (type)
@@ -7813,7 +7813,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
 /* PARALYZE (potion, scroll, wand, staff) */
 
 int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
 
@@ -7877,7 +7877,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
 /* BLINDNESS (potion, scroll, wand, staff) */
 
 int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -7945,7 +7945,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
 /* CONTROL WEATHER */
 
 int cast_control_weather(uint8_t level, Character *ch, char *arg, int type,
-                         Character *tar_ch, struct obj_data *tar_obj, int skill)
+                         Character *tar_ch, class Object *tar_obj, int skill)
 {
   char buffer[MAX_STRING_LENGTH];
   extern struct weather_data weather_info;
@@ -7985,7 +7985,7 @@ int cast_control_weather(uint8_t level, Character *ch, char *arg, int type,
 /* CREATE FOOD (wand, staff, scroll) */
 
 int cast_create_food(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
 
   switch (type)
@@ -8016,7 +8016,7 @@ int cast_create_food(uint8_t level, Character *ch, char *arg, int type,
 /* CREATE WATER (wand, scroll) */
 
 int cast_create_water(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8051,7 +8051,7 @@ int cast_create_water(uint8_t level, Character *ch, char *arg, int type,
 /* REMOVE PARALYSIS (potion, wand, scroll, staff) */
 
 int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
-                          Character *tar_ch, struct obj_data *tar_obj, int skill)
+                          Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
 
@@ -8093,7 +8093,7 @@ int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
 /* REMOVE BLIND (potion, scroll, staff) */
 
 int cast_remove_blind(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8126,7 +8126,7 @@ int cast_remove_blind(uint8_t level, Character *ch, char *arg, int type,
 /* EDITING ENDS HERE */
 
 int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8196,7 +8196,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8270,7 +8270,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_curse(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
 
@@ -8330,7 +8330,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_detect_evil(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8361,7 +8361,7 @@ int cast_detect_evil(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_true_sight(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8395,7 +8395,7 @@ int cast_true_sight(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_detect_good(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8426,7 +8426,7 @@ int cast_detect_good(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
-                             Character *tar_ch, struct obj_data *tar_obj, int skill)
+                             Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8499,7 +8499,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8569,7 +8569,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_haste(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8608,7 +8608,7 @@ int cast_haste(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8674,11 +8674,11 @@ int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
-  obj_data *next_o;
+  Object *next_o;
 
   switch (type)
   {
@@ -8731,11 +8731,11 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
-  obj_data *next_o;
+  Object *next_o;
 
   switch (type)
   {
@@ -8787,7 +8787,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_enchant_armor(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8808,7 +8808,7 @@ int cast_enchant_armor(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_enchant_weapon(uint8_t level, Character *ch, char *arg, int type,
-                        Character *tar_ch, struct obj_data *tar_obj, int skill)
+                        Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8829,7 +8829,7 @@ int cast_enchant_weapon(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_mana(uint8_t level, Character *ch, char *arg, int type,
-              Character *tar_ch, struct obj_data *tar_obj, int skill)
+              Character *tar_ch, class Object *tar_obj, int skill)
 {
 
   switch (type)
@@ -8859,7 +8859,7 @@ int cast_mana(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_heal(uint8_t level, Character *ch, char *arg, int type,
-              Character *tar_ch, struct obj_data *tar_obj, int skill)
+              Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8894,7 +8894,7 @@ int cast_heal(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_power_heal(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8929,7 +8929,7 @@ int cast_power_heal(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_full_heal(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -8957,7 +8957,7 @@ int cast_full_heal(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9015,7 +9015,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_locate_object(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9035,7 +9035,7 @@ int cast_locate_object(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_poison(uint8_t level, Character *ch, char *arg, int type,
-                Character *tar_ch, struct obj_data *tar_obj, int skill)
+                Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -9080,7 +9080,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
-                              Character *tar_ch, struct obj_data *tar_obj, int skill)
+                              Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9169,7 +9169,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
-                              Character *tar_ch, struct obj_data *tar_obj, int skill)
+                              Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9257,7 +9257,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9299,7 +9299,7 @@ int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9359,7 +9359,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_fireshield(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9391,7 +9391,7 @@ int cast_fireshield(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
-               Character *tar_ch, struct obj_data *tar_obj, int skill)
+               Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -9443,7 +9443,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_strength(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9475,7 +9475,7 @@ int cast_strength(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *tmp_ch;
   char buf1[MAX_STRING_LENGTH];
@@ -9525,7 +9525,7 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
   return eSUCCESS;
 }
 
-int targetted_word_of_recall(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int targetted_word_of_recall(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (player_resist_reallocation(victim, skill))
   {
@@ -9540,7 +9540,7 @@ int targetted_word_of_recall(uint8_t level, Character *ch, Character *victim, st
 
 /* WORD OF RECALL (spell, potion, wand, staff, scroll)*/
 int cast_word_of_recall(uint8_t level, Character *ch, char *arg, int type,
-                        Character *tar_ch, struct obj_data *tar_obj, int skill)
+                        Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *tar_ch_next;
 
@@ -9576,7 +9576,7 @@ int cast_word_of_recall(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_wizard_eye(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9591,7 +9591,7 @@ int cast_wizard_eye(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_eagle_eye(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9607,7 +9607,7 @@ int cast_eagle_eye(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_summon(uint8_t level, Character *ch, char *arg, int type,
-                Character *tar_ch, struct obj_data *tar_obj, int skill)
+                Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9622,7 +9622,7 @@ int cast_summon(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -9660,7 +9660,7 @@ int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_sense_life(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9690,7 +9690,7 @@ int cast_sense_life(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_identify(uint8_t level, Character *ch, char *arg, int type,
-                  Character *tar_ch, struct obj_data *tar_obj, int skill)
+                  Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9708,7 +9708,7 @@ int cast_identify(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_frost_breath(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9723,7 +9723,7 @@ int cast_frost_breath(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_acid_breath(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9738,7 +9738,7 @@ int cast_acid_breath(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_fire_breath(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9754,7 +9754,7 @@ int cast_fire_breath(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_gas_breath(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9770,7 +9770,7 @@ int cast_gas_breath(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_lightning_breath(uint8_t level, Character *ch, char *arg, int type,
-                          Character *tar_ch, struct obj_data *tar_obj, int skill)
+                          Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9785,7 +9785,7 @@ int cast_lightning_breath(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_fear(uint8_t level, Character *ch, char *arg, int type,
-              Character *tar_ch, struct obj_data *tar_obj, int skill)
+              Character *tar_ch, class Object *tar_obj, int skill)
 {
   int retval;
   Character *next_v;
@@ -9835,7 +9835,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
-                 Character *tar_ch, struct obj_data *tar_obj, int skill)
+                 Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9912,7 +9912,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_fly(uint8_t level, Character *ch, char *arg, int type,
-             Character *tar_ch, struct obj_data *tar_obj, int skill)
+             Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -9989,7 +9989,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_cont_light(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10007,7 +10007,7 @@ int cast_cont_light(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_know_alignment(uint8_t level, Character *ch, char *arg, int type,
-                        Character *tar_ch, struct obj_data *tar_obj, int skill)
+                        Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10049,7 +10049,7 @@ char *dispel_magic_spells[] =
         "frost_shield", "lightning_shield", "fire_shield", "acid_shield", "protection_from_good", "\n"};
 
 int cast_dispel_magic(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   int spell = 0;
   char buffer[MAX_INPUT_LENGTH];
@@ -10113,7 +10113,7 @@ char *dispel_minor_spells[] =
 };
 
 int cast_dispel_minor(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   int spell = 0;
   char buffer[MAX_INPUT_LENGTH];
@@ -10366,13 +10366,13 @@ bool elemental_score(Character *ch, int level)
 
 int cast_conjure_elemental(uint8_t level, Character *ch,
                            char *arg, int type,
-                           Character *tar_ch, struct obj_data *tar_obj, int skill)
+                           Character *tar_ch, class Object *tar_obj, int skill)
 {
   return spell_conjure_elemental(level, ch, arg, 0, tar_obj, skill);
 }
 
 int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10448,7 +10448,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -10499,7 +10499,7 @@ int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
 
 int cast_cause_critical(uint8_t level, Character *ch, char *arg,
                         int type, Character *tar_ch,
-                        struct obj_data *tar_obj, int skill)
+                        class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -10549,7 +10549,7 @@ int cast_cause_critical(uint8_t level, Character *ch, char *arg,
 
 int cast_cause_serious(uint8_t level, Character *ch, char *arg,
                        int type, Character *tar_ch,
-                       struct obj_data *tar_obj, int skill)
+                       class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -10599,7 +10599,7 @@ int cast_cause_serious(uint8_t level, Character *ch, char *arg,
 
 int cast_flamestrike(uint8_t level, Character *ch, char *arg,
                      int type, Character *tar_ch,
-                     struct obj_data *tar_obj, int skill)
+                     class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -10646,7 +10646,7 @@ int cast_flamestrike(uint8_t level, Character *ch, char *arg,
 
 int cast_resist_cold(uint8_t level, Character *ch, char *arg,
                      int type, Character *tar_ch,
-                     struct obj_data *tar_obj, int skill)
+                     class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10671,7 +10671,7 @@ int cast_resist_cold(uint8_t level, Character *ch, char *arg,
   return eFAILURE;
 }
 int cast_staunchblood(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10699,7 +10699,7 @@ int cast_staunchblood(uint8_t level, Character *ch, char *arg, int type,
 }
 
 int cast_resist_energy(uint8_t level, Character *ch, char *arg, int type,
-                       Character *tar_ch, struct obj_data *tar_obj, int skill)
+                       Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10726,7 +10726,7 @@ int cast_resist_energy(uint8_t level, Character *ch, char *arg, int type,
 
 int cast_resist_fire(uint8_t level, Character *ch, char *arg,
                      int type, Character *tar_ch,
-                     struct obj_data *tar_obj, int skill)
+                     class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10753,7 +10753,7 @@ int cast_resist_fire(uint8_t level, Character *ch, char *arg,
 
 int cast_resist_magic(uint8_t level, Character *ch, char *arg,
                       int type, Character *tar_ch,
-                      struct obj_data *tar_obj, int skill)
+                      class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10819,7 +10819,7 @@ int cast_resist_magic(uint8_t level, Character *ch, char *arg,
 
 int cast_stone_skin(uint8_t level, Character *ch, char *arg,
                     int type, Character *tar_ch,
-                    struct obj_data *tar_obj, int skill)
+                    class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10846,7 +10846,7 @@ int cast_stone_skin(uint8_t level, Character *ch, char *arg,
 
 int cast_shield(uint8_t level, Character *ch, char *arg,
                 int type, Character *tar_ch,
-                struct obj_data *tar_obj, int skill)
+                class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10884,7 +10884,7 @@ int cast_shield(uint8_t level, Character *ch, char *arg,
 
 int cast_weaken(uint8_t level, Character *ch, char *arg,
                 int type, Character *tar_ch,
-                struct obj_data *tar_obj, int skill)
+                class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -10944,7 +10944,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
 
 int cast_mass_invis(uint8_t level, Character *ch, char *arg,
                     int type, Character *tar_ch,
-                    struct obj_data *tar_obj, int skill)
+                    class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -10968,7 +10968,7 @@ int cast_mass_invis(uint8_t level, Character *ch, char *arg,
 
 int cast_acid_blast(uint8_t level, Character *ch, char *arg,
                     int type, Character *tar_ch,
-                    struct obj_data *tar_obj, int skill)
+                    class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -11023,7 +11023,7 @@ int cast_acid_blast(uint8_t level, Character *ch, char *arg,
 
 int cast_hellstream(uint8_t level, Character *ch, char *arg,
                     int type, Character *tar_ch,
-                    struct obj_data *tar_obj, int skill)
+                    class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -11072,7 +11072,7 @@ int cast_hellstream(uint8_t level, Character *ch, char *arg,
 
 int cast_portal(uint8_t level, Character *ch, char *arg,
                 int type, Character *tar_ch,
-                struct obj_data *tar_obj, int skill)
+                class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11102,7 +11102,7 @@ int cast_portal(uint8_t level, Character *ch, char *arg,
 
 int cast_infravision(uint8_t level, Character *ch, char *arg,
                      int type, Character *tar_ch,
-                     struct obj_data *tar_obj, int skill)
+                     class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11140,7 +11140,7 @@ int cast_infravision(uint8_t level, Character *ch, char *arg,
 }
 
 int cast_animate_dead(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11162,7 +11162,7 @@ int cast_animate_dead(uint8_t level, Character *ch, char *arg, int type,
 
 /* BEE STING */
 
-int spell_bee_sting(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int retval;
@@ -11200,7 +11200,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, struct obj_
 }
 
 int cast_bee_sting(uint8_t level, Character *ch, char *arg, int type,
-                   Character *victim, struct obj_data *tar_obj, int skill)
+                   Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11229,7 +11229,7 @@ int cast_bee_sting(uint8_t level, Character *ch, char *arg, int type,
 
 /* BEE SWARM */
 int cast_bee_swarm(uint8_t level, Character *ch, char *arg, int type,
-                   Character *victim, struct obj_data *tar_obj, int skill)
+                   Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11258,7 +11258,7 @@ int cast_bee_swarm(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int retval;
@@ -11311,7 +11311,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* CREEPING DEATH */
 
-int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   int dam;
   int retval;
@@ -11422,7 +11422,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
 
 /* BARKSKIN */
 int cast_barkskin(uint8_t level, Character *ch, char *arg, int type,
-                  Character *victim, struct obj_data *tar_obj, int skill)
+                  Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11451,7 +11451,7 @@ int cast_barkskin(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_barkskin(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_barkskin(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -11478,7 +11478,7 @@ int spell_barkskin(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* HERB LORE */
 
-int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   int healamount;
   char buf[MAX_STRING_LENGTH * 2], dammsg[MAX_STRING_LENGTH];
@@ -11542,7 +11542,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
   one_argument(arg, arg1);
   if (arg1[0])
   {
-    obj_data *obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
+    Object *obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
     if (!obj)
     {
       send_to_char("You don't seem to be carrying any such root.\r\n", ch);
@@ -11714,7 +11714,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
 
 /* CALL FOLLOWER */
 
-int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
   {
@@ -11762,7 +11762,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
 
 /* ENTANGLE */
 int cast_entangle(uint8_t level, Character *ch, char *arg, int type,
-                  Character *victim, struct obj_data *tar_obj, int skill)
+                  Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11785,7 +11785,7 @@ int cast_entangle(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_entangle(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_entangle(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
 
   if (!OUTSIDE(ch))
@@ -11819,7 +11819,7 @@ int spell_entangle(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* EYES OF THE OWL */
 int cast_eyes_of_the_owl(uint8_t level, Character *ch, char *arg, int type,
-                         Character *victim, struct obj_data *tar_obj, int skill)
+                         Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11849,7 +11849,7 @@ int cast_eyes_of_the_owl(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -11875,7 +11875,7 @@ int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, struc
 
 /* FELINE AGILITY */
 int cast_feline_agility(uint8_t level, Character *ch, char *arg, int type,
-                        Character *victim, struct obj_data *tar_obj, int skill)
+                        Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11903,7 +11903,7 @@ int cast_feline_agility(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_feline_agility(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_feline_agility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -11934,7 +11934,7 @@ int spell_feline_agility(uint8_t level, Character *ch, Character *victim, struct
 
 /* OAKEN FORTITUDE */
 int cast_oaken_fortitude(uint8_t level, Character *ch, char *arg, int type,
-                         Character *victim, struct obj_data *tar_obj, int skill)
+                         Character *victim, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -11963,7 +11963,7 @@ int cast_oaken_fortitude(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 { // Feline agility rip
   struct affected_type af;
 
@@ -11994,7 +11994,7 @@ int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, struc
 
 /* CLARITY */
 
-int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 { // Feline agility rip
   struct affected_type af;
 
@@ -12021,7 +12021,7 @@ int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *v
 
 /* FOREST MELD */
 
-int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   if (!(world[ch->in_room].sector_type == SECT_FOREST || world[ch->in_room].sector_type == SECT_SWAMP))
   {
@@ -12058,7 +12058,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
 
 /* COMPANION (disabled) */
 
-int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   Character *mob;
   struct affected_type af;
@@ -12163,7 +12163,7 @@ int check_components(Character *ch, int destroy, int item_one = 0,
   // We're going to assume you never have more than 4 items
   // for a spell, though you can easily change to take more
   int all_ok = 0;
-  obj_data *ptr_one, *ptr_two, *ptr_three, *ptr_four;
+  Object *ptr_one, *ptr_two, *ptr_three, *ptr_four;
 
   ptr_one = ptr_two = ptr_three = ptr_four = nullptr;
 
@@ -12241,7 +12241,7 @@ int check_components(Character *ch, int destroy, int item_one = 0,
 
 /* CREATE GOLEM */
 
-int spell_create_golem(int level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_create_golem(int level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   char buf[200];
   Character *mob;
@@ -12418,7 +12418,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, struct obj_d
 
 /*
 int cast_create_golem( uint8_t level, Character *ch, char *arg, int type,
-  Character *tar_ch, struct obj_data *tar_obj, int skill )
+  Character *tar_ch, class Object *tar_obj, int skill )
 {
   switch (type) {
     case SPELL_TYPE_SPELL:
@@ -12432,7 +12432,7 @@ int cast_create_golem( uint8_t level, Character *ch, char *arg, int type,
 }*/
 
 /*
-int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data * tar_obj, int skill)
+int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object * tar_obj, int skill)
 {
    // Character *tmp_vict;
    struct follow_type * temp;
@@ -12463,7 +12463,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 
 /* BEACON */
 
-int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   //   extern int top_of_world;
   //   int to_room = 0;
@@ -12566,7 +12566,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
 
 int do_beacon(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *new_obj = nullptr;
+  class Object *new_obj = nullptr;
   if (IS_NPC(ch))
     return eFAILURE;
   if (GET_CLASS(ch) != CLASS_ANTI_PAL && GET_LEVEL(ch) < ARCHANGEL)
@@ -12624,7 +12624,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
 
 /* REFLECT (non-castable atm) */
 
-int spell_reflect(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_reflect(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   send_to_char("Tell an immortal what you just did.\r\n", ch);
   return eFAILURE;
@@ -12744,7 +12744,7 @@ void familiar_creation_message(Character *ch, int fam_type)
   }
 }
 
-int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Character *victim, struct obj_data *tar_obj, int skill)
+int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
   Character *mob = nullptr;
   int r_num;
@@ -12794,7 +12794,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
 }
 
 int cast_summon_familiar(uint8_t level, Character *ch, char *arg, int type,
-                         Character *tar_ch, struct obj_data *tar_obj, int skill)
+                         Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -12822,7 +12822,7 @@ int cast_summon_familiar(uint8_t level, Character *ch, char *arg, int type,
 
 /* LIGHTED PATH */
 
-int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   struct room_track_data *ptrack;
   char buf[180];
@@ -12854,7 +12854,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
 }
 
 int cast_lighted_path(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, struct obj_data *tar_obj, int skill)
+                      Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -12889,7 +12889,7 @@ int cast_lighted_path(uint8_t level, Character *ch, char *arg, int type,
 
 /* RESIST ACID */
 
-int spell_resist_acid(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_resist_acid(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch != victim)
@@ -12917,7 +12917,7 @@ int spell_resist_acid(uint8_t level, Character *ch, Character *victim, struct ob
 }
 
 int cast_resist_acid(uint8_t level, Character *ch, char *arg, int type,
-                     Character *tar_ch, struct obj_data *tar_obj, int skill)
+                     Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -12946,7 +12946,7 @@ int cast_resist_acid(uint8_t level, Character *ch, char *arg, int type,
 
 /* SUN RAY */
 
-int spell_sun_ray(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_sun_ray(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   extern struct weather_data weather_info;
@@ -12970,7 +12970,7 @@ int spell_sun_ray(uint8_t level, Character *ch, Character *victim, struct obj_da
 }
 
 int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
-                 Character *victim, struct obj_data *tar_obj, int skill)
+                 Character *victim, class Object *tar_obj, int skill)
 {
   extern struct weather_data weather_info;
   int retval;
@@ -13024,7 +13024,7 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
 
 /* RAPID MEND */
 
-int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int regen = 0, duration = 0;
@@ -13074,7 +13074,7 @@ int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, struct obj
 }
 
 int cast_rapid_mend(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13101,7 +13101,7 @@ int cast_rapid_mend(uint8_t level, Character *ch, char *arg, int type,
 
 /* IRON ROOTS */
 
-int spell_iron_roots(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_iron_roots(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -13132,7 +13132,7 @@ int spell_iron_roots(uint8_t level, Character *ch, Character *victim, struct obj
 /* IRON ROOTS (potion, scroll, staff, wand) */
 
 int cast_iron_roots(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13165,7 +13165,7 @@ int cast_iron_roots(uint8_t level, Character *ch, char *arg, int type,
 
 /* ACID SHIELD */
 
-int spell_acid_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_acid_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -13189,7 +13189,7 @@ int spell_acid_shield(uint8_t level, Character *ch, Character *victim, struct ob
 
 /* ACID SHIELD (potion, scroll, wand, staves) */
 
-int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13228,7 +13228,7 @@ int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Characte
 
 /* WATER BREATHING */
 
-int spell_water_breathing(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_water_breathing(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   struct affected_type *cur_af;
@@ -13251,7 +13251,7 @@ int spell_water_breathing(uint8_t level, Character *ch, Character *victim, struc
 
 /* WATERBREATHING (potions, scrolls, staves, wands) */
 
-int cast_water_breathing(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_water_breathing(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13282,9 +13282,9 @@ int cast_water_breathing(uint8_t level, Character *ch, char *arg, int type, Char
 
 /* GLOBE OF DARKNESS */
 
-int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  obj_data *globe;
+  Object *globe;
   int dur = 0, mod = 0;
 
   if (skill <= 20)
@@ -13345,7 +13345,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, str
 
 /* GLOBE OF DARKNESS (potions, scrolls, staves, wands) */
 
-int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13375,13 +13375,13 @@ int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Ch
 
 /* EYES OF THE EAGLE (disabled) */
 
-int spell_eyes_of_the_eagle(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_eyes_of_the_eagle(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   send_to_char("This spell doesn't do anything right now.\r\n", ch);
   return eSUCCESS;
 }
 
-int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13403,7 +13403,7 @@ int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Ch
 
 /* ICESTORM */
 
-int spell_icestorm(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int retval = eSUCCESS;
@@ -13473,7 +13473,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* ICESTORM (potions, scrolls, wands, staves) */
 
-int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -13516,7 +13516,7 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
 
 /* LIGHTNING SHIELD */
 
-int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -13540,7 +13540,7 @@ int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, stru
 
 /* LIGHTNING SHIELD (potion, scroll, wand, staves) */
 
-int cast_lightning_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_lightning_shield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13571,7 +13571,7 @@ int cast_lightning_shield(uint8_t level, Character *ch, char *arg, int type, Cha
 
 /* BLUE BIRD */
 
-int spell_blue_bird(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   int dam;
   int count;
@@ -13628,7 +13628,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* BLUE BIRD (scrolls, wands, staves) */
 
-int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -13668,7 +13668,7 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
 
 /* DEBILITY */
 
-int spell_debility(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_debility(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int retval = eSUCCESS, duration = 0;
@@ -13751,7 +13751,7 @@ int spell_debility(uint8_t level, Character *ch, Character *victim, struct obj_d
 
 /* DEBILITY (scrolls, wands, staves) */
 
-int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -13795,7 +13795,7 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
 
 /* ATTRITION */
 
-int spell_attrition(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_attrition(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   int retval = eSUCCESS;
@@ -13873,7 +13873,7 @@ int spell_attrition(uint8_t level, Character *ch, Character *victim, struct obj_
 
 /* ATTRITION (scrolls, wands, staves) */
 
-int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   Character *next_v;
   int retval;
@@ -13917,7 +13917,7 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
 
 /* VAMPIRIC AURA */
 
-int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   /*
@@ -13947,7 +13947,7 @@ int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, struct 
 
 /* VAMPIRIC AURA (potion, scroll, wands, staves) */
 
-int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -13982,7 +13982,7 @@ int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Charac
 
 /* HOLY AURA */
 
-int spell_holy_aura(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_holy_aura(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -14012,7 +14012,7 @@ int spell_holy_aura(uint8_t level, Character *ch, Character *victim, struct obj_
   return eSUCCESS;
 }
 
-int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
 
   struct affected_type af;
@@ -14076,7 +14076,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
 
 /* DISMISS FAMILIAR */
 
-int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   victim = nullptr;
 
@@ -14105,7 +14105,7 @@ int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, stru
 
 /* DISMISS FAMILIAR (potions, wands, scrolls, staves) */
 
-int cast_dismiss_familiar(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_dismiss_familiar(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14135,7 +14135,7 @@ int cast_dismiss_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
 
 /* DISMISS CORPSE */
 
-int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   victim = nullptr;
   // send_to_char("Disabled.\r\n",ch);
@@ -14162,7 +14162,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, struct
 
 /* DISMISS CORPSE (wands, scrolls, potions, staves) */
 
-int cast_dismiss_corpse(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_dismiss_corpse(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14192,7 +14192,7 @@ int cast_dismiss_corpse(uint8_t level, Character *ch, char *arg, int type, Chara
 
 /* RELEASE ELEMENTAL */
 
-int spell_release_elemental(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_release_elemental(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   victim = nullptr;
   // send_to_char("Disabled.\r\n",ch);
@@ -14237,7 +14237,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, str
 
 /* RELEASE ELEMENTAL (wands, scrolls, potions, staves) */
 
-int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14267,7 +14267,7 @@ int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Ch
 
 /* VISAGE OF HATE */
 
-int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -14302,7 +14302,7 @@ int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, struct
   return eSUCCESS;
 }
 
-int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14318,7 +14318,7 @@ int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Chara
 
 /* BLESSED HALO */
 
-int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -14353,7 +14353,7 @@ int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, struct o
   return eSUCCESS;
 }
 
-int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14369,7 +14369,7 @@ int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Charact
 
 /* SPIRIT WALK (GHOST WALK) */
 
-int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   if (ch->fighting)
   {
@@ -14451,7 +14451,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, struct obj
   return eSUCCESS;
 }
 
-int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14467,7 +14467,7 @@ int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character
 
 /* CONJURE ELEMENTAL */
 
-int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *victim, struct obj_data *component, int skill)
+int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *victim, class Object *component, int skill)
 {
   Character *mob;
   int r_num, liquid, virt;
@@ -14481,7 +14481,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
     send_to_char("How do you plan on controlling so many followers?\n\r", ch);
     return eFAILURE;
   }
-  //  obj_data *container  = nullptr;
+  //  Object *container  = nullptr;
   if (!str_cmp(arg, "fire"))
   {
     virt = FIRE_ELEMENTAL;
@@ -14507,7 +14507,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
     send_to_char("Unknown elemental type. Applicable types are: fire, water, air and earth.\r\n", ch);
     return eFAILURE;
   }
-  obj_data *obj;
+  Object *obj;
   for (obj = ch->carrying; obj; obj = obj->next_content)
   {
     if (obj->obj_flags.type_flag == ITEM_DRINKCON &&
@@ -14583,7 +14583,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
 
 /* MEND GOLEM */
 
-int cast_mend_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_mend_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14602,7 +14602,7 @@ int cast_mend_golem(uint8_t level, Character *ch, char *arg, int type, Character
 
 /* DIVINE INTERVENTION */
 
-int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -14631,7 +14631,7 @@ int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, o
   return eSUCCESS;
 }
 
-int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14650,7 +14650,7 @@ int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, 
 
 /* WRATH OF GOD */
 
-int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   int castcost = 0, dam = 0;
   int retval = eSUCCESS;
@@ -14703,7 +14703,7 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, obj_data
   return retval;
 }
 
-int cast_wrath_of_god(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_wrath_of_god(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14722,7 +14722,7 @@ int cast_wrath_of_god(uint8_t level, Character *ch, char *arg, int type, Charact
 
 /* ATONEMENT */
 
-int spell_atonement(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_atonement(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   int heal = GET_MAX_MANA(ch) - GET_MANA(ch);
   heal = heal / 1000 + 1;
@@ -14749,7 +14749,7 @@ int spell_atonement(uint8_t level, Character *ch, Character *victim, obj_data *o
   return eSUCCESS;
 }
 
-int cast_atonement(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_atonement(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14768,9 +14768,9 @@ int cast_atonement(uint8_t level, Character *ch, char *arg, int type, Character 
 
 /* SILENCE */
 
-int spell_silence(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
-  obj_data *silence_obj = nullptr;
+  Object *silence_obj = nullptr;
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
   {
@@ -14794,7 +14794,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, obj_data *obj
   return eSUCCESS;
 }
 
-int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14813,7 +14813,7 @@ int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *t
 
 /* IMMUNITY */
 
-int spell_immunity(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill, int spl = 0)
+int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj, int skill, int spl = 0)
 {
   struct affected_type af;
 
@@ -14849,7 +14849,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, obj_data *ob
   return eSUCCESS;
 }
 
-int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14868,7 +14868,7 @@ int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *
 
 /* BONESHIELD */
 
-int spell_boneshield(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_boneshield(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -14891,7 +14891,7 @@ int spell_boneshield(uint8_t level, Character *ch, Character *victim, obj_data *
   return eSUCCESS;
 }
 
-int cast_boneshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_boneshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14910,7 +14910,7 @@ int cast_boneshield(uint8_t level, Character *ch, char *arg, int type, Character
 
 /* CHANNEL */
 
-int spell_channel(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill, int heal = 0)
+int spell_channel(uint8_t level, Character *ch, Character *victim, Object *obj, int skill, int heal = 0)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -14932,7 +14932,7 @@ int spell_channel(uint8_t level, Character *ch, Character *victim, obj_data *obj
   return eSUCCESS;
 }
 
-int cast_channel(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, obj_data *tar_obj, int skill)
+int cast_channel(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -14949,7 +14949,7 @@ int cast_channel(uint8_t level, Character *ch, char *arg, int type, Character *t
   return eFAILURE;
 }
 
-SPELL_POINTER get_wild_magic_offensive(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+SPELL_POINTER get_wild_magic_offensive(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   const int MAX_OFFENSIVE = 25;
   SPELL_POINTER spell_to_cast = nullptr;
@@ -15042,7 +15042,7 @@ SPELL_POINTER get_wild_magic_offensive(uint8_t level, Character *ch, Character *
 
 int cast_solidity(uint8_t level, Character *ch, char *arg,
                   int type, Character *tar_ch,
-                  struct obj_data *tar_obj, int skill)
+                  class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15073,7 +15073,7 @@ int cast_solidity(uint8_t level, Character *ch, char *arg,
   return eFAILURE;
 }
 
-int spell_solidity(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_solidity(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   struct affected_type af;
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
@@ -15100,7 +15100,7 @@ int spell_solidity(uint8_t level, Character *ch, Character *victim, obj_data *ob
 
 int cast_stability(uint8_t level, Character *ch, char *arg,
                    int type, Character *tar_ch,
-                   struct obj_data *tar_obj, int skill)
+                   class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15124,7 +15124,7 @@ int cast_stability(uint8_t level, Character *ch, char *arg,
   return eFAILURE;
 }
 
-int spell_stability(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_stability(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   struct affected_type af;
   if (IS_AFFECTED(victim, AFF_STABILITY))
@@ -15148,7 +15148,7 @@ int spell_stability(uint8_t level, Character *ch, Character *victim, obj_data *o
   return eSUCCESS;
 }
 
-int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15173,7 +15173,7 @@ int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Characte
   return eFAILURE;
 }
 
-int spell_frostshield(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+int spell_frostshield(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -15194,7 +15194,7 @@ int spell_frostshield(uint8_t level, Character *ch, Character *victim, obj_data 
   return eSUCCESS;
 }
 
-SPELL_POINTER get_wild_magic_defensive(uint8_t level, Character *ch, Character *victim, obj_data *obj, int skill)
+SPELL_POINTER get_wild_magic_defensive(uint8_t level, Character *ch, Character *victim, Object *obj, int skill)
 {
   const int MAX_DEFENSIVE = 50;
   SPELL_POINTER spell_to_cast = nullptr;
@@ -15363,7 +15363,7 @@ SPELL_POINTER get_wild_magic_defensive(uint8_t level, Character *ch, Character *
 
 int cast_wild_magic(uint8_t level, Character *ch, char *arg,
                     int type, Character *tar_ch,
-                    struct obj_data *tar_obj, int skill)
+                    class Object *tar_obj, int skill)
 {
   char off_def[MAX_INPUT_LENGTH + 1];
   SPELL_POINTER spell_to_cast = nullptr;
@@ -15389,9 +15389,9 @@ int cast_wild_magic(uint8_t level, Character *ch, char *arg,
 
 /* SPIRIT SHIELD */
 
-int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  obj_data *ssobj = nullptr;
+  Object *ssobj = nullptr;
 
   if (ch->equipment[WEAR_SHIELD])
   {
@@ -15425,7 +15425,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, struct 
   return eSUCCESS;
 }
 
-int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Character *victim, obj_data *tar_obj, int skill)
+int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Character *victim, Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15444,7 +15444,7 @@ int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Charac
 
 /* VILLAINY */
 
-int spell_villainy(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_villainy(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -15464,7 +15464,7 @@ int spell_villainy(uint8_t level, Character *ch, Character *victim, struct obj_d
   return eSUCCESS;
 }
 
-int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15497,7 +15497,7 @@ int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *
 
 /* HEROISM */
 
-int spell_heroism(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_heroism(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
 
@@ -15517,7 +15517,7 @@ int spell_heroism(uint8_t level, Character *ch, Character *victim, struct obj_da
   return eSUCCESS;
 }
 
-int cast_heroism(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_heroism(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15551,11 +15551,11 @@ int cast_heroism(uint8_t level, Character *ch, char *arg, int type, Character *t
 /* CONSERATE */
 
 int spell_consecrate(uint8_t level, Character *ch, Character *victim,
-                     struct obj_data *obj, int skill)
+                     class Object *obj, int skill)
 {
   int spl = SPELL_CONSECRATE;
   int compNum = CONSECRATE_COMP_OBJ_NUMBER;
-  obj_data *component = nullptr;
+  Object *component = nullptr;
 
   if (IS_MORTAL(ch))
   {
@@ -15615,7 +15615,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     }
   }
 
-  obj_data *cItem = nullptr;
+  Object *cItem = nullptr;
 
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
@@ -15685,7 +15685,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 }
 
 int cast_consecrate(uint8_t level, Character *ch, char *arg, int type,
-                    Character *tar_ch, struct obj_data *tar_obj, int skill)
+                    Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15716,12 +15716,12 @@ int cast_consecrate(uint8_t level, Character *ch, char *arg, int type,
 /* DESECRATE */
 
 int spell_desecrate(uint8_t level, Character *ch, Character *victim,
-                    struct obj_data *obj, int skill)
+                    class Object *obj, int skill)
 {
   int spl = SPELL_DESECRATE;
   int compNum = DESECRATE_COMP_OBJ_NUMBER;
   char buf[MAX_STRING_LENGTH];
-  obj_data *component = nullptr;
+  Object *component = nullptr;
 
   if (IS_MORTAL(ch))
   {
@@ -15789,7 +15789,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     return eSUCCESS;
   }
 
-  obj_data *cItem = nullptr;
+  Object *cItem = nullptr;
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
     if (ch == ((Character *)(cItem->obj_flags.origin)))
@@ -15855,7 +15855,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 }
 
 int cast_desecrate(uint8_t level, Character *ch, char *arg, int type,
-                   Character *tar_ch, struct obj_data *tar_obj, int skill)
+                   Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15885,13 +15885,13 @@ int cast_desecrate(uint8_t level, Character *ch, char *arg, int type,
 
 /* ELEMENTAL_WALL */
 
-int spell_elemental_wall(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_elemental_wall(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   send_to_char("Pirahna is still working on this.\r\n", ch);
   return eFAILURE;
 }
 
-int cast_elemental_wall(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_elemental_wall(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {
@@ -15910,7 +15910,7 @@ int cast_elemental_wall(uint8_t level, Character *ch, char *arg, int type, Chara
 
 /* ETHEREAL FOCUS */
 
-int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, struct obj_data *obj, int skill)
+int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
   Character *ally, *next_ally;
@@ -15952,7 +15952,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, struct
   return eSUCCESS;
 }
 
-int cast_ethereal_focus(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_ethereal_focus(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
   switch (type)
   {

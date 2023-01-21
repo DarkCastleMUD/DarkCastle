@@ -265,7 +265,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
 }
 
 // Spellcraft golem stuff.
-int sc_golem(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int sc_golem(Character *ch, class Object *obj, int cmd, const char *arg,
              Character *owner)
 {
   if (cmd)
@@ -299,11 +299,11 @@ int sc_golem(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // Couple mobs actually still use this.
-int fighter(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
             Character *owner)
 {
-  /*struct obj_data *obj;*/
-  struct obj_data *wielded;
+  /*class Object *obj;*/
+  class Object *wielded;
   Character *vict;
 
   if (cmd)
@@ -357,7 +357,7 @@ int fighter(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int active_tarrasque(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
                      Character *owner)
 {
   Character *vict;
@@ -405,7 +405,7 @@ int active_tarrasque(Character *ch, struct obj_data *obj, int cmd, const char *a
   return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int active_grandmaster(Character *ch, struct obj_data *obj, int command, const char *arg,
+int active_grandmaster(Character *ch, class Object *obj, int command, const char *arg,
                        Character *owner)
 {
   Character *vict;
@@ -486,7 +486,7 @@ static char *frostyYellText[] = {
 
 #define FROSTY_YELL_TEXT_SIZE (sizeof(frostyYellText) / sizeof(char *))
 
-int frosty(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int frosty(Character *ch, class Object *obj, int cmd, const char *arg,
            Character *owner)
 {
   int x;
@@ -546,7 +546,7 @@ static char *poetEmoteText[] = {
 #define POET_SAY_TEXT_SIZE (sizeof(poetSayText) / sizeof(char *))
 #define POET_EMOTE_TEXT_SIZE (sizeof(poetEmoteText) / sizeof(char *))
 
-int poet(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int poet(Character *ch, class Object *obj, int cmd, const char *arg,
          Character *owner)
 {
   int x;
@@ -581,7 +581,7 @@ static char *stcrewEmoteText[] = {
 
 #define STCREW_EMOTE_TEXT_SIZE (sizeof(stcrewEmoteText) / sizeof(char *))
 
-int stcrew(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int stcrew(Character *ch, class Object *obj, int cmd, const char *arg,
            Character *owner)
 {
   int x;
@@ -608,7 +608,7 @@ static char *stofficerEmoteText[] = {
 
 #define OFFICER_EMOTE_TEXT_SIZE (sizeof(stofficerEmoteText) / sizeof(char *))
 
-int stofficer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int stofficer(Character *ch, class Object *obj, int cmd, const char *arg,
               Character *owner)
 {
   int x;
@@ -629,7 +629,7 @@ int stofficer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int backstabber(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
+int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   Character *tch;
   /*Character *mob;
@@ -699,7 +699,7 @@ int backstabber(Character *ch, struct obj_data *obj, int cmd, const char *arg, C
   return eFAILURE;
 }
 
-int white_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int white_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *vict = ch->fighting;
@@ -722,7 +722,7 @@ int white_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int black_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int black_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *vict = ch->fighting;
@@ -745,7 +745,7 @@ int black_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_acid_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int red_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
 
@@ -765,7 +765,7 @@ int red_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int green_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
 
@@ -785,7 +785,7 @@ int green_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int brass_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *vict;
@@ -831,7 +831,7 @@ int brass_dragon(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int francis_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int francis_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   if (cmd != 1)
@@ -849,7 +849,7 @@ int francis_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
  *  Special procedures for mobiles                                      *
  ******************************************************************** */
 
-int guild_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                 Character *owner)
 {
   if (cmd > 6 || cmd < 1)
@@ -984,7 +984,7 @@ int guild_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int clan_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
   int in_room = ch->in_room;
@@ -1894,7 +1894,7 @@ vector<string> ChainSayText =
 
 // ENDOFCHAIN
 
-int chain_gossips(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
+int chain_gossips(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   int x;
 
@@ -1927,10 +1927,10 @@ int chain_gossips(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int fido(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int fido(Character *ch, class Object *obj, int cmd, const char *arg,
          Character *owner)
 {
-  struct obj_data *i, *temp, *next_obj, *deep, *next_deep;
+  class Object *i, *temp, *next_obj, *deep, *next_deep;
 
   if (cmd || !AWAKE(ch))
     return eFAILURE;
@@ -1968,10 +1968,10 @@ int fido(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int janitor(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
             Character *owner)
 {
-  struct obj_data *i;
+  class Object *i;
 
   if (cmd || !AWAKE(ch))
     return eFAILURE;
@@ -1994,7 +1994,7 @@ int janitor(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int mother_moat_and_moad(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *arg,
                          Character *owner)
 {
   Character *temp, *tmp_victim;
@@ -2046,7 +2046,7 @@ int mother_moat_and_moad(Character *ch, struct obj_data *obj, int cmd, const cha
   return eFAILURE;
 }
 
-int adept(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int adept(Character *ch, class Object *obj, int cmd, const char *arg,
           Character *owner)
 {
   Character *tch;
@@ -2088,7 +2088,7 @@ int adept(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int mud_school_adept(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int mud_school_adept(Character *ch, class Object *obj, int cmd, const char *arg,
                      Character *owner)
 {
   Character *tch;
@@ -2155,7 +2155,7 @@ int mud_school_adept(Character *ch, struct obj_data *obj, int cmd, const char *a
   return eSUCCESS;
 }
 
-int bee(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int bee(Character *ch, class Object *obj, int cmd, const char *arg,
         Character *owner)
 {
   if (cmd)
@@ -2196,7 +2196,7 @@ static char *apiary_workerEmoteText[] = {
 
 #define APIARY_WORKER_EMOTE_TEXT_SIZE (sizeof(apiary_workerEmoteText) / sizeof(char *))
 
-int apiary_worker(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int apiary_worker(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   int x;
@@ -2302,7 +2302,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
   return eFAILURE;
 }
 
-int newbie_zone_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int newbie_zone_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                       Character *owner)
 {
   if (cmd > 6 || cmd < 1)
@@ -2349,7 +2349,7 @@ int newbie_zone_guard(Character *ch, struct obj_data *obj, int cmd, const char *
 }
 
 // I just like to hellstream every other round.
-int hellstreamer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int hellstreamer(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *vict;
@@ -2386,7 +2386,7 @@ int hellstreamer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int firestormer(Character *ch, class Object *obj, int cmd, const char *arg,
                 Character *owner)
 {
   Character *vict = nullptr;
@@ -2397,7 +2397,7 @@ int firestormer(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int humaneater(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
   Character *tch;
@@ -2491,7 +2491,7 @@ static char *pir_slutSayText[] = {
 
 #define PIR_SAY_TEXT_SIZE (sizeof(pir_slutSayText) / sizeof(char *))
 
-int pir_slut(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int pir_slut(Character *ch, class Object *obj, int cmd, const char *arg,
              Character *owner)
 {
   int x;
@@ -2508,11 +2508,11 @@ int pir_slut(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int clutchdrone_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                        Character *owner)
 {
-  /*struct obj_data *obj;*/
-  // struct obj_data *wielded;
+  /*class Object *obj;*/
+  // class Object *wielded;
   Character *vict;
   // int dam;
   int retval;
@@ -2557,7 +2557,7 @@ int clutchdrone_combat(Character *ch, struct obj_data *obj, int cmd, const char 
   return eFAILURE;
 }
 
-int generic_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int generic_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   if (cmd > 6 || cmd < 1)
@@ -2576,7 +2576,7 @@ int generic_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int portal_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int portal_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   char buf[200];
@@ -2599,7 +2599,7 @@ int portal_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int blindingparrot(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
                    Character *owner)
 {
   if (cmd)
@@ -2623,7 +2623,7 @@ int blindingparrot(Character *ch, struct obj_data *obj, int cmd, const char *arg
   return eFAILURE;
 }
 
-int doorcloser(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int doorcloser(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
   // int x;
@@ -2653,7 +2653,7 @@ int doorcloser(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int panicprisoner(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int panicprisoner(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   // int x;
@@ -2697,7 +2697,7 @@ int panicprisoner(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // let's teleport people around the mud:)
-int bounder(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int bounder(Character *ch, class Object *obj, int cmd, const char *arg,
             Character *owner)
 {
   Character *vict;
@@ -2729,7 +2729,7 @@ int bounder(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I love to dispel stuff!
-int dispelguy(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
               Character *owner)
 {
   Character *vict;
@@ -2769,11 +2769,11 @@ int dispelguy(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int marauder(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
              Character *owner)
 {
-  /*struct obj_data *obj;*/
-  struct obj_data *wielded;
+  /*class Object *obj;*/
+  class Object *wielded;
   Character *vict;
 
   if (cmd)
@@ -2819,7 +2819,7 @@ int marauder(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int foggy_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *mob = nullptr;
@@ -2857,7 +2857,7 @@ int foggy_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int foggy_non(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int foggy_non(Character *ch, class Object *obj, int cmd, const char *arg,
               Character *owner)
 {
   // n s e s u d are commands 1-6.  For anything but that, ignore
@@ -2875,7 +2875,7 @@ int foggy_non(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int iasenko_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int iasenko_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                    Character *owner)
 {
   Character *vict = nullptr;
@@ -2930,7 +2930,7 @@ int iasenko_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg
   return eSUCCESS;
 }
 
-int iasenko_non_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int iasenko_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                        Character *owner)
 {
   if (cmd)
@@ -2939,7 +2939,7 @@ int iasenko_non_combat(Character *ch, struct obj_data *obj, int cmd, const char 
   return protect(ch, 8543); // rescue Koban if he's fighting
 }
 
-int koban_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int koban_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   Character *iasenko = nullptr;
@@ -2975,7 +2975,7 @@ int koban_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return cast_call_lightning(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int koban_non_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                      Character *owner)
 {
   Character *iasenko = nullptr;
@@ -3023,7 +3023,7 @@ int koban_non_combat(Character *ch, struct obj_data *obj, int cmd, const char *a
   return eFAILURE;
 }
 
-int kogiro_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int kogiro_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   Character *vict = nullptr;
@@ -3067,7 +3067,7 @@ int kogiro_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int takahashi_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int takahashi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                      Character *owner)
 {
   int retval;
@@ -3101,7 +3101,7 @@ int takahashi_combat(Character *ch, struct obj_data *obj, int cmd, const char *a
   return eSUCCESS;
 }
 
-int askari_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int askari_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                   Character *owner)
 {
   int dam;
@@ -3140,7 +3140,7 @@ int askari_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int surimoto_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int surimoto_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                     Character *owner)
 {
   int dam;
@@ -3168,7 +3168,7 @@ int surimoto_combat(Character *ch, struct obj_data *obj, int cmd, const char *ar
   return eSUCCESS;
 }
 
-int hiryushi_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int hiryushi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                     Character *owner)
 {
   Character *victim = nullptr;
@@ -3205,7 +3205,7 @@ int hiryushi_combat(Character *ch, struct obj_data *obj, int cmd, const char *ar
   return eSUCCESS;
 }
 
-int izumi_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int izumi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *owner)
 {
   int retval;
@@ -3233,7 +3233,7 @@ int izumi_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int shogura_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int shogura_combat(Character *ch, class Object *obj, int cmd, const char *arg,
                    Character *owner)
 {
   if (cmd)
@@ -3274,7 +3274,7 @@ int shogura_combat(Character *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 // Proc for the arena mobs to make DAMN sure they stay in the arena.
-int arena_only(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int arena_only(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
   if (cmd || ch->fighting)
@@ -3301,7 +3301,7 @@ int arena_only(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int druid_elemental(Character *ch, struct obj_data *obj,
+int druid_elemental(Character *ch, class Object *obj,
                     int cmd, const char *arg, Character *owner)
 {
   if (cmd)
@@ -3327,7 +3327,7 @@ int druid_elemental(Character *ch, struct obj_data *obj,
   return eSUCCESS;
 }
 
-int mage_golem(Character *ch, struct obj_data *obj, int cmd,
+int mage_golem(Character *ch, class Object *obj, int cmd,
                const char *arg, Character *owner)
 {
   if (cmd || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
@@ -3359,14 +3359,14 @@ int gremlinthing(Character *ch)
   return eFAILURE;
 }
 
-int mage_familiar_gremlin(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
+int mage_familiar_gremlin(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   if (number(0, 1))
     return eFAILURE;
   return gremlinthing(ch);
 }
 
-int mage_familiar_gremlin_non(Character *ch, struct obj_data *obj,
+int mage_familiar_gremlin_non(Character *ch, class Object *obj,
                               int cmd, const char *arg, Character *owner)
 {
   if (cmd)
@@ -3408,7 +3408,7 @@ int mage_familiar_gremlin_non(Character *ch, struct obj_data *obj,
   return gremlinthing(ch);
 }
 
-int mage_familiar_imp(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int mage_familiar_imp(Character *ch, class Object *obj, int cmd, const char *arg,
                       Character *owner)
 {
   if (number(0, 1))
@@ -3417,7 +3417,7 @@ int mage_familiar_imp(Character *ch, struct obj_data *obj, int cmd, const char *
   return eFAILURE;
 }
 
-int mage_familiar_imp_non(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char *arg,
                           Character *owner)
 {
   if (cmd)
@@ -3463,7 +3463,7 @@ int mage_familiar_imp_non(Character *ch, struct obj_data *obj, int cmd, const ch
   return eFAILURE;
 }
 
-int druid_familiar_owl_non(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
+int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   if (ch->fighting)
     return eFAILURE;
@@ -3551,7 +3551,7 @@ int druid_familiar_owl_non(Character *ch, struct obj_data *obj, int cmd, const c
   return eFAILURE;
 }
 
-int druid_familiar_chipmunk_non(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const char *arg,
                                 Character *owner)
 {
   if (cmd)
@@ -3608,7 +3608,7 @@ int druid_familiar_chipmunk_non(Character *ch, struct obj_data *obj, int cmd, co
 
 // This is here so we don't need 2398429 procs that are just for a bodyguard
 // Just add a case for your mob, and the mob he's supposed to protect
-int bodyguard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
               Character *owner)
 {
   if (cmd)
@@ -3631,7 +3631,7 @@ int bodyguard(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eFAILURE;
 }
 
-int generic_blocker(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int generic_blocker(Character *ch, class Object *obj, int cmd, const char *arg,
                     Character *owner)
 {
   if (cmd > 6 || cmd < 1)
@@ -3650,7 +3650,7 @@ int generic_blocker(Character *ch, struct obj_data *obj, int cmd, const char *ar
   return eFAILURE;
 }
 
-int generic_doorpick_blocker(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int generic_doorpick_blocker(Character *ch, class Object *obj, int cmd, const char *arg,
                              Character *owner)
 {
   if (cmd != 35) // pick
@@ -3671,7 +3671,7 @@ int generic_doorpick_blocker(Character *ch, struct obj_data *obj, int cmd, const
   return eFAILURE;
 }
 
-int startrek_miles(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int startrek_miles(Character *ch, class Object *obj, int cmd, const char *arg,
                    Character *owner)
 {
   if (cmd != 185)

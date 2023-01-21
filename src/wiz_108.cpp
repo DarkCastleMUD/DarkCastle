@@ -28,7 +28,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   struct room_direction_data *curExits;
   int curZone = GET_ZONE(ch);
   int curRoom = ch->in_room;
-  obj_data *portal;
+  Object *portal;
   int i, dir;
   int low, high;
   int last_good = curRoom;
@@ -170,7 +170,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 int do_purloin(Character *ch, char *argument, int cmd)
 {
   char bufName[200], *pBuf;
-  struct obj_data *k;
+  class Object *k;
   int j, nIndex = 0;
 
   if (!has_skill(ch, COMMAND_PURLOIN))

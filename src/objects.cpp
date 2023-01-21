@@ -38,11 +38,11 @@ extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 int hands_are_free(Character *ch, int number);
-struct obj_data *get_object_in_equip_vis(Character *ch,
-                                         char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
+class Object *get_object_in_equip_vis(Character *ch,
+                                         char *arg, class Object *equipment[], int *j, bool blindfighting);
 
 // add an affect to an item
-void add_obj_affect(obj_data *obj, int loc, int mod)
+void add_obj_affect(Object *obj, int loc, int mod)
 {
   obj->num_affects++;
 #ifdef LEAK_CHECK
@@ -56,7 +56,7 @@ void add_obj_affect(obj_data *obj, int loc, int mod)
   obj->affected[obj->num_affects - 1].modifier = mod;
 }
 
-void remove_obj_affect_by_index(obj_data *obj, int index)
+void remove_obj_affect_by_index(Object *obj, int index)
 {
   // shift everyone to right of the one we're deleting to the left
   // TODO - redo this with memmove
@@ -77,7 +77,7 @@ void remove_obj_affect_by_index(obj_data *obj, int index)
   }
 }
 
-void remove_obj_affect_by_type(obj_data *obj, int loc)
+void remove_obj_affect_by_type(Object *obj, int loc)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == loc)
@@ -86,7 +86,7 @@ void remove_obj_affect_by_type(obj_data *obj, int loc)
 
 // given an object, return the maximum points of damage the item
 // can take before being scrapped
-int eq_max_damage(obj_data *obj)
+int eq_max_damage(Object *obj)
 {
   int amount = 0;
 
@@ -119,7 +119,7 @@ int eq_max_damage(obj_data *obj)
   return amount;
 }
 
-int eq_current_damage(obj_data *obj)
+int eq_current_damage(Object *obj)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
@@ -130,7 +130,7 @@ int eq_current_damage(obj_data *obj)
 
 // when repairing eq, we just leave the affect of 0 in there.  That way when
 // it gets damaged again, we don't have to realloc the affect list again
-void eq_remove_damage(obj_data *obj)
+void eq_remove_damage(Object *obj)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
@@ -141,7 +141,7 @@ void eq_remove_damage(obj_data *obj)
 }
 
 // Damage a piece of eq once and return the amount of damage currently on it
-int damage_eq_once(obj_data *obj)
+int damage_eq_once(Object *obj)
 {
   if (obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
@@ -178,7 +178,7 @@ void object_activity(uint64_t pulse_type)
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((obj_data *)obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_description->description, obj->in_room, true);
     }
     else
@@ -201,7 +201,7 @@ void object_activity(uint64_t pulse_type)
   return;
 }
 
-void name_from_drinkcon(struct obj_data *obj)
+void name_from_drinkcon(class Object *obj)
 {
   int i;
   char *new_new_name;
@@ -218,7 +218,7 @@ void name_from_drinkcon(struct obj_data *obj)
 
 int do_switch(Character *ch, char *arg, int cmd)
 {
-  struct obj_data *between;
+  class Object *between;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
   {
@@ -262,7 +262,7 @@ int do_switch(Character *ch, char *arg, int cmd)
 int do_quaff(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  struct obj_data *temp;
+  class Object *temp;
   int i /*,j*/;
   bool equipped;
   int retval = eSUCCESS;
@@ -358,7 +358,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
 int do_recite(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  struct obj_data *scroll, *obj;
+  class Object *scroll, *obj;
   Character *victim;
   int i, bits;
   bool equipped;
@@ -479,10 +479,10 @@ int do_recite(Character *ch, char *argument, int cmd)
 
 #define GOD_TRAP_ITEM 193
 
-void set_movement_trap(Character *ch, struct obj_data *obj)
+void set_movement_trap(Character *ch, class Object *obj)
 {
   char buf[200];
-  struct obj_data *trap_obj = nullptr;
+  class Object *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->short_description);
   send_to_char(buf, ch);
@@ -500,10 +500,10 @@ void set_movement_trap(Character *ch, struct obj_data *obj)
   obj_to_room(trap_obj, ch->in_room);
 }
 
-void set_exit_trap(Character *ch, struct obj_data *obj, char *arg)
+void set_exit_trap(Character *ch, class Object *obj, char *arg)
 {
   char buf[200];
-  struct obj_data *trap_obj = nullptr;
+  class Object *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->short_description);
   send_to_char(buf, ch);
@@ -525,11 +525,11 @@ void set_exit_trap(Character *ch, struct obj_data *obj, char *arg)
 
 // Return false if there was a command problem
 // Return true if it went off
-bool set_utility_mortar(Character *ch, struct obj_data *obj, char *arg)
+bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
 {
   char direct[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *trap_obj = nullptr;
+  class Object *trap_obj = nullptr;
   int dir;
 
   one_argument(arg, direct);
@@ -599,7 +599,7 @@ bool set_utility_mortar(Character *ch, struct obj_data *obj, char *arg)
 }
 
 // With catstink, the value[1] is the sector type it was designed for
-void set_catstink(Character *ch, struct obj_data *obj)
+void set_catstink(Character *ch, class Object *obj)
 {
   char buf[200];
   extern const char *sector_types[];
@@ -631,9 +631,9 @@ void set_catstink(Character *ch, struct obj_data *obj)
   world[ch->in_room].FreeTracks();
 }
 
-void set_utility_item(Character *ch, struct obj_data *obj, char *argument)
+void set_utility_item(Character *ch, class Object *obj, char *argument)
 {
-  int class_restricted(Character * ch, struct obj_data * obj);
+  int class_restricted(Character * ch, class Object * obj);
 
   if (class_restricted(ch, obj))
   {
@@ -668,7 +668,7 @@ void set_utility_item(Character *ch, struct obj_data *obj, char *argument)
 
 int do_mortal_set(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *obj = nullptr;
+  class Object *obj = nullptr;
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
@@ -708,7 +708,7 @@ int do_use(Character *ch, char *argument, int cmd)
   char targ[MAX_INPUT_LENGTH + 1];
   char xtra_arg[MAX_INPUT_LENGTH + 1];
   Character *tmp_char;
-  struct obj_data *tmp_object, *stick;
+  class Object *tmp_object, *stick;
   int lvl;
   int bits;
 
@@ -903,7 +903,7 @@ int do_name(Character *ch, char *arg, int cmd)
 int do_drink(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  struct obj_data *temp;
+  class Object *temp;
   struct affected_type af;
   int amount;
 
@@ -1055,7 +1055,7 @@ int do_drink(Character *ch, char *argument, int cmd)
 int do_eat(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  struct obj_data *temp;
+  class Object *temp;
   struct affected_type af;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -1122,8 +1122,8 @@ int do_pour(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *from_obj;
-  struct obj_data *to_obj;
+  class Object *from_obj;
+  class Object *to_obj;
   int amount;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -1239,7 +1239,7 @@ int do_sip(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *temp;
+  class Object *temp;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
   {
@@ -1301,7 +1301,7 @@ int do_sip(Character *ch, char *argument, int cmd)
 int do_taste(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  struct obj_data *temp;
+  class Object *temp;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
   {
@@ -1349,7 +1349,7 @@ int do_taste(Character *ch, char *argument, int cmd)
 
 /* functions related to wear */
 
-void perform_wear(Character *ch, struct obj_data *obj_object,
+void perform_wear(Character *ch, class Object *obj_object,
                   int keyword)
 {
   switch (keyword)
@@ -1422,7 +1422,7 @@ void perform_wear(Character *ch, struct obj_data *obj_object,
   }
 }
 
-int class_restricted(Character *ch, struct obj_data *obj)
+int class_restricted(Character *ch, class Object *obj)
 {
   if (IS_NPC(ch))
     return false;
@@ -1444,7 +1444,7 @@ int class_restricted(Character *ch, struct obj_data *obj)
   return true;
 }
 
-int charmie_restricted(Character *ch, struct obj_data *obj, int wear_loc)
+int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
 {
   return false; // sigh, work for nohin'
   if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
@@ -1493,7 +1493,7 @@ int charmie_restricted(Character *ch, struct obj_data *obj, int wear_loc)
   return false;
 }
 
-int size_restricted(Character *ch, struct obj_data *obj)
+int size_restricted(Character *ch, class Object *obj)
 {
   if (IS_SET(obj->obj_flags.size, SIZE_ANY))
     return false;
@@ -1546,7 +1546,7 @@ int size_restricted(Character *ch, struct obj_data *obj)
 // it wearing in terms of sizes vs. height
 // ch = player obj = obj to remove/wear add = 1(wear) or 0(remove)
 // function WILL tell the character if anything is wrong
-int will_screwup_worn_sizes(Character *ch, obj_data *obj, int add)
+int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
 {
   int j;
   int mod = 0;
@@ -1618,9 +1618,9 @@ int will_screwup_worn_sizes(Character *ch, obj_data *obj, int add)
   return false;
 }
 
-void wear(Character *ch, struct obj_data *obj_object, int keyword)
+void wear(Character *ch, class Object *obj_object, int keyword)
 {
-  struct obj_data *obj;
+  class Object *obj;
   char buffer[MAX_STRING_LENGTH];
   if (!obj_object)
     return;
@@ -2164,7 +2164,7 @@ void wear(Character *ch, struct obj_data *obj_object, int keyword)
         return;
       }
 
-      struct obj_data *obj_temp = ch->equipment[WIELD];
+      class Object *obj_temp = ch->equipment[WIELD];
       obj_to_char(unequip_char(ch, WIELD), ch);
       wear(ch, obj_object, 12);
       wear(ch, obj_temp, 12);
@@ -2198,7 +2198,7 @@ void wear(Character *ch, struct obj_data *obj_object, int keyword)
   redo_ki(ch);
 }
 
-int keywordfind(struct obj_data *obj_object)
+int keywordfind(class Object *obj_object)
 {
   int keyword;
 
@@ -2244,7 +2244,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   char arg2[MAX_STRING_LENGTH];
   char buf[256];
   char buffer[MAX_STRING_LENGTH];
-  struct obj_data *obj_object, *tmp_object, *next_obj;
+  class Object *obj_object, *tmp_object, *next_obj;
   int keyword;
   bool blindlag = false;
   static char const *keywords[] = {
@@ -2340,7 +2340,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  struct obj_data *obj_object;
+  class Object *obj_object;
   bool blindlag = false;
   int keyword = 12;
 
@@ -2390,7 +2390,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  struct obj_data *obj_object;
+  class Object *obj_object;
   bool blindlag = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -2433,7 +2433,7 @@ int do_grab(Character *ch, char *argument, int cmd)
 
 int hands_are_free(Character *ch, int number)
 {
-  struct obj_data *wielded;
+  class Object *wielded;
   int hands = 0;
 
   wielded = ch->equipment[WIELD];
@@ -2482,7 +2482,7 @@ int hands_are_free(Character *ch, int number)
 int do_remove(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH];
-  struct obj_data *obj_object;
+  class Object *obj_object;
   bool blindlag = false;
   int j;
 
@@ -2610,7 +2610,7 @@ int do_remove(Character *ch, char *argument, int cmd)
 int recheck_height_wears(Character *ch)
 {
   int j;
-  struct obj_data *obj = nullptr;
+  class Object *obj = nullptr;
   if (!ch || IS_NPC(ch))
     return eFAILURE; // NPCs get to wear the stuff.
 
@@ -2630,7 +2630,7 @@ int recheck_height_wears(Character *ch)
   return eSUCCESS;
 }
 
-bool fullSave(obj_data *obj)
+bool fullSave(Object *obj)
 {
   if (!obj)
     return 0;
@@ -2638,7 +2638,7 @@ bool fullSave(obj_data *obj)
   if (eq_current_damage(obj))
     return 1;
 
-  obj_data *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
+  Object *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
   if (!tmp_obj)
   {
     char buf[MAX_STRING_LENGTH];
@@ -2706,7 +2706,7 @@ void heightweight(Character *ch, bool add)
   }
 }
 
-int obj_from(obj_data *obj)
+int obj_from(Object *obj)
 {
   if (obj == nullptr)
   {
@@ -2731,12 +2731,12 @@ int obj_from(obj_data *obj)
   return false;
 }
 
-bool obj_data::isDark(void)
+bool Object::isDark(void)
 {
   return IS_SET(obj_flags.extra_flags, ITEM_DARK);
 }
 
-uint64_t obj_data::getLevel(void)
+uint64_t Object::getLevel(void)
 {
   return obj_flags.eq_level;
 }

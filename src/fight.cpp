@@ -92,7 +92,7 @@ void do_champ_flag_death(Character *victim)
 {
 
   char buf[MAX_STRING_LENGTH];
-  obj_data *obj;
+  Object *obj;
   obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
   if (obj)
   {
@@ -539,7 +539,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 {
   int result = 0;
   int chance;
-  obj_data *wielded = 0;
+  Object *wielded = 0;
   int handle_any_guard(Character * ch);
 
   if (!ch || !vict)
@@ -1289,7 +1289,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   return eSUCCESS;
 }
 
-void check_weapon_skill_bonus(Character *ch, int type, obj_data *wielded,
+void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
                               int &weapon_skill_hit_bonus, int &weapon_skill_dam_bonus)
 {
   int specialization;
@@ -1362,7 +1362,7 @@ void check_weapon_skill_bonus(Character *ch, int type, obj_data *wielded,
   }
 }
 
-int get_weapon_damage_type(struct obj_data *wielded)
+int get_weapon_damage_type(class Object *wielded)
 {
   char log_buf[256];
 
@@ -1446,7 +1446,7 @@ int calculate_paladin_damage_bonus(Character *ch, Character *victim)
 // standard "returnvals.h" returns
 int one_hit(Character *ch, Character *vict, int type, int weapon)
 {
-  struct obj_data *wielded; /* convenience */
+  class Object *wielded; /* convenience */
   int w_type;               /* Holds type info for damage() */
   int weapon_type;
   int dam = 0; /* Self explan. */
@@ -1716,7 +1716,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 } // one_hit
 
 // pos of -1 means inventory
-void eq_destroyed(Character *ch, obj_data *obj, int pos)
+void eq_destroyed(Character *ch, Object *obj, int pos)
 {
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     return;
@@ -1734,7 +1734,7 @@ void eq_destroyed(Character *ch, obj_data *obj, int pos)
     }
     else if ((pos == WIELD) && (ch->equipment[SECOND_WIELD]))
     {
-      obj_data *temp;
+      Object *temp;
       temp = unequip_char(ch, SECOND_WIELD);
       equip_char(ch, temp, WIELD);
     }
@@ -1775,7 +1775,7 @@ void eq_damage(Character *ch, Character *victim,
                int dam, int weapon_type, int attacktype)
 {
   int count, eqdam, chance, value;
-  struct obj_data *obj;
+  class Object *obj;
   int pos;
 
   if (IS_SET(world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
@@ -2049,7 +2049,7 @@ int damage(Character *ch, Character *victim,
 {
   int can_miss = 1;
   int32_t weapon_bit;
-  struct obj_data *wielded;
+  class Object *wielded;
   int typeofdamage;
   int damage_type(int weapon_type);
   int32_t get_weapon_bit(int weapon_type);
@@ -2950,7 +2950,7 @@ int is_pkill(Character *ch, Character *vict)
   return false;
 }
 
-void send_damage(char const *buf, Character *ch, obj_data *obj, Character *victim, char const *dmg, char const *buf2, int to)
+void send_damage(char const *buf, Character *ch, Object *obj, Character *victim, char const *dmg, char const *buf2, int to)
 {
   Character *tmpch;
   char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
@@ -4306,13 +4306,13 @@ void stop_fighting(Character *ch, int clearlag)
   return;
 }
 
-void make_scraps(Character *ch, struct obj_data *obj)
+void make_scraps(Character *ch, class Object *obj)
 {
-  struct obj_data *corpse /*, *o*/;
+  class Object *corpse /*, *o*/;
   char buf[MAX_STRING_LENGTH];
   /*int i;*/
 
-  corpse = new obj_data;
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
@@ -4348,13 +4348,13 @@ void make_scraps(Character *ch, struct obj_data *obj)
 
 void make_corpse(Character *ch)
 {
-  struct obj_data *corpse, *o, *o_in_container, *next_o_in_container;
-  struct obj_data *money, *next_obj;
-  extern struct obj_data *object_list;
+  class Object *corpse, *o, *o_in_container, *next_o_in_container;
+  class Object *money, *next_obj;
+  extern class Object *object_list;
   char buf[MAX_STRING_LENGTH];
   int i;
 
-  corpse = new obj_data;
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->item_number = -1;
@@ -4482,7 +4482,7 @@ void make_corpse(Character *ch)
 
     if (IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) > 90) // 10%
     {
-      struct obj_data *recipeitem = nullptr;
+      class Object *recipeitem = nullptr;
       int rarity = number(1, 100);
       bool itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
@@ -4545,7 +4545,7 @@ void make_corpse(Character *ch)
           break;
         }
       }
-      if (recipeitem > (obj_data *)0)
+      if (recipeitem > (Object *)0)
       {
         obj_to_obj(recipeitem, corpse);
       }
@@ -4595,8 +4595,8 @@ void make_corpse(Character *ch)
 
 void make_dust(Character *ch)
 {
-  struct obj_data *o, *tmp_o, *blah;
-  struct obj_data *money, *next_obj;
+  class Object *o, *tmp_o, *blah;
+  class Object *money, *next_obj;
   int i;
 
   for (i = 0; i < MAX_WEAR; i++)
@@ -4688,13 +4688,13 @@ void change_alignment(Character *ch, Character *victim)
 
 void make_husk(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
   corpse->item_number = -1;
@@ -4729,13 +4729,13 @@ void make_husk(Character *ch)
 
 void make_head(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
 
@@ -4775,13 +4775,13 @@ void make_head(Character *ch)
 
 void make_arm(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
 
@@ -4821,13 +4821,13 @@ void make_arm(Character *ch)
 
 void make_leg(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
 
@@ -4867,13 +4867,13 @@ void make_leg(Character *ch)
 
 void make_bowels(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
 
@@ -4913,13 +4913,13 @@ void make_bowels(Character *ch)
 
 void make_blood(Character *ch)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(corpse);
 
@@ -4959,16 +4959,16 @@ void make_blood(Character *ch)
 
 void make_heart(Character *ch, Character *vict)
 {
-  struct obj_data *corpse;
+  class Object *corpse;
   char buf[MAX_STRING_LENGTH];
   int hands_are_free(Character * ch, int number);
 
   if (!hands_are_free(ch, 1))
     return;
 #ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)calloc(1, sizeof(class Object));
 #else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
 
   clear_object(corpse);
@@ -6321,7 +6321,7 @@ void dam_message(int dam, Character *ch, Character *victim,
  */
 void disarm(Character *ch, Character *victim)
 {
-  struct obj_data *obj;
+  class Object *obj;
 
   if (victim->equipment[WIELD] == nullptr)
     return;
@@ -6734,7 +6734,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim)
   {
     REMBIT(victim->affected_by, AFF_CHAMPION);
-    obj_data *obj = nullptr;
+    Object *obj = nullptr;
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
       logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
@@ -7092,7 +7092,7 @@ int can_be_attacked(Character *ch, Character *vict)
 int weapon_spells(Character *ch, Character *vict, int weapon)
 {
   int i, current_affect, chance, percent, retval;
-  obj_data *weap;
+  Object *weap;
 
   if (!ch || !vict)
   {
@@ -7653,7 +7653,7 @@ int32_t get_weapon_bit(int weapon_type)
 
 void remove_nosave(Character *vict)
 {
-  struct obj_data *o, *next_obj, *blah, *tmp_o;
+  class Object *o, *next_obj, *blah, *tmp_o;
 
   if (!vict)
   {
@@ -7687,7 +7687,7 @@ void remove_nosave(Character *vict)
 
 void remove_active_potato(Character *vict)
 {
-  struct obj_data *obj, *next_obj;
+  class Object *obj, *next_obj;
   // char buf[256];
 
   if (!vict)

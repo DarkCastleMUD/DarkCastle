@@ -757,12 +757,12 @@ void gain_condition(Character *ch, int condition, int value)
 
 void food_update(void)
 {
-	struct obj_data *bring_type_to_front(Character * ch, int item_type);
+	class Object *bring_type_to_front(Character * ch, int item_type);
 	int do_eat(Character * ch, char *argument, int cmd);
 	int do_drink(Character * ch, char *argument, int cmd);
 	int FOUNTAINisPresent(Character * ch);
 
-	struct obj_data *food = nullptr;
+	class Object *food = nullptr;
 
 	auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
 	for (auto &i : character_list)
@@ -868,15 +868,15 @@ void point_update(void)
 void update_corpses_and_portals(void)
 {
 	// char buf[256];
-	struct obj_data *j, *next_thing;
-	struct obj_data *jj, *next_thing2;
+	class Object *j, *next_thing;
+	class Object *jj, *next_thing2;
 	int proc = 0; // Processed items. Debugging.
 	bool corpses_need_saving = false;
-	void extract_obj(struct obj_data * obj); /* handler.c */
+	void extract_obj(class Object * obj); /* handler.c */
 	/* objects */
 	for (j = object_list; j; j = next_thing, proc++)
 	{
-		if (j == (struct obj_data *)0x95959595)
+		if (j == (class Object *)0x95959595)
 			break;
 		next_thing = j->next; /* Next in object list */
 		/* Type 1 is a permanent game portal, and type 3 is a look_only
@@ -928,7 +928,7 @@ void update_corpses_and_portals(void)
 
 					if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER)
 					{
-						obj_data *oo, *oon;
+						Object *oo, *oon;
 						for (oo = jj->contains; oo; oo = oon)
 						{
 							oon = oo->next_content;

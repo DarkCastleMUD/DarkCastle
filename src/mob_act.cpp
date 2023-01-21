@@ -46,9 +46,9 @@
 #include "Timer.h"
 #include "move.h"
 
-int keywordfind(struct obj_data *obj_object);
+int keywordfind(class Object *obj_object);
 int hands_are_free(Character *ch, int number);
-void perform_wear(Character *ch, struct obj_data *obj_object,
+void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);
 bool is_protected(Character *vict, Character *ch);
 void scavenge(Character *ch);
@@ -65,7 +65,7 @@ bool is_r_denied(Character *ch, int room)
 void mobile_activity(void)
 {
   Character *tmp_ch, *pch;
-  struct obj_data *obj, *best_obj;
+  class Object *obj, *best_obj;
   char buf[1000];
   int door, max;
   int done;
@@ -670,7 +670,7 @@ bool is_protected(Character *vict, Character *ch)
 
 void scavenge(Character *ch)
 {
-  struct obj_data *obj;
+  class Object *obj;
   int done;
   int keyword;
 

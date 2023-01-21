@@ -43,7 +43,7 @@ affected_type * affected_by_random(Character *ch);
 #define SUPPRESS_ALL		(SUPPRESS_CONSEQUENCES | SUPPRESS_MESSAGES)
 
 /* utility */
-struct obj_data *create_money( int amount );
+class Object *create_money( int amount );
 char *fname(char *namelist);
 int get_max_stat(Character * ch, uint8_t stat);
 //TIMERS
@@ -52,31 +52,31 @@ void addTimer(Character *ch, int spell, int ticks);
 //END TIMERS
 /* ******** objects *********** */
 
-int move_obj(obj_data * obj, int dest);
-int move_obj(obj_data * obj, Character * ch);
-int move_obj(obj_data * obj, obj_data * dest_obj);
+int move_obj(Object * obj, int dest);
+int move_obj(Object * obj, Character * ch);
+int move_obj(Object * obj, Object * dest_obj);
 
-int obj_to_char(struct obj_data *object, Character *ch);
-int obj_from_char(struct obj_data *object);
+int obj_to_char(class Object *object, Character *ch);
+int obj_from_char(class Object *object);
 
-int obj_to_room(struct obj_data *object, int room);
-int obj_from_room(struct obj_data *object);
+int obj_to_room(class Object *object, int room);
+int obj_from_room(class Object *object);
 
-int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
-int obj_from_obj(struct obj_data *obj);
+int obj_to_obj(class Object *obj, class Object *obj_to);
+int obj_from_obj(class Object *obj);
 
-int equip_char(Character *ch, struct obj_data *obj, int pos, int flag =0);
-struct obj_data *unequip_char(Character *ch, int pos, int flag = 0);
+int equip_char(Character *ch, class Object *obj, int pos, int flag =0);
+class Object *unequip_char(Character *ch, int pos, int flag = 0);
 
-struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
-struct obj_data *get_obj_in_list_num(int num, struct obj_data *list);
-struct obj_data *get_obj(char *name);
-struct obj_data *get_obj(int vnum);
-struct obj_data *get_obj_num(int nr);
+class Object *get_obj_in_list(char *name, class Object *list);
+class Object *get_obj_in_list_num(int num, class Object *list);
+class Object *get_obj(char *name);
+class Object *get_obj(int vnum);
+class Object *get_obj_num(int nr);
 
-void object_list_new_new_owner(struct obj_data *list, Character *ch);
+void object_list_new_new_owner(class Object *list, Character *ch);
 
-void extract_obj(struct obj_data *obj);
+void extract_obj(class Object *obj);
 
 /* ******* characters ********* */
 
@@ -106,13 +106,13 @@ Character *get_mob_vis(Character *ch, char *name);
 Character *get_random_mob_vnum(int vnum);
 Character *get_mob_room_vis(Character *ch, char *name);
 Character *get_mob_vnum(int vnum);
-obj_data *get_obj_vnum(int vnum);
-struct obj_data *get_obj_in_list_vis(Character *ch, const char *name, 
-		struct obj_data *list, bool bf = false);
-struct obj_data *get_obj_in_list_vis(Character *ch, int item_num, 
-		struct obj_data *list, bool bf = false);
-struct obj_data *get_obj_vis(Character *ch, const char *name, bool loc = false);
-struct obj_data *get_obj_vis(Character *ch, string name, bool loc = false);
+Object *get_obj_vnum(int vnum);
+class Object *get_obj_in_list_vis(Character *ch, const char *name, 
+		class Object *list, bool bf = false);
+class Object *get_obj_in_list_vis(Character *ch, int item_num, 
+		class Object *list, bool bf = false);
+class Object *get_obj_vis(Character *ch, const char *name, bool loc = false);
+class Object *get_obj_vis(Character *ch, string name, bool loc = false);
 
 void extract_char(Character *ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
@@ -125,7 +125,7 @@ Character *get_pc_vis(Character *ch, string name);
 
 /* Generic Find */
 
-int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, struct obj_data **tar_obj, bool verbose = false);
+int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, class Object **tar_obj, bool verbose = false);
 
 int get_number(char **name);
 int get_number(string & name);
@@ -137,7 +137,7 @@ int get_number(string & name);
 #define FIND_OBJ_WORLD     16
 #define FIND_OBJ_EQUIP     32
 
-bool is_wearing(Character *ch, obj_data *item);
+bool is_wearing(Character *ch, Object *item);
 
 class ErrorHandler {
  public:
@@ -145,7 +145,7 @@ class ErrorHandler {
   class overrun {};
 };
 
-bool objExists(obj_data *obj);
+bool objExists(Object *obj);
 bool charge_moves(Character *ch, int skill, double modifier = 1);
 
 void die_follower(Character *ch);

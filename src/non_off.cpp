@@ -41,7 +41,7 @@ extern struct index_data *obj_index;
 extern CVoteData *DCVote;
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(Character *ch, obj_data *obj, bool decay = false)
+void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == NOWHERE)
@@ -53,10 +53,10 @@ void log_sacrifice(Character *ch, obj_data *obj, bool decay = false)
   }
   else
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
-  for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
     logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
@@ -67,7 +67,7 @@ void log_sacrifice(Character *ch, obj_data *obj, bool decay = false)
 
 int do_sacrifice(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *obj;
+  class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -178,7 +178,7 @@ int do_visible(Character *ch, char *argument, int cmd)
 
 int do_donate(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *obj;
+  class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
   char buf[MAX_STRING_LENGTH];
   int location;
@@ -316,7 +316,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
     logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-    for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);

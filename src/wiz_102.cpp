@@ -294,7 +294,7 @@ int do_stat(Character *ch, char *arg, int cmd)
 {
   struct descriptor_data d;
   Character *vict;
-  struct obj_data *obj;
+  class Object *obj;
   char type[MAX_INPUT_LENGTH];
   char name[MAX_INPUT_LENGTH];
   char *c;
@@ -1455,7 +1455,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  obj_data *obj = nullptr;
+  Object *obj = nullptr;
   int num;
 
   extra_descr_data *curr = nullptr;
@@ -1476,7 +1476,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   // select = # of affect
   // value = value to change aff to
 
-  obj = (obj_data *)obj_index[item_num].item;
+  obj = (Object *)obj_index[item_num].item;
 
   if (!*buf)
   {
@@ -1645,7 +1645,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  obj_data *obj = nullptr;
+  Object *obj = nullptr;
   int num;
   int modifier;
 
@@ -1686,7 +1686,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       break;
   }
 
-  obj = (obj_data *)obj_index[item_num].item;
+  obj = (Object *)obj_index[item_num].item;
 
   switch (x)
   {
@@ -2000,7 +2000,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
   if (!*buf3) // no field.  Stat the item.
   {
-    obj_stat(ch, (obj_data *)obj_index[rnum].item);
+    obj_stat(ch, (Object *)obj_index[rnum].item);
     return eSUCCESS;
   }
 
@@ -2035,7 +2035,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] keywords <new_keywords>\n\r", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->name = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->name = str_hsh(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2049,7 +2049,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] longdesc <new_desc>\n\r", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->description = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->description = str_hsh(buf4);
     sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2063,7 +2063,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] shortdesc <new_desc>\n\r", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->short_description = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->short_description = str_hsh(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2077,7 +2077,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] actiondesc <new_desc>\n\r", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->action_description = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->action_description = str_hsh(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2091,7 +2091,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\n", item_types[((obj_data *)obj_index[rnum].item)->obj_flags.type_flag]);
+      sprintf(buf, "%s\n", item_types[((Object *)obj_index[rnum].item)->obj_flags.type_flag]);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
 
@@ -2108,13 +2108,13 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     if (intval == 24)
     {
-      ((obj_data *)obj_index[rnum].item)->obj_flags.value[2] = -1;
+      ((Object *)obj_index[rnum].item)->obj_flags.value[2] = -1;
     }
     else
     {
-      ((obj_data *)obj_index[rnum].item)->obj_flags.value[2] = 0;
+      ((Object *)obj_index[rnum].item)->obj_flags.value[2] = 0;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.type_flag = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.type_flag = intval;
     sprintf(buf, "Item type set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2128,7 +2128,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((obj_data *)obj_index[rnum].item)->obj_flags.wear_flags,
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.wear_flags,
                 wear_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -2140,7 +2140,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(wear_bits, buf4, ch,
-                              ((obj_data *)obj_index[rnum].item)->obj_flags.wear_flags);
+                              ((Object *)obj_index[rnum].item)->obj_flags.wear_flags);
   }
   break;
 
@@ -2152,7 +2152,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((obj_data *)obj_index[rnum].item)->obj_flags.size,
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.size,
                 size_bitfields, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -2164,7 +2164,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(size_bitfields, buf4, ch,
-                              ((obj_data *)obj_index[rnum].item)->obj_flags.size);
+                              ((Object *)obj_index[rnum].item)->obj_flags.size);
   }
   break;
 
@@ -2176,7 +2176,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((obj_data *)obj_index[rnum].item)->obj_flags.extra_flags,
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.extra_flags,
                 extra_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -2188,7 +2188,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(extra_bits, buf4, ch,
-                              ((obj_data *)obj_index[rnum].item)->obj_flags.extra_flags);
+                              ((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
   }
   break;
 
@@ -2205,7 +2205,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.weight = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.weight = intval;
     sprintf(buf, "Item weight set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2224,7 +2224,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.cost = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.cost = intval;
     sprintf(buf, "Item value set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2238,7 +2238,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((obj_data *)obj_index[rnum].item)->obj_flags.more_flags,
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.more_flags,
                 more_obj_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -2250,7 +2250,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(more_obj_bits, buf4, ch,
-                              ((obj_data *)obj_index[rnum].item)->obj_flags.more_flags);
+                              ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
   }
   break;
 
@@ -2267,7 +2267,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.eq_level = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.eq_level = intval;
     sprintf(buf, "Item minimum level set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2286,7 +2286,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.value[0] = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.value[0] = intval;
     sprintf(buf, "Item value 1 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2305,7 +2305,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.value[1] = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.value[1] = intval;
     sprintf(buf, "Item value 2 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2324,7 +2324,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.value[2] = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.value[2] = intval;
     sprintf(buf, "Item value 3 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2343,7 +2343,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.value[3] = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.value[3] = intval;
     sprintf(buf, "Item value 4 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -2424,7 +2424,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
     struct vault_data *vault, *tvault;
     struct vault_items_data *items, *titems;
-    struct obj_data *obj;
+    class Object *obj;
     int num = 0, real_num = 0;
 
     for (vault = vault_table; vault; vault = tvault, num++)
@@ -2438,14 +2438,14 @@ int do_oedit(Character *ch, char *argument, int cmd)
           titems = items->next;
 
           real_num = real_object(items->item_vnum);
-          obj = items->obj ? items->obj : ((struct obj_data *)obj_index[real_num].item);
+          obj = items->obj ? items->obj : ((class Object *)obj_index[real_num].item);
           if (obj == nullptr)
             continue;
 
           if (obj->item_number == rnum)
           {
 
-            void item_remove(obj_data * obj, struct vault_data * vault);
+            void item_remove(Object * obj, struct vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
             logf(0, LogChannels::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner);
@@ -2454,9 +2454,9 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
     }
 
-    obj_data *next_k;
+    Object *next_k;
     // remove the item from players in world
-    for (obj_data *k = object_list; k; k = next_k)
+    for (Object *k = object_list; k; k = next_k)
     {
       next_k = k->next;
       if (k->item_number == rnum)
@@ -2472,7 +2472,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   // stat
   case 20:
   {
-    obj_stat(ch, (obj_data *)obj_index[rnum].item);
+    obj_stat(ch, (Object *)obj_index[rnum].item);
     return eSUCCESS;
     break;
   }
@@ -2488,23 +2488,23 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((obj_data *)obj_index[rnum].item)->obj_flags.timer = intval;
+    ((Object *)obj_index[rnum].item)->obj_flags.timer = intval;
     sprintf(buf, "Item timer to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
   break;
   case 22:
     extra_descr_data *curr;
-    for (curr = ((obj_data *)obj_index[rnum].item)->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, ((obj_data *)obj_index[rnum].item)->name))
+    for (curr = ((Object *)obj_index[rnum].item)->ex_description; curr; curr = curr->next)
+      if (!str_cmp(curr->keyword, ((Object *)obj_index[rnum].item)->name))
         break;
     if (!curr)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(((obj_data *)obj_index[rnum].item)->name);
+      curr->keyword = str_dup(((Object *)obj_index[rnum].item)->name);
       curr->description = str_dup("");
-      curr->next = ((obj_data *)obj_index[rnum].item)->ex_description;
-      ((obj_data *)obj_index[rnum].item)->ex_description = curr;
+      curr->next = ((Object *)obj_index[rnum].item)->ex_description;
+      ((Object *)obj_index[rnum].item)->ex_description = curr;
     }
     send_to_char("Write your object's description. End with /s.\r\n", ch);
     ch->desc->connected = conn::EDITING;
@@ -4964,7 +4964,7 @@ int do_osave(Character *ch, char *arg, int cmd)
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_object((obj_data *)obj_index[x].item, f);
+    write_object((Object *)obj_index[x].item, f);
 
   // end file
   fprintf(f, "$~\n");
@@ -4985,7 +4985,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   int low, high;
   int /*number,*/ count;
   Character *mob, /**tmp_mob,*next_mob,*/ *mob_list;
-  struct obj_data *obj, *tmp_obj, /**next_obj,*/ *obj_list;
+  class Object *obj, *tmp_obj, /**next_obj,*/ *obj_list;
 
   bool found_room = false;
 
@@ -5286,7 +5286,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   char buf2[MAX_STRING_LENGTH];
   class room_data *rm = 0;
   Character *k = 0;
-  struct obj_data *j = 0;
+  class Object *j = 0;
   struct extra_descr_data *desc;
   int i, x, loc;
 

@@ -24,7 +24,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
   char buf[MAX_INPUT_LENGTH];
   Character *victim;
   struct affected_type *af, *afpk;
-  struct obj_data *dummy;
+  class Object *dummy;
 
   one_argument(argument, buf);
 
@@ -85,7 +85,7 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
 int do_log(Character *ch, char *argument, int cmd)
 {
   Character *vict;
-  struct obj_data *dummy;
+  class Object *dummy;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
@@ -377,7 +377,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
 int do_dmg_eq(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *obj_object;
+  class Object *obj_object;
   int eqdam;
 
   one_argument(argument, buf);
@@ -655,7 +655,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
   }
   return eSUCCESS;
 }
-int max_aff(struct obj_data *obj, int type)
+int max_aff(class Object *obj, int type)
 {
   int a, b = -1;
   for (a = 0; a < obj->num_affects; a++)
@@ -691,8 +691,8 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   int a = 0, o;
   argument = one_argument(argument, arg);
-  extern int class_restricted(Character * ch, struct obj_data * obj);
-  extern int size_restricted(Character * ch, struct obj_data * obj);
+  extern int class_restricted(Character * ch, class Object * obj);
+  extern int size_restricted(Character * ch, class Object * obj);
 
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
@@ -733,12 +733,12 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   if (!str_cmp(arg, "nodouble"))
     nodouble = true;
   int i = 1;
-  struct obj_data *obj;
+  class Object *obj;
   for (i = 1; i < 32000; i++)
   {
     if (real_object(i) < 0)
       continue;
-    obj = (obj_data *)obj_index[real_object(i)].item;
+    obj = (Object *)obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
@@ -791,7 +791,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((obj_data *)obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -914,7 +914,7 @@ int do_listproc(Character *ch, char *argument, int a)
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((obj_data *)obj_index[real_object(i)].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)obj_index[real_object(i)].item)->name);
     }
   }
   send_to_char(buf, ch);

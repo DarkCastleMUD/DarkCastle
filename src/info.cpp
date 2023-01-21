@@ -58,7 +58,7 @@ using namespace std;
 extern CWorld world;
 
 extern struct descriptor_data *descriptor_list;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char credits[MAX_STRING_LENGTH];
@@ -86,7 +86,7 @@ extern int getRealSpellDamage(Character *ch);
 
 /* intern functions */
 
-void list_obj_to_char(struct obj_data *list, Character *ch, int mode, bool show);
+void list_obj_to_char(class Object *list, Character *ch, int mode, bool show);
 
 int get_saves(Character *ch, int savetype)
 {
@@ -158,8 +158,8 @@ void argument_split_3(char *argument, char *first_arg, char *second_arg, char *t
    begin += look_at;
 }
 
-struct obj_data *get_object_in_equip_vis(Character *ch,
-                                         char *arg, struct obj_data *equipment[], int *j, bool blindfighting)
+class Object *get_object_in_equip_vis(Character *ch,
+                                         char *arg, class Object *equipment[], int *j, bool blindfighting)
 {
    int k, num;
    char tmpname[MAX_STRING_LENGTH];
@@ -194,7 +194,7 @@ char *find_ex_description(char *word, struct extra_descr_data *list)
    return (0);
 }
 
-const char *item_condition(struct obj_data *object)
+const char *item_condition(class Object *object)
 {
    int percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
 
@@ -214,7 +214,7 @@ const char *item_condition(struct obj_data *object)
       return " [$5Pile of Scraps$R]";
 }
 
-void show_obj_to_char(struct obj_data *object, Character *ch, int mode)
+void show_obj_to_char(class Object *object, Character *ch, int mode)
 {
    char buffer[MAX_STRING_LENGTH];
    char flagbuf[MAX_STRING_LENGTH];
@@ -390,10 +390,10 @@ void show_obj_to_char(struct obj_data *object, Character *ch, int mode)
    page_string(ch->desc, buffer, 1);
 }
 
-void list_obj_to_char(struct obj_data *list, Character *ch, int mode,
+void list_obj_to_char(class Object *list, Character *ch, int mode,
                       bool show)
 {
-   struct obj_data *i;
+   class Object *i;
    bool found = false;
    int number = 1;
    int can_see;
@@ -497,7 +497,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 {
    string buffer;
    int j, found, percent;
-   struct obj_data *tmp_obj;
+   class Object *tmp_obj;
    char buf2[MAX_STRING_LENGTH];
    clan_data *clan;
    char buf[200];
@@ -916,8 +916,8 @@ void list_char_to_char(Character *list, Character *ch, int mode)
 void try_to_peek_into_container(Character *vict, Character *ch,
                                 char *container)
 {
-   struct obj_data *obj = nullptr;
-   struct obj_data *cont = nullptr;
+   class Object *obj = nullptr;
+   class Object *cont = nullptr;
    int found = false;
 
    if (GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) < DEITY)
@@ -1040,7 +1040,7 @@ void showStatDiff(Character *ch, int base, int random, bool swapcolors = false)
    return;
 }
 
-bool identify(Character *ch, obj_data *obj)
+bool identify(Character *ch, Object *obj)
 {
    if (ch == nullptr || obj == nullptr)
    {
@@ -1087,7 +1087,7 @@ bool identify(Character *ch, obj_data *obj)
    csendf(ch, "$3Weight: $R%d\r\n", obj->obj_flags.weight);
    csendf(ch, "$3Value: $R%d\r\n", obj->obj_flags.cost);
 
-   const obj_data *vobj = nullptr;
+   const Object *vobj = nullptr;
    if (obj->item_number >= 0)
    {
       const int vnum = obj_index[obj->item_number].virt;
@@ -1096,7 +1096,7 @@ bool identify(Character *ch, obj_data *obj)
          const int rn_of_vnum = real_object(vnum);
          if (rn_of_vnum >= 0)
          {
-            vobj = (obj_data *)obj_index[rn_of_vnum].item;
+            vobj = (Object *)obj_index[rn_of_vnum].item;
          }
       }
    }
@@ -1169,7 +1169,7 @@ bool identify(Character *ch, obj_data *obj)
       }
       csendf(ch, "\r\n");
 
-      int get_weapon_damage_type(obj_data * wielded);
+      int get_weapon_damage_type(Object * wielded);
       bits = get_weapon_damage_type(obj) - 1000;
       extern char *strs_damage_types[];
       csendf(ch, "$3Damage type$R: %s\r\n", strs_damage_types[bits]);
@@ -1285,7 +1285,7 @@ command_return_t Character::do_identify(QStringList &arguments, int cmd)
 
    QRegularExpression re("^v(?<vnum>\\d+)$");
    QRegularExpressionMatch match = re.match(arg1);
-   obj_data *obj = nullptr;
+   Object *obj = nullptr;
    if (match.hasMatch())
    {
       QString buffer = match.captured("vnum");
@@ -1297,7 +1297,7 @@ command_return_t Character::do_identify(QStringList &arguments, int cmd)
          send("Invalid VNUM.\r\n");
          return eFAILURE;
       }
-      obj = (obj_data *)obj_index[rnum].item;
+      obj = (Object *)obj_index[rnum].item;
 
       if (isMortal() && obj->isDark())
       {
@@ -1337,14 +1337,14 @@ int do_look(Character *ch, char *argument, int cmd)
    int j = 0, bits = 0, temp = 0;
    int door = 0, original_loc = 0;
    bool found = 0;
-   struct obj_data *tmp_object = nullptr, *found_object = nullptr;
+   class Object *tmp_object = nullptr, *found_object = nullptr;
    Character *tmp_char = nullptr;
    char *tmp_desc = nullptr;
    static const char *keywords[] = {"north", "east", "south", "west", "up", "down",
                                     "in", "at", "out", "through", "", /* Look at '' case */
                                     "\n"};
 
-   int weight_in(struct obj_data * obj);
+   int weight_in(class Object * obj);
    if (!ch->desc)
       return 1;
    if (GET_POS(ch) < POSITION_SLEEPING)
@@ -1494,7 +1494,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight)
                      {
 
-                        int weight_in(struct obj_data * obj);
+                        int weight_in(class Object * obj);
                         if (obj_index[tmp_object->item_number].virt == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
@@ -1875,7 +1875,7 @@ int do_examine(Character *ch, char *argument, int cmd)
 {
    char name[200], buf[200];
    Character *tmp_char;
-   struct obj_data *tmp_object;
+   class Object *tmp_object;
 
    sprintf(buf, "at %s", argument);
    do_look(ch, buf, 15);
@@ -2612,7 +2612,7 @@ int do_info(Character *ch, char *argument, int cmd)
 int do_olocate(Character *ch, char *name, int cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
-   struct obj_data *k;
+   class Object *k;
    int in_room = 0, count = 0;
    int vnum = 0;
    int searchnum = 0;
@@ -3395,7 +3395,7 @@ command_return_t Character::do_experience(QStringList &arguments, int cmd)
 
 void check_champion_and_website_who_list()
 {
-   obj_data *obj;
+   Object *obj;
    stringstream buf, buf2;
    int addminute = 0;
    string name;
@@ -3519,7 +3519,7 @@ public:
       O_EQUIPPED_BY,
       LIMIT
    };
-   bool operator==(const obj_data *obj);
+   bool operator==(const Object *obj);
    void setType(types type) { type_ = type; }
    types getType(void) { return type_; }
    void setObjectMinimumLevel(uint64_t level) { o_min_level_ = level; }
@@ -3560,7 +3560,7 @@ private:
    bool show_range_ = false;
 };
 
-bool Search::operator==(const obj_data *obj)
+bool Search::operator==(const Object *obj)
 {
    if (obj == nullptr)
    {
@@ -3867,7 +3867,7 @@ command_return_t Character::do_search(QStringList &arguments, int cmd)
 
    bool header_shown = false;
    size_t objects_found = 0;
-   vector<struct obj_data *> obj_results;
+   vector<class Object *> obj_results;
    uint64_t limit_output = 0;
 
    for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
@@ -3878,7 +3878,7 @@ command_return_t Character::do_search(QStringList &arguments, int cmd)
       {
          continue;
       }
-      obj_data *obj = static_cast<obj_data *>(obj_index[rnum].item);
+      Object *obj = static_cast<Object *>(obj_index[rnum].item);
       if (obj == nullptr)
       {
          continue;

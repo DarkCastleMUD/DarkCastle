@@ -644,7 +644,7 @@ void check_maxes(Character *ch);
 typedef	int	SPELL_FUN	( uint8_t level, Character *ch,
 				  char *arg, int type,
 				  Character *tar_ch,
-				  struct obj_data *tar_obj,
+				  class Object *tar_obj,
                                   int skill );
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C

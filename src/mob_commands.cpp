@@ -71,7 +71,7 @@ extern struct mprog_throw_type *g_mprog_throw_list;
 extern Character *activeActor;
 extern Character *activeRndm;
 extern Character *activeTarget;
-extern obj_data *activeObj;
+extern Object *activeObj;
 extern void *activeVo;
 
 extern int top_of_world;
@@ -80,7 +80,7 @@ extern struct index_data *obj_index;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
 
-struct obj_data *get_object_in_equip_vis(Character *ch, char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
+class Object *get_object_in_equip_vis(Character *ch, char *arg, class Object *equipment[], int *j, bool blindfighting);
 
 /*
  * Local functions.
@@ -355,7 +355,7 @@ int do_mpaddlag(Character *ch, char *argument, int cmd)
 int do_mpjunk(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  obj_data *obj;
+  Object *obj;
   int location;
   bool dot = false;
   char dotbuf[MAX_INPUT_LENGTH];
@@ -396,7 +396,7 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
         if (!dot || isname(dotbuf, ch->equipment[l]->name))
           extract_obj(unequip_char(ch, l));
 
-    obj_data *x, *v;
+    Object *x, *v;
     for (x = ch->carrying; x; x = v)
     {
       v = x->next_content;
@@ -567,7 +567,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH] = {0};
   char arg2[MAX_INPUT_LENGTH] = {0};
-  obj_data *obj;
+  Object *obj;
   int realnum;
   extern struct index_data *obj_index;
 
@@ -624,7 +624,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
-  obj_data *obj;
+  Object *obj;
 
   if (!IS_NPC(ch))
   {
@@ -638,7 +638,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
   {
     /* 'purge' */
     Character *vnext;
-    obj_data *obj_next;
+    Object *obj_next;
 
     for (victim = world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
@@ -756,7 +756,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   }
   else
   {
-    obj_data *obj;
+    Object *obj;
     if ((vict = get_char_vis(ch, arg)))
     {
       location = vict->in_room;
@@ -1832,7 +1832,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 
   extern Character *activeActor;
   extern Character *activeRndm;
-  extern obj_data *activeObj;
+  extern Object *activeObj;
   extern void *activeVo;
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;

@@ -52,7 +52,7 @@ int move_gain(Character *ch, int extra);
 void isr_set(Character *ch);
 Character *get_pc(char *name);
 void mob_stat(Character *ch, Character *k);
-void obj_stat(Character *ch, struct obj_data *j);
+void obj_stat(Character *ch, class Object *j);
 int number_or_name(char **name, int *num);
 int mob_in_index(char *name, int index);
 int obj_in_index(char *name, int index);

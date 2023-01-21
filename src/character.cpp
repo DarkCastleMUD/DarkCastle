@@ -20,12 +20,12 @@ QString Character::getSetting(QString key, QString defaultValue)
     return defaultValue;
 }
 
-void mob_data::setObject(obj_data *o)
+void mob_data::setObject(Object *o)
 {
     object = o;
 }
 
-obj_data *mob_data::getObject(void)
+Object *mob_data::getObject(void)
 {
     return object;
 }

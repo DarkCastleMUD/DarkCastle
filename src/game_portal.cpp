@@ -180,14 +180,14 @@ void process_portals()
 */
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 {
-  extern struct obj_data *object_list;
-  struct obj_data *from_portal;
+  extern class Object *object_list;
+  class Object *from_portal;
   char log_buf[256];
 
 #ifdef LEAK_CHECK
-  from_portal = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+  from_portal = (class Object *)calloc(1, sizeof(class Object));
 #else
-  from_portal = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  from_portal = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(from_portal);
 
@@ -257,10 +257,10 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
 void find_and_remove_player_portal(Character *ch)
 {
-  struct obj_data *k;
-  struct obj_data *next_k;
+  class Object *k;
+  class Object *next_k;
   char searchstr[180];
-  extern struct obj_data *object_list;
+  extern class Object *object_list;
   extern int top_of_world;
   extern class room_data **world_array;
 

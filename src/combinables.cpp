@@ -41,7 +41,7 @@ extern struct index_data *obj_index;
 // local function declarations
 void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial);
 int determine_trade_skill_chance(int learned, int trivial);
-int valid_trade_skill_combine(struct obj_data *container, struct trade_data_type *data, Character *ch);
+int valid_trade_skill_combine(class Object *container, struct trade_data_type *data, Character *ch);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -136,7 +136,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
   }
 
   // TODO search for mortar and pestle
-  obj_data *container = get_obj_in_list_vis(ch, TRADE_SKILL_POISON_CONT, ch->carrying);
+  Object *container = get_obj_in_list_vis(ch, TRADE_SKILL_POISON_CONT, ch->carrying);
 
   if (!container)
   {
@@ -190,7 +190,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
     return (eFAILURE | eINTERNAL_ERROR);
   }
 
-  obj_data *reward = clone_object(rewardnum);
+  Object *reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
   csendf(ch, "You succesfully make a %s!\r\n", reward->short_description);
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
@@ -223,7 +223,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   }
 
   // find weapon
-  obj_data *weapon = ch->equipment[WIELD];
+  Object *weapon = ch->equipment[WIELD];
   if (!weapon)
   {
     send_to_char("You aren't wielding a weapon to poison.\r\n", ch);
@@ -231,7 +231,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   }
 
   // find vial and verify it's a valid poison vial
-  obj_data *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
+  Object *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
     csendf(ch, "You don't seem to have any %s.\r\n", vialarg);
@@ -275,7 +275,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 // Return index of match on successful find
 // Return -1 on failure
 // Return -2 if there's nothing in the container
-int valid_trade_skill_combine(obj_data *container, trade_data_type *data, Character *ch)
+int valid_trade_skill_combine(Object *container, trade_data_type *data, Character *ch)
 {
   if (!(container->contains))
   {
@@ -286,7 +286,7 @@ int valid_trade_skill_combine(obj_data *container, trade_data_type *data, Charac
   vector<int> current;
 
   // take all the items in our container and put them in an array by vnum
-  for (obj_data *j = container->contains; j; j = j->next_content)
+  for (Object *j = container->contains; j; j = j->next_content)
     if (j->item_number >= 0)
       current.push_back(obj_index[j->item_number].virt);
     else
@@ -405,7 +405,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
 int do_brew(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
-  obj_data *herbobj, *liquidobj, *containerobj;
+  Object *herbobj, *liquidobj, *containerobj;
   affected_type af;
   Brew b;
 
@@ -912,7 +912,7 @@ int Brew::find(Brew::recipe r)
 int do_scribe(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
-  obj_data *inkobj, *dustobj, *penobj, *paperobj;
+  Object *inkobj, *dustobj, *penobj, *paperobj;
   affected_type af;
   Scribe s;
 

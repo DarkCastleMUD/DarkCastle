@@ -116,7 +116,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
 /*
  * See if a shop will buy an item.
  */
-int trade_with(struct obj_data *item, int shop_nr)
+int trade_with(class Object *item, int shop_nr)
 {
   int counter;
 
@@ -132,9 +132,9 @@ int trade_with(struct obj_data *item, int shop_nr)
   return false;
 }
 
-int unlimited_supply(struct obj_data *item, int shop_nr)
+int unlimited_supply(class Object *item, int shop_nr)
 {
-  struct obj_data *obj;
+  class Object *obj;
 
   for (obj = shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -147,7 +147,7 @@ int unlimited_supply(struct obj_data *item, int shop_nr)
 
 void restock_keeper(Character *keeper, int shop_nr)
 {
-  struct obj_data *obj, *obj2;
+  class Object *obj, *obj2;
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
@@ -168,7 +168,7 @@ void shopping_buy(const char *arg, Character *ch,
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  struct obj_data *obj;
+  class Object *obj;
   uint32_t cost;
 
   if (!is_ok(keeper, ch, shop_nr))
@@ -280,7 +280,7 @@ void shopping_sell(const char *arg, Character *ch,
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  struct obj_data *obj;
+  class Object *obj;
   uint32_t cost;
 
   if (!is_ok(keeper, ch, shop_nr))
@@ -393,7 +393,7 @@ void shopping_value(const char *arg, Character *ch,
 {
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  struct obj_data *obj;
+  class Object *obj;
   int cost;
   bool keeperhas = false;
 
@@ -629,7 +629,7 @@ void shopping_list(const char *arg, Character *ch,
                    Character *keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *obj, *tobj;
+  class Object *obj, *tobj;
   int cost;
   //    extern char *drinks[];
   int found;
@@ -695,7 +695,7 @@ void shopping_list(const char *arg, Character *ch,
 
 // Spec proc for shop keepers.
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
-int shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
+int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
 {
   Character *keeper;
   int shop_nr;
@@ -899,7 +899,7 @@ void fix_shopkeepers_inventory()
   int shop_nr;
 
   Character *keeper = 0;
-  struct obj_data *obj, *last_obj, *cloned;
+  class Object *obj, *last_obj, *cloned;
 
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
@@ -1153,7 +1153,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   }
 
   // find item
-  obj_data *obj;
+  Object *obj;
 
   if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == nullptr)
   {
@@ -1233,7 +1233,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   }
 
   // give it to them, thank them, take the money
-  obj_data *obj = clone_object(robj);
+  Object *obj = clone_object(robj);
   obj_to_char(obj, ch);
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
@@ -1447,14 +1447,14 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       if (robj < 0)
         csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, "INVALID ITEM NUMBER", item->price);
       else
-        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, ((obj_data *)obj_index[robj].item)->short_description, item->price);
+        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, ((Object *)obj_index[robj].item)->short_description, item->price);
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
     csendf(ch, "\r\nYour shop has %ld cash in the till.\r\n", shop->money_on_hand);
 }
 
-int player_shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
+int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
 {
   Character *keeper;
 
@@ -1661,7 +1661,7 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
     {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0, 0},
     {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0, 0}};
 
-int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
+int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   if (cmd != CMD_LIST && cmd != CMD_BUY)
     return eFAILURE;
@@ -1688,7 +1688,7 @@ int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *a
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+        strncpy(item_buf, ((Object *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
       }
       else
       {
@@ -1697,7 +1697,7 @@ int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *a
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+        strncpy(cost_buf, ((Object *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1824,7 +1824,7 @@ int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *a
 
       for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
       {
-        obj_data *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
+        Object *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
         if (obj != 0)
         {
           if (obj->in_obj)
@@ -1855,7 +1855,7 @@ int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *a
 
     for (int i = 0; i < eddie[choice - 1].item_qty; i++)
     {
-      obj_data *item = clone_object(real_object(eddie[choice - 1].item_vnum));
+      Object *item = clone_object(real_object(eddie[choice - 1].item_vnum));
       if (item != 0)
       {
         obj_to_char(item, ch);
@@ -1881,7 +1881,7 @@ int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *a
   return eSUCCESS;
 }
 
-int reroll_trader(Character *ch, obj_data *obj, int cmd, const char *arg, Character *owner)
+int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Character *owner)
 {
   if (ch == nullptr || IS_MOB(ch))
   {
@@ -1953,15 +1953,15 @@ int reroll_trader(Character *ch, obj_data *obj, int cmd, const char *arg, Charac
           return eSUCCESS;
         }
 
-        if (isname("godload", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
-            isname("gl", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+        if (isname("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
+            isname("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
             IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+        if (isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
             obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");

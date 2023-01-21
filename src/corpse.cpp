@@ -45,22 +45,22 @@
 #define VIRTUAL 1
 
 /* External Structures / Variables */
-extern struct obj_data *object_list;
-struct obj_data *obj_proto;
+extern class Object *object_list;
+class Object *obj_proto;
 extern struct CWorld world;
 extern struct index_data *obj_index; /* index table for object file   */
 int16_t frozen_start_room = 1;
 
 /* Local Function Declerations */
 int count_hash_records(FILE *fl);
-struct obj_data *create_obj_new(void);
+class Object *create_obj_new(void);
 void save_corpses(void);
 void load_corpses(void);
-int corpse_save(struct obj_data *obj, FILE *fp, int location, bool recurse_this_tree);
-int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate);
+int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tree);
+int write_corpse_to_disk(FILE *fp, class Object *obj, int locate);
 void clean_string(char *buffer);
 int get_line_new(FILE *fl, char *buf);
-struct obj_data *read_object_new(int nr, int type);
+class Object *read_object_new(int nr, int type);
 char *fread_string_new(FILE *fl, char *error);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
@@ -81,13 +81,13 @@ void clean_string(char *buffer)
 	}
 }
 
-int corpse_save(struct obj_data *obj, FILE *fp, int location, bool recurse_this_tree)
+int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tree)
 {
 	/* This function basically is responsible for taking the    */
 	/* supplied obj and figuring out if it has any contents. If */
 	/* it does then we write those to disk.. Ad Nasum.          */
 
-	// struct obj_data *tmp;
+	// class Object *tmp;
 	int result;
 
 	if (obj)
@@ -120,7 +120,7 @@ int corpse_save(struct obj_data *obj, FILE *fp, int location, bool recurse_this_
 	return (true);
 }
 
-int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate)
+int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 {
 	/* This is basically Patrick's my_obj_save_to_disk function with    */
 	/* a few minor tweaks to make it work for corpses. Basically it     */
@@ -209,7 +209,7 @@ void save_corpses(void)
 	/* directly or indirectly you need to call this function */
 
 	FILE *fp;
-	struct obj_data *i, *next;
+	class Object *i, *next;
 	int location = 0;
 	char buf1[256] = {0};
 	extern int do_not_save_corpses;
@@ -262,12 +262,12 @@ void load_corpses(void)
 	char line[256] = {0};
 	int t[15], zwei = 0;
 	int nr, num_objs = 0;
-	struct obj_data *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
+	class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
 	struct extra_descr_data *new_descr;
 	char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
 	bool end = false;
 	int number = -1;
-	struct obj_data *money;
+	class Object *money;
 	int debug = 0;
 
 	if (!(fp = fopen(CORPSE_FILE, "r")))
@@ -587,11 +587,11 @@ int get_line_new(FILE *fl, char *buf)
 	}
 }
 
-struct obj_data *create_obj_new(void)
+class Object *create_obj_new(void)
 {
-	struct obj_data *obj;
+	class Object *obj;
 
-	CREATE(obj, struct obj_data, 1);
+	CREATE(obj, class Object, 1);
 	clear_object(obj);
 	obj->next = object_list;
 	object_list = obj;
@@ -604,9 +604,9 @@ struct obj_data *create_obj_new(void)
 }
 
 /* create a new object from a prototype */
-struct obj_data *read_object_new(int nr, int type)
+class Object *read_object_new(int nr, int type)
 {
-	struct obj_data *obj;
+	class Object *obj;
 	int i;
 	char buf[256] = {0};
 
@@ -626,7 +626,7 @@ struct obj_data *read_object_new(int nr, int type)
 	else
 		i = nr;
 
-	CREATE(obj, struct obj_data, 1);
+	CREATE(obj, class Object, 1);
 	clear_object(obj);
 	//  *obj = obj_proto[i];
 	obj->next = object_list;

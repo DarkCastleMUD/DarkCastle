@@ -337,7 +337,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	int was_in;
 	int need_movement, learned, mvinroom = 0, mvtoroom = 0;
 	int retval;
-	struct obj_data *obj;
+	class Object *obj;
 	bool has_boat;
 
 	/*
@@ -704,7 +704,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		WAIT_STATE(ch, PULSE_VIOLENCE);
 	}
 
-	obj_data *tmp_obj;
+	Object *tmp_obj;
 	for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
 			send_to_char("The sounds around you fade to nothing as the silence takes hold...\r\n", ch);
@@ -1031,7 +1031,7 @@ int do_move(Character *ch, char *argument, int cmd)
 
 int do_leave(Character *ch, char *arguement, int cmd)
 {
-	struct obj_data *k;
+	class Object *k;
 	char buf[200];
 	int retval;
 
@@ -1075,7 +1075,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	int retval;
 
 	Character *sesame;
-	obj_data *portal = nullptr;
+	Object *portal = nullptr;
 
 	if ((ch->in_room != NOWHERE) || (ch->in_room))
 	{
@@ -1265,7 +1265,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 int do_climb(Character *ch, char *argument, int cmd)
 {
 	char buf[MAX_INPUT_LENGTH];
-	obj_data *obj = nullptr;
+	Object *obj = nullptr;
 
 	one_argument(argument, buf);
 

@@ -132,7 +132,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -202,7 +202,7 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  obj_data *tmp_obj = nullptr;
+  Object *tmp_obj = nullptr;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -312,7 +312,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -423,7 +423,7 @@ int do_auction(Character *ch, char *argument, int cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -520,7 +520,7 @@ int do_shout(Character *ch, char *argument, int cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -598,7 +598,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -815,7 +815,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
 {
   Character *vict = nullptr;
   string name = {}, message = {}, buf = {}, log_buf = {};
-  obj_data *tmp_obj = nullptr;
+  Object *tmp_obj = nullptr;
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
   {
@@ -1032,7 +1032,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -1068,7 +1068,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -1113,7 +1113,7 @@ int do_ask(Character *ch, char *argument, int cmd)
   Character *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -1158,7 +1158,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   Character *k;
   struct follow_type *f;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (ch == nullptr || ch->pcdata == nullptr)
@@ -1256,7 +1256,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))

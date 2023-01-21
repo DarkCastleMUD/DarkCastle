@@ -46,7 +46,7 @@ struct shop_data
     int in_room;            /* Where is the shop?                   */
     int open1, open2;       /* When does the shop open?             */
     int close1, close2;     /* When does the shop close?            */
-    struct obj_data *inventory;  /* list of things shop never runs out of  
+    class Object *inventory;  /* list of things shop never runs out of  
 */
 };
 
@@ -54,11 +54,11 @@ void redo_shop_profit(void);
 
 struct reroll_t
 {
-  obj_data *choice1_obj = nullptr;
-  obj_data *choice2_obj = nullptr;
+  Object *choice1_obj = nullptr;
+  Object *choice2_obj = nullptr;
   uint64_t orig_rnum = {};
   vnum_t orig_vnum = {};
-  obj_data *orig_obj = nullptr;
+  Object *orig_obj = nullptr;
 
   enum reroll_states_t
   {

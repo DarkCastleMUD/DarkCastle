@@ -25,7 +25,7 @@ using namespace std;
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
-struct obj_data *my_obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data *last_cont);
+class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 int read_pc_or_mob_data(Character *ch, FILE *fpsave);
 void init_random();
 void load_vaults();
@@ -115,7 +115,7 @@ void test_random_stats(void)
   }
 }
 
-void showObjectAffects(obj_data *obj)
+void showObjectAffects(Object *obj)
 {
   for (int i = 0; i < obj->num_affects; ++i)
   {
@@ -143,7 +143,7 @@ void showObjectAffects(obj_data *obj)
   }
 }
 
-void showObjectVault(const char *owner, obj_data *obj)
+void showObjectVault(const char *owner, Object *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -165,7 +165,7 @@ void showObjectVault(const char *owner, obj_data *obj)
   cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
-void showObject(Character *ch, obj_data *obj)
+void showObject(Character *ch, Object *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 
   if (argv[1] == string("all") || argv[1] == string("leaderboard"))
   {
-    obj_data *obj = nullptr;
+    Object *obj = nullptr;
     string savepath = dclib + "../save/";
     for (const auto &entry : filesystem::directory_iterator(savepath))
     {
@@ -343,7 +343,7 @@ int main(int argc, char **argv)
                 }
               }
 
-              for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
+              for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
                 if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
                 {
@@ -352,7 +352,7 @@ int main(int argc, char **argv)
 
                 if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
                 {
-                  for (obj_data *container = obj->contains; container; container = container->next_content)
+                  for (Object *container = obj->contains; container; container = container->next_content)
                   {
                     if (vnum > 0 && obj_index[container->item_number].virt == vnum)
                     {
@@ -418,7 +418,7 @@ int main(int argc, char **argv)
     {
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
-        obj_data *obj = items->obj ? items->obj : get_obj(items->item_vnum);
+        Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
         if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
         {
           showObjectVault(vault->owner, obj);
@@ -434,7 +434,7 @@ int main(int argc, char **argv)
   {
     try
     {
-      obj_data *obj;
+      Object *obj;
       if (load_char_obj(d, argv[1]) == false)
       {
         cerr << "Unable to load " << argv[1] << endl;
@@ -458,13 +458,13 @@ int main(int argc, char **argv)
         }
       }
 
-      for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
+      for (Object *obj = ch->carrying; obj; obj = obj->next_content)
       {
         showObject(ch, obj);
 
         if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
         {
-          for (obj_data *container = obj->contains; container; container = container->next_content)
+          for (Object *container = obj->contains; container; container = container->next_content)
           {
             showObject(ch, container);
           }

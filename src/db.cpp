@@ -91,7 +91,7 @@ class room_data **world_array = 0; // array of rooms
 int top_of_world = 0;			   // index of last room in world
 int top_of_world_alloc = 0;		   // index of last alloc'd memory in world
 
-struct obj_data *object_list = 0; /* the global linked list of obj's */
+class Object *object_list = 0; /* the global linked list of obj's */
 
 pulse_data *bard_list = 0; /* global l-list of bards          */
 
@@ -1290,7 +1290,7 @@ void remove_all_mobs_from_world()
 
 void remove_all_objs_from_world()
 {
-	obj_data *curr = nullptr;
+	Object *curr = nullptr;
 
 	while ((curr = object_list))
 		extract_obj(curr);
@@ -1365,7 +1365,7 @@ struct index_data *generate_obj_indices(int *top,
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].progtypes = 0;
-					if (!(index[i].item = (struct obj_data *)read_object(i, fl, false)))
+					if (!(index[i].item = (class Object *)read_object(i, fl, false)))
 					{
 						sprintf(log_buf, "Unable to load object %d!\n\r",
 								index[i].virt);
@@ -1890,11 +1890,11 @@ void free_mobs_from_memory()
 
 void free_objs_from_memory()
 {
-	struct obj_data *curr = nullptr;
+	class Object *curr = nullptr;
 	// struct extra_descr_data * curr_extra = nullptr;
 
 	for (int i = 0; i <= top_of_objt; i++)
-		if ((curr = (struct obj_data *)obj_index[i].item))
+		if ((curr = (class Object *)obj_index[i].item))
 		{
 			free_obj(curr);
 			obj_index[i].item = nullptr;
@@ -3402,8 +3402,8 @@ Character *clone_mobile(int nr)
 //
 int create_blank_item(int nr)
 {
-	struct obj_data *obj;
-	struct obj_data *curr;
+	class Object *obj;
+	class Object *curr;
 	int cur_index = 0;
 
 	// check if room available in index
@@ -3426,9 +3426,9 @@ int create_blank_item(int nr)
 		// create
 
 #ifdef LEAK_CHECK
-	obj = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+	obj = (class Object *)calloc(1, sizeof(class Object));
 #else
-	obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+	obj = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
 
 	clear_object(obj);
@@ -3465,7 +3465,7 @@ int create_blank_item(int nr)
 
 	// update index of all the obj prototypes
 	for (int i = cur_index + 1; i <= top_of_objt; i++)
-		((obj_data *)obj_index[i].item)->item_number++;
+		((Object *)obj_index[i].item)->item_number++;
 
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
@@ -3734,7 +3734,7 @@ void delete_mob_from_index(int nr)
 void delete_item_from_index(int nr)
 {
 	int i = 0, j = 0;
-	struct obj_data *curr;
+	class Object *curr;
 
 	if (nr < 0 || nr > top_of_objt) // doesn't exist!
 		return;
@@ -3753,7 +3753,7 @@ void delete_item_from_index(int nr)
 
 	// update index of all the obj prototypes
 	for (i = nr; i <= top_of_objt; i++)
-		((obj_data *)obj_index[i].item)->item_number--;
+		((Object *)obj_index[i].item)->item_number--;
 
 	// update obj file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;
@@ -3797,9 +3797,9 @@ void delete_item_from_index(int nr)
 }
 
 /* read an object from OBJ_FILE */
-struct obj_data *read_object(int nr, FILE *fl, bool zz)
+class Object *read_object(int nr, FILE *fl, bool zz)
 {
-	struct obj_data *obj;
+	class Object *obj;
 	int loc, mod;
 
 	char chk;
@@ -3811,9 +3811,9 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	}
 
 #ifdef LEAK_CHECK
-	obj = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+	obj = (class Object *)calloc(1, sizeof(class Object));
 #else
-	obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+	obj = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
 
 	clear_object(obj);
@@ -3950,7 +3950,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	return obj;
 }
 
-ifstream &operator>>(ifstream &in, obj_data *obj)
+ifstream &operator>>(ifstream &in, Object *obj)
 {
 	int loc, mod, nr;
 
@@ -4079,7 +4079,7 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 // write an object to file
 // This assumes that the object is valid, and the file is open for writing
 //
-void write_object(obj_data *obj, FILE *fl)
+void write_object(Object *obj, FILE *fl)
 {
 	struct extra_descr_data *currdesc;
 
@@ -4131,7 +4131,7 @@ void write_object(obj_data *obj, FILE *fl)
 	fprintf(fl, "S\n");
 }
 
-ofstream &operator<<(ofstream &out, obj_data *obj)
+ofstream &operator<<(ofstream &out, Object *obj)
 {
 	out << "#" << obj_index[obj->item_number].virt << "\n";
 	string_to_file(out, obj->name);
@@ -4232,7 +4232,7 @@ void write_bitvector_csv(uint32_t vector, const char *const *array, ofstream &fo
 	return;
 }
 
-void write_object_csv(obj_data *obj, ofstream &fout)
+void write_object_csv(Object *obj, ofstream &fout)
 {
 	try
 	{
@@ -4284,24 +4284,24 @@ void write_object_csv(obj_data *obj, ofstream &fout)
 	fout << endl;
 }
 
-bool has_random(obj_data *obj)
+bool has_random(Object *obj)
 {
 
 	return ((obj_index[obj->item_number].progtypes & RAND_PROG) || (obj_index[obj->item_number].progtypes & ARAND_PROG));
 }
 
 /* clone an object from obj_index */
-struct obj_data *clone_object(int nr)
+class Object *clone_object(int nr)
 {
-	struct obj_data *obj, *old;
+	class Object *obj, *old;
 	struct extra_descr_data *new_new_descr, *descr;
 
 	if (nr < 0)
 		return 0;
 
-	obj = new obj_data;
+	obj = new Object;
 	clear_object(obj);
-	old = ((struct obj_data *)obj_index[nr].item); /* cast the void pointer */
+	old = ((class Object *)obj_index[nr].item); /* cast the void pointer */
 
 	if (old != 0)
 	{
@@ -4355,7 +4355,7 @@ struct obj_data *clone_object(int nr)
 	return obj;
 }
 
-void randomize_object_affects(obj_data *obj)
+void randomize_object_affects(Object *obj)
 {
 	if (obj == nullptr)
 	{
@@ -4452,7 +4452,7 @@ void randomize_object_affects(obj_data *obj)
 	}
 }
 
-void randomize_object(obj_data *obj)
+void randomize_object(Object *obj)
 {
 	if (obj == nullptr)
 	{
@@ -4560,7 +4560,7 @@ void Zone::reset(ResetType reset_type)
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
 	Character *mob = nullptr;
-	struct obj_data *obj, *obj_to;
+	class Object *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
 	char buf[MAX_STRING_LENGTH];
@@ -5685,7 +5685,7 @@ void free_char(Character *ch, Trace trace)
 }
 
 /* release memory allocated for an obj struct */
-void free_obj(struct obj_data *obj)
+void free_obj(class Object *obj)
 {
 	struct extra_descr_data *ths, *next_one;
 
@@ -5855,7 +5855,7 @@ void clear_char(Character *ch)
 	GET_AC(ch) = 100; /* Basic Armor */
 }
 
-void clear_object(struct obj_data *obj)
+void clear_object(class Object *obj)
 {
 	if (obj == nullptr)
 	{
@@ -6087,9 +6087,9 @@ int obj_in_index(char *name, int index)
 	int i, j;
 
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
-					   ((struct obj_data *)(obj_index[i].item));
+					   ((class Object *)(obj_index[i].item));
 		 i++)
-		if (isname(name, ((struct obj_data *)(obj_index[i].item))->name))
+		if (isname(name, ((class Object *)(obj_index[i].item))->name))
 		{
 			if (j == index)
 				return i;
@@ -6387,7 +6387,7 @@ void string_to_file(ofstream &f, char *string)
 	delete[] newbuf;
 }
 
-void copySaveData(obj_data *target, obj_data *source)
+void copySaveData(Object *target, Object *source)
 {
 	int i;
 	if ((i = eq_current_damage(source)) > 0)
@@ -6492,7 +6492,7 @@ void copySaveData(obj_data *target, obj_data *source)
 	return;
 }
 
-bool fullItemMatch(obj_data *obj, obj_data *obj2)
+bool fullItemMatch(Object *obj, Object *obj2)
 {
 	if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
 	{
@@ -6566,11 +6566,11 @@ bool fullItemMatch(obj_data *obj, obj_data *obj2)
 }
 
 // Function to ensure an item is not bugged. If it is, replace it with the original.
-bool verify_item(struct obj_data **obj)
+bool verify_item(class Object **obj)
 {
 	extern int top_of_objt;
 
-	if (!str_cmp((*obj)->short_description, ((struct obj_data *)obj_index[(*obj)->item_number].item)->short_description))
+	if (!str_cmp((*obj)->short_description, ((class Object *)obj_index[(*obj)->item_number].item)->short_description))
 		return false;
 
 	int newitem = -1;
@@ -6581,14 +6581,14 @@ bool verify_item(struct obj_data **obj)
 			break; // No item at all found, it's a restring or deleted.
 
 		if ((*obj)->item_number - i >= 0)
-			if (!str_cmp((*obj)->short_description, ((struct obj_data *)obj_index[(*obj)->item_number - i].item)->short_description))
+			if (!str_cmp((*obj)->short_description, ((class Object *)obj_index[(*obj)->item_number - i].item)->short_description))
 			{
 				newitem = (*obj)->item_number - i;
 				break;
 			}
 
 		if ((*obj)->item_number + i <= top_of_objt)
-			if (!str_cmp((*obj)->short_description, ((struct obj_data *)obj_index[(*obj)->item_number + i].item)->short_description))
+			if (!str_cmp((*obj)->short_description, ((class Object *)obj_index[(*obj)->item_number + i].item)->short_description))
 			{
 				newitem = (*obj)->item_number + i;
 				break;

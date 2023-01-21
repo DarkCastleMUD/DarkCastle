@@ -156,7 +156,7 @@ public:
 
     int (*funct)(Character *, int, char *) = {}; // special procedure
 
-    struct obj_data *contents = {}; // List of items in room
+    class Object *contents = {}; // List of items in room
     Character *people = {};         // List of NPC / PC in room
 
     int nTracks = {};                 // number of tracks in the room

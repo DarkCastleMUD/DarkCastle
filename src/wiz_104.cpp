@@ -168,10 +168,10 @@ int do_load(Character *ch, char *arg, int cmd)
 			if ((num = real_object(x)) < 0)
 				continue;
 
-			if (isname("prize", ((struct obj_data *)(obj_index[num].item))->name))
+			if (isname("prize", ((class Object *)(obj_index[num].item))->name))
 			{
 				cnt++;
-				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((struct obj_data *)(obj_index[num].item))->short_description);
+				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(obj_index[num].item))->short_description);
 				send_to_char(buf, ch);
 			}
 
@@ -266,12 +266,12 @@ int do_load(Character *ch, char *arg, int cmd)
 				return eFAILURE;
 			}
 			if ((GET_LEVEL(ch) < 108) &&
-				IS_SET(((struct obj_data *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+				IS_SET(((class Object *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
 				send_to_char("Why would you want to load that?\n\r", ch);
 				return eFAILURE;
 			}
-			else if (cmd == CMD_PRIZE && !isname("prize", ((struct obj_data *)(obj_index[number].item))->name))
+			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->name))
 			{
 				send_to_char("This command can only load prize items.\r\n", ch);
 				return eFAILURE;
@@ -284,7 +284,7 @@ int do_load(Character *ch, char *arg, int cmd)
 
 			if (random[0] == 'r')
 			{
-				obj_data *obj = (obj_data *)(obj_index[number].item);
+				Object *obj = (Object *)(obj_index[number].item);
 				if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
 					csendf(ch, "You cannot random load vnum %d because extra flag ITEM_SPECIAL is set.\r\n", num);
@@ -311,13 +311,13 @@ int do_load(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 		if ((GET_LEVEL(ch) < IMPLEMENTER) &&
-			IS_SET(((struct obj_data *)(obj_index[num].item))->obj_flags.extra_flags,
+			IS_SET(((class Object *)(obj_index[num].item))->obj_flags.extra_flags,
 				   ITEM_SPECIAL))
 		{
 			send_to_char("Why would you want to load that?\n\r", ch);
 			return eFAILURE;
 		}
-		else if (cmd == CMD_PRIZE && !isname("prize", ((struct obj_data *)(obj_index[num].item))->name))
+		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->name))
 		{
 			send_to_char("This command can only load prize items.\r\n", ch);
 			return eFAILURE;
@@ -332,7 +332,7 @@ int do_load(Character *ch, char *arg, int cmd)
 int do_purge(Character *ch, char *argument, int cmd)
 {
 	Character *vict, *next_v;
-	struct obj_data *obj, *next_o;
+	class Object *obj, *next_o;
 
 	char name[100], buf[300];
 
@@ -991,8 +991,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_object(begin)) >= 0)
 				{
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
-							((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-							((struct obj_data *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
+							((class Object *)(obj_index[nr].item))->short_description);
 					send_to_char(buf, ch);
 				}
 			}
@@ -1006,8 +1006,8 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-							((struct obj_data *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
+							((class Object *)(obj_index[nr].item))->short_description);
 					send_to_char(buf, ch);
 
 					if (count > 200)
@@ -1031,12 +1031,12 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 
 				if (isname(name,
-						   ((struct obj_data *)(obj_index[nr].item))->name))
+						   ((class Object *)(obj_index[nr].item))->name))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-							((struct obj_data *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
+							((class Object *)(obj_index[nr].item))->short_description);
 					send_to_char(buf, ch);
 				}
 
@@ -1662,37 +1662,37 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 20; i++)
 					if (IS_SET(wear, 1 << i))
 						if (!IS_SET(
-								((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags,
+								((class Object *)(obj_index[nr].item))->obj_flags.wear_flags,
 								1 << i))
 							goto endLoop;
 			if (type)
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.type_flag != type)
 					continue;
 			if (lweight != -555)
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight < lweight)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.weight < lweight)
 					continue;
 			if (hweight != -555)
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight > hweight)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.weight > hweight)
 					continue;
 
 			if (levhigh != -555)
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
 					continue;
 			if (levlow != -555)
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.eq_level < levlow)
 					continue;
 			if (size)
 				for (i = 0; i < 10; i++)
 					if (IS_SET(size, 1 << i))
 						if (!IS_SET(
-								((struct obj_data *)(obj_index[nr].item))->obj_flags.size,
+								((class Object *)(obj_index[nr].item))->obj_flags.size,
 								1 << i))
 							goto endLoop;
-			if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
+			if (((class Object *)(obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
 			{
-				int get_weapon_damage_type(struct obj_data * wielded);
+				int get_weapon_damage_type(class Object * wielded);
 				its = get_weapon_damage_type(
-					((struct obj_data *)(obj_index[nr].item)));
+					((class Object *)(obj_index[nr].item)));
 			}
 			if (dam && dam != (its - 1000))
 				continue;
@@ -1700,10 +1700,10 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 30; i++)
 					if (IS_SET(extra, 1 << i))
 						if (!IS_SET(
-								((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags,
+								((class Object *)(obj_index[nr].item))->obj_flags.extra_flags,
 								1 << i) &&
 							!(any && IS_SET(
-										 ((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags,
+										 ((class Object *)(obj_index[nr].item))->obj_flags.extra_flags,
 										 1 << any)))
 							goto endLoop;
 
@@ -1711,16 +1711,16 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 10; i++)
 					if (IS_SET(more, 1 << i))
 						if (!IS_SET(
-								((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags,
+								((class Object *)(obj_index[nr].item))->obj_flags.more_flags,
 								1 << i))
 							goto endLoop;
 			//      int aff,total = 0;
 			//    bool found = false;
 			if (!item_type)
 				for (aff = 0;
-					 aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;
+					 aff < ((class Object *)(obj_index[nr].item))->num_affects;
 					 aff++)
-					if (affect == ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
+					if (affect == ((class Object *)(obj_index[nr].item))->affected[aff].location)
 						found = true;
 			if (affect && !item_type)
 				if (!found)
@@ -1729,14 +1729,14 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (item_type)
 			{
 				bool spell_found = false;
-				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != item_type)
+				if (((class Object *)(obj_index[nr].item))->obj_flags.type_flag != item_type)
 					continue;
 				if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
 					for (i = 1; i < 4; i++)
-						if (((struct obj_data *)(obj_index[nr].item))->obj_flags.value[i] == spellnum)
+						if (((class Object *)(obj_index[nr].item))->obj_flags.value[i] == spellnum)
 							spell_found = true;
 				if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-					if (((struct obj_data *)(obj_index[nr].item))->obj_flags.value[3] == spellnum)
+					if (((class Object *)(obj_index[nr].item))->obj_flags.value[3] == spellnum)
 						spell_found = true;
 
 				if (!spell_found)
@@ -1750,8 +1750,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
-					((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-					((struct obj_data *)(obj_index[nr].item))->short_description);
+					((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
+					((class Object *)(obj_index[nr].item))->short_description);
 			send_to_char(buf, ch);
 		endLoop:
 			continue;
@@ -2067,14 +2067,14 @@ char *oprog_type_to_name(int type)
 void opstat(Character *ch, int vnum)
 {
 	int num = real_object(vnum);
-	obj_data *obj;
+	Object *obj;
 	char buf[MAX_STRING_LENGTH];
 	if (num < 0)
 	{
 		send_to_char("Error, non-existant object.\r\n", ch);
 		return;
 	}
-	obj = (obj_data *)obj_index[num].item;
+	obj = (Object *)obj_index[num].item;
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
 			obj->name, vnum);
 	send_to_char(buf, ch);
@@ -2416,7 +2416,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 		send_to_char("Syntax: oclone <source vnum> <destination vnum>\n\r", ch);
 		return eFAILURE;
 	}
-	obj_data *obj, *otmp;
+	Object *obj, *otmp;
 	int v1 = atoi(arg1), v2 = atoi(arg2);
 	int r1 = real_object(v1), r2 = real_object(v2);
 	if (r1 < 0)
@@ -2463,11 +2463,11 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	*/
 
 	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\r\n",
-		   v1, ((obj_data *)obj_index[real_object(v1)].item)->short_description,
-		   v2, ((obj_data *)obj_index[real_object(v2)].item)->short_description);
+		   v1, ((Object *)obj_index[real_object(v1)].item)->short_description,
+		   v2, ((Object *)obj_index[real_object(v2)].item)->short_description);
 
 	object_list = object_list->next;
-	otmp = (obj_data *)obj_index[r2].item;
+	otmp = (Object *)obj_index[r2].item;
 	obj->item_number = r2;
 	obj_index[r2].item = (void *)obj;
 	obj_index[r2].non_combat_func = 0;

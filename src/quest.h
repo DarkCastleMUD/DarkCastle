@@ -42,7 +42,7 @@ int  stop_current_quest(Character *, int);
 int  stop_all_quests(Character *);
 void quest_update();
 int  quest_handler(Character *, Character *, int, char *);
-int  quest_master(Character *, obj_data *, int, char *, Character *);
+int  quest_master(Character *, Object *, int, char *, Character *);
 int  do_quest(Character *, char *, int);
 
 

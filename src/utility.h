@@ -493,14 +493,14 @@ void redo_ki(Character *ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);
-void free_obj(struct obj_data *obj);
+void free_obj(class Object *obj);
 
 int char_from_room(Character *ch, bool stop_fighting);
 int char_from_room(Character *ch);
 void do_start(Character *ch);
 
 void update_pos(Character *victim);
-void clear_object(struct obj_data *obj);
+void clear_object(class Object *obj);
 void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
@@ -522,19 +522,19 @@ void save_char_obj_db(Character *ch);
 
 void unique_scan(Character *victim);
 void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage);
-bool obj_to_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_pos);
+bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void check_idling(Character *ch);
 void stop_follower(Character *ch, int cmd);
 bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ(Character *sub, struct obj_data *obj, bool bf = false);
+bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool bf = false);
 bool check_blind(Character *ch);
 void raw_kill(Character *ch, Character *victim);
 void check_killer(Character *ch, Character *victim);
 int map_eq_level(Character *mob);
 void disarm(Character *ch, Character *victim);
-int shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker);
+int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker);
 void send_to_all(char *messg);
 void ansi_color(char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
@@ -566,8 +566,8 @@ void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t &value);
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint16_t &value);
 void display_string_list(const char *list[], Character *ch);
-int contains_no_trade_item(obj_data *obj);
-int contents_cause_unique_problem(obj_data *obj, Character *vict);
+int contains_no_trade_item(Object *obj);
+int contents_cause_unique_problem(Object *obj, Character *vict);
 bool check_make_camp(int);
 int get_leadership_bonus(Character *);
 void update_make_camp_and_leadership(void);
@@ -577,19 +577,19 @@ void mob_suprised_sayings(Character *ch, Character *aggressor);
 
 // MOBProgs prototypes
 int mprog_wordlist_check(const char *arg, Character *mob,
-                         Character *actor, obj_data *object,
+                         Character *actor, Object *object,
                          void *vo, int type, bool reverse = false);
 void mprog_percent_check(Character *mob, Character *actor,
-                         obj_data *object, void *vo,
+                         Object *object, void *vo,
                          int type);
 int mprog_act_trigger(string buf, Character *mob,
-                      Character *ch, obj_data *obj,
+                      Character *ch, Object *obj,
                       void *vo);
 int mprog_bribe_trigger(Character *mob, Character *ch,
                         int amount);
 int mprog_entry_trigger(Character *mob);
 int mprog_give_trigger(Character *mob, Character *ch,
-                       obj_data *obj);
+                       Object *obj);
 int mprog_greet_trigger(Character *mob);
 int mprog_fight_trigger(Character *mob, Character *ch);
 int mprog_hitprcnt_trigger(Character *mob, Character *ch);
@@ -597,23 +597,23 @@ int mprog_death_trigger(Character *mob, Character *killer);
 int mprog_random_trigger(Character *mob);
 int mprog_arandom_trigger(Character *mob);
 int mprog_speech_trigger(const char *txt, Character *mob);
-int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, obj_data *obj, void *vo, Character *rndm);
+int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
 int mprog_attack_trigger(Character *mob, Character *ch);
 int mprog_load_trigger(Character *mob);
 int mprog_can_see_trigger(Character *ch, Character *mob);
 int mprog_damage_trigger(Character *mob, Character *ch, int amount);
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, Character *actor, obj_data *obj2, void *vo, Character *rndm);
+int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
 int oprog_act_trigger(const char *txt, Character *ch);
 int oprog_speech_trigger(const char *txt, Character *ch);
 int oprog_command_trigger(const char *txt, Character *ch, char *arg);
-int oprog_weapon_trigger(Character *ch, obj_data *item);
-int oprog_armour_trigger(Character *ch, obj_data *item);
-int oprog_rand_trigger(obj_data *item);
-int oprog_arand_trigger(obj_data *item);
+int oprog_weapon_trigger(Character *ch, Object *item);
+int oprog_armour_trigger(Character *ch, Object *item);
+int oprog_rand_trigger(Object *item);
+int oprog_arand_trigger(Object *item);
 int oprog_greet_trigger(Character *ch);
-int oprog_load_trigger(obj_data *item);
-int oprog_can_see_trigger(Character *ch, obj_data *item);
+int oprog_load_trigger(Object *item);
+int oprog_can_see_trigger(Character *ch, Object *item);
 bool is_in_game(Character *ch);
 int get_stat(Character *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
@@ -645,7 +645,7 @@ struct mprog_throw_type
    bool mob;  // Mob or object.
    char *var; // temporary variable
    Character *actor;
-   obj_data *obj;
+   Object *obj;
    void *vo;
    Character *rndm; // $r
 
@@ -696,11 +696,11 @@ bool isDead(Character *ch);
 bool isNowhere(Character *ch);
 bool file_exists(string filename);
 bool char_file_exists(string name);
-void show_obj_class_size_mini(obj_data *obj, Character *ch);
-const char *item_condition(struct obj_data *obj);
+void show_obj_class_size_mini(Object *obj, Character *ch);
+const char *item_condition(class Object *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
-bool identify(Character *ch, obj_data *obj);
+bool identify(Character *ch, Object *obj);
 extern void end_oproc(Character *ch, Trace trace = Trace("unknown"));
 void undo_race_saves(Character *ch);
 string handle_ansi(string s, Character *ch);

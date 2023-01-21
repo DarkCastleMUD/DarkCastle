@@ -35,7 +35,7 @@ struct event_brief
 struct event_params
 {
    Character *ch;
-   struct obj_data *obj;
+   class Object *obj;
    Character *vict;
    char str[1024];
    int num;

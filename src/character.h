@@ -38,7 +38,7 @@ class Character;
 
 struct strcasecmp_compare
 {
-    bool operator()(const string &l, const string &r) const
+    bool operator()(const std::string &l, const std::string &r) const
     {
         return strcasecmp(l.c_str(), r.c_str()) < 0;
     }
@@ -143,7 +143,7 @@ struct mob_prog_act_list
     mob_prog_act_list *next;
     char *buf;
     Character *ch;
-    obj_data *obj;
+    Object *obj;
     void *vo;
 };
 
@@ -270,7 +270,7 @@ struct pc_data
     int16_t buildLowVnum = {}, buildHighVnum = {};
     int16_t buildMLowVnum = {}, buildMHighVnum = {};
     int16_t buildOLowVnum = {}, buildOHighVnum = {};
-    obj_data *skillchange = {}; /* Skill changing equipment. */
+    Object *skillchange = {}; /* Skill changing equipment. */
 
     int32_t last_mob_edit = {}; // vnum of last mob edited
     vnum_t last_obj_vnum = {};  // vnum of last obj edited
@@ -348,12 +348,12 @@ public:
     mob_flag_data mob_flags = {}; /* Mobile information               */
     bool paused = {};
 
-    void setObject(obj_data *);
-    obj_data *getObject(void);
+    void setObject(Object *);
+    Object *getObject(void);
     bool isObject(void);
 
 private:
-    obj_data *object = {};
+    Object *object = {};
 };
 
 // Character, Character
@@ -365,7 +365,7 @@ class Character
 public:
     struct mob_data *mobdata = nullptr;
     struct pc_data *pcdata = nullptr;
-    struct obj_data *objdata = nullptr;
+    class Object *objdata = nullptr;
 
     struct descriptor_data *desc = nullptr; // nullptr normally for mobs
 
@@ -452,18 +452,18 @@ public:
 
     int16_t glow_factor = {}; // Amount that the character glows
 
-    obj_data *beacon = nullptr; /* pointer to my beacon */
+    Object *beacon = nullptr; /* pointer to my beacon */
 
     std::vector<struct songInfo> songs = {}; // Song list
                                              //     int16_t song_timer = {};       /* status for songs being sung */
                                              //     int16_t song_number = {};      /* number of song being sung */
                                              //     char * song_data = {};        /* args for the songs */
 
-    struct obj_data *equipment[MAX_WEAR] = {}; // Equipment List
+    class Object *equipment[MAX_WEAR] = {}; // Equipment List
 
     skill_list_t skills = {};                 // Skills List
     struct affected_type *affected = nullptr; // Affected by list
-    struct obj_data *carrying = nullptr;      // Inventory List
+    class Object *carrying = nullptr;         // Inventory List
 
     int16_t poison_amount = {}; // How much poison damage I'm taking every few seconds
 
@@ -484,7 +484,7 @@ public:
     Character *next = {};          /* Next anywhere in game */
     Character *next_in_room = {};  /* Next in room */
     Character *next_fighting = {}; /* Next fighting */
-    obj_data *altar = {};
+    Object *altar = {};
     struct follow_type *followers = {}; /* List of followers */
     Character *master = {};             /* Who is char following? */
     char *group_name = {};              /* Name of group */
@@ -554,7 +554,7 @@ public:
     command_return_t save(int cmd = CMD_DEFAULT);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
-    obj_data *getVisibleObject(QString name);
+    Object *getVisibleObject(QString name);
     bool isMortal(void);
     bool isImmortal(void);
     bool isImplementer(void);

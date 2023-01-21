@@ -135,7 +135,7 @@ command_return_t Character::do_goto(QStringList &arguments, int cmd)
   Character *target_mob = {}, *pers = {};
   Character *tmp_ch = {};
   struct follow_type *k = {}, *next_dude = {};
-  struct obj_data *target_obj = {};
+  class Object *target_obj = {};
   extern int top_of_world;
 
   if (IS_NPC(this))
@@ -485,7 +485,7 @@ int do_at(Character *ch, char *argument, int cmd)
   char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
   int loc_nr, location, original_loc;
   Character *target_mob;
-  struct obj_data *target_obj;
+  class Object *target_obj;
   // extern int top_of_world;
 
   if (IS_NPC(ch))

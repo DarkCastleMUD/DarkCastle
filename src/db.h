@@ -34,7 +34,7 @@
 
 using namespace std;
 
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern int top_of_world;
 
 struct index_data;
@@ -113,13 +113,13 @@ bool can_modify_object(Character *ch, int32_t room);
 
 void write_one_room(FILE *fl, int nr);
 void write_mobile(Character *mob, FILE *fl);
-void write_object(obj_data *obj, FILE *fl);
+void write_object(Object *obj, FILE *fl);
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(Character *ch);
 void clear_char(Character *ch);
-void clear_object(struct obj_data *obj);
+void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
@@ -137,7 +137,7 @@ int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range);
 uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char(FILE *fl);
 void add_mobspec(int i);
-void write_object_csv(obj_data *obj, ofstream &fout);
+void write_object_csv(Object *obj, ofstream &fout);
 index_data *generate_obj_indices(int *top, index_data *index);
 index_data *generate_mob_indices(int *top, struct index_data *index);
 
@@ -146,20 +146,20 @@ extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
 
-struct obj_data *read_object(int nr, FILE *fl, bool zz);
+class Object *read_object(int nr, FILE *fl, bool zz);
 Character *read_mobile(int nr, FILE *fl);
-struct obj_data *clone_object(int nr);
+class Object *clone_object(int nr);
 Character *clone_mobile(int nr);
-void randomize_object(obj_data *obj);
+void randomize_object(Object *obj);
 void string_to_file(FILE *f, char *string);
 void string_to_file(ofstream &f, char *string);
-ofstream &operator<<(ofstream &out, obj_data *obj);
-ifstream &operator>>(ifstream &in, obj_data *obj);
+ofstream &operator<<(ofstream &out, Object *obj);
+ifstream &operator>>(ifstream &in, Object *obj);
 string lf_to_crlf(string &s1);
-void copySaveData(obj_data *new_obj, obj_data *obj);
-bool verify_item(struct obj_data **obj);
-bool fullItemMatch(obj_data *obj, obj_data *obj2);
-bool has_random(obj_data *obj);
+void copySaveData(Object *new_obj, Object *obj);
+bool verify_item(class Object **obj);
+bool fullItemMatch(Object *obj, Object *obj2);
+bool has_random(Object *obj);
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
 
 extern int top_of_objt;
@@ -204,8 +204,8 @@ struct index_data
 {
   int virt;                                                                               /* virt number of ths mob/obj           */
   int number;                                                                             /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(Character *, struct obj_data *, int, const char *, Character *); // non Combat special proc
-  int (*combat_func)(Character *, struct obj_data *, int, const char *, Character *);     // combat special proc
+  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
+  int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
   void *item;                                                                             /* the mobile/object itself                 */
 
   mob_prog_data *mobprogs;

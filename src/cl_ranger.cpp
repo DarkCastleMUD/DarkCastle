@@ -35,7 +35,7 @@
 #include "corpse.h"
 
 extern CWorld world;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern int rev_dir[];
 
 int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
@@ -747,7 +747,7 @@ struct forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
 int do_forage(Character *ch, char *arg, int cmd)
 {
   int learned;
-  struct obj_data *new_obj = 0;
+  class Object *new_obj = 0;
   struct affected_type af;
 
   if (affected_by_spell(ch, SKILL_FORAGE))
@@ -875,11 +875,11 @@ int parse_arrow(Character *ch, char *arrow)
 /* go through and find an arrow */
 /* return nullptr if failure
  *  return pointer if success */
-struct obj_data *find_arrow(struct obj_data *quiver)
+class Object *find_arrow(class Object *quiver)
 {
-  struct obj_data *target;
+  class Object *target;
 
-  struct obj_data *get_obj_in_list(char *, struct obj_data *);
+  class Object *get_obj_in_list(char *, class Object *);
 
   target = get_obj_in_list("arrow", quiver->contains);
 
@@ -892,7 +892,7 @@ struct obj_data *find_arrow(struct obj_data *quiver)
   return target;
 }
 
-void do_arrow_miss(Character *ch, Character *victim, int dir, struct obj_data *found)
+void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *found)
 {
   char buf[200];
 
@@ -1061,7 +1061,7 @@ int mob_arrow_response(Character *ch, Character *victim,
 /* no need anymore
 int do_arrow_damage(Character *ch, Character *victim,
                      int dir, int dam, int artype,
-                     struct obj_data *found)
+                     class Object *found)
 {
   char buf[200];
   int retval;
@@ -1151,7 +1151,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 {
   Character *victim;
   int dam, dir = -1, artype, cost, retval, victroom;
-  struct obj_data *found;
+  class Object *found;
   unsigned cur_room, new_room = 0;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH],
       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
@@ -1646,7 +1646,7 @@ int do_fire(Character *ch, char *arg, int cmd)
       // just in case
       if (IS_SET(retval, eCH_DIED))
       {
-        obj_data *corpse, *next;
+        Object *corpse, *next;
         for (corpse = object_list; corpse; corpse = next)
         {
           next = corpse->next;

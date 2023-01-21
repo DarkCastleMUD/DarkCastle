@@ -1818,7 +1818,7 @@ bool check_conc_loss(Character *ch, int spl)
 // Assumes that *argument does start with first letter of chopped string
 int do_cast(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *tar_obj;
+  class Object *tar_obj;
   Character *tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
   int qend, spl, i, learned;
@@ -1840,7 +1840,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  obj_data *tmp_obj;
+  Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -3102,7 +3102,7 @@ int spl_lvl(int lev)
 // if not, return 0
 int has_skill(Character *ch, skill_t skill)
 {
-  struct obj_data *o;
+  class Object *o;
   int bonus = 0;
 
   if (IS_MOB(ch))

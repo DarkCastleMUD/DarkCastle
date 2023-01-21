@@ -56,12 +56,12 @@
 
 extern CWorld world;
 
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct descriptor_data *descriptor_list;
 
-void huntclear_item(struct obj_data *obj);
+void huntclear_item(class Object *obj);
 
 #ifdef WIN32
 int strncasecmp(char *s1, const char *s2, int len);
@@ -98,7 +98,7 @@ void addTimer(Character *ch, int spell, int ticks)
 }
 // END TIMERS
 
-bool is_wearing(Character *ch, obj_data *item)
+bool is_wearing(Character *ch, Object *item)
 {
 	int i;
 	for (i = 0; i < MAX_WEAR; i++)
@@ -523,7 +523,7 @@ const struct set_data set_list[] = {
 	 "\n",
 	 "\n"}};
 
-void add_set_stats(Character *ch, obj_data *obj, int flag, int pos)
+void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 {
 	// obj has just been worn
 	int obj_vnum = obj_index[obj->item_number].virt;
@@ -794,7 +794,7 @@ void add_set_stats(Character *ch, obj_data *obj, int flag, int pos)
 			}
 }
 
-void remove_set_stats(Character *ch, obj_data *obj, int flag)
+void remove_set_stats(Character *ch, Object *obj, int flag)
 {
 	// obj has just been removed
 	int obj_vnum = obj_index[obj->item_number].virt;
@@ -839,7 +839,7 @@ void remove_set_stats(Character *ch, obj_data *obj, int flag)
 
 void check_weapon_weights(Character *ch)
 {
-	struct obj_data *weapon;
+	class Object *weapon;
 
 	if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 		return;
@@ -1812,7 +1812,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			send_to_char("Your regeneration slows back to normal.\r\n", ch);
 		break;
 	case SKILL_INNATE_POWERWIELD:
-		struct obj_data *obj;
+		class Object *obj;
 		obj = ch->equipment[WIELD];
 		if (obj)
 			if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
@@ -2442,7 +2442,7 @@ int apply_ac(Character *ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-int equip_char(Character *ch, struct obj_data *obj, int pos, int flag)
+int equip_char(Character *ch, class Object *obj, int pos, int flag)
 {
 	int j;
 
@@ -2582,10 +2582,10 @@ int equip_char(Character *ch, struct obj_data *obj, int pos, int flag)
 	return 1;
 }
 
-struct obj_data *unequip_char(Character *ch, int pos, int flag)
+class Object *unequip_char(Character *ch, int pos, int flag)
 {
 	int j;
-	struct obj_data *obj;
+	class Object *obj;
 
 	assert(pos >= 0 && pos < MAX_WEAR);
 	assert(ch->equipment[pos]);
@@ -2612,12 +2612,12 @@ struct obj_data *unequip_char(Character *ch, int pos, int flag)
 		GET_AC(ch) += apply_ac(ch, pos);
 
 	remove_set_stats(ch, obj, flag);
-	struct obj_data *a, *b = nullptr;
+	class Object *a, *b = nullptr;
 b: // ew
 	if (!IS_NPC(ch))
 		for (a = ch->pcdata->skillchange; a; a = a->next_skill)
 		{
-			if (a == (obj_data *)0x95959595)
+			if (a == (Object *)0x95959595)
 			{
 				int i;
 				ch->pcdata->skillchange = nullptr;
@@ -2731,9 +2731,9 @@ int get_number(char **name)
 }
 
 /* Search a given list for an object, and return a pointer to that object */
-struct obj_data *get_obj_in_list(char *name, struct obj_data *list)
+class Object *get_obj_in_list(char *name, class Object *list)
 {
-	struct obj_data *i;
+	class Object *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -2755,9 +2755,9 @@ struct obj_data *get_obj_in_list(char *name, struct obj_data *list)
 }
 
 /* Search a given list for an object number, and return a ptr to that obj */
-struct obj_data *get_obj_in_list_num(int num, struct obj_data *list)
+class Object *get_obj_in_list_num(int num, class Object *list)
 {
-	struct obj_data *i;
+	class Object *i;
 
 	for (i = list; i; i = i->next_content)
 		if (i->item_number == num)
@@ -2767,9 +2767,9 @@ struct obj_data *get_obj_in_list_num(int num, struct obj_data *list)
 }
 
 /*search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj(char *name)
+class Object *get_obj(char *name)
 {
-	struct obj_data *i;
+	class Object *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -2790,17 +2790,17 @@ struct obj_data *get_obj(char *name)
 	return (0);
 }
 
-struct obj_data *get_obj(int vnum)
+class Object *get_obj(int vnum)
 {
 	int num = real_object(vnum);
 
-	return ((struct obj_data *)obj_index[num].item);
+	return ((class Object *)obj_index[num].item);
 }
 
 /*search the entire world for an object number, and return a pointer  */
-struct obj_data *get_obj_num(int nr)
+class Object *get_obj_num(int nr)
 {
-	struct obj_data *i;
+	class Object *i;
 
 	for (i = object_list; i; i = i->next)
 		if (i->item_number == nr)
@@ -2951,10 +2951,10 @@ Character *get_char_num(int nr)
 
 // move an object from its current location into the room
 // specified by dest.
-int move_obj(obj_data *obj, int dest)
+int move_obj(Object *obj, int dest)
 {
 	int obj_in_room = NOWHERE;
-	obj_data *contained_by = 0;
+	Object *contained_by = 0;
 	Character *carried_by = 0;
 
 	if (!obj)
@@ -3036,10 +3036,10 @@ int move_obj(obj_data *obj, int dest)
 
 // move an object from its current location into the container
 // specified by dest_obj.
-int move_obj(obj_data *obj, obj_data *dest_obj)
+int move_obj(Object *obj, Object *dest_obj)
 {
 	int obj_in_room = NOWHERE;
-	obj_data *contained_by = 0;
+	Object *contained_by = 0;
 	Character *carried_by = 0;
 
 	if (!obj)
@@ -3121,10 +3121,10 @@ int move_obj(obj_data *obj, obj_data *dest_obj)
 
 // move an object from its current location into the inventory of the
 // character specified by ch.
-int move_obj(obj_data *obj, Character *ch)
+int move_obj(Object *obj, Character *ch)
 {
 	int obj_in_room = NOWHERE;
-	obj_data *contained_by = 0;
+	Object *contained_by = 0;
 	Character *carried_by = 0;
 
 	//  char buffer[300];
@@ -3224,9 +3224,9 @@ int move_obj(obj_data *obj, Character *ch)
 
 // give an object to a char
 // 1 if success, 0 if failure
-int obj_to_char(struct obj_data *object, Character *ch)
+int obj_to_char(class Object *object, Character *ch)
 {
-	// struct obj_data *obj;
+	// class Object *obj;
 	/*
 	 if(!(obj = ch->carrying) ||
 	 (!obj->next_content && obj->item_number > object->item_number))
@@ -3240,7 +3240,7 @@ int obj_to_char(struct obj_data *object, Character *ch)
 	IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
 	IS_CARRYING_N(ch)
 	++;
-	extern void pick_up_item(Character * ch, struct obj_data * obj);
+	extern void pick_up_item(Character * ch, class Object * obj);
 
 	pick_up_item(ch, object);
 	return 1;
@@ -3265,9 +3265,9 @@ int obj_to_char(struct obj_data *object, Character *ch)
 }
 
 // take an object from a char
-int obj_from_char(struct obj_data *object)
+int obj_from_char(class Object *object)
 {
-	struct obj_data *tmp;
+	class Object *tmp;
 
 	if (!object->carried_by)
 	{
@@ -3305,9 +3305,9 @@ int obj_from_char(struct obj_data *object)
 }
 
 // put an object in a room
-int obj_to_room(struct obj_data *object, int room)
+int obj_to_room(class Object *object, int room)
 {
-	struct obj_data *obj;
+	class Object *obj;
 
 	if (!object)
 		return 0;
@@ -3388,9 +3388,9 @@ int obj_to_room(struct obj_data *object, int room)
 }
 
 // Take an object from a room
-int obj_from_room(struct obj_data *object)
+int obj_from_room(class Object *object)
 {
-	struct obj_data *i;
+	class Object *i;
 
 	if (object->in_room < 0)
 	{
@@ -3426,9 +3426,9 @@ int obj_from_room(struct obj_data *object)
 }
 
 // put an object in an object (quaint)
-int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
+int obj_to_obj(class Object *obj, class Object *obj_to)
 {
-	struct obj_data *tobj;
+	class Object *tobj;
 
 	obj->in_obj = obj_to;
 
@@ -3463,9 +3463,9 @@ int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 }
 
 // remove an object from an object
-int obj_from_obj(struct obj_data *obj)
+int obj_from_obj(class Object *obj)
 {
-	struct obj_data *tmp, *obj_from;
+	class Object *tmp, *obj_from;
 
 	if (!obj->in_obj)
 	{
@@ -3516,7 +3516,7 @@ int obj_from_obj(struct obj_data *obj)
 }
 
 // Set all carried_by to point to new_new owner
-void object_list_new_new_owner(struct obj_data *list, Character *ch)
+void object_list_new_new_owner(class Object *list, Character *ch)
 {
 	if (list)
 	{
@@ -3527,9 +3527,9 @@ void object_list_new_new_owner(struct obj_data *list, Character *ch)
 }
 
 // Extract an object from the world
-void extract_obj(struct obj_data *obj)
+void extract_obj(class Object *obj)
 {
-	struct obj_data *temp1;
+	class Object *temp1;
 	huntclear_item(obj);
 
 	// if we're going away, unhook myself from my owner
@@ -3618,7 +3618,7 @@ void extract_obj(struct obj_data *obj)
 	DC::getInstance()->obj_free_list.insert(obj);
 }
 
-void update_object(struct obj_data *obj, int use)
+void update_object(class Object *obj, int use)
 {
 	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 && obj_index[obj->item_number].virt != 30033 && obj_index[obj->item_number].virt != 30097 && obj_index[obj->item_number].virt != 30019))
 		obj->obj_flags.timer -= use;
@@ -3680,7 +3680,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	/*Character *i;*/
 	bool isGolem = false;
 
-	struct obj_data *i;
+	class Object *i;
 	Character *omast = nullptr;
 	int ret = eSUCCESS;
 	if (!IS_NPC(ch) && !ch->desc)
@@ -3790,7 +3790,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		}
 		if (ch->carrying)
 		{
-			struct obj_data *inext;
+			class Object *inext;
 			for (i = ch->carrying; i; i = inext)
 			{
 				inext = i->next_content;
@@ -4172,9 +4172,9 @@ Character *get_mob_vis(Character *ch, char *name)
 	return partial_match;
 }
 
-obj_data *get_obj_vnum(int vnum)
+Object *get_obj_vnum(int vnum)
 {
-	obj_data *i;
+	Object *i;
 	int num = real_object(vnum);
 	for (i = object_list; i; i = i->next)
 		if (i->item_number == num)
@@ -4382,7 +4382,7 @@ Character *Character::getVisibleCharacter(QString name)
 	return get_char_vis(this, name.toStdString());
 }
 
-obj_data *Character::getVisibleObject(QString name)
+Object *Character::getVisibleObject(QString name)
 {
 	return get_obj_vis(this, name.toStdString());
 }
@@ -4481,9 +4481,9 @@ Character *get_active_pc_vis(Character *ch, const char *name)
 }
 
 // search by item number
-struct obj_data *get_obj_in_list_vis(Character *ch, int item_num, struct obj_data *list, bool blindfighting)
+class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool blindfighting)
 {
-	struct obj_data *i;
+	class Object *i;
 	int number = real_object(item_num);
 
 	// never match invalid items
@@ -4497,9 +4497,9 @@ struct obj_data *get_obj_in_list_vis(Character *ch, int item_num, struct obj_dat
 	return nullptr;
 }
 
-struct obj_data *get_obj_in_list_vis(Character *ch, const char *name, struct obj_data *list, bool blindfighting)
+class Object *get_obj_in_list_vis(Character *ch, const char *name, class Object *list, bool blindfighting)
 {
-	struct obj_data *i;
+	class Object *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -4520,16 +4520,16 @@ struct obj_data *get_obj_in_list_vis(Character *ch, const char *name, struct obj
 	return (0);
 }
 
-struct obj_data *get_obj_vis(Character *ch, string name, bool loc)
+class Object *get_obj_vis(Character *ch, string name, bool loc)
 {
 	/*search the entire world for an object, and return a pointer  */
 	return get_obj_vis(ch, name.c_str(), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(Character *ch, const char *name, bool loc)
+class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 {
-	struct obj_data *i;
+	class Object *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -4568,9 +4568,9 @@ struct obj_data *get_obj_vis(Character *ch, const char *name, bool loc)
 	return (0);
 }
 
-struct obj_data *create_money(int amount)
+class Object *create_money(int amount)
 {
-	struct obj_data *obj;
+	class Object *obj;
 	struct extra_descr_data *new_new_descr;
 
 	if (amount <= 0)
@@ -4579,7 +4579,7 @@ struct obj_data *create_money(int amount)
 		return (0);
 	}
 
-	obj = new obj_data;
+	obj = new Object;
 	new_new_descr = new extra_descr_data;
 
 	clear_object(obj);
@@ -4632,7 +4632,7 @@ struct obj_data *create_money(int amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, struct obj_data **tar_obj, bool verbose)
+int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, class Object **tar_obj, bool verbose)
 {
 	static const char *ignore[] = {"the", "in", "\n"};
 

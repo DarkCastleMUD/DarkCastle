@@ -150,7 +150,7 @@ void do_mload(Character *ch, int rnum, int cnt)
 
 obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
 {
-  obj_data *obj = nullptr;
+  Object *obj = nullptr;
   obj_list_t obj_list = {};
   string buf;
 
@@ -200,7 +200,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
 
 void do_oload(Character *ch, int rnum, int cnt, bool random)
 {
-  struct obj_data *obj = nullptr;
+  class Object *obj = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
 
@@ -271,7 +271,7 @@ void boro_mob_stat(Character *ch, Character *k)
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   struct follow_type *fol;
-  struct obj_data *j = 0;
+  class Object *j = 0;
   struct affected_type *aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
@@ -577,7 +577,7 @@ void mob_stat(Character *ch, Character *k)
   struct follow_type *fol;
   int i2;
   char buf2[MAX_STRING_LENGTH];
-  struct obj_data *j = 0;
+  class Object *j = 0;
   // extern char *skills[];
   // extern char *spells[];
   // extern char *ki[];
@@ -952,9 +952,9 @@ void mob_stat(Character *ch, Character *k)
   }
 }
 
-void obj_stat(Character *ch, struct obj_data *j)
+void obj_stat(Character *ch, class Object *j)
 {
-  struct obj_data *j2 = 0;
+  class Object *j2 = 0;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
@@ -1082,7 +1082,7 @@ void obj_stat(Character *ch, struct obj_data *j)
             j->obj_flags.value[2]);
     break;
   case ITEM_WEAPON:
-    int get_weapon_damage_type(struct obj_data * wielded);
+    int get_weapon_damage_type(class Object * wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern char *strs_damage_types[];
     sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d (%s)",
@@ -1646,7 +1646,7 @@ struct hunt_items
 { // Bleh, don't wanna make it go through every item in the game everytime someone checks the list
   struct hunt_items *next;
   struct hunt_data *hunt;
-  struct obj_data *obj;
+  class Object *obj;
   char *mobname;
 };
 
@@ -1696,9 +1696,9 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1709,7 +1709,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -1756,7 +1756,7 @@ int do_huntclear(Character *ch, char *arg, int cmd)
   }
 }
 
-void huntclear_item(struct obj_data *obj)
+void huntclear_item(class Object *obj)
 {
   struct hunt_items *hi, *hin, *hip = nullptr;
   for (hi = hunt_items_list; hi; hi = hin)
@@ -1921,7 +1921,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
       break;
     }
-    struct obj_data *obj = clone_object(rnum);
+    class Object *obj = clone_object(rnum);
     obj_to_char(obj, vict);
     struct hunt_items *ni;
 #ifdef LEAK_CHECK
@@ -1937,7 +1937,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   }
 }
 
-void pick_up_item(Character *ch, struct obj_data *obj)
+void pick_up_item(Character *ch, class Object *obj)
 {
   struct hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
@@ -1956,7 +1956,7 @@ void pick_up_item(Character *ch, struct obj_data *obj)
               obj->short_description, i->mobname, ch->name);
       send_info(buf);
       struct hunt_data *h = i->hunt;
-      struct obj_data *oitem = nullptr, *citem;
+      class Object *oitem = nullptr, *citem;
       int r1 = 0;
       switch (vnum)
       {
@@ -2050,7 +2050,7 @@ void pulse_hunts()
       return;
     }
 
-    struct obj_data *obj, *onext;
+    class Object *obj, *onext;
     for (obj = world[6345].contents; obj; obj = onext)
     {
       onext = obj->next_content;
@@ -2084,11 +2084,11 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     int itemsleft = 0;

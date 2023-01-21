@@ -387,7 +387,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
 int do_rename_char(Character *ch, char *arg, int cmd)
 {
   Character *victim;
-  struct obj_data *obj;
+  class Object *obj;
   char name[160];
   char strsave[MAX_INPUT_LENGTH];
   char oldname[MAX_INPUT_LENGTH];
@@ -504,7 +504,7 @@ int do_rename_char(Character *ch, char *arg, int cmd)
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
-      obj_data *obj2;
+      Object *obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
         if (IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -885,11 +885,11 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
   }
   i = 1 << i;
   int r, o = 1;
-  obj_data *obj;
+  Object *obj;
   char buf[MAX_STRING_LENGTH];
   for (r = 0; r < top_of_objt; r++)
   {
-    obj = (obj_data *)obj_index[r].item;
+    obj = (Object *)obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -998,7 +998,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     {
       for (int x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv((obj_data *)obj_index[x].item, fout);
+        write_object_csv((Object *)obj_index[x].item, fout);
       }
       curr = curr->next;
     }

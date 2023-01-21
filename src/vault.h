@@ -32,13 +32,13 @@ void vault_sell(Character *ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
 void vlog(const char *message, const char *name);
 
-struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int num);
+class Object *get_obj_in_vault(struct vault_data *vault, char *object, int num);
 struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *object, int num);
 
-struct obj_data *get_unique_obj_in_vault(struct vault_data *vault, char *object, int num);
+class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, int num);
 struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num);
 
-struct obj_data *get_obj_in_all_vaults(char *object, int num);
+class Object *get_obj_in_all_vaults(char *object, int num);
 struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 int has_vault_access(char *owner, struct vault_data *vault);
@@ -64,6 +64,6 @@ struct vault_access_data {
 struct vault_items_data {
   int item_vnum;
   int count;
-  obj_data *obj; // for full-save items
+  Object *obj; // for full-save items
   struct vault_items_data *next;
 };

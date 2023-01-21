@@ -32,7 +32,7 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-act_return act(const string &str, Character *ch, obj_data *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
@@ -40,7 +40,7 @@ act_return act(const string &str, Character *ch, obj_data *obj, void *vict_obj, 
 act_return act(
     const char *str,   // Buffer
     Character *ch,     // Character from
-    obj_data *obj,     // Object
+    Object *obj,     // Object
     void *vict_obj,    // Victim object
     int16_t destination, // Destination flags
     int16_t flags        // Optional flags
@@ -173,7 +173,7 @@ void send_message(string str, Character *to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList * tokens, Character *ch, obj_data * obj, void * vict_obj, int flags, Character *to)
+send_tokens_return send_tokens(TokenList * tokens, Character *ch, Object * obj, void * vict_obj, int flags, Character *to)
 {
   int retval = 0;
   string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);

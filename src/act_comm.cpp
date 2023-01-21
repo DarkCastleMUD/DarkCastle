@@ -477,7 +477,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
 
 int do_write(Character *ch, char *argument, int cmd)
 {
-  struct obj_data *paper = 0, *pen = 0;
+  class Object *paper = 0, *pen = 0;
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
       buf[MAX_STRING_LENGTH];
 

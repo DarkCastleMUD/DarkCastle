@@ -1063,7 +1063,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   return false;
 }
 
-bool CAN_SEE_OBJ(Character *sub, struct obj_data *obj, bool blindfighting)
+bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
 {
   int skill = 0;
   struct affected_type *cur_af;
@@ -1538,7 +1538,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   struct clan_room_data *room;
   int found = 0;
   char buf[MAX_STRING_LENGTH];
-  obj_data *obj, *tmp_obj;
+  Object *obj, *tmp_obj;
 
   void find_and_remove_player_portal(Character * ch);
 
@@ -2648,11 +2648,11 @@ void unique_scan(Character *victim)
   if (!victim)
     return;
 
-  struct obj_data *i = nullptr;
-  struct obj_data *j = nullptr;
+  class Object *i = nullptr;
+  class Object *j = nullptr;
   int k;
   map<int, int> virtnums;
-  queue<obj_data *> found_items;
+  queue<Object *> found_items;
 
   for (k = 0; k < MAX_WEAR; k++)
   {

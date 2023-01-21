@@ -36,11 +36,11 @@
 extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern int rev_dir[];
 
 /* procedures related to get */
-void get(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
+void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, int cmd)
 {
   string buffer;
 
@@ -145,7 +145,7 @@ void get(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
               sub_object->name,
               obj_index[sub_object->item_number].virt);
       logentry(log_buf, 110, LogChannels::LOG_OBJECTS);
-      for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
         logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
              obj_object->short_description,
              obj_index[obj_object->item_number].virt,
@@ -176,7 +176,7 @@ void get(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
       sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
               ch->in_room);
       logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-      for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
         logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
              obj_object->short_description,
              loop_obj->short_description,
@@ -285,9 +285,9 @@ int do_get(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  struct obj_data *sub_object;
-  struct obj_data *obj_object;
-  struct obj_data *next_obj;
+  class Object *sub_object;
+  class Object *obj_object;
+  class Object *next_obj;
   bool found = false;
   bool fail = false;
   bool has_consent = false;
@@ -670,7 +670,7 @@ int do_get(Character *ch, char *argument, int cmd)
                    fname(obj_object->name));
             continue;
           } /*
-       struct obj_data *temp,*next_contentthing;
+       class Object *temp,*next_contentthing;
        for (temp = obj_object->contains;temp;temp = next_contentthing)
        {
       next_contentthing = temp->next_content;
@@ -988,7 +988,7 @@ int do_get(Character *ch, char *argument, int cmd)
 int do_consent(Character *ch, char *arg, int cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1], buf2[MAX_STRING_LENGTH + 1];
-  struct obj_data *obj;
+  class Object *obj;
   Character *vict;
 
   while (isspace(*arg))
@@ -1060,11 +1060,11 @@ int do_consent(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int contents_cause_unique_problem(obj_data *obj, Character *vict)
+int contents_cause_unique_problem(Object *obj, Character *vict)
 {
   int lastnum = -1;
 
-  for (obj_data *inside = obj->contains; inside; inside = inside->next_content)
+  for (Object *inside = obj->contains; inside; inside = inside->next_content)
   {
     if (inside->item_number < 0) // skip -1 items
       continue;
@@ -1079,9 +1079,9 @@ int contents_cause_unique_problem(obj_data *obj, Character *vict)
   return false;
 }
 
-int contains_no_trade_item(obj_data *obj)
+int contains_no_trade_item(Object *obj)
 {
-  obj_data *inside = obj->contains;
+  Object *inside = obj->contains;
 
   while (inside)
   {
@@ -1098,8 +1098,8 @@ int do_drop(Character *ch, char *argument, int cmd)
   char arg[MAX_STRING_LENGTH];
   int amount;
   char buffer[MAX_STRING_LENGTH];
-  struct obj_data *tmp_object;
-  struct obj_data *next_obj;
+  class Object *tmp_object;
+  class Object *next_obj;
   bool test = false, blindlag = false;
   char alldot[MAX_STRING_LENGTH];
 
@@ -1207,7 +1207,7 @@ int do_drop(Character *ch, char *argument, int cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt, ch->in_room);
             logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-            for (obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
@@ -1276,7 +1276,7 @@ int do_drop(Character *ch, char *argument, int cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt, ch->in_room);
             logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-            for (obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
@@ -1301,8 +1301,8 @@ int do_drop(Character *ch, char *argument, int cmd)
 
 void do_putalldot(Character *ch, char *name, char *target, int cmd)
 {
-  struct obj_data *tmp_object;
-  struct obj_data *next_object;
+  class Object *tmp_object;
+  class Object *next_object;
   char buf[200];
   bool found = false;
 
@@ -1333,10 +1333,10 @@ void do_putalldot(Character *ch, char *name, char *target, int cmd)
     send_to_char("You don't have one.\r\n", ch);
 }
 
-int weight_in(struct obj_data *obj)
+int weight_in(class Object *obj)
 { // Sheldon backpack. Damn procs.
   int w = 0;
-  struct obj_data *obj2;
+  class Object *obj2;
   for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
     w += obj2->obj_flags.weight;
   return w;
@@ -1347,8 +1347,8 @@ int do_put(Character *ch, char *argument, int cmd)
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
-  struct obj_data *obj_object;
-  struct obj_data *sub_object;
+  class Object *obj_object;
+  class Object *sub_object;
   Character *tmp_char;
   int bits;
   char allbuf[MAX_STRING_LENGTH];
@@ -1564,8 +1564,8 @@ int do_put(Character *ch, char *argument, int cmd)
 
 void do_givealldot(Character *ch, char *name, char *target, int cmd)
 {
-  struct obj_data *tmp_object;
-  struct obj_data *next_object;
+  class Object *tmp_object;
+  class Object *next_object;
   char buf[200];
   bool found = false;
 
@@ -1600,7 +1600,7 @@ int do_give(Character *ch, char *argument, int cmd)
   int retval;
   extern int top_of_world;
   Character *vict;
-  struct obj_data *obj;
+  class Object *obj;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
   {
@@ -1924,7 +1924,7 @@ int do_give(Character *ch, char *argument, int cmd)
   sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
           GET_NAME(vict));
   logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-  for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
          obj_index[obj->item_number].virt,
@@ -1945,7 +1945,7 @@ int do_give(Character *ch, char *argument, int cmd)
   // otherwise it defeats the purpose of no_trade:)
 
   retval = mprog_give_trigger(vict, ch, obj);
-  bool objExists(obj_data * obj);
+  bool objExists(Object * obj);
   if (!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
       objExists(obj))
     extract_obj(obj);
@@ -1961,12 +1961,12 @@ int do_give(Character *ch, char *argument, int cmd)
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-struct obj_data *bring_type_to_front(Character *ch, int item_type)
+class Object *bring_type_to_front(Character *ch, int item_type)
 {
-  struct obj_data *item_carried = nullptr;
-  struct obj_data *container_item = nullptr;
+  class Object *item_carried = nullptr;
+  class Object *container_item = nullptr;
 
-  queue<obj_data *> container_queue;
+  queue<Object *> container_queue;
 
   for (item_carried = ch->carrying; item_carried; item_carried = item_carried->next_content)
   {
@@ -1996,10 +1996,10 @@ struct obj_data *bring_type_to_front(Character *ch, int item_type)
 }
 
 // Find an item on a character
-struct obj_data *search_char_for_item(Character *ch, int16_t item_number, bool wearonly)
+class Object *search_char_for_item(Character *ch, int16_t item_number, bool wearonly)
 {
-  struct obj_data *i = nullptr;
-  struct obj_data *j = nullptr;
+  class Object *i = nullptr;
+  class Object *j = nullptr;
   int k;
 
   for (k = 0; k < MAX_WEAR; k++)
@@ -2040,8 +2040,8 @@ struct obj_data *search_char_for_item(Character *ch, int16_t item_number, bool w
 // Find out how many of an item exists on character
 int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly)
 {
-  struct obj_data *i = nullptr;
-  struct obj_data *j = nullptr;
+  class Object *i = nullptr;
+  class Object *j = nullptr;
   int k;
   int count = 0;
 
@@ -2082,7 +2082,7 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
   return count;
 }
 
-bool search_container_for_item(obj_data *obj, int item_number)
+bool search_container_for_item(Object *obj, int item_number)
 {
   if (obj == nullptr)
   {
@@ -2094,7 +2094,7 @@ bool search_container_for_item(obj_data *obj, int item_number)
     return false;
   }
 
-  for (obj_data *i = obj->contains; i; i = i->next_content)
+  for (Object *i = obj->contains; i; i = i->next_content)
   {
     if (i->item_number == item_number)
     {
@@ -2105,7 +2105,7 @@ bool search_container_for_item(obj_data *obj, int item_number)
   return false;
 }
 
-bool search_container_for_vnum(obj_data *obj, int vnum)
+bool search_container_for_vnum(Object *obj, int vnum)
 {
   if (obj == nullptr)
   {
@@ -2117,7 +2117,7 @@ bool search_container_for_vnum(obj_data *obj, int vnum)
     return false;
   }
 
-  for (obj_data *i = obj->contains; i; i = i->next_content)
+  for (Object *i = obj->contains; i; i = i->next_content)
   {
     if (obj_index[i->item_number].virt == vnum)
     {
@@ -2217,7 +2217,7 @@ int do_open(Character *ch, char *argument, int cmd)
   int door, other_room, retval;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   struct room_direction_data *back;
-  struct obj_data *obj;
+  class Object *obj;
   Character *victim;
   Character *next_vict;
 
@@ -2379,7 +2379,7 @@ int do_close(Character *ch, char *argument, int cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   struct room_direction_data *back;
-  struct obj_data *obj;
+  class Object *obj;
   Character *victim;
 
   argument_interpreter(argument, type, dir);
@@ -2458,7 +2458,7 @@ bool has_key(Character *ch, int key)
     return false;
   }
 
-  obj_data *obj = ch->equipment[HOLD];
+  Object *obj = ch->equipment[HOLD];
   if (obj && IS_KEY(obj))
   {
     if (obj_index[obj->item_number].virt == key)
@@ -2488,7 +2488,7 @@ int do_lock(Character *ch, char *argument, int cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct room_direction_data *back;
-  struct obj_data *obj;
+  class Object *obj;
   Character *victim;
 
   argument_interpreter(argument, type, dir);
@@ -2561,7 +2561,7 @@ int do_unlock(Character *ch, char *argument, int cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct room_direction_data *back;
-  struct obj_data *obj;
+  class Object *obj;
   Character *victim;
 
   argument_interpreter(argument, type, dir);
@@ -2630,7 +2630,7 @@ int do_unlock(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int palm(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 
@@ -2726,7 +2726,7 @@ int palm(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             sub_object->name);
     logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-    for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }
@@ -2735,7 +2735,7 @@ int palm(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             ch->in_room);
     logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
-    for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }

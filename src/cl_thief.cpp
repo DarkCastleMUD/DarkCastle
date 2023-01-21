@@ -34,7 +34,7 @@ extern struct index_data *obj_index;
 extern int top_of_world;
 
 int find_door(Character *ch, char *type, char *dir);
-int get_weapon_damage_type(struct obj_data *wielded);
+int get_weapon_damage_type(class Object *wielded);
 int check_autojoiners(Character *ch, int skill = 0);
 int check_joincharmie(Character *ch, int skill = 0);
 
@@ -801,7 +801,7 @@ int max_level(Character *ch)
 int do_steal(Character *ch, char *argument, int cmd)
 {
   Character *victim;
-  struct obj_data *obj, *loop_obj, *next_obj;
+  class Object *obj, *loop_obj, *next_obj;
   struct affected_type pthiefaf, *paf;
   char victim_name[240];
   char obj_name[240];
@@ -809,7 +809,7 @@ int do_steal(Character *ch, char *argument, int cmd)
   int eq_pos;
   int _exp;
   int retval;
-  obj_data *has_item = nullptr;
+  Object *has_item = nullptr;
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + has_skill(ch, SKILL_STEAL) / 4;
   extern struct index_data *obj_index;
@@ -1457,7 +1457,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct room_direction_data *back;
-  struct obj_data *obj;
+  class Object *obj;
   Character *victim;
   bool has_lockpicks = false;
 
@@ -1599,9 +1599,9 @@ int do_slip(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   int amount;
   Character *vict;
-  struct obj_data *obj, *tmp_object, *container;
+  class Object *obj, *tmp_object, *container;
 
-  extern int weight_in(obj_data *);
+  extern int weight_in(Object *);
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
@@ -2205,7 +2205,7 @@ int do_jab(Character *ch, char *argument, int cmd)
 int do_appraise(Character *ch, char *argument, int cmd)
 {
   Character *victim;
-  obj_data *obj;
+  Object *obj;
   char name[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
   char item[MAX_STRING_LENGTH];
   int appraised = 0, bits, learned;

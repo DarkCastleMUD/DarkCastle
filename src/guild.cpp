@@ -23,7 +23,7 @@
 extern vector<profession> professions;
 
 int get_max(Character *ch, int skill);
-int guild(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner);
+int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 
 int do_practice(Character *ch, char *arg, int cmd)
 {
@@ -830,7 +830,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   return eSUCCESS;
 }
 
-int guild(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int guild(Character *ch, class Object *obj, int cmd, const char *arg,
           Character *owner)
 {
   int64_t exp_needed;
@@ -1008,7 +1008,7 @@ int guild(Character *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int skill_master(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
                  Character *invoker)
 {
   char buf[MAX_STRING_LENGTH];

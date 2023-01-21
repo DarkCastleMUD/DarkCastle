@@ -693,10 +693,10 @@ int do_redirect(Character *ch, char *argument, int cmd)
 int do_disarm(Character *ch, char *argument, int cmd)
 {
   Character *victim;
-  struct obj_data *wielded;
+  class Object *wielded;
 
   char name[256];
-  struct obj_data *obj;
+  class Object *obj;
   int retval = 0;
 
   int is_fighting_mob(Character * ch);

@@ -52,9 +52,9 @@ using namespace std;
 extern struct index_data *obj_index;
 extern CWorld world;
 
-struct obj_data *obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data *last_cont);
-bool put_obj_in_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_pos);
-void restore_weight(struct obj_data *obj);
+class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
+bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
+void restore_weight(class Object *obj);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 char *fread_alias_string(FILE *fpsave);
 
@@ -969,7 +969,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   FILE *fpsave = nullptr;
   char strsave[MAX_INPUT_LENGTH];
   struct char_file_u4 uchar;
-  struct obj_data *last_cont = nullptr;
+  class Object *last_cont = nullptr;
   Character *ch;
 
   if (!name || !strcmp(name, ""))
@@ -1043,9 +1043,9 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
 }
 
 // read data from file for an item.
-struct obj_data *obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data *last_cont)
+class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont)
 {
-  struct obj_data *obj;
+  class Object *obj;
   //  struct extra_descr_data *new_new_descr;
   //  struct extra_descr_data *ed, *next_ed;
 
@@ -1279,9 +1279,9 @@ struct obj_data *obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data 
   return last_cont;
 }
 
-bool obj_to_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_pos)
+bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
 {
-  // struct obj_data *tmp;
+  // class Object *tmp;
 
   if (obj == nullptr)
     return true;
@@ -1304,10 +1304,10 @@ bool obj_to_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_po
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_pos)
+bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
 {
   obj_file_elem object;
-  obj_data *standard_obj = 0;
+  Object *standard_obj = 0;
   uint16_t length = 0; // do not change this type
 
   memset(&object, 0, sizeof(object));
@@ -1352,7 +1352,7 @@ bool put_obj_in_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wea
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = ((struct obj_data *)obj_index[obj->item_number].item);
+  standard_obj = ((class Object *)obj_index[obj->item_number].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1548,9 +1548,9 @@ bool put_obj_in_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wea
 /*
  * Restore container weights after a save.
  */
-void restore_weight(struct obj_data *obj)
+void restore_weight(class Object *obj)
 {
-  struct obj_data *tmp;
+  class Object *tmp;
 
   if (obj == nullptr)
     return;
@@ -1652,7 +1652,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   int i;
   int x;
   struct affected_type *af;
-  struct obj_data *char_eq[MAX_WEAR];
+  class Object *char_eq[MAX_WEAR];
 
   // Remove all the eq and store it in temp storage
   for (i = 0; i < MAX_WEAR; i++)

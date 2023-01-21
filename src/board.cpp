@@ -604,7 +604,7 @@ int save_boards()
 Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
-int board(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
+int board(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
 {
   static int has_loaded = 0;
 

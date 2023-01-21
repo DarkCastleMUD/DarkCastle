@@ -68,14 +68,14 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern class room_data **world_array;
 int activeProgs = 0; // loop protection
 
 Character *activeActor = nullptr;
 Character *activeRndm = nullptr;
 Character *activeTarget = nullptr;
-obj_data *activeObj = nullptr;
+Object *activeObj = nullptr;
 void *activeVo = nullptr;
 
 char *activeProg;
@@ -133,17 +133,17 @@ int mprog_line_num = 0;
 int mprog_seval(Character *ch, char *lhs, char *opr, char *rhs);
 int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
 int mprog_do_ifchck(char *ifchck, Character *mob,
-					Character *actor, obj_data *obj,
+					Character *actor, Object *obj,
 					void *vo, Character *rndm);
 char *mprog_process_if(char *ifchck, char *com_list,
 					   Character *mob, Character *actor,
-					   obj_data *obj, void *vo,
+					   Object *obj, void *vo,
 					   Character *rndm, struct mprog_throw_type *thrw = nullptr);
 void mprog_translate(char ch, char *t, Character *mob,
-					 Character *actor, obj_data *obj,
+					 Character *actor, Object *obj,
 					 void *vo, Character *rndm);
 int mprog_process_cmnd(char *cmnd, Character *mob,
-					   Character *actor, obj_data *obj,
+					   Character *actor, Object *obj,
 					   void *vo, Character *rndm);
 
 /***************************************************************************
@@ -296,7 +296,7 @@ bool istank(Character *ch)
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 					 uint32_t **valui, char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb,
-					 Character *mob, Character *actor, obj_data *obj, void *vo,
+					 Character *mob, Character *actor, Object *obj, void *vo,
 					 Character *rndm)
 {
 	/*
@@ -311,7 +311,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	 */
 
 	Character *target = nullptr;
-	obj_data *otarget = nullptr;
+	Object *otarget = nullptr;
 	int rtarget = -1, ztarget = -1;
 	bool valset = false; // done like that to determine if value is set, since it can be 0
 	struct tempvariable *mobTempVar = nullptr;
@@ -411,11 +411,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	else if (!str_prefix("ozone_", left))
 	{
 		left += 6;
-		obj_data *otmp;
+		Object *otmp;
 		int z = world[mob->in_room].zone;
 		for (otmp = object_list; otmp; otmp = otmp->next)
 		{
-			obj_data *cmp = otmp->in_obj ? otmp->in_obj : otmp;
+			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
 			if ((cmp->in_room != NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
 				if (isname(left, otmp->name))
 				{
@@ -465,7 +465,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			otarget = obj;
 			break;
 		case 'p':
-			otarget = (obj_data *)vo;
+			otarget = (Object *)vo;
 			break;
 		case 'f':
 			if (actor)
@@ -1480,7 +1480,7 @@ std::map<std::string, mprog_ifs> load_ifchecks()
 std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
 
 int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
-					obj_data *obj, void *vo, Character *rndm)
+					Object *obj, void *vo, Character *rndm)
 {
 
 	char buf[MAX_INPUT_LENGTH];
@@ -1489,7 +1489,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	char val[MAX_INPUT_LENGTH];
 	char val2[MAX_INPUT_LENGTH]; // used for non-traditional
 	Character *vict = (Character *)vo;
-	obj_data *v_obj = (obj_data *)vo;
+	Object *v_obj = (Object *)vo;
 	char *bufpt = buf;
 	char *argpt = arg;
 	char *oprpt = opr;
@@ -1785,7 +1785,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int target = atoi(arg);
 		int count = 0;
 
-		obj_data *p;
+		Object *p;
 		for (p = object_list; p; p = p->next)
 		{
 			if (obj_index[p->item_number].virt == target)
@@ -2124,7 +2124,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eISWORN:
 	{
-		obj_data *o = nullptr;
+		Object *o = nullptr;
 		if (mob->mobdata->isObject())
 		{
 			o = mob->mobdata->getObject();
@@ -2546,7 +2546,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eWEARS:
 	{
-		struct obj_data *obj = 0;
+		class Object *obj = 0;
 		Character *take;
 		char bufeh[MAX_STRING_LENGTH];
 		char *valu = one_argument(val, bufeh);
@@ -2617,7 +2617,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eCARRIES:
 	{
-		struct obj_data *obj = 0;
+		class Object *obj = 0;
 		Character *take;
 		char bufeh[MAX_STRING_LENGTH];
 		char *valu = one_argument(val, bufeh);
@@ -2867,7 +2867,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	{
 		int target = atoi(arg);
 
-		for (obj_data *obj = world[mob->in_room].contents;
+		for (Object *obj = world[mob->in_room].contents;
 			 obj;
 			 obj = obj->next_content)
 		{
@@ -3005,7 +3005,7 @@ int mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
 char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
-					   Character *actor, obj_data *obj, void *vo,
+					   Character *actor, Object *obj, void *vo,
 					   Character *rndm, struct mprog_throw_type *thrw)
 {
 
@@ -3306,13 +3306,13 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
  * but this would require a lot of small changes all over the code.
  */
 void mprog_translate(char ch, char *t, Character *mob, Character *actor,
-					 obj_data *obj, void *vo, Character *rndm)
+					 Object *obj, void *vo, Character *rndm)
 {
 	static char *he_she[] = {"it", "he", "she"};
 	static char *him_her[] = {"it", "him", "her"};
 	static char *his_her[] = {"its", "his", "her"};
 	Character *vict = (Character *)vo;
-	obj_data *v_obj = (obj_data *)vo;
+	Object *v_obj = (Object *)vo;
 
 	*t = '\0';
 	switch (ch)
@@ -3683,7 +3683,7 @@ void debugpoint(){};
  * code scrutinizer will notice that this is taken from act()
  */
 int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
-					   obj_data *obj, void *vo, Character *rndm)
+					   Object *obj, void *vo, Character *rndm)
 {
 	char buf[MAX_INPUT_LENGTH * 2];
 	char tmp[MAX_INPUT_LENGTH * 2];
@@ -3834,9 +3834,9 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 	return command_interpreter(mob, buf, true);
 }
 
-bool objExists(obj_data *obj)
+bool objExists(Object *obj)
 {
-	obj_data *tobj;
+	Object *tobj;
 
 	for (tobj = object_list; tobj; tobj = tobj->next)
 		if (tobj == obj)
@@ -3852,7 +3852,7 @@ bool objExists(obj_data *obj)
  *  complex procedures, everything is farmed out to the other guys.
  */
 void mprog_driver(char *com_list, Character *mob, Character *actor,
-				  obj_data *obj, void *vo, struct mprog_throw_type *thrw, Character *rndm)
+				  Object *obj, void *vo, struct mprog_throw_type *thrw, Character *rndm)
 {
 
 	char tmpcmndlst[MAX_STRING_LENGTH];
@@ -3989,7 +3989,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 // Returns true if match
 // false if no match
 int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
-						 obj_data *obj, void *vo, int type, bool reverse)
+						 Object *obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
@@ -4088,7 +4088,7 @@ int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
 	return retval;
 }
 
-void mprog_percent_check(Character *mob, Character *actor, obj_data *obj,
+void mprog_percent_check(Character *mob, Character *actor, Object *obj,
 						 void *vo, int type)
 {
 	mob_prog_data *mprg;
@@ -4137,7 +4137,7 @@ void mprog_percent_check(Character *mob, Character *actor, obj_data *obj,
  * trigger calls.
  */
 int mprog_act_trigger(string buf, Character *mob, Character *ch,
-					  obj_data *obj, void *vo)
+					  Object *obj, void *vo)
 {
 
 	//  mob_prog_act_list * tmp_act;
@@ -4189,7 +4189,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 
 	mob_prog_data *mprg = 0;
 	mob_prog_data *next = 0;
-	obj_data *obj = 0;
+	Object *obj = 0;
 	bool done = false;
 
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
@@ -4233,7 +4233,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 
 	mob_prog_data *mprg = 0;
 	mob_prog_data *next = 0;
-	obj_data *obj = 0;
+	Object *obj = 0;
 	bool done = false;
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
 	{
@@ -4308,7 +4308,7 @@ int mprog_attack_trigger(Character *mob, Character *ch)
 	return mprog_cur_result;
 }
 
-int mprog_give_trigger(Character *mob, Character *ch, obj_data *obj)
+int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 {
 
 	char buf[MAX_INPUT_LENGTH];
@@ -4350,7 +4350,7 @@ int mprog_give_trigger(Character *mob, Character *ch, obj_data *obj)
 
 	if (okay && !SOMEONE_DIED(mprog_cur_result))
 	{
-		obj_data *a;
+		Object *a;
 		SET_BIT(mprog_cur_result, eEXTRA_VALUE);
 		for (a = mob->carrying; a; a = a->next_content)
 			if (a == obj)
@@ -4498,7 +4498,7 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 	return mprog_cur_result;
 }
 
-int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, obj_data *obj, void *vo, Character *rndm)
+int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
 {
 	if (!mob || isDead(mob) || isNowhere(mob))
 	{
@@ -4587,7 +4587,7 @@ void update_mprog_throws()
 	struct mprog_throw_type *action;
 	struct mprog_throw_type *last = nullptr;
 	Character *vict;
-	obj_data *vobj;
+	Object *vobj;
 	for (curr = g_mprog_throw_list; curr;)
 	{
 		// update
@@ -4683,7 +4683,7 @@ void update_mprog_throws()
 	}
 }
 
-Character *initiate_oproc(Character *ch, obj_data *obj)
+Character *initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
 	Character *temp;
 	temp = clone_mobile(real_mobile(12));
@@ -4695,7 +4695,7 @@ Character *initiate_oproc(Character *ch, obj_data *obj)
 	else
 		char_to_room(temp, obj->in_room);
 	if (ch)
-		temp->beacon = (obj_data *)ch;
+		temp->beacon = (Object *)ch;
 	temp->mobdata->setObject(obj);
 	//  temp->master = ch;
 	// dc_free(temp->short_desc);
@@ -4739,7 +4739,7 @@ void end_oproc(Character *ch, Trace trace)
 	}
 }
 
-int oprog_can_see_trigger(Character *ch, obj_data *item)
+int oprog_can_see_trigger(Character *ch, Object *item)
 {
 	if (!ch || isDead(ch) || isNowhere(ch))
 	{
@@ -4767,7 +4767,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 	}
 
 	Character *vmob = nullptr;
-	obj_data *item;
+	Object *item;
 
 	mprog_cur_result = eSUCCESS;
 
@@ -4808,7 +4808,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 	return mprog_cur_result;
 }
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, Character *actor, obj_data *obj2, void *vo, Character *rndm)
+int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
 {
 	mob_prog_data *mprg;
 	int curr_catch;
@@ -4872,7 +4872,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 	}
 
 	Character *vmob;
-	obj_data *item;
+	Object *item;
 
 	mprog_cur_result = eSUCCESS;
 
@@ -4926,7 +4926,7 @@ int oprog_greet_trigger(Character *ch)
 	}
 
 	Character *vmob;
-	obj_data *item;
+	Object *item;
 
 	mprog_cur_result = eSUCCESS;
 
@@ -4942,10 +4942,10 @@ int oprog_greet_trigger(Character *ch)
 	return mprog_cur_result;
 }
 
-int oprog_rand_trigger(obj_data *item)
+int oprog_rand_trigger(Object *item)
 {
 	Character *vmob;
-	//  obj_data *item;
+	//  Object *item;
 	Character *ch;
 	mprog_cur_result = eSUCCESS;
 	if (item->carried_by)
@@ -4962,7 +4962,7 @@ int oprog_rand_trigger(obj_data *item)
 	return mprog_cur_result;
 }
 
-int oprog_arand_trigger(obj_data *item)
+int oprog_arand_trigger(Object *item)
 {
 	Character *vmob;
 	Character *ch;
@@ -4986,7 +4986,7 @@ int oprog_load_trigger(Character *ch)
 {
 
 	Character *vmob;
-	obj_data *item;
+	Object *item;
 
 	mprog_cur_result = eSUCCESS;
 
@@ -5020,7 +5020,7 @@ int oprog_load_trigger(Character *ch)
 	return mprog_cur_result;
 }
 
-int oprog_weapon_trigger(Character *ch, obj_data *item)
+int oprog_weapon_trigger(Character *ch, Object *item)
 {
 	if (!ch || isDead(ch) || isNowhere(ch))
 	{
@@ -5042,7 +5042,7 @@ int oprog_weapon_trigger(Character *ch, obj_data *item)
 	return mprog_cur_result;
 }
 
-int oprog_armour_trigger(Character *ch, obj_data *item)
+int oprog_armour_trigger(Character *ch, Object *item)
 {
 	if (!ch || isDead(ch) || isNowhere(ch))
 	{
@@ -5072,7 +5072,7 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 	}
 
 	Character *vmob = nullptr;
-	obj_data *item = nullptr;
+	Object *item = nullptr;
 	mprog_cur_result = eFAILURE;
 	char buf[MAX_STRING_LENGTH] = {0};
 	if (ch->in_room >= 0)

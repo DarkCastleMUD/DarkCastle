@@ -52,7 +52,7 @@ using namespace std;
 #define AUC_MAX_PRICE 2000000000
 
 struct AuctionTicket;
-obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
+Object *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -91,7 +91,7 @@ struct AuctionTicket
   string buyer;
   AuctionStates state;
   unsigned int end_time;
-  obj_data *obj;
+  Object *obj;
 };
 
 /*
@@ -105,7 +105,7 @@ public:
   ~AuctionHouse();
   void CollectTickets(Character *ch, unsigned int ticket = 0);
   void CancelAll(Character *ch);
-  void AddItem(Character *ch, obj_data *obj, unsigned int price, string buyer);
+  void AddItem(Character *ch, Object *obj, unsigned int price, string buyer);
   void RemoveTicket(Character *ch, unsigned int ticket);
   void BuyItem(Character *ch, unsigned int ticket);
   void ListItems(Character *ch, ListOptions options, string name, unsigned int to, unsigned int from);
@@ -133,7 +133,7 @@ private:
   unsigned int ItemsActive;
   void ParseStats();
   bool CanSellMore(Character *ch);
-  bool IsOkToSell(obj_data *obj);
+  bool IsOkToSell(Object *obj);
   bool IsWearable(Character *ch, int vnum);
   bool IsNoTrade(int vnum);
   bool IsSeller(string in_name, string seller);
@@ -178,7 +178,7 @@ bool AuctionHouse::IsRace(int vnum, string israce)
   if (nr < 0)
     return false;
 
-  obj_data *obj = (struct obj_data *)(obj_index[nr].item);
+  Object *obj = (class Object *)(obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -229,7 +229,7 @@ bool AuctionHouse::IsClass(int vnum, string isclass)
   if (nr < 0)
     return false;
 
-  obj_data *obj = (struct obj_data *)(obj_index[nr].item);
+  Object *obj = (class Object *)(obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -460,7 +460,7 @@ bool AuctionHouse::CanSellMore(Character *ch)
 /*
 Is item type ok to sell?
 */
-bool AuctionHouse::IsOkToSell(obj_data *obj)
+bool AuctionHouse::IsOkToSell(Object *obj)
 {
   if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
@@ -500,7 +500,7 @@ Identify an item.
 */
 void AuctionHouse::Identify(Character *ch, unsigned int ticket)
 {
-  int spell_identify(uint8_t level, Character * ch, Character * victim, struct obj_data * obj, int skill);
+  int spell_identify(uint8_t level, Character * ch, Character * victim, class Object * obj, int skill);
   map<unsigned int, AuctionTicket>::iterator Item_it;
 
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
@@ -528,7 +528,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
     return;
   }
 
-  obj_data *obj = ticket_object_load(Item_it, ticket);
+  Object *obj = ticket_object_load(Item_it, ticket);
 
   if (!obj)
   {
@@ -586,7 +586,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
   if (nr < 0)
     return true;
 
-  obj_data *obj = (struct obj_data *)(obj_index[nr].item);
+  Object *obj = (class Object *)(obj_index[nr].item);
   switch (keyword)
   {
   case 0:
@@ -652,14 +652,14 @@ Is the item wearable by the player?
 */
 bool AuctionHouse::IsWearable(Character *ch, int vnum)
 {
-  int class_restricted(Character * ch, struct obj_data * obj);
-  int size_restricted(Character * ch, struct obj_data * obj);
+  int class_restricted(Character * ch, class Object * obj);
+  int size_restricted(Character * ch, class Object * obj);
   int nr = real_object(vnum);
 
   if (nr < 0)
     return true;
 
-  obj_data *obj = (struct obj_data *)(obj_index[nr].item);
+  Object *obj = (class Object *)(obj_index[nr].item);
   return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > GET_LEVEL(ch)));
 }
 
@@ -685,7 +685,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return IS_SET(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -706,7 +706,7 @@ bool AuctionHouse::IsLevel(unsigned int to, unsigned int from, int vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((class Object *)(obj_index[nr].item))->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -721,7 +721,7 @@ bool AuctionHouse::IsName(string name, int vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  return isname(name.c_str(), ((struct obj_data *)(obj_index[nr].item))->name);
+  return isname(name.c_str(), ((class Object *)(obj_index[nr].item))->name);
 }
 
 /*
@@ -1126,7 +1126,7 @@ BUY ITEM
 void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
-  obj_data *obj;
+  Object *obj;
   Character *vict;
   FILE *fl;
   char *buf[10];
@@ -1194,7 +1194,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    obj_data *no_trade_obj;
+    Object *no_trade_obj;
     int nr = real_object(27909);
 
     no_trade_obj = search_char_for_item(ch, nr, false);
@@ -1202,7 +1202,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((struct obj_data *)(obj_index[nr].item))->short_description);
+        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((class Object *)(obj_index[nr].item))->short_description);
       return;
     }
     else
@@ -1289,7 +1289,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   }
 }
 
-obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket)
+Object *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket)
 {
   // If obj is nullptr then either we haven't loaded this object yet or it's not custom
   if (Item_it->second.obj == nullptr)
@@ -1305,7 +1305,7 @@ obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it,
 
       try
       {
-        Item_it->second.obj = new obj_data;
+        Item_it->second.obj = new Object;
         auction_obj_file >> Item_it->second.obj;
         auction_obj_file.close();
       }
@@ -1337,12 +1337,12 @@ obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it,
     }
   }
 
-  obj_data *obj;
+  Object *obj;
   int rnum = real_object(Item_it->second.vitem);
   // If load was successful use it as a copy reference for a clone
   if (Item_it->second.obj)
   {
-    obj_data *reference_obj = Item_it->second.obj;
+    Object *reference_obj = Item_it->second.obj;
 
     obj = clone_object(rnum);
     copySaveData(obj, reference_obj);
@@ -1366,7 +1366,7 @@ CANCEL ITEM
 void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
-  obj_data *obj;
+  Object *obj;
   bool expired = false;
 
   Item_it = Items_For_Sale.find(ticket);
@@ -1418,7 +1418,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       return;
     }
 
-    if (IS_SET(((struct obj_data *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (IS_SET(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
@@ -1618,7 +1618,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, string name, un
     if (nr >= 0)
     {
       sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
-              ((struct obj_data *)(obj_index[nr].item))->short_description);
+              ((class Object *)(obj_index[nr].item))->short_description);
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
@@ -1632,7 +1632,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, string name, un
 /*
 ADD ITEM
 */
-void AuctionHouse::AddItem(Character *ch, obj_data *obj, unsigned int price, string buyer)
+void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, string buyer)
 {
   char buf[20];
   strncpy(buf, buyer.c_str(), 19);
@@ -1721,7 +1721,7 @@ void AuctionHouse::AddItem(Character *ch, obj_data *obj, unsigned int price, str
     return;
   }
 
-  if (strcmp(obj->short_description, ((struct obj_data *)(obj_index[obj->item_number].item))->short_description))
+  if (strcmp(obj->short_description, ((class Object *)(obj_index[obj->item_number].item))->short_description))
   {
     send_to_char("The Consignment broker informs you that he does not handle items that have been restrung.\r\n", ch);
     return;
@@ -1883,7 +1883,7 @@ void load_auction_tickets()
 int do_vend(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  obj_data *obj;
+  Object *obj;
   unsigned int price;
 
   if (!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 104)

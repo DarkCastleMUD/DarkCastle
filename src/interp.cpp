@@ -53,7 +53,7 @@ using namespace fmt;
 
 #define SKILL_HIDE 337
 
-int clan_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner);
+int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
@@ -1591,7 +1591,7 @@ void chop_half(char *string, char *arg1, char *arg2)
 
 int special(Character *ch, int cmd, char *arg)
 {
-  struct obj_data *i;
+  class Object *i;
   Character *k;
   int j;
   int retval;

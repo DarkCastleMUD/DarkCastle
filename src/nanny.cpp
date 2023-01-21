@@ -82,7 +82,7 @@ extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 extern struct descriptor_data *descriptor_list;
-extern obj_data *object_list;
+extern Object *object_list;
 extern struct index_data *obj_index;
 extern CWorld world;
 extern CVoteData *DCVote;
@@ -333,7 +333,7 @@ void do_inate_race_abilities(Character *ch)
    }
 }
 
-obj_data *clan_altar(Character *ch)
+Object *clan_altar(Character *ch)
 {
    clan_data *clan;
    struct clan_room_data *room;
@@ -347,7 +347,7 @@ obj_data *clan_altar(Character *ch)
             {
                if (real_room(room->room_number) == NOWHERE)
                   continue;
-               obj_data *t = world[real_room(room->room_number)].contents;
+               Object *t = world[real_room(room->room_number)].contents;
                for (; t; t = t->next_content)
                {
                   if (t->obj_flags.type_flag == ITEM_ALTAR)
@@ -2292,7 +2292,7 @@ void update_characters()
 
 void check_silence_beacons(void)
 {
-   obj_data *obj, *tmp_obj;
+   Object *obj, *tmp_obj;
 
    for (obj = object_list; obj; obj = tmp_obj)
    {
@@ -2311,7 +2311,7 @@ void check_silence_beacons(void)
 
 void checkConsecrate(int pulseType)
 {
-   obj_data *obj, *tmp_obj;
+   Object *obj, *tmp_obj;
    Character *ch = nullptr, *tmp_ch, *next_ch;
    int align, amount, spl = 0;
    char buf[MAX_STRING_LENGTH];

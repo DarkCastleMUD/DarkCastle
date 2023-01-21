@@ -35,10 +35,10 @@ typedef QList<QString> hints_t;
 
 using namespace std;
 
-using special_function = int (*)(Character *, struct obj_data *, int, const char *, Character *);
+using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
 
 typedef set<Character *> character_list_t;
-typedef set<struct obj_data *> obj_list_t;
+typedef set<class Object *> obj_list_t;
 typedef set<int> client_descriptor_list_t;
 typedef set<int> server_descriptor_list_t;
 typedef vector<in_port_t> port_list_t;
@@ -153,7 +153,7 @@ extern struct descriptor_data *descriptor_list;
 extern vector<string> continent_names;
 extern class CVoteData *DCVote;
 extern class room_data **world_array;
-extern struct obj_data *object_list;
+extern class Object *object_list;
 extern struct spell_info_type spell_info[];
 void renum_world(void);
 void renum_zone_table(void);

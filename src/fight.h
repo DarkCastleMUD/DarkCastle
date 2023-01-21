@@ -19,7 +19,7 @@ int damage(Character *ch, Character *victim, int dam,
            int weapon_type, int attacktype, int weapon, bool is_death_prog = false);
 int noncombat_damage(Character *ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
-void send_damage(char const *, Character *, obj_data *, Character *, char const *, char const *, int);
+void send_damage(char const *, Character *, Object *, Character *, char const *, char const *, int);
 int getRealSpellDamage(Character *ch);
 
 #define FIRST WIELD
@@ -40,7 +40,7 @@ void make_arm(Character *ch);
 void make_leg(Character *ch);
 void make_bowels(Character *ch);
 void make_blood(Character *ch);
-void make_scraps(Character *ch, struct obj_data *obj);
+void make_scraps(Character *ch, class Object *obj);
 void room_mobs_only_hate(Character *ch);
 void add_memory(Character *ch, char *victim, char type);
 void stop_follower(Character *ch, int cmd);
@@ -79,7 +79,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker 
 void arena_kill(Character *ch, Character *victim, int type);
 void do_dead(Character *ch, Character *victim);
 bool ArenaIsOpen();
-void eq_destroyed(Character *ch, obj_data *obj, int pos);
+void eq_destroyed(Character *ch, Object *obj, int pos);
 int is_stunned(Character *ch);
 void update_flags(Character *vict);
 void update_stuns(Character *ch);
