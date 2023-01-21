@@ -1238,12 +1238,12 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     return last_cont;
   }
   // Handle worn EQ
-  if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]) && CAN_WEAR(obj, wear_corr[wear_pos]))
+  if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos]))
   {
     equip_char(ch, obj, wear_pos, 1);
     return obj;
   }
-  else if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos + 1]) && CAN_WEAR(obj, wear_corr[wear_pos + 1]))
+  else if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos + 1]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos + 1]))
   {
     equip_char(ch, obj, wear_pos + 1, 1);
     return obj;

@@ -362,6 +362,8 @@ private:
 class Character
 {
 public:
+    static const QList<int> wear_to_item_wear;
+
     struct mob_data *mobdata = nullptr;
     struct pc_data *pcdata = nullptr;
     class Object *objdata = nullptr;

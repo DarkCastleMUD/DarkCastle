@@ -5,7 +5,6 @@
 #include "DC.h"
 
 extern bestowable_god_commands_type bestowable_god_commands[];
-extern int wear_corr[];
 extern const char *dirs[];
 extern struct race_data races[];
 extern const char *extra_bits[];
