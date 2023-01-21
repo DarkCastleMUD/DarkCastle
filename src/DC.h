@@ -1,13 +1,9 @@
 /*
- * DC.h
- *
- *  Created on: Dec 24, 2017
- *      Author: jhhudso
- *      Based on http://www.cplusplus.com/forum/beginner/152735/#msg792909
+ * Copyright 2017-2023 Jared H. Hudson
+ * Licensed under the LGPL.
  */
-
-#ifndef SRC_INCLUDE_DC_H_
-#define SRC_INCLUDE_DC_H_
+#ifndef DC_H_
+#define DC_H_
 
 #include <set>
 #include <queue>
@@ -162,4 +158,4 @@ extern struct spell_info_type spell_info[];
 void renum_world(void);
 void renum_zone_table(void);
 
-#endif /* SRC_INCLUDE_DC_H_ */
+#endif
