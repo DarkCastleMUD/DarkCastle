@@ -282,7 +282,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!tar_char)
       {
         logentry("Dammit Morc, fix that null tar_char thing in ki", IMPLEMENTER,
-            LogChannels::LOG_BUG);
+                 LogChannels::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
             "game.  Tell a god what you did immediately.\r\n",
@@ -400,6 +400,24 @@ int ki_gain(Character *ch)
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
     gain = (int)(gain * 1.25);
+
+  int multiplyer = 1;
+  switch (GET_POS(ch))
+  {
+  case POSITION_SLEEPING:
+    multiplyer = 3;
+    break;
+  case POSITION_RESTING:
+    multiplyer = 2;
+    break;
+  case POSITION_SITTING:
+    multiplyer = 2;
+    break;
+  default:
+    multiplyer = 1;
+    break;
+  }
+  gain *= multiplyer;
 
   return MAX(gain, 1);
 }
