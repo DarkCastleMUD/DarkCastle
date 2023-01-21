@@ -1,7 +1,6 @@
 
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
-class Character;
 /******************************************************************************
 | $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
@@ -18,10 +17,12 @@ class Character;
 #include <string>
 #include <algorithm>
 #include <set>
+using namespace std;
 
 #include <QString>
 #include <QMap>
 
+class Character;
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include "structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -33,8 +34,6 @@ class Character;
 #include "quest.h"
 #include "interp.h"
 #include "utility.h"
-
-class Character;
 
 struct strcasecmp_compare
 {
