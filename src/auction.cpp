@@ -626,13 +626,13 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
     return CAN_WEAR(obj, ITEM_WEAR_FACE);
     break;
   case 12:
-    return CAN_WEAR(obj, ITEM_WIELD);
+    return CAN_WEAR(obj, ITEM_WEAR_WIELD);
     break;
   case 13:
     return CAN_WEAR(obj, ITEM_WEAR_SHIELD);
     break;
   case 14:
-    return CAN_WEAR(obj, ITEM_HOLD);
+    return CAN_WEAR(obj, ITEM_WEAR_HOLD);
     break;
   case 15:
     return CAN_WEAR(obj, ITEM_WEAR_EAR);

@@ -1978,7 +1978,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 12:
-    if (CAN_WEAR(obj_object, ITEM_WIELD))
+    if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     {
       if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, STR)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
@@ -2045,7 +2045,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 14:
-    if (CAN_WEAR(obj_object, ITEM_HOLD))
+    if (CAN_WEAR(obj_object, ITEM_WEAR_HOLD))
     {
 
       if (charmie_restricted(ch, obj_object, HOLD))
@@ -2135,7 +2135,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
 
   case 17: // primary
-    if (CAN_WEAR(obj_object, ITEM_WIELD))
+    if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     {
       // if not wielding anything, just call regular wield
       if (!ch->equipment[WIELD])
@@ -2228,11 +2228,11 @@ int Object::keywordfind(void)
     keyword = 10;
   else if (CAN_WEAR(obj_object, ITEM_WEAR_FACE))
     keyword = 11;
-  else if (CAN_WEAR(obj_object, ITEM_WIELD))
+  else if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     keyword = 12;
   else if (CAN_WEAR(obj_object, ITEM_WEAR_SHIELD))
     keyword = 13;
-  else if (CAN_WEAR(obj_object, ITEM_HOLD))
+  else if (CAN_WEAR(obj_object, ITEM_WEAR_HOLD))
     keyword = 14;
   else if (CAN_WEAR(obj_object, ITEM_WEAR_EAR))
     keyword = 15;

@@ -4752,7 +4752,7 @@ void make_head(Character *ch)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1; /* corpse identifyer */
   corpse->obj_flags.weight = 5;
@@ -4798,7 +4798,7 @@ void make_arm(Character *ch)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1; /* corpse identifyer */
   corpse->obj_flags.weight = 5;
@@ -4844,7 +4844,7 @@ void make_leg(Character *ch)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1; /* corpse identifyer */
   corpse->obj_flags.weight = 5;
@@ -4890,7 +4890,7 @@ void make_bowels(Character *ch)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1; /* corpse identifyer */
   corpse->obj_flags.weight = 5;
@@ -4936,7 +4936,7 @@ void make_blood(Character *ch)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1; /* corpse identifyer */
   corpse->obj_flags.weight = 5;
@@ -4986,7 +4986,7 @@ void make_heart(Character *ch, Character *vict)
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_FOOD;
-  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+  corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_WEAR_HOLD;
   corpse->obj_flags.value[0] = 0; /* You can't store stuff in a heart */
   corpse->obj_flags.value[3] = 1; /* corpse identifier */
   corpse->obj_flags.weight = 2;

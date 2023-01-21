@@ -3770,10 +3770,10 @@ const QList<int> Character::wear_to_item_wear =
         ITEM_WEAR_WAISTE,
         ITEM_WEAR_WRIST,
         ITEM_WEAR_WRIST, // 15
-        ITEM_WIELD,
-        ITEM_WIELD,
-        ITEM_HOLD,
-        ITEM_HOLD,
+        ITEM_WEAR_WIELD,
+        ITEM_WEAR_WIELD,
+        ITEM_WEAR_HOLD,
+        ITEM_WEAR_HOLD,
         ITEM_WEAR_FACE, // 20
         ITEM_WEAR_EAR,
         ITEM_WEAR_EAR};

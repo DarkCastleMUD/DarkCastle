@@ -690,7 +690,7 @@ void scavenge(Character *ch)
     {
       if (hands_are_free(ch, 1))
       {
-        if (CAN_WEAR(obj, ITEM_WIELD))
+        if (CAN_WEAR(obj, ITEM_WEAR_WIELD))
         {
           if (GET_OBJ_WEIGHT(obj) < GET_STR(ch))
           {
@@ -897,7 +897,7 @@ void scavenge(Character *ch)
             break;
 
           case 14:
-            if ((CAN_WEAR(obj, ITEM_HOLD)) && (!ch->equipment[HOLD]))
+            if ((CAN_WEAR(obj, ITEM_WEAR_HOLD)) && (!ch->equipment[HOLD]))
             {
               if ((obj->obj_flags.type_flag == ITEM_LIGHT) &&
                   (!ch->equipment[WEAR_LIGHT]))
