@@ -46,7 +46,6 @@
 #include "Timer.h"
 #include "move.h"
 
-int keywordfind(class Object *obj_object);
 int hands_are_free(Character *ch, int number);
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);
@@ -685,7 +684,7 @@ void scavenge(Character *ch)
     if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
       continue;
 
-    keyword = keywordfind(obj);
+    keyword = obj->keywordfind();
 
     if (keyword != -2)
     {

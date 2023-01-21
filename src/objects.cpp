@@ -39,7 +39,7 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 int hands_are_free(Character *ch, int number);
 class Object *get_object_in_equip_vis(Character *ch,
-                                         char *arg, class Object *equipment[], int *j, bool blindfighting);
+                                      char *arg, class Object *equipment[], int *j, bool blindfighting);
 
 // add an affect to an item
 void add_obj_affect(Object *obj, int loc, int mod)
@@ -2198,8 +2198,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   redo_ki(ch);
 }
 
-int keywordfind(class Object *obj_object)
+int Object::keywordfind(void)
 {
+  Object *obj_object = this;
   int keyword;
 
   keyword = -2;
@@ -2290,7 +2291,7 @@ int do_wear(Character *ch, char *argument, int cmd)
       next_obj = tmp_object->next_content;
       if (!CAN_SEE_OBJ(ch, tmp_object))
         continue;
-      keyword = keywordfind(tmp_object);
+      keyword = tmp_object->keywordfind();
       if (keyword != -2)
         wear(ch, tmp_object, keyword);
     }
@@ -2322,7 +2323,7 @@ int do_wear(Character *ch, char *argument, int cmd)
     }
     else
     {
-      wear(ch, obj_object, keywordfind(obj_object));
+      wear(ch, obj_object, obj_object->keywordfind());
     }
     if (blindlag)
       WAIT_STATE(ch, PULSE_VIOLENCE);

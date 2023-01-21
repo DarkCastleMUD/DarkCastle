@@ -46,7 +46,6 @@ char *valid_fields[] = {
     "brownie",
     nullptr};
 
-extern int keywordfind(Object *);
 extern void wear(Character *, Object *, int);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -602,7 +601,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    SET_BIT(obj->obj_flags.extra_flags, ITEM_QUEST);
 
    obj_to_char(obj, mob);
-   wear(mob, obj, keywordfind(obj));
+   wear(mob, obj, obj->keywordfind());
 
    logf(IMMORTAL, LogChannels::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
 
@@ -796,7 +795,7 @@ void quest_update()
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
                   obj->name = str_hsh(buf);
                   obj_to_char(obj, mob);
-                  wear(mob, obj, keywordfind(obj));
+                  wear(mob, obj, obj->keywordfind());
                }
             }
          }

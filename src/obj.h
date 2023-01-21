@@ -265,6 +265,8 @@ public:
 
     bool isDark(void);
     uint64_t getLevel(void);
+
+    int keywordfind(void);
 };
 
 /* For 'equipment' */
