@@ -2,24 +2,22 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v2
-    - name: install ubuntu software
-      run: |
-        sudo apt update
-        sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++ scons libcurl4 libpq-dev libpq5 libcurl4-openssl-dev \
-                         unzip zlib1g-dev libfmt-dev cmake qt6-base-dev libssh-dev
-    - name: make
-      run: |
-        cmake -S src -B build
-        make -C build -j$(grep -c process /proc/cpuinfo)
-
+      - uses: actions/checkout@v2
+      - name: install ubuntu software
+        run: |
+          sudo apt update
+          sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++ scons libcurl4 libpq-dev libpq5 libcurl4-openssl-dev \
+                           unzip zlib1g-dev libfmt-dev cmake qt6-base-dev libssh-dev qt6-base-dev
+      - name: make
+        run: |
+          cmake -S src -B build
+          make -C build -j$(grep -c process /proc/cpuinfo)
