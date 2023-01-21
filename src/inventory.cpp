@@ -1803,26 +1803,37 @@ int do_give(Character *ch, char *argument, int cmd)
       send_to_char("This item is NODROP btw.\r\n", ch);
   }
 
-  // You can give no_trade items to mobs for quest purposes.  It's taken care of later
-  if (!IS_NPC(vict) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) &&
-      (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  // Handle no-trade items
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    if (GET_LEVEL(ch) > IMMORTAL)
-      send_to_char("That was a NO_TRADE item btw....\r\n", ch);
-    else
+    // Mortal ch cam give immortal vict no-trade items
+    if (IS_PC(ch) && IS_PC(vict) && GET_LEVEL(ch) < IMMORTAL && GET_LEVEL(vict) >= IMMORTAL)
     {
-      send_to_char("It seems magically attached to you.\r\n", ch);
-      return eFAILURE;
+      send_to_char("It seems to no longer be magically attached to you.\r\n", ch);
     }
-  }
-  if (contains_no_trade_item(obj))
-  {
-    if (GET_LEVEL(ch) > IMMORTAL)
-      send_to_char("That was a NO_TRADE item btw....\r\n", ch);
     else
     {
-      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
-      return eFAILURE;
+      // You can give no_trade items to mobs for quest purposes.  It's taken care of later
+      if (IS_PC(vict) && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+      {
+        if (GET_LEVEL(ch) > IMMORTAL)
+          send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+        else
+        {
+          send_to_char("It seems magically attached to you.\r\n", ch);
+          return eFAILURE;
+        }
+      }
+      if (contains_no_trade_item(obj))
+      {
+        if (GET_LEVEL(ch) > IMMORTAL)
+          send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+        else
+        {
+          send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+          return eFAILURE;
+        }
+      }
     }
   }
 
@@ -1843,34 +1854,52 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  // Check if mortal ch is trying to give more items to vict than they can carry
   if ((1 + IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
   {
-    if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-        IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
-        arena.type == POTATO)
+    if (GET_LEVEL(ch) >= IMMORTAL)
     {
-      ;
+      act("$N seems to have $S hands full but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
     }
     else
     {
-      act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
-      return eFAILURE;
+      if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+          arena.type == POTATO)
+      {
+        ;
+      }
+      else
+      {
+        act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
+        return eFAILURE;
+      }
     }
   }
+
+  // Check if mortal ch is trying to give more weight to vict than they can carry
   if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
-    if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-        IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
-        arena.type == POTATO)
+    if (GET_LEVEL(ch) >= IMMORTAL)
     {
-      ;
+      act("$E can't carry that much weight but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
     }
     else
     {
-      act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
-      return eFAILURE;
+      if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+          arena.type == POTATO)
+      {
+        ;
+      }
+      else
+      {
+        act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
+        return eFAILURE;
+      }
     }
   }
+
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(vict, obj->item_number, false))
