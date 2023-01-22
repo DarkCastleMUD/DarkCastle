@@ -1423,17 +1423,31 @@ bool is_abbrev(const string &aabrev, const string &word)
                });
 }
 
+bool is_abbrev(QString aabrev, QString word)
+{
+  if (aabrev.isEmpty())
+  {
+    return false;
+  }
+
+  return equal(aabrev.begin(), aabrev.end(), word.begin(),
+               [](QChar a, QChar w)
+               {
+                 return tolower(a.toLatin1()) == tolower(w.toLatin1());
+               });
+}
+
 /* determine if a given string is an abbreviation of another */
-int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */
+bool is_abbrev(const char *arg1, const char *arg2) /* arg1 is short, arg2 is long */
 {
   if (!*arg1)
-    return (0);
+    return false;
 
   for (; *arg1; arg1++, arg2++)
     if (LOWER(*arg1) != LOWER(*arg2))
-      return (0);
+      return false;
 
-  return (1);
+  return true;
 }
 
 string ltrim(string str)
