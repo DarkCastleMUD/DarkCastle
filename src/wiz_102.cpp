@@ -2128,14 +2128,12 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.wear_flags,
-                Object::wear_bits, buf);
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.wear_flags, Object::wear_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
       for (i = 0; i < Object::wear_bits.size(); i++)
       {
-        sprintf(buf, "  %s\n\r", Object::wear_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(QString("  %1\r\n").arg(Object::wear_bits[i]));
       }
       return eFAILURE;
     }
