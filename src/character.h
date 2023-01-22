@@ -567,6 +567,7 @@ public:
     bool removeGold(uint64_t gold);
     int store_to_char_variable_data(FILE *fpsave);
     int char_to_store_variable_data(FILE *fpsave);
+    bool load_charmie_equipment(QString name);
 
 private:
     uint64_t gold_ = {}; /* Money carried                           */

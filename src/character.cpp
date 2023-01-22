@@ -2,6 +2,10 @@
 
 #include "character.h"
 #include "levels.h"
+#include "db.h"
+
+void set_golem(Character *golem, int golemtype);
+class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -194,4 +198,43 @@ bool Character::multiplyGold(double mult)
 uint64_t &Character::getGoldReference(void)
 {
     return gold_;
+}
+
+bool Character::load_charmie_equipment(QString name)
+{
+    int golemtype = 0;
+
+    if (name.isEmpty())
+    {
+        return false;
+    }
+
+    char file[200];
+    FILE *fpfile = nullptr;
+    Character *golem;
+    if (IS_NPC(this) || GET_LEVEL(this) < IMMORTAL)
+    {
+        return false;
+    }
+
+    sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, name[0], name.toStdString().c_str(), 0);
+    if (!(fpfile = fopen(file, "r")))
+    { // No golem. Create a new one.
+        this->send("No charmie save file found.\r\n");
+        return false;
+    }
+
+    golem = clone_mobile(real_mobile(8));
+    set_golem(golem, golemtype); // Basics
+    this->pcdata->golem = golem;
+    golem->level = 1;
+    class Object *last_cont = nullptr; // Last container.
+    while (!feof(fpfile))
+    {
+        last_cont = obj_store_to_char(golem, fpfile, last_cont);
+    }
+    fclose(fpfile);
+    char_to_room(golem, this->in_room);
+
+    return true;
 }
