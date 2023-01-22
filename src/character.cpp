@@ -217,7 +217,7 @@ bool Character::load_charmie_equipment(QString name)
         return false;
     }
 
-    sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, name[0], name.toStdString().c_str(), 0);
+    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, name[0], name.toStdString().c_str(), 0);
     if (!(fpfile = fopen(file, "r")))
     { // No golem. Create a new one.
         this->send("No charmie save file found.\r\n");
