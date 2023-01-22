@@ -834,7 +834,7 @@ item_types_t item_types =
         "KEYRING",
         "\n"};
 
-const char *wear_bits[] =
+const QStringList Object::wear_bits =
     {
         "TAKE",
         "FINGER",
@@ -854,8 +854,7 @@ const char *wear_bits[] =
         "THROW",
         "LIGHT-SOURCE",
         "FACE",
-        "EAR",
-        "\n"};
+        "EAR"};
 
 const char *zone_modes[] =
     {
