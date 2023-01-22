@@ -12,7 +12,6 @@ extern const char *size_bits[];
 extern const char *spells[];
 extern const char *apply_types[];
 extern item_types_t item_types;
-extern const char *wear_bits[];
 extern const char *more_obj_bits[];
 extern const char *connected_states[];
 extern const char *race_types[];
