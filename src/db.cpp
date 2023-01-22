@@ -88,8 +88,8 @@ world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
 class Room **world_array = 0; // array of rooms
-int top_of_world = 0;			   // index of last room in world
-int top_of_world_alloc = 0;		   // index of last alloc'd memory in world
+int top_of_world = 0;		  // index of last room in world
+int top_of_world_alloc = 0;	  // index of last alloc'd memory in world
 
 class Object *object_list = 0; /* the global linked list of obj's */
 
@@ -4214,6 +4214,23 @@ string lf_to_crlf(string &s1)
 	return s1;
 }
 
+void write_bitvector_csv(uint32_t vector, QStringList names, ofstream &fout)
+{
+
+	for (uint32_t nr = 0; nr < names.size(); nr++)
+	{
+		if (IS_SET(1, vector))
+		{
+			fout << names[nr].toStdString();
+		}
+
+		fout << ",";
+		vector >>= 1;
+	}
+
+	return;
+}
+
 void write_bitvector_csv(uint32_t vector, const char *const *array, ofstream &fout)
 {
 	int nr = 0;
@@ -4251,7 +4268,7 @@ void write_object_csv(Object *obj, ofstream &fout)
 		fout << obj->obj_flags.weight << ",";
 		fout << obj->obj_flags.cost << ",";
 
-		write_bitvector_csv(obj->obj_flags.wear_flags, wear_bits, fout);
+		write_bitvector_csv(obj->obj_flags.wear_flags, Object::wear_bits, fout);
 		write_bitvector_csv(obj->obj_flags.extra_flags, extra_bits, fout);
 		write_bitvector_csv(obj->obj_flags.more_flags, more_obj_bits, fout);
 
