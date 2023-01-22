@@ -494,7 +494,6 @@ void redo_mana(Character *ch);      /* Rua's put in  */
 void redo_ki(Character *ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
-void assign_mobiles(void);
 void free_obj(class Object *obj);
 
 int char_from_room(Character *ch, bool stop_fighting);

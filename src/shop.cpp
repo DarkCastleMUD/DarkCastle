@@ -18,6 +18,8 @@
 #include <cstring>
 #include <fmt/format.h>
 
+#include <QObject>
+
 #include "affect.h"
 #include "character.h"
 #include "utility.h"

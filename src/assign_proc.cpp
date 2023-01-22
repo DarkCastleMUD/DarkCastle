@@ -37,10 +37,11 @@ void assign_combat_procs();
  ******************************************************************** */
 
 /* assign special procedures to mobiles */
-void assign_mobiles(void)
+void DC::assign_mobiles(void)
 {
   assign_non_combat_procs();
   assign_combat_procs();
+  
   boot_the_shops();
   logf(IMMORTAL, LogChannels::LOG_WORLD, "Booting player shops.");
   boot_player_shops();

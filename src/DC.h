@@ -130,6 +130,7 @@ public:
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
+  void assign_mobiles(void);
 
 private:
   DC(const DC &) = delete; // non-copyable
