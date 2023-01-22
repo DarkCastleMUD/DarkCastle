@@ -1471,8 +1471,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				goto endy;
 			}
 
-			for (i = 0; *wear_bits[i] != '\n'; i++)
-				if (!str_nosp_cmp(wear_bits[i], arg1))
+			for (i = 0; i < Object::wear_bits.size(); i++)
+				if (!str_nosp_cmp(Object::wear_bits[i], arg1))
 				{
 					SET_BIT(wear, 1 << i);
 					goto endy;
@@ -1574,10 +1574,10 @@ int do_show(Character *ch, char *argument, int cmd)
 		int o = 0, z;
 		if (!fo)
 		{
-			for (z = 0; *wear_bits[z] != '\n'; z++)
+			for (z = 0; i < Object::wear_bits.size(); z++)
 			{
 				o++;
-				send_to_char_nosp(wear_bits[z], ch);
+				send_to_char_nosp(Object::wear_bits[z], ch);
 				if (o % 7 == 0)
 					send_to_char("\r\n", ch);
 				else

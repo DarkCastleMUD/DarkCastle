@@ -148,7 +148,7 @@ void showObjectVault(const char *owner, Object *obj)
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
 
-  sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+  sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.size, size_bits, buf);
@@ -170,7 +170,7 @@ void showObject(Character *ch, Object *obj)
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
 
-  sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+  sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.size, size_bits, buf);

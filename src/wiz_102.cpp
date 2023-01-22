@@ -2129,18 +2129,17 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.wear_flags,
-                wear_bits, buf);
+                Object::wear_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
-      for (i = 0; *wear_bits[i] != '\n'; i++)
+      for (i = 0; i < Object::wear_bits.size(); i++)
       {
-        sprintf(buf, "  %s\n\r", wear_bits[i]);
+        sprintf(buf, "  %s\n\r", Object::wear_bits[i]);
         send_to_char(buf, ch);
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(wear_bits, buf4, ch,
-                              ((Object *)obj_index[rnum].item)->obj_flags.wear_flags);
+    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, ((Object *)obj_index[rnum].item)->obj_flags.wear_flags);
   }
   break;
 
@@ -4080,7 +4079,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         csendf(ch, "%s\n\r", fields[x]);
       }
     }
-    if (is_abbrev(arg1, fields[x]))
+    if (is_abbrev(arg1.c_str(), fields[x]))
       break;
   }
 
@@ -4152,7 +4151,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       tie(direction, remainder_args) = half_chop(remainder_args);
       for (x = 0; x <= 6; x++)
       {
-        if (is_abbrev(direction, dirs[x]))
+        if (is_abbrev(direction.c_str(), dirs[x]))
         {
           if (world[ch->in_room].dir_option[x] == nullptr)
           {
@@ -4210,7 +4209,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
-      if (is_abbrev(arg2, dirs[x]))
+      if (is_abbrev(arg2.c_str(), dirs[x]))
         break;
     }
     if (remainder_args.empty())
@@ -4470,7 +4469,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
-      if (is_abbrev(arg3, dirs[x]))
+      if (is_abbrev(arg3.c_str(), dirs[x]))
         break;
     }
 
@@ -4554,7 +4553,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         send_to_char("No such sector type.\r\n", ch);
         return eFAILURE;
       }
-      else if (is_abbrev(remainder_args, sector_types[x]))
+      else if (is_abbrev(remainder_args.c_str(), sector_types[x]))
       {
         world[ch->in_room].sector_type = x;
         csendf(ch, "Sector type set to %s.\r\n", sector_types[x]);

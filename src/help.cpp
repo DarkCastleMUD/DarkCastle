@@ -35,7 +35,7 @@ extern void skip_spaces(char **string);
 extern struct help_index_element_new *new_help_table;
 extern int new_top_of_helpt;
 int get_line(FILE *fl, char *buf);
-int is_abbrev(char *arg1, char *arg2);
+int is_abbrev(const char *arg1, const char *arg2);
 void help_string_to_file(FILE *f, char *string);
 
 // locals

@@ -875,10 +875,10 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
   }
 
   int i = 1;
-  for (; wear_bits[i][0] != '\n'; i++)
-    if (!str_cmp(wear_bits[i], arg))
+  for (; i < Object::wear_bits.size(); i++)
+    if (Object::wear_bits[i] == QString(arg))
       break;
-  if (wear_bits[i][0] == '\n')
+  if (i >= Object::wear_bits.size())
   {
     send_to_char("Syntax: acfinder <wear slot>\r\n", ch);
     return eFAILURE;
@@ -963,6 +963,14 @@ void write_array_csv(const char *const *array, ofstream &fout)
   }
 }
 
+void write_array_csv(QStringList names, ofstream &fout)
+{
+  for (auto &entry : names)
+  {
+    fout << entry.toStdString() << ",";
+  }
+}
+
 int do_export(Character *ch, char *args, int cmdnum)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
@@ -988,7 +996,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     fout << "size,value[0],value[1],value[2],value[3],level,weight,cost,";
 
     // Print individual array values as columns
-    write_array_csv(wear_bits, fout);
+    write_array_csv(Object::wear_bits, fout);
     write_array_csv(extra_bits, fout);
     write_array_csv(more_obj_bits, fout);
 

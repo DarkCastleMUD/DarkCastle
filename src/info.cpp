@@ -159,7 +159,7 @@ void argument_split_3(char *argument, char *first_arg, char *second_arg, char *t
 }
 
 class Object *get_object_in_equip_vis(Character *ch,
-                                         char *arg, class Object *equipment[], int *j, bool blindfighting)
+                                      char *arg, class Object *equipment[], int *j, bool blindfighting)
 {
    int k, num;
    char tmpname[MAX_STRING_LENGTH];
@@ -1077,7 +1077,7 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
 
-   sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
    csendf(ch, "$3Worn on: $R%s\r\n", buf);
 
    sprintbit(obj->obj_flags.size, size_bits, buf);

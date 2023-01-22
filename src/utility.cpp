@@ -578,6 +578,38 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
     strcat(result, "NoBits ");
 }
 
+// leading space until all calling functions cleaned up
+void sprintbit(uint32_t vektor, QStringList names, char *result)
+{
+  int32_t nr;
+
+  *result = '\0';
+
+  if (vektor < 0)
+  {
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    return;
+  }
+
+  for (nr = 0; vektor; vektor >>= 1)
+  {
+    if (IS_SET(1, vektor))
+    {
+      if (names[nr].compare("unused", Qt::CaseInsensitive) == 0)
+        continue;
+
+      strcat(result, names.value(nr, "Undefined").toStdString().c_str());
+      strcat(result, " ");
+    }
+
+    if (nr < names.size() - 1)
+      nr++;
+  }
+
+  if (*result == '\0')
+    strcat(result, "NoBits ");
+}
+
 // no leading space
 std::string sprintbit(uint32_t vektor, const char *names[])
 {
@@ -2008,7 +2040,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
     {
       if (!strcmp("unused", bits[x]))
         continue;
-      if (is_abbrev(arg1, bits[x]))
+      if (is_abbrev(arg1.c_str(), bits[x]))
       {
         if (ISSET(value, x + 1))
         {
@@ -2018,6 +2050,59 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
         else
         {
           SETBIT(value, x + 1);
+          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+        }
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found)
+  {
+    send_to_char("No matching bits found.\r\n", ch);
+  }
+}
+
+void parse_bitstrings_into_int(QStringList bits, QString remainder_args, Character *ch, uint32_t &value)
+{
+  int found = false;
+
+  if (ch == nullptr)
+  {
+    return;
+  }
+
+  for (;;)
+  {
+    if (remainder_args.isEmpty())
+    {
+      break;
+    }
+
+    QStringList args = remainder_args.split(' ');
+    if (args.isEmpty())
+    {
+      break;
+    }
+    QString arg1 = args.at(0);
+
+    for (int x = 0; bits.size(); x++)
+    {
+      if (bits[x] == "unused")
+      {
+        continue;
+      }
+
+      if (is_abbrev(arg1, bits[x]))
+      {
+        if (IS_SET(value, (1 << x)))
+        {
+          REMOVE_BIT(value, (1 << x));
+          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+        }
+        else
+        {
+          SET_BIT(value, (1 << x));
           csendf(ch, "%s flag ADDED.\r\n", bits[x]);
         }
         found = true;
@@ -2065,7 +2150,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
     {
       if (!strcmp("unused", bits[x]))
         continue;
-      if (is_abbrev(arg1, bits[x]))
+      if (is_abbrev(arg1.c_str(), bits[x]))
       {
         if (IS_SET(value, (1 << x)))
         {
@@ -2126,7 +2211,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
         continue;
       }
 
-      if (is_abbrev(arg1, bits[x]))
+      if (is_abbrev(arg1.c_str(), bits[x]))
       {
         if (IS_SET(value, (1 << x)))
         {

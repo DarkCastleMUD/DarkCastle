@@ -443,6 +443,8 @@ std::string sprintbit(uint value[], const char *names[]);
 void sprintbit(uint32_t vektor, const char *names[], char *result);
 std::string sprintbit(uint32_t vektor, const char *names[]);
 
+void sprintbit(uint32_t vektor, QStringList names, char *result);
+
 void sprinttype(int type, const char *names[], char *result);
 std::string sprinttype(int type, const char *names[]);
 
@@ -561,6 +563,7 @@ bool check_range_valid_and_convert(int &value, const char *buf, int begin, int e
 bool check_valid_and_convert(int &value, char *buf);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t value[]);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t &value);
+void parse_bitstrings_into_int(QStringList bits, QString strings, Character *ch, uint32_t &value);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint16_t &value);
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t value[]);
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t &value);
