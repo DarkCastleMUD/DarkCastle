@@ -3774,10 +3774,10 @@ command_return_t Character::do_search(QStringList &arguments, int cmd)
          send("type=?        show available object types.\r\n");
          send("wear=neck     show objects that can be worn on the neck.\r\n");
          send("wear=?        show available wear locations.\r\n");
-         send("class==mage   show objects that can be worn by a mage.\r\n");
-         send("class=?       show available classes.\r\n");
-         send("size=small    show objects that can be worn on the neck.\r\n");
-         send("size=?        show available sizes.\r\n");
+         // send("class==mage   show objects that can be worn by a mage.\r\n");
+         // send("class=?       show available classes.\r\n");
+         // send("size=small    show objects that can be worn on the neck.\r\n");
+         // send("size=?        show available sizes.\r\n");
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
          send("Search terms can be combined.\r\n");
