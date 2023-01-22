@@ -61,7 +61,7 @@ class PlayerConfig : public QObject
 {
     Q_OBJECT
 public:
-    PlayerConfig();
+    explicit PlayerConfig(QObject *parent = nullptr);
     player_config_t::iterator begin();
     player_config_t::iterator end();
     player_config_t::const_iterator constBegin() const;

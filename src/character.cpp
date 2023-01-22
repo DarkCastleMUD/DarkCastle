@@ -83,7 +83,8 @@ void pc_data::toggleJoining(QString key)
     }
 }
 
-PlayerConfig::PlayerConfig()
+PlayerConfig::PlayerConfig(QObject *parent)
+    : QObject(parent)
 {
     config["color.good"] = "green";
     config["color.bad"] = "red";
