@@ -3496,18 +3496,18 @@ class Search
 public:
    enum types
    {
-      O_NAME,
+      O_NAME, // name=
       O_DESCRIPTION,
       O_SHORT_DESCRIPTION,
       O_ACTION_DESCRIPTION,
-      O_TYPE_FLAG,
-      O_WEAR_FLAGS,
+      O_TYPE_FLAG,  // type=
+      O_WEAR_FLAGS, // wear=
       O_SIZE,
-      O_EXTRA_FLAGS,
+      O_EXTRA_FLAGS, // extra=
       O_WEIGHT,
       O_COST,
       O_MORE_FLAGS,
-      O_EQ_LEVEL,
+      O_EQ_LEVEL, // level
       O_V1,
       O_V2,
       O_V3,
@@ -3522,15 +3522,55 @@ public:
    bool operator==(const Object *obj);
    void setType(types type) { type_ = type; }
    types getType(void) { return type_; }
+
+   // name=
+   void setObjectName(QString name) { o_name_ = name; }
+
+   // description
+   // short description
+   // action description
+
+   // type=
+   void setObjectType(object_type_t object_type) { obj_flags_.type_flag = object_type; }
+
+   // wear=
+   void setObjectWearLocation(uint32_t location) { obj_flags_.wear_flags = location; }
+
+   // size=
+   void setObjectSize(uint16_t size) { obj_flags_.size = size; }
+
+   // extra=
+   void setOBjectMore(uint32_t flags) { obj_flags_.more_flags = flags; }
+
+   // weaight
+   // cost
+   // more flags
+
+   // level=
    void setObjectMinimumLevel(uint64_t level) { o_min_level_ = level; }
    void setObjectMaximumLevel(uint64_t level) { o_max_level_ = level; }
-   void setObjectType(object_type_t object_type) { obj_flags_.type_flag = object_type; }
-   void setObjectName(QString name) { o_name_ = name; }
-   void setObjectEquippedBy(QString name) { o_equipped_by_ = name; }
-   void setObjectCarriedBy(QString name) { o_carried_by_ = name; }
+
+   // v1
+   // v2
+   // v3
+   // v4
+   // affected
+
+   // edd keyword
    void setObjectEDDKeyword(QString keyword) { o_edd_keyword_ = keyword; }
+
+   // edd description
+
+   // carried by
+   void setObjectCarriedBy(QString name) { o_carried_by_ = name; }
+
+   // equired by
+   void setObjectEquippedBy(QString name) { o_equipped_by_ = name; }
+
+   // limit=
    void setLimitOutput(uint64_t limit_output) { limit_output_ = limit_output; }
    uint64_t getLimitOutput(void) { return limit_output_; }
+
    void enableShowRange(void) { show_range_ = true; }
    bool isShowRange(void) { return show_range_; }
 
@@ -3582,7 +3622,6 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_DESCRIPTION:
-
       break;
 
    case O_SHORT_DESCRIPTION:
@@ -3603,9 +3642,24 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_WEAR_FLAGS:
+      if (obj->obj_flags.wear_flags == obj_flags_.wear_flags || IS_SET(obj->obj_flags.wear_flags, obj_flags_.wear_flags))
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
       break;
-
    case O_SIZE:
+      if (obj->obj_flags.size == obj_flags_.size || IS_SET(obj->obj_flags.size, obj_flags_.size))
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
       break;
 
    case O_EDD_KEYWORD:
@@ -3716,8 +3770,14 @@ command_return_t Character::do_search(QStringList &arguments, int cmd)
          send("level=50      show objects that are level 50.\r\n");
          send("level=50-60   show objects with level including and between 50 to 60.\r\n");
          send("level=?       show objects with level including and between 50 to 60.\r\n");
-         send("type=WEAPON   show objects of type WEAPON.\r\n");
+         send("type=weapon   show objects of type weapon.\r\n");
          send("type=?        show available object types.\r\n");
+         send("wear=neck     show objects that can be worn on the neck.\r\n");
+         send("wear=?        show available wear locations.\r\n");
+         send("class==mage   show objects that can be worn by a mage.\r\n");
+         send("class=?       show available classes.\r\n");
+         send("size=small    show objects that can be worn on the neck.\r\n");
+         send("size=?        show available sizes.\r\n");
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
          send("Search terms can be combined.\r\n");
@@ -3844,6 +3904,32 @@ command_return_t Character::do_search(QStringList &arguments, int cmd)
             for (auto &i : item_types)
             {
                send(i + "\r\n");
+            }
+            return eFAILURE;
+         }
+      }
+      else if (arg1 == "wear")
+      {
+         bool found = false;
+         if (!arg2.isEmpty())
+         {
+            uint32_t location = 0;
+            parse_bitstrings_into_int(Object::wear_bits, arg2, nullptr, location);
+            if (location)
+            {
+               found = true;
+               so.setObjectWearLocation(location);
+               so.setType(Search::types::O_WEAR_FLAGS);
+               sl.push_back(so);
+            }
+         }
+         if (!found)
+         {
+            send("What type are you searching for?\r\n");
+            send("Here are some valid wear locations:\r\n");
+            for (auto &w : Object::wear_bits)
+            {
+               send(w + "\r\n");
             }
             return eFAILURE;
          }

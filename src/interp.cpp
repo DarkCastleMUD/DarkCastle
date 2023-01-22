@@ -1425,16 +1425,7 @@ bool is_abbrev(const string &aabrev, const string &word)
 
 bool is_abbrev(QString aabrev, QString word)
 {
-  if (aabrev.isEmpty())
-  {
-    return false;
-  }
-
-  return equal(aabrev.begin(), aabrev.end(), word.begin(),
-               [](QChar a, QChar w)
-               {
-                 return tolower(a.toLatin1()) == tolower(w.toLatin1());
-               });
+  return word.startsWith(aabrev, Qt::CaseInsensitive);
 }
 
 /* determine if a given string is an abbreviation of another */

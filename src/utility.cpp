@@ -2063,54 +2063,35 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
   }
 }
 
-void parse_bitstrings_into_int(QStringList bits, QString remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, uint32_t &value)
 {
   int found = false;
 
-  if (ch == nullptr)
+  for (int x = 0; x < bits.size(); ++x)
   {
-    return;
-  }
-
-  for (;;)
-  {
-    if (remainder_args.isEmpty())
+    if (bits.value(x) != "unused" && is_abbrev(arg1, bits.value(x)))
     {
+      if (IS_SET(value, (1 << x)))
+      {
+        REMOVE_BIT(value, (1 << x));
+        if (ch != nullptr)
+        {
+          ch->send(QString("%1 flag REMOVED.\r\n").arg(bits.value(x)));
+        }
+      }
+      else
+      {
+        SET_BIT(value, (1 << x));
+        if (ch != nullptr)
+        {
+          ch->send(QString("%1 flag ADDED.\r\n").arg(bits.value(x)));
+        }
+      }
+      found = true;
       break;
     }
-
-    QStringList args = remainder_args.split(' ');
-    if (args.isEmpty())
-    {
-      break;
-    }
-    QString arg1 = args.at(0);
-
-    for (int x = 0; bits.size(); x++)
-    {
-      if (bits[x] == "unused")
-      {
-        continue;
-      }
-
-      if (is_abbrev(arg1, bits[x]))
-      {
-        if (IS_SET(value, (1 << x)))
-        {
-          REMOVE_BIT(value, (1 << x));
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
-        }
-        else
-        {
-          SET_BIT(value, (1 << x));
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
-        }
-        found = true;
-        break;
-      }
-    }
   }
-  if (!found)
+  if (!found && ch != nullptr)
   {
     send_to_char("No matching bits found.\r\n", ch);
   }
