@@ -1274,7 +1274,7 @@ bool identify(Character *ch, Object *obj)
    return true;
 }
 
-command_return_t Character::do_identify(QStringList &arguments, int cmd)
+command_return_t Character::do_identify(QStringList arguments, int cmd)
 {
    if (arguments.isEmpty())
    {
@@ -3361,7 +3361,7 @@ int do_tick(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-command_return_t Character::do_experience(QStringList &arguments, int cmd)
+command_return_t Character::do_experience(QStringList arguments, int cmd)
 {
    if (level >= IMMORTAL)
    {
@@ -3706,7 +3706,7 @@ bool Search::operator==(const Object *obj)
    return false;
 }
 
-command_return_t Character::do_search(QStringList &arguments, int cmd)
+command_return_t Character::do_search(QStringList arguments, int cmd)
 {
    if (arguments.empty())
    {

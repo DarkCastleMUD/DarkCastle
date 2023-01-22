@@ -135,7 +135,7 @@ int do_found(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_split(QStringList &arguments, int cmd)
+command_return_t Character::do_split(QStringList arguments, int cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;

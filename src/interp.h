@@ -163,14 +163,14 @@ enum class CommandType
 
 struct command_info
 {
-    char *command_name;                                                               /* Name of ths command             */
-    int (*command_pointer)(Character *ch, char *argument, int cmd);                   /* Function that does it            */
-    command_return_t (*command_pointer2)(Character *ch, string argument, int cmd);    /* Function that does it            */
-    command_return_t (Character::*command_pointer3)(QStringList &arguments, int cmd); /* Function that does it            */
-    uint8_t minimum_position;                                                         /* Position commander must be in    */
-    uint8_t minimum_level;                                                            /* Minimum level needed             */
-    int command_number;                                                               /* Passed to function as argument   */
-    int flags;                                                                        // what flags the skills has
+    char *command_name;                                                              /* Name of ths command             */
+    int (*command_pointer)(Character *ch, char *argument, int cmd);                  /* Function that does it            */
+    command_return_t (*command_pointer2)(Character *ch, string argument, int cmd);   /* Function that does it            */
+    command_return_t (Character::*command_pointer3)(QStringList arguments, int cmd); /* Function that does it            */
+    uint8_t minimum_position;                                                        /* Position commander must be in    */
+    uint8_t minimum_level;                                                           /* Minimum level needed             */
+    int command_number;                                                              /* Passed to function as argument   */
+    int flags;                                                                       // what flags the skills has
     uint8_t toggle_hide;
     CommandType type;
 };
@@ -271,7 +271,7 @@ command_return_t do_cwithdraw(Character *ch, char *argument, int cmd);
 command_return_t do_cbalance(Character *ch, char *argument, int cmd);
 command_return_t do_colors(Character *ch, char *argument, int cmd);
 command_return_t do_compact(Character *ch, char *argument, int cmd);
-command_return_t do_config(Character *ch, QStringList &arguments, int cmd);
+command_return_t do_config(Character *ch, QStringList arguments, int cmd);
 command_return_t do_consent(Character *ch, char *argument, int cmd);
 command_return_t do_consider(Character *ch, char *argument, int cmd);
 command_return_t do_count(Character *ch, char *argument, int cmd);
@@ -303,7 +303,7 @@ command_return_t do_equipment(Character *ch, char *argument, int cmd);
 command_return_t do_eyegouge(Character *ch, char *argument, int cmd);
 command_return_t do_examine(Character *ch, char *argument, int cmd);
 command_return_t do_exits(Character *ch, char *argument, int cmd);
-command_return_t do_experience(Character *ch, QStringList &arguments, int cmd);
+command_return_t do_experience(Character *ch, QStringList arguments, int cmd);
 command_return_t do_export(Character *ch, char *argument, int cmd);
 command_return_t do_ferocity(Character *ch, char *argument, int cmd);
 command_return_t do_fighting(Character *ch, char *argument, int cmd);
@@ -437,7 +437,7 @@ command_return_t do_news(Character *ch, char *argument, int cmd);
 command_return_t do_noemote(Character *ch, char *argument, int cmd);
 command_return_t do_nohassle(Character *ch, char *argument, int cmd);
 command_return_t do_noname(Character *ch, char *argument, int cmd);
-command_return_t do_not_here(Character *ch, char *argument, int cmd);
+command_return_t generic_command(Character *ch, char *argument, int cmd);
 command_return_t do_notax_toggle(Character *ch, char *argument, int cmd);
 command_return_t do_guide_toggle(Character *ch, char *argument, int cmd);
 command_return_t do_oclone(Character *ch, char *argument, int cmd);

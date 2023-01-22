@@ -631,7 +631,7 @@ int do_toggle(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int Character::do_config(QStringList &arguments, int cmd)
+int Character::do_config(QStringList arguments, int cmd)
 {
   if (pcdata->config == nullptr)
   {

@@ -2825,7 +2825,7 @@ int do_ctax(Character *ch, char *arg, int cmd)
 }
 
 // This command deposits gold into a clan bank account
-command_return_t Character::do_cdeposit(QStringList &arguments, int cmd)
+command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
 {
   QString arg1;
 
@@ -3390,7 +3390,7 @@ void pulse_takeover()
   }
 }
 
-command_return_t Character::do_clanarea(QStringList &arguments, int cmd)
+command_return_t Character::do_clanarea(QStringList arguments, int cmd)
 {
   bool clanless_challenge = false;
 

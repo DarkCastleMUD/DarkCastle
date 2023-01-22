@@ -128,7 +128,7 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   return eSUCCESS;
 }
 
-command_return_t Character::do_goto(QStringList &arguments, int cmd)
+command_return_t Character::do_goto(QStringList arguments, int cmd)
 {
   int loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};

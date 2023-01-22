@@ -4764,7 +4764,7 @@ int do_oneway(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_zsave(QStringList &arguments, int cmd)
+command_return_t Character::do_zsave(QStringList arguments, int cmd)
 {
   FILE *f = nullptr;
 

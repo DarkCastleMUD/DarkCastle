@@ -1806,7 +1806,7 @@ command_return_t Character::save(int cmd)
 //        that save after every other kill don't actually do it, but it
 //        pretends that it does.  That way we can start reducing the amount
 //        of writing we're doing.
-command_return_t Character::do_save(QStringList &arguments, int cmd)
+command_return_t Character::do_save(QStringList arguments, int cmd)
 {
   if (IS_IMMORTAL(this))
   {
@@ -1875,18 +1875,18 @@ int do_home(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_not_here(Character *ch, char *argument, int cmd)
+command_return_t Character::generic_command(QStringList argument, int cmd)
 {
   switch (cmd)
   {
   case CMD_SELL:
-    ch->send("You can't sell anything here!\r\n");
+    send("You can't sell anything here!\r\n");
     break;
   case CMD_ERASE:
-    ch->send("You can't erase anything here!\r\n");
+    send("You can't erase anything here!\r\n");
     break;
   default:
-    ch->send("Sorry, but you cannot do that here!\r\n");
+    send("Sorry, but you cannot do that here!\r\n");
     break;
   }
 
