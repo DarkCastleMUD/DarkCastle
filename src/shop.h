@@ -1,25 +1,10 @@
 #ifndef SHOP_H_
 #define SHOP_H_
 
-#include <QObject>
+
 #include "structs.h" // uint8_t, uint8_t, etc..
 
-class Shop : public QObject
-{
-  Q_OBJECT
-public:
-  Shop() {}
 
-private:
-};
-class Shops : public QObject
-{
-  Q_OBJECT
-public:
-  Shops() {}
-
-private:
-};
 
 struct player_shop_item
 {

@@ -16,7 +16,7 @@
 string DC::version = VERSION;
 
 DC::DC(int &argc, char **argv)
-	: QCoreApplication(argc, argv), ssh(this)
+	: QCoreApplication(argc, argv), ssh(this), shops_(this)
 {
 	// ssh = QSharedPointer<SSH::SSH>(new SSH::SSH);
 }

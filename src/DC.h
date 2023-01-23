@@ -32,6 +32,7 @@ typedef QList<QString> hints_t;
 #include "SSH.h"
 #include "weather.h"
 #include "Zone.h"
+#include "Shops.h"
 
 using namespace std;
 
@@ -148,6 +149,7 @@ private:
   void game_loop_init(void);
   void game_loop(void);
   int init_socket(in_port_t port);
+  Shops shops_;
 };
 
 extern struct descriptor_data *descriptor_list;
