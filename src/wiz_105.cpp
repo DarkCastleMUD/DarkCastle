@@ -300,14 +300,21 @@ int do_debug(Character *ch, char *args, int cmd)
   else if (arg1 == "charmie")
   {
     tie(arg2, remainder) = half_chop(remainder);
-    ch->load_charmie_equipment(QString(arg2.c_str()));
+    if (remainder == "previous")
+    {
+      ch->load_charmie_equipment(QString(arg2.c_str()), true);
+    }
+    else
+    {
+      ch->load_charmie_equipment(QString(arg2.c_str()));
+    }
   }
   else
   {
     csendf(ch, "debug <perf> <list>\n\r");
     csendf(ch, "      <perf> <show> <key>\n\r");
     csendf(ch, "      <perf> <set> <key> <value>\n\r");
-    csendf(ch, "      <charmie> <name>\n\r");
+    csendf(ch, "      <charmie> <name> [previous]\n\r");
   }
 
   csendf(ch, "\n\r");

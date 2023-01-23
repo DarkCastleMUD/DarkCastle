@@ -1,4 +1,5 @@
 #include <QStringTokenizer>
+#include <QFile>
 
 #include "character.h"
 #include "levels.h"
@@ -201,41 +202,68 @@ uint64_t &Character::getGoldReference(void)
     return gold_;
 }
 
-bool Character::load_charmie_equipment(QString name)
+bool Character::load_charmie_equipment(QString player_name, bool previous)
 {
     int golemtype = 0;
 
-    if (name.isEmpty())
+    if (player_name.isEmpty())
     {
         return false;
     }
 
-    char file[200];
     FILE *fpfile = nullptr;
-    Character *golem;
+
     if (IS_NPC(this) || GET_LEVEL(this) < IMMORTAL)
     {
         return false;
     }
 
-    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, name[0], name.toStdString().c_str(), 0);
-    if (!(fpfile = fopen(file, "r")))
-    { // No golem. Create a new one.
-        this->send("No charmie save file found.\r\n");
+    player_name = player_name.toLower();
+    player_name[0] = player_name[0].toUpper();
+
+    QString restored = "";
+    if (previous)
+    {
+        restored = ".restored";
+    }
+    QString filename = QString("%1.%2%3").arg(player_name).arg(0).arg(restored);
+
+    QString path = QString("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
+    QString fullpath = path + filename;
+    if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
+    {
+        send(QString("No charmie save file found at '%1'.").arg(fullpath));
         return false;
     }
 
-    golem = clone_mobile(real_mobile(8));
-    set_golem(golem, golemtype); // Basics
-    this->pcdata->golem = golem;
-    golem->level = 1;
+    Character *charmie = clone_mobile(real_mobile(8));
+    if (charmie == nullptr)
+    {
+        logentry("Error. clone_mobile(real_mobile(8)) returned nullptr.");
+        return false;
+    }
+    charmie->level = 1;
     class Object *last_cont = nullptr; // Last container.
     while (!feof(fpfile))
     {
-        last_cont = obj_store_to_char(golem, fpfile, last_cont);
+        last_cont = obj_store_to_char(charmie, fpfile, last_cont);
     }
     fclose(fpfile);
-    char_to_room(golem, this->in_room);
+
+    char_to_room(charmie, in_room);
+
+    QString message = QString("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
+    send(message);
+    logentry(message);
+
+    if (!previous)
+    {
+        QFile file(fullpath);
+        if (file.rename(fullpath + ".restored"))
+        {
+            logentry(QString("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
+        }
+    }
 
     return true;
 }
