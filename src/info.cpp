@@ -1082,7 +1082,7 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
    csendf(ch, "$3Worn on: $R%s\r\n", buf);
 
-   sprintbit(obj->obj_flags.size, size_bits, buf);
+   sprintbit(obj->obj_flags.size, Object::size_bits, buf);
    csendf(ch, "$3Worn by: $R%s\r\n", buf);
 
    csendf(ch, "$3Level: $R%d\n\r", obj->obj_flags.eq_level);
@@ -3873,8 +3873,8 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          send("type=?        show available object types.\r\n");
          send("wear=neck     show objects that can be worn on the neck.\r\n");
          send("wear=?        show available wear locations.\r\n");
-         // send("size=small    show objects that can be worn on the neck.\r\n");
-         // send("size=?        show available sizes.\r\n");
+         send("size=small    show objects that can be worn on the neck.\r\n");
+         send("size=?        show available sizes.\r\n");
          // send("extra=mage    show objects that have the extra flag for mage set.\r\n");
          // send("extra=?       show available extra flags.\r\n");
          // send("more=unique   show objects that have the extra flag for mage set.\r\n");
@@ -4035,6 +4035,32 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             for (auto &w : Object::wear_bits)
             {
                send(w + "\r\n");
+            }
+            return eFAILURE;
+         }
+      }
+      else if (arg1 == "size")
+      {
+         bool found = false;
+         if (!arg2.isEmpty())
+         {
+            uint32_t size = 0;
+            parse_bitstrings_into_int(Object::size_bits, arg2, nullptr, size);
+            if (size)
+            {
+               found = true;
+               so.setObjectSize(size);
+               so.setType(Search::types::O_SIZE);
+               sl.push_back(so);
+            }
+         }
+         if (!found)
+         {
+            send("What size are you searching for?\r\n");
+            send("Here are some valid sizes:\r\n");
+            for (auto &s : Object::size_bits)
+            {
+               send(s + "\r\n");
             }
             return eFAILURE;
          }

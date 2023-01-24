@@ -441,7 +441,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
-        sprintbit(obj->obj_flags.size, size_bits, buf2);
+        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be wielded by these classes: ");
@@ -490,7 +490,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size, size_bits, buf2);
+        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
@@ -582,7 +582,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size, size_bits, buf2);
+        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");

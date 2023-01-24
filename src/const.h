@@ -8,7 +8,6 @@ extern bestowable_god_commands_type bestowable_god_commands[];
 extern const char *dirs[];
 extern struct race_data races[];
 extern const char *extra_bits[];
-extern const char *size_bits[];
 extern const char *spells[];
 extern const char *apply_types[];
 extern item_types_t item_types;

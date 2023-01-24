@@ -1008,7 +1008,7 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   send_to_char("$3Can be worn by$R:", ch);
-  sprintbit(j->obj_flags.size, size_bits, buf);
+  sprintbit(j->obj_flags.size,Object::size_bits, buf);
   strcat(buf, "\n\r");
   send_to_char(buf, ch);
 

@@ -4670,7 +4670,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     send_to_char(buf, ch);
 
     send_to_char("Worn by: ", ch);
-    sprintbit(obj->obj_flags.size, size_bits, buf);
+    sprintbit(obj->obj_flags.size,Object::size_bits, buf);
     strcat(buf, "\r\n");
     send_to_char(buf, ch);
 

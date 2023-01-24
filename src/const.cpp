@@ -959,13 +959,12 @@ const char *size_bitfields[] =
         "LARGE",
         "\n"};
 
-const char *size_bits[] =
+const QStringList Object::size_bits =
     {
         "Any race",
         "Small races",
         "Medium races",
-        "Large races",
-        "\n"};
+        "Large races"};
 
 const char *room_bits[] =
     {
