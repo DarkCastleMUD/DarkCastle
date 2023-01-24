@@ -50,6 +50,7 @@
 #include "Leaderboard.h"
 #include "handler.h"
 #include "const.h"
+#include "vault.h"
 
 using namespace std;
 
@@ -3519,6 +3520,15 @@ public:
       O_EQUIPPED_BY,
       LIMIT
    };
+   enum locations
+   {
+      in_inventory,
+      in_equipment,
+      in_room,
+      in_vault,
+      in_clan_vault,
+      in_object_database
+   };
    bool operator==(const Object *obj);
    void setType(types type) { type_ = type; }
    types getType(void) { return type_; }
@@ -3706,6 +3716,30 @@ bool Search::operator==(const Object *obj)
    return false;
 }
 
+bool search_object(Object *obj, QList<Search> sl)
+{
+   bool matches = false;
+   for (auto i = 0; i < sl.size(); ++i)
+   {
+      if (sl[i].getType() == Search::types::LIMIT)
+      {
+         continue;
+      }
+
+      if (sl[i] == obj)
+      {
+         matches = true;
+      }
+      else
+      {
+         matches = false;
+         break;
+      }
+   }
+
+   return matches;
+}
+
 command_return_t Character::do_search(QStringList arguments, int cmd)
 {
    if (arguments.empty())
@@ -3717,7 +3751,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
    QList<Search> sl;
    QString arg1, arg2;
-   bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false;
+   bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false, search_world = false;
    for (auto i = 0; i < arguments.size(); ++i)
    {
       Search so = {};
@@ -3765,7 +3799,9 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       if (arg1 == "help" || arg1 == "?")
       {
          send("Usage: search <search terms> <other options>\r\n");
-         send("\r\n");
+         send("       Searches object database.\r\n\r\n");
+         send("Usage: search world <search terms> <other options>\r\n");
+         send("       Searches your reachable world.\r\n\r\n");
          send("Search terms:\r\n");
          send("level=50      show objects that are level 50.\r\n");
          send("level=50-60   show objects with level including and between 50 to 60.\r\n");
@@ -3781,11 +3817,15 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
          send("Search terms can be combined.\r\n");
-         send("search level=1-10 type=ARMOR golden\r\n");
+         send("Example: search level=1-10 type=ARMOR golden\r\n");
          send("\r\n");
          send("Other options:\r\n");
          send("limit=10       limit output to only 10 results.\r\n");
          return eSUCCESS;
+      }
+      else if (arg1 == "world")
+      {
+         search_world = true;
       }
       else if (arg1 == "level")
       {
@@ -3953,109 +3993,350 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
    bool header_shown = false;
    size_t objects_found = 0;
-   vector<class Object *> obj_results;
+
+   QList<QPair<Search::locations, Object *>> obj_results;
    uint64_t limit_output = 0;
 
-   for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
+   if (search_world)
    {
-      int rnum = 0;
-      // real_object returns -1 for missing VNUMs
-      if ((rnum = real_object(vnum)) < 0)
-      {
-         continue;
-      }
-      Object *obj = static_cast<Object *>(obj_index[rnum].item);
-      if (obj == nullptr)
-      {
-         continue;
-      }
+      uint64_t old_count = 0;
 
-      if (isMortal() && obj->isDark())
+      // search inventory
+      for (auto obj = carrying; obj; obj = obj->next_content)
       {
-         continue;
-      }
-
-      bool matches = false;
-
-      for (auto i = 0; i < sl.size(); ++i)
-      {
-         if (sl[i].getType() == Search::types::LIMIT)
+         if (CAN_SEE_OBJ(this, obj))
          {
-            limit_output = sl[i].getLimitOutput();
-            continue;
-         }
-
-         if (sl[i] == obj)
-         {
-            matches = true;
-         }
-         else
-         {
-            matches = false;
-            break;
-         }
-      }
-
-      if (matches)
-      {
-         obj_results.push_back(obj);
-      }
-   }
-
-   if (obj_results.empty())
-   {
-      send(QString("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
-      return eFAILURE;
-   }
-
-   bool showed_ranges = false;
-
-   for (auto &s : sl)
-   {
-      if (s.isShowRange())
-      {
-         if (s.getType() == Search::types::O_EQ_LEVEL)
-         {
-            uint64_t min_level = 100, max_level = 0;
-            for (auto &obj : obj_results)
+            if (search_object(obj, sl))
             {
-               if (obj->getLevel() > max_level)
-               {
-                  max_level = obj->getLevel();
-               }
-               else if (obj->getLevel() < min_level)
-               {
-                  min_level = obj->getLevel();
-               }
+               obj_results.push_back({Search::locations::in_inventory, obj});
             }
 
-            send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
-
-            showed_ranges = true;
+            // containers must be open to search them
+            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+            {
+               // search inventory containers
+               for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
+               {
+                  if (CAN_SEE_OBJ(this, obj_in_container))
+                  {
+                     if (search_object(obj_in_container, sl))
+                     {
+                        obj_results.push_back({Search::locations::in_inventory, obj_in_container});
+                     }
+                  }
+               }
+            }
          }
       }
-   }
+      send(QString("Searching your inventory.......%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      old_count = obj_results.size();
 
-   if (showed_ranges)
-   {
-      return eSUCCESS;
-   }
+      // Search equipment
+      for (auto k = 0; k < MAX_WEAR; k++)
+      {
+         auto *obj = equipment[k];
+         if (obj != nullptr)
+         {
+            if (CAN_SEE_OBJ(this, obj))
+            {
+               if (search_object(obj, sl))
+               {
+                  obj_results.push_back({Search::locations::in_equipment, obj});
+               }
 
-   if (limit_output)
-   {
-      send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+               if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER && !IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+               {
+                  for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
+                  {
+                     if (CAN_SEE_OBJ(this, obj_in_container))
+                     {
+                        if (search_object(obj_in_container, sl))
+                        {
+                           obj_results.push_back({Search::locations::in_equipment, obj_in_container});
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      send(QString("Searching your equipment.......%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      old_count = obj_results.size();
+
+      // search room
+      for (auto obj = world[in_room].contents; obj; obj = obj->next_content)
+      {
+         if (CAN_SEE_OBJ(this, obj))
+         {
+            if (search_object(obj, sl))
+            {
+               obj_results.push_back({Search::locations::in_room, obj});
+            }
+
+            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+            {
+               // search inventory containers
+               for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
+               {
+                  if (CAN_SEE_OBJ(this, obj_in_container))
+                  {
+                     if (search_object(obj_in_container, sl))
+                     {
+                        obj_results.push_back({Search::locations::in_room, obj_in_container});
+                     }
+                  }
+               }
+            }
+         }
+      }
+      send(QString("Searching this room............%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      old_count = obj_results.size();
+
+      auto vault = has_vault(name);
+      // search vault if able
+      if (vault)
+      {
+         struct vault_items_data *items;
+         struct sorted_vault sv;
+         sort_vault(*vault, sv);
+         if (!sv.vault_contents.empty())
+         {
+            for (auto &o_short_description : sv.vault_contents)
+            {
+               auto &o = sv.vault_content_qty[o_short_description];
+               auto &obj = o.first;
+               auto &count = o.second;
+
+               bool matches = false;
+
+               for (auto i = 0; i < sl.size(); ++i)
+               {
+                  if (sl[i].getType() == Search::types::LIMIT)
+                  {
+                     limit_output = sl[i].getLimitOutput();
+                     continue;
+                  }
+
+                  if (sl[i] == obj)
+                  {
+                     matches = true;
+                  }
+                  else
+                  {
+                     matches = false;
+                     break;
+                  }
+               }
+
+               if (matches)
+               {
+                  for (auto counter = 0; counter < count; counter++)
+                  {
+                     obj_results.push_back({Search::locations::in_vault, obj});
+                  }
+               }
+            }
+         }
+         send(QString("Searching your vault........   %1 matches found.\r\n").arg(obj_results.size() - old_count));
+         old_count = obj_results.size();
+      }
+
+      if (clan)
+      {
+         // search clan vault is able
+
+         QString vault_name = QString("clan%1").arg(clan);
+         auto vault = has_vault(vault_name.toStdString().c_str());
+         // search vault if able
+         if (vault)
+         {
+            struct vault_items_data *items;
+            struct sorted_vault sv;
+            sort_vault(*vault, sv);
+            if (!sv.vault_contents.empty())
+            {
+               for (auto &o_short_description : sv.vault_contents)
+               {
+                  auto &o = sv.vault_content_qty[o_short_description];
+                  auto &obj = o.first;
+                  auto &count = o.second;
+
+                  bool matches = false;
+
+                  for (auto i = 0; i < sl.size(); ++i)
+                  {
+                     if (sl[i].getType() == Search::types::LIMIT)
+                     {
+                        limit_output = sl[i].getLimitOutput();
+                        continue;
+                     }
+
+                     if (sl[i] == obj)
+                     {
+                        matches = true;
+                     }
+                     else
+                     {
+                        matches = false;
+                        break;
+                     }
+                  }
+
+                  if (matches)
+                  {
+                     for (auto counter = 0; counter < count; counter++)
+                     {
+                        obj_results.push_back({Search::locations::in_clan_vault, obj});
+                     }
+                  }
+               }
+            }
+            send(QString("Searching your clan vault......%1 matches found.\r\n").arg(obj_results.size() - old_count));
+            old_count = obj_results.size();
+         }
+      }
+
+      bool showed_ranges = false;
+
+      for (auto &s : sl)
+      {
+         if (s.isShowRange())
+         {
+            if (s.getType() == Search::types::O_EQ_LEVEL)
+            {
+               uint64_t min_level = 100, max_level = 0;
+               for (auto &result : obj_results)
+               {
+                  auto obj = result.second;
+                  if (obj->getLevel() > max_level)
+                  {
+                     max_level = obj->getLevel();
+                  }
+                  else if (obj->getLevel() < min_level)
+                  {
+                     min_level = obj->getLevel();
+                  }
+               }
+
+               send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+
+               showed_ranges = true;
+            }
+         }
+      }
+
+      if (showed_ranges)
+      {
+         return eSUCCESS;
+      }
    }
    else
    {
-      send(QString("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+      for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
+      {
+         int rnum = 0;
+         // real_object returns -1 for missing VNUMs
+         if ((rnum = real_object(vnum)) < 0)
+         {
+            continue;
+         }
+         Object *obj = static_cast<Object *>(obj_index[rnum].item);
+         if (obj == nullptr)
+         {
+            continue;
+         }
+
+         if (isMortal() && obj->isDark())
+         {
+            continue;
+         }
+
+         bool matches = false;
+
+         for (auto i = 0; i < sl.size(); ++i)
+         {
+            if (sl[i].getType() == Search::types::LIMIT)
+            {
+               limit_output = sl[i].getLimitOutput();
+               continue;
+            }
+
+            if (sl[i] == obj)
+            {
+               matches = true;
+            }
+            else
+            {
+               matches = false;
+               break;
+            }
+         }
+
+         if (matches)
+         {
+            obj_results.push_back({Search::locations::in_object_database, obj});
+         }
+      }
+      if (obj_results.empty())
+      {
+         send(QString("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
+         return eFAILURE;
+      }
+
+      bool showed_ranges = false;
+
+      for (auto &s : sl)
+      {
+         if (s.isShowRange())
+         {
+            if (s.getType() == Search::types::O_EQ_LEVEL)
+            {
+               uint64_t min_level = 100, max_level = 0;
+               for (auto &result : obj_results)
+               {
+                  auto obj = result.second;
+                  if (obj->getLevel() > max_level)
+                  {
+                     max_level = obj->getLevel();
+                  }
+                  else if (obj->getLevel() < min_level)
+                  {
+                     min_level = obj->getLevel();
+                  }
+               }
+
+               send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+
+               showed_ranges = true;
+            }
+         }
+      }
+
+      if (showed_ranges)
+      {
+         return eSUCCESS;
+      }
+   }
+
+   if (!search_world)
+   {
+      if (limit_output)
+      {
+         send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+      }
+      else
+      {
+         send(QString("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+      }
    }
 
    QString header;
    qsizetype max_keyword_size = 0, max_short_description_size = 0;
 
    uint64_t result_nr = {};
-   for (auto obj : obj_results)
+   for (auto &result : obj_results)
    {
+      auto obj = result.second;
       if (limit_output > 0 && ++result_nr > limit_output)
       {
          break;
@@ -4077,6 +4358,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       header += QString(" [%1]").arg("Keywords", -max_keyword_size);
    }
 
+   if (search_world)
+   {
+      header += QString(" [%1]").arg("Location", 9);
+   }
+
    if (true || count_if(sl.begin(), sl.end(), [](Search search_item)
                         { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
    {
@@ -4086,8 +4372,9 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
 
    result_nr = 0;
-   for (auto obj : obj_results)
+   for (auto &result : obj_results)
    {
+      auto obj = result.second;
       if (limit_output > 0 && ++result_nr > limit_output)
       {
          break;
@@ -4100,16 +4387,38 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
       }
 
-      // For now short description is always shown
-      if (true ||
-          count_if(sl.begin(), sl.end(), [](Search search_item)
-                   { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
+      if (search_world)
       {
-         // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-         custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
-      }
+         switch (result.first)
+         {
+         case Search::locations::in_inventory:
+            custom_columns += QString(" [%1]").arg("inventory", 9);
+            break;
+         case Search::locations::in_equipment:
+            custom_columns += QString(" [%1]").arg("equipped", 9);
+            break;
+         case Search::locations::in_room:
+            custom_columns += QString(" [%1]").arg("in room", 9);
+            break;
+         case Search::locations::in_vault:
+            custom_columns += QString(" [%1]").arg("in vault", 9);
+            break;
+         case Search::locations::in_clan_vault:
+            custom_columns += QString(" [%1]").arg("in cvault", 9);
+            break;
+         }
 
-      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+         // For now short description is always shown
+         if (true ||
+             count_if(sl.begin(), sl.end(), [](Search search_item)
+                      { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
+         {
+            // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
+            custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+         }
+
+         send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+      }
    }
    send("Identify an object with the command: identify v####\r\n");
 
