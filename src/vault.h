@@ -1,8 +1,8 @@
 #include "utility.h"
 
 #define VAULT_UPGRADE_COST 100 // plats
-#define VAULT_BASE_SIZE 10  // weight
-#define VAULT_MAX_SIZE  10000 // weight
+#define VAULT_BASE_SIZE 10     // weight
+#define VAULT_MAX_SIZE 10000   // weight
 
 #define VAULT_MAX_DEPWITH 2000000000 // 2 bil max to add/remove from bank at a time
 
@@ -44,24 +44,27 @@ struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 int has_vault_access(char *owner, struct vault_data *vault);
 int vault_search(Character *ch, const char *keyword);
 
-struct vault_data {
-   char *owner;
-   unsigned int size;
-   unsigned int weight;
-   uint64_t gold;
+struct vault_data
+{
+  char *owner;
+  unsigned int size;
+  unsigned int weight;
+  uint64_t gold;
 
-   struct vault_access_data *access;
-   struct vault_items_data *items;
+  struct vault_access_data *access;
+  struct vault_items_data *items;
 
-   struct vault_data *next;
+  struct vault_data *next;
 };
 
-struct vault_access_data {
+struct vault_access_data
+{
   char *name;
   struct vault_access_data *next;
 };
 
-struct vault_items_data {
+struct vault_items_data
+{
   int item_vnum;
   int count;
   Object *obj; // for full-save items
