@@ -1076,7 +1076,7 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
    csendf(ch, "$3Extra flags: $R%s\r\n", buf);
 
-   sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
+   sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
 
    sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);

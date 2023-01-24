@@ -238,6 +238,7 @@ class Object
 public:
     static const QStringList wear_bits;
     static const QStringList size_bits;
+    static const QStringList more_obj_bits;
 
     int32_t item_number = {};     /* Where in data-base               */
     room_t in_room = {};          /* In what room -1 when conta/carr  */

@@ -931,7 +931,7 @@ const char *extra_bits[] =
 
 // more_flags obj flags
 
-const char *more_obj_bits[] =
+const QStringList Object::more_obj_bits =
     {
         "NO_RESTRING",
         "LIMIT_SACRIFICE",
@@ -948,8 +948,7 @@ const char *more_obj_bits[] =
         "NO_DISARM",
         "PROCTOGGLE",
         "NO_CUSTOM",
-        "24H_NO_SELL",
-        "\n"};
+        "24H_NO_SELL"};
 
 const char *size_bitfields[] =
     {

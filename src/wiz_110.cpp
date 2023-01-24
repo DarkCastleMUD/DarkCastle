@@ -998,7 +998,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     // Print individual array values as columns
     write_array_csv(Object::wear_bits, fout);
     write_array_csv(extra_bits, fout);
-    write_array_csv(more_obj_bits, fout);
+    write_array_csv(Object::more_obj_bits, fout);
 
     fout << "affects" << endl;
 

@@ -2236,17 +2236,17 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.more_flags,
-                more_obj_bits, buf);
+                Object::more_obj_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
-      for (i = 0; *more_obj_bits[i] != '\n'; i++)
+      for (i = 0; Object::more_obj_bits[i] != '\n'; i++)
       {
-        sprintf(buf, "  %s\n\r", more_obj_bits[i]);
+        sprintf(buf, "  %s\n\r", Object::more_obj_bits[i]);
         send_to_char(buf, ch);
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(more_obj_bits, buf4, ch, ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, buf4, ch, ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
   }
   break;
 

@@ -4663,7 +4663,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     send_to_char("Item is: ", ch);
     sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
-    sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
+    sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf2);
     strcat(buf, " ");
     strcat(buf, buf2);
     strcat(buf, "\n\r");
