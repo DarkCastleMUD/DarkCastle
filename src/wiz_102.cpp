@@ -2246,8 +2246,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(more_obj_bits, buf4, ch,
-                              ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(more_obj_bits, buf4, ch, ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
   }
   break;
 
