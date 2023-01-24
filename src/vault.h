@@ -43,6 +43,7 @@ struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 int has_vault_access(char *owner, struct vault_data *vault);
 int vault_search(Character *ch, const char *keyword);
+void sort_vault(const vault_data &vault, struct sorted_vault &sv);
 
 struct vault_data
 {
@@ -69,4 +70,15 @@ struct vault_items_data
   int count;
   Object *obj; // for full-save items
   struct vault_items_data *next;
+};
+
+struct sorted_vault
+{
+  // This stores the quantity of each item found in a vault
+  map<string, pair<Object *, uint32_t>> vault_content_qty{};
+
+  // This stores the order in which vault items are found
+  vector<string> vault_contents{};
+
+  unsigned int weight{};
 };

@@ -1830,17 +1830,6 @@ void vault_put(Character *ch, char *object, char *owner)
   save_char_obj(ch);
 }
 
-struct sorted_vault
-{
-  // This stores the quantity of each item found in a vault
-  map<string, pair<Object *, uint32_t>> vault_content_qty{};
-
-  // This stores the order in which vault items are found
-  vector<string> vault_contents{};
-
-  unsigned int weight{};
-};
-
 void sort_vault(const vault_data &vault, sorted_vault &sv)
 {
   class Object *obj;
