@@ -1,3 +1,4 @@
+
 /****************************************************************************
  * file: act_info.c , Implementation of commands.	 Part of DIKUMUD    *
  * Usage : Informative commands. 					    *
@@ -3501,18 +3502,18 @@ public:
       O_DESCRIPTION,
       O_SHORT_DESCRIPTION,
       O_ACTION_DESCRIPTION,
-      O_TYPE_FLAG,  // type=
-      O_WEAR_FLAGS, // wear=
-      O_SIZE,
+      O_TYPE_FLAG,   // type=
+      O_WEAR_FLAGS,  // wear=
+      O_SIZE,        // size=
       O_EXTRA_FLAGS, // extra=
       O_WEIGHT,
       O_COST,
-      O_MORE_FLAGS,
-      O_EQ_LEVEL, // level
-      O_V1,
-      O_V2,
-      O_V3,
-      O_V4,
+      O_MORE_FLAGS, // more=
+      O_EQ_LEVEL,   // level
+      O_V1,         // v1
+      O_V2,         // v2
+      O_V3,         // v3
+      O_V4,         // v4
       O_AFFECTED,
       O_EDD_KEYWORD,
       O_EDD_DESCRIPTION,
@@ -3550,11 +3551,18 @@ public:
    void setObjectSize(uint16_t size) { obj_flags_.size = size; }
 
    // extra=
-   void setOBjectMore(uint32_t flags) { obj_flags_.more_flags = flags; }
+   void setObjectExtra(uint32_t flags) { obj_flags_.extra_flags = flags; }
 
-   // weaight
+   // weight
+   void setObjectMinimumWeight(uint64_t weight) { o_min_weight_ = weight; }
+   void setObjectMaximumWeight(uint64_t weight) { o_max_weight_ = weight; }
+
    // cost
+   void setObjectMinimumCost(uint64_t cost) { o_min_cost_ = cost; }
+   void setObjectMaximumCost(uint64_t cost) { o_max_cost_ = cost; }
+
    // more flags
+   void setObjectMore(uint32_t flags) { obj_flags_.more_flags = flags; }
 
    // level=
    void setObjectMinimumLevel(uint64_t level) { o_min_level_ = level; }
@@ -3589,6 +3597,12 @@ private:
 
    uint64_t o_min_level_ = {};
    uint64_t o_max_level_ = {};
+   uint64_t o_min_cost_ = {};
+   uint64_t o_max_cost_ = {};
+   uint64_t o_min_weight_ = {};
+   uint64_t o_max_weight_ = {};
+
+   uint64_t o_value[4] = {};
 
    uint64_t o_item_number_ = {};         /* Where in data-base               */
    uint64_t o_in_room_ = {};             /* In what room -1 when conta/carr  */
@@ -3679,14 +3693,47 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_WEIGHT:
+      if (o_max_weight_ == -1 && obj->obj_flags.weight >= o_min_weight_)
+      {
+         return true;
+      }
+      else if (obj->obj_flags.weight >= o_min_weight_ && obj->obj_flags.weight <= o_max_weight_)
+      {
+         return true;
+      }
       break;
 
    case O_COST:
+      if (o_max_cost_ == -1 && obj->obj_flags.cost >= o_min_cost_)
+      {
+         return true;
+      }
+      else if (obj->obj_flags.cost >= o_min_cost_ && obj->obj_flags.cost <= o_max_cost_)
+      {
+         return true;
+      }
       break;
 
    case O_MORE_FLAGS:
+      if (obj_flags_.more_flags == obj->obj_flags.more_flags || IS_SET(obj->obj_flags.more_flags, obj_flags_.more_flags))
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
       break;
-
+   case O_EXTRA_FLAGS:
+      if (obj->obj_flags.extra_flags == obj_flags_.extra_flags || IS_SET(obj->obj_flags.extra_flags, obj_flags_.extra_flags))
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
+      break;
    case O_EQ_LEVEL:
       if (o_max_level_ == -1 && obj->obj_flags.eq_level >= o_min_level_)
       {
@@ -3699,15 +3746,31 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_V1:
+      if (o_value[0] == obj->obj_flags.value[0])
+      {
+         return true;
+      }
       break;
 
    case O_V2:
+      if (o_value[1] == obj->obj_flags.value[1])
+      {
+         return true;
+      }
       break;
 
    case O_V3:
+      if (o_value[2] == obj->obj_flags.value[2])
+      {
+         return true;
+      }
       break;
 
    case O_V4:
+      if (o_value[3] == obj->obj_flags.value[3])
+      {
+         return true;
+      }
       break;
 
    case O_AFFECTED:
@@ -3810,10 +3873,12 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          send("type=?        show available object types.\r\n");
          send("wear=neck     show objects that can be worn on the neck.\r\n");
          send("wear=?        show available wear locations.\r\n");
-         // send("class==mage   show objects that can be worn by a mage.\r\n");
-         // send("class=?       show available classes.\r\n");
          // send("size=small    show objects that can be worn on the neck.\r\n");
          // send("size=?        show available sizes.\r\n");
+         // send("extra=mage    show objects that have the extra flag for mage set.\r\n");
+         // send("extra=?       show available extra flags.\r\n");
+         // send("more=unique   show objects that have the extra flag for mage set.\r\n");
+         // send("more=?        show available extra flags.\r\n");
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
          send("Search terms can be combined.\r\n");
@@ -4349,6 +4414,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       if (nocolor_strlen(obj->short_description) > max_short_description_size)
       {
          max_short_description_size = nocolor_strlen(obj->short_description);
+         max_short_description_size = MAX(20, max_short_description_size);
       }
    }
 
@@ -4407,18 +4473,18 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             custom_columns += QString(" [%1]").arg("in cvault", 9);
             break;
          }
-
-         // For now short description is always shown
-         if (true ||
-             count_if(sl.begin(), sl.end(), [](Search search_item)
-                      { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
-         {
-            // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-            custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
-         }
-
-         send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
       }
+
+      // For now short description is always shown
+      if (true ||
+          count_if(sl.begin(), sl.end(), [](Search search_item)
+                   { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
+      {
+         // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
+         custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+      }
+
+      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
    }
    send("Identify an object with the command: identify v####\r\n");
 
