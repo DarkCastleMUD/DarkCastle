@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "connect.h" // descriptor_data
+#include "connect.h" // Connection
 #include "character.h"
 #include "utility.h"
 #include "mobile.h"
@@ -24,12 +24,12 @@ using namespace std;
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(Character *ch, int abort);
-void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen);
+void format_text(char **ptr_string, int mode, class Connection *d, int maxlen);
 int replace_str(char **string, char *pattern, char *replacement, int rep_all, int max_size);
 void check_for_awaymsgs(Character *);
 
 /*  handle some editor commands */
-void parse_action(int command, char *str, struct descriptor_data *d)
+void parse_action(int command, char *str, class Connection *d)
 {
    int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
    int j = 0;
@@ -565,7 +565,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
 
 /* re-formats message type formatted char * */
 /* (for strings edited with d->strnew) (mostly olc and mail)     */
-void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen)
+void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
 {
    int total_chars, cap_next = true, cap_next_next = false;
    char *flow, *start = nullptr, temp;
@@ -677,7 +677,7 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, int max
    strcpy(*ptr_string, formated);
 }
 
-void new_string_add(struct descriptor_data *d, char *str)
+void new_string_add(class Connection *d, char *str)
 {
    // char *scan;
    int terminator = 0, action = 0;

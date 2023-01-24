@@ -678,7 +678,7 @@ int do_nohassle(Character *ch, char *argument, int cmd)
 command_return_t do_wiz(Character *ch, string argument, int cmd)
 {
   string buf1 = {};
-  descriptor_data *i = nullptr;
+  Connection *i = nullptr;
 
   if (IS_NPC(ch))
   {
@@ -744,7 +744,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
     send_to_char(buf1, ch);
     ansi_color(NTEXT, ch);
 
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character))
       {

@@ -39,7 +39,7 @@
 #include "fight.h"
 #include "spells.h" // ETHERAL consts
 #include "mobile.h"
-#include "connect.h" // descriptor_data
+#include "connect.h" // Connection
 #include "room.h"
 #include "db.h"
 #include "act.h"

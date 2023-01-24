@@ -29,7 +29,7 @@
 using namespace std;
 
 extern CWorld world;
-extern struct descriptor_data *descriptor_list;
+
 extern bool MOBtrigger;
 
 act_return act(const string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
@@ -46,7 +46,7 @@ act_return act(
     int16_t flags        // Optional flags
 )
 {
-  struct descriptor_data *i;
+  class Connection *i;
   int retval = 0;
   TokenList *tokens;
 
@@ -133,7 +133,7 @@ act_return act(
       ar.retval = eFAILURE;
       return ar;
     }
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!i->character || i->character == ch)

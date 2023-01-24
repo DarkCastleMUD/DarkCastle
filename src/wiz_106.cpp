@@ -21,7 +21,7 @@ using namespace fmt;
 int do_plats(Character *ch, char *argument, int cmd)
 {
   Character *i;
-  struct descriptor_data *d;
+  class Connection *d;
   char arg[100];
   char buf[100];
   int minamt;
@@ -35,7 +35,7 @@ int do_plats(Character *ch, char *argument, int cmd)
   send_to_char("          Plats - Player\n\r", ch);
   send_to_char("          --------------\n\r", ch);
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if ((d->connected) || (!CAN_SEE(ch, d->character)))
       continue;
@@ -56,8 +56,8 @@ int do_plats(Character *ch, char *argument, int cmd)
 
 int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
 {
-  struct descriptor_data *i = {};
-  struct descriptor_data *next_i = {};
+  class Connection *i = {};
+  class Connection *next_i = {};
   Character *vict = {};
   string name = {}, to_force = {}, buf = {};
 
@@ -120,7 +120,7 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
       send_to_char("Not gonna happen.\r\n", ch);
       return eFAILURE;
     }
-    for (i = descriptor_list; i; i = next_i)
+    for (i = DC::getInstance()->descriptor_list; i; i = next_i)
     {
       next_i = i->next;
       if (i->character != ch && !i->connected)

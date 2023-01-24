@@ -478,7 +478,7 @@ int has_skill(Character *ch, skill_t skill);
 const char *get_skill_name(int skillnum);
 void gain_exp_regardless(Character *ch, int gain);
 void advance_level(Character *ch, int is_conversion);
-int close_socket(struct descriptor_data *d);
+int close_socket(class Connection *d);
 int isname(string arg, string namelist);
 int isname(string arg, const char *namelist);
 int isname(QString arg, const char *namelist);
@@ -487,7 +487,7 @@ int isname(QString arg, QStringList namelist);
 int isname(const char *arg, const char *namelist);
 int isname(const char *arg, string namelist);
 int isname(const char *arg, joining_t &namelist);
-void page_string(struct descriptor_data *d, const char *str,
+void page_string(class Connection *d, const char *str,
                  int keep_internal);
 void gain_exp(Character *ch, int64_t gain);
 void redo_hitpoints(Character *ch); /* Rua's put in  */
@@ -513,9 +513,9 @@ void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
 int special(Character *ch, int cmd, char *arg);
-int process_output(struct descriptor_data *t);
+int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
-bool load_char_obj(struct descriptor_data *d, const char *name);
+bool load_char_obj(class Connection *d, const char *name);
 void save_char_obj(Character *ch);
 
 #ifdef USE_SQL
@@ -622,7 +622,7 @@ int get_stat(Character *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);
-void make_prompt(struct descriptor_data *d, string &prompt);
+void make_prompt(class Connection *d, string &prompt);
 string remove_all_codes(string input);
 void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
@@ -709,7 +709,7 @@ void undo_race_saves(Character *ch);
 string handle_ansi(string s, Character *ch);
 char *handle_ansi_(char *s, Character *ch);
 void blackjack_prompt(Character *ch, string &prompt, bool ascii);
-void show_string(struct descriptor_data *d, const char *input);
+void show_string(class Connection *d, const char *input);
 void special_log(char *arg);
 int check_social(Character *ch, string pcomm, int length);
 

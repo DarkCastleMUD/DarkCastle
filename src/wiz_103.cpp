@@ -164,7 +164,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  struct descriptor_data *d;
+  class Connection *d;
   unsigned sdesc;
 
   if (IS_NPC(ch))
@@ -178,7 +178,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
     send_to_char("Usage: release <#>\n\r", ch);
     return eFAILURE;
   }
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->descriptor == sdesc)
     {

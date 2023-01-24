@@ -53,7 +53,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 {
 	char buf1[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
-	struct descriptor_data *i;
+	class Connection *i;
 	char buf3[MAX_INPUT_LENGTH];
 
 	if (!IS_NPC(ch) && ch->pcdata->wizinvis)
@@ -74,7 +74,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 			sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
 		act(buf2, ch, 0, 0, TO_CHAR, 0);
 
-		for (i = descriptor_list; i; i = i->next)
+		for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 			if (i->character != ch && !i->connected)
 			{
 				if (!IS_NPC(ch) && ch->pcdata->wizinvis && i->character->level < ch->pcdata->wizinvis)
@@ -1830,10 +1830,10 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 
 	Character *victim = nullptr;
 	room_t source_room = {};
-	descriptor_data *i = nullptr;
+	Connection *i = nullptr;
 	if (arg1 == "all")
 	{
-		for (i = descriptor_list; i; i = i->next)
+		for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 		{
 			victim = i->character;
 			source_room = victim->in_room;
@@ -1976,7 +1976,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 
 int do_gtrans(Character *ch, char *argument, int cmd)
 {
-	// struct descriptor_data *i;
+	// class Connection *i;
 	Character *victim;
 	char buf[100];
 	int target;

@@ -36,7 +36,7 @@ void AuctionHandleDelete(string name);
 
 int do_linkload(Character *ch, char *arg, int cmd)
 {
-  struct descriptor_data d;
+  class Connection d;
   Character *new_new;
   char buf[100];
   char *c;
@@ -375,7 +375,7 @@ int do_global(Character *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct descriptor_data *point;
+  class Connection *point;
 
   if (IS_NPC(ch))
     return eFAILURE;
@@ -388,7 +388,7 @@ int do_global(Character *ch, char *argument, int cmd)
   else
   {
     sprintf(buf, "\n\r%s\n\r", argument + i);
-    for (point = descriptor_list; point; point = point->next)
+    for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
         send_to_char(buf, point->character);
   }

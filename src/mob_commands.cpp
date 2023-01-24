@@ -64,7 +64,7 @@ using namespace std;
 
 extern struct index_data *mob_index;
 extern CWorld world;
-extern struct descriptor_data *descriptor_list;
+
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
 
@@ -900,7 +900,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   int32_t location;
-  descriptor_data *d;
+  Connection *d;
   Character *victim;
 
   if (!IS_NPC(ch))
@@ -919,7 +919,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
 
   if (!str_cmp(arg1, "all"))
   {
-    for (d = descriptor_list; d != nullptr; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
     {
       if (d->connected == conn::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {

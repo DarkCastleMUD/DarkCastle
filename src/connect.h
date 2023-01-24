@@ -6,10 +6,10 @@
 | Description: State of connectedness information.
 */
 #include "character.h"
-#include "structs.h"  // MAX_INPUT_LENGTH
+#include "structs.h" // MAX_INPUT_LENGTH
 #include "comm.h"
 
-#define STATE(d)  ((d)->connected)
+#define STATE(d) ((d)->connected)
 
 enum conn
 {
@@ -62,7 +62,7 @@ enum conn
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
 
-#define MAX_RAW_INPUT_LENGTH  512
+#define MAX_RAW_INPUT_LENGTH 512
 
 class stat_data
 {
@@ -78,14 +78,16 @@ public:
   uint8_t clss;
 };
 
-struct descriptor_data {
+class Connection
+{
+public:
   int descriptor = {}; /* file descriptor for socket	*/
   int desc_num = {};
-  char *name = {}; /* Copy of the player name	*/
-  char host[80] = {}; /* hostname			*/
+  char *name = {};     /* Copy of the player name	*/
+  char host[80] = {};  /* hostname			*/
   conn connected = {}; /* mode of 'connectedness'	*/
   int web_connected = {};
-  int wait = {}; /* wait for how many loops	*/
+  int wait = {};           /* wait for how many loops	*/
   char *showstr_head = {}; /* for paging through texts	*/
   const char **showstr_vector = {};
   int showstr_count = {};
@@ -95,22 +97,22 @@ struct descriptor_data {
   char **hashstr = {};
   char *astr = {};
   int max_str = {};
-  string buf = {}; /* buffer for raw input	*/
+  string buf = {};        /* buffer for raw input	*/
   string last_input = {}; /* the last input	*/
-  string output = {}; /* queue of strings to send	*/
+  string output = {};     /* queue of strings to send	*/
   string inbuf = {};
-  queue<string> input = {}; /* queue of unprocessed input	*/
-  Character *character = {}; /* linked to char		*/
-  Character *original = {}; /* for switch / return		*/
-  struct descriptor_data *snooping = {}; /* Who is this char snooping       */
-  struct descriptor_data *snoop_by = {}; /* And who is snooping this char   */
-  struct descriptor_data *next = {}; /* link to next descriptor	*/
-  int tick_wait = {}; /* # ticks desired to wait	*/
-  int reallythere = {}; /* Goddamm #&@$*% sig 13 (hack) */
+  queue<string> input = {};        /* queue of unprocessed input	*/
+  Character *character = {};       /* linked to char		*/
+  Character *original = {};        /* for switch / return		*/
+  class Connection *snooping = {}; /* Who is this char snooping       */
+  class Connection *snoop_by = {}; /* And who is snooping this char   */
+  class Connection *next = {};     /* link to next descriptor	*/
+  int tick_wait = {};              /* # ticks desired to wait	*/
+  int reallythere = {};            /* Goddamm #&@$*% sig 13 (hack) */
   int prompt_mode = {};
   uint8_t idle_tics = {};
   time_t login_time = {};
-  stat_data *stats = {};            // for rolling up a char
+  stat_data *stats = {}; // for rolling up a char
 
   char **strnew = {}; /* for the modify-str system	*/
   char *backstr = {};

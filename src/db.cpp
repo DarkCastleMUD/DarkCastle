@@ -47,7 +47,7 @@ int load_debug = 0;
 #include "race.h"
 #include "obj.h"		 // extra_descr_data
 #include "handler.h"	 // get_obj_num
-#include "connect.h"	 // descriptor_data
+#include "connect.h"	 // Connection
 #include "game_portal.h" // load_game_portals()
 #include "interp.h"
 #include "returnvals.h"
@@ -192,7 +192,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool zz);
 extern bool MOBtrigger;
 
 /* external refs */
-extern struct descriptor_data *descriptor_list;
+
 void load_messages(char *file, int base = 0);
 int dice(int number, int size);
 int number(int from, int to);
@@ -396,7 +396,7 @@ char *funnybootmessages[] =
 
 void funny_boot_message()
 {
-	struct descriptor_data *d;
+	class Connection *d;
 
 	extern int was_hotboot;
 
@@ -407,7 +407,7 @@ void funny_boot_message()
 
 	num = number(0, num - 1);
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 		write_to_descriptor(d->descriptor, funnybootmessages[num]);
 }
 
@@ -5008,9 +5008,9 @@ void Zone::reset(ResetType reset_type)
 
 bool Zone::isEmpty(void)
 {
-	struct descriptor_data *i;
+	class Connection *i;
 
-	for (i = descriptor_list; i; i = i->next)
+	for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 		if (STATE(i) == conn::PLAYING && i->character && world[i->character->in_room].zone == id)
 			return false;
 

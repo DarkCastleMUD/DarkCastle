@@ -102,7 +102,7 @@ void rebuild_rnum_references(int startAt, int type)
 
 int do_check(Character *ch, char *arg, int cmd)
 {
-  struct descriptor_data d;
+  class Connection d;
   Character *vict;
   int connected = 1;
   char buf[120];
@@ -292,7 +292,7 @@ int do_find(Character *ch, char *arg, int cmd)
 
 int do_stat(Character *ch, char *arg, int cmd)
 {
-  struct descriptor_data d;
+  class Connection d;
   Character *vict;
   class Object *obj;
   char type[MAX_INPUT_LENGTH];
@@ -5531,7 +5531,7 @@ int do_sockets(Character *ch, char *argument, int cmd)
   char name[200];
   char buf[MAX_STRING_LENGTH];
 
-  descriptor_data *d = 0, *ad = 0;
+  Connection *d = 0, *ad = 0;
 
   if (IS_NPC(ch))
   {
@@ -5544,7 +5544,7 @@ int do_sockets(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (GET_LEVEL(ch) < OVERSEER)
     {
@@ -5568,7 +5568,7 @@ int do_sockets(Character *ch, char *argument, int cmd)
         !str_str(d->host, name) && (!d->character || !isname(name, GET_NAME(d->character))))
       continue;
     bool duplicate = false;
-    for (ad = descriptor_list; ad; ad = ad->next)
+    for (ad = DC::getInstance()->descriptor_list; ad; ad = ad->next)
       if (ad != d && !str_cmp(d->host, ad->host))
         if (!ad->character ||
             GET_LEVEL(ad->character) <= GET_LEVEL(ch))

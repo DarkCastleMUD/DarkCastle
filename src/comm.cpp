@@ -108,13 +108,12 @@ void save_slot_machines(void);
 void check_silence_beacons(void);
 
 /* local globals */
-struct descriptor_data *descriptor_list = nullptr; /* master desc list */
-struct txt_block *bufpool = 0;                     /* pool of large output buffers */
-int buf_largecount = 0;                            /* # of large buffers which exist */
-int buf_overflows = 0;                             /* # of overflows of output */
-int buf_switches = 0;                              /* # of switches from small to large buf */
-int _shutdown = 0;                                 /* clean shutdown */
-int tics = 0;                                      /* for extern checkpointing */
+struct txt_block *bufpool = 0; /* pool of large output buffers */
+int buf_largecount = 0;        /* # of large buffers which exist */
+int buf_overflows = 0;         /* # of overflows of output */
+int buf_switches = 0;          /* # of switches from small to large buf */
+int _shutdown = 0;             /* clean shutdown */
+int tics = 0;                  /* for extern checkpointing */
 // int nameserver_is_slow = 0;	/* see config.c */
 // extern int auto_save;		/* see config.c */
 // extern int autosave_time;	/* see config.c */
@@ -149,11 +148,11 @@ string generate_prompt(Character *ch);
 string get_from_q(queue<string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
-int process_output(struct descriptor_data *t);
-int process_input(struct descriptor_data *t);
-void flush_queues(struct descriptor_data *d);
-int perform_subst(struct descriptor_data *t, char *orig, char *subst);
-string perform_alias(struct descriptor_data *d, string orig);
+int process_output(class Connection *t);
+int process_input(class Connection *t);
+void flush_queues(class Connection *d);
+int perform_subst(class Connection *t, char *orig, char *subst);
+string perform_alias(class Connection *d, string orig);
 void check_idle_passwords(void);
 void init_heartbeat();
 void heartbeat();
@@ -168,7 +167,7 @@ void food_update(void);                    /* In limits.c */
 void mobile_activity(void);
 void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
-void string_hash_add(struct descriptor_data *d, char *str);
+void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
 int isbanned(char *hostname);
 void time_update();
@@ -197,8 +196,8 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
 int write_hotboot_file(char **new_argv)
 {
   FILE *fp;
-  struct descriptor_data *d;
-  struct descriptor_data *sd;
+  class Connection *d;
+  class Connection *sd;
   /* Azrack -- do these need to be here?
   extern int mother_desc;
   extern int other_desc;
@@ -217,7 +216,7 @@ int write_hotboot_file(char **new_argv)
   for_each(dc->server_descriptor_list.begin(), dc->server_descriptor_list.end(), [&fp](const int &fd)
            { fprintf(fp, "%d\n", fd); });
 
-  for (d = descriptor_list; d; d = sd)
+  for (d = DC::getInstance()->descriptor_list; d; d = sd)
   {
     sd = d->next;
     if (STATE(d) != conn::PLAYING || !d->character || GET_LEVEL(d->character) < 1)
@@ -315,7 +314,7 @@ int load_hotboot_descs()
   string chr = {};
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   int desc = {};
-  struct descriptor_data *d = nullptr;
+  class Connection *d = nullptr;
   DC *dc = dynamic_cast<DC *>(DC::instance());
   ifstream ifs;
 
@@ -350,7 +349,7 @@ int load_hotboot_descs()
       }
 
       // fscanf(fp, "%d\n%s\n%s\n", &desc, chr.data(), host);
-      d = new descriptor_data;
+      d = new Connection;
 
       d->idle_time = 0;
       d->idle_tics = 0;
@@ -386,8 +385,8 @@ int load_hotboot_descs()
         continue;
       }
 
-      d->next = descriptor_list;
-      descriptor_list = d;
+      d->next = DC::getInstance()->descriptor_list;
+      DC::getInstance()->descriptor_list = d;
     }
     ifs.close();
   }
@@ -406,12 +405,12 @@ int load_hotboot_descs()
 
 void finish_hotboot()
 {
-  struct descriptor_data *d;
+  class Connection *d;
   char buf[MAX_STRING_LENGTH];
 
   void do_on_login_stuff(Character * ch);
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     write_to_descriptor(d->descriptor, "Reconnecting your link to your character...\r\n");
 
@@ -438,7 +437,7 @@ void finish_hotboot()
     update_max_who();
   }
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     do_look(d->character, "", 8);
     d->character->save(666);
@@ -531,9 +530,9 @@ void DC::init_game(void)
   do_not_save_corpses = 1;
 
   logentry("Closing all sockets.", 0, LogChannels::LOG_MISC);
-  while (descriptor_list)
+  while (DC::getInstance()->descriptor_list)
   {
-    close_socket(descriptor_list);
+    close_socket(DC::getInstance()->descriptor_list);
   }
 
   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const int &fd)
@@ -651,7 +650,7 @@ int DC::init_socket(in_port_t port)
 // This is set as a global...it is the increment variable for the descriptor list
 // used in game_loop.  It has to be global so that "close_socket" can increment
 // it if we are closing the socket that is next to be processed.
-struct descriptor_data *next_d;
+class Connection *next_d;
 stringstream timingDebugStr;
 uint64_t pulseavg = 0;
 
@@ -668,7 +667,7 @@ void DC::game_loop(void)
   // otherwise an alias'd command could easily overrun the buffer
   string comm = {};
   char buf[128] = {};
-  struct descriptor_data *d = {};
+  class Connection *d = {};
   int maxdesc = {};
   int aliased = false;
 
@@ -693,7 +692,7 @@ void DC::game_loop(void)
                  maxdesc = fd;
                } });
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->descriptor > maxdesc)
       maxdesc = d->descriptor;
@@ -722,7 +721,7 @@ void DC::game_loop(void)
                } });
 
   // close the weird descriptors in the exception set
-  for (d = descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if (FD_ISSET(d->descriptor, &exc_set))
@@ -734,7 +733,7 @@ void DC::game_loop(void)
   }
 
   /* process descriptors with input pending */
-  for (d = descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if (FD_ISSET(d->descriptor, &input_set))
@@ -753,7 +752,7 @@ void DC::game_loop(void)
   }
 
   /* process commands we just read from process_input */
-  for (d = descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     if (d->character != nullptr)
     {
@@ -854,7 +853,7 @@ void DC::game_loop(void)
   PerfTimers["output"].start();
 
   /* send queued output out to the operating system (ultimately to user) */
-  for (d = descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if ((FD_ISSET(d->descriptor, &output_set) && !d->output.empty()) || d->prompt_mode)
@@ -1128,7 +1127,7 @@ void heartbeat()
 /*
  * Turn off echoing (specific to telnet client)
  */
-void telnet_echo_off(struct descriptor_data *d)
+void telnet_echo_off(class Connection *d)
 {
   char off_string[] =
       {
@@ -1144,7 +1143,7 @@ void telnet_echo_off(struct descriptor_data *d)
 /*
  * Turn on echoing (specific to telnet client)
  */
-void telnet_echo_on(struct descriptor_data *d)
+void telnet_echo_on(class Connection *d)
 {
   char on_string[] =
       {
@@ -1159,13 +1158,13 @@ void telnet_echo_on(struct descriptor_data *d)
   SEND_TO_Q(on_string, d);
 }
 
-void telnet_sga(descriptor_data *d)
+void telnet_sga(Connection *d)
 {
   char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
   SEND_TO_Q(suppress_go_ahead, d);
 }
 
-void telnet_ga(descriptor_data *d)
+void telnet_ga(Connection *d)
 {
   char go_ahead[] = {(char)IAC, (char)GA, (char)0};
   SEND_TO_Q(go_ahead, d);
@@ -1371,7 +1370,7 @@ char *calc_condition(Character *ch, bool colour = false)
     return cond_txt[7];
 }
 
-void make_prompt(struct descriptor_data *d, string &prompt)
+void make_prompt(class Connection *d, string &prompt)
 {
   string buf = {};
   if (!d->character)
@@ -1909,7 +1908,7 @@ string get_from_q(queue<string> &input_queue)
 }
 
 /* Empty the queues before closing connection */
-void flush_queues(struct descriptor_data *d)
+void flush_queues(class Connection *d)
 {
   int dummy;
   string buf2 = {};
@@ -1946,7 +1945,7 @@ void scramble_text(string &txt)
   }
 }
 
-void write_to_output(string txt, struct descriptor_data *t)
+void write_to_output(string txt, class Connection *t)
 {
   string buf = {};
   string temp = {};
@@ -1982,7 +1981,7 @@ int new_descriptor(int s)
   int i;
 #endif
   static int last_desc = 0; /* last descriptor number */
-  struct descriptor_data *newd;
+  class Connection *newd;
   struct sockaddr_in peer;
   char buf[MAX_STRING_LENGTH];
 
@@ -2012,7 +2011,7 @@ int new_descriptor(int s)
 #endif
 
   /* create a new descriptor */
-  newd = new descriptor_data;
+  newd = new Connection;
   strcpy(newd->host, inet_ntoa(peer.sin_addr));
 
   /* determine if the site is banned */
@@ -2037,7 +2036,7 @@ int new_descriptor(int s)
   newd->idle_time = 0;
   newd->wait = 1;
   newd->output = {};
-  newd->next = descriptor_list;
+  newd->next = DC::getInstance()->descriptor_list;
   newd->login_time = time(0);
   newd->astr = 0;
   if (++last_desc == 1000)
@@ -2045,13 +2044,13 @@ int new_descriptor(int s)
   newd->desc_num = last_desc;
 
   /* prepend to list */
-  descriptor_list = newd;
+  DC::getInstance()->descriptor_list = newd;
 
   newd->connected = conn::PRE_DISPLAY_ENTRANCE;
   return 0;
 }
 
-int process_output(struct descriptor_data *t)
+int process_output(class Connection *t)
 {
   string i = {};
   static int result;
@@ -2143,7 +2142,7 @@ enum telnet
   iac = '\xFF'
 };
 
-void process_iac(descriptor_data *t)
+void process_iac(Connection *t)
 {
   char prev = '\0';
 
@@ -2364,7 +2363,7 @@ string remove_non_color_codes(string input)
  * ASSUMPTION: There will be no newlines in the raw input buffer when this
  * function is called.  We must maintain that before returning.
  */
-int process_input(struct descriptor_data *t)
+int process_input(class Connection *t)
 {
   size_t eoc_pos = t->inbuf.npos;
   size_t erase = 0;
@@ -2611,7 +2610,7 @@ int process_input(struct descriptor_data *t)
  * orig is the orig string (i.e. the one being modified.
  * subst contains the substition string, i.e. "^telm^tell"
  */
-int perform_subst(struct descriptor_data *t, char *orig, char *subst)
+int perform_subst(class Connection *t, char *orig, char *subst)
 {
   char new_subst[MAX_INPUT_LENGTH + 5];
 
@@ -2663,10 +2662,10 @@ int perform_subst(struct descriptor_data *t, char *orig, char *subst)
 
 // return 1 on success
 // return 0 if we quit everyone out at the bottom
-int close_socket(struct descriptor_data *d)
+int close_socket(class Connection *d)
 {
   char buf[128], idiotbuf[128];
-  struct descriptor_data *temp;
+  class Connection *temp;
   // int32_t target_idnum = -1;
   if (!d)
     return 0;
@@ -2744,7 +2743,7 @@ int close_socket(struct descriptor_data *d)
   if (d == next_d)
     next_d = d->next;
 
-  REMOVE_FROM_LIST(d, descriptor_list, next);
+  REMOVE_FROM_LIST(d, DC::getInstance()->descriptor_list, next);
 
   if (d->showstr_head)
     dc_free(d->showstr_head);
@@ -2754,7 +2753,7 @@ int close_socket(struct descriptor_data *d)
   delete d;
   d = nullptr;
 
-  /*  if(descriptor_list == nullptr)
+  /*  if(DC::getInstance()->descriptor_list == nullptr)
   {
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
@@ -2773,9 +2772,9 @@ int close_socket(struct descriptor_data *d)
 
 void check_idle_passwords(void)
 {
-  struct descriptor_data *d, *next_d;
+  class Connection *d, *next_d;
 
-  for (d = descriptor_list; d; d = next_d)
+  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
@@ -2822,7 +2821,7 @@ void report_debug_logging()
 
 void crash_hotboot()
 {
-  struct descriptor_data *d = nullptr;
+  class Connection *d = nullptr;
   extern int try_to_hotboot_on_crash;
   extern int died_from_sigsegv;
 
@@ -2830,7 +2829,7 @@ void crash_hotboot()
   // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
   // sigsegv = # of times we've crashed from SIGSEGV
 
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
     write_to_descriptor(d->descriptor, "Mud crash detected.\r\n");
   }
@@ -2838,7 +2837,7 @@ void crash_hotboot()
   // attempt to hotboot
   if (try_to_hotboot_on_crash)
   {
-    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
@@ -2846,13 +2845,13 @@ void crash_hotboot()
     write_hotboot_file(0);
     // we shouldn't return from there unless we failed
     logentry("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
-    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
     }
   }
 
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
     write_to_descriptor(d->descriptor, "Giving up, goodbye.\r\n");
   }
@@ -3132,10 +3131,10 @@ void send_to_char(string messg, Character *ch)
 
 void send_to_all(char *messg)
 {
-  struct descriptor_data *i;
+  class Connection *i;
 
   if (messg)
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (!i->connected)
         SEND_TO_Q(messg, i);
 }
@@ -3168,10 +3167,10 @@ void send_info(string messg)
 
 void send_info(const char *messg)
 {
-  struct descriptor_data *i;
+  class Connection *i;
 
   if (messg)
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (!(i->character) ||
           !IS_SET(i->character->misc, LogChannels::CHANNEL_INFO))
@@ -3183,10 +3182,10 @@ void send_info(const char *messg)
 
 void send_to_outdoor(char *messg)
 {
-  struct descriptor_data *i;
+  class Connection *i;
 
   if (messg)
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (!i->connected)
         if (OUTSIDE(i->character) && !is_busy(i->character))
           SEND_TO_Q(messg, i);
@@ -3194,10 +3193,10 @@ void send_to_outdoor(char *messg)
 
 void send_to_zone(char *messg, int zone)
 {
-  struct descriptor_data *i = nullptr;
+  class Connection *i = nullptr;
   if (messg)
   {
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (!i->connected && !is_busy(i->character) && i->character->in_room != NOWHERE && world[i->character->in_room].zone == zone)
       {
@@ -3239,7 +3238,7 @@ int is_busy(Character *ch)
   return (0);
 }
 
-string perform_alias(struct descriptor_data *d, string orig)
+string perform_alias(class Connection *d, string orig)
 {
   string first_arg, remainder, new_buf;
   // ptr = any_one_arg(orig, first_arg);
@@ -3293,7 +3292,7 @@ char *any_one_arg(char *argument, char *first_arg)
 
 bool is_multi(Character *ch)
 {
-  for (descriptor_data *d = descriptor_list; d; d = d->next)
+  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
@@ -3313,7 +3312,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   list<multiplayer> multi_list;
 
-  for (descriptor_data *d = descriptor_list; d; d = d->next)
+  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&

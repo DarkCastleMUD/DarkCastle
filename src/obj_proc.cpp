@@ -44,7 +44,7 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
 
-extern struct descriptor_data *descriptor_list;
+
 
 extern Character *initiate_oproc(Character *ch, Object *obj);
 
@@ -3861,7 +3861,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     }
 
     if (!IS_NPC(vict))
-      for (descriptor_data *i = descriptor_list; i; i = i->next)
+      for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           send_to_char("You hear a large BOOM from somewhere in the distance.\r\n", i->character);
 

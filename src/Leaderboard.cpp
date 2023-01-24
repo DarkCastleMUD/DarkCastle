@@ -22,8 +22,6 @@ extern "C"
 #include "interp.h"
 #include "returnvals.h"
 
-extern struct descriptor_data *descriptor_list;
-
 using namespace std;
 
 Leaderboard::Leaderboard()
@@ -66,7 +64,7 @@ Leaderboard::~Leaderboard()
 void Leaderboard::check(void)
 {
 	// check online players to the file and make sure the file is up to date
-	struct descriptor_data *d;
+	class Connection *d;
 	int i, j, k;
 	extern char *curr_type;
 	extern char *curr_name;
@@ -78,7 +76,7 @@ void Leaderboard::check(void)
 
 	read_file();
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL || IS_NPC(d->character))
 			continue;
@@ -1375,7 +1373,7 @@ int Leaderboard::pdscore(Character *ch)
 
 int do_leaderboard(Character *ch, char *argument, int cmd)
 {
-	struct descriptor_data *d;
+	class Connection *d;
 	FILE *fl;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	int i, j, k, validclass = 0;
@@ -1582,7 +1580,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 	fclose(fl);
 
 	// top 5 online
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 
 		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL)

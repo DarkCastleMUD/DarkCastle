@@ -59,7 +59,6 @@ using namespace std;
 
 extern CWorld world;
 
-extern struct descriptor_data *descriptor_list;
 extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -78,7 +77,7 @@ extern int max_who;
 /* extern functions */
 
 struct time_info_data age(Character *ch);
-void page_string(struct descriptor_data *d, const char *str, int keep_internal);
+void page_string(class Connection *d, const char *str, int keep_internal);
 clan_data *get_clan(Character *);
 extern int hit_gain(Character *ch, int position);
 extern int mana_gain(Character *ch);
@@ -794,10 +793,10 @@ int do_botcheck(Character *ch, char *argument, int cmd)
 
    if (victim == nullptr && name != nullptr && !strcmp(name, "all"))
    {
-      descriptor_data *d;
+      Connection *d;
       Character *i;
 
-      for (d = descriptor_list; d; d = d->next)
+      for (d = DC::getInstance()->descriptor_list; d; d = d->next)
       {
          if (d->connected || !d->character)
             continue;
@@ -2504,14 +2503,14 @@ int do_help(Character *ch, char *argument, int cmd)
 
 int do_count(Character *ch, char *arg, int cmd)
 {
-   struct descriptor_data *d;
+   class Connection *d;
    Character *i;
    int clss[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
    int race[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
    int immortal = 0;
    int total = 0;
 
-   for (d = descriptor_list; d; d = d->next)
+   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
    {
       if (d->connected || !d->character)
          continue;

@@ -109,7 +109,7 @@ queue<string> newbie_history;
 queue<string> trivia_history;
 
 extern CWorld world;
-extern struct descriptor_data *descriptor_list;
+
 extern struct index_data *obj_index;
 
 command_return_t do_say(Character *ch, string argument, int cmd)
@@ -258,7 +258,7 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
 int do_pray(Character *ch, char *arg, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
 
   if (IS_NPC(ch))
     return eSUCCESS;
@@ -292,7 +292,7 @@ int do_pray(Character *ch, char *arg, int cmd)
 
   sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
 
-  for (i = descriptor_list; i; i = i->next)
+  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
     if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
@@ -311,7 +311,7 @@ int do_pray(Character *ch, char *arg, int cmd)
 int do_gossip(Character *ch, char *argument, int cmd)
 {
   char buf2[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
   Object *tmp_obj;
   bool silence = false;
 
@@ -395,7 +395,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
       gossip_history.pop();
     }
 
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (i->character != ch && !i->connected && (IS_SET(i->character->misc, LogChannels::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
       {
@@ -422,7 +422,7 @@ int do_auction(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
   Object *tmp_obj;
   bool silence = false;
 
@@ -497,7 +497,7 @@ int do_auction(Character *ch, char *argument, int cmd)
     if (auction_history.size() > 10)
       auction_history.pop();
 
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
           (IS_SET(i->character->misc, LogChannels::CHANNEL_AUCTION)) &&
           !is_ignoring(i->character, ch))
@@ -519,7 +519,7 @@ int do_shout(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
   Object *tmp_obj;
   bool silence = false;
 
@@ -574,7 +574,7 @@ int do_shout(Character *ch, char *argument, int cmd)
     sprintf(buf2, "$BYou shout '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
           (world[i->character->in_room].zone == world[ch->in_room].zone) &&
           (IS_NPC(i->character) || IS_SET(i->character->misc, LogChannels::CHANNEL_SHOUT)) &&
@@ -597,7 +597,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
   Object *tmp_obj;
   bool silence = false;
 
@@ -683,7 +683,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
   if (trivia_history.size() > 10)
     trivia_history.pop();
 
-  for (i = descriptor_list; i; i = i->next)
+  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     if (i->character != ch && !i->connected &&
         (IS_SET(i->character->misc, LogChannels::CHANNEL_TRIVIA)) &&
         !is_ignoring(i->character, ch))
@@ -705,7 +705,7 @@ int do_dream(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
-  struct descriptor_data *i = nullptr;
+  class Connection *i = nullptr;
   int ctr = 0;
 
   if ((GET_POS(ch) != POSITION_SLEEPING) && (GET_LEVEL(ch) < MIN_GOD))
@@ -761,7 +761,7 @@ int do_dream(Character *ch, char *argument, int cmd)
     sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n\r", GET_SHORT(ch), argument);
     sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n\r", argument);
     send_to_char(buf2, ch);
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if ((i->character != ch) &&
           (!i->connected) &&
@@ -1255,7 +1255,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  class Connection *i;
   Object *tmp_obj;
   bool silence = false;
 
@@ -1324,7 +1324,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
     if (newbie_history.size() > 10)
       newbie_history.pop();
 
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
           !is_ignoring(i->character, ch) &&
           (IS_SET(i->character->misc, LogChannels::CHANNEL_NEWBIE)))

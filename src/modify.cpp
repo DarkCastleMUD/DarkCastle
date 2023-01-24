@@ -24,7 +24,7 @@ extern "C"
 #include <stdlib.h>
 }
 
-#include "connect.h" // descriptor_data
+#include "connect.h" // Connection
 #include "utility.h"
 #include "character.h"
 #include "mobile.h"
@@ -47,7 +47,7 @@ using namespace std;
 #define TP_ERROR 2
 
 void check_for_awaymsgs(Character *ch);
-void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
+void page_string_dep(class Connection *d, const char *str, int keep_internal);
 
 const char *string_fields[] = {"name", "short", "long", "description", "title", "delete-description", "\n"};
 
@@ -61,7 +61,7 @@ const char *skill_fields[] = {"learned", "recognize", "\n"};
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(struct descriptor_data *d, char *str)
+void string_hash_add(class Connection *d, char *str)
 {
 	char *scan;
 	int terminator = 0;
@@ -632,7 +632,7 @@ int count_pages(const char *str)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(const char *str, struct descriptor_data *d)
+void paginate_string(const char *str, class Connection *d)
 {
 	int i;
 
@@ -645,7 +645,7 @@ void paginate_string(const char *str, struct descriptor_data *d)
 	d->showstr_page = 0;
 }
 
-void page_string(struct descriptor_data *d, const char *str, int keep_internal)
+void page_string(class Connection *d, const char *str, int keep_internal)
 {
 	if (!d || !(d->character))
 		return;
@@ -685,7 +685,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 }
 
 /* The depreciated call that gets the paging ball rolling... */
-void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal)
+void page_string_dep(class Connection *d, const char *str, int keep_internal)
 {
 	if (!d)
 		return;
@@ -709,7 +709,7 @@ void page_string_dep(struct descriptor_data *d, const char *str, int keep_intern
 }
 
 /* The call that displays the next page. */
-void show_string(struct descriptor_data *d, const char *input)
+void show_string(class Connection *d, const char *input)
 {
 	char buffer[MAX_STRING_LENGTH];
 	char buf[MAX_STRING_LENGTH];

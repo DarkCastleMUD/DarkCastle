@@ -39,7 +39,7 @@
 #include "levels.h"
 #include "db.h"
 #include "mobile.h"
-#include "connect.h" // descriptor_data
+#include "connect.h" // Connection
 #include "handler.h" // FIND_CHAR_ROOM
 #include "interp.h"	 // do_return
 #include "act.h"
@@ -59,7 +59,7 @@ extern CWorld world;
 extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern struct descriptor_data *descriptor_list;
+
 
 void huntclear_item(class Object *obj);
 
@@ -3675,7 +3675,7 @@ void update_char_objects(Character *ch)
 void extract_char(Character *ch, bool pull, Trace t)
 {
 	Character *k, *next_char;
-	struct descriptor_data *t_desc;
+	class Connection *t_desc;
 	int l, was_in;
 	/*Character *i;*/
 	bool isGolem = false;
@@ -3684,7 +3684,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	Character *omast = nullptr;
 	int ret = eSUCCESS;
 	if (!IS_NPC(ch) && !ch->desc)
-		for (t_desc = descriptor_list; t_desc; t_desc = t_desc->next)
+		for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
 			if (t_desc->original == ch)
 				ret = do_return(t_desc->character, "", 0);
 	if (SOMEONE_DIED(ret))
@@ -4323,12 +4323,12 @@ get_active_pc(const char *name)
 {
 	Character *i;
 	Character *partial_match;
-	struct descriptor_data *d;
-	extern struct descriptor_data *descriptor_list;
+	class Connection *d;
+	
 
 	partial_match = 0;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 		if (!(i = d->character) || d->connected)
 			continue;
@@ -4353,10 +4353,10 @@ get_active_pc(const char *name)
 Character *get_all_pc(char *name)
 {
 	Character *i;
-	struct descriptor_data *d;
-	extern struct descriptor_data *descriptor_list;
+	class Connection *d;
+	
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 		if (!(i = d->character))
 		{
@@ -4448,12 +4448,12 @@ Character *get_active_pc_vis(Character *ch, const char *name)
 {
 	Character *i;
 	Character *partial_match;
-	struct descriptor_data *d;
-	extern struct descriptor_data *descriptor_list;
+	class Connection *d;
+	
 
 	partial_match = 0;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 		if (!d->character || !GET_NAME(d->character))
 			continue;

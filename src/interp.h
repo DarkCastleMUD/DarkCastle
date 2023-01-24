@@ -36,7 +36,7 @@ void half_chop(const char *string, char *arg1, char *arg2);
 tuple<string, string> last_argument(string arguments);
 tuple<string, string> half_chop(string arguments, const char token = ' ');
 void chop_half(char *string, char *arg1, char *arg2);
-void nanny(struct descriptor_data *d, string arg = "");
+void nanny(class Connection *d, string arg = "");
 bool is_abbrev(QString abbrev, QString word);
 // bool is_abbrev(const string &abbrev, const string &word);
 // bool is_abbrev(const char *arg1, const char *arg2);

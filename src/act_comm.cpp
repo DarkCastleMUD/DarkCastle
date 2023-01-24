@@ -139,7 +139,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
   QString buf1;
   QString buf;
   QString typestr;
-  descriptor_data *i = nullptr;
+  Connection *i = nullptr;
 
   if (message.isEmpty())
   {
@@ -213,7 +213,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
   buf = QString("//(%1) %2\n\r").arg(typestr).arg(message);
   buf1 = QString("%1%2//%3(%4)%5 %6%7 %8%9%10\n\r").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
-  for (i = descriptor_list; i; i = i->next)
+  for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
     if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
@@ -753,7 +753,7 @@ void DC::send_hint(void)
 
   QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints.value(num));
 
-  for (descriptor_data *i = descriptor_list; i; i = i->next)
+  for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
     if (i->connected || !i->character || !i->character->desc || is_busy(i->character) || IS_NPC(i->character))
     {

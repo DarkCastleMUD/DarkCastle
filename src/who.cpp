@@ -75,7 +75,7 @@ void clear_who_buffer()
 int do_whogroup(Character *ch, char *argument, int cmd)
 {
 
-  descriptor_data *d;
+  Connection *d;
   Character *k, *i;
   follow_type *f;
   char target[MAX_INPUT_LENGTH];
@@ -102,7 +102,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
 
   clear_who_buffer();
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     foundtarget = 0;
 
@@ -200,7 +200,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
 
 int do_whosolo(Character *ch, char *argument, int cmd)
 {
-  descriptor_data *d;
+  Connection *d;
   Character *i;
   char tempbuffer[800];
   char buf[MAX_INPUT_LENGTH + 1];
@@ -217,7 +217,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
 
   clear_who_buffer();
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     foundtarget = false;
 
@@ -261,7 +261,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
 
 int do_who(Character *ch, char *argument, int cmd)
 {
-  struct descriptor_data *d;
+  class Connection *d;
   Character *i;
   clan_data *clan;
   int numPC = 0;
@@ -429,7 +429,7 @@ int do_who(Character *ch, char *argument, int cmd)
 
   clear_who_buffer();
 
-  for (d = descriptor_list; d; d = d->next)
+  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     // we have an invalid match arg, so nothing is going to match
     if (nomatch)
@@ -719,7 +719,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
 
 int do_where(Character *ch, char *argument, int cmd)
 {
-  struct descriptor_data *d;
+  class Connection *d;
   int zonenumber;
   char buf[MAX_INPUT_LENGTH];
 
@@ -728,7 +728,7 @@ int do_where(Character *ch, char *argument, int cmd)
   if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all"))
   { //  immortal noly, shows all
     send_to_char("All Players:\n\r--------\n\r", ch);
-    for (d = descriptor_list; d; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
       {
@@ -748,7 +748,7 @@ int do_where(Character *ch, char *argument, int cmd)
   else if (GET_LEVEL(ch) >= IMMORTAL && *buf)
   { // immortal only, shows ONE person
     send_to_char("Search of Players:\n\r--------\n\r", ch);
-    for (d = descriptor_list; d; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
       {
@@ -777,7 +777,7 @@ int do_where(Character *ch, char *argument, int cmd)
     send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
     if (IS_SET(world[ch->in_room].room_flags, NO_WHERE))
       return eFAILURE;
-    for (d = descriptor_list; d; d = d->next)
+    for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == conn::PLAYING) && (d->character->in_room != NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&

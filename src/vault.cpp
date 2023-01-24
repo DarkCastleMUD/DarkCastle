@@ -953,7 +953,7 @@ void load_vaults(void)
 void add_vault_access(Character *ch, char *name, struct vault_data *vault)
 {
   struct vault_access_data *access;
-  struct descriptor_data d;
+  class Connection d;
 
   name[0] = UPPER(name[0]);
 

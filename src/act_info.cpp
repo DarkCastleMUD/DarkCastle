@@ -39,7 +39,7 @@ int max_who = 0;
 
 /* extern functions */
 
-void page_string(struct descriptor_data *d, const char *str, int keep_internal);
+void page_string(class Connection *d, const char *str, int keep_internal);
 
 int do_levels(Character *ch, char *argument, int cmd) {
 	int i;

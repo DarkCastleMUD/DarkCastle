@@ -61,7 +61,7 @@ using namespace std;
 void AuctionHandleDelete(string name);
 bool is_bracing(Character *bracee, struct room_direction_data *exit);
 void check_for_sold_items(Character *ch);
-void show_question_race(descriptor_data *d);
+void show_question_race(Connection *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
                     "0) Exit Dark Castle.\r\n"
@@ -81,7 +81,7 @@ extern char greetings4[MAX_STRING_LENGTH];
 extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
-extern struct descriptor_data *descriptor_list;
+
 extern Object *object_list;
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -89,23 +89,23 @@ extern CVoteData *DCVote;
 
 int isbanned(char *hostname);
 int _parse_email(char *arg);
-bool check_deny(struct descriptor_data *d, char *name);
+bool check_deny(class Connection *d, char *name);
 void update_wizlist(Character *ch);
 void isr_set(Character *ch);
-bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect);
-bool check_playing(struct descriptor_data *d, char *name);
+bool check_reconnect(class Connection *d, char *name, bool fReconnect);
+bool check_playing(class Connection *d, char *name);
 bool on_forbidden_name_list(char *name);
 void check_hw(Character *ch);
 char *str_str(char *first, char *second);
 bool apply_race_attributes(Character *ch, int race = 0);
 bool check_race_attributes(Character *ch, int race = 0);
-bool handle_get_race(descriptor_data *d, string arg);
-void show_question_race(descriptor_data *d);
-void show_question_class(descriptor_data *d);
-bool handle_get_class(descriptor_data *d, string arg);
+bool handle_get_race(Connection *d, string arg);
+void show_question_race(Connection *d);
+void show_question_class(Connection *d);
+bool handle_get_class(Connection *d, string arg);
 int is_clss_race_compat(Character *ch, int clss);
-void show_question_stats(descriptor_data *d);
-bool handle_get_stats(descriptor_data *d, string arg);
+void show_question_stats(Connection *d);
+bool handle_get_stats(Connection *d, string arg);
 
 int is_race_eligible(Character *ch, int race)
 {
@@ -361,7 +361,7 @@ Object *clan_altar(Character *ch)
 void update_max_who(void)
 {
    uint64_t players = 0;
-   for (auto d = descriptor_list; d != nullptr; d = d->next)
+   for (auto d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
    {
       switch (d->connected)
       {
@@ -769,10 +769,10 @@ void roll_and_display_stats(Character *ch)
    WAIT_STATE(ch, PULSE_TIMER / 10);
 }
 
-int count_IP_connections(struct descriptor_data *new_conn)
+int count_IP_connections(class Connection *new_conn)
 {
    int count = 0;
-   for (struct descriptor_data *d = descriptor_list; d; d = d->next)
+   for (class Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
    {
       if (!d->host)
          continue;
@@ -844,7 +844,7 @@ void set_hw(Character *ch)
 }
 
 // Deal with sockets that haven't logged in yet.
-void nanny(struct descriptor_data *d, string arg)
+void nanny(class Connection *d, string arg)
 {
    char buf[MAX_STRING_LENGTH];
    stringstream str_tmp;
@@ -1032,7 +1032,7 @@ void nanny(struct descriptor_data *d, string arg)
       // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
       if (DC::getInstance()->cf.allow_imp_password && allowed_host(d->host))
       {
-         for (descriptor_data *ad = descriptor_list; ad && ad != (descriptor_data *)0x95959595; ad = ad->next)
+         for (Connection *ad = DC::getInstance()->descriptor_list; ad && ad != (Connection *)0x95959595; ad = ad->next)
          {
             if (ad != d && !str_cmp(d->host, ad->host))
             {
@@ -2030,7 +2030,7 @@ int _parse_name(const char *arg, char *name)
 }
 
 // Check for denial of service.
-bool check_deny(struct descriptor_data *d, char *name)
+bool check_deny(class Connection *d, char *name)
 {
    FILE *fpdeny = nullptr;
    char strdeny[MAX_INPUT_LENGTH];
@@ -2051,7 +2051,7 @@ bool check_deny(struct descriptor_data *d, char *name)
 }
 
 // Look for link-dead player to reconnect.
-bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
+bool check_reconnect(class Connection *d, char *name, bool fReconnect)
 {
    auto &character_list = DC::getInstance()->character_list;
    for (auto &tmp_ch : character_list)
@@ -2111,12 +2111,12 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 /*
  * Check if already playing (on an open descriptor.)
  */
-bool check_playing(struct descriptor_data *d, char *name)
+bool check_playing(class Connection *d, char *name)
 {
-   struct descriptor_data *dold, *next_d;
+   class Connection *dold, *next_d;
    Character *compare = 0;
 
-   for (dold = descriptor_list; dold; dold = next_d)
+   for (dold = DC::getInstance()->descriptor_list; dold; dold = next_d)
    {
       next_d = dold->next;
 
@@ -2550,7 +2550,7 @@ bool on_forbidden_name_list(char *name)
    return found;
 }
 
-void show_question_race(descriptor_data *d)
+void show_question_race(Connection *d)
 {
    if (d == nullptr || d->character == nullptr)
    {
@@ -2581,7 +2581,7 @@ void show_question_race(descriptor_data *d)
    telnet_ga(d);
 }
 
-bool handle_get_race(descriptor_data *d, string arg)
+bool handle_get_race(Connection *d, string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
@@ -2618,7 +2618,7 @@ bool handle_get_race(descriptor_data *d, string arg)
    return true;
 }
 
-void show_question_class(descriptor_data *d)
+void show_question_class(Connection *d)
 {
    if (d == nullptr || d->character == nullptr)
    {
@@ -2655,7 +2655,7 @@ void show_question_class(descriptor_data *d)
    telnet_ga(d);
 }
 
-bool handle_get_class(descriptor_data *d, string arg)
+bool handle_get_class(Connection *d, string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
@@ -2730,7 +2730,7 @@ void stat_data::setMin(void)
    wis[0] = getMin(wis[0], races[race].mod_wis, MAX(races[race].min_wis, classes[clss].min_wis));
 }
 
-void show_question_stats(descriptor_data *d)
+void show_question_stats(Connection *d)
 {
    if (d == nullptr || d->character == nullptr)
    {
@@ -2835,7 +2835,7 @@ void show_question_stats(descriptor_data *d)
    telnet_ga(d);
 }
 
-bool handle_get_stats(descriptor_data *d, string arg)
+bool handle_get_stats(Connection *d, string arg)
 {
    if (arg != "+" && arg != "-" && arg != "confirm")
    {

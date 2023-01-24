@@ -28,7 +28,7 @@ uint64_t i = UINT64_MAX;
 #include "player.h"
 #include "utility.h"
 #include "character.h"
-#include "connect.h"  // descriptor_data
+#include "connect.h"  // Connection
 #include "mobile.h"   // utility.h stuff
 #include "clan.h"     // duh
 #include "interp.h"   // do_outcast, etc..
@@ -44,7 +44,7 @@ uint64_t i = UINT64_MAX;
 
 using namespace std;
 
-extern descriptor_data *descriptor_list;
+
 extern index_data *obj_index;
 extern CWorld world;
 
@@ -829,7 +829,7 @@ void message_to_clan(Character *ch, char buf[])
 {
   Character *pch;
 
-  for (descriptor_data *d = descriptor_list; d; d = d->next)
+  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->connected || !(pch = d->character))
       continue;
@@ -1041,7 +1041,7 @@ int do_outcast(Character *ch, char *arg, int cmd)
 {
   Character *victim;
   clan_data *clan;
-  struct descriptor_data d;
+  class Connection d;
   char buf[MAX_STRING_LENGTH], tmp_buf[MAX_STRING_LENGTH];
   bool connected = true;
 
@@ -1542,7 +1542,7 @@ int clan_email(Character *ch, char *arg)
 int do_ctell(Character *ch, char *arg, int cmd)
 {
   Character *pch;
-  struct descriptor_data *desc;
+  class Connection *desc;
   char buf[MAX_STRING_LENGTH];
 
   if (!ch->clan)
@@ -1599,7 +1599,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   sprintf(buf, "%s tells the clan, '%s'\n\r", GET_SHORT(ch), arg);
   bool yes;
-  for (desc = descriptor_list; desc; desc = desc->next)
+  for (desc = DC::getInstance()->descriptor_list; desc; desc = desc->next)
   {
     yes = false;
     if (desc->connected || !(pch = desc->character))
@@ -2728,7 +2728,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
 int do_whoclan(Character *ch, char *arg, int cmd)
 {
   clan_data *clan;
-  struct descriptor_data *desc;
+  class Connection *desc;
   Character *pch;
   char buf[100];
   int found;
@@ -2749,7 +2749,7 @@ int do_whoclan(Character *ch, char *arg, int cmd)
     found = 0;
     if (clan_num && clan->number != clan_num)
       continue;
-    for (desc = descriptor_list; desc; desc = desc->next)
+    for (desc = DC::getInstance()->descriptor_list; desc; desc = desc->next)
     {
       if (desc->connected || !(pch = desc->character))
         continue;

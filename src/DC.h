@@ -72,6 +72,7 @@ public:
   static string getBuildTime();
   static DC *getInstance();
 
+  Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
@@ -152,7 +153,6 @@ private:
   Shops shops_;
 };
 
-extern struct descriptor_data *descriptor_list;
 extern vector<string> continent_names;
 extern class CVoteData *DCVote;
 extern class Room **world_array;

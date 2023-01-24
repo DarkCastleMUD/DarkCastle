@@ -64,8 +64,8 @@ struct pulse_info
 
 #include "character.h"
 
-// void     write_to_output(const char *txt, struct descriptor_data *d);
-void write_to_output(string txt, struct descriptor_data *d);
+// void     write_to_output(const char *txt, class Connection *d);
+void write_to_output(string txt, class Connection *d);
 void scramble_text(char *txt);
 void warn_if_duplicate_ip(Character *ch);
 void record_msg(string messg, Character *ch);
@@ -73,11 +73,11 @@ int write_hotboot_file(char **argv);
 void send_info(string messg);
 void send_info(const char *messg);
 bool is_multi(Character *ch);
-void new_string_add(struct descriptor_data *d, char *str);
-void telnet_ga(descriptor_data *d);
-void telnet_sga(descriptor_data *d);
-void telnet_echo_off(struct descriptor_data *d);
-void telnet_echo_on(struct descriptor_data *d);
+void new_string_add(class Connection *d, char *str);
+void telnet_ga(Connection *d);
+void telnet_sga(Connection *d);
+void telnet_echo_off(class Connection *d);
+void telnet_echo_on(class Connection *d);
 string remove_non_color_codes(string input);
 
 #endif

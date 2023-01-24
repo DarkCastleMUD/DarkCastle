@@ -262,7 +262,7 @@ int main(int argc, char **argv)
   logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
   renum_zone_table();
 
-  struct descriptor_data *d = new descriptor_data;
+  class Connection *d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
   create_blank_item(1);
@@ -279,7 +279,7 @@ int main(int argc, char **argv)
     vnum = atoi(argv[2]);
   }
 
-  d = new descriptor_data;
+  d = new Connection;
   Character *ch = new Character;
   ch->name = strdup("DebugIMP");
   ch->pcdata = new pc_data;

@@ -1533,7 +1533,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 {
   Character *victim;
   char buf[100];
-  struct descriptor_data *i;
+  class Connection *i;
 
   void update_pos(Character * victim);
 
@@ -1598,7 +1598,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
       return eFAILURE;
     }
-    for (i = descriptor_list; i; i = i->next)
+    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected)
       {
 

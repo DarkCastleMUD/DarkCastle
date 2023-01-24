@@ -964,7 +964,7 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH])
 }
 
 // Load a char and inventory into a new_new ch structure.
-bool load_char_obj(struct descriptor_data *d, const char *name)
+bool load_char_obj(class Connection *d, const char *name)
 {
   FILE *fpsave = nullptr;
   char strsave[MAX_INPUT_LENGTH];
