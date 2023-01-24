@@ -2174,17 +2174,17 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.extra_flags,
-                extra_bits, buf);
+                Object::extra_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
-      for (i = 0; *extra_bits[i] != '\n'; i++)
+      for (i = 0; i < Object::extra_bits.size(); i++)
       {
-        sprintf(buf, "  %s\n\r", extra_bits[i]);
+        sprintf(buf, "  %s\n\r", Object::extra_bits[i]);
         send_to_char(buf, ch);
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(extra_bits, buf4, ch,
+    parse_bitstrings_into_int(Object::extra_bits, buf4, ch,
                               ((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
   }
   break;

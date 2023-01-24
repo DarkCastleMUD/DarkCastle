@@ -4269,7 +4269,7 @@ void write_object_csv(Object *obj, ofstream &fout)
 		fout << obj->obj_flags.cost << ",";
 
 		write_bitvector_csv(obj->obj_flags.wear_flags, Object::wear_bits, fout);
-		write_bitvector_csv(obj->obj_flags.extra_flags, extra_bits, fout);
+		write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
 		write_bitvector_csv(obj->obj_flags.more_flags,Object::more_obj_bits, fout);
 
 		char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];

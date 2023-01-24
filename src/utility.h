@@ -444,6 +444,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result);
 std::string sprintbit(uint32_t vektor, const char *names[]);
 
 void sprintbit(uint32_t vektor, QStringList names, char *result);
+QString sprintbit(uint32_t vektor, QStringList names);
 
 void sprinttype(int type, const char *names[], char *result);
 std::string sprinttype(int type, const char *names[]);

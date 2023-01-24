@@ -1073,7 +1073,7 @@ bool identify(Character *ch, Object *obj)
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    csendf(ch, "$3Item type: $R%s\r\n", buf2);
 
-   sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
    csendf(ch, "$3Extra flags: $R%s\r\n", buf);
 
    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
@@ -3875,10 +3875,10 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          send("wear=?        show available wear locations.\r\n");
          send("size=small    show objects that can be worn on the neck.\r\n");
          send("size=?        show available sizes.\r\n");
-         // send("extra=mage    show objects that have the extra flag for mage set.\r\n");
-         // send("extra=?       show available extra flags.\r\n");
-         // send("more=unique   show objects that have the extra flag for mage set.\r\n");
-         // send("more=?        show available extra flags.\r\n");
+         send("extra=mage    show objects that have the extra flag for mage set.\r\n");
+         send("extra=?       show available extra flags.\r\n");
+         send("more=unique   show objects that have the extra flag for mage set.\r\n");
+         send("more=?        show available extra flags.\r\n");
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
          send("Search terms can be combined.\r\n");
@@ -4059,6 +4059,58 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             send("What size are you searching for?\r\n");
             send("Here are some valid sizes:\r\n");
             for (auto &s : Object::size_bits)
+            {
+               send(s + "\r\n");
+            }
+            return eFAILURE;
+         }
+      }
+      else if (arg1 == "more")
+      {
+         bool found = false;
+         if (!arg2.isEmpty())
+         {
+            uint32_t more_flag = 0;
+            parse_bitstrings_into_int(Object::more_obj_bits, arg2, nullptr, more_flag);
+            if (more_flag)
+            {
+               found = true;
+               so.setObjectMore(more_flag);
+               so.setType(Search::types::O_MORE_FLAGS);
+               sl.push_back(so);
+            }
+         }
+         if (!found)
+         {
+            send("What more flag are you searching for?\r\n");
+            send("Here are some valid more flags:\r\n");
+            for (auto &s : Object::more_obj_bits)
+            {
+               send(s + "\r\n");
+            }
+            return eFAILURE;
+         }
+      }
+      else if (arg1 == "extra")
+      {
+         bool found = false;
+         if (!arg2.isEmpty())
+         {
+            uint32_t extra_flag = 0;
+            parse_bitstrings_into_int(Object::extra_bits, arg2, nullptr, extra_flag);
+            if (extra_flag)
+            {
+               found = true;
+               so.setObjectExtra(extra_flag);
+               so.setType(Search::types::O_EXTRA_FLAGS);
+               sl.push_back(so);
+            }
+         }
+         if (!found)
+         {
+            send("What extra flag are you searching for?\r\n");
+            send("Here are some valid extra flags:\r\n");
+            for (auto &s : Object::extra_bits)
             {
                send(s + "\r\n");
             }

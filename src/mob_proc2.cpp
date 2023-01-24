@@ -600,7 +600,8 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 		uint32_t a = obj->obj_flags.extra_flags;
 		a &= ALL_CLASSES;
 
-		buf2 = fmt::format("{}]$R, ", sprintbit(a, extra_bits));
+		QString buffer = sprintbit(a, Object::extra_bits);
+		buf2 = fmt::format("{}]$R, ", buffer.toStdString());
 
 		if (a)
 		{

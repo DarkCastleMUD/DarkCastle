@@ -893,7 +893,7 @@ const char *zone_bits[] =
         "\n"};
 
 // new obj flags
-const char *extra_bits[] =
+const QStringList Object::extra_bits =
     {
         "GLOWING",
         "HUMMING",

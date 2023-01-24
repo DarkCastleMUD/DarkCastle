@@ -4603,7 +4603,7 @@ void show_obj_class_size_mini(Object *obj, Character *ch)
 {
   for (int i = 12; i < 23; i++)
     if (IS_SET(obj->obj_flags.extra_flags, 1 << i))
-      csendf(ch, " %s", extra_bits[i]);
+      csendf(ch, " %s", Object::extra_bits[i]);
 }
 
 /* IDENFITY */
@@ -4662,7 +4662,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     send_to_char(buf, ch);
 
     send_to_char("Item is: ", ch);
-    sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+    sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
     sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf2);
     strcat(buf, " ");
     strcat(buf, buf2);

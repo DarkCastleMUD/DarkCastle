@@ -1013,7 +1013,7 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   send_to_char("$3Extra flags$R: ", ch);
-  sprintbit(j->obj_flags.extra_flags, extra_bits, buf);
+  sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
   strcat(buf, "\n\r");
   send_to_char(buf, ch);
 

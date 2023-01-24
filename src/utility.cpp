@@ -610,6 +610,41 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
     strcat(result, "NoBits ");
 }
 
+// leading space until all calling functions cleaned up
+QString sprintbit(uint32_t vektor, QStringList names)
+{
+  int32_t nr;
+  QString result;
+
+  if (vektor < 0)
+  {
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    return QString();
+  }
+
+  for (nr = 0; vektor; vektor >>= 1)
+  {
+    if (IS_SET(1, vektor))
+    {
+      if (names[nr].compare("unused", Qt::CaseInsensitive) == 0)
+        continue;
+
+      result += names.value(nr, "Undefined") + " ";
+    }
+
+    if (nr < names.size() - 1)
+    {
+      nr++;
+    }
+  }
+
+  if (result.isEmpty())
+  {
+    result = "NoBits";
+  }
+  return result;
+}
+
 // no leading space
 std::string sprintbit(uint32_t vektor, const char *names[])
 {
@@ -656,6 +691,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   return result;
 }
+
 void sprinttype(int type, QStringList names, char *result)
 {
   if (result == nullptr)

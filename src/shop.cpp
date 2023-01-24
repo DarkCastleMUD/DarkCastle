@@ -445,7 +445,7 @@ void shopping_value(const char *arg, Character *ch,
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be wielded by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
@@ -494,7 +494,7 @@ void shopping_value(const char *arg, Character *ch,
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
@@ -586,7 +586,7 @@ void shopping_value(const char *arg, Character *ch,
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);

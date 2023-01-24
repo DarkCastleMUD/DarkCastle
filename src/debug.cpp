@@ -154,7 +154,7 @@ void showObjectVault(const char *owner, Object *obj)
   sprintbit(obj->obj_flags.size,Object::size_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+  sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
@@ -176,7 +176,7 @@ void showObject(Character *ch, Object *obj)
   sprintbit(obj->obj_flags.size,Object::size_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+  sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);

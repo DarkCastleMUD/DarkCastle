@@ -1491,10 +1491,10 @@ int do_show(Character *ch, char *argument, int cmd)
 					dam = i;
 					goto endy;
 				}
-			for (i = 0; *extra_bits[i] != '\n'; i++)
-				if (!str_nosp_cmp(extra_bits[i], arg1))
+			for (i = 0; i < Object::extra_bits.size(); i++)
+				if (!str_nosp_cmp(Object::extra_bits[i].toStdString().c_str(), arg1))
 				{
-					if (!str_cmp(extra_bits[i], "ANY_CLASS"))
+					if (!str_cmp(Object::extra_bits[i].toStdString().c_str(), "ANY_CLASS"))
 						any = i;
 					else
 						SET_BIT(extra, 1 << i);
@@ -1583,10 +1583,10 @@ int do_show(Character *ch, char *argument, int cmd)
 				else
 					send_to_char(" ", ch);
 			}
-			for (z = 0; *extra_bits[z] != '\n'; z++)
+			for (z = 0; z < Object::extra_bits.size(); z++)
 			{
 				o++;
-				send_to_char_nosp(extra_bits[z], ch);
+				send_to_char_nosp(Object::extra_bits[z], ch);
 				if (o % 7 == 0)
 					send_to_char("\r\n", ch);
 				else
