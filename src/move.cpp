@@ -701,7 +701,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	if (IS_SET(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
 	{
 		send_to_char("Your crippled body responds slowly.\r\n", ch);
-		WAIT_STATE(ch, PULSE_VIOLENCE);
+		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	}
 
 	Object *tmp_obj;
@@ -1205,7 +1205,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	{
 	case 0:
 		do_look(ch, "", CMD_DEFAULT);
-		WAIT_STATE(ch, PULSE_VIOLENCE);
+		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 		send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\r\n", ch);
 		act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
 		break;
@@ -1360,10 +1360,10 @@ int ambush(Character *ch)
 				if (IS_SET(retval, eCH_DIED))
 					return (eSUCCESS); // doesn't matter, but don't lag vict
 				if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
-					WAIT_STATE(i, PULSE_VIOLENCE * 3);
+					WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
 				else
-					WAIT_STATE(i, PULSE_VIOLENCE * 2);
-				WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+					WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);
+				WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 			}
 			// we continue instead of breaking in case there are any OTHER rangers in the room
 		}

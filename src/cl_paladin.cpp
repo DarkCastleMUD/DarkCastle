@@ -83,12 +83,12 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
    if(!skill_success(ch,victim,SKILL_HARM_TOUCH)) {
      send_to_char("Your god refuses you.\r\n", ch);
      duration = 1;
-     WAIT_STATE(ch, PULSE_VIOLENCE/2 + number(1, PULSE_VIOLENCE/2));
+     WAIT_STATE(ch, DC::PULSE_VIOLENCE/2 + number(1, DC::PULSE_VIOLENCE/2));
    }
    else {
      dam = 750;
      retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH, 0);
-     WAIT_STATE(ch, PULSE_VIOLENCE);
+     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
      if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
         if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
            char dammsg[MAX_STRING_LENGTH];
@@ -235,7 +235,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (!charge_moves(ch, SKILL_BEHEAD)) return eSUCCESS;
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE));
+  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE));
  
   if(!skill_success(ch,vict,SKILL_BEHEAD))
   {

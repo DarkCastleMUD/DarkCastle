@@ -886,7 +886,7 @@ void DC::game_loop(void)
   }
   PerfTimers["output"].stop();
   // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
-  // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
+  // we want to pulse DC::PASSES_PER_SEC times a second (duh).  This is currently 4.
 
   gettimeofday(&now_time, nullptr);
 
@@ -909,7 +909,7 @@ void DC::game_loop_init(void)
 
   QTimer *gameLoopTimer = new QTimer(this);
   connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);
-  gameLoopTimer->start(1000 / PASSES_PER_SEC);
+  gameLoopTimer->start(1000 / DC::PASSES_PER_SEC);
 
   // QTimer *sshLoopTimer = new QTimer(this);
   // connect(sshLoopTimer, &QTimer::timeout, &ssh, &SSH::SSH::poll);
@@ -924,15 +924,15 @@ extern void pulse_hunts();
 extern void auction_expire();
 void init_heartbeat()
 {
-  pulse_mobile = PULSE_MOBILE;
-  pulse_timer = PULSE_TIMER;
-  pulse_bard = PULSE_BARD;
-  pulse_violence = PULSE_VIOLENCE;
-  pulse_tensec = PULSE_TENSEC;
-  pulse_weather = PULSE_WEATHER;
-  pulse_regen = PULSE_REGEN;
-  pulse_time = PULSE_TIME;
-  pulse_short = PULSE_SHORT;
+  pulse_mobile = DC::PULSE_MOBILE;
+  pulse_timer = DC::PULSE_TIMER;
+  pulse_bard = DC::PULSE_BARD;
+  pulse_violence = DC::PULSE_VIOLENCE;
+  pulse_tensec = DC::PULSE_TENSEC;
+  pulse_weather = DC::PULSE_WEATHER;
+  pulse_regen = DC::PULSE_REGEN;
+  pulse_time = DC::PULSE_TIME;
+  pulse_short = DC::PULSE_SHORT;
 }
 
 void heartbeat()
@@ -940,28 +940,28 @@ void heartbeat()
   DC *dc = DC::getInstance();
   if (--pulse_mobile < 1)
   {
-    pulse_mobile = PULSE_MOBILE;
+    pulse_mobile = DC::PULSE_MOBILE;
 
     PerfTimers["mobile"].start();
     mobile_activity();
     PerfTimers["mobile"].stop();
 
     PerfTimers["object"].start();
-    object_activity(PULSE_MOBILE);
+    object_activity(DC::PULSE_MOBILE);
     PerfTimers["object"].stop();
   }
   if (--pulse_timer < 1)
   {
-    pulse_timer = PULSE_TIMER;
+    pulse_timer = DC::PULSE_TIMER;
     check_timer();
 
     PerfTimers["affect"].start();
-    affect_update(PULSE_TIMER);
+    affect_update(DC::PULSE_TIMER);
     PerfTimers["affect"].stop();
   }
   if (--pulse_short < 1)
   {
-    pulse_short = PULSE_SHORT;
+    pulse_short = DC::PULSE_SHORT;
     PerfTimers["short"].start();
     short_activity();
     PerfTimers["short"].stop();
@@ -970,7 +970,7 @@ void heartbeat()
   // TODO - need to eventually modify this so it works for casters too so I can delay certain
   if (--pulse_bard < 1)
   {
-    pulse_bard = PULSE_BARD;
+    pulse_bard = DC::PULSE_BARD;
 
     PerfTimers["bard"].start();
     update_bard_singing();
@@ -987,27 +987,27 @@ void heartbeat()
 
   if (--pulse_violence < 1)
   {
-    pulse_violence = PULSE_VIOLENCE;
+    pulse_violence = DC::PULSE_VIOLENCE;
 
     PerfTimers["violence"].start();
     perform_violence();
     update_characters();
-    affect_update(PULSE_VIOLENCE);
+    affect_update(DC::PULSE_VIOLENCE);
     check_silence_beacons();
     PerfTimers["violence"].stop();
   }
 
   if (--pulse_tensec < 1)
   {
-    pulse_tensec = PULSE_TENSEC;
+    pulse_tensec = DC::PULSE_TENSEC;
     PerfTimers["consecrate"].start();
-    checkConsecrate(PULSE_TENSEC);
+    checkConsecrate(DC::PULSE_TENSEC);
     PerfTimers["consecrate"].stop();
   }
 
   if (--pulse_weather < 1)
   {
-    pulse_weather = PULSE_WEATHER;
+    pulse_weather = DC::PULSE_WEATHER;
     PerfTimers["weather"].start();
     weather_update();
     PerfTimers["weather"].stop();
@@ -1021,11 +1021,11 @@ void heartbeat()
   {
     PerfTimers["pulse_regen"].start();
     // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number(PULSE_REGEN - 8 * PASSES_PER_SEC, PULSE_REGEN + 5 * PASSES_PER_SEC);
+    pulse_regen = number(DC::PULSE_REGEN - 8 * DC::PASSES_PER_SEC, DC::PULSE_REGEN + 5 * DC::PASSES_PER_SEC);
     point_update();
     pulse_takeover();
-    affect_update(PULSE_REGEN);
-    checkConsecrate(PULSE_REGEN);
+    affect_update(DC::PULSE_REGEN);
+    checkConsecrate(DC::PULSE_REGEN);
     if (!number(0, 2))
     {
       dc->send_hint();
@@ -1035,7 +1035,7 @@ void heartbeat()
 
   if (--pulse_time < 1)
   {
-    pulse_time = PULSE_TIME;
+    pulse_time = DC::PULSE_TIME;
     PerfTimers["pulse_time"].start();
 
     PerfTimers["zone_update"].start();
@@ -1051,7 +1051,7 @@ void heartbeat()
     PerfTimers["food_update"].stop();
 
     PerfTimers["affect_update"].start();
-    affect_update(PULSE_TIME);
+    affect_update(DC::PULSE_TIME);
     PerfTimers["affect_update"].stop();
 
     PerfTimers["update_corpses"].start();
@@ -2396,15 +2396,15 @@ int process_input(class Connection *t)
         {
           if (t->inbuf.size() == 1)
           {
-            cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             t->inbuf.erase(t->inbuf.end() - 1, t->inbuf.end());
-            cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
           }
           if (t->inbuf.size() >= 2)
           {
-            cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             t->inbuf.erase(t->inbuf.end() - 2, t->inbuf.end());
-            cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             new_buffer += "\b \b";
           }
         }

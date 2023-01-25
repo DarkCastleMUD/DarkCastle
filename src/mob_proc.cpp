@@ -2545,7 +2545,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
 
     GET_POS(vict) = POSITION_SITTING;
     SET_BIT(vict->combat, COMBAT_BASH1);
-    WAIT_STATE(vict, PULSE_VIOLENCE * 2);
+    WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
 
     return eSUCCESS;
   }

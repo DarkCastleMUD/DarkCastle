@@ -766,7 +766,7 @@ void roll_and_display_stats(Character *ch)
    SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
    telnet_ga(ch->desc);
 
-   WAIT_STATE(ch, PULSE_TIMER / 10);
+   WAIT_STATE(ch, DC::PULSE_TIMER / 10);
 }
 
 int count_IP_connections(class Connection *new_conn)
@@ -2316,7 +2316,7 @@ void checkConsecrate(int pulseType)
    int align, amount, spl = 0;
    char buf[MAX_STRING_LENGTH];
 
-   if (pulseType == PULSE_REGEN)
+   if (pulseType == DC::PULSE_REGEN)
    {
       for (obj = object_list; obj; obj = tmp_obj)
       {
@@ -2381,7 +2381,7 @@ void checkConsecrate(int pulseType)
          }
       }
    }
-   else if (pulseType == PULSE_TENSEC)
+   else if (pulseType == DC::PULSE_TENSEC)
    {
       for (obj = object_list; obj; obj = tmp_obj)
       {

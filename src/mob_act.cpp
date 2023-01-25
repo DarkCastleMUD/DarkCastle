@@ -85,7 +85,7 @@ void mobile_activity(void)
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
-      MOB_WAIT_STATE(ch) -= PULSE_MOBILE;
+      MOB_WAIT_STATE(ch) -= DC::PULSE_MOBILE;
     if (IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
 

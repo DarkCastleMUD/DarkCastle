@@ -108,14 +108,14 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
       af.modifier = level / 2;
       af.duration = 1;
       af.bitvector = -1;
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
+      affect_to_char(victim, &af, DC::PULSE_VIOLENCE);
     }
 
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
   if (!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)))
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | eSUCCESS;
 }
 
@@ -238,7 +238,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
     }
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   // failure
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_BACKSTAB))
@@ -331,7 +331,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
     // if (SOMEONE_DIED(retval)) return retval;
     if (ch->c_class == CLASS_THIEF && IS_PC(victim))
     {
-      WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     }
   }
 
@@ -439,7 +439,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   act("You circle around your target...", ch, 0, 0, TO_CHAR, 0);
   act("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   char buffer[255];
   sprintf(buffer, "%s", GET_NAME(victim));
@@ -468,7 +468,7 @@ int do_circle(Character *ch, char *argument, int cmd)
     // Now go for dual backstab
     if (ch->equipment[SECOND_WIELD] && (has_skill(ch, SKILL_DUAL_BACKSTAB) || (GET_LEVEL(ch) >= ARCHANGEL)))
     {
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (AWAKE(victim) && !skill_success(ch, victim, SKILL_DUAL_BACKSTAB))
         retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
       else
@@ -568,7 +568,7 @@ int do_trip(Character *ch, char *argument, int cmd)
     act("You try to trip $N but tree roots around $S legs keep $M upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
     act("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+    WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
 
@@ -586,7 +586,7 @@ int do_trip(Character *ch, char *argument, int cmd)
     act("$n fumbles clumsily as $e attempts to trip you!", ch, nullptr, victim, TO_VICT, 0);
     act("You fumble the trip!", ch, nullptr, victim, TO_CHAR, 0);
     act("$n fumbles as $e tries to trip $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   else
@@ -606,9 +606,9 @@ int do_trip(Character *ch, char *argument, int cmd)
       if (GET_POS(victim) > POSITION_SITTING)
         GET_POS(victim) = POSITION_SITTING;
       SET_BIT(victim->combat, COMBAT_BASH2);
-      WAIT_STATE(victim, PULSE_VIOLENCE * 1);
+      WAIT_STATE(victim, DC::PULSE_VIOLENCE * 1);
     }
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   return retval;
@@ -707,7 +707,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_STALK))
     return eSUCCESS;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   if (!skill_success(ch, leader, SKILL_STALK))
     do_follow(ch, argument, CMD_DEFAULT);
@@ -1509,7 +1509,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
         send_to_char("You failed to pick the lock.\r\n", ch);
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         return eFAILURE;
       }
 
@@ -1553,7 +1553,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
         send_to_char("You failed to pick the lock.\r\n", ch);
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
         return eFAILURE;
       }
@@ -1953,7 +1953,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
     SET_BIT(ch->combat, COMBAT_VITAL_STRIKE);
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   // learned should have max of 80 for mortal thieves
   // this means you can use it once per tick
@@ -2048,7 +2048,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
   }
 
   // skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 
@@ -2129,12 +2129,12 @@ int do_jab(Character *ch, char *argument, int cmd)
     return eSUCCESS;
 
   set_cantquit(ch, victim);
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   struct affected_type af;
   af.type = SKILL_JAB;
   af.duration = 2;
-  af.duration_type = PULSE_VIOLENCE;
+  af.duration_type = DC::PULSE_VIOLENCE;
   af.location = APPLY_NONE;
   af.bitvector = AFF_BLACKJACK;
 
@@ -2156,20 +2156,20 @@ int do_jab(Character *ch, char *argument, int cmd)
       {
         // victim's next target will be random
         af.modifier = 1;
-        affect_to_char(victim, &af, PULSE_VIOLENCE);
+        affect_to_char(victim, &af, DC::PULSE_VIOLENCE);
       }
       else
       {
         af.modifier = 2;
         GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
-        affect_to_char(victim, &af, PULSE_VIOLENCE);
+        affect_to_char(victim, &af, DC::PULSE_VIOLENCE);
         // victim's next attack will fail
       }
 
       af.location = APPLY_AC;
       af.modifier = learned * 1.5;
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
+      affect_to_char(victim, &af, DC::PULSE_VIOLENCE);
     }
 
     // the character didn't die so affect it with jab wait effect
@@ -2188,7 +2188,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
     if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }
 
@@ -2320,7 +2320,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, victim, SKILL_APPRAISE))
   {
     send_to_char("You estimate a worth of 30000000000?!?\n\r", ch);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
   {
@@ -2331,7 +2331,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
     else
       sprintf(buf, "After some consideration, you estimate the amount of $B$5gold$R %s is carrying to be %d.\r\n", GET_NAME(victim), appraised);
     send_to_char(buf, ch);
-    WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
+    WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
   }
 
   return eSUCCESS;
@@ -2394,7 +2394,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_CRIPPLE))
     return eSUCCESS;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   // Make 'em fight eachother
   if (!vict->fighting)
     set_fighting(vict, ch);
@@ -2424,11 +2424,11 @@ int do_cripple(Character *ch, char *argument, int cmd)
       struct affected_type af;
       af.type = SKILL_CRIPPLE;
       af.duration = skill / 20;
-      af.duration_type = PULSE_VIOLENCE;
+      af.duration_type = DC::PULSE_VIOLENCE;
       af.modifier = skill;
       af.location = APPLY_NONE;
       af.bitvector = AFF_CRIPPLE;
-      affect_to_char(vict, &af, PULSE_VIOLENCE);
+      affect_to_char(vict, &af, DC::PULSE_VIOLENCE);
     }
   }
 

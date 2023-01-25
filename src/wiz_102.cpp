@@ -5584,7 +5584,7 @@ int do_sockets(Character *ch, char *argument, int cmd)
       sprintf(buf + strlen(buf), "%-20s |", pStr);
     else
       sprintf(buf + strlen(buf), "***UNKNOWN*** | ");
-    sprintf(buf + strlen(buf), "%d\r\n", d->idle_time / PASSES_PER_SEC);
+    sprintf(buf + strlen(buf), "%d\r\n", d->idle_time / DC::PASSES_PER_SEC);
 
   } // for
 

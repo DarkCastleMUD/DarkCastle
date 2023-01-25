@@ -88,7 +88,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE))
       return eSUCCESS;
 
@@ -307,7 +307,7 @@ int do_brace(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
       return eSUCCESS;
 
@@ -426,7 +426,7 @@ int do_rage(Character *ch, char *argument, int cmd)
     SET_BIT(ch->combat, COMBAT_RAGE1);
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
   if (!ch->fighting)
     return attack(ch, victim, TYPE_UNDEFINED);
@@ -504,9 +504,9 @@ int do_battlecry(Character *ch, char *argument, int cmd)
   }
 
   if (has_skill(ch, SKILL_BATTLECRY) > 40 && !number(0, 4))
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   else
-    WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
   return eSUCCESS;
 }
 
@@ -582,12 +582,12 @@ int do_berserk(Character *ch, char *argument, int cmd)
     {
       SET_BIT(ch->combat, COMBAT_BASH2);
       send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     }
     else
     {
       SET_BIT(ch->combat, COMBAT_BASH1);
-      WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     }
   }
   else
@@ -607,7 +607,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
   if (bSuccess && !IS_SET(ch->combat, COMBAT_RAGE1))
     SET_BIT(ch->combat, COMBAT_RAGE1);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   if (!ch->fighting)
     retval = attack(ch, victim, TYPE_UNDEFINED);
@@ -615,7 +615,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
   if (!IS_SET(retval, eCH_DIED))
   {
     if (!IS_SET(retval, eVICT_DIED) && !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-      WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
     REMOVE_BIT(ch->combat, COMBAT_RAGE2);
@@ -705,7 +705,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
 
-    WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     return eSUCCESS;
   }
 
@@ -728,7 +728,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || IS_SET(victim->immune, weapon_bit) || do_frostshield(ch, victim))
   {
-    WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
     // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
@@ -747,7 +747,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
         return retval;
       }
 
-      WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
       retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       // the damage call here takes care of starting combat and such
       retval = eSUCCESS;
@@ -758,9 +758,9 @@ int do_headbutt(Character *ch, char *argument, int cmd)
         REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
       set_fighting(victim, ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
-      WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+      WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
@@ -866,7 +866,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
     duration = 16 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   af.type = SKILL_CRAZED_ASSAULT;
   af.duration = duration;
@@ -968,10 +968,10 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   if (!(victim = get_char_room_vis(ch, who)))
   {
     send_to_char("You charge in, but are left confused by the complete lack of such a target!\r\n", ch);
-    //     WAIT_STATE(ch,PULSE_VIOLENCE/2);
+    //     WAIT_STATE(ch,DC::PULSE_VIOLENCE/2);
     return eFAILURE;
   }
-  //  WAIT_STATE(ch, PULSE_VIOLENCE);
+  //  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   if (!skill_success(ch, victim, SKILL_BULLRUSH))
   {
@@ -1064,7 +1064,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
     }
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 
@@ -1162,7 +1162,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
       act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
       act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       return eFAILURE;
     }
   }
@@ -1218,7 +1218,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     }
 
     GET_POS(ch) = POSITION_SITTING;
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
     return eFAILURE;
   }
@@ -1235,7 +1235,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     }
 
     GET_POS(ch) = POSITION_SITTING;
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
   else if (CAN_GO(victim, dir) &&
@@ -1291,7 +1291,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
       }
       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
     }
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eSUCCESS;
   }
   else
@@ -1316,7 +1316,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
                   "$N barely keeps $S footing, stumbling backwards after your smash.", TO_CHAR);
       send_damage("$n knocks you back across the room for | damage.", ch, 0, victim, dammsg,
                   "$n knocks you back across the room.", TO_VICT);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       return attack(victim, ch, TYPE_UNDEFINED);
     }
   }

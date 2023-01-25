@@ -86,7 +86,7 @@ int do_kick(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_KICK))
     return eSUCCESS;
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
+  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(ch, victim, SKILL_KICK))
   {
@@ -238,7 +238,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   dam += to_dam;
   dam *= (GET_LEVEL(ch) / 6); // 10 at level 50
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
   attacktype = ch->equipment[WIELD]->obj_flags.value[3] + TYPE_HIT;
 
   if (!skill_success(ch, victim, SKILL_DEATHSTROKE, -25))
@@ -337,7 +337,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
         "You fall to the ground!",
         ch, 0, 0, TO_CHAR, INVIS_NULL);
     GET_POS(ch) = POSITION_SITTING;
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
 
@@ -416,14 +416,14 @@ int do_hitall(Character *ch, char *argument, int cmd)
 
     room_mobs_only_hate(ch);
 
-    WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
   }
   else
   {
     act("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
     act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
     SET_BIT(ch->combat, COMBAT_HITALL);
-    WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     auto &character_list = DC::getInstance()->character_list;
     for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
@@ -519,7 +519,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n bashes you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
     act("The tree roots support $N keeping $M from sprawling after $n's bash.", ch, 0, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+    WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
 
@@ -528,7 +528,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
     act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
     act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+    WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
 
@@ -575,7 +575,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   modifier += stat_mod;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
   if (!skill_success(ch, victim, SKILL_BASH, modifier))
   {
@@ -606,7 +606,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
       if (!SOMEONE_DIED(retval))
         if (victim->desc)
-          WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+          WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
     }
   }
 
@@ -676,7 +676,7 @@ int do_redirect(Character *ch, char *argument, int cmd)
     act("$n tries to redirect his attacks but $N won't allow it.", ch, nullptr, ch->fighting, TO_VICT, 0);
     act("You try to redirect your attacks to $N but are blocked.", ch, nullptr, victim, TO_CHAR, 0);
     act("$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
   {
@@ -685,7 +685,7 @@ int do_redirect(Character *ch, char *argument, int cmd)
     act("$n redirects his attacks at $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     stop_fighting(ch);
     set_fighting(ch, victim);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   return eSUCCESS;
 }
@@ -790,7 +790,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
       send_to_char("You can't seem to work it loose.\r\n", ch);
     else
       disarm(ch, victim);
-    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+    WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
     if (IS_NPC(victim) && !victim->fighting)
     {
       retval = one_hit(victim, ch, TYPE_UNDEFINED, 0);
@@ -802,7 +802,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
     act("$B$n attempts to disarm you!$R", ch, nullptr, victim, TO_VICT, 0);
     act("You try to disarm $N and fail!", ch, nullptr, victim, TO_CHAR, 0);
     act("$n attempts to disarm $N, but fails!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     if (IS_NPC(victim) && !victim->fighting)
     {
       retval = one_hit(victim, ch, TYPE_UNDEFINED, 0);
@@ -902,8 +902,8 @@ int do_rescue(Character *ch, char *argument, int cmd)
     set_fighting(ch, tmp_ch);
   set_fighting(tmp_ch, ch);
 
-  WAIT_STATE(ch, MAX(PULSE_VIOLENCE * 2, tempwait));
-  WAIT_STATE(victim, MAX(PULSE_VIOLENCE * 2, tempvictwait));
+  WAIT_STATE(ch, MAX(DC::PULSE_VIOLENCE * 2, tempwait));
+  WAIT_STATE(victim, MAX(DC::PULSE_VIOLENCE * 2, tempvictwait));
   return eSUCCESS;
 }
 
@@ -949,7 +949,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
     SET_BIT(ch->combat, COMBAT_BLADESHIELD1);
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   af.type = SKILL_BLADESHIELD;
   af.duration = duration;
@@ -1196,7 +1196,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
     }
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 
@@ -1256,7 +1256,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     }
   }
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
+  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 2.5));
 
   send_to_char("You scan about for signs of danger as you clear an area to make camp...\r\n", ch);
   act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
@@ -1335,7 +1335,7 @@ int do_triage(Character *ch, char *argument, int cmd)
   }
 
   GET_MOVE(ch) -= skill_cost.find(SKILL_TRIAGE)->second;
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   af.type = SKILL_TRIAGE_TIMER;
   af.modifier = 0;
@@ -1381,7 +1381,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   if (!skill_success(ch, 0, SKILL_BATTLESENSE))
   {
@@ -1398,7 +1398,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
     af.duration = 1 + learned / 11;
     af.bitvector = -1;
 
-    affect_to_char(ch, &af, PULSE_VIOLENCE);
+    affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
   return eSUCCESS;
@@ -1463,7 +1463,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 
   affect_to_char(ch, &af);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 4);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 4);
 
   if (!skill_success(ch, vict, SKILL_SMITE))
   {
@@ -1484,7 +1484,7 @@ int do_smite(Character *ch, char *argument, int cmd)
     af.duration = 1 + learned / 16;
     af.bitvector = -1;
 
-    affect_to_char(ch, &af, PULSE_VIOLENCE);
+    affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
   return ch->fighting ? eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
@@ -1522,7 +1522,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   send_to_char("You loudly call, 'Once more unto the breach, dear friends!'\n\r", ch);
   act("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, TO_ROOM, 0);
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
+  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(ch, 0, SKILL_LEADERSHIP))
   {
@@ -1566,7 +1566,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   if (!skill_success(ch, 0, SKILL_PERSEVERANCE))
   {
@@ -1583,7 +1583,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
     af.modifier = learned;
     af.bitvector = -1;
 
-    affect_to_char(ch, &af, PULSE_VIOLENCE);
+    affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
 
   return eSUCCESS;
@@ -1608,7 +1608,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
   }
 
   vict = ch->fighting;
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
   if (!skill_success(ch, 0, SKILL_DEFENDERS_STANCE))
   {
@@ -1629,7 +1629,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
     af.duration = 1 + learned / 12;
     af.bitvector = -1;
 
-    affect_to_char(ch, &af, PULSE_VIOLENCE);
+    affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
   }
   return eSUCCESS;
 }
@@ -1657,7 +1657,7 @@ int do_onslaught(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   if (!skill_success(ch, 0, SKILL_ONSLAUGHT))
   {

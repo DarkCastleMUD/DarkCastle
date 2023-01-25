@@ -937,7 +937,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	dc_free((*i).song_data);
 	(*i).song_data = 0;
 
-	WAIT_STATE(ch, PULSE_VIOLENCE);
+	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	if (!IS_NPC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
 	{
 		send_to_char("They don't seem particularily interested.\r\n", ch);
@@ -997,7 +997,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 	act("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
 	send_to_char("You sing your funniest limerick!\r\n", ch);
 
-	WAIT_STATE(ch, PULSE_VIOLENCE);
+	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC))
 	{
 		act("$N resists your disarming limerick!", ch, nullptr, victim, TO_CHAR, 0);
@@ -1087,7 +1087,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 		return retval;
 	}
 
-	WAIT_STATE(ch, PULSE_VIOLENCE / 3);
+	WAIT_STATE(ch, DC::PULSE_VIOLENCE / 3);
 	return eSUCCESS;
 }
 
@@ -1742,12 +1742,12 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 	{
 		send_to_char("Mystic winds shock you back into your old reality.\r\n", victim);
 		act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
-		WAIT_STATE(victim, PULSE_VIOLENCE * 3);
+		WAIT_STATE(victim, DC::PULSE_VIOLENCE * 3);
 		return;
 	}
 
 	do_look(victim, "", CMD_DEFAULT);
-	WAIT_STATE(victim, PULSE_VIOLENCE);
+	WAIT_STATE(victim, DC::PULSE_VIOLENCE);
 	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
@@ -3244,7 +3244,7 @@ int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Cha
 		{
 			make_person_dance(i);
 			if (skill > 80)
-				WAIT_STATE(i, PULSE_VIOLENCE * 2);
+				WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);
 		}
 	}
 

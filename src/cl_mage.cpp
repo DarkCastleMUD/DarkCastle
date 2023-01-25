@@ -103,7 +103,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
          ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("Your mind cannot handle the strain!\r\n", ch);
-    WAIT_STATE(ch, PULSE_VIOLENCE*2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE*2);
     duration = 20 - (has_skill(ch, SKILL_FOCUSED_REPELANCE) / 10);
   }
   else 
@@ -205,7 +205,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
 
   charges = number(1, 1 + lvl / 20);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   af.type      = SKILL_IMBUE;
   af.duration  = 2;
@@ -341,8 +341,8 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         return (eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
       retval = eFAILURE;
     }
-    WAIT_STATE(i, PULSE_VIOLENCE * 2);
-    WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+    WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
     // Loop through allies and attack
     for(ally = world[ch->in_room].people; ally; ally = next_ally) 
@@ -365,7 +365,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       {
         act("$n's magically sharpened reflexes direct attacks at you as you enter the room!", i, 0, ch, TO_VICT, 0);
         act("You attack $N with supernaturally focused reflexes!", ally, 0, ch, TO_CHAR, 0);
-        WAIT_STATE(ally, PULSE_VIOLENCE * 2);
+        WAIT_STATE(ally, DC::PULSE_VIOLENCE * 2);
 
         if( trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL) {
           // Get um!

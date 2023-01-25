@@ -12409,7 +12409,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
     GET_POS(ch) = POSITION_RESTING;
 
     // why won't this line work?
-    //  WAIT_STATE(ch, (PULSE_VIOLENCE * number(10, 15)));
+    //  WAIT_STATE(ch, (DC::PULSE_VIOLENCE * number(10, 15)));
   }
   return eSUCCESS;
 }
@@ -14621,12 +14621,12 @@ int spell_divine_intervention(uint8_t level, Character *ch, Character *victim, O
   af.modifier = 0;
   af.location = 0;
   af.bitvector = -1;
-  affect_to_char(ch, &af, PULSE_VIOLENCE);
+  affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
 
   af.type = SPELL_DIVINE_INTER;
   af.duration = 4 + skill / 15;
   af.modifier = 10 - skill / 10;
-  affect_to_char(ch, &af, PULSE_VIOLENCE);
+  affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
 
   return eSUCCESS;
 }
@@ -14844,7 +14844,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
   af.location = 0;
   af.bitvector = -1;
 
-  affect_to_char(ch, &af, PULSE_REGEN);
+  affect_to_char(ch, &af, DC::PULSE_REGEN);
 
   return eSUCCESS;
 }
@@ -15420,7 +15420,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
   send_to_char("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!\n\r", ch);
   act("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, TO_ROOM, 0);
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
+  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 2.5));
 
   return eSUCCESS;
 }
@@ -15663,7 +15663,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
       "The runes begin to glow brightly upon the ground, then softly fade from view.\r\n",
       ch->in_room);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   ch->cRooms++;
 
@@ -15830,7 +15830,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
       "The runes begin to hum ominously, then softly fade from view.\r\n",
       ch->in_room);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   ch->cRooms++;
 

@@ -74,7 +74,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
 
   if (!charge_moves(ch, SKILL_EAGLE_CLAW)) return eSUCCESS;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   if (!skill_success(ch,victim, SKILL_EAGLE_CLAW))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
@@ -179,7 +179,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
     duration = 12;
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE*2);
   af.type = SKILL_QUIVERING_PALM;
   af.duration = duration;
   af.modifier = 0;
@@ -332,15 +332,15 @@ int do_stun(Character *ch, char *argument, int cmd)
 
     if(has_skill(ch,SKILL_STUN) > 35 && !number(0, 7)) {
        send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
-       WAIT_STATE(ch, PULSE_VIOLENCE*3);
+       WAIT_STATE(ch, DC::PULSE_VIOLENCE*3);
     }
-    else WAIT_STATE(ch, PULSE_VIOLENCE*4);
+    else WAIT_STATE(ch, DC::PULSE_VIOLENCE*4);
     retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   else 
   {
     set_fighting(victim, ch);
-    WAIT_STATE(ch, PULSE_VIOLENCE*5);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE*5);
 
     if(IS_SET(victim->combat, COMBAT_STUNNED) ||
        IS_SET(victim->combat, COMBAT_STUNNED2))
@@ -418,7 +418,7 @@ int do_stun(Character *ch, char *argument, int cmd)
           return retval;
       }
 
-      WAIT_STATE(victim, PULSE_VIOLENCE*2);
+      WAIT_STATE(victim, DC::PULSE_VIOLENCE*2);
       if(GET_POS(victim) > POSITION_STUNNED)
         GET_POS(victim) = POSITION_STUNNED;
       SET_BIT(victim->combat, COMBAT_STUNNED);

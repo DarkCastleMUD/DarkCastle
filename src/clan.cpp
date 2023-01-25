@@ -3485,7 +3485,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = -1;
-    affect_to_char(this, &af, PULSE_TIMER);
+    affect_to_char(this, &af, DC::PULSE_TIMER);
 
     auto zone_key = world[in_room].zone;
     DC::setZoneClanOwner(zone_key, clan);
@@ -3620,7 +3620,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = -1;
-    affect_to_char(this, &af, PULSE_TIMER);
+    affect_to_char(this, &af, DC::PULSE_TIMER);
 
     // no point checking for noclaim flag, at this point it already IS under someone's control
     struct takeover_pulse_data *pl;

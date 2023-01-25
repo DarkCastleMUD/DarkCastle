@@ -39,53 +39,53 @@ extern int hit_gain(Character *, int);
 
 struct ki_info_type ki_info[] = {
     {/* 0 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_blast,
      SKILL_INCREASE_HARD},
 
     {/* 1 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_punch,
      SKILL_INCREASE_HARD},
 
     {/* 2 */
-     3 * PULSE_TIMER, POSITION_STANDING, 5,
+     3 * DC::PULSE_TIMER, POSITION_STANDING, 5,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_sense,
      SKILL_INCREASE_MEDIUM},
 
     {/* 3 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 8,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 8,
      TAR_IGNORE, ki_storm, SKILL_INCREASE_HARD},
 
     {/* 4 */
-     3 * PULSE_TIMER, POSITION_STANDING, 25,
+     3 * DC::PULSE_TIMER, POSITION_STANDING, 25,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_speed,
      SKILL_INCREASE_HARD},
 
     {/* 5 */
-     3 * PULSE_TIMER, POSITION_RESTING, 8,
+     3 * DC::PULSE_TIMER, POSITION_RESTING, 8,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_purify,
      SKILL_INCREASE_MEDIUM},
 
     {/* 6 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 10,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 10,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT, ki_disrupt,
      SKILL_INCREASE_HARD},
 
     {/* 7 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
      TAR_IGNORE, ki_stance, SKILL_INCREASE_EASY},
 
     {/* 8 */
-     3 * PULSE_TIMER, POSITION_FIGHTING, 20,
+     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20,
      TAR_IGNORE, ki_agility, SKILL_INCREASE_MEDIUM},
 
     {/* 9 */
-     3 * PULSE_TIMER, POSITION_RESTING, 15,
+     3 * DC::PULSE_TIMER, POSITION_RESTING, 15,
      TAR_IGNORE, ki_meditation, SKILL_INCREASE_HARD},
 
     {/* 10 */
-     3 * PULSE_TIMER, POSITION_STANDING, 1,
+     3 * DC::PULSE_TIMER, POSITION_STANDING, 1,
      TAR_CHAR_ROOM | TAR_SELF_NONO, ki_transfer, SKILL_INCREASE_HARD}
 
 };
@@ -536,7 +536,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
       retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
 
       ch->removeHP((1 / 8) * (GET_MAX_HIT(ch)));
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (!vict->fighting)
         return attack(vict, ch, TYPE_UNDEFINED);
     }
@@ -617,7 +617,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     ch->addHP(dam);
     send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   return eSUCCESS;
 }
 
@@ -725,7 +725,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     return eINTERNAL_ERROR;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   set_cantquit(ch, victim);
 
   bool disrupt_bingo = false;
@@ -1206,7 +1206,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
     }
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 

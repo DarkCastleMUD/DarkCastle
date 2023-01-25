@@ -113,7 +113,7 @@ int do_hit(Character *ch, char *argument, int cmd)
 	    return eFAILURE;
 	  }
 	  */
-	  WAIT_STATE(ch, PULSE_VIOLENCE);
+	  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	  return attack(ch, victim, TYPE_UNDEFINED);
 	}
 	else
@@ -159,7 +159,7 @@ int do_murder(Character *ch, char *argument, int cmd)
         if ((GET_POS(ch)==POSITION_STANDING) &&
 	    (victim != ch->fighting))
 	{
-          WAIT_STATE(ch, PULSE_VIOLENCE+2); /* HVORFOR DET?? */
+          WAIT_STATE(ch, DC::PULSE_VIOLENCE+2); /* HVORFOR DET?? */
           return attack(ch, victim, TYPE_UNDEFINED);
         }
 	else

@@ -307,7 +307,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE / 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
   if (ch->fighting && number(0, 1) != 0)
   {
     act("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
@@ -325,7 +325,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
   }
 
   if (pos == -2)
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   act("$n quaffs $p.", ch, temp, 0, TO_ROOM, 0);
   act("You quaff $p which dissolves.", ch, temp, 0, TO_CHAR, 0);
@@ -429,7 +429,7 @@ int do_recite(Character *ch, char *argument, int cmd)
       GET_CLASS(ch) == CLASS_CLERIC ||
       GET_CLASS(ch) == CLASS_DRUID)
     failmark -= 5;
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
   if (ch->fighting && number(0, 100) < failmark)
   {
@@ -662,7 +662,7 @@ void set_utility_item(Character *ch, class Object *obj, char *argument)
     break;
   }
 
-  WAIT_STATE(ch, (PULSE_VIOLENCE * obj->obj_flags.value[3]));
+  WAIT_STATE(ch, (DC::PULSE_VIOLENCE * obj->obj_flags.value[3]));
   extract_obj(obj);
 }
 
@@ -747,7 +747,7 @@ int do_use(Character *ch, char *argument, int cmd)
     { /* Charges left? */
       stick->obj_flags.value[2]--;
       lvl = (int)(1.5 * stick->obj_flags.value[0]);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       int retval = 0;
       if (spell_info[stick->obj_flags.value[3]].spell_pointer)
         retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
@@ -782,7 +782,7 @@ int do_use(Character *ch, char *argument, int cmd)
       { // are there any charges left?
         stick->obj_flags.value[2]--;
         lvl = (int)(1.5 * stick->obj_flags.value[0]);
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         int retval;
         if (spell_info[stick->obj_flags.value[3]].spell_pointer)
           retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
@@ -2326,7 +2326,7 @@ int do_wear(Character *ch, char *argument, int cmd)
       wear(ch, obj_object, obj_object->keywordfind());
     }
     if (blindlag)
-      WAIT_STATE(ch, PULSE_VIOLENCE);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
   {
@@ -2371,7 +2371,7 @@ int do_wield(Character *ch, char *argument, int cmd)
       wear(ch, obj_object, keyword);
 
       if (blindlag)
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     }
     else
     {
@@ -2417,7 +2417,7 @@ int do_grab(Character *ch, char *argument, int cmd)
       else
         wear(ch, obj_object, 14);
       if (blindlag)
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     }
     else
     {
@@ -2584,7 +2584,7 @@ int do_remove(Character *ch, char *argument, int cmd)
           act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
           act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
           if (blindlag)
-            WAIT_STATE(ch, PULSE_VIOLENCE);
+            WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         }
         else
         {

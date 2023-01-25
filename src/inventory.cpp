@@ -84,7 +84,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
         struct affected_type pthiefaf;
-        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, obj_index[obj_object->item_number].virt, sub_object->name);
@@ -118,7 +118,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
         char log_buf[MAX_STRING_LENGTH] = {};
@@ -913,7 +913,7 @@ int do_get(Character *ch, char *argument, int cmd)
                     pthiefaf.location = APPLY_NONE;
                     pthiefaf.bitvector = -1;
 
-                    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+                    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
                     send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
                     if (affected_by_spell(ch, FUCK_PTHIEF))
                     {
@@ -939,7 +939,7 @@ int do_get(Character *ch, char *argument, int cmd)
                 get(ch, obj_object, sub_object, has_consent, cmd);
               found = true;
               if (blindlag)
-                WAIT_STATE(ch, PULSE_VIOLENCE);
+                WAIT_STATE(ch, DC::PULSE_VIOLENCE);
             }
             else
             {
@@ -1218,7 +1218,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           move_obj(tmp_object, ch->in_room);
           test = true;
           if (blindlag)
-            WAIT_STATE(ch, PULSE_VIOLENCE);
+            WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         }
         else
         {
@@ -1935,7 +1935,7 @@ int do_give(Character *ch, char *argument, int cmd)
       IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
   {
     send_to_char("Here, have some for some potato lag!!\r\n", vict);
-    WAIT_STATE(vict, PULSE_VIOLENCE * 2);
+    WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
   }
 
   //    send_to_char("Ok.\r\n", ch);
@@ -2677,7 +2677,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
         struct affected_type pthiefaf;
-        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
         send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
         pthiefaf.type = FUCK_PTHIEF;
@@ -2706,7 +2706,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
-        WAIT_STATE(ch, PULSE_VIOLENCE);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
         if (affected_by_spell(ch, FUCK_GTHIEF))

@@ -20,9 +20,6 @@ typedef int socket_t;
 #define LARGE_BUFSIZE (24 * 2048)
 #define GARBAGE_SPACE 32
 #define NUM_RESERVED_DESCS 8
-// #define OPT_USEC                250000
-// #define PASSES_PER_SEC         (1000000 / OPT_USEC)
-#define PASSES_PER_SEC 100
 #define HOST_LENGTH 30
 
 enum pulse_type
@@ -45,17 +42,6 @@ struct pulse_info
 	uint64_t duration;
 	char name[];
 };
-
-#define PULSE_TIMER (1 * PASSES_PER_SEC)
-#define PULSE_MOBILE (4 * PASSES_PER_SEC)
-#define PULSE_OBJECT (4 * PASSES_PER_SEC)
-#define PULSE_VIOLENCE (2 * PASSES_PER_SEC)
-#define PULSE_BARD (1 * PASSES_PER_SEC)
-#define PULSE_TENSEC (10 * PASSES_PER_SEC)
-#define PULSE_WEATHER (45 * PASSES_PER_SEC)
-#define PULSE_TIME (60 * PASSES_PER_SEC)
-#define PULSE_REGEN (15 * PASSES_PER_SEC)
-#define PULSE_SHORT 1 // Pulses all the time.
 
 #define BAN_NOT 0
 #define BAN_NEW 1

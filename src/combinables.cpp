@@ -551,7 +551,7 @@ int do_brew(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   const char *potion_color;
   // Determine color to use in message based on herb used
@@ -1066,7 +1066,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
   Scribe::recipe r = {obj_index[inkobj->item_number].virt,

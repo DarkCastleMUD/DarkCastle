@@ -300,7 +300,7 @@ void perform_violence(void)
           if (MOB_WAIT_STATE(ch) > 0)
           {
             // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
-            // MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
+            // MOB_WAIT_STATE(ch) -= DC::PULSE_VIOLENCE; // MIKE
             // logentry(debug, OVERSEER, LogChannels::LOG_BUG);
           }
           else
@@ -5337,7 +5337,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
     {
       GET_POS(vict) = POSITION_SITTING;
       SET_BIT(vict->combat, COMBAT_BASH2);
-      WAIT_STATE(vict, PULSE_VIOLENCE);
+      WAIT_STATE(vict, DC::PULSE_VIOLENCE);
       act("Your whipping attack trips up $N and $E goes down!", ch, 0, vict, TO_CHAR, 0);
       act("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, TO_VICT, 0);
       act("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -5348,7 +5348,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
       af.modifier = 0;
       af.duration = number(3, 4);
       af.bitvector = -1;
-      affect_to_char(ch, &af, PULSE_VIOLENCE);
+      affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
     }
   }
 
@@ -6387,11 +6387,11 @@ void trip(Character *ch, Character *victim)
   act("$n trips $N and $N goes down!",
       ch, nullptr, victim, TO_ROOM, NOTVICT);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
   if (damage(ch, victim, 1, TYPE_HIT, SKILL_TRIP, 0) == (-1))
     return;
 
-  WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+  WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
   GET_POS(victim) = POSITION_SITTING;
 
   return;
@@ -7570,7 +7570,7 @@ int check_pursuit(Character *ch, Character *victim, char *dircommand)
   {
     // failure
     act("$N fled quickly before you were able to pursue $m!", ch, 0, victim, TO_CHAR, 0);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
   {
@@ -7590,7 +7590,7 @@ int check_pursuit(Character *ch, Character *victim, char *dircommand)
     act("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", ch, 0, victim, TO_VICT, 0);
     act("$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", ch, 0, victim, TO_ROOM, NOTVICT);
     attack(ch, victim, TYPE_UNDEFINED);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
 
   return eSUCCESS;

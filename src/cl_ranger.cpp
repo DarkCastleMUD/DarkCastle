@@ -203,7 +203,7 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   act("$n holds out $s hand to $N and beckons softly.", ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   if ((IS_SET(victim->immune, ISR_CHARM)) ||
       !ISSET(victim->mobdata->actflags, ACT_CHARM))
@@ -830,7 +830,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = -1;
-  affect_to_char(ch, &af, PULSE_VIOLENCE);
+  affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
 
   skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
   if (!new_obj)
@@ -1706,7 +1706,7 @@ int do_fire(Character *ch, char *arg, int cmd)
               TO_VICT, 0);
           act("$n's body seems a bit slower!", victim, 0, 0, TO_ROOM,
               0);
-          WAIT_STATE(victim, PULSE_VIOLENCE);
+          WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
         retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
         skill_increase_check(ch, SKILL_ICE_ARROW,
@@ -1754,7 +1754,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           act("The stones knock $n flat on $s ass!", victim, 0, 0,
               TO_ROOM, 0);
           GET_POS(victim) = POSITION_SITTING;
-          WAIT_STATE(victim, PULSE_VIOLENCE);
+          WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
         retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
                         0);
@@ -1774,9 +1774,9 @@ int do_fire(Character *ch, char *arg, int cmd)
   DC::getInstance()->shooting_list.insert(ch);
 
   if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
-    ch->shotsthisround += PULSE_VIOLENCE;
+    ch->shotsthisround += DC::PULSE_VIOLENCE;
   else if (has_skill(ch, SKILL_ARCHERY) < 86)
-    ch->shotsthisround += PULSE_VIOLENCE / 2;
+    ch->shotsthisround += DC::PULSE_VIOLENCE / 2;
   else
     ch->shotsthisround += 3;
 

@@ -3202,7 +3202,7 @@ int gotta_dance_boots(Character *ch, class Object *obj, int cmd, const char *arg
   make_person_dance(obj->equipped_by);
   send_to_char("You slump back down, exhausted.\r\n", obj->equipped_by);
   if (GET_LEVEL(obj->equipped_by) <= MORTAL)
-    WAIT_STATE(obj->equipped_by, PULSE_VIOLENCE * 3);
+    WAIT_STATE(obj->equipped_by, DC::PULSE_VIOLENCE * 3);
 
   return eSUCCESS;
 }

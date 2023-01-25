@@ -304,7 +304,7 @@ int do_pray(Character *ch, char *arg, int cmd)
       send_to_char(buf1, i->character);
   }
   send_to_char("\a\aOk.\r\n", ch);
-  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 

@@ -72,6 +72,18 @@ public:
   static string getBuildTime();
   static DC *getInstance();
 
+  static constexpr uint64_t PASSES_PER_SEC = 100;
+  static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_OBJECT = 4 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_VIOLENCE = 2 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_BARD = 1 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_TENSEC = 10 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_WEATHER = 45 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
+  static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
+
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
