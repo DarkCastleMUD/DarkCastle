@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3 -ggdb -Wno-write-strings -fdiagnostics-color=always")
 #set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer)
 
 execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
@@ -178,7 +178,7 @@ add_library(DC STATIC
     wizard.h
     Zone.h
 )
-target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network pq fmt crypt ssh Qt6::Sql)
+target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer)
 target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt_add_executable(dcastle dcastle.cpp)
