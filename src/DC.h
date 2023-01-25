@@ -139,7 +139,6 @@ private:
   DC(DC &&) = delete;      // and non-movable
   static string version;
   struct timeval last_time = {}, delay_time = {}, now_time = {};
-  int32_t secDelta = {}, usecDelta = {};
   hints_t hints;
   const QString HINTS_FILE_NAME = "playerhints.txt";
 

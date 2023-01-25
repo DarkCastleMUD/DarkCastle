@@ -10,7 +10,7 @@
 #include "shop.h" // legacy shop
 #include "Shops.h"
 
-Shops::Shops(QObject *parent) : QObject(parent)
+Shops::Shops(QObject *parent) : Database(parent)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     // db.setHostName("localhost");
@@ -29,8 +29,7 @@ Shops::Shops(QObject *parent) : QObject(parent)
         if (!db.tables().contains("shops"))
         {
             QSqlQuery query;
-            query.prepare("CREATE TABLE shops (id BIGINT GENERATED ALWAYS AS IDENTITY)");
-            if (query.exec())
+            if (query.exec("CREATE TABLE shops (id BIGINT GENERATED ALWAYS AS IDENTITY)"))
             {
                 logentry(QString("Created database table %1.").arg("shops"));
                 if (!db.tables().contains("shops"))
@@ -50,10 +49,10 @@ Shops::Shops(QObject *parent) : QObject(parent)
 
         model->setTable("shops");
         model->setEditStrategy(QSqlTableModel::OnFieldChange);
-        // model->setHeaderData(0, Qt::Horizontal, tr("Type"));
-        // model->setHeaderData(1, Qt::Horizontal, tr("Profit Sell"));
+        model->setHeaderData(0, Qt::Horizontal, tr("Type"));
+        model->setHeaderData(1, Qt::Horizontal, tr("Profit Sell"));
 
-        // model->setRelation(0, QSqlRelation("city", "id", "name"));
-        // model->setRelation(1, QSqlRelation("country", "id", "name"));
+        model->setRelation(0, QSqlRelation("city", "id", "name"));
+        model->setRelation(1, QSqlRelation("country", "id", "name"));
     }
 }

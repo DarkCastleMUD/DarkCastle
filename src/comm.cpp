@@ -663,6 +663,28 @@ uint64_t pulseavg = 0;
 
 void DC::game_loop(void)
 {
+  static QElapsedTimer last_execution;
+  if (last_execution.isValid())
+  {
+    quint64 nsecs_expired = last_execution.nsecsElapsed();
+    double msecs_expired = 0;
+    if (nsecs_expired >= 1000000)
+    {
+      msecs_expired = nsecs_expired / 1000000.0;
+      // qDebug() << QString("%1 msec.").arg(msecs_expired);
+    }
+    else
+    {
+      // qDebug() << QString("%1 nsec.").arg(nsecs_expired);
+    }
+
+    last_execution.restart();
+  }
+  else
+  {
+    last_execution.start();
+  }
+
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
   string comm = {};
@@ -867,52 +889,6 @@ void DC::game_loop(void)
   // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
 
   gettimeofday(&now_time, nullptr);
-  usecDelta = ((int)last_time.tv_usec) - ((int)now_time.tv_usec);
-  secDelta = ((int)last_time.tv_sec) - ((int)now_time.tv_sec);
-
-  /*
-  if (now_time.tv_sec-last_time.tv_sec > 0 || now_time.tv_usec-last_time.tv_usec > 20000) {
-    timingDebugStr <<  "Time since last pulse is "
-        << (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
-        << (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
-    //logf(110, LogChannels::LOG_BUG, timingDebugStr.str().c_str());
-  }
-  */
-
-  usecDelta += (1000000 / PASSES_PER_SEC);
-  while (usecDelta < 0)
-  {
-    usecDelta += 1000000;
-    secDelta -= 1;
-  }
-  while (usecDelta >= 1000000)
-  {
-    usecDelta -= 1000000;
-    secDelta += 1;
-  }
-  // logf(110, LogChannels::LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
-
-  if (secDelta > 0 || (secDelta == 0 && usecDelta > 0))
-  {
-    delay_time.tv_usec = usecDelta;
-    delay_time.tv_sec = secDelta;
-    // cerr << QString("Pausing for  %1sec %2usec.").arg(secDelta).arg(usecDelta).toStdString() << endl;
-    int fd_nr = -1;
-    errno = 0;
-    fd_nr = select(0, nullptr, nullptr, nullptr, &delay_time);
-    if (fd_nr == -1)
-    {
-      if (errno == EINTR)
-      {
-        qWarning() << "select() interupted.";
-      }
-      else
-      {
-        perror("game_loop: select: delay");
-        exit(1);
-      }
-    }
-  }
 
   // temp removing this since it's spamming the crap out of us
   // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
@@ -933,7 +909,7 @@ void DC::game_loop_init(void)
 
   QTimer *gameLoopTimer = new QTimer(this);
   connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);
-  gameLoopTimer->start();
+  gameLoopTimer->start(1000 / PASSES_PER_SEC);
 
   // QTimer *sshLoopTimer = new QTimer(this);
   // connect(sshLoopTimer, &QTimer::timeout, &ssh, &SSH::SSH::poll);

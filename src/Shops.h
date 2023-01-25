@@ -6,15 +6,24 @@
 
 #include <QObject>
 
-class Shop : public QObject
+class Database : public QObject
 {
     Q_OBJECT
 public:
-    explicit Shop(QObject *parent = nullptr) : QObject(parent) {}
+    explicit Database(QObject *parent = nullptr) : QObject(parent) {}
 
 private:
 };
-class Shops : public QObject
+
+class Shop : public Database
+{
+    Q_OBJECT
+public:
+    explicit Shop(QObject *parent = nullptr) : Database(parent) {}
+
+private:
+};
+class Shops : public Database
 {
     Q_OBJECT
 public:
