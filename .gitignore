@@ -18,3 +18,4 @@ src/dcastle.master
 src/Makefile
 src/version.h
 build/
+lib/wizlist.txt
