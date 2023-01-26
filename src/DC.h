@@ -78,6 +78,7 @@ public:
     bool allow_newstatsys = false;
     string dir = DFLT_DIR;
     string leaderboard_check;
+    QString implementer;
   } cf;
 
   static const room_t SORPIGAL_BANK_ROOM = 3005;

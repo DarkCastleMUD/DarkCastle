@@ -1764,6 +1764,16 @@ void nanny(class Connection *d, string arg)
             d->character = 0;
             load_char_obj(d, tmp_name);
             ch = d->character;
+
+            if (!DC::getInstance()->cf.implementer.isEmpty())
+            {
+               if (QString(GET_NAME(ch)).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
+               {
+                  GET_LEVEL(ch) = 110;
+               }
+            }
+            qDebug() << DC::getInstance()->cf.implementer << QString(GET_NAME(ch));
+
             if (!ch)
             {
                write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");

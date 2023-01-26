@@ -130,10 +130,13 @@ DC::config parse_arguments(int argc, char *const argv[])
   uint32_t port;
   DC::config cf;
 
-  while ((opt = getopt(argc, argv, "vp:Pmbd:shwcn?")) != -1)
+  while ((opt = getopt(argc, argv, "vp:Pmbd:shwcn?i:")) != -1)
   {
     switch (opt)
     {
+    case 'i':
+      cf.implementer = optarg;
+      break;
     case 'v':
       cf.verbose_mode = true;
       break;
@@ -182,7 +185,7 @@ DC::config parse_arguments(int argc, char *const argv[])
     default:
     case 'h':
     case '?':
-      fprintf(stderr, "Usage: %s [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P]\n"
+      fprintf(stderr, "Usage: %s [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P] [-i playername]\n"
                       "-v\t\tVerbose mode\n"
                       "-h\t\tUsage information\n"
                       "-w\t\tWorld testing mode\n"
@@ -192,8 +195,9 @@ DC::config parse_arguments(int argc, char *const argv[])
                       "-b\t\tBuilders' port (7000-7003)\n"
                       "-d directory\tData directory\n"
                       "-p [port#]\tCan be repeated to listen on multiple ports\n"
-                      "-P\t\tAllow imps to use their password\n\n"
-                      "-s\t\tSyntax checking mode\n",
+                      "-P\t\tAllow imps to use their password\n"
+                      "-s\t\tSyntax checking mode\n"
+                      "-i playername\tset playername as level 110\n",
               argv[0]);
 
       exit(EXIT_FAILURE);
