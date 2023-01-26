@@ -216,3 +216,50 @@ void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
 		}
 	}
 }
+
+bool DC::authenticate(QString username, QString password, uint64_t level)
+{
+	username = username.toLower();
+	username[0] = username[0].toUpper();
+	if (!Character::validateName(username))
+	{
+		return false;
+	}
+
+	Connection d;
+	if (!load_char_obj(&d, username.toStdString().c_str()))
+	{
+		return false;
+	}
+
+	if (d.character == nullptr || d.character->pcdata == nullptr)
+	{
+		return false;
+	}
+
+	QString cipher = d.character->pcdata->pwd;
+	qDebug() << cipher << password << crypt(password.toStdString().c_str(), cipher.toStdString().c_str());
+	if (crypt(password.toStdString().c_str(), cipher.toStdString().c_str()) == cipher)
+	{
+		if (GET_LEVEL(d.character) >= level)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool DC::authenticate(const QHttpServerRequest &request, uint64_t level)
+{
+	const auto query = request.query();
+	if (!query.hasQueryItem("username") || !query.hasQueryItem("password"))
+	{
+		return false;
+	}
+
+	QString username = query.queryItemValue("username");
+	QString password = query.queryItemValue("password");
+
+	return authenticate(username, password, level);
+}

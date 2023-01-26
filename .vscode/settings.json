@@ -68,6 +68,7 @@
         "variant": "cpp",
         "semaphore": "cpp",
         "qsharedpointer": "cpp",
-        "qtconcurrent": "cpp"
+        "qtconcurrent": "cpp",
+        "qhttpserverrequest": "cpp"
     }
 }

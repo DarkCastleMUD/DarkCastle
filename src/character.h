@@ -35,6 +35,8 @@ class Character;
 #include "interp.h"
 #include "utility.h"
 
+bool on_forbidden_name_list(const char *name);
+
 struct strcasecmp_compare
 {
     bool operator()(const std::string &l, const std::string &r) const
@@ -362,7 +364,10 @@ private:
 class Character
 {
 public:
+    static constexpr uint64_t MIN_NAME_SIZE = 3;
+    static constexpr uint64_t MAX_NAME_SIZE = 12;
     static const QList<int> wear_to_item_wear;
+    static bool validateName(QString name);
 
     struct mob_data *mobdata = nullptr;
     struct pc_data *pcdata = nullptr;

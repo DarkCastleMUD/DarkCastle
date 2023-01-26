@@ -17,6 +17,8 @@
 #include <QCoreApplication>
 #include <QMap>
 #include <QString>
+#include <QtHttpServer/QHttpServer>
+#include <QtConcurrent/QtConcurrent>
 
 typedef uint64_t vnum_t;
 typedef QMap<QString, bool> joining_t;
@@ -140,6 +142,8 @@ public:
   void save_hints(void);
   void send_hint(void);
   void assign_mobiles(void);
+  bool authenticate(QString username, QString password, uint64_t level = 0);
+  bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
 
 private:
   DC(const DC &) = delete; // non-copyable

@@ -6,7 +6,7 @@
         {
             "label": "build src using 32 threads",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then curl http://127.0.0.1:6980/shutdown; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -25,7 +25,7 @@
         {
             "label": "build debug src using 32 threads",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then curl http://127.0.0.1:6980/shutdown; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -46,7 +46,7 @@
         {
             "label": "build src using 128 threads",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then curl http://127.0.0.1:6980/shutdown; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -65,7 +65,7 @@
         {
             "label": "build debug src using 128 threads",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then curl http://127.0.0.1:6980/shutdown; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [

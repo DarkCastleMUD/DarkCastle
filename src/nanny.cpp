@@ -94,7 +94,6 @@ void update_wizlist(Character *ch);
 void isr_set(Character *ch);
 bool check_reconnect(class Connection *d, char *name, bool fReconnect);
 bool check_playing(class Connection *d, char *name);
-bool on_forbidden_name_list(char *name);
 void check_hw(Character *ch);
 char *str_str(char *first, char *second);
 bool apply_race_attributes(Character *ch, int race = 0);
@@ -2522,7 +2521,7 @@ void checkConsecrate(int pulseType)
 }
 
 /* check name to see if it is listed in the file of forbidden player names */
-bool on_forbidden_name_list(char *name)
+bool on_forbidden_name_list(const char *name)
 {
    FILE *nameList;
    char buf[MAX_STRING_LENGTH + 1];

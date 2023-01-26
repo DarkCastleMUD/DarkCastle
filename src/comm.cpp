@@ -913,62 +913,66 @@ void DC::game_loop_init(void)
 
   QHttpServer server(this);
   QStringList myData;
-
-  server.route("/test", QHttpServerRequest::Method::Get, [&myData](const QHttpServerRequest &request)
+  auto dc = this;
+  server.route("/test", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
                {
-                
-                qDebug() << request;
-                qDebug() << request.query().hasQueryItem("username") << request.query().hasQueryItem("password");
+    if (!dc->authenticate(request))
+    {
+      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+    }
 
-                auto future = QtConcurrent::run([]() {});
+    auto future = QtConcurrent::run([]() {});
 
-                if (future.isValid())
-                {
-                  QJsonArray array = QJsonArray::fromStringList(myData);
+    if (future.isValid())
+    {
+      // QJsonArray array = QJsonArray::fromStringList(myData);
 
-                  return QHttpServerResponse(QString("Success: %1\r\n").arg(array.size()));
-                }
-                else
-                {
-                 return QHttpServerResponse("Failed.\r\n");
-                } });
+      return QHttpServerResponse(QString("Success.\r\n"));
+    }
+    else
+    {
+      return QHttpServerResponse("Failed.\r\n");
+    } });
 
-               server.route("/shutdown", QHttpServerRequest::Method::Get, [&myData](const QHttpServerRequest &request)
+  server.route("/shutdown", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
                {
-                auto future = QtConcurrent::run([]()
-                 {
-                    int do_not_save_corpses = 1;
-
-                    QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
-                    send_to_all(buf.toStdString().c_str());
-                    logentry(buf, ANGEL, LogChannels::LOG_GOD);
-                    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
-
-                    for (auto &ch : DC::getInstance()->character_list)
+                    if (!dc->authenticate(request, 110))
                     {
-                      if (ch->pcdata && IS_PC(ch))
-                      {
-                        ch->save();
-                      }
+                      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
                     }
 
-                    char **argv = nullptr;
-                    if (!write_hotboot_file(argv))
+                    auto future = QtConcurrent::run([]()
                     {
-                      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
-                    }                 
-                 });
-                 
-                if (future.isValid())
-                {
-                  QJsonArray array = QJsonArray::fromStringList(myData);
+                                        
+                      int do_not_save_corpses = 1;
 
-                  return QHttpServerResponse(QString("Rebooting...: %1\r\n").arg(array.size()));
-                }
-                else
-                {
-                 return QHttpServerResponse("Failed.");
-                } });
+                      QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                      send_to_all(buf.toStdString().c_str());
+                      logentry(buf, ANGEL, LogChannels::LOG_GOD);
+                      logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+
+                      for (auto &ch : DC::getInstance()->character_list)
+                      {
+                        if (ch->pcdata && IS_PC(ch))
+                        {
+                          ch->save();
+                        }
+                      }
+
+                      char **argv = nullptr;
+                      if (!write_hotboot_file(argv))
+                      {
+                        logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+                    } });
+
+    if (future.isValid())
+    {
+      return QHttpServerResponse("Rebooting.\r\n");
+    }
+    else
+    {
+      return QHttpServerResponse("Failed.\r\n");
+    } });
 
   server.listen(QHostAddress::LocalHost, 6980);
 

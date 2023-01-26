@@ -267,3 +267,26 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
     return true;
 }
+
+bool Character::validateName(QString name)
+{
+    if (name.isEmpty() || name.size() < Character::MIN_NAME_SIZE || name.size() > Character::MAX_NAME_SIZE)
+    {
+        return false;
+    }
+
+    for (auto &c : name)
+    {
+        if (!isalpha(c.toLatin1()))
+        {
+            return false;
+        }
+    }
+
+    if (on_forbidden_name_list(name.toStdString().c_str()))
+    {
+        return false;
+    }
+
+    return true;
+}
