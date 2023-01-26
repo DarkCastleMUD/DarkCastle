@@ -21,7 +21,6 @@
 
 using namespace std;
 
-extern char *const *orig_argv;
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 CVoteData *DCVote;
 
@@ -57,8 +56,6 @@ int main(int argc, char **argv)
     dc->cf.ports.push_back(DFLT_PORT3);
     dc->cf.ports.push_back(DFLT_PORT4);
   }
-
-  orig_argv = argv;
 
   init_random();
 
@@ -176,7 +173,7 @@ DC::config parse_arguments(int argc, char *const argv[])
       cf.test_world = 1;
       logentry("Mud in world checking mode. TinyTinyworld being used. (WLD)", 0, LogChannels::LOG_MISC);
       logentry("Do NOT have mortals login when in world checking mode.", 0,
-          LogChannels::LOG_MISC);
+               LogChannels::LOG_MISC);
       break;
     case 'c':
       cf.test_objs = 1;

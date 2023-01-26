@@ -67,6 +67,7 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "semaphore": "cpp",
-        "qsharedpointer": "cpp"
+        "qsharedpointer": "cpp",
+        "qtconcurrent": "cpp"
     }
 }

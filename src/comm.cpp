@@ -34,6 +34,9 @@
 
 #include <fmt/format.h>
 #include <QTimer>
+#include <QHttpServer>
+#include <QtConcurrent>
+#include <QMap>
 
 #include "terminal.h"
 #include "fileinfo.h"
@@ -84,7 +87,6 @@ int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
 
-char *const *orig_argv;
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
 int restrict = 0;
@@ -212,6 +214,7 @@ int write_hotboot_file(char **new_argv)
   }
 
   DC *dc = dynamic_cast<DC *>(DC::instance());
+
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
   for_each(dc->server_descriptor_list.begin(), dc->server_descriptor_list.end(), [&fp](const int &fd)
            { fprintf(fp, "%d\n", fd); });
@@ -270,35 +273,28 @@ int write_hotboot_file(char **new_argv)
 
   chdir("../bin/");
 
-  char *const *argv;
-  if (new_argv)
+  char *cwd = get_current_dir_name();
+  if (cwd != nullptr)
   {
-    argv = new_argv;
-  }
-  else
-  {
-    argv = orig_argv;
+    logentry(QString("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, LogChannels::LOG_GOD);
+    free(cwd);
   }
 
-  // convert array to string
-  int index = 0;
-  stringstream argv_string;
-  while (argv[index] != 0)
+  QStringList arguments = DC::getInstance()->arguments();
+  char **argv = new char *[arguments.size() + 1];
+  for (auto i = 0; i < arguments.size(); ++i)
   {
-    argv_string << argv[index++];
-    argv_string << " ";
+    argv[i] = new char[strlen(arguments.at(i).toStdString().c_str()) + 1];
+    strcpy(argv[i], arguments.at(i).toStdString().c_str());
   }
-  char *buffer = new char[100];
-  getcwd(buffer, 99);
+  argv[arguments.size()] = nullptr;
 
   DC::getInstance()->ssh.close();
-
-  logf(108, LogChannels::LOG_GOD, "Hotbooting %s at [%s]", argv_string.str().c_str(), buffer);
-
-  if (-1 == execv(argv[0], argv))
+  char *const *argv2 = argv;
+  if (-1 == execv(DC::getInstance()->applicationFilePath().toStdString().c_str(), argv2))
   {
     logentry("Hotboot execv call failed.", 0, LogChannels::LOG_MISC);
-    perror(argv[0]);
+    perror(DC::getInstance()->applicationFilePath().toStdString().c_str());
     chdir(DFLT_DIR);
     unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
@@ -366,7 +362,7 @@ int load_hotboot_descs()
         sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr, desc);
         logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
-        dc_free(d);
+        delete d;
         d = nullptr;
         continue;
       }
@@ -914,6 +910,67 @@ void DC::game_loop_init(void)
   // QTimer *sshLoopTimer = new QTimer(this);
   // connect(sshLoopTimer, &QTimer::timeout, &ssh, &SSH::SSH::poll);
   // sshLoopTimer->start();
+
+  QHttpServer server(this);
+  QStringList myData;
+
+  server.route("/test", QHttpServerRequest::Method::Get, [&myData](const QHttpServerRequest &request)
+               {
+                
+                qDebug() << request;
+                qDebug() << request.query().hasQueryItem("username") << request.query().hasQueryItem("password");
+
+                auto future = QtConcurrent::run([]() {});
+
+                if (future.isValid())
+                {
+                  QJsonArray array = QJsonArray::fromStringList(myData);
+
+                  return QHttpServerResponse(QString("Success: %1\r\n").arg(array.size()));
+                }
+                else
+                {
+                 return QHttpServerResponse("Failed.\r\n");
+                } });
+
+               server.route("/shutdown", QHttpServerRequest::Method::Get, [&myData](const QHttpServerRequest &request)
+               {
+                auto future = QtConcurrent::run([]()
+                 {
+                    int do_not_save_corpses = 1;
+
+                    QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                    send_to_all(buf.toStdString().c_str());
+                    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+                    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+
+                    for (auto &ch : DC::getInstance()->character_list)
+                    {
+                      if (ch->pcdata && IS_PC(ch))
+                      {
+                        ch->save();
+                      }
+                    }
+
+                    char **argv = nullptr;
+                    if (!write_hotboot_file(argv))
+                    {
+                      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+                    }                 
+                 });
+                 
+                if (future.isValid())
+                {
+                  QJsonArray array = QJsonArray::fromStringList(myData);
+
+                  return QHttpServerResponse(QString("Rebooting...: %1\r\n").arg(array.size()));
+                }
+                else
+                {
+                 return QHttpServerResponse("Failed.");
+                } });
+
+  server.listen(QHostAddress::LocalHost, 6980);
 
   exec();
 
@@ -3105,7 +3162,7 @@ void send_to_char(string messg, Character *ch)
   }
 }
 
-void send_to_all(char *messg)
+void send_to_all(const char *messg)
 {
   class Connection *i;
 
@@ -3203,7 +3260,6 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
 
 int is_busy(Character *ch)
 {
-
   if (ch->desc &&
       ((ch->desc->connected == conn::WRITE_BOARD) ||
        (ch->desc->connected == conn::SEND_MAIL) ||

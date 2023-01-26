@@ -537,7 +537,7 @@ void check_killer(Character *ch, Character *victim);
 int map_eq_level(Character *mob);
 void disarm(Character *ch, Character *victim);
 int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker);
-void send_to_all(char *messg);
+void send_to_all(const char *messg);
 void ansi_color(char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
 void send_to_char(string messg, Character *ch);
