@@ -269,7 +269,7 @@ int do_addnews(Character *ch, char *argument, int cmd)
   if (nnews->news)
     send_to_char(nnews->news, ch);
   //  nnews->news = str_dup("Temporary data.\r\n");
-  ch->desc->connected = conn::EDITING;
+  ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;
 

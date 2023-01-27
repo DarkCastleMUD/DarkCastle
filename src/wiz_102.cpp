@@ -1622,7 +1622,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     //                   " Terminate with '~' on a new line.\n\r\n\r", ch);
     //        curr->description = 0;
 
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(curr->description);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
@@ -2503,7 +2503,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ((Object *)obj_index[rnum].item)->ex_description = curr;
     }
     send_to_char("Write your object's description. End with /s.\r\n", ch);
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(curr->description);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
     break;
@@ -2890,11 +2890,11 @@ int do_procedit(Character *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
     {
-      ch->desc->web_connected = conn::EDIT_MPROG;
+      ch->desc->web_connected = Connection::states::EDIT_MPROG;
     }
     else
     {
-      ch->desc->connected = conn::EDIT_MPROG;
+      ch->desc->connected = Connection::states::EDIT_MPROG;
 
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                    "   |--------------------------------------------------------------------------------|\r\n",
@@ -3121,7 +3121,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                  ch);
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
     //        ((Character *)mob_index[mob_num].item)->description = nullptr;
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
     ((Character *)mob_index[mob_num].item)->description = str_dup("");
     ch->desc->strnew =
         &(((Character *)mob_index[mob_num].item)->description);
@@ -4109,7 +4109,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     send_to_char("        Write your room's description.  (/s saves /h for help)\r\n", ch);
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(world[ch->in_room].description);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
   }
@@ -4439,7 +4439,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     send_to_char("Write your extra description. (/s saves /h for help)\r\n", ch);
     ch->desc->strnew = &extra->description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
     if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
     {
       // There's already an existing extra description so let's show it
@@ -4486,7 +4486,7 @@ int do_redit(Character *ch, char *argument, int cmd)
    */
     ch->desc->strnew = &world[ch->in_room].dir_option[x]->general_description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
-    ch->desc->connected = conn::EDITING;
+    ch->desc->connected = Connection::states::EDITING;
   }
   break;
 
@@ -5559,7 +5559,7 @@ int do_sockets(Character *ch, char *argument, int cmd)
         continue;
       if (GET_LEVEL(ch) < GET_LEVEL(d->character))
         continue;
-      if ((d->connected != conn::PLAYING) &&
+      if ((d->connected != Connection::states::PLAYING) &&
           (GET_LEVEL(ch) < GET_LEVEL(d->character)))
         continue;
     }

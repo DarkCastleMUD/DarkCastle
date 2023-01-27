@@ -5011,7 +5011,7 @@ bool Zone::isEmpty(void)
 	class Connection *i;
 
 	for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-		if (STATE(i) == conn::PLAYING && i->character && world[i->character->in_room].zone == id)
+		if (STATE(i) == Connection::states::PLAYING && i->character && world[i->character->in_room].zone == id)
 			return false;
 
 	return true;

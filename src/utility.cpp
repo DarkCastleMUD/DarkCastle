@@ -2406,11 +2406,11 @@ bool is_in_game(Character *ch)
 
   switch (STATE(ch->desc))
   {
-  case conn::PLAYING:
-  case conn::EDIT_MPROG:
-  case conn::WRITE_BOARD:
-  case conn::EDITING:
-  case conn::SEND_MAIL:
+  case Connection::states::PLAYING:
+  case Connection::states::EDIT_MPROG:
+  case Connection::states::WRITE_BOARD:
+  case Connection::states::EDITING:
+  case Connection::states::SEND_MAIL:
     return true;
     break;
   }

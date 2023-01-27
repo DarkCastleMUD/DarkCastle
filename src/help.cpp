@@ -876,7 +876,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
         send_to_char(ch->desc->backstr, ch);
       }
 
-      ch->desc->connected = conn::EDITING;
+      ch->desc->connected = Connection::states::EDITING;
       ch->desc->strnew = &(new_help_table[help_id].entry);
       ch->desc->max_str = MAX_HELP_LENGTH;
     }

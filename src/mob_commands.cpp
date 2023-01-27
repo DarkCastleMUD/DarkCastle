@@ -921,7 +921,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
   {
     for (d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
     {
-      if (d->connected == conn::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
+      if (d->connected == Connection::states::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {
         char buf[MAX_STRING_LENGTH];
         sprintf(buf, "%s %s", d->character->name, arg2);

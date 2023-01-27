@@ -437,7 +437,7 @@ int do_who(Character *ch, char *argument, int cmd)
       break;
     }
 
-    if ((d->connected) && (d->connected) != conn::WRITE_BOARD && (d->connected) != conn::EDITING && (d->connected) != conn::EDIT_MPROG)
+    if ((d->connected) && (d->connected) != Connection::states::WRITE_BOARD && (d->connected) != Connection::states::EDITING && (d->connected) != Connection::states::EDIT_MPROG)
     {
       continue;
     }
@@ -584,8 +584,8 @@ int do_who(Character *ch, char *argument, int cmd)
       numPC++;
     }
 
-    if ((d->connected) == conn::WRITE_BOARD || (d->connected) == conn::EDITING ||
-        (d->connected) == conn::EDIT_MPROG)
+    if ((d->connected) == Connection::states::WRITE_BOARD || (d->connected) == Connection::states::EDITING ||
+        (d->connected) == Connection::states::EDIT_MPROG)
     {
       strcpy(tailBuf, "$1$B(writing) ");
     }
@@ -730,7 +730,7 @@ int do_where(Character *ch, char *argument, int cmd)
     send_to_char("All Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
       {
         if (d->original)
         { // If switched
@@ -750,7 +750,7 @@ int do_where(Character *ch, char *argument, int cmd)
     send_to_char("Search of Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
       {
         if (d->original)
         { // If switched
@@ -779,7 +779,7 @@ int do_where(Character *ch, char *argument, int cmd)
       return eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == conn::PLAYING) && (d->character->in_room != NOWHERE) &&
+      if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
           CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
       {

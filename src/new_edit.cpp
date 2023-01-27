@@ -818,23 +818,23 @@ void new_string_add(class Connection *d, char *str)
          }
          d->backstr = nullptr;
          d->strnew = nullptr;
-         if (d->connected == conn::WRITE_BOARD)
+         if (d->connected == Connection::states::WRITE_BOARD)
          {
             if (d->character)
             {
-               d->connected = conn::PLAYING;
+               d->connected = Connection::states::PLAYING;
             }
             new_edit_board_unlock_board(d->character, 1);
          }
          else
          {
-            if (d->connected != conn::EXDSCR)
-               d->connected = conn::PLAYING;
+            if (d->connected != Connection::states::EXDSCR)
+               d->connected = Connection::states::PLAYING;
          }
          send_to_char("Aborted.\r\n", ch);
-         if (d->connected == conn::EXDSCR)
+         if (d->connected == Connection::states::EXDSCR)
          {
-            STATE(d) = conn::SELECT_MENU;
+            STATE(d) = Connection::states::SELECT_MENU;
             SEND_TO_Q(menu, d);
          }
          else
@@ -848,17 +848,17 @@ void new_string_add(class Connection *d, char *str)
          }
          else
          {
-            if (STATE(d) == conn::EXDSCR)
+            if (STATE(d) == Connection::states::EXDSCR)
                save_char_obj(d->character);
             if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
                dc_free(*d->strnew);
             d->backstr = nullptr;
             d->strnew = nullptr;
-            if (d->connected == conn::WRITE_BOARD)
+            if (d->connected == Connection::states::WRITE_BOARD)
             {
                if (d->character)
                {
-                  d->connected = conn::PLAYING;
+                  d->connected = Connection::states::PLAYING;
                }
                new_edit_board_unlock_board(d->character, 0);
             }
@@ -866,14 +866,14 @@ void new_string_add(class Connection *d, char *str)
             {
                send_to_char("Ok.\r\n", ch);
 
-               if (d->connected != conn::EXDSCR)
+               if (d->connected != Connection::states::EXDSCR)
                {
-                  d->connected = conn::PLAYING;
+                  d->connected = Connection::states::PLAYING;
                   check_for_awaymsgs(ch);
                }
                else
                {
-                  STATE(d) = conn::SELECT_MENU;
+                  STATE(d) = Connection::states::SELECT_MENU;
                   SEND_TO_Q(menu, d);
                }
             }

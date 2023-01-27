@@ -80,7 +80,7 @@ void Leaderboard::check(void)
 	{
 		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL || IS_NPC(d->character))
 			continue;
-		if (!d->connected == conn::PLAYING)
+		if (!d->connected == Connection::states::PLAYING)
 			continue;
 		if (!d->character->pcdata)
 			continue;
@@ -1585,7 +1585,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 
 		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL)
 			continue;
-		if (!d->connected == conn::PLAYING)
+		if (!d->connected == Connection::states::PLAYING)
 			continue;
 		if (!d->character->pcdata)
 			continue;

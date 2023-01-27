@@ -49,7 +49,7 @@ extern "C"
 #include "room.h"
 #include "obj.h"
 #include "player.h"   // MAX_*
-#include "connect.h"  // conn::WRITE_BOARD
+#include "connect.h"  // Connection::states::WRITE_BOARD
 #include "terminal.h" // BOLD
 #include "fileinfo.h" // for the board files
 #include "levels.h"   // levels..
@@ -787,7 +787,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO
   reserve->buf = 0;
   reserve->board = board;
   wait_for_write[ch] = reserve;
-  ch->desc->connected = conn::WRITE_BOARD;
+  ch->desc->connected = Connection::states::WRITE_BOARD;
   ch->desc->strnew = &reserve->buf;
   ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }

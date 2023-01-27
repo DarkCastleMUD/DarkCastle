@@ -751,7 +751,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
         if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
           continue;
 
-        if (STATE(i) == conn::PLAYING)
+        if (STATE(i) == Connection::states::PLAYING)
         {
           send_to_char(buf1, i->character);
         }

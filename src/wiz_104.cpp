@@ -1837,7 +1837,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 		{
 			victim = i->character;
 			source_room = victim->in_room;
-			if (victim != ch && i->connected == conn::PLAYING && source_room != 0)
+			if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
 			{
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
 				ch->send(format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
@@ -2371,11 +2371,11 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 		if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
 		{
-			ch->desc->web_connected = conn::EDIT_MPROG;
+			ch->desc->web_connected = Connection::states::EDIT_MPROG;
 		}
 		else
 		{
-			ch->desc->connected = conn::EDIT_MPROG;
+			ch->desc->connected = Connection::states::EDIT_MPROG;
 
 			send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
 						 "|--------------------------------------------------------------------------------|\r\n",

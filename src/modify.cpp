@@ -120,7 +120,7 @@ void string_hash_add(class Connection *d, char *str)
 		dc_free(*d->hashstr);
 		*d->hashstr = scan;
 		d->hashstr = 0;
-		d->connected = conn::PLAYING;
+		d->connected = Connection::states::PLAYING;
 		send_to_char("Ok.\r\n", ch);
 		check_for_awaymsgs(ch);
 	}
@@ -426,7 +426,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			(*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
 #endif
 		ch->desc->max_str = length[field - 1];
-		ch->desc->connected = conn::EDITING;
+		ch->desc->connected = Connection::states::EDITING;
 	}
 	return 1;
 }

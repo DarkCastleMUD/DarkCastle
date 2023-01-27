@@ -364,12 +364,12 @@ void update_max_who(void)
    {
       switch (d->connected)
       {
-      case conn::PLAYING:
-      case conn::EDIT_MPROG:
-      case conn::EDITING:
-      case conn::EXDSCR:
-      case conn::SEND_MAIL:
-      case conn::WRITE_BOARD:
+      case Connection::states::PLAYING:
+      case Connection::states::EDIT_MPROG:
+      case Connection::states::EDITING:
+      case Connection::states::EXDSCR:
+      case Connection::states::SEND_MAIL:
+      case Connection::states::WRITE_BOARD:
          players++;
          break;
       }
@@ -861,12 +861,12 @@ void nanny(class Connection *d, string arg)
    arg.erase(0, arg.find_first_not_of(' '));
 
    if (!str_prefix("help", arg.c_str()) &&
-       (STATE(d) == conn::OLD_GET_CLASS ||
-        STATE(d) == conn::OLD_GET_RACE ||
-        STATE(d) == conn::OLD_CHOOSE_STATS ||
-        STATE(d) == conn::GET_CLASS ||
-        STATE(d) == conn::GET_RACE ||
-        STATE(d) == conn::GET_STATS))
+       (STATE(d) == Connection::states::OLD_GET_CLASS ||
+        STATE(d) == Connection::states::OLD_GET_RACE ||
+        STATE(d) == Connection::states::OLD_CHOOSE_STATS ||
+        STATE(d) == Connection::states::GET_CLASS ||
+        STATE(d) == Connection::states::GET_RACE ||
+        STATE(d) == Connection::states::GET_STATS))
    {
       arg.erase(0, 4);
       do_new_help(d->character, arg.data(), 88);
@@ -881,13 +881,13 @@ void nanny(class Connection *d, string arg)
       close_socket(d);
       return;
 
-   case conn::PRE_DISPLAY_ENTRANCE:
-      // _shouldn't_ get here, but if we do, let it fall through to conn::DISPLAY_ENTRANCE
+   case Connection::states::PRE_DISPLAY_ENTRANCE:
+      // _shouldn't_ get here, but if we do, let it fall through to Connection::states::DISPLAY_ENTRANCE
       // This is here to allow the mud to 'skip' this descriptor until the next pulse on
       // a new connection.  That allows the "GET" and "POST" from a webbrowser to get there.
       // no break;
 
-   case conn::DISPLAY_ENTRANCE:
+   case Connection::states::DISPLAY_ENTRANCE:
 
       // Check for people trying to connect to a webserver
       if (arg == "GET" || arg == "POST")
@@ -928,7 +928,7 @@ void nanny(class Connection *d, string arg)
       }
       SEND_TO_Q("What name for the roster? ", d);
       telnet_ga(d);
-      STATE(d) = conn::GET_NAME;
+      STATE(d) = Connection::states::GET_NAME;
 
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
       if (arg.empty())
@@ -937,7 +937,7 @@ void nanny(class Connection *d, string arg)
       }
       /* no break */
 
-   case conn::GET_NAME:
+   case Connection::states::GET_NAME:
 
       if (arg.empty())
       {
@@ -1003,7 +1003,7 @@ void nanny(class Connection *d, string arg)
          /* Old player */
          SEND_TO_Q("Password: ", d);
          telnet_ga(d);
-         STATE(d) = conn::GET_OLD_PASSWORD;
+         STATE(d) = Connection::states::GET_OLD_PASSWORD;
          return;
       }
       else
@@ -1017,12 +1017,12 @@ void nanny(class Connection *d, string arg)
          sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = conn::CONFIRM_NEW_NAME;
+         STATE(d) = Connection::states::CONFIRM_NEW_NAME;
          return;
       }
       break;
 
-   case conn::GET_OLD_PASSWORD:
+   case Connection::states::GET_OLD_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       // Default is to authenticate against character password
@@ -1112,10 +1112,10 @@ void nanny(class Connection *d, string arg)
          SEND_TO_Q(buf, d);
       }
       check_for_sold_items(d->character);
-      STATE(d) = conn::READ_MOTD;
+      STATE(d) = Connection::states::READ_MOTD;
       break;
 
-   case conn::CONFIRM_NEW_NAME:
+   case Connection::states::CONFIRM_NEW_NAME:
       if (arg.empty())
       {
          SEND_TO_Q("Please type y or n: ", d);
@@ -1136,13 +1136,13 @@ void nanny(class Connection *d, string arg)
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
-            STATE(d) = conn::CLOSE;
+            STATE(d) = Connection::states::CLOSE;
             return;
          }
          sprintf(buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch));
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = conn::GET_NEW_PASSWORD;
+         STATE(d) = Connection::states::GET_NEW_PASSWORD;
          // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
 #ifdef LEAK_CHECK
@@ -1161,7 +1161,7 @@ void nanny(class Connection *d, string arg)
          GET_NAME(ch) = nullptr;
          delete d->character;
          d->character = nullptr;
-         STATE(d) = conn::GET_NAME;
+         STATE(d) = Connection::states::GET_NAME;
          break;
 
       default:
@@ -1171,7 +1171,7 @@ void nanny(class Connection *d, string arg)
       }
       break;
 
-   case conn::GET_NEW_PASSWORD:
+   case Connection::states::GET_NEW_PASSWORD:
       SEND_TO_Q("\r\n", d);
 
       if (arg.length() < 6)
@@ -1185,30 +1185,30 @@ void nanny(class Connection *d, string arg)
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
-      STATE(d) = conn::CONFIRM_NEW_PASSWORD;
+      STATE(d) = Connection::states::CONFIRM_NEW_PASSWORD;
       break;
 
-   case conn::CONFIRM_NEW_PASSWORD:
+   case Connection::states::CONFIRM_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
-         STATE(d) = conn::GET_NEW_PASSWORD;
+         STATE(d) = Connection::states::GET_NEW_PASSWORD;
          return;
       }
 
-   case conn::QUESTION_ANSI:
+   case Connection::states::QUESTION_ANSI:
       SEND_TO_Q("Do you want ANSI color (y/n)? ", d);
       telnet_ga(d);
-      STATE(d) = conn::GET_ANSI;
+      STATE(d) = Connection::states::GET_ANSI;
       break;
 
-   case conn::GET_ANSI:
+   case Connection::states::GET_ANSI:
       if (arg.empty())
       {
-         STATE(d) = conn::QUESTION_ANSI;
+         STATE(d) = Connection::states::QUESTION_ANSI;
          return;
       }
 
@@ -1223,24 +1223,24 @@ void nanny(class Connection *d, string arg)
          d->color = false;
          break;
       default:
-         STATE(d) = conn::QUESTION_ANSI;
+         STATE(d) = Connection::states::QUESTION_ANSI;
          return;
       }
 
-      STATE(d) = conn::QUESTION_SEX;
+      STATE(d) = Connection::states::QUESTION_SEX;
       break;
 
-   case conn::QUESTION_SEX:
+   case Connection::states::QUESTION_SEX:
       SEND_TO_Q("What is your sex (m/f)? ", d);
       telnet_ga(d);
-      STATE(d) = conn::GET_NEW_SEX;
+      STATE(d) = Connection::states::GET_NEW_SEX;
       break;
 
-   case conn::GET_NEW_SEX:
+   case Connection::states::GET_NEW_SEX:
       if (arg.empty())
       {
          SEND_TO_Q("That's not a sex.\r\n", d);
-         STATE(d) = conn::QUESTION_SEX;
+         STATE(d) = Connection::states::QUESTION_SEX;
          break;
       }
 
@@ -1256,14 +1256,14 @@ void nanny(class Connection *d, string arg)
          break;
       default:
          SEND_TO_Q("That's not a sex.\r\n", d);
-         STATE(d) = conn::QUESTION_SEX;
+         STATE(d) = Connection::states::QUESTION_SEX;
          return;
       }
 
       /*
             if (!allowed_host(d->host) && DC::getInstance()->cf.allow_newstatsys == false)
             {
-               STATE(d) = conn::OLD_STAT_METHOD;
+               STATE(d) = Connection::states::OLD_STAT_METHOD;
                break;
             }
       */
@@ -1286,19 +1286,19 @@ void nanny(class Connection *d, string arg)
       SEND_TO_Q("rolling dice then the game shows you what races you can pick based on the dice\r\n", d);
       SEND_TO_Q("rolls. After picking from the races your dice rolls allow then you have to\r\n", d);
       SEND_TO_Q("pick a class that fits your choosen stats.\r\n", d);
-      STATE(d) = conn::QUESTION_STAT_METHOD;
+      STATE(d) = Connection::states::QUESTION_STAT_METHOD;
       return;
 
-   case conn::QUESTION_STAT_METHOD:
+   case Connection::states::QUESTION_STAT_METHOD:
       SEND_TO_Q("\r\n", d);
       SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
       SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);
       SEND_TO_Q("What is your choice (1,2)? ", d);
       telnet_ga(d);
-      STATE(d) = conn::GET_STAT_METHOD;
+      STATE(d) = Connection::states::GET_STAT_METHOD;
       break;
 
-   case conn::GET_STAT_METHOD:
+   case Connection::states::GET_STAT_METHOD:
       try
       {
          selection = stoul(arg);
@@ -1310,88 +1310,88 @@ void nanny(class Connection *d, string arg)
 
       if (selection == 1)
       {
-         STATE(d) = conn::NEW_STAT_METHOD;
+         STATE(d) = Connection::states::NEW_STAT_METHOD;
       }
       else if (selection == 2)
       {
-         STATE(d) = conn::OLD_STAT_METHOD;
+         STATE(d) = Connection::states::OLD_STAT_METHOD;
       }
       else
       {
-         STATE(d) = conn::QUESTION_STAT_METHOD;
+         STATE(d) = Connection::states::QUESTION_STAT_METHOD;
       }
       break;
 
-   case conn::NEW_STAT_METHOD:
-      STATE(d) = conn::QUESTION_RACE;
+   case Connection::states::NEW_STAT_METHOD:
+      STATE(d) = Connection::states::QUESTION_RACE;
       break;
 
-   case conn::QUESTION_RACE:
+   case Connection::states::QUESTION_RACE:
       show_question_race(d);
 
-      STATE(d) = conn::GET_RACE;
+      STATE(d) = Connection::states::GET_RACE;
       break;
 
-   case conn::GET_RACE:
+   case Connection::states::GET_RACE:
       if (handle_get_race(d, arg) == true)
       {
-         STATE(d) = conn::QUESTION_CLASS;
+         STATE(d) = Connection::states::QUESTION_CLASS;
       }
       else
       {
-         STATE(d) = conn::QUESTION_RACE;
+         STATE(d) = Connection::states::QUESTION_RACE;
       }
       break;
 
-   case conn::QUESTION_CLASS:
+   case Connection::states::QUESTION_CLASS:
       show_question_class(d);
 
-      STATE(d) = conn::GET_CLASS;
+      STATE(d) = Connection::states::GET_CLASS;
       break;
 
-   case conn::GET_CLASS:
+   case Connection::states::GET_CLASS:
       if (handle_get_class(d, arg) == false)
       {
-         if (STATE(d) != conn::QUESTION_RACE)
+         if (STATE(d) != Connection::states::QUESTION_RACE)
          {
-            STATE(d) = conn::QUESTION_CLASS;
+            STATE(d) = Connection::states::QUESTION_CLASS;
          }
       }
       else
       {
-         STATE(d) = conn::QUESTION_STATS;
+         STATE(d) = Connection::states::QUESTION_STATS;
       }
       break;
 
-   case conn::QUESTION_STATS:
+   case Connection::states::QUESTION_STATS:
       show_question_stats(d);
 
-      STATE(d) = conn::GET_STATS;
+      STATE(d) = Connection::states::GET_STATS;
       break;
 
-   case conn::GET_STATS:
+   case Connection::states::GET_STATS:
       if (handle_get_stats(d, arg) == false)
       {
-         STATE(d) = conn::QUESTION_STATS;
+         STATE(d) = Connection::states::QUESTION_STATS;
       }
       else
       {
-         STATE(d) = conn::NEW_PLAYER;
+         STATE(d) = Connection::states::NEW_PLAYER;
       }
       break;
 
-   case conn::OLD_STAT_METHOD:
+   case Connection::states::OLD_STAT_METHOD:
       if (ch->desc->stats != nullptr)
       {
          delete ch->desc->stats;
       }
       ch->desc->stats = new stat_data;
 
-      STATE(d) = conn::OLD_CHOOSE_STATS;
+      STATE(d) = Connection::states::OLD_CHOOSE_STATS;
       arg.clear();
       // break;  no break on purpose...might as well do this now.  no point in waiting
 
-   case conn::OLD_CHOOSE_STATS:
+   case Connection::states::OLD_CHOOSE_STATS:
 
       if (arg.length() > 1)
       {
@@ -1428,13 +1428,13 @@ void nanny(class Connection *d, string arg)
 
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = conn::OLD_GET_RACE;
+         STATE(d) = Connection::states::OLD_GET_RACE;
          break;
       }
       roll_and_display_stats(ch);
       break;
 
-   case conn::OLD_GET_RACE:
+   case Connection::states::OLD_GET_RACE:
       try
       {
          selection = stoul(arg);
@@ -1605,10 +1605,10 @@ void nanny(class Connection *d, string arg)
               (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
       SEND_TO_Q(buf, d);
       telnet_ga(d);
-      STATE(d) = conn::OLD_GET_CLASS;
+      STATE(d) = Connection::states::OLD_GET_CLASS;
       break;
 
-   case conn::OLD_GET_CLASS:
+   case Connection::states::OLD_GET_CLASS:
       try
       {
          selection = stoul(arg);
@@ -1716,10 +1716,10 @@ void nanny(class Connection *d, string arg)
          GET_CLASS(ch) = CLASS_DRUID;
          break;
       }
-      STATE(d) = conn::NEW_PLAYER;
+      STATE(d) = Connection::states::NEW_PLAYER;
       break;
 
-   case conn::NEW_PLAYER:
+   case Connection::states::NEW_PLAYER:
 
       init_char(ch);
 
@@ -1730,16 +1730,16 @@ void nanny(class Connection *d, string arg)
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
       telnet_ga(d);
 
-      STATE(d) = conn::READ_MOTD;
+      STATE(d) = Connection::states::READ_MOTD;
       break;
 
-   case conn::READ_MOTD:
+   case Connection::states::READ_MOTD:
       SEND_TO_Q(menu, d);
       telnet_ga(d);
-      STATE(d) = conn::SELECT_MENU;
+      STATE(d) = Connection::states::SELECT_MENU;
       break;
 
-   case conn::SELECT_MENU:
+   case Connection::states::SELECT_MENU:
       if (arg.empty())
       {
          SEND_TO_Q(menu, d);
@@ -1760,7 +1760,7 @@ void nanny(class Connection *d, string arg)
          if (GET_LEVEL(ch) > 0)
          {
             strcpy(tmp_name, GET_NAME(ch));
-            free_char(d->character, Trace("nanny conn::SELECT_MENU 1"));
+            free_char(d->character, Trace("nanny Connection::states::SELECT_MENU 1"));
             d->character = 0;
             load_char_obj(d, tmp_name);
             ch = d->character;
@@ -1813,7 +1813,7 @@ void nanny(class Connection *d, string arg)
          update_wizlist(ch);
          check_maxes(ch); // Check skill maxes.
 
-         STATE(d) = conn::PLAYING;
+         STATE(d) = Connection::states::PLAYING;
          update_max_who();
 
          if (GET_LEVEL(ch) == 0)
@@ -1854,27 +1854,27 @@ void nanny(class Connection *d, string arg)
 
          d->strnew = &ch->description;
          d->max_str = 539;
-         STATE(d) = conn::EXDSCR;
+         STATE(d) = Connection::states::EXDSCR;
          break;
 
       case '3':
          SEND_TO_Q("Enter current password: ", d);
          telnet_ga(d);
-         STATE(d) = conn::CONFIRM_PASSWORD_CHANGE;
+         STATE(d) = Connection::states::CONFIRM_PASSWORD_CHANGE;
          break;
 
       case '4':
          // Archive the charater
          SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
          telnet_ga(d);
-         STATE(d) = conn::ARCHIVE_CHAR;
+         STATE(d) = Connection::states::ARCHIVE_CHAR;
          break;
 
       case '5':
          // delete this character
          SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
          telnet_ga(d);
-         STATE(d) = conn::DELETE_CHAR;
+         STATE(d) = Connection::states::DELETE_CHAR;
          break;
 
       default:
@@ -1884,7 +1884,7 @@ void nanny(class Connection *d, string arg)
       }
       break;
 
-   case conn::ARCHIVE_CHAR:
+   case Connection::states::ARCHIVE_CHAR:
       if (arg == "ARCHIVE ME")
       {
          str_tmp << GET_NAME(d->character);
@@ -1895,12 +1895,12 @@ void nanny(class Connection *d, string arg)
       }
       else
       {
-         STATE(d) = conn::SELECT_MENU;
+         STATE(d) = Connection::states::SELECT_MENU;
          SEND_TO_Q(menu, d);
       }
       break;
 
-   case conn::DELETE_CHAR:
+   case Connection::states::DELETE_CHAR:
       if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->name);
@@ -1923,30 +1923,30 @@ void nanny(class Connection *d, string arg)
       }
       else
       {
-         STATE(d) = conn::SELECT_MENU;
+         STATE(d) = Connection::states::SELECT_MENU;
          SEND_TO_Q(menu, d);
          telnet_ga(d);
       }
       break;
 
-   case conn::CONFIRM_PASSWORD_CHANGE:
+   case Connection::states::CONFIRM_PASSWORD_CHANGE:
       SEND_TO_Q("\n\r", d);
       if (string(crypt(arg.c_str(), ch->pcdata->pwd)) == ch->pcdata->pwd)
       {
          SEND_TO_Q("Enter a new password: ", d);
          telnet_ga(d);
-         STATE(d) = conn::RESET_PASSWORD;
+         STATE(d) = Connection::states::RESET_PASSWORD;
          break;
       }
       else
       {
          SEND_TO_Q("Incorrect.", d);
-         STATE(d) = conn::SELECT_MENU;
+         STATE(d) = Connection::states::SELECT_MENU;
          SEND_TO_Q(menu, d);
       }
       break;
 
-   case conn::RESET_PASSWORD:
+   case Connection::states::RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (arg.length() < 6)
@@ -1959,30 +1959,30 @@ void nanny(class Connection *d, string arg)
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
-      STATE(d) = conn::CONFIRM_RESET_PASSWORD;
+      STATE(d) = Connection::states::CONFIRM_RESET_PASSWORD;
       break;
 
-   case conn::CONFIRM_RESET_PASSWORD:
+   case Connection::states::CONFIRM_RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
-         STATE(d) = conn::RESET_PASSWORD;
+         STATE(d) = Connection::states::RESET_PASSWORD;
          return;
       }
 
       SEND_TO_Q("\n\rDone.\r\n", d);
       SEND_TO_Q(menu, d);
-      STATE(d) = conn::SELECT_MENU;
+      STATE(d) = Connection::states::SELECT_MENU;
       if (GET_LEVEL(ch) > 1)
       {
          char blah1[50], blah2[50];
          // this prevents a dupe bug
          strcpy(blah1, GET_NAME(ch));
          strcpy(blah2, ch->pcdata->pwd);
-         free_char(d->character, Trace("nanny conn::CONFIRM_RESET_PASSWORD"));
+         free_char(d->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
          d->character = 0;
          load_char_obj(d, blah1);
          ch = d->character;
@@ -1993,7 +1993,7 @@ void nanny(class Connection *d, string arg)
       }
 
       break;
-   case conn::CLOSE:
+   case Connection::states::CLOSE:
       close_socket(d);
       break;
    }
@@ -2104,7 +2104,7 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
             logentry(log_buf, GET_LEVEL(tmp_ch), LogChannels::LOG_SOCKET);
          }
 
-         STATE(d) = conn::PLAYING;
+         STATE(d) = Connection::states::PLAYING;
 
          if (tmp_ch->getSetting("mode").startsWith("char"))
          {
@@ -2143,10 +2143,10 @@ bool check_playing(class Connection *d, char *name)
       if (str_cmp(name, GET_NAME(compare)))
          continue;
 
-      if (STATE(dold) == conn::GET_NAME)
+      if (STATE(dold) == Connection::states::GET_NAME)
          continue;
 
-      if (STATE(dold) == conn::GET_OLD_PASSWORD)
+      if (STATE(dold) == Connection::states::GET_OLD_PASSWORD)
       {
          free_char(dold->character, Trace("check_playing"));
          dold->character = 0;
@@ -2673,7 +2673,7 @@ bool handle_get_class(Connection *d, string arg)
 
    if (arg == "back")
    {
-      STATE(d) = conn::QUESTION_RACE;
+      STATE(d) = Connection::states::QUESTION_RACE;
       return false;
    }
 

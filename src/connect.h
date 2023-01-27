@@ -11,54 +11,6 @@
 
 #define STATE(d) ((d)->connected)
 
-enum conn
-{
-  PLAYING,
-  GET_NAME,
-  GET_OLD_PASSWORD,
-  CONFIRM_NEW_NAME,
-  GET_NEW_PASSWORD,
-  CONFIRM_NEW_PASSWORD,
-  GET_NEW_SEX,
-  OLD_GET_CLASS,
-  READ_MOTD,
-  SELECT_MENU,
-  RESET_PASSWORD,
-  CONFIRM_RESET_PASSWORD,
-  EXDSCR,
-  OLD_GET_RACE,
-  WRITE_BOARD,
-  EDITING,
-  SEND_MAIL,
-  DELETE_CHAR,
-  OLD_CHOOSE_STATS,
-  PFILE_WIPE,
-  ARCHIVE_CHAR,
-  CLOSE,
-  CONFIRM_PASSWORD_CHANGE,
-  EDIT_MPROG,
-  DISPLAY_ENTRANCE,
-  PRE_DISPLAY_ENTRANCE,
-  SELECT_RECOVERY_MENU,
-  GET_NEW_RECOVERY_QUESTION,
-  GET_NEW_RECOVERY_ANSWER,
-  GET_NEW_RECOVERY_EMAIL,
-  QUESTION_ANSI,
-  GET_ANSI,
-  QUESTION_SEX,
-  QUESTION_STAT_METHOD,
-  GET_STAT_METHOD,
-  OLD_STAT_METHOD,
-  NEW_STAT_METHOD,
-  NEW_PLAYER,
-  QUESTION_RACE,
-  GET_RACE,
-  QUESTION_CLASS,
-  GET_CLASS,
-  QUESTION_STATS,
-  GET_STATS
-};
-
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
 
@@ -83,11 +35,59 @@ public:
 class Connection
 {
 public:
+  enum states
+  {
+    PLAYING,
+    GET_NAME,
+    GET_OLD_PASSWORD,
+    CONFIRM_NEW_NAME,
+    GET_NEW_PASSWORD,
+    CONFIRM_NEW_PASSWORD,
+    GET_NEW_SEX,
+    OLD_GET_CLASS,
+    READ_MOTD,
+    SELECT_MENU,
+    RESET_PASSWORD,
+    CONFIRM_RESET_PASSWORD,
+    EXDSCR,
+    OLD_GET_RACE,
+    WRITE_BOARD,
+    EDITING,
+    SEND_MAIL,
+    DELETE_CHAR,
+    OLD_CHOOSE_STATS,
+    PFILE_WIPE,
+    ARCHIVE_CHAR,
+    CLOSE,
+    CONFIRM_PASSWORD_CHANGE,
+    EDIT_MPROG,
+    DISPLAY_ENTRANCE,
+    PRE_DISPLAY_ENTRANCE,
+    SELECT_RECOVERY_MENU,
+    GET_NEW_RECOVERY_QUESTION,
+    GET_NEW_RECOVERY_ANSWER,
+    GET_NEW_RECOVERY_EMAIL,
+    QUESTION_ANSI,
+    GET_ANSI,
+    QUESTION_SEX,
+    QUESTION_STAT_METHOD,
+    GET_STAT_METHOD,
+    OLD_STAT_METHOD,
+    NEW_STAT_METHOD,
+    NEW_PLAYER,
+    QUESTION_RACE,
+    GET_RACE,
+    QUESTION_CLASS,
+    GET_CLASS,
+    QUESTION_STATS,
+    GET_STATS
+  };
+
   int descriptor = {}; /* file descriptor for socket	*/
   int desc_num = {};
-  char *name = {};     /* Copy of the player name	*/
-  char host[80] = {};  /* hostname			*/
-  conn connected = {}; /* mode of 'connectedness'	*/
+  char *name = {};       /* Copy of the player name	*/
+  char host[80] = {};    /* hostname			*/
+  states connected = {}; /* mode of 'connectedness'	*/
   int web_connected = {};
   int wait = {};           /* wait for how many loops	*/
   char *showstr_head = {}; /* for paging through texts	*/
