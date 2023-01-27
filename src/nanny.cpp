@@ -2830,15 +2830,15 @@ void show_question_stats(Connection *d)
 
    if (d->stats->selection == 0)
    {
-      buffer += "Type '1-5' or 'help keyword': ";
+      buffer += "Type 1-5 or help strength,wisdom,etc: ";
    }
    else if (d->stats->points > 0)
    {
-      buffer += "Type '+', '-', '1-5', 'confirm' or 'help keyword': ";
+      buffer += "Type max, +, -, 1-5, confirm or help strength,wisdom,etc: ";
    }
    else
    {
-      buffer += "Type '-', '1-5', 'confirm' or 'help keyword': ";
+      buffer += "Type -, 1-5, confirm or help strength,wisdom,etc: ";
    }
    SEND_TO_Q(buffer.c_str(), d);
    telnet_ga(d);
@@ -2846,7 +2846,7 @@ void show_question_stats(Connection *d)
 
 bool handle_get_stats(Connection *d, string arg)
 {
-   if (arg != "+" && arg != "-" && arg != "confirm")
+   if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
    {
       try
       {
@@ -2864,90 +2864,15 @@ bool handle_get_stats(Connection *d, string arg)
    {
       if (arg == "+")
       {
-         if (d->stats->points > 0)
-         {
-            switch (d->stats->selection)
-            {
-            case 1: // STR
-               if (d->stats->str[0] < 18)
-               {
-                  d->stats->str[0]++;
-                  d->stats->points--;
-               }
-               break;
-
-            case 2: // DEX
-               if (d->stats->dex[0] < 18)
-               {
-                  d->stats->dex[0]++;
-                  d->stats->points--;
-               }
-               break;
-            case 3: // CON
-               if (d->stats->con[0] < 18)
-               {
-                  d->stats->con[0]++;
-                  d->stats->points--;
-               }
-               break;
-            case 4: // INT
-               if (d->stats->tel[0] < 18)
-               {
-                  d->stats->tel[0]++;
-                  d->stats->points--;
-               }
-               break;
-            case 5: // WIS
-               if (d->stats->wis[0] < 18)
-               {
-                  d->stats->wis[0]++;
-                  d->stats->points--;
-               }
-               break;
-            }
-         }
+         d->stats->increase(1);
+      }
+      else if (arg == "max")
+      {
+         d->stats->increase(d->stats->points);
       }
       else if (arg == "-")
       {
-         switch (d->stats->selection)
-         {
-         case 1: // STR
-            if (d->stats->str[0] > 12)
-            {
-               d->stats->str[0]--;
-               d->stats->points++;
-            }
-            break;
-
-         case 2: // DEX
-            if (d->stats->dex[0] > 12)
-            {
-               d->stats->dex[0]--;
-               d->stats->points++;
-            }
-            break;
-         case 3: // CON
-            if (d->stats->con[0] > 12)
-            {
-               d->stats->con[0]--;
-               d->stats->points++;
-            }
-            break;
-         case 4: // INT
-            if (d->stats->tel[0] > 12)
-            {
-               d->stats->tel[0]--;
-               d->stats->points++;
-            }
-            break;
-         case 5: // WIS
-            if (d->stats->wis[0] > 12)
-            {
-               d->stats->wis[0]--;
-               d->stats->points++;
-            }
-            break;
-         }
+         d->stats->decrease(1);
          d->stats->setMin();
       }
       else if (arg.find("help") == 0)
@@ -3259,4 +3184,130 @@ stat_data::stat_data(void)
    memset(con, 0, sizeof(con));
    memset(tel, 0, sizeof(tel));
    memset(wis, 0, sizeof(wis));
+}
+
+bool stat_data::increase(uint64_t number)
+{
+   if (points <= 0)
+   {
+      return false;
+   }
+
+   int *attribute_to_change = nullptr;
+   switch (selection)
+   {
+   case 1: // STR
+      if (str[0] < 18)
+      {
+         attribute_to_change = &str[0];
+      }
+      break;
+
+   case 2: // DEX
+      if (dex[0] < 18)
+      {
+         attribute_to_change = &dex[0];
+      }
+      break;
+   case 3: // CON
+      if (con[0] < 18)
+      {
+         attribute_to_change = &con[0];
+      }
+      break;
+   case 4: // INT
+      if (tel[0] < 18)
+      {
+         attribute_to_change = &tel[0];
+      }
+      break;
+   case 5: // WIS
+      if (wis[0] < 18)
+      {
+         attribute_to_change = &wis[0];
+      }
+      break;
+      // selection wasn't a recognized attribute
+   default:
+      return false;
+      break;
+   }
+   // attribute selected was already at max (18+)
+   if (attribute_to_change == nullptr)
+   {
+      return false;
+   }
+
+   // Can't increase by more than you have
+   if (number > points)
+   {
+      number = points;
+   }
+
+   uint64_t diff_from_natural_max = 18 - *attribute_to_change;
+   if (number > diff_from_natural_max)
+   {
+      number = diff_from_natural_max;
+   }
+
+   points -= number;
+   (*attribute_to_change) += number;
+   return true;
+}
+
+bool stat_data::decrease(uint64_t number)
+{
+   int *attribute_to_change = nullptr;
+   switch (selection)
+   {
+   case 1: // STR
+      if (str[0] > 12)
+      {
+         attribute_to_change = &str[0];
+      }
+      break;
+
+   case 2: // DEX
+      if (dex[0] > 12)
+      {
+         attribute_to_change = &dex[0];
+      }
+      break;
+   case 3: // CON
+      if (con[0] > 12)
+      {
+         attribute_to_change = &con[0];
+      }
+      break;
+   case 4: // INT
+      if (tel[0] > 12)
+      {
+         attribute_to_change = &tel[0];
+      }
+      break;
+   case 5: // WIS
+      if (wis[0] > 12)
+      {
+         attribute_to_change = &wis[0];
+      }
+      break;
+      // selection wasn't a recognized attribute
+   default:
+      return false;
+      break;
+   }
+   // attribute selected was already at max (18+)
+   if (attribute_to_change == nullptr)
+   {
+      return false;
+   }
+
+   if (number > *attribute_to_change)
+   {
+      number = *attribute_to_change;
+   }
+
+   points += number;
+   (*attribute_to_change) -= number;
+   return true;
 }
