@@ -290,3 +290,25 @@ bool Character::validateName(QString name)
 
     return true;
 }
+
+void Connection::send(QString txt)
+{
+    /* if there's no descriptor, don't worry about output */
+    if (descriptor == 0)
+    {
+        return;
+    }
+
+    if (allowColor && connected != states::EDITING && connected != states::WRITE_BOARD && connected != states::EDIT_MPROG)
+    {
+        string buffer = handle_ansi(txt.toStdString(), character);
+        txt = buffer.c_str();
+    }
+
+    if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && connected == Connection::states::PLAYING)
+    {
+        txt = scramble_text(txt);
+    }
+
+    output += txt.toStdString();
+}

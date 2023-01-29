@@ -122,6 +122,7 @@ public:
   bool color = {};
   bool server_size_echo = false;
   bool allowColor = 1;
+  void send(QString txt);
 };
 
 #endif
