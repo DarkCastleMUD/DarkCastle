@@ -287,7 +287,7 @@ void boro_mob_stat(Character *ch, Character *k)
           (!IS_NPC(k) ? "PC" : "MOB"),
           GET_NAME(k),
           (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
-          (k->in_room == NOWHERE ? -1 : world[k->in_room].number),
+          (k->in_room == DC::NOWHERE ? 0 : world[k->in_room].number),
           /* end of first line */
 
           (k->short_desc ? k->short_desc : "None"),
@@ -591,7 +591,7 @@ void mob_stat(Character *ch, Character *k)
             (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
             (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
             (IS_NPC(k) ? k->mobdata->nr : 0),
-            k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+            k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
     strcat(buf, buf2);
@@ -601,7 +601,7 @@ void mob_stat(Character *ch, Character *k)
   {
     sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
             (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
-            k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+            k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
   }
   send_to_char(buf, ch);
 
@@ -1008,7 +1008,7 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   send_to_char("$3Can be worn by$R:", ch);
-  sprintbit(j->obj_flags.size,Object::size_bits, buf);
+  sprintbit(j->obj_flags.size, Object::size_bits, buf);
   strcat(buf, "\n\r");
   send_to_char(buf, ch);
 
@@ -1018,7 +1018,7 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   send_to_char("$3More flags$R: ", ch);
-  sprintbit(j->obj_flags.more_flags,Object::more_obj_bits, buf);
+  sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
   strcat(buf, "\n\r");
   send_to_char(buf, ch);
 
@@ -1031,8 +1031,8 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   strcpy(buf, "$3In room$R: ");
-  if (j->in_room == NOWHERE)
-    strcat(buf, "Nowhere");
+  if (j->in_room == DC::NOWHERE)
+    strcat(buf, "NOWHERE");
   else
   {
     sprintf(buf2, "%d", world[j->in_room].number);
@@ -1451,7 +1451,7 @@ int do_clear(Character *ch, char *argument, int cmd)
       produce_coredump(tmp_victim);
       continue;
     }
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }

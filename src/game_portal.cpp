@@ -191,7 +191,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 #endif
   clear_object(from_portal);
 
-  if (real_room(from_room) == NOWHERE)
+  if (real_room(from_room) == DC::NOWHERE)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     dc_free(from_portal);
@@ -236,7 +236,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
   from_portal->obj_flags.timer = timer;
 
-  from_portal->in_room = NOWHERE;
+  from_portal->in_room = DC::NOWHERE;
 
   /* The room that it goes to */
   from_portal->obj_flags.value[0] = to_room;

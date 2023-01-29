@@ -371,7 +371,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left, &mob](Character *const &tmp)
 				{
-					if (tmp->in_room != NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
+					if (tmp->in_room != DC::NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
 					{
 						target = tmp;
 						return true;
@@ -416,7 +416,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		for (otmp = object_list; otmp; otmp = otmp->next)
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
-			if ((cmp->in_room != NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
+			if ((cmp->in_room != DC::NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
 				if (isname(left, otmp->name))
 				{
 					otarget = otmp;
@@ -1767,7 +1767,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		count = count_if(character_list.begin(), character_list.end(),
 						 [&target](Character *vch)
 						 {
-							 if (IS_NPC(vch) && vch->in_room != NOWHERE && mob_index[vch->mobdata->nr].virt == target)
+							 if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobdata->nr].virt == target)
 							 {
 								 return true;
 							 }

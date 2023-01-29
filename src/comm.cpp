@@ -3272,7 +3272,7 @@ void send_to_zone(char *messg, int zone)
   {
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (!i->connected && !is_busy(i->character) && i->character->in_room != NOWHERE && world[i->character->in_room].zone == zone)
+      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && world[i->character->in_room].zone == zone)
       {
         SEND_TO_Q(messg, i);
       }
@@ -3285,7 +3285,7 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
   Character *i = nullptr;
 
   // If a megaphone goes off when in someone's inventory this happens
-  if (room == NOWHERE)
+  if (room == DC::NOWHERE)
     return;
 
   if (!world_array[room] || !world[room].people)

@@ -344,7 +344,7 @@ Object *clan_altar(Character *ch)
          {
             for (room = clan->rooms; room; room = room->next)
             {
-               if (real_room(room->room_number) == NOWHERE)
+               if (real_room(room->room_number) == DC::NOWHERE)
                   continue;
                Object *t = world[real_room(room->room_number)].contents;
                for (; t; t = t->next_content)

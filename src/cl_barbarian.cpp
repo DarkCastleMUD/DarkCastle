@@ -148,7 +148,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       REMOVE_BIT(exit->exit_info, EX_CLOSED); // break this side of door
       SET_BIT(exit->exit_info, EX_BROKEN);
 
-      if ((other_room = exit->to_room) != NOWHERE)
+      if ((other_room = exit->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
@@ -328,7 +328,7 @@ int do_brace(Character *ch, char *argument, int cmd)
       act("The passage now appears firmly blocked.", ch, 0, exit->keyword, TO_ROOM, 0);
       exit->bracee = ch;
       ch->brace_at = exit;
-      if ((other_room = exit->to_room) != NOWHERE)
+      if ((other_room = exit->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {

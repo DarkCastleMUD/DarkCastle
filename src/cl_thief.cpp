@@ -303,7 +303,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB) && GET_POS(victim) != POSITION_DEAD && victim->in_room != NOWHERE)
+  if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB) && GET_POS(victim) != POSITION_DEAD && victim->in_room != DC::NOWHERE)
   {
     if (was_in == ch->in_room)
     {
@@ -1573,7 +1573,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       send_to_char("The lock quickly yields to your skills.\r\n", ch);
 
       /* now for unlocking the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
       {
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
         {

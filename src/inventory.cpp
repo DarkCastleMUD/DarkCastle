@@ -2298,7 +2298,7 @@ int do_open(Character *ch, char *argument, int cmd)
       }
 
       /* now for opening the OTHER side of the door! */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
@@ -2407,7 +2407,7 @@ int do_close(Character *ch, char *argument, int cmd)
         act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("Ok.\r\n", ch);
       /* now for closing the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
@@ -2545,7 +2545,7 @@ int do_lock(Character *ch, char *argument, int cmd)
         act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("*Click*\r\n", ch);
       /* now for locking the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             SET_BIT(back->exit_info, EX_LOCKED);
@@ -2619,7 +2619,7 @@ int do_unlock(Character *ch, char *argument, int cmd)
         act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("*click*\r\n", ch);
       /* now for unlocking the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
         if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             REMOVE_BIT(back->exit_info, EX_LOCKED);

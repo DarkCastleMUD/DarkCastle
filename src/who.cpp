@@ -21,7 +21,7 @@
 #include "const.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
-//        from another class will pop up who name is nowhere near matching.
+//        from another class will pop up who name is DC::NOWHERE near matching.
 
 clan_data *get_clan(Character *);
 
@@ -730,7 +730,7 @@ int do_where(Character *ch, char *argument, int cmd)
     send_to_char("All Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
       {
         if (d->original)
         { // If switched
@@ -750,7 +750,7 @@ int do_where(Character *ch, char *argument, int cmd)
     send_to_char("Search of Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
       {
         if (d->original)
         { // If switched
@@ -779,7 +779,7 @@ int do_where(Character *ch, char *argument, int cmd)
       return eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-      if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != NOWHERE) &&
+      if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
           CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
       {

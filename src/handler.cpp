@@ -60,7 +60,6 @@ extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 
-
 void huntclear_item(class Object *obj);
 
 #ifdef WIN32
@@ -2240,7 +2239,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 	Character *i, *fighter, *next_char;
 	bool Other = false, More = false, kimore = false;
 
-	if (ch->in_room == NOWHERE)
+	if (ch->in_room == DC::NOWHERE)
 	{
 		return (0);
 	}
@@ -2305,7 +2304,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 		REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
 	}
 
-	ch->in_room = NOWHERE;
+	ch->in_room = DC::NOWHERE;
 	ch->next_in_room = 0;
 
 	/* success */
@@ -2334,7 +2333,7 @@ bool is_hiding(Character *ch, Character *vict)
 int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 {
 	Character *temp;
-	if (room == NOWHERE)
+	if (room == DC::NOWHERE)
 		return (0);
 
 	if (world[room].people == ch)
@@ -2475,7 +2474,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		return 0;
 	}
 
-	if (obj->in_room != NOWHERE)
+	if (obj->in_room != DC::NOWHERE)
 	{
 		logentry("EQUIP: Obj is in_room when equip.", ANGEL, LogChannels::LOG_BUG);
 		return 0;
@@ -2494,7 +2493,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 			}
 			return 1;
 		}
-		if (ch->in_room != NOWHERE)
+		if (ch->in_room != DC::NOWHERE)
 		{
 			act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
 			act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
@@ -2508,7 +2507,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		}
 		else
 		{
-			logentry("ch->in_room = NOWHERE when equipping char.", 0, LogChannels::LOG_BUG);
+			logentry("ch->in_room = DC::NOWHERE when equipping char.", 0, LogChannels::LOG_BUG);
 		}
 	}
 
@@ -2953,7 +2952,7 @@ Character *get_char_num(int nr)
 // specified by dest.
 int move_obj(Object *obj, int dest)
 {
-	int obj_in_room = NOWHERE;
+	int obj_in_room = DC::NOWHERE;
 	Object *contained_by = 0;
 	Character *carried_by = 0;
 
@@ -2969,7 +2968,7 @@ int move_obj(Object *obj, int dest)
 		abort();
 	}
 
-	if ((obj_in_room = obj->in_room) != NOWHERE)
+	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
 	{
 		if (obj_from_room(obj) == 0)
 		{
@@ -3007,22 +3006,22 @@ int move_obj(Object *obj, int dest)
 	{
 		// Couldn't move obj to dest...where to put it now?
 
-		if ((obj_in_room != NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (1): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (1): %s.\n", obj->name);
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (2) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (2) : %s.\n", obj->name);
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (3) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (3) : %s.\n", obj->name);
 			abort();
 		}
 
@@ -3038,7 +3037,7 @@ int move_obj(Object *obj, int dest)
 // specified by dest_obj.
 int move_obj(Object *obj, Object *dest_obj)
 {
-	int obj_in_room = NOWHERE;
+	int obj_in_room = DC::NOWHERE;
 	Object *contained_by = 0;
 	Character *carried_by = 0;
 
@@ -3054,7 +3053,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		abort();
 	}
 
-	if ((obj_in_room = obj->in_room) != NOWHERE)
+	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
 	{
 		if (obj_from_room(obj) == 0)
 		{
@@ -3092,22 +3091,22 @@ int move_obj(Object *obj, Object *dest_obj)
 	{
 		// Couldn't move obj to dest_obj...where to put it now?
 
-		if ((obj_in_room != NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (4): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (4): %s.\n", obj->name);
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (5) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (5) : %s.\n", obj->name);
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (6) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (6) : %s.\n", obj->name);
 			abort();
 		}
 
@@ -3123,7 +3122,7 @@ int move_obj(Object *obj, Object *dest_obj)
 // character specified by ch.
 int move_obj(Object *obj, Character *ch)
 {
-	int obj_in_room = NOWHERE;
+	int obj_in_room = DC::NOWHERE;
 	Object *contained_by = 0;
 	Character *carried_by = 0;
 
@@ -3141,7 +3140,7 @@ int move_obj(Object *obj, Character *ch)
 		abort();
 	}
 
-	if ((obj_in_room = obj->in_room) != NOWHERE)
+	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
 	{
 		if (obj_from_room(obj) == 0)
 		{
@@ -3195,22 +3194,22 @@ int move_obj(Object *obj, Character *ch)
 	{
 		// Couldn't move obj to ch...where to put it now?
 
-		if ((obj_in_room != NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (7): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (7): %s.\n", obj->name);
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (8) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (8) : %s.\n", obj->name);
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in NOWHERE (9) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (9) : %s.\n", obj->name);
 			abort();
 		}
 
@@ -3236,7 +3235,7 @@ int obj_to_char(class Object *object, Character *ch)
 	ch->carrying = object;
 	object->carried_by = ch;
 	object->equipped_by = 0;
-	object->in_room = NOWHERE;
+	object->in_room = DC::NOWHERE;
 	IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
 	IS_CARRYING_N(ch)
 	++;
@@ -3255,7 +3254,7 @@ int obj_to_char(class Object *object, Character *ch)
 	 obj->next_content    = object;
 	 object->carried_by   = ch;
 	 object->equipped_by  = 0;
-	 object->in_room      = NOWHERE;
+	 object->in_room      = DC::NOWHERE;
 
 	 IS_CARRYING_W(ch)   += GET_OBJ_WEIGHT(object);
 	 IS_CARRYING_N(ch)++;
@@ -3418,7 +3417,7 @@ int obj_from_room(class Object *object)
 		}
 	}
 
-	object->in_room = NOWHERE;
+	object->in_room = DC::NOWHERE;
 	object->next_content = 0;
 
 	save_corpses();
@@ -3555,7 +3554,7 @@ void extract_obj(class Object *obj)
 			}
 	}
 
-	if (obj->in_room != NOWHERE)
+	if (obj->in_room != DC::NOWHERE)
 		obj_from_room(obj);
 	else if (obj->carried_by)
 		obj_from_char(obj);
@@ -3691,9 +3690,9 @@ void extract_char(Character *ch, bool pull, Trace t)
 	{ // already taken care of
 		return;
 	}
-	if (ch->in_room == NOWHERE)
+	if (ch->in_room == DC::NOWHERE)
 	{
-		logentry("Extract_char: NOWHERE", ANGEL, LogChannels::LOG_BUG);
+		logentry("Extract_char: DC::NOWHERE", ANGEL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -4255,7 +4254,7 @@ Character *get_char_vis(Character *ch, const char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](Character *const &i)
 						  {
-		if (i->in_room == NOWHERE)
+		if (i->in_room == DC::NOWHERE)
 		{
 			return false;
 		}
@@ -4324,7 +4323,6 @@ get_active_pc(const char *name)
 	Character *i;
 	Character *partial_match;
 	class Connection *d;
-	
 
 	partial_match = 0;
 
@@ -4354,7 +4352,6 @@ Character *get_all_pc(char *name)
 {
 	Character *i;
 	class Connection *d;
-	
 
 	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
@@ -4449,7 +4446,6 @@ Character *get_active_pc_vis(Character *ch, const char *name)
 	Character *i;
 	Character *partial_match;
 	class Connection *d;
-	
 
 	partial_match = 0;
 

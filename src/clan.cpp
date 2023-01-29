@@ -699,7 +699,7 @@ void delete_clan(clan_data *dead_clan)
       {
         room = dead_clan->rooms;
         nextroom = room->next;
-        if (real_room(room->room_number) != NOWHERE)
+        if (real_room(room->room_number) != DC::NOWHERE)
           if (IS_SET(world[real_room(room->room_number)].room_flags, CLAN_ROOM))
             REMOVE_BIT(world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 

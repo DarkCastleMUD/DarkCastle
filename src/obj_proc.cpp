@@ -124,7 +124,7 @@ void load_emoting_objects()
   index_cursor = obj_emote_head.next;
   index_cursor->next = nullptr;
   index_cursor->data = nullptr;
-  index_cursor->room_number = NOWHERE;
+  index_cursor->room_number = DC::NOWHERE;
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
 #ifdef LEAK_CHECK
@@ -192,7 +192,7 @@ void load_emoting_objects()
       index_cursor->data = (struct obj_emote_data *)
           dc_alloc(1, sizeof(struct obj_emote_data));
 #endif
-      index_cursor->room_number = NOWHERE;
+      index_cursor->room_number = DC::NOWHERE;
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
       data_cursor = index_cursor->data;
@@ -230,7 +230,7 @@ int emoting_object(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     if (real_room(index_cursor->room_number) == obj->in_room)
     {
-      if (real_room(index_cursor->room_number) == NOWHERE)
+      if (real_room(index_cursor->room_number) == DC::NOWHERE)
       {
         return eFAILURE;
       }
@@ -1823,7 +1823,7 @@ int weenie_weedy(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     if (obj->carried_by)
       send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
-    else if (obj->in_room != NOWHERE)
+    else if (obj->in_room != DC::NOWHERE)
       send_to_room("a weenie weedy doll says, 'BLARG!'\r\n", obj->in_room);
     else if (obj->in_obj && obj->in_obj->carried_by)
       send_to_room("a muffled 'BLARG!' comes from a weenie weedy doll somewhere nearby.\r\n", obj->in_obj->carried_by->in_room);
@@ -2431,7 +2431,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
         break;
       }
     }
-    if (first && real_room(30000) != NOWHERE)
+    if (first && real_room(30000) != DC::NOWHERE)
     {
       int zone = world[real_room(30000)].zone;
       auto &character_list = DC::getInstance()->character_list;
@@ -2443,7 +2443,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
           produce_coredump(tmp_victim);
           continue;
         }
-        if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+        if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
         {
           continue;
         }
@@ -2627,7 +2627,7 @@ int moving_portals(Character *ch, class Object *obj, int cmd,
         break;
       }
       bool portal = false;
-      if (real_room(room) == NOWHERE)
+      if (real_room(room) == DC::NOWHERE)
         continue;
       if (sector)
         if (world[real_room(room)].sector_type != sector)

@@ -81,7 +81,8 @@ public:
     QString implementer;
   } cf;
 
-  static const room_t SORPIGAL_BANK_ROOM = 3005;
+  static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
+  static constexpr room_t NOWHERE = 0;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;

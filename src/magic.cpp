@@ -962,7 +962,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
       break;
     }
 
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1289,7 +1289,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1323,7 +1323,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Objec
   for (auto &tmp_victim : character_list)
   {
 
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1357,7 +1357,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1384,7 +1384,7 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1410,7 +1410,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Obje
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1474,7 +1474,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1720,7 +1720,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
       do
       {
         to_room = number(cur_zone_bottom, cur_zone_top);
-      } while (real_room(to_room) == NOWHERE);
+      } while (real_room(to_room) == DC::NOWHERE);
     }
   }
   else
@@ -3095,7 +3095,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       continue;
     }
 
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
     {
       if (isname(tmp, i->name))
       {
@@ -3117,7 +3117,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
         sprintf(buf, "%s is in %s.\r\n", i->short_description,
                 i->in_obj->short_description);
       }
-      else if (i->in_room != NOWHERE)
+      else if (i->in_room != DC::NOWHERE)
       {
         sprintf(buf, "%s is in %s.\r\n", i->short_description,
                 world[i->in_room].name);
@@ -3148,7 +3148,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
   if (GET_LEVEL(ch) >= IMMORTAL)
   {
-    ch->send(format("Skipped god:{} other:{} nolocate:{} nosee:{} nowhere:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
+    ch->send(format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
 
   return eSUCCESS;
@@ -4280,7 +4280,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
       {
         act("$n disappears.", victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
         move_char(victim->pcdata->golem, location);
-        act("$n appears out of nowhere.", victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
+        act("$n appears out of DC::NOWHERE.", victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
         GET_MANA(victim) -= 50;
       }
     }
@@ -4288,7 +4288,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   /* a location has been found. */
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   move_char(victim, location);
-  act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n appears out of DC::NOWHERE.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   do_look(victim, "", 15);
   return eSUCCESS;
 }
@@ -4663,14 +4663,14 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     send_to_char("Item is: ", ch);
     sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-    sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf2);
+    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
     strcat(buf, " ");
     strcat(buf, buf2);
     strcat(buf, "\n\r");
     send_to_char(buf, ch);
 
     send_to_char("Worn by: ", ch);
-    sprintbit(obj->obj_flags.size,Object::size_bits, buf);
+    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
     strcat(buf, "\r\n");
     send_to_char(buf, ch);
 
@@ -4947,7 +4947,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -4988,7 +4988,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -6555,8 +6555,8 @@ void make_portal(Character *ch, Character *vict)
 
   ch_portal->item_number = -1;
   vict_portal->item_number = -1;
-  ch_portal->in_room = NOWHERE;
-  vict_portal->in_room = NOWHERE;
+  ch_portal->in_room = DC::NOWHERE;
+  vict_portal->in_room = DC::NOWHERE;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(buf, "pcportal portal cleric %s", GET_NAME(ch));
@@ -11272,7 +11272,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
   {
     try
     {
-      if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+      if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
       {
         continue;
       }
@@ -12723,7 +12723,7 @@ void familiar_creation_message(Character *ch, int fam_type)
                  ch);
     break;
   case FAMILIAR_MOB_CHIPMUNK:
-    act("$n coaxs a chipmunk from nowhere and gives it an acorn to eat.\r\n"
+    act("$n coaxs a chipmunk from DC::NOWHERE and gives it an acorn to eat.\r\n"
         "A small chipmunk eats the acorn and looks at $n lovingly.",
         ch, 0, 0, TO_ROOM, 0);
     send_to_char("You whistle a little tune summoning a chipmunk to you and give it an acorn.\r\n"
@@ -13429,7 +13429,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }

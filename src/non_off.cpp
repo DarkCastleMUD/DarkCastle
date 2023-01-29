@@ -44,7 +44,7 @@ extern CVoteData *DCVote;
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 {
 
-  if (GET_OBJ_RNUM(obj) == NOWHERE)
+  if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
     return;
 
   if (!decay)

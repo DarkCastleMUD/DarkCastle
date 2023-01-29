@@ -863,7 +863,7 @@ void boot_the_shops()
 
     shop_index[max_shop].inventory = 0;
 
-    if (real_room(temp) == NOWHERE)
+    if (real_room(temp) == DC::NOWHERE)
     {
       char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "BAD SHOP IN ROOM %d -- FIX THIS!", temp);

@@ -48,7 +48,7 @@ int do_report(Character *ch, char *argument, int cmd)
   char report[200];
 
   assert(ch != 0);
-  if (ch->in_room == NOWHERE)
+  if (ch->in_room == DC::NOWHERE)
   {
     logentry("NOWHERE sent to do_report!", OVERSEER, LogChannels::LOG_BUG);
     return eSUCCESS;

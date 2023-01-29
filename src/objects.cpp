@@ -185,7 +185,7 @@ void object_activity(uint64_t pulse_type)
     {
       int retval = 0;
 
-      if (obj->in_room != NOWHERE)
+      if (obj->in_room != DC::NOWHERE)
       {
         if (DC::getInstance()->zones.value(world[obj->in_room].zone).players > 0)
           retval = oprog_rand_trigger(obj);

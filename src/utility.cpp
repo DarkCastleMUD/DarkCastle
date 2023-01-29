@@ -1079,7 +1079,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL)
     return true;
 
-  if (obj->in_room == NOWHERE)
+  if (obj->in_room == DC::NOWHERE)
   {
     return false;
   }
@@ -1586,7 +1586,7 @@ int do_recall(Character *ch, char *argument, int cmd)
 
   if (!is_mob && !IS_SET(retval, eCH_DIED))
   { // if it was a mob, we might have died moving
-    act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act("$n appears out of DC::NOWHERE.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     do_look(victim, "", 0);
   }
   return retval;
@@ -2681,7 +2681,7 @@ void update_make_camp_and_leadership(void)
                  affect_from_char(i, SKILL_BATTLESENSE);
              }
 
-             if (i->in_room != NOWHERE)
+             if (i->in_room != DC::NOWHERE)
              {
                if (!check_make_camp(i->in_room))
                {
@@ -3080,7 +3080,7 @@ bool isDead(Character *ch)
 
 bool isNowhere(Character *ch)
 {
-  return (ch && ch->in_room == NOWHERE);
+  return (ch && ch->in_room == DC::NOWHERE);
 }
 
 bool file_exists(string filename)

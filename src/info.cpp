@@ -1815,7 +1815,7 @@ int do_look(Character *ch, char *argument, int cmd)
             else
                door = doorj;
 
-            if (!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
+            if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
                continue;
             is_closed = IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED);
             is_hidden = IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN);
@@ -1922,7 +1922,7 @@ int do_exits(Character *ch, char *argument, int cmd)
 
    for (door = 0; door <= 5; door++)
    {
-      if (!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
+      if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
          continue;
 
       if (!IS_MOB(ch) && ch->pcdata->holyLite)
@@ -2680,11 +2680,11 @@ int do_olocate(Character *ch, char *name, int cmd)
 
       count++;
 
-      if (in_room != NOWHERE)
+      if (in_room != DC::NOWHERE)
          sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
       else
          sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
-                 "(Item at NOWHERE.)");
+                 "(Item at DC::NOWHERE.)");
 
       if (k->in_obj)
       {

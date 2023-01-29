@@ -893,7 +893,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		return eFAILURE;
 	}
 
-	if (EXIT(ch, cmd)->to_room == NOWHERE)
+	if (EXIT(ch, cmd)->to_room == DC::NOWHERE)
 	{
 		send_to_char("Alas, you can't go that way.\r\n", ch);
 		return eFAILURE;
@@ -1077,7 +1077,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	Character *sesame;
 	Object *portal = nullptr;
 
-	if ((ch->in_room != NOWHERE) || (ch->in_room))
+	if ((ch->in_room != DC::NOWHERE) || (ch->in_room))
 	{
 		one_argument(argument, buf);
 	}
@@ -1234,12 +1234,12 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 
 	int origination = ch->in_room;
 
-	if (ch->in_room != NOWHERE)
+	if (ch->in_room != DC::NOWHERE)
 	{
 		// Couldn't move char from the room
 		if (char_from_room(ch, stop_all_fighting) == 0)
 		{
-			logentry("Error in move_char(), character not NOWHERE, but couldn't be moved.",
+			logentry("Error in move_char(), character not DC::NOWHERE, but couldn't be moved.",
 					 OVERSEER, LogChannels::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}
@@ -1251,7 +1251,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 		// Now we have real problems
 		if (char_to_room(ch, origination) == 0)
 		{
-			fprintf(stderr, "Error in move_char(), character stuck in NOWHERE: %s.\n", GET_NAME(ch));
+			fprintf(stderr, "Error in move_char(), character stuck in DC::NOWHERE: %s.\n", GET_NAME(ch));
 			abort();
 		}
 		logf(OVERSEER, LogChannels::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), world[dest].number);

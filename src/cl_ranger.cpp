@@ -1319,7 +1319,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     {
       if (dir >= 0)
       {
-        if (world[cur_room].dir_option[dir] && !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (world[cur_room].dir_option[dir] && !(world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = world[cur_room].dir_option[dir]->to_room;
           if (IS_SET(world[new_room].room_flags, SAFE))
@@ -1344,7 +1344,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
       if (!victim && new_room && artype == 3 && dir >= 0)
       {
-        if (world[new_room].dir_option[dir] && !(world[new_room].dir_option[dir]->to_room == NOWHERE) && !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (world[new_room].dir_option[dir] && !(world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
@@ -1370,7 +1370,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
       if (!victim && new_room && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0)
       {
-        if (world[new_room].dir_option[dir] && !(world[new_room].dir_option[dir]->to_room == NOWHERE) && !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (world[new_room].dir_option[dir] && !(world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);

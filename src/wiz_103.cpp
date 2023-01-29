@@ -416,7 +416,7 @@ int do_guild(Character *ch, char *argument, int cmd)
     {
       // guild <room #>
       room = lookupRoom(ch, arg1);
-      if (room == NOWHERE)
+      if (room == DC::NOWHERE)
       {
         return eFAILURE;
       }
@@ -493,7 +493,7 @@ int do_guild(Character *ch, char *argument, int cmd)
   }
 
   room = lookupRoom(ch, arg2);
-  if (room == NOWHERE)
+  if (room == DC::NOWHERE)
   {
     return eFAILURE;
   }

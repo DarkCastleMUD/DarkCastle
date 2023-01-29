@@ -2072,7 +2072,7 @@ void setup_dir(FILE *fl, int room, int dir)
 	}
 	catch (...)
 	{
-		world[room].dir_option[dir]->to_room = NOWHERE;
+		world[room].dir_option[dir]->to_room = DC::NOWHERE;
 	}
 }
 
@@ -2142,7 +2142,7 @@ void renum_world(void)
 		for (door = 0; door <= 5; door++)
 			if (world_array[room])
 				if (world[room].dir_option[door])
-					if (world[room].dir_option[door]->to_room != NOWHERE)
+					if (world[room].dir_option[door]->to_room != DC::NOWHERE)
 						world[room].dir_option[door]->to_room =
 							real_room(world[room].dir_option[door]->to_room);
 }
@@ -2185,7 +2185,7 @@ void renum_zone_table(void)
 				else
 					zone.cmd[comm].active = 0;
 
-				//            if (zone.cmd[comm].arg3 != NOWHERE)
+				//            if (zone.cmd[comm].arg3 != DC::NOWHERE)
 				//          zone.cmd[comm].arg3 =
 				//        real_room(zone.cmd[comm].arg3);
 				break;
@@ -3436,7 +3436,7 @@ int create_blank_item(int nr)
 	obj->short_description = str_hsh("An empty obj");
 	obj->description = str_hsh("An empty obj sits here dejectedly.");
 	obj->action_description = str_hsh("Fixed.");
-	obj->in_room = NOWHERE;
+	obj->in_room = DC::NOWHERE;
 	obj->next_content = 0;
 	obj->next_skill = 0;
 	obj->table = 0;
@@ -3930,7 +3930,7 @@ class Object *read_object(int nr, FILE *fl, bool zz)
 		fscanf(fl, "%c\n", &chk);
 	}
 
-	obj->in_room = NOWHERE;
+	obj->in_room = DC::NOWHERE;
 	obj->next_skill = 0;
 	obj->next_content = 0;
 	obj->carried_by = 0;
@@ -4064,7 +4064,7 @@ ifstream &operator>>(ifstream &in, Object *obj)
 		in >> chk;
 	}
 
-	obj->in_room = NOWHERE;
+	obj->in_room = DC::NOWHERE;
 	obj->next_skill = 0;
 	obj->next_content = 0;
 	obj->carried_by = 0;
@@ -4270,7 +4270,7 @@ void write_object_csv(Object *obj, ofstream &fout)
 
 		write_bitvector_csv(obj->obj_flags.wear_flags, Object::wear_bits, fout);
 		write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
-		write_bitvector_csv(obj->obj_flags.more_flags,Object::more_obj_bits, fout);
+		write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
 
 		char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 		for (int i = 0; i < obj->num_affects; i++)
@@ -4687,7 +4687,7 @@ void Zone::reset(ResetType reset_type)
 						if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 						{
 							sprintf(buf,
-									"Obj %d loaded to NOWHERE. Zone %d Cmd %d",
+									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
 									obj_index[cmd[cmd_no].arg1].virt, id, cmd_no);
 							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
@@ -4993,7 +4993,7 @@ void Zone::reset(ResetType reset_type)
 		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmp_victim : character_list)
 		{
-			if (tmp_victim->in_room == NOWHERE)
+			if (tmp_victim->in_room == DC::NOWHERE)
 			{
 				continue;
 			}
@@ -5866,7 +5866,7 @@ void clear_char(Character *ch)
 	}
 
 	*ch = {};
-	ch->in_room = NOWHERE;
+	ch->in_room = DC::NOWHERE;
 	ch->position = POSITION_STANDING;
 	GET_HOME(ch) = START_ROOM;
 	GET_AC(ch) = 100; /* Basic Armor */
@@ -5881,7 +5881,7 @@ void clear_object(class Object *obj)
 
 	*obj = {};
 	obj->item_number = -1;
-	obj->in_room = NOWHERE;
+	obj->in_room = DC::NOWHERE;
 	obj->vroom = 0;
 	obj->obj_flags = obj_flag_data();
 	obj->num_affects = 0;
@@ -6021,7 +6021,7 @@ room_t real_room(room_t virt)
 {
 	if (virt < 0 || virt > top_of_world)
 	{
-		return NOWHERE;
+		return DC::NOWHERE;
 	}
 
 	if (world_array[virt])
@@ -6029,7 +6029,7 @@ room_t real_room(room_t virt)
 		return virt;
 	}
 
-	return NOWHERE;
+	return DC::NOWHERE;
 }
 
 /* returns the real number of the monster with given virt number */

@@ -9,7 +9,6 @@
 #include <assert.h>
 
 #include "DC.h"
-#include "room.h" // NOWHERE
 #include "db.h"
 #include "version.h"
 
@@ -50,7 +49,7 @@ void DC::handleShooting(void)
 	for (auto &ch : shooting_list)
 	{
 		// ignore the dead
-		if (ch->in_room == NOWHERE)
+		if (ch->in_room == DC::NOWHERE)
 		{
 			continue;
 		}

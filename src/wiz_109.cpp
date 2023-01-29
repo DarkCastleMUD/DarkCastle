@@ -515,7 +515,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
   {
     // let's crash the mud!
     Character *crashus = nullptr;
-    if (crashus->in_room == NOWHERE)
+    if (crashus->in_room == DC::NOWHERE)
     {
       return eFAILURE; // this should never be reached
     }
@@ -532,7 +532,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
 
     // let's crash the mud!
     Character *crashus = nullptr;
-    if (crashus->in_room == NOWHERE)
+    if (crashus->in_room == DC::NOWHERE)
     {
       return eFAILURE; // this should never be reached
     }

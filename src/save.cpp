@@ -1636,7 +1636,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   // make the actual call to "char_to_room" using this data later
   ch->in_room = real_room(st->load_room);
 
-  if (ch->in_room == NOWHERE)
+  if (ch->in_room == DC::NOWHERE)
   {
     if (GET_LEVEL(ch) >= IMMORTAL)
       ch->in_room = real_room(17);

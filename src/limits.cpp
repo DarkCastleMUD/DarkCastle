@@ -815,7 +815,7 @@ void point_update(void)
 	auto &character_list = DC::getInstance()->character_list;
 	for (auto &i : character_list)
 	{
-		if (i->in_room == NOWHERE)
+		if (i->in_room == DC::NOWHERE)
 			continue;
 		if (affected_by_spell(i, SPELL_POISON))
 			continue;
@@ -890,7 +890,7 @@ void update_corpses_and_portals(void)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if ((j->in_room != NOWHERE) && (world[j->in_room].people))
+				if ((j->in_room != DC::NOWHERE) && (world[j->in_room].people))
 				{
 					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
@@ -916,7 +916,7 @@ void update_corpses_and_portals(void)
 			{
 				if (j->carried_by)
 					act("$p decays in your hands.", j->carried_by, j, 0, TO_CHAR, 0);
-				else if ((j->in_room != NOWHERE) && (world[j->in_room].people))
+				else if ((j->in_room != DC::NOWHERE) && (world[j->in_room].people))
 				{
 					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_CHAR, 0);
@@ -968,7 +968,7 @@ void update_corpses_and_portals(void)
 						else
 							move_obj(jj, j->carried_by);
 					}
-					else if (j->in_room != NOWHERE)
+					else if (j->in_room != DC::NOWHERE)
 					{
 						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{

@@ -146,7 +146,7 @@ int do_arena(Character *ch, char *argument, int cmd)
 int do_joinarena(Character *ch, char *arg, int cmd)
 {
   char buf[256];
-  int send_to = NOWHERE;
+  int send_to = DC::NOWHERE;
   struct affected_type *af, *next_af;
   int pot_low = 6362;
   int pot_hi = 6379;
@@ -215,7 +215,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   GET_KI(ch) = GET_MAX_KI(ch);
 
   act("$n disappears in a glorious flash of heroism.", ch, 0, 0, TO_ROOM, 0);
-  while (send_to == NOWHERE)
+  while (send_to == DC::NOWHERE)
   {
     if (arena.type == POTATO)
     { // potato arena

@@ -263,9 +263,9 @@ bool IS_DARK(int room);
 #define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
 #define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
 #define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? obj_index[GET_OBJ_RNUM(obj)].virt : -1)
-#define VALID_ROOM_RNUM(rnum) ((rnum) != NOWHERE && (rnum) <= top_of_world)
+#define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= top_of_world)
 #define GET_ROOM_VNUM(rnum) \
-   ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
+   ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : DC::NOWHERE))
 
 #define GET_PROMPT(ch) ((ch)->pcdata->prompt)
 #define GET_LAST_PROMPT(ch) ((ch)->pcdata->last_prompt)
@@ -400,7 +400,7 @@ inline const short IS_ANONYMOUS(Character *ch)
 
 #define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags, INDOORS))
 #define EXIT(ch, door) (world[(ch)->in_room].dir_option[door])
-#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != NOWHERE) && (EXIT(ch, door)->to_room != NOWHERE) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
 #define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)

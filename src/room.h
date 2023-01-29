@@ -11,10 +11,6 @@
 #include "MobActivity.h" // struct path_data
 #include "player.h"      // CLASS_MAX
 
-// The following defs are for Room
-
-const unsigned int NOWHERE = 0;
-
 /* Bitvector For 'room_flags' */
 
 const auto DARK = 1;
@@ -157,7 +153,7 @@ public:
     int (*funct)(Character *, int, char *) = {}; // special procedure
 
     class Object *contents = {}; // List of items in room
-    Character *people = {};         // List of NPC / PC in room
+    Character *people = {};      // List of NPC / PC in room
 
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents

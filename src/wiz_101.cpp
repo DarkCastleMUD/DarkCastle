@@ -233,7 +233,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
-        if (target_obj->in_room != NOWHERE)
+        if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
           send(QString("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
@@ -511,7 +511,7 @@ int do_at(Character *ch, char *argument, int cmd)
   else if ((target_mob = get_char_vis(ch, loc_str)) != nullptr)
     location = target_mob->in_room;
   else if ((target_obj = get_obj_vis(ch, loc_str)) != nullptr)
-    if (target_obj->in_room != NOWHERE)
+    if (target_obj->in_room != DC::NOWHERE)
       location = target_obj->in_room;
     else
     {

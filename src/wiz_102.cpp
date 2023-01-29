@@ -5005,7 +5005,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
       continue;
     found_room = true;
     break;
@@ -5029,7 +5029,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
       continue;
     break;
   }
@@ -5045,7 +5045,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
       continue;
 
     for (door = 0; door <= 5; door++)
@@ -5076,7 +5076,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
       continue;
 
     if (world[room].contents)
@@ -5139,7 +5139,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == NOWHERE)
+    if (room == DC::NOWHERE)
       continue;
 
     if (world[room].people)
@@ -5300,7 +5300,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   else
   {
     x = atoi(arg1);
-    if (x < 0 || (loc = real_room(x)) == NOWHERE)
+    if (x < 0 || (loc = real_room(x)) == DC::NOWHERE)
     {
       send_to_char("No such room exists.\r\n", ch);
       return eFAILURE;

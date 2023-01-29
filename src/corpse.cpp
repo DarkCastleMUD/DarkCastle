@@ -596,7 +596,7 @@ class Object *create_obj_new(void)
 	obj->next = object_list;
 	object_list = obj;
 	/* Corpse saving stuff */
-	GET_OBJ_VROOM(obj) = NOWHERE;
+	GET_OBJ_VROOM(obj) = DC::NOWHERE;
 	GET_OBJ_TIMER(obj) = 0;
 	obj->save_expiration = 0;
 	obj->no_sell_expiration = 0;

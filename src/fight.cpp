@@ -1447,7 +1447,7 @@ int calculate_paladin_damage_bonus(Character *ch, Character *victim)
 int one_hit(Character *ch, Character *vict, int type, int weapon)
 {
   class Object *wielded; /* convenience */
-  int w_type;               /* Holds type info for damage() */
+  int w_type;            /* Holds type info for damage() */
   int weapon_type;
   int dam = 0; /* Self explan. */
   int retval = 0;
@@ -4316,7 +4316,7 @@ void make_scraps(Character *ch, class Object *obj)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("scraps");
 
   sprintf(buf, "A pile of scraps from %s is lying here.",
@@ -4358,7 +4358,7 @@ void make_corpse(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
 
   // If pc is in the name, the consent system works
   // Thieves don't deserve consent! Loot time!
@@ -4405,7 +4405,7 @@ void make_corpse(Character *ch)
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
     corpse->obj_flags.more_flags = 0;
     SET_BIT(corpse->obj_flags.more_flags, ITEM_NPC_CORPSE);
-    GET_OBJ_VROOM(corpse) = NOWHERE;
+    GET_OBJ_VROOM(corpse) = DC::NOWHERE;
   }
   else
   {
@@ -4698,7 +4698,7 @@ void make_husk(Character *ch)
 #endif
   clear_object(corpse);
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("husk");
   sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
           (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
@@ -4740,7 +4740,7 @@ void make_head(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("head");
 
   sprintf(buf, "The head of %s is lying here.",
@@ -4786,7 +4786,7 @@ void make_arm(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("arm");
 
   sprintf(buf, "The arm of %s is lying here.",
@@ -4832,7 +4832,7 @@ void make_leg(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("leg");
 
   sprintf(buf, "The leg of %s is lying here.",
@@ -4878,7 +4878,7 @@ void make_bowels(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("bowels");
 
   sprintf(buf, "The steaming bowels of %s is lying here.",
@@ -4924,7 +4924,7 @@ void make_blood(Character *ch)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("blood");
 
   sprintf(buf, "A pool of %s's blood is here.",
@@ -4974,7 +4974,7 @@ void make_heart(Character *ch, Character *vict)
   clear_object(corpse);
 
   corpse->item_number = -1;
-  corpse->in_room = NOWHERE;
+  corpse->in_room = DC::NOWHERE;
   corpse->name = str_hsh("heart");
 
   sprintf(buf, "%s's heart is laying here.",
