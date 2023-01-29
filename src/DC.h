@@ -145,6 +145,7 @@ public:
   void assign_mobiles(void);
   bool authenticate(QString username, QString password, uint64_t level = 0);
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
+  void sendAll(QString message);
 
 private:
   DC(const DC &) = delete; // non-copyable
