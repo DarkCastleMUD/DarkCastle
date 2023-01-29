@@ -914,6 +914,18 @@ void DC::game_loop_init(void)
   QHttpServer server(this);
   QStringList myData;
   auto dc = this;
+
+  server.route("/myApi/<arg>", QHttpServerRequest::Method::Get,
+               [&dc](int id, const QHttpServerRequest &request)
+               {
+                 return QHttpServerResponse(QString("int:%1\r\n").arg(id));
+               });
+  server.route("/myApi/<arg>/<arg>", QHttpServerRequest::Method::Get,
+               [&dc](QString str, QString str2, const QHttpServerRequest &request)
+               {
+                 return QHttpServerResponse(QString("str:%1 str2:%2\r\n").arg(str).arg(str2));
+               });
+
   server.route("/test", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
                {
     if (!dc->authenticate(request))
@@ -936,43 +948,36 @@ void DC::game_loop_init(void)
 
   server.route("/shutdown", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
                {
-                    if (!dc->authenticate(request, 110))
-                    {
-                      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
-                    }
+                 if (!dc->authenticate(request, 110))
+                 {
+                   return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+                 }
 
-                    auto future = QtConcurrent::run([]()
-                    {
-                                        
-                      int do_not_save_corpses = 1;
+                 auto future = QtConcurrent::run([]() {});
 
-                      QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
-                      send_to_all(buf.toStdString().c_str());
-                      logentry(buf, ANGEL, LogChannels::LOG_GOD);
-                      logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+                 int do_not_save_corpses = 1;
 
-                      for (auto &ch : DC::getInstance()->character_list)
-                      {
-                        if (ch->pcdata && IS_PC(ch))
-                        {
-                          ch->save();
-                        }
-                      }
+                 QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                 send_to_all(buf.toStdString().c_str());
+                 logentry(buf, ANGEL, LogChannels::LOG_GOD);
+                 logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
 
-                      char **argv = nullptr;
-                      if (!write_hotboot_file(argv))
-                      {
-                        logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
-                    } });
+                 for (auto &ch : dc->character_list)
+                 {
+                   if (ch->pcdata && IS_PC(ch))
+                   {
+                     ch->save();
+                   }
+                 }
 
-    if (future.isValid())
-    {
-      return QHttpServerResponse("Rebooting.\r\n");
-    }
-    else
-    {
-      return QHttpServerResponse("Failed.\r\n");
-    } });
+                 char **argv = nullptr;
+                 if (!write_hotboot_file(argv))
+                 {
+                   logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+                   return QHttpServerResponse("Failed.\r\n");
+                 }
+
+                 return QHttpServerResponse("Rebooting.\r\n"); });
 
   server.listen(QHostAddress::LocalHost, 6980);
 
@@ -1980,6 +1985,22 @@ void scramble_text(string &txt)
       curr = number(0, 1) ? (char)number('a', 'z') : (char)number('A', 'Z');
     }
   }
+}
+
+QString scramble_text(QString input)
+{
+  QString output;
+
+  for (auto &c : input)
+  {
+    // only scramble letters, but not 'm' cause 'm' is used in ansi codes
+    if (number(1, 5) == 5 && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) && c != 'm')
+    {
+      c = number(0, 1) ? (char)number('a', 'z') : (char)number('A', 'Z');
+    }
+  }
+
+  return output;
 }
 
 void write_to_output(string txt, class Connection *t)
@@ -3163,6 +3184,22 @@ void send_to_char(string messg, Character *ch)
   if (!selfpurge && (ch->desc && !messg.empty()) && (!is_busy(ch)))
   {
     SEND_TO_Q(messg, ch->desc);
+  }
+}
+
+void DC::sendAll(QString message)
+{
+  if (message.isEmpty())
+  {
+    return;
+  }
+
+  for (auto i = descriptor_list; i; i = i->next)
+  {
+    if (i->connected == Connection::states::PLAYING)
+    {
+      i->send(message);
+    }
   }
 }
 
