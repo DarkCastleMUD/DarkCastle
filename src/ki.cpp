@@ -1023,7 +1023,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Pick the lucky spell/affect to be removed
-  int i = number(0, aff_list.size() - 1);
+  uint64_t i = number((quint64)0, (quint64)aff_list.size() - 1);
 
   try
   {

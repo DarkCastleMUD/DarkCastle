@@ -491,7 +491,6 @@ command_return_t do_random(Character *ch, char *argument, int cmd);
 command_return_t do_range(Character *ch, char *argument, int cmd);
 command_return_t do_rdelete(Character *ch, char *argument, int cmd);
 command_return_t do_read(Character *ch, char *argument, int cmd);
-command_return_t do_recall(Character *ch, char *argument, int cmd);
 command_return_t do_recite(Character *ch, char *argument, int cmd);
 command_return_t do_redirect(Character *ch, char *argument, int cmd);
 command_return_t do_redit(Character *ch, char *argument, int cmd);

@@ -556,6 +556,7 @@ public:
     command_return_t do_save(QStringList arguments, int cmd);
     command_return_t do_search(QStringList arguments, int cmd);
     command_return_t do_identify(QStringList arguments, int cmd);
+    command_return_t do_recall(QStringList arguments, int cmd);
     command_return_t do_cdeposit(QStringList arguments, int cmd);
     command_return_t generic_command(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);

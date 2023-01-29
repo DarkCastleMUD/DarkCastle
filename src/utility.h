@@ -423,7 +423,18 @@ string double_dollars(string source);
 void clan_death(char *b, Character *ch);
 
 int move_char(Character *ch, int dest, bool stop_all_fighting = true);
-int number(int from, int to);
+// int number(int from, int to);
+
+qint64 number(int lowest, quint32 highest);
+qint64 number(int lowest, qint64 highest);
+qint64 number(qint64 lowest, int highest);
+quint64 number(unsigned lowest, quint64 highest);
+quint64 number(quint64 lowest, unsigned highest);
+qint32 number(qint32 from, qint32 to);
+quint32 number(quint32 from, quint32 to);
+qint64 number(qint64 from, qint64 to);
+quint64 number(quint64 from, quint64 to);
+
 int dice(int number, int size);
 int str_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(const char *arg1, const char *arg2);

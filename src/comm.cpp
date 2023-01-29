@@ -1087,7 +1087,7 @@ void heartbeat()
   {
     PerfTimers["pulse_regen"].start();
     // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number(DC::PULSE_REGEN - 8 * DC::PASSES_PER_SEC, DC::PULSE_REGEN + 5 * DC::PASSES_PER_SEC);
+    pulse_regen = number((quint64)DC::PULSE_REGEN - 8 * DC::PASSES_PER_SEC, (quint64)DC::PULSE_REGEN + 5 * DC::PASSES_PER_SEC);
     point_update();
     pulse_takeover();
     affect_update(DC::PULSE_REGEN);

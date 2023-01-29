@@ -120,7 +120,7 @@ struct command_info cmd_info[] =
         {"order", do_order, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"rest", do_rest, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
         {"recite", do_recite, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
-        {"recall", do_recall, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"recall", nullptr, nullptr, &Character::do_recall, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"score", do_score, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"scan", do_scan, nullptr, nullptr, POSITION_RESTING, 1, CMD_DEFAULT, 0, 25, CommandType::all},
         {"stand", do_stand, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},

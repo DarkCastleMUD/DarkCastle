@@ -3699,7 +3699,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
 
     if (!tmp.empty())
     {
-      int rnd = number(0, tmp.size() - 1);
+      int rnd = number((quint64)0, (quint64)tmp.size() - 1);
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
       strcat(buf2, "'$R\n\r");

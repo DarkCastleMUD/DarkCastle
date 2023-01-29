@@ -489,7 +489,7 @@ static char *frostyYellText[] = {
 int frosty(Character *ch, class Object *obj, int cmd, const char *arg,
            Character *owner)
 {
-  int x;
+  quint64 x;
 
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return eFAILURE;
@@ -497,7 +497,7 @@ int frosty(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  x = number(0, FROSTY_YELL_TEXT_SIZE * 60);
+  x = number((quint64)0, (quint64)FROSTY_YELL_TEXT_SIZE * 60);
 
   if ((unsigned)x < FROSTY_YELL_TEXT_SIZE)
   {
@@ -557,7 +557,7 @@ int poet(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  x = number(0, POET_SAY_TEXT_SIZE * 10);
+  x = number((quint64)0, (quint64)POET_SAY_TEXT_SIZE * 10);
 
   if ((unsigned)x < POET_SAY_TEXT_SIZE)
   {
@@ -565,7 +565,7 @@ int poet(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  x = number(0, POET_EMOTE_TEXT_SIZE * 30);
+  x = number((quint64)0, (quint64)POET_EMOTE_TEXT_SIZE * 30);
 
   if ((unsigned)x < POET_EMOTE_TEXT_SIZE)
   {
@@ -592,7 +592,7 @@ int stcrew(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  x = number(0, STCREW_EMOTE_TEXT_SIZE * 20);
+  x = number((quint64)0, (quint64)STCREW_EMOTE_TEXT_SIZE * 20);
 
   if ((unsigned)x < STCREW_EMOTE_TEXT_SIZE)
   {
@@ -619,7 +619,7 @@ int stofficer(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  x = number(0, OFFICER_EMOTE_TEXT_SIZE * 20);
+  x = number((quint64)0, (quint64)OFFICER_EMOTE_TEXT_SIZE * 20);
 
   if ((unsigned)x < OFFICER_EMOTE_TEXT_SIZE)
   {
@@ -1909,7 +1909,7 @@ int chain_gossips(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     return eFAILURE;
   }
 
-  x = number(0, ChainSayText.size());
+  x = number((quint64)0, (quint64)ChainSayText.size());
 
   string message;
   try
@@ -2207,7 +2207,7 @@ int apiary_worker(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  x = number(0, APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
+  x = number((quint64)0, (quint64)APIARY_WORKER_EMOTE_TEXT_SIZE * 25);
 
   if ((unsigned)x < APIARY_WORKER_EMOTE_TEXT_SIZE)
   {
@@ -2499,7 +2499,7 @@ int pir_slut(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return eFAILURE;
-  x = number(0, PIR_SAY_TEXT_SIZE * 6);
+  x = number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
   if ((unsigned)x < PIR_SAY_TEXT_SIZE)
   {
     do_say(ch, pir_slutSayText[x], CMD_DEFAULT);

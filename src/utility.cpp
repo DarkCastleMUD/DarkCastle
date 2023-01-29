@@ -43,6 +43,7 @@
 #include <algorithm>
 
 #include <fmt/format.h>
+#include <QRandomGenerator>
 
 #include "innate.h"
 #include "structs.h"
@@ -1400,58 +1401,68 @@ int do_bug(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_recall(Character *ch, char *argument, int cmd)
+command_return_t Character::do_recall(QStringList arguments, int cmd)
 {
-  int location, percent, level, cost = 0, x;
-  Character *victim;
-  Character *loop_ch;
-  float cf;
-  char name[256] = "";
-  clan_data *clan;
+  int location = {}, level = {}, cost = {}, x = {};
+  Character *victim = {};
+  Character *loop_ch = {};
+  float cf = {};
+  QString name;
+  clan_data *clan = {};
   struct clan_room_data *room;
-  int found = 0;
-  int retval;
-  int is_mob;
+  int found = {};
+  int retval = {};
+  int is_mob = {};
 
-  act("$n prays to $s God for transportation!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n prays to $s God for transportation!", this, 0, 0, TO_ROOM, INVIS_NULL);
 
-  if (IS_AFFECTED(ch, AFF_CHARM))
+  if (IS_AFFECTED(this, AFF_CHARM))
     return eFAILURE;
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(world[this->in_room].room_flags, ARENA))
   {
-    send_to_char("To the DEATH, you wimp.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
-  {
-    send_to_char("Your magic fizzles and dies.\r\n", ch);
+    send_to_char("TYou can't recall while in the arena.\r\n", this);
     return eFAILURE;
   }
 
-  if (IS_SET(ch->combat, COMBAT_BASH1) ||
-      IS_SET(ch->combat, COMBAT_BASH2))
+  if (IS_SET(world[this->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("You can't, you're bashed!\r\n", ch);
+    send_to_char("You can't use magic here.\r\n", this);
     return eFAILURE;
   }
 
-  one_argument(argument, name);
-
-  if (!(*name))
-    victim = ch;
-  else if (!(victim = get_char_room_vis(ch, name)) ||
-           (!ARE_GROUPED(ch, victim) && !ARE_CLANNED(ch, victim)))
+  if (IS_SET(this->combat, COMBAT_BASH1) ||
+      IS_SET(this->combat, COMBAT_BASH2))
   {
-    send_to_char("Whom do you want to recall?\n\r", ch);
+    send_to_char("You can't, you're bashed!\r\n", this);
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch))
+  if (arguments.isEmpty())
   {
-    x = GET_WIS(ch);
-    percent = number(1, 100);
+    victim = this;
+  }
+  else
+  {
+    name = arguments.at(0);
+    victim = get_char_room_vis(this, name.toStdString());
+    if (victim == nullptr)
+    {
+      send_to_char("Whom do you want to recall?\n\r", this);
+      return eFAILURE;
+    }
+
+    if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
+    {
+      send(QString("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(GET_NAME(victim)));
+      return eFAILURE;
+    }
+  }
+
+  if (IS_PC(this))
+  {
+    x = GET_WIS(this);
+    uint64_t percent = number(1, 100);
     if (percent > x)
     {
       percent -= x;
@@ -1466,12 +1477,12 @@ int do_recall(Character *ch, char *argument, int cmd)
 
     if (percent > 50)
     {
-      send_to_char("You failed in your recall!\n\r", ch);
+      send_to_char("You failed in your recall!\n\r", this);
       return eFAILURE;
     }
   }
 
-  if (victim->fighting && !IS_NPC(victim->fighting)) // PvP fight?
+  if (victim->fighting && IS_PC(victim->fighting)) // PvP fight?
   {
     send_to_char("The gods refuse to answer your prayers while you're fighting!\r\n", victim);
     return eFAILURE;
@@ -1483,18 +1494,24 @@ int do_recall(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(ch))
-    location = real_room(GET_HOME(ch));
+  if (IS_NPC(this))
+  {
+    location = real_room(GET_HOME(this));
+  }
   else
   {
-    if (GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 ||
-        IS_AFFECTED(victim, AFF_CANTQUIT))
+    if (GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
+    {
       location = real_room(START_ROOM);
+    }
     else
+    {
       location = real_room(GET_HOME(victim));
+    }
+
     if (location < 0)
     {
-      send_to_char("Failed.\r\n", ch);
+      send_to_char("Failed.\r\n", this);
       return eFAILURE;
     }
 
@@ -1511,7 +1528,7 @@ int do_recall(Character *ch, char *argument, int cmd)
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
-        send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+        send_to_char("The gods frown on you, and reset your home.\r\n", this);
         location = real_room(START_ROOM);
         GET_HOME(victim) = START_ROOM;
       }
@@ -1523,7 +1540,7 @@ int do_recall(Character *ch, char *argument, int cmd)
 
         if (!found)
         {
-          send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+          send_to_char("The gods frown on you, and reset your home.\r\n", this);
           location = real_room(START_ROOM);
           GET_HOME(victim) = START_ROOM;
         }
@@ -1561,18 +1578,23 @@ int do_recall(Character *ch, char *argument, int cmd)
       cost *= 2;
     }
 
-    if (ch->getGold() < (uint32_t)cost)
+    if (this->getGold() < (uint32_t)cost)
     {
-      csendf(ch, "You don't have %d gold!\n\r", cost);
+      csendf(this, "You don't have %d gold!\n\r", cost);
       return eFAILURE;
     }
 
-    ch->removeGold(cost);
+    this->removeGold(cost);
   }
 
-  if (IS_AFFECTED(victim, AFF_CURSE) || IS_AFFECTED(victim, AFF_SOLIDITY))
+  if (IS_AFFECTED(victim, AFF_CURSE))
   {
-    send_to_char("Something blocks it.\r\n", ch);
+    send_to_char("A curse affect prevents it.\r\n", this);
+    return eFAILURE;
+  }
+  if (IS_AFFECTED(victim, AFF_SOLIDITY))
+  {
+    send_to_char("A solidity affect prevents it.\r\n", this);
     return eFAILURE;
   }
 
@@ -2351,6 +2373,7 @@ void init_random()
 //
 // return value can include the from or to variable
 //
+/*
 int number(int from, int to)
 {
   if (from == to)
@@ -2368,6 +2391,76 @@ int number(int from, int to)
 
   number = from + (int)((double)number * ((double)random() / ((double)RAND_MAX + 1.0)));
   return number;
+}
+*/
+
+qint64 number(int lowest, size_t highest)
+{
+  return number(qint64(lowest), qint64(highest));
+}
+
+qint64 number(int lowest, qint64 highest)
+{
+  return number(qint64(lowest), qint64(highest));
+}
+qint64 number(qint64 lowest, int highest)
+{
+  return number(qint64(lowest), qint64(highest));
+}
+
+quint64 number(unsigned lowest, quint64 highest)
+{
+  return number(quint64(lowest), quint64(highest));
+}
+quint64 number(quint64 lowest, unsigned highest)
+{
+  return number(quint64(lowest), quint64(highest));
+}
+
+qint32 number(qint32 from, qint32 to)
+{
+  return number((qint64)from, (qint64)to);
+}
+
+quint32 number(quint32 from, quint32 to)
+{
+  return number((quint64)from, (quint64)to);
+}
+
+qint64 number(qint64 from, qint64 to)
+{
+  if (from == to)
+  {
+    return to;
+  }
+
+  if (from > to)
+  {
+
+    logentry(QString("BACKWARDS usage: numbers(%1, %2)!").arg(from).arg(to));
+    produce_coredump();
+    return to;
+  }
+
+  return QRandomGenerator::global()->bounded(from, to);
+}
+
+quint64 number(quint64 from, quint64 to)
+{
+  if (from == to)
+  {
+    return to;
+  }
+
+  if (from > to)
+  {
+
+    logentry(QString("BACKWARDS usage: numbers(%1, %2)!").arg(from).arg(to));
+    produce_coredump();
+    return to;
+  }
+
+  return QRandomGenerator::global()->bounded(from, to);
 }
 
 // Random
