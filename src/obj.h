@@ -240,6 +240,7 @@ public:
     static const QStringList size_bits;
     static const QStringList more_obj_bits;
     static const QStringList extra_bits;
+    static const QStringList apply_types;
 
     int32_t item_number = {};     /* Where in data-base               */
     room_t in_room = {};          /* In what room -1 when conta/carr  */

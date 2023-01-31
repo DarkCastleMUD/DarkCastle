@@ -11,6 +11,33 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
 char_file_u4::char_file_u4()
 {
 }
+QString color_to_code(QString color)
+{
+    QMap<QString, QString> colors;
+    // colors["black"]="$0";
+    colors["blue"] = "$1";
+    colors["green"] = "$2";
+    colors["cyan"] = "$3";
+    colors["red"] = "$4";
+    colors["yellow"] = "$5";
+    colors["magenta"] = "$6";
+    colors["white"] = "$7";
+    colors["gray"] = "$B$0";
+    colors["bright blue"] = "$B$1";
+    colors["bright green"] = "$B$2";
+    colors["bright cyan"] = "$B$3";
+    colors["bright red"] = "$B$4";
+    colors["bright yellow"] = "$B$5";
+    colors["bright magenta"] = "$B$6";
+    colors["bright white"] = "$B$7";
+
+    return colors.value(color);
+}
+
+QString Character::getSettingAsColor(QString key, QString defaultValue)
+{
+    return color_to_code(getSetting(key, defaultValue));
+}
 
 QString Character::getSetting(QString key, QString defaultValue)
 {
@@ -312,3 +339,116 @@ void Connection::send(QString txt)
 
     output += txt.toStdString();
 }
+
+const QStringList Object::apply_types =
+    {
+        "NONE", // 0
+        "STR",
+        "DEX",
+        "INT",
+        "WIS",
+        "CON",
+        "SEX",
+        "CLASS",
+        "LEVEL",
+        "AGE",
+        "CHAR_WEIGHT", // 10
+        "CHAR_HEIGHT",
+        "MANA",
+        "HIT_POINTS",
+        "MOVE",
+        "GOLD",
+        "EXP",
+        "ARMOR",
+        "HITROLL",
+        "DAMROLL",
+        "SAVE_VS_FIRE", // 20
+        "SAVE_VS_COLD",
+        "SAVE_VS_ENERGY",
+        "SAVE_VS_ACID",
+        "SAVE_VS_MAGIC",
+        "SAVE_VS_POISON",
+        "HIT -N- DAM",
+        "SANCTUARY",
+        "SENSE LIFE",
+        "DETECT INVISIBLE",
+        "INVISIBILITY", // 30
+        "SNEAK",
+        "INFRARED",
+        "HASTE",
+        "PROTECTION FROM EVIL",
+        "FLY",
+        "MAGIC MISSILE",
+        "WEP BLIND",
+        "EARTHQUAKE",
+        "CURSE",
+        "COLOUR SPRAY", // 40
+        "DISPEL EVIL",
+        "ENERGY DRAIN",
+        "FIREBALL",
+        "LIGHTNING BOLT",
+        "HARM",
+        "POISON",
+        "SLEEP",
+        "FEAR",
+        "DISPEL MAGIC",
+        "WEAKEN", // 50
+        "CAUSE LIGHT",
+        "CAUSE CRITICAL",
+        "PARALYZE",
+        "ACID BLAST",
+        "BEE STING",
+        "CURE LIGHT",
+        "FLAMESTRIKE",
+        "HEAL SPRAY",
+        "DROWN",
+        "HOWL", // 60
+        "SOULDRAIN",
+        "SPARKS",
+        "BARKSKIN",
+        "RESIST FIRE",
+        "RESIST COLD",
+        "KI",
+        "CAMOUFLAGE",
+        "FARSIGHT",
+        "FREEFLOAT",
+        "FROSTSHIELD", // 70
+        "INSOMNIA",
+        "LIGHTNING SHIELD",
+        "REFLECT",
+        "RESIST ELECTRICITY",
+        "SHADOWSLIP",
+        "SOLIDITY",
+        "STABILITY",
+        "STAUNCHBLOOD",
+        "DISPEL GOOD",
+        "TELEPORT", // 80
+        "CHILL TOUCH",
+        "POWER HARM",
+        "VAMPIRIC TOUCH",
+        "LIFE LEECH",
+        "METEOR SWARM",
+        "ENTANGLE",
+        "INSANE",
+        "GLITTER DUST",
+        "RESIST ACID",
+        "HP REGEN",
+        "MANA REGEN",
+        "MOVE REGEN",
+        "KI REGEN",
+        "CREATE FOOD",
+        "DAMAGED",
+        "THIEF_POISON",
+        "PROTECTION FROM GOOD",
+        "MELEE MITIGATION",
+        "SPELL MITIGATION",
+        "SONG MITIGATION",
+        "RESIST MAGIC",
+        "ALL SAVES",
+        "SPELLDAMAGE",
+        "FREEDOM FROM HUNGER",
+        "FREEDOM FROM THIRST",
+        "AFF BLIND",
+        "WATERBREATHING",
+        "DETECT MAGIC",
+        "WILD MAGIC"};

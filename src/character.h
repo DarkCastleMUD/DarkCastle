@@ -36,6 +36,7 @@ class Character;
 #include "utility.h"
 
 bool on_forbidden_name_list(const char *name);
+QString color_to_code(QString color);
 
 struct strcasecmp_compare
 {
@@ -546,7 +547,10 @@ public:
     char_skill_data &getSkill(skill_t skill);
     void setSkill(skill_t, int value = 0);
     void upSkill(skill_t skillnum, int learned = 1);
+
     QString getSetting(QString key, QString defaultValue = QString());
+    QString getSettingAsColor(QString key, QString defaultValue = QString());
+
     command_return_t do_clanarea(QStringList arguments, int cmd);
     command_return_t do_config(QStringList arguments, int cmd);
     command_return_t do_experience(QStringList arguments, int cmd);
@@ -563,6 +567,7 @@ public:
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
     Object *getVisibleObject(QString name);
+    QString getStatDiff(int base, int random, bool swapcolors = false);
     bool isMortal(void);
     bool isImmortal(void);
     bool isImplementer(void);

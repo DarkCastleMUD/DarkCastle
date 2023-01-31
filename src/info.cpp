@@ -88,6 +88,7 @@ extern int getRealSpellDamage(Character *ch);
 /* intern functions */
 
 void list_obj_to_char(class Object *list, Character *ch, int mode, bool show);
+void showStatDiff(Character *ch, int base, int random, bool swapcolors = false);
 
 int get_saves(Character *ch, int savetype)
 {
@@ -961,48 +962,20 @@ void try_to_peek_into_container(Character *vict, Character *ch,
       send_to_char("You don't see anything inside it.\r\n", ch);
 }
 
-void showStatDiff(Character *ch, int base, int random, bool swapcolors = false)
+QString Character::getStatDiff(int base, int random, bool swapcolors)
 {
    QString buf, buf2;
    QString color_good = "$2";
    QString color_bad = "$4";
 
-   if (ch && ch->pcdata)
+   if (this && this->pcdata)
    {
-      if (ch->pcdata->config)
-      {
-         QMap<QString, QString> colors;
-         // colors["black"]="$0";
-         colors["blue"] = "$1";
-         colors["green"] = "$2";
-         colors["cyan"] = "$3";
-         colors["red"] = "$4";
-         colors["yellow"] = "$5";
-         colors["magenta"] = "$6";
-         colors["white"] = "$7";
-         colors["gray"] = "$B$0";
-         colors["bright blue"] = "$B$1";
-         colors["bright green"] = "$B$2";
-         colors["bright cyan"] = "$B$3";
-         colors["bright red"] = "$B$4";
-         colors["bright yellow"] = "$B$5";
-         colors["bright magenta"] = "$B$6";
-         colors["bright white"] = "$B$7";
-
-         if (ch->pcdata->config->value("color.good").isEmpty() == false)
-         {
-            color_good = colors.value(ch->pcdata->config->value("color.good"));
-         }
-
-         if (ch->pcdata->config->value("color.bad").isEmpty() == false)
-         {
-            color_bad = colors.value(ch->pcdata->config->value("color.bad"));
-         }
-      }
+      color_good = this->getSettingAsColor("color.good");
+      color_bad = this->getSettingAsColor("color.bad");
    }
    else
    {
-      return;
+      return QString();
    }
 
    // original value
@@ -1037,8 +1010,11 @@ void showStatDiff(Character *ch, int base, int random, bool swapcolors = false)
    }
    buf += "$R";
 
-   ch->send(buf);
-   return;
+   return buf;
+}
+void showStatDiff(Character *ch, int base, int random, bool swapcolors)
+{
+   ch->send(ch->getStatDiff(base, random, swapcolors));
 }
 
 bool identify(Character *ch, Object *obj)
@@ -3813,7 +3789,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
    QList<Search> sl;
    QString arg1, arg2;
-   bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false, search_world = false;
+   bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false, search_world = false, show_affects = false, show_details = false;
    for (auto i = 0; i < arguments.size(); ++i)
    {
       Search so = {};
@@ -3885,11 +3861,21 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          send("\r\n");
          send("Other options:\r\n");
          send("limit=10       limit output to only 10 results.\r\n");
+         send("affects        shows affects.\r\n");
+         send("details        shows certain details depending on object type.\r\n");
          return eSUCCESS;
       }
       else if (arg1 == "world")
       {
          search_world = true;
+      }
+      else if (arg1 == "affects")
+      {
+         show_affects = true;
+      }
+      else if (arg1 == "details")
+      {
+         show_details = true;
       }
       else if (arg1 == "level")
       {
@@ -4512,6 +4498,23 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       header += QString(" [%1]").arg(QString("Short Description"), -max_short_description_size);
    }
 
+   if (show_details)
+   {
+      if (search_world)
+      {
+         header += QString(" [%1]").arg(QString("Details"), -21);
+      }
+      else
+      {
+         header += QString(" [%1]").arg(QString("Details"));
+      }
+   }
+
+   if (show_affects)
+   {
+      header += QString(" [%1]").arg(QString("Affects"));
+   }
+
    send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
 
    result_nr = 0;
@@ -4561,9 +4564,105 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
       }
 
-      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+      // Needed to show details or affects below
+      const Object *vobj = nullptr;
+      if (obj->item_number >= 0)
+      {
+         const int vnum = obj_index[obj->item_number].virt;
+         if (vnum >= 0)
+         {
+            const int rn_of_vnum = real_object(vnum);
+            if (rn_of_vnum >= 0)
+            {
+               vobj = (Object *)obj_index[rn_of_vnum].item;
+            }
+         }
+      }
+
+      QString buffer;
+      if (show_details)
+      {
+         switch (GET_ITEM_TYPE(obj))
+         {
+         case ITEM_WEAPON:
+            buffer = QString("%1D%2").arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
+
+            if (search_world && vobj != nullptr)
+            {
+               buffer += " (";
+               buffer += getStatDiff(vobj->obj_flags.value[1], obj->obj_flags.value[1]);
+               buffer += "D";
+               buffer += getStatDiff(vobj->obj_flags.value[2], obj->obj_flags.value[2]);
+               buffer += ")";
+            }
+            break;
+         default:
+            buffer = "";
+            break;
+         }
+         custom_columns += QString(" [%1]").arg(buffer, -21);
+         /*
+                  int get_weapon_damage_type(Object * wielded);
+                  bits = get_weapon_damage_type(obj) - 1000;
+                  extern char *strs_damage_types[];
+                  csendf(ch, "$3Damage type$R: %s\r\n", strs_damage_types[bits]);
+         */
+      }
+
+      if (show_affects)
+      {
+         uint64_t affects_found = 0;
+         for (int16_t i = 0; i < obj->num_affects; i++)
+         {
+            if ((obj->affected[i].location != APPLY_NONE) &&
+                (obj->affected[i].modifier != 0 ||
+                 (vobj != nullptr &&
+                  i < vobj->num_affects &&
+                  vobj->affected != nullptr &&
+                  vobj->affected[i].location == obj->affected[i].location)))
+            {
+               QString buffer;
+               if (obj->affected[i].location < 1000)
+               {
+                  buffer = sprinttype(obj->affected[i].location, Object::apply_types);
+               }
+               else if (get_skill_name(obj->affected[i].location / 1000))
+               {
+                  buffer = get_skill_name(obj->affected[i].location / 1000);
+               }
+               else
+               {
+                  buffer = "Invalid";
+               }
+
+               if (affects_found++ == 0)
+               {
+                  custom_columns += QString(" [");
+               }
+               else
+               {
+                  custom_columns += QString(",");
+               }
+
+               if (obj->affected[i].modifier > 0)
+               {
+                  custom_columns += QString("$R%1%2+%3$R").arg(buffer).arg(getSettingAsColor("color.good")).arg(obj->affected[i].modifier);
+               }
+               else
+               {
+                  custom_columns += QString("$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad")).arg(obj->affected[i].modifier);
+               }
+            }
+         }
+         if (affects_found)
+         {
+            custom_columns += QString("]");
+         }
+      }
+
+      send(QString("[%1] [%2]%3\r\n\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
    }
-   send("Identify an object with the command: identify v####\r\n");
+   send("Identify a virtual object with the command: identify v####\r\n");
 
    return eSUCCESS;
 }
