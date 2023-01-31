@@ -702,6 +702,11 @@ void sprinttype(int type, QStringList names, char *result)
   strcpy(result, names.value(type, "Undefined").toStdString().c_str());
 }
 
+QString sprinttype(uint64_t type, QStringList names)
+{
+  return names.value(type, "Undefined");
+}
+
 void sprinttype(int type, const char *names[], char *result)
 {
   int nr;

@@ -462,6 +462,7 @@ std::string sprinttype(int type, const char *names[]);
 
 void sprinttype(int type, vector<const char *>, char *result);
 void sprinttype(int type, QStringList, char *result);
+QString sprinttype(uint64_t type, QStringList names);
 std::string sprinttype(int type, vector<const char *>);
 
 int consttype(char *search_str, const char *names[]);
