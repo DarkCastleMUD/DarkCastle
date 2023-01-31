@@ -4660,9 +4660,9 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          }
       }
 
-      send(QString("[%1] [%2]%3\r\n\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
    }
-   send("Identify a virtual object with the command: identify v####\r\n");
+   send("\r\nIdentify a virtual object with the command: identify v####\r\n");
 
    return eSUCCESS;
 }
