@@ -2447,7 +2447,7 @@ qint64 number(qint64 from, qint64 to)
     return to;
   }
 
-  return QRandomGenerator::global()->bounded(from, to);
+  return QRandomGenerator::global()->bounded(from, to + 1);
 }
 
 quint64 number(quint64 from, quint64 to)
@@ -2465,7 +2465,7 @@ quint64 number(quint64 from, quint64 to)
     return to;
   }
 
-  return QRandomGenerator::global()->bounded(from, to);
+  return QRandomGenerator::global()->bounded(from, to + 1);
 }
 
 // Random
