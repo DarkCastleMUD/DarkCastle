@@ -32,7 +32,7 @@ int do_alias(Character *ch, char *arg, int cmd)
 
   if (!*arg) 
   {
-    curr = ch->pcdata->alias;
+    curr = ch->player->alias;
     if(!curr) {
       send_to_char("No aliases defined.\r\n", ch);
       return eSUCCESS;
@@ -117,7 +117,7 @@ int do_alias(Character *ch, char *arg, int cmd)
       /*   Check for keyword match...
        *   If match found, replace command with command...
        */
-      for (x = 1, curr = ch->pcdata->alias; curr; curr = curr->next, x++)  
+      for (x = 1, curr = ch->player->alias; curr; curr = curr->next, x++)  
       {
           if (!str_cmp(curr->keyword, buf)) {
             sprintf(outbuf, "Alias %d: %s == %s    REPLACED with '%s'.\r\n", x,
@@ -132,7 +132,7 @@ int do_alias(Character *ch, char *arg, int cmd)
       }
 
       /*  If no match found, add a new alias! :) */
-      curr = ch->pcdata->alias;
+      curr = ch->player->alias;
       while(curr) {
         curr = curr->next;
         count++;
@@ -153,8 +153,8 @@ int do_alias(Character *ch, char *arg, int cmd)
       curr->keyword = str_dup(buf);
       curr->command = str_dup(buf1);
       send_to_char ("New Alias Defined.\r\n", ch);
-      curr->next = ch->pcdata->alias;
-      ch->pcdata->alias = curr;
+      curr->next = ch->player->alias;
+      ch->player->alias = curr;
       dc_free(buf);
       dc_free(buf1);
       return eSUCCESS;
@@ -174,20 +174,20 @@ int do_alias(Character *ch, char *arg, int cmd)
 	    
       if(!str_cmp(buf, "deleteall"))
       {
-         for (curr = ch->pcdata->alias; curr; curr = next)
+         for (curr = ch->player->alias; curr; curr = next)
          {
             next = curr->next;
             dc_free (curr->keyword);
             dc_free (curr->command);
             dc_free (curr);
          }
-         ch->pcdata->alias = nullptr;
+         ch->player->alias = nullptr;
          send_to_char("All aliases deleted.\r\n", ch);
          dc_free(buf);
          return eSUCCESS;
       }
       int o = 1;
-      for (curr = ch->pcdata->alias; curr; curr = curr->next,o++)
+      for (curr = ch->player->alias; curr; curr = curr->next,o++)
       {
 	  
           if (!str_cmp(buf, curr->keyword)) {
@@ -195,11 +195,11 @@ int do_alias(Character *ch, char *arg, int cmd)
                    curr->keyword, curr->command);
             send_to_char(outbuf, ch);
             // if we're first, reassign the chain
-            if(curr == ch->pcdata->alias)
-              ch->pcdata->alias = curr->next;
+            if(curr == ch->player->alias)
+              ch->player->alias = curr->next;
             else {
               // loop through the chain
-              next = ch->pcdata->alias;
+              next = ch->player->alias;
               while(next->next != curr)
                 next = next->next;
               // we should now be pointing at curr, or the world will blow up

@@ -82,7 +82,7 @@ void Leaderboard::check(void)
 			continue;
 		if (!d->connected == Connection::states::PLAYING)
 			continue;
-		if (!d->character->pcdata)
+		if (!d->character->player)
 			continue;
 
 		k = MIN(CLASS_DRUID - 1, GET_CLASS(d->character) - 1);
@@ -618,7 +618,7 @@ void Leaderboard::check_offline(void)
 		if (GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch))
 			continue;
 
-		if (ch->pcdata == nullptr)
+		if (ch->player == nullptr)
 			continue;
 
 		k = MIN(CLASS_DRUID - 1, GET_CLASS(ch) - 1);
@@ -1362,7 +1362,7 @@ void Leaderboard::write_file(const char filename[])
 
 int Leaderboard::pdscore(Character *ch)
 {
-	return ch->pcdata->pdeaths;
+	return ch->player->pdeaths;
 }
 
 /*
@@ -1587,7 +1587,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 			continue;
 		if (!d->connected == Connection::states::PLAYING)
 			continue;
-		if (!d->character->pcdata)
+		if (!d->character->player)
 			continue;
 		if (!CAN_SEE(ch, d->character))
 			continue;

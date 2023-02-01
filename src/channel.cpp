@@ -75,7 +75,7 @@ public:
   {
     if (sender && IS_PC(sender))
     {
-      wizinvis = sender->pcdata->wizinvis;
+      wizinvis = sender->player->wizinvis;
     }
     else
     {
@@ -119,7 +119,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
   int retval;
   extern bool MOBtrigger;
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_STUPID))
   {
     send_to_char("You try to speak but just look like an idiot!\r\n", ch);
     return eSUCCESS;
@@ -190,7 +190,7 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
   Character *victim = nullptr;
   extern bool MOBtrigger;
 
-  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_STUPID))
   {
     send_to_char("You try to speak but just look like an idiot!\r\n", ch);
     return eSUCCESS;
@@ -278,13 +278,13 @@ int do_pray(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_STUPID))
   {
     send_to_char("Duh...I'm too stupid!\n\r", ch);
     return eSUCCESS;
   }
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOPRAY))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOPRAY))
   {
     send_to_char("The gods are deaf to your prayers.\r\n", ch);
     return eSUCCESS;
@@ -342,7 +342,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (!IS_NPC(ch))
   {
-    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -448,7 +448,7 @@ int do_auction(Character *ch, char *argument, int cmd)
 
   if (!IS_NPC(ch))
   {
-    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -542,7 +542,7 @@ int do_shout(Character *ch, char *argument, int cmd)
     return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
   }
 
-  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+  if (!IS_NPC(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
   {
     send_to_char("You must have somehow offended the gods, for you "
                  "find yourself unable to!\n\r",
@@ -621,7 +621,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
 
   if (!IS_NPC(ch))
   {
-    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -720,7 +720,7 @@ int do_dream(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
   if (!IS_NPC(ch))
-    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -792,16 +792,16 @@ command_return_t do_tellhistory(Character *ch, string argument, int cmd)
 
   if (arg1 == "timestamp")
   {
-    QString tell_history_timestamp = ch->pcdata->config->value("tell.history.timestamp");
+    QString tell_history_timestamp = ch->player->config->value("tell.history.timestamp");
 
     if (tell_history_timestamp == "0" || tell_history_timestamp.isEmpty())
     {
-      ch->pcdata->config->insert("tell.history.timestamp", "1");
+      ch->player->config->insert("tell.history.timestamp", "1");
       ch->send(fmt::format("tell history timestamp turned on\r\n"));
     }
     else if (tell_history_timestamp == "1")
     {
-      ch->pcdata->config->insert("tell.history.timestamp", "0");
+      ch->player->config->insert("tell.history.timestamp", "0");
       ch->send(fmt::format("tell history timestamp turned off\r\n"));
     }
 
@@ -817,7 +817,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
   string name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOTELL))
   {
     send_to_char("Your message didn't get through!!\n\r", ch);
     return eSUCCESS;
@@ -840,14 +840,14 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
 
   if (name.empty() || message.empty())
   {
-    if (ch->pcdata->tell_history == nullptr || ch->pcdata->tell_history->empty())
+    if (ch->player->tell_history == nullptr || ch->player->tell_history->empty())
     {
       send_to_char("You have not sent or recieved any tell messages.\r\n", ch);
       return eSUCCESS;
     }
 
     send_to_char("Here are the last 10 tell messages:\r\n", ch);
-    history_t tmp = *(ch->pcdata->tell_history);
+    history_t tmp = *(ch->player->tell_history);
     while (!tmp.empty())
     {
       communication c = tmp.front();
@@ -932,11 +932,11 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
 
         if (!IS_NPC(ch) && !IS_NPC(vict))
         {
-          vict->pcdata->last_tell = GET_NAME(ch);
+          vict->player->last_tell = GET_NAME(ch);
         }
       }
 
@@ -959,9 +959,9 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
         if (!IS_NPC(ch) && !IS_NPC(vict))
-          vict->pcdata->last_tell = GET_NAME(ch);
+          vict->player->last_tell = GET_NAME(ch);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
@@ -973,7 +973,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       ch->tell_history(ch, ar.str);
 
       // Log what I told a logged player under their name
-      if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
+      if (!IS_MOB(vict) && IS_SET(vict->player->punish, PUNISH_LOG))
       {
         logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
@@ -988,10 +988,10 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
 
         if (!IS_NPC(ch) && !IS_NPC(vict))
-          vict->pcdata->last_tell = GET_NAME(ch);
+          vict->player->last_tell = GET_NAME(ch);
       }
       ansi_color(GREEN, vict);
       ansi_color(BOLD, vict);
@@ -1007,7 +1007,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
 
       send_to_char("They were sleeping btw...\r\n", ch);
       // Log what I told a logged player under their name
-      if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
+      if (!IS_MOB(vict) && IS_SET(vict->player->punish, PUNISH_LOG))
       {
         logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
@@ -1026,7 +1026,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
   string buf = {};
   Character *vict = nullptr;
 
-  if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
+  if (IS_MOB(ch) || ch->player->last_tell.empty())
   {
     send_to_char("You have noone to reply to.\r\n", ch);
     return eSUCCESS;
@@ -1045,9 +1045,9 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
   if (argument.empty())
   {
     send_to_char("Reply what?\n\r", ch);
-    if ((vict = get_char(ch->pcdata->last_tell)) && CAN_SEE(ch, vict))
+    if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
     {
-      ch->send(fmt::format("Last tell was from {}.\r\n", ch->pcdata->last_tell.c_str()));
+      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.c_str()));
     }
     else
     {
@@ -1057,7 +1057,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  buf = fmt::format("{} {}", ch->pcdata->last_tell.c_str(), argument);
+  buf = fmt::format("{} {}", ch->player->last_tell.c_str(), argument);
   do_tell(ch, buf, CMD_TELL_REPLY);
   return eSUCCESS;
 }
@@ -1161,20 +1161,20 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (ch == nullptr || ch->pcdata == nullptr)
+  if (ch == nullptr || ch->player == nullptr)
   {
     return eFAILURE;
   }
 
   if (!*argument)
   {
-    if (ch->pcdata->gtell_history == nullptr || ch->pcdata->gtell_history->empty())
+    if (ch->player->gtell_history == nullptr || ch->player->gtell_history->empty())
     {
       send_to_char("No one has said anything.\r\n", ch);
       return eFAILURE;
     }
 
-    history_t copy = *(ch->pcdata->gtell_history);
+    history_t copy = *(ch->player->gtell_history);
     send_to_char("Here are the last 10 group tells:\r\n", ch);
     while (!copy.empty())
     {
@@ -1195,7 +1195,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOTELL))
   {
     send_to_char("Your message didn't get through!!\n\r", ch);
     return eSUCCESS;
@@ -1220,7 +1220,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   {
     act_return ar = act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE | ASLEEP);
 
-    if (ch->master && ch->master->pcdata)
+    if (ch->master && ch->master->player)
     {
       ch->master->gtell_history(ch, ar.str);
     }
@@ -1241,7 +1241,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
       if (!silence)
       {
         act_return ar = act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
-        if (f->follower && f->follower->pcdata)
+        if (f->follower && f->follower->player)
         {
           f->follower->gtell_history(ch, ar.str);
         }
@@ -1280,7 +1280,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
   if (!IS_NPC(ch))
   {
-    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
@@ -1344,43 +1344,43 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
 void Character::tell_history(Character *ch, string message)
 {
-  if (this->pcdata == nullptr)
+  if (this->player == nullptr)
   {
     return;
   }
 
-  if (this->pcdata->tell_history == nullptr)
+  if (this->player->tell_history == nullptr)
   {
-    this->pcdata->tell_history = new history_t();
+    this->player->tell_history = new history_t();
   }
 
   communication c(ch, message);
 
-  this->pcdata->tell_history->push(c);
-  if (this->pcdata->tell_history->size() > 10)
+  this->player->tell_history->push(c);
+  if (this->player->tell_history->size() > 10)
   {
-    this->pcdata->tell_history->pop();
+    this->player->tell_history->pop();
   }
 }
 
 void Character::gtell_history(Character *ch, string message)
 {
-  if (this->pcdata == nullptr)
+  if (this->player == nullptr)
   {
     return;
   }
 
-  if (this->pcdata->gtell_history == nullptr)
+  if (this->player->gtell_history == nullptr)
   {
-    this->pcdata->gtell_history = new history_t();
+    this->player->gtell_history = new history_t();
   }
 
   communication c(ch, message);
 
-  this->pcdata->gtell_history->push(c);
-  if (this->pcdata->gtell_history->size() > 10)
+  this->player->gtell_history->push(c);
+  if (this->player->gtell_history->size() > 10)
   {
-    this->pcdata->gtell_history->pop();
+    this->player->gtell_history->pop();
   }
 }
 

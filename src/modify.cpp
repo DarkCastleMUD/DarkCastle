@@ -656,7 +656,7 @@ void page_string(class Connection *d, const char *str, int keep_internal)
 		return;
 	}
 
-	if (IS_PC(d->character) && !IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+	if (IS_PC(d->character) && !IS_SET(d->character->player->toggles, PLR_PAGER))
 	{
 		page_string_dep(d, str, keep_internal);
 		return;

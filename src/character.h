@@ -223,9 +223,9 @@ struct follow_type
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
-struct pc_data
+class Player
 {
-
+public:
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */
 
@@ -308,6 +308,8 @@ struct pc_data
     QString getJoining(void);
     void setJoining(QString list);
     void toggleJoining(QString key);
+
+private:
 };
 
 enum mob_type_t
@@ -371,7 +373,7 @@ public:
     static bool validateName(QString name);
 
     struct mob_data *mobdata = nullptr;
-    struct pc_data *pcdata = nullptr;
+    class Player *player = nullptr;
     class Object *objdata = nullptr;
 
     class Connection *desc = nullptr; // nullptr normally for mobs

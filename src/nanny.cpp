@@ -388,14 +388,14 @@ void do_on_login_stuff(Character *ch)
    void add_to_bard_list(Character * ch);
 
    add_to_bard_list(ch);
-   ch->pcdata->bad_pw_tries = 0;
+   ch->player->bad_pw_tries = 0;
    redo_hitpoints(ch);
    redo_mana(ch);
    redo_ki(ch);
    do_inate_race_abilities(ch);
    check_hw(ch);
    /* Add a character's skill item's to the list. */
-   ch->pcdata->skillchange = nullptr;
+   ch->player->skillchange = nullptr;
    ch->spellcraftglyph = 0;
    for (int i = 0; i < MAX_WEAR; i++)
    {
@@ -405,8 +405,8 @@ void do_on_login_stuff(Character *ch)
       {
          if (ch->equipment[i]->affected[a].location >= 1000)
          {
-            ch->equipment[i]->next_skill = ch->pcdata->skillchange;
-            ch->pcdata->skillchange = ch->equipment[i];
+            ch->equipment[i]->next_skill = ch->player->skillchange;
+            ch->player->skillchange = ch->equipment[i];
             ch->equipment[i]->next_skill = nullptr;
          }
       }
@@ -415,7 +415,7 @@ void do_on_login_stuff(Character *ch)
    for (int i = 0; i <= SAVE_TYPE_MAX; i++)
    {
       ch->saves[i] += GET_LEVEL(ch) / 4;
-      ch->saves[i] += ch->pcdata->saves_mods[i];
+      ch->saves[i] += ch->player->saves_mods[i];
    }
 
    if (GET_TITLE(ch) == nullptr)
@@ -441,7 +441,7 @@ void do_on_login_stuff(Character *ch)
 
    if (!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL)
    {
-      ch->pcdata->holyLite = true;
+      ch->player->holyLite = true;
       GET_COND(ch, THIRST) = -1;
       GET_COND(ch, FULL) = -1;
    }
@@ -461,11 +461,11 @@ void do_on_login_stuff(Character *ch)
    REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
    for (int i = 0; i < QUEST_MAX; i++)
    {
-      ch->pcdata->quest_current[i] = -1;
-      ch->pcdata->quest_current_ticksleft[i] = 0;
+      ch->player->quest_current[i] = -1;
+      ch->player->quest_current_ticksleft[i] = 0;
    }
    struct vault_data *vault = has_vault(GET_NAME(ch));
-   if (ch->pcdata->time.logon < 1172204700)
+   if (ch->player->time.logon < 1172204700)
    {
       if (vault)
       {
@@ -490,18 +490,18 @@ void do_on_login_stuff(Character *ch)
       save_vault(vault->owner);
    }
 
-   if (ch->pcdata->time.logon < 1151506181)
+   if (ch->player->time.logon < 1151506181)
    {
-      ch->pcdata->quest_points = 0;
+      ch->player->quest_points = 0;
       for (int i = 0; i < QUEST_CANCEL; i++)
-         ch->pcdata->quest_cancel[i] = 0;
+         ch->player->quest_cancel[i] = 0;
       for (int i = 0; i < QUEST_TOTAL / ASIZE; i++)
-         ch->pcdata->quest_complete[i] = 0;
+         ch->player->quest_complete[i] = 0;
    }
-   if (ch->pcdata->time.logon < 1151504181)
+   if (ch->player->time.logon < 1151504181)
       SET_BIT(ch->misc, LogChannels::CHANNEL_TELL);
 
-   if (ch->pcdata->time.logon < 1171757100)
+   if (ch->player->time.logon < 1171757100)
    {
       switch (GET_CLASS(ch))
       {
@@ -1026,7 +1026,7 @@ void nanny(class Connection *d, string arg)
       SEND_TO_Q("\n\r", d);
 
       // Default is to authenticate against character password
-      password = ch->pcdata->pwd;
+      password = ch->player->pwd;
 
       // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
       if (DC::getInstance()->cf.allow_imp_password && allowed_host(d->host))
@@ -1037,7 +1037,7 @@ void nanny(class Connection *d, string arg)
             {
                if (ad->character && GET_LEVEL(ad->character) == IMPLEMENTER && IS_PC(ad->character))
                {
-                  password = ad->character->pcdata->pwd;
+                  password = ad->character->player->pwd;
                   logf(OVERSEER, LogChannels::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
                   break;
                }
@@ -1059,14 +1059,14 @@ void nanny(class Connection *d, string arg)
          }
          else
          {
-            if (d->character->pcdata->bad_pw_tries > 100)
+            if (d->character->player->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
                logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
             }
             else
             {
-               d->character->pcdata->bad_pw_tries++;
+               d->character->player->bad_pw_tries++;
                save_char_obj(d->character);
             }
          }
@@ -1102,13 +1102,13 @@ void nanny(class Connection *d, string arg)
 
       sprintf(log_buf, "\n\rIf you have read this motd, press Return."
                        "\n\rLast connected from:\n\r%s\n\r",
-              ch->pcdata->last_site);
+              ch->player->last_site);
       SEND_TO_Q(log_buf, d);
       telnet_ga(d);
 
-      if (d->character->pcdata->bad_pw_tries)
+      if (d->character->player->bad_pw_tries)
       {
-         sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->pcdata->bad_pw_tries);
+         sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->player->bad_pw_tries);
          SEND_TO_Q(buf, d);
       }
       check_for_sold_items(d->character);
@@ -1143,12 +1143,12 @@ void nanny(class Connection *d, string arg)
          SEND_TO_Q(buf, d);
          telnet_ga(d);
          STATE(d) = Connection::states::GET_NEW_PASSWORD;
-         // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
+         // at this point, player hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
 #ifdef LEAK_CHECK
-         ch->pcdata = (pc_data *)calloc(1, sizeof(pc_data));
+         ch->player = (Player *)calloc(1, sizeof(Player));
 #else
-         ch->pcdata = (pc_data *)dc_alloc(1, sizeof(pc_data));
+         ch->player = (Player *)dc_alloc(1, sizeof(Player));
 #endif
          break;
 
@@ -1181,8 +1181,8 @@ void nanny(class Connection *d, string arg)
          return;
       }
 
-      strncpy(ch->pcdata->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
-      ch->pcdata->pwd[PASSWORD_LEN] = '\0';
+      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
+      ch->player->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
       STATE(d) = Connection::states::CONFIRM_NEW_PASSWORD;
@@ -1191,7 +1191,7 @@ void nanny(class Connection *d, string arg)
    case Connection::states::CONFIRM_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
+      if (string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -1931,7 +1931,7 @@ void nanny(class Connection *d, string arg)
 
    case Connection::states::CONFIRM_PASSWORD_CHANGE:
       SEND_TO_Q("\n\r", d);
-      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) == ch->pcdata->pwd)
+      if (string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
       {
          SEND_TO_Q("Enter a new password: ", d);
          telnet_ga(d);
@@ -1955,8 +1955,8 @@ void nanny(class Connection *d, string arg)
          telnet_ga(d);
          return;
       }
-      strncpy(ch->pcdata->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
-      ch->pcdata->pwd[PASSWORD_LEN] = '\0';
+      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
+      ch->player->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
       STATE(d) = Connection::states::CONFIRM_RESET_PASSWORD;
@@ -1965,7 +1965,7 @@ void nanny(class Connection *d, string arg)
    case Connection::states::CONFIRM_RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
+      if (string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -1981,12 +1981,12 @@ void nanny(class Connection *d, string arg)
          char blah1[50], blah2[50];
          // this prevents a dupe bug
          strcpy(blah1, GET_NAME(ch));
-         strcpy(blah2, ch->pcdata->pwd);
+         strcpy(blah2, ch->player->pwd);
          free_char(d->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
          d->character = 0;
          load_char_obj(d, blah1);
          ch = d->character;
-         strcpy(ch->pcdata->pwd, blah2);
+         strcpy(ch->player->pwd, blah2);
          save_char_obj(ch);
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
          logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
@@ -2077,8 +2077,8 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
       // unless someone changed their password and didn't save this doesn't seem useful
       // removed 8/29/02..i think this might be related to the bug causing people
       // to morph into other people
-      // if(d->character->pcdata)
-      //  strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
+      // if(d->character->player)
+      //  strncpy( d->character->player->pwd, tmp_ch->player->pwd, PASSWORD_LEN );
       //      }
       //      else {
 

@@ -348,7 +348,7 @@ int do_title(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTITLE))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOTITLE))
   {
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
@@ -427,7 +427,7 @@ int do_toggle(Character *ch, char *arg, int cmd)
   {
     for (x = 0; toggle_txt[x][0] != '\0'; x++)
     {
-      if (x != 14 || (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
+      if (x != 14 || (IS_SET(ch->player->toggles, PLR_GUIDE)))
       {
         sprintf(buf + strlen(buf), "%-11s ", toggle_txt[x]);
       }
@@ -436,94 +436,94 @@ int do_toggle(Character *ch, char *arg, int cmd)
       {
       case 0:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 1:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 2:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 3:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 4:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 5:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 6:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 7:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
+                IS_SET(ch->player->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
         break;
 
       case 8:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
+                IS_SET(ch->player->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
         break;
 
       case 9:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 10:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 11:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 12:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 13:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 14:
-        if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+        if (IS_SET(ch->player->toggles, PLR_GUIDE))
         {
           sprintf(buf + strlen(buf), "%s\n\r",
-                  IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
+                  IS_SET(ch->player->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
         }
         break;
       case 15:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 16:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
+                IS_SET(ch->player->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
         break;
       case 17:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 18:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R");
+                IS_SET(ch->player->toggles, PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R");
         break;
       default:
         break;
@@ -605,7 +605,7 @@ int do_toggle(Character *ch, char *arg, int cmd)
     break;
 
   case 14:
-    if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+    if (IS_SET(ch->player->toggles, PLR_GUIDE))
       do_guide_toggle(ch, "", CMD_DEFAULT);
     else
       send_to_char("You're not a guide!\r\n", ch);
@@ -633,14 +633,14 @@ int do_toggle(Character *ch, char *arg, int cmd)
 
 int Character::do_config(QStringList arguments, int cmd)
 {
-  if (pcdata->config == nullptr)
+  if (player->config == nullptr)
   {
-    pcdata->config = new PlayerConfig();
+    player->config = new PlayerConfig();
   }
 
   if (arguments.isEmpty())
   {
-    for (auto setting = pcdata->config->constBegin(); setting != pcdata->config->constEnd(); ++setting)
+    for (auto setting = player->config->constBegin(); setting != player->config->constEnd(); ++setting)
     {
       send(QString("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
     }
@@ -694,7 +694,7 @@ int Character::do_config(QStringList arguments, int cmd)
   if (setting.size() < 2)
   {
     bool found = false;
-    for (auto i = pcdata->config->begin(); i != pcdata->config->end(); ++i)
+    for (auto i = player->config->begin(); i != player->config->end(); ++i)
     {
       if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
       {
@@ -722,10 +722,10 @@ int Character::do_config(QStringList arguments, int cmd)
   // config key=
   if (value.isEmpty() && key.isEmpty() == false && value.isEmpty() == true)
   {
-    if (pcdata->config->find(key) != pcdata->config->end())
+    if (player->config->find(key) != player->config->end())
     {
       send(QString("%1 unset.\r\n").arg(key));
-      pcdata->config->insert(key, QString());
+      player->config->insert(key, QString());
       return eSUCCESS;
     }
     send(QString("%1 not found.\r\n").arg(key));
@@ -782,7 +782,7 @@ int Character::do_config(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-    pcdata->config->insert(key, value);
+    player->config->insert(key, value);
 
     send(QString("Setting %1=%2\r\n").arg(key).arg(value));
     return eSUCCESS;
@@ -796,15 +796,15 @@ int do_brief(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+  if (IS_SET(ch->player->toggles, PLR_BRIEF))
   {
     send_to_char("Brief mode $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_BRIEF);
+    REMOVE_BIT(ch->player->toggles, PLR_BRIEF);
   }
   else
   {
     send_to_char("Brief mode $B$2on$R.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_BRIEF);
+    SET_BIT(ch->player->toggles, PLR_BRIEF);
   }
   return eSUCCESS;
 }
@@ -814,15 +814,15 @@ int do_ansi(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_ANSI))
+  if (IS_SET(ch->player->toggles, PLR_ANSI))
   {
     send_to_char("ANSI COLOR $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_ANSI);
+    REMOVE_BIT(ch->player->toggles, PLR_ANSI);
   }
   else
   {
     send_to_char("ANSI COLOR $B$2on$R.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+    SET_BIT(ch->player->toggles, PLR_ANSI);
   }
   return eSUCCESS;
 }
@@ -832,15 +832,15 @@ int do_vt100(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_VT100))
+  if (IS_SET(ch->player->toggles, PLR_VT100))
   {
     send_to_char("VT100 $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_VT100);
+    REMOVE_BIT(ch->player->toggles, PLR_VT100);
   }
   else
   {
     send_to_char("VT100 $B$2on$R.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_VT100);
+    SET_BIT(ch->player->toggles, PLR_VT100);
   }
   return eSUCCESS;
 }
@@ -850,15 +850,15 @@ int do_compact(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_COMPACT))
+  if (IS_SET(ch->player->toggles, PLR_COMPACT))
   {
     send_to_char("Compact mode $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_COMPACT);
+    REMOVE_BIT(ch->player->toggles, PLR_COMPACT);
   }
   else
   {
     send_to_char("Compact mode $B$2on$R.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_COMPACT);
+    SET_BIT(ch->player->toggles, PLR_COMPACT);
   }
   return eSUCCESS;
 }
@@ -868,17 +868,17 @@ int do_summon_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE))
+  if (IS_SET(ch->player->toggles, PLR_SUMMONABLE))
   {
     send_to_char("You may no longer be summoned by other players.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
+    REMOVE_BIT(ch->player->toggles, PLR_SUMMONABLE);
   }
   else
   {
     send_to_char("You may now be summoned by other players.\r\n"
                  "Make _sure_ you want this...they could summon you to your death!\r\n",
                  ch);
-    SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
+    SET_BIT(ch->player->toggles, PLR_SUMMONABLE);
   }
   return eSUCCESS;
 }
@@ -888,15 +888,15 @@ int do_lfg_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_LFG))
+  if (IS_SET(ch->player->toggles, PLR_LFG))
   {
     send_to_char("You are no longer Looking For Group.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
+    REMOVE_BIT(ch->player->toggles, PLR_LFG);
   }
   else
   {
     send_to_char("You are now Looking For Group.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_LFG);
+    SET_BIT(ch->player->toggles, PLR_LFG);
   }
   return eSUCCESS;
 }
@@ -906,21 +906,21 @@ int do_guide_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+  if (!IS_SET(ch->player->toggles, PLR_GUIDE))
   {
     send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
+  if (IS_SET(ch->player->toggles, PLR_GUIDE_TOG))
   {
     send_to_char("You have hidden your $B(Guide)$R tag.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+    REMOVE_BIT(ch->player->toggles, PLR_GUIDE_TOG);
   }
   else
   {
     send_to_char("You will now show your $B(Guide)$R tag.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+    SET_BIT(ch->player->toggles, PLR_GUIDE_TOG);
   }
 
   return eSUCCESS;
@@ -930,15 +930,15 @@ int do_news_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_NEWS))
+  if (IS_SET(ch->player->toggles, PLR_NEWS))
   {
     send_to_char("You now view news in an up-down fashion.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_NEWS);
+    REMOVE_BIT(ch->player->toggles, PLR_NEWS);
   }
   else
   {
     send_to_char("You now view news in a down-up fashion..\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_NEWS);
+    SET_BIT(ch->player->toggles, PLR_NEWS);
   }
 
   return eSUCCESS;
@@ -949,15 +949,15 @@ int do_ascii_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_ASCII))
+  if (IS_SET(ch->player->toggles, PLR_ASCII))
   {
-    REMOVE_BIT(ch->pcdata->toggles, PLR_ASCII);
+    REMOVE_BIT(ch->player->toggles, PLR_ASCII);
     send_to_char("Cards are now displayed through ASCII.\r\n", ch);
   }
   else
   {
     send_to_char("Cards are no longer dislayed through ASCII.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_ASCII);
+    SET_BIT(ch->player->toggles, PLR_ASCII);
   }
 
   return eSUCCESS;
@@ -968,15 +968,15 @@ int do_damage_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+  if (IS_SET(ch->player->toggles, PLR_DAMAGE))
   {
-    REMOVE_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+    REMOVE_BIT(ch->player->toggles, PLR_DAMAGE);
     send_to_char("Damage numbers will no longer be displayed in combat.\r\n", ch);
   }
   else
   {
     send_to_char("Damage numbers will now be displayed in combat.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+    SET_BIT(ch->player->toggles, PLR_DAMAGE);
   }
 
   return eSUCCESS;
@@ -987,15 +987,15 @@ int do_notax_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
+  if (IS_SET(ch->player->toggles, PLR_NOTAX))
   {
     send_to_char("You will now be taxed on all your loot.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
+    REMOVE_BIT(ch->player->toggles, PLR_NOTAX);
   }
   else
   {
     send_to_char("You will no longer be taxed.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
+    SET_BIT(ch->player->toggles, PLR_NOTAX);
   }
 
   return eSUCCESS;
@@ -1006,15 +1006,15 @@ int do_charmiejoin_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
+  if (IS_SET(ch->player->toggles, PLR_CHARMIEJOIN))
   {
     send_to_char("Your followers will no longer automatically join you.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
+    REMOVE_BIT(ch->player->toggles, PLR_CHARMIEJOIN);
   }
   else
   {
     send_to_char("Your followers will automatically aid you in battle.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
+    SET_BIT(ch->player->toggles, PLR_CHARMIEJOIN);
   }
 
   return eSUCCESS;
@@ -1025,15 +1025,15 @@ int do_autoeat(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_AUTOEAT))
+  if (IS_SET(ch->player->toggles, PLR_AUTOEAT))
   {
     send_to_char("You no longer automatically eat and drink.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
+    REMOVE_BIT(ch->player->toggles, PLR_AUTOEAT);
   }
   else
   {
     send_to_char("You now automatically eat and drink when hungry and thirsty.\r\n", ch);
-    SET_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
+    SET_BIT(ch->player->toggles, PLR_AUTOEAT);
   }
   return eSUCCESS;
 }
@@ -1050,7 +1050,7 @@ int do_anonymous(Character *ch, char *argument, int cmd)
     send_to_char("You are too inexperienced to disguise your profession.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
+  if (IS_SET(ch->player->toggles, PLR_ANONYMOUS))
   {
     send_to_char("Your class and level information is now public.\r\n", ch);
   }
@@ -1059,21 +1059,21 @@ int do_anonymous(Character *ch, char *argument, int cmd)
     send_to_char("Your class and level information is now private.\r\n", ch);
   }
 
-  TOGGLE_BIT(ch->pcdata->toggles, PLR_ANONYMOUS);
+  TOGGLE_BIT(ch->player->toggles, PLR_ANONYMOUS);
   return eSUCCESS;
 }
 
 int do_wimpy(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+  if (IS_SET(ch->player->toggles, PLR_WIMPY))
   {
     send_to_char("You are no longer a wimp....maybe.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_WIMPY);
+    REMOVE_BIT(ch->player->toggles, PLR_WIMPY);
     return eFAILURE;
   }
 
   send_to_char("You are now an official wimp.\r\n", ch);
-  SET_BIT(ch->pcdata->toggles, PLR_WIMPY);
+  SET_BIT(ch->player->toggles, PLR_WIMPY);
   return eSUCCESS;
 }
 
@@ -1081,43 +1081,43 @@ int do_wimpy(Character *ch, char *argument, int cmd)
 // If it's not set, we do.
 int do_pager(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->pcdata->toggles, PLR_PAGER))
+  if (IS_SET(ch->player->toggles, PLR_PAGER))
   {
     send_to_char("You now page your strings in 24 line chunks.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_PAGER);
+    REMOVE_BIT(ch->player->toggles, PLR_PAGER);
     return eFAILURE;
   }
 
   send_to_char("You no longer page strings in 24 line chunks.\r\n", ch);
-  SET_BIT(ch->pcdata->toggles, PLR_PAGER);
+  SET_BIT(ch->player->toggles, PLR_PAGER);
   return eSUCCESS;
 }
 
 int do_bard_song_toggle(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
+  if (IS_SET(ch->player->toggles, PLR_BARD_SONG))
   {
     send_to_char("Bard singing now in verbose mode.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
+    REMOVE_BIT(ch->player->toggles, PLR_BARD_SONG);
     return eFAILURE;
   }
 
   send_to_char("Bard singing now in brief mode.\r\n", ch);
-  SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
+  SET_BIT(ch->player->toggles, PLR_BARD_SONG);
   return eSUCCESS;
 }
 
 int do_nodupekeys_toggle(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
+  if (IS_SET(ch->player->toggles, PLR_NODUPEKEYS))
   {
     send_to_char("You will attach duplicate keys to keyrings.\r\n", ch);
-    REMOVE_BIT(ch->pcdata->toggles, PLR_NODUPEKEYS);
+    REMOVE_BIT(ch->player->toggles, PLR_NODUPEKEYS);
     return eFAILURE;
   }
 
   send_to_char("You will not attach duplicate keys to keyrings.\r\n", ch);
-  SET_BIT(ch->pcdata->toggles, PLR_NODUPEKEYS);
+  SET_BIT(ch->player->toggles, PLR_NODUPEKEYS);
   return eSUCCESS;
 }
 
@@ -1126,14 +1126,14 @@ int do_beep_set(Character *ch, char *arg, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_BEEP))
+  if (IS_SET(ch->player->toggles, PLR_BEEP))
   {
-    REMOVE_BIT(ch->pcdata->toggles, PLR_BEEP);
+    REMOVE_BIT(ch->player->toggles, PLR_BEEP);
     send_to_char("\nTell is now silent.\n", ch);
     return eFAILURE;
   }
 
-  SET_BIT(ch->pcdata->toggles, PLR_BEEP);
+  SET_BIT(ch->player->toggles, PLR_BEEP);
   send_to_char("\nTell now beeps.\a\n", ch);
   return eSUCCESS;
 }

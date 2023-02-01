@@ -234,34 +234,34 @@ int write_hotboot_file(char **new_argv)
       if (d->original)
       {
         fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->host);
-        if (d->original->pcdata)
+        if (d->original->player)
         {
-          if (d->original->pcdata->last_site)
-            dc_free(d->original->pcdata->last_site);
+          if (d->original->player->last_site)
+            dc_free(d->original->player->last_site);
 #ifdef LEAK_CHECK
-          d->original->pcdata->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+          d->original->player->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
 #else
-          d->original->pcdata->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+          d->original->player->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
 #endif
-          strcpy(d->original->pcdata->last_site, d->original->desc->host);
-          d->original->pcdata->time.logon = time(0);
+          strcpy(d->original->player->last_site, d->original->desc->host);
+          d->original->player->time.logon = time(0);
         }
         save_char_obj(d->original);
       }
       else
       {
         fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->host);
-        if (d->character->pcdata)
+        if (d->character->player)
         {
-          if (d->character->pcdata->last_site)
-            dc_free(d->character->pcdata->last_site);
+          if (d->character->player->last_site)
+            dc_free(d->character->player->last_site);
 #ifdef LEAK_CHECK
-          d->character->pcdata->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+          d->character->player->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
 #else
-          d->character->pcdata->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+          d->character->player->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
 #endif
-          strcpy(d->character->pcdata->last_site, d->character->desc->host);
-          d->character->pcdata->time.logon = time(0);
+          strcpy(d->character->player->last_site, d->character->desc->host);
+          d->character->player->time.logon = time(0);
         }
         save_char_obj(d->character);
       }
@@ -817,7 +817,7 @@ void DC::game_loop(void)
         new_string_add(d, comm.data());
       else if (d->hashstr)
         string_hash_add(d, comm.data());
-      else if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+      else if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->player->toggles, PLR_EDITOR_WEB)))
         new_string_add(d, comm.data());
       else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
@@ -964,7 +964,7 @@ void DC::game_loop_init(void)
 
                  for (auto &ch : dc->character_list)
                  {
-                   if (ch->pcdata && IS_PC(ch))
+                   if (ch->player && IS_PC(ch))
                    {
                      ch->save();
                    }
@@ -1427,7 +1427,7 @@ void make_prompt(class Connection *d, string &prompt)
   }
   else if (d->strnew)
   {
-    if (IS_PC(d->character) && IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB))
+    if (IS_PC(d->character) && IS_SET(d->character->player->toggles, PLR_EDITOR_WEB))
     {
       prompt += "Web Editor] ";
     }
@@ -1726,9 +1726,9 @@ string generate_prompt(Character *ch)
     case 'O':
       if (IS_PC(ch))
       {
-        if (ch->pcdata->last_obj_vnum > 0)
+        if (ch->player->last_obj_vnum > 0)
         {
-          sprintf(pro, "%llu", ch->pcdata->last_obj_vnum);
+          sprintf(pro, "%llu", ch->player->last_obj_vnum);
         }
       }
       break;
@@ -1783,7 +1783,7 @@ string generate_prompt(Character *ch)
     case 'S':
       if (IS_PC(ch))
       {
-        sprintf(pro, "%d", ch->pcdata->last_mob_edit);
+        sprintf(pro, "%d", ch->player->last_mob_edit);
       }
       break;
     case 't':
@@ -1872,7 +1872,7 @@ string generate_prompt(Character *ch)
     case 'z':
       if (IS_IMMORTAL(ch))
       {
-        sprintf(pro, "%s%d%s", YELLOW, ch->pcdata->wizinvis, NTEXT);
+        sprintf(pro, "%s%d%s", YELLOW, ch->player->wizinvis, NTEXT);
       }
       break;
     // Z - zone number
@@ -2120,7 +2120,7 @@ int process_output(class Connection *t)
   i += t->output;
 
   if (t->character && t->connected == Connection::states::PLAYING)
-    blackjack_prompt(t->character, i, t->character->pcdata && !IS_SET(t->character->pcdata->toggles, PLR_ASCII));
+    blackjack_prompt(t->character, i, t->character->player && !IS_SET(t->character->player->toggles, PLR_ASCII));
   make_prompt(t, i);
 
   /*
@@ -2745,7 +2745,7 @@ int close_socket(class Connection *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+  if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->player->toggles, PLR_EDITOR_WEB)))
   {
     strcpy(idiotbuf, "/s\n\r");
     strcat(idiotbuf, "\0");
@@ -3104,14 +3104,14 @@ void record_msg(string messg, Character *ch)
   if (messg.empty() || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
     return;
 
-  if (ch->pcdata->away_msgs == 0)
+  if (ch->player->away_msgs == 0)
   {
-    ch->pcdata->away_msgs = new std::queue<string>();
+    ch->player->away_msgs = new std::queue<string>();
   }
 
-  if (ch->pcdata->away_msgs->size() < 1000)
+  if (ch->player->away_msgs->size() < 1000)
   {
-    ch->pcdata->away_msgs->push(messg);
+    ch->player->away_msgs->push(messg);
   }
 }
 
@@ -3123,18 +3123,18 @@ int do_awaymsgs(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if ((ch->pcdata->away_msgs == 0) || ch->pcdata->away_msgs->empty())
+  if ((ch->player->away_msgs == 0) || ch->player->away_msgs->empty())
   {
     SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
     return eSUCCESS;
   }
 
   // Show 23 lines of text, then stop
-  while (!ch->pcdata->away_msgs->empty())
+  while (!ch->player->away_msgs->empty())
   {
-    tmp = ch->pcdata->away_msgs->front();
+    tmp = ch->player->away_msgs->front();
     SEND_TO_Q(tmp, ch->desc);
-    ch->pcdata->away_msgs->pop();
+    ch->player->away_msgs->pop();
 
     if (++lines == 23)
     {
@@ -3155,7 +3155,7 @@ void check_for_awaymsgs(Character *ch)
   if (IS_NPC(ch))
     return;
 
-  if ((ch->pcdata->away_msgs == 0) || ch->pcdata->away_msgs->empty())
+  if ((ch->player->away_msgs == 0) || ch->player->away_msgs->empty())
   {
     return;
   }
@@ -3324,10 +3324,10 @@ string perform_alias(class Connection *d, string orig)
   {
     return orig;
   }
-  if (IS_MOB(d->character) || !d->character->pcdata->alias)
+  if (IS_MOB(d->character) || !d->character->player->alias)
     return orig;
 
-  for (x = d->character->pcdata->alias; x; x = x->next)
+  for (x = d->character->player->alias; x; x = x->next)
   {
     if (x->keyword)
     {
@@ -3403,14 +3403,14 @@ void warn_if_duplicate_ip(Character *ch)
 
       // Mark both characters as multi-playing until they log out
       // This will be used elsewhere to enable automatic logging
-      if (ch->pcdata)
+      if (ch->player)
       {
-        ch->pcdata->multi = true;
+        ch->player->multi = true;
       }
 
-      if (d->character->pcdata)
+      if (d->character->player)
       {
-        d->character->pcdata->multi = true;
+        d->character->player->multi = true;
       }
     }
   }
@@ -3430,7 +3430,7 @@ int do_editor(Character *ch, char *argument, int cmd)
   if (IS_MOB(ch))
     return eFAILURE;
 
-  csendf(ch, "Current editor: %s\n\r\n\r", IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB) ? "web" : "game");
+  csendf(ch, "Current editor: %s\n\r\n\r", IS_SET(ch->player->toggles, PLR_EDITOR_WEB) ? "web" : "game");
 
   one_argument(argument, arg1);
 
@@ -3438,14 +3438,14 @@ int do_editor(Character *ch, char *argument, int cmd)
   {
     if (!strcmp(arg1, "web"))
     {
-      SET_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+      SET_BIT(ch->player->toggles, PLR_EDITOR_WEB);
       send_to_char("Changing to web editor.\r\n", ch);
       send_to_char("Ok.\r\n", ch);
       return eSUCCESS;
     }
     else if (!strcmp(arg1, "game"))
     {
-      REMOVE_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+      REMOVE_BIT(ch->player->toggles, PLR_EDITOR_WEB);
       send_to_char("Changing to in game line editor.\r\n", ch);
       send_to_char("Ok.\r\n", ch);
       return eSUCCESS;

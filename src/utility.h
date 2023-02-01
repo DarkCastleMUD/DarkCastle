@@ -220,25 +220,25 @@ bool IS_DARK(int room);
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
 #define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL - 1))
 
-#define GET_RDEATHS(ch) ((ch)->pcdata->rdeaths)
-#define GET_PDEATHS(ch) ((ch)->pcdata->pdeaths)
-#define GET_PKILLS(ch) ((ch)->pcdata->pkills)
-#define GET_PKILLS_TOTAL(ch) ((ch)->pcdata->pklvl)
+#define GET_RDEATHS(ch) ((ch)->player->rdeaths)
+#define GET_PDEATHS(ch) ((ch)->player->pdeaths)
+#define GET_PKILLS(ch) ((ch)->player->pkills)
+#define GET_PKILLS_TOTAL(ch) ((ch)->player->pklvl)
 
-#define GET_PKILLS_LOGIN(ch) ((ch)->pcdata->totalpkills)
-#define GET_PKILLS_TOTAL_LOGIN(ch) ((ch)->pcdata->totalpkillslv)
-#define GET_PDEATHS_LOGIN(ch) ((ch)->pcdata->pdeathslogin)
+#define GET_PKILLS_LOGIN(ch) ((ch)->player->totalpkills)
+#define GET_PKILLS_TOTAL_LOGIN(ch) ((ch)->player->totalpkillslv)
+#define GET_PDEATHS_LOGIN(ch) ((ch)->player->pdeathslogin)
 
-#define GET_GROUP_KILLS(ch) ((ch)->pcdata->group_kills)
-#define GET_GROUP_PKILLS(ch) ((ch)->pcdata->group_pkills)
-#define GET_GROUP_PKILLSTOTAL(ch) ((ch)->pcdata->grpplvl)
+#define GET_GROUP_KILLS(ch) ((ch)->player->group_kills)
+#define GET_GROUP_PKILLS(ch) ((ch)->player->group_pkills)
+#define GET_GROUP_PKILLSTOTAL(ch) ((ch)->player->grpplvl)
 
 #define GET_HP_METAS(ch) ((ch)->hpmetas)
 #define GET_MANA_METAS(ch) ((ch)->manametas)
 #define GET_MOVE_METAS(ch) ((ch)->movemetas)
 #define GET_AC_METAS(ch) ((ch)->acmetas)
 #define GET_AGE_METAS(ch) ((ch)->agemetas)
-#define GET_KI_METAS(ch) ((ch)->pcdata->kimetas)
+#define GET_KI_METAS(ch) ((ch)->player->kimetas)
 
 #define GET_POS(ch) ((ch)->position)
 #define GET_COND(ch, i) ((ch)->conditions[(i)])
@@ -267,9 +267,9 @@ bool IS_DARK(int room);
 #define GET_ROOM_VNUM(rnum) \
    ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : DC::NOWHERE))
 
-#define GET_PROMPT(ch) ((ch)->pcdata->prompt)
-#define GET_LAST_PROMPT(ch) ((ch)->pcdata->last_prompt)
-#define GET_TOGGLES(ch) ((ch)->pcdata->toggles)
+#define GET_PROMPT(ch) ((ch)->player->prompt)
+#define GET_LAST_PROMPT(ch) ((ch)->player->last_prompt)
+#define GET_TOGGLES(ch) ((ch)->player->toggles)
 
 #define GET_CLASS(ch) ((ch)->c_class)
 #define GET_HOME(ch) ((ch)->hometown)
@@ -314,7 +314,7 @@ bool IS_DARK(int room);
 #define GET_MAX_KI(ch) ((ch)->max_ki)
 
 #define GET_PLATINUM(ch) ((ch)->plat)
-#define GET_BANK(ch) ((ch)->pcdata->bank)
+#define GET_BANK(ch) ((ch)->player->bank)
 #define GET_CLAN(ch) ((ch)->clan)
 #define GET_EXP(ch) ((ch)->exp)
 #define GET_HEIGHT(ch) ((ch)->height)
@@ -324,7 +324,7 @@ bool IS_DARK(int room);
 #define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
 #define GET_DAMROLL(ch) ((ch)->damroll)
 #define GET_REAL_DAMROLL(ch) ((ch)->damroll + str_app[GET_STR((ch))].todam)
-#define GET_QPOINTS(ch) ((ch)->pcdata->quest_points)
+#define GET_QPOINTS(ch) ((ch)->player->quest_points)
 #define GET_SPELLDAMAGE(ch) ((ch)->spelldamage)
 
 #define GET_RACE(ch) ((ch)->race)
@@ -333,7 +333,7 @@ bool IS_DARK(int room);
 
 #define AWAKE(ch) (GET_POS(ch) != POSITION_SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->player->toggles, PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
@@ -343,7 +343,7 @@ inline const short IS_ANONYMOUS(Character *ch)
   else if (GET_LEVEL(ch) >= 101)
      return 0;
   else
-     return (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) != 0);
+     return (IS_SET(ch->player->toggles, PLR_ANONYMOUS) != 0);
 }
 */
 /* Object And Carry related macros */

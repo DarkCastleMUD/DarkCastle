@@ -70,9 +70,9 @@ int do_abandon(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    ch->pcdata->group_pkills = 0;
-    ch->pcdata->grpplvl = 0;
-    ch->pcdata->group_kills = 0;
+    ch->player->group_pkills = 0;
+    ch->player->grpplvl = 0;
+    ch->player->group_kills = 0;
   }
 
   stop_follower(ch, STOP_FOLLOW);
@@ -125,13 +125,13 @@ int do_found(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    ch->pcdata->group_pkills = 0;
-    ch->pcdata->grpplvl = 0;
-    ch->pcdata->group_kills = 0;
+    ch->player->group_pkills = 0;
+    ch->player->grpplvl = 0;
+    ch->player->group_kills = 0;
   }
 
   SETBIT(ch->affected_by, AFF_GROUP);
-  REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
+  REMOVE_BIT(ch->player->toggles, PLR_LFG);
   return eSUCCESS;
 }
 
@@ -274,7 +274,7 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
   else
   {
-    if (IS_PC(i) && IS_SET(i->pcdata->toggles, PLR_ANSI))
+    if (IS_PC(i) && IS_SET(i->player->toggles, PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
         sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
@@ -417,7 +417,7 @@ int do_group(Character *ch, char *argument, int cmd)
         act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
         SETBIT(victim->affected_by, AFF_GROUP);
         if (!IS_NPC(victim))
-          REMOVE_BIT(victim->pcdata->toggles, PLR_LFG);
+          REMOVE_BIT(victim->player->toggles, PLR_LFG);
       }
       return eSUCCESS;
       //    }
@@ -501,12 +501,12 @@ int do_promote(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && IS_PC(new_new_leader))
   {
-    new_new_leader->pcdata->grpplvl = ch->pcdata->grpplvl;
-    new_new_leader->pcdata->group_pkills = ch->pcdata->group_pkills;
-    new_new_leader->pcdata->group_kills = ch->pcdata->group_kills;
-    ch->pcdata->group_pkills = 0;
-    ch->pcdata->grpplvl = 0;
-    ch->pcdata->group_kills = 0;
+    new_new_leader->player->grpplvl = ch->player->grpplvl;
+    new_new_leader->player->group_pkills = ch->player->group_pkills;
+    new_new_leader->player->group_kills = ch->player->group_kills;
+    ch->player->group_pkills = 0;
+    ch->player->grpplvl = 0;
+    ch->player->group_kills = 0;
   }
 
   if (ch->group_name)
@@ -584,9 +584,9 @@ int do_disband(Character *ch, char *argument, int cmd)
 
     if (IS_PC(k))
     {
-      k->pcdata->group_pkills = 0;
-      k->pcdata->grpplvl = 0;
-      k->pcdata->group_kills = 0;
+      k->player->group_pkills = 0;
+      k->player->grpplvl = 0;
+      k->player->group_kills = 0;
     }
 
     for (f = k->followers; f; f = next_f)
@@ -633,9 +633,9 @@ int do_disband(Character *ch, char *argument, int cmd)
   stop_grouped_bards(adios, 1);
   if (IS_PC(adios))
   {
-    adios->pcdata->grpplvl = 0;
-    adios->pcdata->group_pkills = 0;
-    adios->pcdata->group_kills = 0;
+    adios->player->grpplvl = 0;
+    adios->player->group_pkills = 0;
+    adios->player->group_kills = 0;
   }
   stop_follower(adios, STOP_FOLLOW);
   return eSUCCESS;
@@ -733,7 +733,7 @@ int do_follow(Character *ch, char *argument, int cmd)
 
 command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
 {
-  if (ch->pcdata == nullptr)
+  if (ch->player == nullptr)
   {
     return eFAILURE;
   }
@@ -742,13 +742,13 @@ command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    if (ch->pcdata->joining.empty())
+    if (ch->player->joining.empty())
     {
       ch->send("You are not configured to auto-joining anyone.\r\n");
     }
     else
     {
-      ch->send(QString("You are configured to auto-join: %1\r\n").arg(ch->pcdata->getJoining()));
+      ch->send(QString("You are configured to auto-join: %1\r\n").arg(ch->player->getJoining()));
     }
 
     ch->send("Syntax: autojoin <player1> <player2> <player3> ...\r\n");
@@ -758,7 +758,7 @@ command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
 
   else if (arguments == "clear")
   {
-    ch->pcdata->joining.clear();
+    ch->player->joining.clear();
     ch->send("Auto-join list cleared.\r\n");
     return eSUCCESS;
   }
@@ -766,10 +766,10 @@ command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
   auto parts = arguments.toLower().split(' ');
   for (auto &i : parts)
   {
-    ch->pcdata->toggleJoining(i);
+    ch->player->toggleJoining(i);
   }
 
-  ch->send(QString("You are now autojoining: %1\r\n").arg(ch->pcdata->getJoining()));
+  ch->send(QString("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
   return eSUCCESS;
 }
 

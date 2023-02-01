@@ -778,7 +778,7 @@ void check_blackjacks(struct table_data *tbl)
          if (!verify(plr))
             continue;
          buf[0] = '\0';
-         blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
+         blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->player->toggles, PLR_ASCII));
          send_to_char(buf, plr->ch);
       }
       check_winner(tbl);
@@ -799,7 +799,7 @@ void check_blackjacks(struct table_data *tbl)
 
          send_to_char(buf, plr->ch);
          buf[0] = '\0';
-         blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
+         blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->player->toggles, PLR_ASCII));
          send_to_char(buf, plr->ch);
 
          if (plr->table->gold)

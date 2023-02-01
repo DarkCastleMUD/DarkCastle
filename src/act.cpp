@@ -85,7 +85,7 @@ act_return act(
   }
   else if (destination == TO_CHAR)
   {
-    if (!IS_SET(flags, BARDSONG) || ch->pcdata == nullptr || !IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
+    if (!IS_SET(flags, BARDSONG) || ch->player == nullptr || !IS_SET(ch->player->toggles, PLR_BARD_SONG))
     {
       st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
       retval |= st_return.retval;
@@ -112,7 +112,7 @@ act_return act(
         }
         if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
         {
-          if (!IS_SET(flags, BARDSONG) || tmp_char->pcdata == nullptr || !IS_SET(tmp_char->pcdata->toggles, PLR_BARD_SONG))
+          if (!IS_SET(flags, BARDSONG) || tmp_char->player == nullptr || !IS_SET(tmp_char->player->toggles, PLR_BARD_SONG))
           {
             st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char);
             retval |= st_return.retval;

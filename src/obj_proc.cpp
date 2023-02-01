@@ -466,7 +466,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE))
+    if (IS_PC(tmp_char) && IS_SET(tmp_char->player->toggles, PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {
@@ -3573,7 +3573,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!vict)
     return eFAILURE;
 
-  if (vict->pcdata && vict->desc == nullptr)
+  if (vict->player && vict->desc == nullptr)
   {
     return eFAILURE;
   }

@@ -815,7 +815,7 @@ int do_name(Character *ch, char *arg, int cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NONAME))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NONAME))
   {
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;

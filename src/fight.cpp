@@ -128,7 +128,7 @@ int check_autojoiners(Character *ch, int skill = 0)
     return eFAILURE; // irrelevant
   if (!ch->fighting)
     return eFAILURE;
-  if (ch->pcdata && ch->pcdata->unjoinable == true)
+  if (ch->player && ch->player->unjoinable == true)
     return eFAILURE;
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
@@ -146,9 +146,9 @@ int check_autojoiners(Character *ch, int skill = 0)
       continue;
     if (GET_POS(tmp) != POSITION_STANDING)
       continue;
-    if (tmp->pcdata == nullptr || tmp->pcdata->joining.empty())
+    if (tmp->player == nullptr || tmp->player->joining.empty())
       continue;
-    if (!isname(GET_NAME(ch), tmp->pcdata->joining))
+    if (!isname(GET_NAME(ch), tmp->player->joining))
       continue;
     if (IS_AFFECTED(tmp, AFF_INSANE))
       continue;
@@ -183,10 +183,10 @@ int check_joincharmie(Character *ch, int skill = 0)
     return eFAILURE;
   if (GET_POS(tmp) != POSITION_STANDING)
     return eFAILURE;
-  if (!tmp->pcdata || tmp->pcdata->joining.empty())
+  if (!tmp->player || tmp->player->joining.empty())
     return eFAILURE;
-  if (!isname("follower", tmp->pcdata->joining) &&
-      !isname("followers", tmp->pcdata->joining))
+  if (!isname("follower", tmp->player->joining) &&
+      !isname("followers", tmp->player->joining))
     return eFAILURE;
   if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
     return eFAILURE;
@@ -259,7 +259,7 @@ void perform_violence(void)
       retval = check_joincharmie(ch);
     if (SOMEONE_DIED(retval))
       continue;
-    if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
+    if (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_CHARMIEJOIN))
     {
       if (ch->followers)
       {
@@ -1931,7 +1931,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       break;
     } // of switch
     logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
-    victim->pcdata->statmetas -= 1; // we lost a stat, so don't charge extra meta
+    victim->player->statmetas -= 1; // we lost a stat, so don't charge extra meta
   }                                 // of pir's extra stat loss
 }
 
@@ -2845,7 +2845,7 @@ int damage(Character *ch, Character *victim,
           SET_BIT(retval, check_joincharmie(ch));
       if (SOMEONE_DIED(retval))
         return debug_retval(ch, victim, retval);
-      if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
+      if (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
       {
         if (ch->followers)
         {
@@ -2989,7 +2989,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
     {
       if (tmpch == ch || tmpch == victim)
         continue;
-      if (!IS_NPC(tmpch) && IS_SET(tmpch->pcdata->toggles, PLR_DAMAGE))
+      if (!IS_NPC(tmpch) && IS_SET(tmpch->player->toggles, PLR_DAMAGE))
         send_tokens(tokens, ch, obj, victim, 0, tmpch);
       else
         send_tokens(tokens2, ch, obj, victim, 0, tmpch);
@@ -2997,14 +2997,14 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
   }
   else if (to == TO_CHAR)
   {
-    if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+    if (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, ch);
     else
       send_tokens(tokens2, ch, obj, victim, 0, ch);
   }
   else if (to == TO_VICT)
   {
-    if (!IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE))
+    if (!IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, victim);
     else
       send_tokens(tokens2, ch, obj, victim, 0, victim);
@@ -4255,7 +4255,7 @@ void stop_fighting(Character *ch, int clearlag)
   update_pos(ch);
 
   // Remove ch's lag if he wasn't using wimpy.
-  if (!IS_NPC(ch) && ch->desc && !IS_SET(ch->pcdata->toggles, PLR_WIMPY) && clearlag)
+  if (!IS_NPC(ch) && ch->desc && !IS_SET(ch->player->toggles, PLR_WIMPY) && clearlag)
     ch->desc->wait = 0;
 
   if (ch == combat_next_dude)
@@ -5411,10 +5411,10 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (IS_PC(victim))
       {
-        master->pcdata->grpplvl += GET_LEVEL(victim);
-        master->pcdata->group_pkills += 1;
+        master->player->grpplvl += GET_LEVEL(victim);
+        master->player->group_pkills += 1;
       }
-      master->pcdata->group_kills += 1;
+      master->player->group_kills += 1;
     }
   }
 
@@ -5442,30 +5442,30 @@ void raw_kill(Character *ch, Character *victim)
     stop_grouped_bards(victim, !IS_SINGING(victim));
   }
 
-  if (victim->pcdata->golem)
+  if (victim->player->golem)
   {
     void release_message(Character * ch);
     void shatter_message(Character * ch);
 
-    if (number(0, 99) < (GET_LEVEL(victim) / 10 + victim->pcdata->golem->level / 5))
+    if (number(0, 99) < (GET_LEVEL(victim) / 10 + victim->player->golem->level / 5))
     { /* rk */
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
       logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
-      shatter_message(victim->pcdata->golem);
-      extract_char(victim->pcdata->golem, true);
+      shatter_message(victim->player->golem);
+      extract_char(victim->player->golem, true);
     }
     else
     { /* release */
-      release_message(victim->pcdata->golem);
-      extract_char(victim->pcdata->golem, false);
+      release_message(victim->player->golem);
+      extract_char(victim->player->golem, false);
     }
   }
-  victim->pcdata->group_pkills = 0;
-  victim->pcdata->grpplvl = 0;
-  victim->pcdata->group_kills = 0;
-  if (IS_SET(victim->pcdata->punish, PUNISH_SPAMMER))
-    REMOVE_BIT(victim->pcdata->punish, PUNISH_SPAMMER);
+  victim->player->group_pkills = 0;
+  victim->player->grpplvl = 0;
+  victim->player->group_kills = 0;
+  if (IS_SET(victim->player->punish, PUNISH_SPAMMER))
+    REMOVE_BIT(victim->player->punish, PUNISH_SPAMMER);
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
     is_thief = 1;
@@ -5579,7 +5579,7 @@ void raw_kill(Character *ch, Character *victim)
             {
               sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
               logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
-              victim->pcdata->statmetas--;
+              victim->player->statmetas--;
             }
           }
           else
@@ -5591,7 +5591,7 @@ void raw_kill(Character *ch, Character *victim)
             {
               sprintf(log_buf, "%s lost a dex. ouch.", GET_NAME(victim));
               logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
-              victim->pcdata->statmetas--;
+              victim->player->statmetas--;
             }
           }
           pir_stat_loss(victim, chance, false, is_thief);
@@ -6238,16 +6238,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
     else if (has_skill(victim, SKILL_TUMBLING))
@@ -6256,15 +6256,15 @@ void dam_message(int dam, Character *ch, Character *victim,
       {
         sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
         sprintf(dammsg, " for $B%d$R damage", dam);
-        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
       }
       else
       {
         sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
         sprintf(dammsg, ", dealing $B%d$R damage", dam);
-        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
       }
     }
     else
@@ -6274,16 +6274,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
   }
@@ -6297,16 +6297,16 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
     }
     else
     {
       if (!attack)
         attack = attack_table[w_type];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
   //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -6624,10 +6624,10 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
           {
             if (IS_PC(victim))
             {
-              master->pcdata->grpplvl += GET_LEVEL(victim);
-              master->pcdata->group_pkills += 1;
+              master->player->grpplvl += GET_LEVEL(victim);
+              master->player->group_pkills += 1;
             }
-            master->pcdata->group_kills += 1;
+            master->player->group_kills += 1;
           }
         }
       }
@@ -6662,10 +6662,10 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
             {
               if (IS_PC(victim))
               {
-                master->pcdata->grpplvl += GET_LEVEL(victim);
-                master->pcdata->group_pkills += 1;
+                master->player->grpplvl += GET_LEVEL(victim);
+                master->player->group_pkills += 1;
               }
-              master->pcdata->group_kills += 1;
+              master->player->group_kills += 1;
             }
           }
         }
@@ -6701,10 +6701,10 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
             {
               if (IS_PC(victim))
               {
-                master->pcdata->grpplvl += GET_LEVEL(victim);
-                master->pcdata->group_pkills += 1;
+                master->player->grpplvl += GET_LEVEL(victim);
+                master->player->group_pkills += 1;
               }
-              master->pcdata->group_kills += 1;
+              master->player->group_kills += 1;
             }
           }
         }
@@ -6942,7 +6942,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return false;
 
   // Ch should not be able to attack a wizinvis immortal player
-  if (!IS_NPC(vict) && GET_LEVEL(ch) < vict->pcdata->wizinvis)
+  if (!IS_NPC(vict) && GET_LEVEL(ch) < vict->player->wizinvis)
     return false;
 
   if (IS_NPC(vict))
@@ -7391,7 +7391,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
       }   // end of if npc
       else
       {
-        if (IS_SET(victim->pcdata->toggles, PLR_WIMPY))
+        if (IS_SET(victim->player->toggles, PLR_WIMPY))
         {
           if ((!IS_AFFECTED(victim, AFF_PARALYSIS)) &&
               (!IS_SET(victim->combat, COMBAT_STUNNED)) &&

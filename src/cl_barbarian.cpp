@@ -614,7 +614,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
 
   if (!IS_SET(retval, eCH_DIED))
   {
-    if (!IS_SET(retval, eVICT_DIED) && !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+    if (!IS_SET(retval, eVICT_DIED) && !IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);

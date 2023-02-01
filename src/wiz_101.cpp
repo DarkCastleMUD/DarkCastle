@@ -318,15 +318,15 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   if (!IS_MOB(this))
     for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(pcdata->poofout, tmp_ch);
+        send_to_char(player->poofout, tmp_ch);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
-      else if (tmp_ch != this && !pcdata->stealth)
+      else if (tmp_ch != this && !player->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -340,16 +340,16 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   if (!IS_MOB(this))
     for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
 
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(pcdata->poofin, tmp_ch);
+        send_to_char(player->poofin, tmp_ch);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
-      else if (tmp_ch != this && !pcdata->stealth)
+      else if (tmp_ch != this && !player->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -392,10 +392,10 @@ int do_poof(Character *ch, char *arg, int cmd)
   {
     send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
     send_to_char("\n\rCurrent poof in is:\n\r", ch);
-    send_to_char(ch->pcdata->poofin, ch);
+    send_to_char(ch->player->poofin, ch);
     send_to_char("\n\r", ch);
     send_to_char("\n\rCurrent poof out is:\n\r", ch);
-    send_to_char(ch->pcdata->poofout, ch);
+    send_to_char(ch->player->poofout, ch);
     send_to_char("\n\r", ch);
     return eSUCCESS;
   }
@@ -465,15 +465,15 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (inout[0] == 'i')
   {
-    if (ch->pcdata->poofin)
-      dc_free(ch->pcdata->poofin);
-    ch->pcdata->poofin = str_dup(buf);
+    if (ch->player->poofin)
+      dc_free(ch->player->poofin);
+    ch->player->poofin = str_dup(buf);
   }
   else
   {
-    if (ch->pcdata->poofout)
-      dc_free(ch->pcdata->poofout);
-    ch->pcdata->poofout = str_dup(buf);
+    if (ch->player->poofout)
+      dc_free(ch->player->poofout);
+    ch->player->poofout = str_dup(buf);
   }
 
   send_to_char("Ok.\r\n", ch);
@@ -604,14 +604,14 @@ int do_holylite(Character *ch, char *argument, int cmd)
         "HOLYLITE doesn't take any arguments; arg ignored.\r\n", ch);
   } /* if */
 
-  if (ch->pcdata->holyLite)
+  if (ch->player->holyLite)
   {
-    ch->pcdata->holyLite = false;
+    ch->player->holyLite = false;
     send_to_char("Holy light mode off.\r\n", ch);
   }
   else
   {
-    ch->pcdata->holyLite = true;
+    ch->player->holyLite = true;
     send_to_char("Holy light mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;
@@ -635,22 +635,22 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (ch->pcdata->wizinvis == 0)
+    if (ch->player->wizinvis == 0)
     {
-      ch->pcdata->wizinvis = GET_LEVEL(ch);
+      ch->player->wizinvis = GET_LEVEL(ch);
     }
     else
     {
-      ch->pcdata->wizinvis = 0;
+      ch->player->wizinvis = 0;
     }
   }
   else
   {
     if (arg1 > GET_LEVEL(ch))
       arg1 = GET_LEVEL(ch);
-    ch->pcdata->wizinvis = arg1;
+    ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->pcdata->wizinvis);
+  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
   send_to_char(buf, ch);
   return eSUCCESS;
 }
@@ -660,14 +660,14 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->pcdata->toggles, PLR_NOHASSLE))
+  if (IS_SET(ch->player->toggles, PLR_NOHASSLE))
   {
-    REMOVE_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
+    REMOVE_BIT(ch->player->toggles, PLR_NOHASSLE);
     send_to_char("Mobiles can bother you again.\r\n", ch);
   }
   else
   {
-    SET_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
+    SET_BIT(ch->player->toggles, PLR_NOHASSLE);
     send_to_char("Those pesky mobiles will leave you alone now.\r\n", ch);
   }
   return eSUCCESS;

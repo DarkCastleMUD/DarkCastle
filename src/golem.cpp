@@ -161,16 +161,16 @@ void save_golem_data(Character *ch)
   char file[200];
   FILE *fpfile = nullptr;
   int golemtype = 0;
-  if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->pcdata->golem)
+  if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
-  golemtype = !IS_AFFECTED(ch->pcdata->golem, AFF_GOLEM); // 0 or 1
+  golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
     logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
     return;
   }
-  Character *golem = ch->pcdata->golem; // Just to make the code below cleaner.
+  Character *golem = ch->player->golem; // Just to make the code below cleaner.
   fwrite(&(golem->level), sizeof(golem->level), 1, fpfile);
   fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
@@ -264,7 +264,7 @@ void load_golem_data(Character *ch, int golemtype)
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->pcdata->golem)
+  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
@@ -274,12 +274,12 @@ void load_golem_data(Character *ch, int golemtype)
     golem = clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
     golem->alignment = ch->alignment;
-    ch->pcdata->golem = golem;
+    ch->player->golem = golem;
     return;
   }
   golem = clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  ch->pcdata->golem = golem;
+  ch->player->golem = golem;
   fread(&(golem->level), sizeof(golem->level), 1, fpfile);
   int level = golem->level;
   for (; level > 1; level--)
@@ -301,7 +301,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   arg = one_argument(arg, buf);
   if (IS_NPC(ch))
     return eFAILURE;
-  if (ch->pcdata->golem)
+  if (ch->player->golem)
   {
     send_to_char("You already have a golem.\r\n", ch);
     return eFAILURE;
@@ -324,7 +324,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   }
   load_golem_data(ch, i); // Load the golem up;
   skill_increase_check(ch, SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
-  golem = ch->pcdata->golem;
+  golem = ch->player->golem;
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
     send_to_char("Something goes wrong, and you fail!", ch);
@@ -355,12 +355,12 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   Character *master = ch;
   if (IS_NPC(ch))
     return eFAILURE;
-  if (!ch->pcdata->golem)
+  if (!ch->player->golem)
   {
     send_to_char("But you don't have a golem!\r\n", ch);
     return eFAILURE;
   }
-  ch = ch->pcdata->golem;
+  ch = ch->player->golem;
   struct affected_type *aff;
 
   int64_t exp_needed;

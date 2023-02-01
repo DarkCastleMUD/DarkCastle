@@ -56,7 +56,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 	class Connection *i;
 	char buf3[MAX_INPUT_LENGTH];
 
-	if (!IS_NPC(ch) && ch->pcdata->wizinvis)
+	if (!IS_NPC(ch) && ch->player->wizinvis)
 		sprintf(buf3, "someone");
 	else
 		sprintf(buf3, GET_SHORT(ch));
@@ -77,7 +77,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 		for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 			if (i->character != ch && !i->connected)
 			{
-				if (!IS_NPC(ch) && ch->pcdata->wizinvis && i->character->level < ch->pcdata->wizinvis)
+				if (!IS_NPC(ch) && ch->player->wizinvis && i->character->level < ch->player->wizinvis)
 					sprintf(buf3, "Someone");
 				else
 					sprintf(buf3, GET_SHORT(ch));
@@ -102,17 +102,17 @@ int do_incognito(Character *ch, char *argument, int cmd)
 	if (IS_MOB(ch))
 		return eFAILURE;
 
-	if (ch->pcdata->incognito == true)
+	if (ch->player->incognito == true)
 	{
 		send_to_char("Incognito off.\r\n", ch);
-		ch->pcdata->incognito = false;
+		ch->player->incognito = false;
 	}
 	else
 	{
 		send_to_char("Incognito on.  Even while invis, anyone in your room can "
 					 "see you.\r\n",
 					 ch);
-		ch->pcdata->incognito = true;
+		ch->player->incognito = true;
 	}
 	return eSUCCESS;
 }
@@ -517,7 +517,7 @@ int show_zone_commands(Character *ch, int zone_key, int start)
 		return eFAILURE;
 	}
 
-	if (IS_SET(ch->pcdata->toggles, PLR_PAGER))
+	if (IS_SET(ch->player->toggles, PLR_PAGER))
 		num_to_show = 50;
 	else
 		num_to_show = 20;
@@ -2125,7 +2125,7 @@ int do_opstat(Character *ch, char *argument, int cmd)
 	}
 	else
 	{
-		vnum = ch->pcdata->last_obj_vnum;
+		vnum = ch->player->last_obj_vnum;
 	}
 
 	opstat(ch, vnum);
@@ -2158,7 +2158,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 	}
 	else
 	{
-		vnum = ch->pcdata->last_obj_vnum;
+		vnum = ch->player->last_obj_vnum;
 	}
 
 	if ((num = real_object(vnum)) < 0)
@@ -2171,7 +2171,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		send_to_char("You are unable to work creation outside your range.\r\n", ch);
 		return eFAILURE;
 	}
-	ch->pcdata->last_obj_vnum = vnum;
+	ch->player->last_obj_vnum = vnum;
 	/*  if (!*arg)
 	  {
 		opstat(ch, vnum);
@@ -2369,7 +2369,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		ch->desc->strnew = &(currprog->comlist);
 		ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-		if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
+		if (IS_SET(ch->player->toggles, PLR_EDITOR_WEB))
 		{
 			ch->desc->web_connected = Connection::states::EDIT_MPROG;
 		}
@@ -2401,7 +2401,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 				 "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
 				 ch);
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "$3Current object set to: %llu\r\n", ch->pcdata->last_obj_vnum);
+	sprintf(buf, "$3Current object set to: %llu\r\n", ch->player->last_obj_vnum);
 	send_to_char(buf, ch);
 	return eSUCCESS;
 }
@@ -2478,7 +2478,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	obj_index[r2].mobspec = 0;
 	// extract_obj(otmp);
 
-	ch->pcdata->last_obj_vnum = v2;
+	ch->player->last_obj_vnum = v2;
 	set_zone_modified_obj(r2);
 
 	return eSUCCESS;
@@ -2583,7 +2583,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 		send_to_char("Warning: mob program found. This will need to be copied manually.\r\n", ch);
 	}
 
-	ch->pcdata->last_mob_edit = dst;
+	ch->player->last_mob_edit = dst;
 	set_zone_modified_mob(dst);
 
 	return eSUCCESS;

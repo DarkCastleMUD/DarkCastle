@@ -725,14 +725,14 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
   QString buf;
 
   // Handle logged players.
-  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_LOG))
   {
     buf = QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str());
     logentry(buf, 110, LogChannels::LOG_PLAYER, ch);
   }
 
   // Implement freeze command.
-  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) && pcomm != "quit")
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_FREEZE) && pcomm != "quit")
   {
     send_to_char("You've been frozen by an immortal.\r\n", ch);
     return eSUCCESS;
@@ -905,7 +905,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->player->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
         }
@@ -926,7 +926,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::players_only:
-        if (ch == nullptr || ch->pcdata == nullptr)
+        if (ch == nullptr || ch->player == nullptr)
         {
           return eFAILURE;
         }
@@ -940,7 +940,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::immortals_only:
-        if (ch == nullptr || ch->pcdata == nullptr || GET_LEVEL(ch) < IMMORTAL)
+        if (ch == nullptr || ch->player == nullptr || GET_LEVEL(ch) < IMMORTAL)
         {
           return eFAILURE;
         }
@@ -948,7 +948,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::implementors_only:
-        if (ch == nullptr || ch->pcdata == nullptr || GET_LEVEL(ch) < IMP_ONLY)
+        if (ch == nullptr || ch->player == nullptr || GET_LEVEL(ch) < IMP_ONLY)
         {
           return eFAILURE;
         }

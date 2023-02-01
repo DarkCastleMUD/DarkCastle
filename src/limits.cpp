@@ -589,11 +589,11 @@ void advance_level(Character *ch, int is_conversion)
 	ch->max_ki += add_ki;
 	redo_ki(ch); // Ki gets level bonuses now
 	if (!IS_MOB(ch) && !is_conversion)
-		ch->pcdata->practices += add_practices;
+		ch->player->practices += add_practices;
 
 	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
 			GET_MAX_MOVE(ch),
-			IS_MOB(ch) ? 0 : add_practices, IS_MOB(ch) ? 0 : ch->pcdata->practices, add_ki, GET_MAX_KI(ch));
+			IS_MOB(ch) ? 0 : add_practices, IS_MOB(ch) ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
 	if (!is_conversion)
 		send_to_char(buf, ch);
 
@@ -610,7 +610,7 @@ void advance_level(Character *ch, int is_conversion)
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (GET_LEVEL(ch) > 10 && !IS_SET(ch->pcdata->toggles, PLR_REMORTED))
+	if (GET_LEVEL(ch) > 10 && !IS_SET(ch->player->toggles, PLR_REMORTED))
 	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
@@ -664,8 +664,8 @@ void gain_exp(Character *ch, int64_t gain)
 
 	void golem_gain_exp(Character * ch);
 
-	if (!IS_NPC(ch) && ch->pcdata->golem && ch->in_room == ch->pcdata->golem->in_room) // Golems get mage's exp, when they're in the same room
-		gain_exp(ch->pcdata->golem, gain);
+	if (!IS_NPC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
+		gain_exp(ch->player->golem, gain);
 
 	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
 		golem_gain_exp(ch);
@@ -775,9 +775,9 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -791,9 +791,9 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -826,7 +826,7 @@ void point_update(void)
 		{
 			int o;
 			for (o = 0; o < MAX_HIDE; o++)
-				i->pcdata->hiding_from[o] = nullptr;
+				i->player->hiding_from[o] = nullptr;
 			o = 0;
 			for (temp = world[i->in_room].people; temp; temp = temp->next_in_room)
 			{
@@ -836,13 +836,13 @@ void point_update(void)
 					break;
 				if (number(1, 101) > a) // Failed.
 				{
-					i->pcdata->hiding_from[o] = temp;
-					i->pcdata->hide[o++] = false;
+					i->player->hiding_from[o] = temp;
+					i->player->hide[o++] = false;
 				}
 				else
 				{
-					i->pcdata->hiding_from[o] = temp;
-					i->pcdata->hide[o++] = true;
+					i->player->hiding_from[o] = temp;
+					i->player->hide[o++] = true;
 				}
 			}
 		}
@@ -1049,9 +1049,9 @@ void prepare_character_for_sixty(Character *ch)
 			skl = SKILL_SONG_HYPNOTIC_HARMONY;
 			break;
 		}
-		if (has_skill(ch, skl) && !IS_SET(ch->pcdata->toggles, PLR_50PLUS))
+		if (has_skill(ch, skl) && !IS_SET(ch->player->toggles, PLR_50PLUS))
 		{
-			SET_BIT(ch->pcdata->toggles, PLR_50PLUS);
+			SET_BIT(ch->player->toggles, PLR_50PLUS);
 			int i = (ch->exp / 100000000) * 500000;
 			if (i > 0)
 			{

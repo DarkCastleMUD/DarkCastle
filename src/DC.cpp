@@ -231,12 +231,12 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 		return false;
 	}
 
-	if (d.character == nullptr || d.character->pcdata == nullptr)
+	if (d.character == nullptr || d.character->player == nullptr)
 	{
 		return false;
 	}
 
-	QString cipher = d.character->pcdata->pwd;
+	QString cipher = d.character->player->pwd;
 	qDebug() << cipher << password << crypt(password.toStdString().c_str(), cipher.toStdString().c_str());
 	if (crypt(password.toStdString().c_str(), cipher.toStdString().c_str()) == cipher)
 	{

@@ -204,8 +204,8 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
       cerr << "It's ansi or vt100 code" << endl;
 #endif
       if (IS_MOB(send_to) ||
-          (IS_SET(send_to->pcdata->toggles, PLR_ANSI) && current->IsAnsi()) ||
-          (IS_SET(send_to->pcdata->toggles, PLR_VT100) && current->IsVt100()))
+          (IS_SET(send_to->player->toggles, PLR_ANSI) && current->IsAnsi()) ||
+          (IS_SET(send_to->player->toggles, PLR_VT100) && current->IsVt100()))
       {
         switch (current->GetBuf()[1])
         {

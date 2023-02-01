@@ -407,8 +407,8 @@ int meta_get_stat_exp_cost(Character *ch, uint8_t stat)
 		break;
 	}
 
-	//    if(ch->pcdata->statmetas > 0)
-	//     xp_price += ch->pcdata->statmetas * 20000;
+	//    if(ch->player->statmetas > 0)
+	//     xp_price += ch->player->statmetas * 20000;
 
 	return xp_price;
 }
@@ -888,7 +888,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			GET_PLATINUM(ch) -= statplatprice;
 
 			*pstat += 1;
-			ch->pcdata->statmetas++;
+			ch->player->statmetas++;
 
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
@@ -1239,7 +1239,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			send_to_char("The Meta-Physician gives you a practice session.\r\n", ch);
 
 			GET_PLATINUM(ch) -= 25;
-			ch->pcdata->practices += 1;
+			ch->player->practices += 1;
 			return eSUCCESS;
 		}
 		if (choice == 21)

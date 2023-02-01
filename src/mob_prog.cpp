@@ -646,11 +646,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	case 'b':
 		if (!str_cmp(right, "bank"))
 		{
-			if (!target || !target->pcdata)
+			if (!target || !target->player)
 				tError = true;
 			else
 			{
-				uintval = &target->pcdata->bank;
+				uintval = &target->player->bank;
 			}
 		}
 		break;
@@ -1087,10 +1087,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		else if (!str_cmp(right, "practices"))
 		{
-			if (!target || !target->pcdata)
+			if (!target || !target->player)
 				tError = true;
 			else
-				intval = (int16_t *)&target->pcdata->practices;
+				intval = (int16_t *)&target->player->practices;
 		}
 		break;
 	case 'q':

@@ -388,7 +388,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
     /* set age of victim */
-    vict->pcdata->time.birth =
+    vict->player->time.birth =
         time(0) - (int32_t)value * (int32_t)SECS_PER_MUD_YEAR;
   };
   break;
@@ -645,7 +645,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
     /* set original sessions of victim */
-    vict->pcdata->practices = value;
+    vict->player->practices = value;
   }
   break;
   case 18: /* alignment */
@@ -780,7 +780,7 @@ int do_set(Character *ch, char *argument, int cmd)
       send_to_char("Value must be from -10 to 100.\r\n", ch);
       return eFAILURE;
     }
-    vict->pcdata->saves_mods[i] = value;
+    vict->player->saves_mods[i] = value;
   }
   break;
   case 28:
@@ -827,7 +827,7 @@ int do_set(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    vict->pcdata->profession = value;
+    vict->player->profession = value;
     logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;

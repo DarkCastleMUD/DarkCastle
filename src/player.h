@@ -30,7 +30,7 @@
 
 /************************************************************************
 | Player vectors
-| Character->pcdata->toggles
+| Character->player->toggles
 */
 #define PLR_BRIEF 1U
 #define PLR_COMPACT 1U << 1

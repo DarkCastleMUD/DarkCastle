@@ -225,7 +225,7 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
    if (mode == 0 && IS_SET(object->obj_flags.more_flags, ITEM_NONOTICE) &&
-       (ch->pcdata && !ch->pcdata->holyLite))
+       (ch->player && !ch->player->holyLite))
       return;
 
    buffer[0] = '\0';
@@ -526,13 +526,13 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
             if (!i->desc)
                buffer = "*linkdead*  ";
-            if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
+            if (IS_SET(i->player->toggles, PLR_GUIDE_TOG))
                buffer.append("$B$7(Guide)$B$3 ");
 
             buffer.append(GET_SHORT(i));
             if ((GET_LEVEL(i) < OVERSEER) && i->clan && (clan = get_clan(i)))
             {
-               if (IS_PC(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+               if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
                {
                   sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
                   buffer.append(buf);
@@ -546,7 +546,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+               if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -832,10 +832,10 @@ int do_botcheck(Character *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (victim->pcdata->lastseen == 0)
-      victim->pcdata->lastseen = new multimap<int, pair<timeval, timeval>>;
+   if (victim->player->lastseen == 0)
+      victim->player->lastseen = new multimap<int, pair<timeval, timeval>>;
 
-   if (victim->pcdata->lastseen->size() == 0)
+   if (victim->player->lastseen->size() == 0)
    {
       csendf(ch, "%s has not seen any mobs recently.\r\n", GET_NAME(victim));
       return eFAILURE;
@@ -844,7 +844,7 @@ int do_botcheck(Character *ch, char *argument, int cmd)
    int nr, ms;
    timeval seen, targeted;
    double ts1, ts2;
-   for (multimap<int, pair<timeval, timeval>>::iterator i = victim->pcdata->lastseen->begin(); i != victim->pcdata->lastseen->end(); ++i)
+   for (multimap<int, pair<timeval, timeval>>::iterator i = victim->player->lastseen->begin(); i != victim->player->lastseen->end(); ++i)
    {
       nr = (*i).first;
       seen = (*i).second.first;
@@ -883,8 +883,8 @@ void list_char_to_char(Character *list, Character *ch, int mode)
    {
       if (ch == i)
          continue;
-      if (!IS_MOB(i) && (i->pcdata->wizinvis > GET_LEVEL(ch)))
-         if (!i->pcdata->incognito || !(ch->in_room == i->in_room))
+      if (!IS_MOB(i) && (i->player->wizinvis > GET_LEVEL(ch)))
+         if (!i->player->incognito || !(ch->in_room == i->in_room))
             continue;
       if (IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
       {
@@ -892,17 +892,17 @@ void list_char_to_char(Character *list, Character *ch, int mode)
 
          if (IS_PC(ch) && IS_NPC(i))
          {
-            if (ch->pcdata->lastseen == 0)
-               ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval>>;
+            if (ch->player->lastseen == 0)
+               ch->player->lastseen = new multimap<int, pair<timeval, timeval>>;
 
             if (clear_lastseen == false)
             {
-               ch->pcdata->lastseen->clear();
+               ch->player->lastseen->clear();
                clear_lastseen = true;
             }
 
             gettimeofday(&tv, nullptr);
-            ch->pcdata->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
+            ch->player->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(ch->in_room))
@@ -968,7 +968,7 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
    QString color_good = "$2";
    QString color_bad = "$4";
 
-   if (this && this->pcdata)
+   if (this && this->player)
    {
       color_good = this->getSettingAsColor("color.good");
       color_bad = this->getSettingAsColor("color.bad");
@@ -1333,7 +1333,7 @@ int do_look(Character *ch, char *argument, int cmd)
       ansi_color(GREY, ch);
       return eSUCCESS;
    }
-   else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite))
+   else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
    {
       send_to_char("It is pitch black...\r\n", ch);
       list_char_to_char(world[ch->in_room].people, ch, 0);
@@ -1548,7 +1548,7 @@ int do_look(Character *ch, char *argument, int cmd)
                   show_char_to_char(tmp_char, ch, 1);
                if (ch != tmp_char)
                {
-                  if (!IS_MOB(ch) && (GET_LEVEL(tmp_char) < ch->pcdata->wizinvis))
+                  if (!IS_MOB(ch) && (GET_LEVEL(tmp_char) < ch->player->wizinvis))
                   {
                      return eSUCCESS;
                   }
@@ -1748,7 +1748,7 @@ int do_look(Character *ch, char *argument, int cmd)
          ansi_color(GREY, ch);
 
          // PUT SECTOR AND ROOMFLAG STUFF HERE
-         if (!IS_MOB(ch) && ch->pcdata->holyLite)
+         if (!IS_MOB(ch) && ch->player->holyLite)
          {
             sprinttype(world[ch->in_room].sector_type, sector_types,
                        sector_buf);
@@ -1766,7 +1766,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          send_to_char("\n\r", ch);
 
-         if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+         if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
             send_to_char(world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
@@ -1796,7 +1796,7 @@ int do_look(Character *ch, char *argument, int cmd)
             is_closed = IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED);
             is_hidden = IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN);
 
-            if (IS_MOB(ch) || ch->pcdata->holyLite)
+            if (IS_MOB(ch) || ch->player->holyLite)
             {
                if (is_closed && is_hidden)
                   sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
@@ -1901,7 +1901,7 @@ int do_exits(Character *ch, char *argument, int cmd)
       if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
          continue;
 
-      if (!IS_MOB(ch) && ch->pcdata->holyLite)
+      if (!IS_MOB(ch) && ch->player->holyLite)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  world[EXIT(ch, door)->to_room].name,
                  world[EXIT(ch, door)->to_room].number);
@@ -2267,21 +2267,21 @@ int do_score(Character *ch, char *argument, int cmd)
 
    if (!IS_NPC(ch)) // mob can't view this part
    {
-      if (GET_LEVEL(ch) > IMMORTAL && ch->pcdata->buildLowVnum && ch->pcdata->buildHighVnum)
+      if (GET_LEVEL(ch) > IMMORTAL && ch->player->buildLowVnum && ch->player->buildHighVnum)
       {
-         if (ch->pcdata->buildLowVnum == ch->pcdata->buildOLowVnum &&
-             ch->pcdata->buildLowVnum == ch->pcdata->buildMLowVnum)
+         if (ch->player->buildLowVnum == ch->player->buildOLowVnum &&
+             ch->player->buildLowVnum == ch->player->buildMLowVnum)
          {
-            sprintf(buf, "CREATION RANGE: %d-%d\n\r", ch->pcdata->buildLowVnum, ch->pcdata->buildHighVnum);
+            sprintf(buf, "CREATION RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
             send_to_char(buf, ch);
          }
          else
          {
-            sprintf(buf, "ROOM RANGE: %d-%d\n\r", ch->pcdata->buildLowVnum, ch->pcdata->buildHighVnum);
+            sprintf(buf, "ROOM RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
             send_to_char(buf, ch);
-            sprintf(buf, "MOB RANGE: %d-%d\n\r", ch->pcdata->buildMLowVnum, ch->pcdata->buildMHighVnum);
+            sprintf(buf, "MOB RANGE: %d-%d\n\r", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
             send_to_char(buf, ch);
-            sprintf(buf, "OBJ RANGE: %d-%d\n\r", ch->pcdata->buildOLowVnum, ch->pcdata->buildOHighVnum);
+            sprintf(buf, "OBJ RANGE: %d-%d\n\r", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
             send_to_char(buf, ch);
          }
       }
@@ -3381,7 +3381,7 @@ void check_champion_and_website_who_list()
    for (auto &ch : character_list)
    {
 
-      if (!IS_NPC(ch) && ch->desc && ch->pcdata && ch->pcdata->wizinvis <= 0)
+      if (!IS_NPC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
       {
          buf << GET_SHORT(ch) << endl;
       }

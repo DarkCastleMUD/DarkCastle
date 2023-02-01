@@ -86,7 +86,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
 
   one_argument(argument, target);
 
-  hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
+  hasholylight = IS_MOB(ch) ? 0 : ch->player->holyLite;
 
   send_to_char(
       "$B$7($4:$7)=======================================================================($4:$7)\n\r"
@@ -125,9 +125,9 @@ int do_whogroup(Character *ch, char *argument, int cmd)
                           "   $B$7[$4: $5%s $4:$7]$R\n\r"
                           "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
               k->group_name,
-              IS_MOB(k) ? 0 : k->pcdata->group_pkills,
-              IS_MOB(k) ? 0 : (k->pcdata->group_pkills ? (k->pcdata->grpplvl / k->pcdata->group_pkills) : 0),
-              IS_MOB(k) ? 0 : k->pcdata->group_kills);
+              IS_MOB(k) ? 0 : k->player->group_pkills,
+              IS_MOB(k) ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0),
+              IS_MOB(k) ? 0 : k->player->group_kills);
       add_to_who(tempbuffer);
 
       // If we're searching, see if this is the target
@@ -239,17 +239,17 @@ int do_whosolo(Character *ch, char *argument, int cmd)
                   i->name,
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
-                  IS_MOB(i) ? 0 : i->pcdata->totalpkills,
-                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin,
-                  IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? (i->pcdata->totalpkillslv / i->pcdata->totalpkills) : 0));
+                  IS_MOB(i) ? 0 : i->player->totalpkills,
+                  IS_MOB(i) ? 0 : i->player->pdeathslogin,
+                  IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         else
           sprintf(tempbuffer,
                   "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
                   i->name,
                   races[(int)GET_RACE(i)].singular_name,
-                  IS_MOB(i) ? 0 : i->pcdata->totalpkills,
-                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin,
-                  IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? (i->pcdata->totalpkillslv / i->pcdata->totalpkills) : 0));
+                  IS_MOB(i) ? 0 : i->player->totalpkills,
+                  IS_MOB(i) ? 0 : i->player->pdeathslogin,
+                  IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         add_to_who(tempbuffer);
       } // if is affected by group
   }     // End For Loop.
@@ -329,7 +329,7 @@ int do_who(Character *ch, char *argument, int cmd)
       "troll",
       "\n"};
 
-  hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
+  hasholylight = IS_MOB(ch) ? 0 : ch->player->holyLite;
 
   //  Loop through all our arguments
   for (half_chop(argument, oneword, arg); strlen(oneword); half_chop(arg, oneword, arg))
@@ -494,11 +494,11 @@ int do_who(Character *ch, char *argument, int cmd)
       {
         continue;
       }
-      if (lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))
+      if (lfgcheck && !IS_SET(i->player->toggles, PLR_LFG))
       {
         continue;
       }
-      if (guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
+      if (guidecheck && !IS_SET(i->player->toggles, PLR_GUIDE_TOG))
       {
         continue;
       }
@@ -556,15 +556,15 @@ int do_who(Character *ch, char *argument, int cmd)
         infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
       }
 
-      if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0)
+      if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
       {
-        if (!IS_MOB(i) && i->pcdata->incognito == true)
+        if (!IS_MOB(i) && i->player->incognito == true)
         {
-          sprintf(extraBuf, " (Incognito / WizInvis %ld)", i->pcdata->wizinvis);
+          sprintf(extraBuf, " (Incognito / WizInvis %ld)", i->player->wizinvis);
         }
         else
         {
-          sprintf(extraBuf, " (WizInvis %ld)", i->pcdata->wizinvis);
+          sprintf(extraBuf, " (WizInvis %ld)", i->player->wizinvis);
         }
       }
       numImmort++;
@@ -594,7 +594,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *tailBuf = '\0'; // clear it
     }
 
-    if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
+    if (IS_SET(i->player->toggles, PLR_GUIDE_TOG))
     {
       strcpy(preBuf, "$7$B(Guide)$R ");
     }
@@ -603,7 +603,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *preBuf = '\0';
     }
 
-    if (IS_SET(i->pcdata->toggles, PLR_LFG))
+    if (IS_SET(i->player->toggles, PLR_LFG))
     {
       strcat(tailBuf, "$3(LFG) ");
     }

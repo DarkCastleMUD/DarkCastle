@@ -254,7 +254,7 @@ void fwrite_string_tilde(FILE *fpsave)
   strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void save_pc_data(struct pc_data *i, FILE *fpsave, struct time_data tmpage)
+void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
 {
   fwrite(i->pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(i->alias, fpsave);
@@ -404,10 +404,10 @@ void fread_to_tilde(FILE *fpsave)
   }
 }
 
-void read_pc_data(Character *ch, FILE *fpsave)
+void read_Player(Character *ch, FILE *fpsave)
 {
   char typeflag[4] = {};
-  struct pc_data *i = ch->pcdata;
+  class Player *i = ch->player;
 
   i->golem = 0;
   i->quest_points = 0;
@@ -579,7 +579,7 @@ int save_pc_or_mob_data(Character *ch, FILE *fpsave, struct time_data tmpage)
   if (IS_MOB(ch))
     save_mob_data(ch->mobdata, fpsave);
   else
-    save_pc_data(ch->pcdata, fpsave, tmpage);
+    save_Player(ch->player, fpsave, tmpage);
 
   return 1;
 }
@@ -588,7 +588,7 @@ int read_pc_or_mob_data(Character *ch, FILE *fpsave)
 {
   if (IS_MOB(ch))
   {
-    ch->pcdata = nullptr;
+    ch->player = nullptr;
 #ifdef LEAK_CHECK
     ch->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
 #else
@@ -599,8 +599,8 @@ int read_pc_or_mob_data(Character *ch, FILE *fpsave)
   else
   {
     ch->mobdata = nullptr;
-    ch->pcdata = new pc_data;
-    read_pc_data(ch, fpsave);
+    ch->player = new Player;
+    read_Player(ch, fpsave);
   }
   return 1;
 }
@@ -1018,7 +1018,7 @@ bool load_char_obj(class Connection *d, const char *name)
   ch->store_to_char_variable_data(fpsave);
   read_pc_or_mob_data(ch, fpsave);
 
-  if (!IS_NPC(ch) && ch->pcdata->time.logon < 1117527906)
+  if (!IS_NPC(ch) && ch->player->time.logon < 1117527906)
   {
     extern int do_clearaff(Character * ch, char *argument, int cmd);
     do_clearaff(ch, "", 9);
@@ -1779,7 +1779,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
     st->afected_by2 = 0;
     st->acmetas = GET_AC_METAS(ch);
     st->agemetas = GET_AGE_METAS(ch);
-    tmpage = ch->pcdata->time;
+    tmpage = ch->player->time;
   }
 
   // re-affect the character with spells

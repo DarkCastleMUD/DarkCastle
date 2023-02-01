@@ -481,9 +481,9 @@ void boro_mob_stat(Character *ch, Character *k)
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
-            k->pcdata->time.birth,
-            k->pcdata->time.logon,
-            (int32_t)(k->pcdata->time.played));
+            k->player->time.birth,
+            k->player->time.logon,
+            (int32_t)(k->player->time.played));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
@@ -494,44 +494,44 @@ void boro_mob_stat(Character *ch, Character *k)
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", k->getGold(),
-            k->pcdata->bank);
+            k->player->bank);
     send_to_char(buf, ch);
   }
 
   if (!IS_NPC(k))
   {
     sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
-            k->pcdata->saves_mods[SAVE_TYPE_FIRE],
-            k->pcdata->saves_mods[SAVE_TYPE_COLD],
-            k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
-            k->pcdata->saves_mods[SAVE_TYPE_ACID],
-            k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
-            k->pcdata->saves_mods[SAVE_TYPE_POISON]);
+            k->player->saves_mods[SAVE_TYPE_FIRE],
+            k->player->saves_mods[SAVE_TYPE_COLD],
+            k->player->saves_mods[SAVE_TYPE_ENERGY],
+            k->player->saves_mods[SAVE_TYPE_ACID],
+            k->player->saves_mods[SAVE_TYPE_MAGIC],
+            k->player->saves_mods[SAVE_TYPE_POISON]);
     send_to_char(buf, ch);
   }
 
   if (!IS_MOB(k))
   {
-    sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
+    sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     send_to_char(buf, ch);
-    sprintf(buf, "$3Holylite$R:  %s  ", ((k->pcdata->holyLite) ? "ON" : "OFF"));
+    sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     send_to_char(buf, ch);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON" : "OFF"));
+    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
     send_to_char(buf, ch);
 
-    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum &&
-        (k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum)
+    if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
+        (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
-      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       send_to_char(buf, ch);
     }
     else
     {
-      sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       send_to_char(buf, ch);
-      sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+      sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->player->buildMLowVnum, k->player->buildMHighVnum);
       send_to_char(buf, ch);
-      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
+      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
       send_to_char(buf, ch);
     }
   }
@@ -643,9 +643,9 @@ void mob_stat(Character *ch, Character *k)
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
-            k->pcdata->time.birth,
-            k->pcdata->time.logon,
-            (int32_t)(k->pcdata->time.played));
+            k->player->time.birth,
+            k->player->time.logon,
+            (int32_t)(k->player->time.played));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
@@ -741,8 +741,8 @@ void mob_stat(Character *ch, Character *k)
   }
   else
   {
-    sprintf(buf, "$3PC flags$R: [%d]", k->pcdata->toggles);
-    sprintbit(k->pcdata->toggles, player_bits, buf2);
+    sprintf(buf, "$3PC flags$R: [%d]", k->player->toggles);
+    sprintbit(k->player->toggles, player_bits, buf2);
   }
   strcat(buf, buf2);
   send_to_char(buf, ch);
@@ -795,12 +795,12 @@ void mob_stat(Character *ch, Character *k)
   if (!IS_NPC(k))
   {
     sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
-            k->pcdata->saves_mods[SAVE_TYPE_FIRE],
-            k->pcdata->saves_mods[SAVE_TYPE_COLD],
-            k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
-            k->pcdata->saves_mods[SAVE_TYPE_ACID],
-            k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
-            k->pcdata->saves_mods[SAVE_TYPE_POISON]);
+            k->player->saves_mods[SAVE_TYPE_FIRE],
+            k->player->saves_mods[SAVE_TYPE_COLD],
+            k->player->saves_mods[SAVE_TYPE_ENERGY],
+            k->player->saves_mods[SAVE_TYPE_ACID],
+            k->player->saves_mods[SAVE_TYPE_MAGIC],
+            k->player->saves_mods[SAVE_TYPE_POISON]);
     send_to_char(buf, ch);
   }
 
@@ -855,25 +855,25 @@ void mob_stat(Character *ch, Character *k)
 
   if (!IS_MOB(k))
   {
-    sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
+    sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     send_to_char(buf, ch);
-    sprintf(buf, "$3Holylite$R:  %s  ", ((k->pcdata->holyLite) ? "ON" : "OFF"));
+    sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
     send_to_char(buf, ch);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON" : "OFF"));
+    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
     send_to_char(buf, ch);
-    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum &&
-        (k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum)
+    if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
+        (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
-      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
       send_to_char(buf, ch);
     }
     else
     {
-      sprintf(buf, "$3R Range$R:  %d-%d  ", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      sprintf(buf, "$3R Range$R:  %d-%d  ", k->player->buildLowVnum, k->player->buildHighVnum);
       send_to_char(buf, ch);
-      sprintf(buf, "$3M Range$R:  %d-%d  ", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+      sprintf(buf, "$3M Range$R:  %d-%d  ", k->player->buildMLowVnum, k->player->buildMHighVnum);
       send_to_char(buf, ch);
-      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
+      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
       send_to_char(buf, ch);
     }
   }
@@ -883,7 +883,7 @@ void mob_stat(Character *ch, Character *k)
   if (IS_PC(k))
   {
     csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n", GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
-    csendf(ch, "$3Profession$R: %s (%d)\n\r", find_profession(k->c_class, k->pcdata->profession), k->pcdata->profession);
+    csendf(ch, "$3Profession$R: %s (%d)\n\r", find_profession(k->c_class, k->player->profession), k->player->profession);
   }
 
   if (k->affected)
@@ -1355,10 +1355,10 @@ void do_start(Character *ch)
   }
 
   sprintf(buf, "%s appears with an ear-splitting bang!", GET_SHORT(ch));
-  ch->pcdata->poofin = str_dup(buf);
+  ch->player->poofin = str_dup(buf);
 
   sprintf(buf, "%s disappears in a puff of smoke.", GET_SHORT(ch));
-  ch->pcdata->poofout = str_dup(buf);
+  ch->player->poofout = str_dup(buf);
 
   ch->raw_hit = 10;
   ch->max_hit = 10;
@@ -1367,19 +1367,19 @@ void do_start(Character *ch)
   {
 
   case CLASS_MAGIC_USER:
-    ch->pcdata->practices = 6;
+    ch->player->practices = 6;
     break;
 
   case CLASS_CLERIC:
-    ch->pcdata->practices = 6;
+    ch->player->practices = 6;
     break;
 
   case CLASS_THIEF:
-    ch->pcdata->practices = 6;
+    ch->player->practices = 6;
     break;
 
   case CLASS_WARRIOR:
-    ch->pcdata->practices = 6;
+    ch->player->practices = 6;
     break;
   }
 
@@ -1398,8 +1398,8 @@ void do_start(Character *ch)
   GET_COND(ch, FULL) = 24;
   GET_COND(ch, DRUNK) = 0;
 
-  ch->pcdata->time.played = 0;
-  ch->pcdata->time.logon = time(0);
+  ch->player->time.played = 0;
+  ch->player->time.logon = time(0);
 }
 
 command_return_t do_repop(Character *ch, string arguments, int cmd)
@@ -1491,7 +1491,7 @@ int do_linkdead(Character *ch, char *arg, int cmd)
       continue;
     x++;
 
-    if (i->pcdata->possesing)
+    if (i->player->possesing)
       sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
               (int32_t)(world[i->in_room].number), (world[i->in_room].name));
     else

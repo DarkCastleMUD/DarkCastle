@@ -223,7 +223,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
       continue;
     if (!i->connected && GET_LEVEL(i->character) >= god_level)
     {
-      if (IS_MOB(i->character) || IS_SET(i->character->pcdata->toggles, PLR_ANSI))
+      if (IS_MOB(i->character) || IS_SET(i->character->player->toggles, PLR_ANSI))
         send_to_char(buf1, i->character);
       else
         send_to_char(buf, i->character);
@@ -389,7 +389,7 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
 
   if (args.empty())
   {
-    if (ch->pcdata->ignoring.empty())
+    if (ch->player->ignoring.empty())
     {
       ch->send("Ignore who?\r\n");
       return eSUCCESS;
@@ -397,7 +397,7 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
 
     // convert ignoring map into "char1 char2 char3" format
     string ignoreString = {};
-    for (auto &ignore : ch->pcdata->ignoring)
+    for (auto &ignore : ch->player->ignoring)
     {
       if (ignore.second.ignore)
       {
@@ -425,14 +425,14 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
   }
   arg1[0] = toupper(arg1[0]);
 
-  if (ch->pcdata->ignoring.contains(arg1) == false)
+  if (ch->player->ignoring.contains(arg1) == false)
   {
-    ch->pcdata->ignoring[arg1] = {true, 0};
+    ch->player->ignoring[arg1] = {true, 0};
     ch->send(fmt::format("You now ignore anyone named {}.\r\n", arg1));
   }
   else
   {
-    ch->pcdata->ignoring.erase(arg1);
+    ch->player->ignoring.erase(arg1);
     ch->send(fmt::format("You stop ignoring {}.\r\n", arg1));
   }
   return eSUCCESS;
@@ -440,7 +440,7 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->pcdata->ignoring.empty())
+  if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
   {
     return false;
   }
@@ -450,7 +450,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
     return false;
   }
 
-  if (ch->pcdata->ignoring.contains(GET_NAME(i)))
+  if (ch->player->ignoring.contains(GET_NAME(i)))
   {
     return true;
   }
@@ -462,7 +462,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
   tie(name1, remainder_names) = half_chop(names);
   while (name1.empty() == false)
   {
-    if (ch->pcdata->ignoring.contains(name1))
+    if (ch->player->ignoring.contains(name1))
     {
       return true;
     }
@@ -638,7 +638,7 @@ int do_emote(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE))
+  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You can't show your emotions!!\n\r", ch);
     return eSUCCESS;

@@ -289,7 +289,7 @@ bool check_available_quest(Character *ch, struct quest_info *quest)
 bool check_quest_current(Character *ch, int number)
 {
    for (int i = 0; i < QUEST_MAX; i++)
-      if (ch->pcdata->quest_current[i] == number)
+      if (ch->player->quest_current[i] == number)
          return true;
    return false;
 }
@@ -297,14 +297,14 @@ bool check_quest_current(Character *ch, int number)
 bool check_quest_cancel(Character *ch, int number)
 {
    for (int i = 0; i < QUEST_CANCEL; i++)
-      if (ch->pcdata->quest_cancel[i] == number)
+      if (ch->player->quest_cancel[i] == number)
          return true;
    return false;
 }
 
 bool check_quest_complete(Character *ch, int number)
 {
-   if (ISSET(ch->pcdata->quest_complete, number))
+   if (ISSET(ch->player->quest_complete, number))
       return true;
    return false;
 }
@@ -391,9 +391,9 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
    {
       for (i = 0; i < QUEST_MAX; i++)
       {
-         if (quest->number == ch->pcdata->quest_current[i])
+         if (quest->number == ch->player->quest_current[i])
          {
-            amount = ch->pcdata->quest_current_ticksleft[i];
+            amount = ch->player->quest_current_ticksleft[i];
          }
 
          if (!amount)
@@ -542,7 +542,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    while (count < QUEST_MAX)
    {
-      if (ch->pcdata->quest_current[count] == -1)
+      if (ch->player->quest_current[count] == -1)
          break;
       count++;
       if (count == QUEST_MAX)
@@ -605,16 +605,16 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    logf(IMMORTAL, LogChannels::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
 
-   ch->pcdata->quest_current[count] = quest->number;
-   ch->pcdata->quest_current_ticksleft[count] = quest->timer;
+   ch->player->quest_current[count] = quest->number;
+   ch->player->quest_current_ticksleft[count] = quest->timer;
    if (quest->number)
       quest->active = true;
    count = 0;
    while (count < QUEST_CANCEL)
    {
-      if (ch->pcdata->quest_cancel[count] == quest->number)
+      if (ch->player->quest_cancel[count] == quest->number)
       {
-         ch->pcdata->quest_cancel[count] = 0;
+         ch->player->quest_cancel[count] = 0;
          break;
       }
       count++;
@@ -643,7 +643,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
 
    while (count < QUEST_CANCEL)
    {
-      if (!ch->pcdata->quest_cancel[count])
+      if (!ch->player->quest_cancel[count])
          break;
       count++;
       if (count >= QUEST_CANCEL)
@@ -652,7 +652,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
 
    logf(IMMORTAL, LogChannels::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
 
-   ch->pcdata->quest_cancel[count] = quest->number;
+   ch->player->quest_cancel[count] = quest->number;
 
    return stop_current_quest(ch, quest);
 }
@@ -668,7 +668,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
 
    while (count < QUEST_MAX)
    {
-      if (ch->pcdata->quest_current[count] == quest->number)
+      if (ch->player->quest_current[count] == quest->number)
          break;
       count++;
       if (count >= QUEST_MAX)
@@ -686,11 +686,11 @@ int complete_quest(Character *ch, struct quest_info *quest)
    }
 
    obj_from_char(obj);
-   ch->pcdata->quest_points += quest->reward;
-   ch->pcdata->quest_current[count] = -1;
-   ch->pcdata->quest_current_ticksleft[count] = 0;
+   ch->player->quest_points += quest->reward;
+   ch->player->quest_current[count] = -1;
+   ch->player->quest_current_ticksleft[count] = 0;
    if (quest->number) // quest 0 is recurring auto quest
-      SETBIT(ch->pcdata->quest_complete, quest->number);
+      SETBIT(ch->player->quest_complete, quest->number);
    quest->active = false;
 
    logf(IMMORTAL, LogChannels::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
@@ -709,7 +709,7 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
 
    while (count < QUEST_MAX)
    {
-      if (ch->pcdata->quest_current[count] == quest->number)
+      if (ch->player->quest_current[count] == quest->number)
          break;
       count++;
       if (count >= QUEST_MAX)
@@ -717,8 +717,8 @@ int stop_current_quest(Character *ch, struct quest_info *quest)
          return eFAILURE;
       }
    }
-   ch->pcdata->quest_current[count] = -1;
-   ch->pcdata->quest_current_ticksleft[count] = 0;
+   ch->player->quest_current[count] = -1;
+   ch->player->quest_current_ticksleft[count] = 0;
    quest->active = false;
    sprintf(buf, "q%d", quest->number);
    obj = get_obj(buf);
@@ -743,7 +743,7 @@ int stop_all_quests(Character *ch)
 
    for (int i = 0; i < QUEST_MAX; i++)
    {
-      retval &= stop_current_quest(ch, ch->pcdata->quest_current[i]);
+      retval &= stop_current_quest(ch, ch->player->quest_current[i]);
    }
    return retval;
 }
@@ -767,9 +767,9 @@ void quest_update()
 
          if (quest->timer)
             for (int j = 0; j < QUEST_MAX; j++)
-               if (i->pcdata->quest_current[j] == quest->number)
+               if (i->player->quest_current[j] == quest->number)
                {
-                  if (i->pcdata->quest_current_ticksleft[j] <= 0)
+                  if (i->player->quest_current_ticksleft[j] <= 0)
                   {
                      stop_current_quest(i, quest);
 
@@ -777,7 +777,7 @@ void quest_update()
 
                      csendf(i, "Time has expired for %s.  This quest has ended.\r\n", quest->name);
                   }
-                  i->pcdata->quest_current_ticksleft[j]--;
+                  i->player->quest_current_ticksleft[j]--;
                   break;
                }
 
@@ -1084,11 +1084,11 @@ int do_quest(Character *ch, char *arg, int cmd)
       stop_all_quests(ch);
       for (int i = 0; i < QUEST_MAX; i++)
       {
-         ch->pcdata->quest_current[i] = -1;
-         ch->pcdata->quest_current_ticksleft[i] = 0;
+         ch->player->quest_current[i] = -1;
+         ch->player->quest_current_ticksleft[i] = 0;
       }
-      memset(ch->pcdata->quest_cancel, 0, sizeof(ch->pcdata->quest_cancel));
-      memset(ch->pcdata->quest_complete, 0, sizeof(ch->pcdata->quest_complete));
+      memset(ch->player->quest_cancel, 0, sizeof(ch->player->quest_cancel));
+      memset(ch->player->quest_complete, 0, sizeof(ch->player->quest_complete));
       send_to_char("All quests have been reset.\r\n", ch);
       return retval;
    }
@@ -1209,7 +1209,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
             return eFAILURE;
          }
 
-         csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->pcdata->quest_points);
+         csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->player->quest_points);
       }
       return eSUCCESS;
    }
@@ -1234,11 +1234,11 @@ int do_qedit(Character *ch, char *argument, int cmd)
          }
 
          logf(IMMORTAL, LogChannels::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
-              vict->pcdata->quest_points, atoi(value));
+              vict->player->quest_points, atoi(value));
          csendf(ch, "Setting %s's quest points from %d to %d.\r\n", GET_NAME(vict),
-                vict->pcdata->quest_points, atoi(value));
+                vict->player->quest_points, atoi(value));
 
-         vict->pcdata->quest_points = atoi(value);
+         vict->player->quest_points = atoi(value);
       }
       return eSUCCESS;
    }

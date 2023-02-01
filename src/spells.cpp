@@ -3128,7 +3128,7 @@ int has_skill(Character *ch, skill_t skill)
   {
     auto &curr = ch->skills[skill];
 
-    for (o = ch->pcdata->skillchange; o; o = o->next_skill)
+    for (o = ch->player->skillchange; o; o = o->next_skill)
     {
       int a;
       for (a = 0; a < o->num_affects; a++)

@@ -1033,7 +1033,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 
 	case APPLY_AGE:
 		if (!IS_MOB(ch))
-			ch->pcdata->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
+			ch->player->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
 		break;
 
 	case APPLY_CHAR_WEIGHT:
@@ -2323,7 +2323,7 @@ bool is_hiding(Character *ch, Character *vict)
 
 	int i;
 	for (i = 0; i < MAX_HIDE; i++)
-		if (ch->pcdata->hiding_from[i] == vict && ch->pcdata->hide[i])
+		if (ch->player->hiding_from[i] == vict && ch->player->hide[i])
 			return true;
 	return skill_success(ch, vict, SKILL_HIDE);
 }
@@ -2351,7 +2351,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 	if (!IS_NPC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
 	{
 		for (i = 0; i < MAX_HIDE; i++)
-			ch->pcdata->hiding_from[i] = nullptr;
+			ch->player->hiding_from[i] = nullptr;
 		i = 0;
 		for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
 		{
@@ -2359,13 +2359,13 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 				break;
 			if (number(1, 101) > a) // Failed.
 			{
-				ch->pcdata->hiding_from[i] = temp;
-				ch->pcdata->hide[i++] = false;
+				ch->player->hiding_from[i] = temp;
+				ch->player->hide[i++] = false;
 			}
 			else
 			{
-				ch->pcdata->hiding_from[i] = temp;
-				ch->pcdata->hide[i++] = true;
+				ch->player->hiding_from[i] = temp;
+				ch->player->hide[i++] = true;
 			}
 		}
 	}
@@ -2374,17 +2374,17 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 		if (ISSET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
 			for (i = 0; i < MAX_HIDE; i++)
 			{
-				if (temp->pcdata->hiding_from[i] == nullptr || temp->pcdata->hiding_from[i] == ch)
+				if (temp->player->hiding_from[i] == nullptr || temp->player->hiding_from[i] == ch)
 				{
 					if (number(1, 101) > has_skill(temp, SKILL_HIDE))
 					{
-						temp->pcdata->hiding_from[i] = ch;
-						temp->pcdata->hide[i] = false;
+						temp->player->hiding_from[i] = ch;
+						temp->player->hide[i] = false;
 					}
 					else
 					{
-						temp->pcdata->hiding_from[i] = ch;
-						temp->pcdata->hide[i] = true;
+						temp->player->hiding_from[i] = ch;
+						temp->player->hide[i] = true;
 					}
 				}
 			}
@@ -2541,8 +2541,8 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		{
 			if (obj->affected[a].location >= 1000)
 			{
-				obj->next_skill = ch->pcdata->skillchange;
-				ch->pcdata->skillchange = obj;
+				obj->next_skill = ch->player->skillchange;
+				ch->player->skillchange = obj;
 				break;
 			}
 		}
@@ -2552,7 +2552,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		ch->glow_factor++;
 		if (ch->in_room > -1)
 			world[ch->in_room].light++;
-		//  this crashes in a reconnect cause pcdata isn't around yet
+		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
 		//  it tells you every time you save
 		// TODO - make it not be annoying
@@ -2614,12 +2614,12 @@ class Object *unequip_char(Character *ch, int pos, int flag)
 	class Object *a, *b = nullptr;
 b: // ew
 	if (!IS_NPC(ch))
-		for (a = ch->pcdata->skillchange; a; a = a->next_skill)
+		for (a = ch->player->skillchange; a; a = a->next_skill)
 		{
 			if (a == (Object *)0x95959595)
 			{
 				int i;
-				ch->pcdata->skillchange = nullptr;
+				ch->player->skillchange = nullptr;
 				for (i = 0; i < MAX_WEAR; i++)
 				{
 					int j;
@@ -2629,8 +2629,8 @@ b: // ew
 					{
 						if (ch->equipment[i]->affected[j].location > 1000)
 						{
-							ch->equipment[i]->next_skill = ch->pcdata->skillchange;
-							ch->pcdata->skillchange = ch->equipment[i];
+							ch->equipment[i]->next_skill = ch->player->skillchange;
+							ch->player->skillchange = ch->equipment[i];
 							break;
 						}
 					}
@@ -2642,7 +2642,7 @@ b: // ew
 				if (b)
 					b->next_skill = a->next_skill;
 				else
-					ch->pcdata->skillchange = a->next_skill;
+					ch->player->skillchange = a->next_skill;
 				break;
 			}
 			b = a;
@@ -3704,11 +3704,11 @@ void extract_char(Character *ch, bool pull, Trace t)
 	{
 		void shatter_message(Character * ch);
 		void release_message(Character * ch);
-		if (ch->pcdata->golem)
+		if (ch->player->golem)
 		{
-			if (ch->pcdata->golem->in_room)
-				release_message(ch->pcdata->golem);
-			extract_char(ch->pcdata->golem, false);
+			if (ch->player->golem->in_room)
+				release_message(ch->player->golem);
+			extract_char(ch->player->golem, false);
 		}
 	}
 	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
@@ -3801,7 +3801,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	if (isGolem && omast)
 	{
 		omast->save(666);
-		omast->pcdata->golem = 0; // Reset the golem flag.
+		omast->player->golem = 0; // Reset the golem flag.
 	}
 	/*
 	 switch (GET_CLASS(ch)) {
@@ -3954,16 +3954,16 @@ void lastseen_targeted(Character *ch, Character *victim)
 	if (ch == 0 || victim == 0 || IS_PC(victim) || IS_NPC(ch))
 		return;
 
-	if (ch->pcdata->lastseen == 0)
-		ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval>>;
+	if (ch->player->lastseen == 0)
+		ch->player->lastseen = new multimap<int, pair<timeval, timeval>>;
 
 	int nr = victim->mobdata->nr;
 
 	multimap<int, pair<timeval, timeval>>::iterator i;
-	i = ch->pcdata->lastseen->find(nr);
+	i = ch->player->lastseen->find(nr);
 
 	timeval tv;
-	for (unsigned int j = 0; j < ch->pcdata->lastseen->count(nr); j++)
+	for (unsigned int j = 0; j < ch->player->lastseen->count(nr); j++)
 	{
 		if ((*i).second.second.tv_sec == 0)
 		{

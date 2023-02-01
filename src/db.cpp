@@ -1669,11 +1669,11 @@ bool can_modify_this_room(Character *ch, int32_t vnum)
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
 
-	if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
+	if (ch->player->buildLowVnum <= 0 || ch->player->buildHighVnum <= 0)
 		return false;
-	if (ch->pcdata->buildLowVnum > vnum)
+	if (ch->player->buildLowVnum > vnum)
 		return false;
-	if (ch->pcdata->buildHighVnum < vnum)
+	if (ch->player->buildHighVnum < vnum)
 		return false;
 	return true;
 }
@@ -1683,11 +1683,11 @@ bool can_modify_room(Character *ch, int32_t vnum)
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
 
-	if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
+	if (ch->player->buildLowVnum <= 0 || ch->player->buildHighVnum <= 0)
 		return false;
-	if (ch->pcdata->buildLowVnum > vnum)
+	if (ch->player->buildLowVnum > vnum)
 		return false;
-	if (ch->pcdata->buildHighVnum < vnum)
+	if (ch->player->buildHighVnum < vnum)
 		return false;
 	return true;
 }
@@ -1697,11 +1697,11 @@ bool can_modify_this_mobile(Character *ch, int32_t vnum)
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
 
-	if (ch->pcdata->buildMLowVnum <= 0 || ch->pcdata->buildMHighVnum <= 0)
+	if (ch->player->buildMLowVnum <= 0 || ch->player->buildMHighVnum <= 0)
 		return false;
-	if (ch->pcdata->buildMLowVnum > vnum)
+	if (ch->player->buildMLowVnum > vnum)
 		return false;
-	if (ch->pcdata->buildMHighVnum < vnum)
+	if (ch->player->buildMHighVnum < vnum)
 		return false;
 	return true;
 }
@@ -1716,11 +1716,11 @@ bool can_modify_this_object(Character *ch, int32_t vnum)
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
 
-	if (ch->pcdata->buildOLowVnum <= 0 || ch->pcdata->buildOHighVnum <= 0)
+	if (ch->player->buildOLowVnum <= 0 || ch->player->buildOHighVnum <= 0)
 		return false;
-	if (ch->pcdata->buildOLowVnum > vnum)
+	if (ch->player->buildOLowVnum > vnum)
 		return false;
-	if (ch->pcdata->buildOHighVnum < vnum)
+	if (ch->player->buildOHighVnum < vnum)
 		return false;
 	return true;
 }
@@ -3533,7 +3533,7 @@ int create_blank_mobile(int nr)
 	mob->description = str_hsh("");
 	mob->title = 0;
 	mob->fighting = 0;
-	mob->pcdata = 0;
+	mob->player = 0;
 	mob->altar = 0;
 	mob->desc = 0;
 	GET_RAW_DEX(mob) = 11;
@@ -5629,26 +5629,26 @@ void free_char(Character *ch, Trace trace)
 			dc_free(ch->long_desc);
 		if (ch->description)
 			dc_free(ch->description);
-		if (ch->pcdata)
+		if (ch->player)
 		{
 			// these won't be here if you free an unloaded char
-			ch->pcdata->skillchange = 0;
-			if (ch->pcdata->last_site)
-				dc_free(ch->pcdata->last_site);
-			if (!ch->pcdata->ignoring.empty())
-				ch->pcdata->ignoring.clear();
-			if (ch->pcdata->poofin)
-				dc_free(ch->pcdata->poofin);
-			if (ch->pcdata->poofout)
-				dc_free(ch->pcdata->poofout);
-			if (ch->pcdata->prompt)
-				dc_free(ch->pcdata->prompt);
-			if (ch->pcdata->last_prompt)
-				dc_free(ch->pcdata->last_prompt);
-			if (ch->pcdata->golem)
+			ch->player->skillchange = 0;
+			if (ch->player->last_site)
+				dc_free(ch->player->last_site);
+			if (!ch->player->ignoring.empty())
+				ch->player->ignoring.clear();
+			if (ch->player->poofin)
+				dc_free(ch->player->poofin);
+			if (ch->player->poofout)
+				dc_free(ch->player->poofout);
+			if (ch->player->prompt)
+				dc_free(ch->player->prompt);
+			if (ch->player->last_prompt)
+				dc_free(ch->player->last_prompt);
+			if (ch->player->golem)
 				logentry("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
 			/* Free aliases... (I was to lazy to do before. ;) */
-			for (x = ch->pcdata->alias; x; x = next)
+			for (x = ch->player->alias; x; x = next)
 			{
 				next = x->next;
 				if (x->keyword)
@@ -5658,18 +5658,18 @@ void free_char(Character *ch, Trace trace)
 				dc_free(x);
 			}
 
-			if (ch->pcdata->away_msgs)
-				delete ch->pcdata->away_msgs;
+			if (ch->player->away_msgs)
+				delete ch->player->away_msgs;
 
-			if (ch->pcdata->lastseen)
-				delete ch->pcdata->lastseen;
+			if (ch->player->lastseen)
+				delete ch->player->lastseen;
 
-			if (ch->pcdata->config)
+			if (ch->player->config)
 			{
-				delete ch->pcdata->config;
+				delete ch->player->config;
 			}
 
-			delete ch->pcdata;
+			delete ch->player;
 		}
 	}
 	else
@@ -5913,9 +5913,9 @@ void apply_initial_saves(Character *ch)
 {
 	for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 		if (number(0, 1))
-			ch->pcdata->saves_mods[i] = number(-3, 3);
+			ch->player->saves_mods[i] = number(-3, 3);
 		else
-			ch->pcdata->saves_mods[i] = 0;
+			ch->player->saves_mods[i] = 0;
 }
 
 void init_char(Character *ch)
@@ -5987,22 +5987,22 @@ void init_char(Character *ch)
 	ch->spec = 0;
 	GET_PROMPT(ch) = 0;
 	GET_LAST_PROMPT(ch) = 0;
-	ch->pcdata->skillchange = 0;
-	ch->pcdata->joining = {};
-	ch->pcdata->practices = 0;
-	ch->pcdata->time.birth = time(0);
-	ch->pcdata->time.played = 0;
-	ch->pcdata->time.logon = time(0);
-	ch->pcdata->toggles = 0;
-	ch->pcdata->golem = 0;
-	ch->pcdata->quest_points = 0;
+	ch->player->skillchange = 0;
+	ch->player->joining = {};
+	ch->player->practices = 0;
+	ch->player->time.birth = time(0);
+	ch->player->time.played = 0;
+	ch->player->time.logon = time(0);
+	ch->player->toggles = 0;
+	ch->player->golem = 0;
+	ch->player->quest_points = 0;
 	for (int j = 0; j < QUEST_CANCEL; j++)
-		ch->pcdata->quest_cancel[j] = 0;
+		ch->player->quest_cancel[j] = 0;
 	for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
-		ch->pcdata->quest_complete[j] = 0;
+		ch->player->quest_complete[j] = 0;
 
-	SET_BIT(ch->pcdata->toggles, PLR_ANSI);
-	SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+	SET_BIT(ch->player->toggles, PLR_ANSI);
+	SET_BIT(ch->player->toggles, PLR_DAMAGE);
 	int i;
 	for (i = 0; i < AFF_MAX / ASIZE + 1; i++)
 		ch->affected_by[i] = 0;

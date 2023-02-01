@@ -796,7 +796,7 @@ struct time_info_data age(Character *ch)
     return player_age;
   }
 
-  time_t birth = ch->pcdata->time.birth;
+  time_t birth = ch->player->time.birth;
   player_age = mud_time_passed(time(0), birth);
 
   player_age.year += 17; /* All players start at 17 */
@@ -1055,12 +1055,12 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!IS_MOB(obj))
   {
-    if (!obj->pcdata) // noncreated char
+    if (!obj->player) // noncreated char
       return true;
 
-    if (GET_LEVEL(sub) < obj->pcdata->wizinvis)
+    if (GET_LEVEL(sub) < obj->player->wizinvis)
     {
-      if (obj->pcdata->incognito == true)
+      if (obj->player->incognito == true)
       {
         if (sub->in_room != obj->in_room)
           return false;
@@ -1071,7 +1071,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     }
   }
 
-  if (sub && IS_PC(sub) && sub->pcdata && sub->pcdata->holyLite)
+  if (sub && IS_PC(sub) && sub->player && sub->player->holyLite)
     return true;
 
   if (!noprog && IS_NPC(obj))
@@ -1142,7 +1142,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   int skill = 0;
   struct affected_type *cur_af;
 
-  if (!IS_MOB(sub) && sub->pcdata->holyLite)
+  if (!IS_MOB(sub) && sub->player->holyLite)
     return true;
 
   int prog = oprog_can_see_trigger(sub, obj);
@@ -1209,7 +1209,7 @@ bool check_blind(Character *ch)
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
   //    return false;
 
-  if (!IS_NPC(ch) && ch->pcdata->holyLite)
+  if (!IS_NPC(ch) && ch->player->holyLite)
     return false;
 
   if (IS_AFFECTED(ch, AFF_BLIND) && number(0, 4)) // 20% chance of seeing
@@ -1793,15 +1793,15 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->desc && ch->desc->host)
   {
-    if (ch->pcdata->last_site)
-      dc_free(ch->pcdata->last_site);
+    if (ch->player->last_site)
+      dc_free(ch->player->last_site);
 #ifdef LEAK_CHECK
-    ch->pcdata->last_site = (char *)calloc(strlen(ch->desc->host) + 1, sizeof(char));
+    ch->player->last_site = (char *)calloc(strlen(ch->desc->host) + 1, sizeof(char));
 #else
-    ch->pcdata->last_site = (char *)dc_alloc(strlen(ch->desc->host) + 1, sizeof(char));
+    ch->player->last_site = (char *)dc_alloc(strlen(ch->desc->host) + 1, sizeof(char));
 #endif
-    strcpy(ch->pcdata->last_site, ch->desc->host);
-    ch->pcdata->time.logon = time(0);
+    strcpy(ch->player->last_site, ch->desc->host);
+    ch->player->time.logon = time(0);
   }
 
   if (ch->desc)
@@ -1856,7 +1856,7 @@ command_return_t Character::save(int cmd)
       save_charmie_data(this);
     }
 
-    if (pcdata->golem)
+    if (player->golem)
     {
       save_golem_data(this); // Golem data, eh!
     }
@@ -3231,15 +3231,15 @@ void Character::setPOSFighting(void)
 void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
   string buffer;
-  if (this->pcdata == nullptr)
+  if (this->player == nullptr)
   {
     return;
   }
 
-  if (mob_vnum != this->pcdata->last_mob_edit)
+  if (mob_vnum != this->player->last_mob_edit)
   {
-    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->pcdata->last_mob_edit, mob_vnum));
-    this->pcdata->last_mob_edit = mob_vnum;
+    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->player->last_mob_edit, mob_vnum));
+    this->player->last_mob_edit = mob_vnum;
   }
 }
 

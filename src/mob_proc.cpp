@@ -659,7 +659,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return eFAILURE;
 
-        if (!IS_MOB(tch) && IS_SET(tch->pcdata->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -2420,7 +2420,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_MOB(tch) && IS_SET(tch->pcdata->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -3344,10 +3344,10 @@ int gremlinthing(Character *ch)
   if (GET_POS(ch) < POSITION_STANDING)
     return eFAILURE;
 
-  if (ch->master && !IS_NPC(ch->master) && ch->master->pcdata->golem &&
-      ch->master->pcdata->golem->in_room == ch->in_room)
+  if (ch->master && !IS_NPC(ch->master) && ch->master->player->golem &&
+      ch->master->player->golem->in_room == ch->in_room)
   {
-    Character *gol = ch->master->pcdata->golem;
+    Character *gol = ch->master->player->golem;
     if (gol->hit < gol->max_hit)
     {
       do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", CMD_DEFAULT);

@@ -157,7 +157,7 @@ int do_news(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     up = true;
   else
-    up = !IS_SET(ch->pcdata->toggles, PLR_NEWS);
+    up = !IS_SET(ch->player->toggles, PLR_NEWS);
   struct news_data *tnews;
   char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
   char timez[15];

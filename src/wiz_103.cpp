@@ -47,7 +47,7 @@ int do_boot(Character *ch, char *arg, int cmd)
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return eFAILURE;
     }
-    if (!IS_MOB(victim) && victim->pcdata->possesing)
+    if (!IS_MOB(victim) && victim->player->possesing)
     {
       send_to_char("Oops! They ain't linkdead! Just possessing.", ch);
       return eFAILURE;
@@ -226,7 +226,7 @@ int do_fsave(Character *ch, string argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->pcdata->stealth == false)
+  if (ch->player->stealth == false)
   {
     buf = "$n has forced you to 'save'.";
     act(buf, ch, 0, vict, TO_VICT, 0);

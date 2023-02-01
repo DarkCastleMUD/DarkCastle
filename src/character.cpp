@@ -41,13 +41,13 @@ QString Character::getSettingAsColor(QString key, QString defaultValue)
 
 QString Character::getSetting(QString key, QString defaultValue)
 {
-    if (pcdata != nullptr)
+    if (player != nullptr)
     {
-        if (pcdata->config == nullptr)
+        if (player->config == nullptr)
         {
-            pcdata->config = new PlayerConfig;
+            player->config = new PlayerConfig;
         }
-        return pcdata->config->value(key, defaultValue);
+        return player->config->value(key, defaultValue);
     }
     return defaultValue;
 }
@@ -67,7 +67,7 @@ bool mob_data::isObject(void)
     return object != nullptr;
 }
 
-QString pc_data::getJoining(void)
+QString Player::getJoining(void)
 {
     QString buffer;
     for (joining_t::const_iterator i = joining.begin(); i != joining.end(); ++i)
@@ -88,7 +88,7 @@ QString pc_data::getJoining(void)
     return buffer;
 }
 
-void pc_data::setJoining(QString list)
+void Player::setJoining(QString list)
 {
     joining.clear();
     auto parts = list.split(' ');
@@ -98,7 +98,7 @@ void pc_data::setJoining(QString list)
     }
 }
 
-void pc_data::toggleJoining(QString key)
+void Player::toggleJoining(QString key)
 {
     joining_t::iterator i = joining.find(key);
     if (i == joining.end())

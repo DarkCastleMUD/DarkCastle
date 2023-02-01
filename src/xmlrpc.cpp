@@ -25,9 +25,9 @@ protected:
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
     Character * ch = get_all_pc(buffer);
 
-    if (ch && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->pcdata->pwd &&
-	!strncmp(crypt(password.c_str(), ch->pcdata->pwd),
-		 ch->pcdata->pwd, (PASSWORD_LEN))) {
+    if (ch && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->player->pwd &&
+	!strncmp(crypt(password.c_str(), ch->player->pwd),
+		 ch->player->pwd, (PASSWORD_LEN))) {
       return 1;
     }
     
@@ -72,7 +72,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && !IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
+    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB)) {
       result = "plr_editor_dc";
       return;
     }
@@ -149,7 +149,7 @@ public:
       return;
     }
     
-    if (IS_PC(ch) && !IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
+    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB)) {
       result = "plr_editor_dc";
       return;
     }

@@ -201,7 +201,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     buffer = fmt::format("There was {} coins.",
                          obj_object->obj_flags.value[0]);
-    if (IS_MOB(ch) || !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+    if (IS_MOB(ch) || !IS_SET(ch->player->toggles, PLR_BRIEF))
     {
       send_to_char(buffer, ch);
       send_to_char("\r\n", ch);
@@ -214,7 +214,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(world[ch->in_room].zone).addGold(cgold);
-      if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+      if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
@@ -236,7 +236,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
-      if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+      if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
@@ -266,7 +266,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       buffer = fmt::format("{}\r\n", buffer);
     }
 
-    if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+    if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
       send_to_char(buffer, ch);
     extract_obj(obj_object);
   }
@@ -1467,7 +1467,7 @@ int do_put(Character *ch, char *argument, int cmd)
               {
                 if (duplicate_key == true)
                 {
-                  if (ch && ch->pcdata && IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
+                  if (ch && ch->player && IS_SET(ch->player->toggles, PLR_NODUPEKEYS))
                   {
                     csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", GET_OBJ_SHORT(obj_object));
                     return eFAILURE;

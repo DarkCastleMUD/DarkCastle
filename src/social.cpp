@@ -44,7 +44,7 @@ int check_social(Character *ch, string pcomm, int length)
     return SOCIAL_false;
   }
 
-  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE))
+  if (!IS_NPC(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You are anti-social!\n\r", ch);
     return SOCIAL_true;

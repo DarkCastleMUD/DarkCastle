@@ -114,7 +114,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
-  if (!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)))
+  if (!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | eSUCCESS;
 }
@@ -246,9 +246,9 @@ int do_backstab(Character *ch, char *argument, int cmd)
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
     if (perform_dual_backstab && IS_PC(ch))
     {
-      ch->pcdata->unjoinable = true;
+      ch->player->unjoinable = true;
       retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
-      ch->pcdata->unjoinable = false;
+      ch->player->unjoinable = false;
     }
     else
     {
@@ -257,7 +257,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
   // success
   else if (
-      ((GET_LEVEL(victim) < IMMORTAL && !IS_NPC(victim)) || IS_NPC(victim)) && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 19) && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || (!IS_NPC(victim) && IS_SET(victim->pcdata->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING))))
+      ((GET_LEVEL(victim) < IMMORTAL && !IS_NPC(victim)) || IS_NPC(victim)) && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 19) && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || (!IS_NPC(victim) && IS_SET(victim->player->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -274,9 +274,9 @@ int do_backstab(Character *ch, char *argument, int cmd)
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
     if (perform_dual_backstab && IS_PC(ch))
     {
-      ch->pcdata->unjoinable = true;
+      ch->player->unjoinable = true;
       retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
-      ch->pcdata->unjoinable = false;
+      ch->player->unjoinable = false;
     }
     else
     {
@@ -762,7 +762,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   if (!IS_NPC(ch) && (a = has_skill(ch, SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
-      ch->pcdata->hiding_from[i] = nullptr;
+      ch->player->hiding_from[i] = nullptr;
     i = 0;
     for (temp = world[ch->in_room].people; temp; temp = temp->next_in_room)
     {
@@ -772,13 +772,13 @@ int do_hide(Character *ch, char *argument, int cmd)
         break;
       if (number(1, 101) > a) // Failed.
       {
-        ch->pcdata->hiding_from[i] = temp;
-        ch->pcdata->hide[i++] = false;
+        ch->player->hiding_from[i] = temp;
+        ch->player->hide[i++] = false;
       }
       else
       {
-        ch->pcdata->hiding_from[i] = temp;
-        ch->pcdata->hide[i++] = true;
+        ch->player->hiding_from[i] = temp;
+        ch->player->hide[i++] = true;
       }
     }
   }
@@ -2187,7 +2187,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   // if the victim died and the character did not die
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
-    if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+    if (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }

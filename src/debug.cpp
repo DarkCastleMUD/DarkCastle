@@ -41,8 +41,8 @@ void test_handle_ansi(string test)
 {
   cout << "Testing '" << test << "'" << endl;
   Character *ch = new Character;
-  ch->pcdata = new pc_data;
-  SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+  ch->player = new Player;
+  SET_BIT(ch->player->toggles, PLR_ANSI);
   GET_LEVEL(ch) = 1;
 
   // string str1 = "$b$B$1test$R $ $$ $$$ $$$";
@@ -282,7 +282,7 @@ int main(int argc, char **argv)
   d = new Connection;
   Character *ch = new Character;
   ch->name = strdup("DebugIMP");
-  ch->pcdata = new pc_data;
+  ch->player = new Player;
 
   ch->desc = d;
   ch->level = 110;

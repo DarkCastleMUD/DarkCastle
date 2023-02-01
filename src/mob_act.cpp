@@ -278,7 +278,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
@@ -364,8 +364,8 @@ void mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                       IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE)))
+            if ((!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                       IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -456,8 +456,8 @@ void mobile_activity(void)
 
           if ((!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !IS_SET(world[ch->in_room].room_flags, SAFE) &&
-               !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE) // this is safe, cause we checked !IS_NPC first
+               !IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) ||
+              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked !IS_NPC first
                ))
           {
             int i = 0;

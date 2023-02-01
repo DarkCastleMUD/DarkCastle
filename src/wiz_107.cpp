@@ -184,14 +184,14 @@ int do_stealth(Character *ch, char *argument, int cmd)
         "STEALTH doesn't take any arguments; arg ignored.\r\n", ch);
   } /* if */
 
-  if (ch->pcdata->stealth)
+  if (ch->player->stealth)
   {
-    ch->pcdata->stealth = false;
+    ch->player->stealth = false;
     send_to_char("Stealth mode off.\r\n", ch);
   }
   else
   {
-    ch->pcdata->stealth = true;
+    ch->player->stealth = true;
     send_to_char("Stealth mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;

@@ -346,8 +346,8 @@ int do_chpwd(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  strncpy(victim->pcdata->pwd, (char *)crypt((char *)name, (char *)GET_NAME(victim)), PASSWORD_LEN);
-  victim->pcdata->pwd[PASSWORD_LEN] = '\0';
+  strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)GET_NAME(victim)), PASSWORD_LEN);
+  victim->player->pwd[PASSWORD_LEN] = '\0';
 
   send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
@@ -765,24 +765,24 @@ int do_range(Character *ch, char *arg, int cmd)
     switch (LOWER(kind[0]))
     {
     case 'm':
-      victim->pcdata->buildMLowVnum = low;
-      victim->pcdata->buildMHighVnum = high;
+      victim->player->buildMLowVnum = low;
+      victim->player->buildMHighVnum = high;
       sprintf(message, "%s M range set to %d-%d.\r\n", GET_NAME(victim), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
       send_to_char(message, victim);
       return eSUCCESS;
     case 'o':
-      victim->pcdata->buildOLowVnum = low;
-      victim->pcdata->buildOHighVnum = high;
+      victim->player->buildOLowVnum = low;
+      victim->player->buildOHighVnum = high;
       sprintf(message, "%s O range set to %d-%d.\r\n", GET_NAME(victim), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
       send_to_char(message, victim);
       return eSUCCESS;
     case 'r':
-      victim->pcdata->buildLowVnum = low;
-      victim->pcdata->buildHighVnum = high;
+      victim->player->buildLowVnum = low;
+      victim->player->buildHighVnum = high;
       sprintf(message, "%s R range set to %d-%d.\r\n", GET_NAME(victim), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
@@ -795,8 +795,8 @@ int do_range(Character *ch, char *arg, int cmd)
   }
   else
   {
-    victim->pcdata->buildLowVnum = victim->pcdata->buildOLowVnum = victim->pcdata->buildMLowVnum = low;
-    victim->pcdata->buildHighVnum = victim->pcdata->buildOHighVnum = victim->pcdata->buildMHighVnum = high;
+    victim->player->buildLowVnum = victim->player->buildOLowVnum = victim->player->buildMLowVnum = low;
+    victim->player->buildHighVnum = victim->player->buildOHighVnum = victim->player->buildMHighVnum = high;
     sprintf(message, "%s range set to %d-%d.\r\n", GET_NAME(victim), low, high);
     send_to_char(message, ch);
     sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);

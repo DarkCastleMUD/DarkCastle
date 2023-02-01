@@ -185,11 +185,11 @@ int do_check(Character *ch, char *arg, int cmd)
 
   if (GET_LEVEL(ch) >= OVERSEER && !IS_MOB(vict) && GET_LEVEL(ch) >= GET_LEVEL(vict))
   {
-    sprintf(buf, "$3Last connected from$R: %s\n\r", vict->pcdata->last_site);
+    sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
     send_to_char(buf, ch);
 
     /* ctime adds a \n to the string it returns! */
-    const time_t tBuffer = vict->pcdata->time.logon;
+    const time_t tBuffer = vict->player->time.logon;
     +sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
     send_to_char(buf, ch);
   }
@@ -1968,15 +1968,15 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    if (ch->pcdata->last_obj_vnum != vnum)
+    if (ch->player->last_obj_vnum != vnum)
     {
       ch->send(format("$3Current obj set to:$R {}\r\n", vnum));
-      ch->pcdata->last_obj_vnum = vnum;
+      ch->player->last_obj_vnum = vnum;
     }
   }
   else
   {
-    vnum = ch->pcdata->last_obj_vnum;
+    vnum = ch->player->last_obj_vnum;
     rnum = real_object(vnum);
     if (rnum < 0 || vnum < 1)
     {
@@ -2566,7 +2566,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
                  "  The field must be one of the following:\n\r",
                  ch);
     display_string_list(fields, ch);
-    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->pcdata->last_mob_edit);
+    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
   }
@@ -2584,7 +2584,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
   }
   else
   {
-    mobvnum = ch->pcdata->last_mob_edit;
+    mobvnum = ch->player->last_mob_edit;
     mob_num = real_mobile(mobvnum);
 
     if (mob_num < 0 || mobvnum <= 0)
@@ -2888,7 +2888,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     ch->desc->strnew = &(currprog->comlist);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
+    if (IS_SET(ch->player->toggles, PLR_EDITOR_WEB))
     {
       ch->desc->web_connected = Connection::states::EDIT_MPROG;
     }
@@ -3007,7 +3007,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   }
   else
   {
-    mobvnum = ch->pcdata->last_mob_edit;
+    mobvnum = ch->player->last_mob_edit;
     if (((mob_num = real_mobile(mobvnum)) < 0 && strcmp(buf, "new")))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
@@ -4161,7 +4161,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           free(world[ch->in_room].dir_option[x]);
           world[ch->in_room].dir_option[x] = nullptr;
 
-          if (IS_PC(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
+          if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_ONEWAY))
           {
             // if the destination room has a reverse exit
             if (world[destination_room].dir_option[reverse_number[x]])
@@ -4305,7 +4305,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     send_to_char("Ok.\r\n", ch);
 
-    if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
+    if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4319,11 +4319,11 @@ int do_redit(Character *ch, char *argument, int cmd)
         buf = fmt::format("{} redit exit {} {} {} {} {}", d,
                           return_directions[x], world[ch->in_room].number,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
-        SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+        SET_BIT(ch->player->toggles, PLR_ONEWAY);
         char *tmp = strdup(buf.c_str());
         do_at(ch, tmp, CMD_DEFAULT);
         free(tmp);
-        REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+        REMOVE_BIT(ch->player->toggles, PLR_ONEWAY);
       }
     }
   }
@@ -4750,14 +4750,14 @@ int do_oneway(Character *ch, char *arg, int cmd)
 
   if (cmd == 1)
   {
-    if (!IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
-      SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+    if (!IS_SET(ch->player->toggles, PLR_ONEWAY))
+      SET_BIT(ch->player->toggles, PLR_ONEWAY);
     send_to_char("You generate one-way exits.\r\n", ch);
   }
   else
   {
-    if (IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
-      REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+    if (IS_SET(ch->player->toggles, PLR_ONEWAY))
+      REMOVE_BIT(ch->player->toggles, PLR_ONEWAY);
     send_to_char("You generate two-way exits.\r\n", ch);
   }
   return eSUCCESS;
@@ -4865,13 +4865,13 @@ int do_msave(Character *ch, char *arg, int cmd)
   char buf[180];
   char buf2[180];
 
-  if (ch->pcdata->last_mob_edit <= 0)
+  if (ch->player->last_mob_edit <= 0)
   {
     send_to_char("You have not recently edited a mobile.\r\n", ch);
     return eFAILURE;
   }
 
-  int v = ch->pcdata->last_mob_edit;
+  int v = ch->player->last_mob_edit;
   if (!can_modify_mobile(ch, v))
   {
     send_to_char("You may only msave inside of the room range you are assigned to.\r\n", ch);
@@ -4923,12 +4923,12 @@ int do_osave(Character *ch, char *arg, int cmd)
   char buf[180];
   char buf2[180];
 
-  if (ch->pcdata->last_obj_vnum < 1)
+  if (ch->player->last_obj_vnum < 1)
   {
     send_to_char("You have not recently edited an item.\r\n", ch);
     return eFAILURE;
   }
-  vnum_t v = ch->pcdata->last_obj_vnum;
+  vnum_t v = ch->player->last_obj_vnum;
   if (!can_modify_object(ch, v))
   {
     send_to_char("You may only msave inside of the room range you are assigned to.\r\n", ch);
@@ -5475,7 +5475,7 @@ int do_possess(Character *ch, char *argument, int cmd)
         send_to_char("Ok.\r\n", ch);
         sprintf(buf, "%s possessed %s", GET_NAME(ch), GET_NAME(victim));
         logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-        ch->pcdata->possesing = 1;
+        ch->player->possesing = 1;
         ch->desc->character = victim;
         ch->desc->original = ch;
 
@@ -5505,7 +5505,7 @@ int do_return(Character *ch, char *argument, int cmd)
   {
     send_to_char("You return to your original body.\r\n", ch);
 
-    ch->desc->original->pcdata->possesing = 0;
+    ch->desc->original->player->possesing = 0;
     ch->desc->character = ch->desc->original;
     ch->desc->original = 0;
 
@@ -5701,17 +5701,17 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "stupid", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_STUPID))
+    if (IS_SET(vict->player->punish, PUNISH_STUPID))
     {
       send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
       send_to_char("STUPID removed.\r\n", ch);
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-      REMOVE_BIT(vict->pcdata->punish, PUNISH_STUPID);
-      REMOVE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
-      REMOVE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
-      REMOVE_BIT(vict->pcdata->punish, PUNISH_NONAME);
-      REMOVE_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
+      REMOVE_BIT(vict->player->punish, PUNISH_STUPID);
+      REMOVE_BIT(vict->player->punish, PUNISH_SILENCED);
+      REMOVE_BIT(vict->player->punish, PUNISH_NOEMOTE);
+      REMOVE_BIT(vict->player->punish, PUNISH_NONAME);
+      REMOVE_BIT(vict->player->punish, PUNISH_NOTITLE);
     }
     else
     {
@@ -5722,16 +5722,16 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("STUPID set.\r\n", ch);
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-      SET_BIT(vict->pcdata->punish, PUNISH_STUPID);
-      SET_BIT(vict->pcdata->punish, PUNISH_SILENCED);
-      SET_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
-      SET_BIT(vict->pcdata->punish, PUNISH_NONAME);
-      SET_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
+      SET_BIT(vict->player->punish, PUNISH_STUPID);
+      SET_BIT(vict->player->punish, PUNISH_SILENCED);
+      SET_BIT(vict->player->punish, PUNISH_NOEMOTE);
+      SET_BIT(vict->player->punish, PUNISH_NONAME);
+      SET_BIT(vict->player->punish, PUNISH_NOTITLE);
     }
   }
   if (!strncasecmp(name, "silence", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_SILENCED))
+    if (IS_SET(vict->player->punish, PUNISH_SILENCED))
     {
       send_to_char("The gods take pity on you and lift your silence.\r\n",
                    vict);
@@ -5747,11 +5747,11 @@ int do_punish(Character *ch, char *arg, int cmd)
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
+    TOGGLE_BIT(vict->player->punish, PUNISH_SILENCED);
   }
   if (!strncasecmp(name, "freeze", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_FREEZE))
+    if (IS_SET(vict->player->punish, PUNISH_FREEZE))
     {
       send_to_char("You now can do things again.\r\n", vict);
       send_to_char("FREEZE removed.\r\n", ch);
@@ -5766,11 +5766,11 @@ int do_punish(Character *ch, char *arg, int cmd)
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
       logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_FREEZE);
+    TOGGLE_BIT(vict->player->punish, PUNISH_FREEZE);
   }
   if (!strncasecmp(name, "noarena", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NOARENA))
+    if (IS_SET(vict->player->punish, PUNISH_NOARENA))
     {
       send_to_char("Some kind god has let you join arenas again.\r\n", vict);
       send_to_char("NOARENA removed.\r\n", ch);
@@ -5781,11 +5781,11 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("NOARENA set.\r\n", ch);
       send_to_char(buf, vict);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOARENA);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NOARENA);
   }
   if (!strncasecmp(name, "noemote", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NOEMOTE))
+    if (IS_SET(vict->player->punish, PUNISH_NOEMOTE))
     {
       send_to_char("You can emote again.\r\n", vict);
       send_to_char("NOEMOTE removed.\r\n", ch);
@@ -5796,11 +5796,11 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("NOEMOTE set.\r\n", ch);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NOEMOTE);
   }
   if (!strncasecmp(name, "notell", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NOTELL))
+    if (IS_SET(vict->player->punish, PUNISH_NOTELL))
     {
       send_to_char("You can use telepatic communication again.\r\n", vict);
       send_to_char("NOTELL removed.\r\n", ch);
@@ -5811,11 +5811,11 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("NOTELL set.\r\n", ch);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTELL);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NOTELL);
   }
   if (!strncasecmp(name, "noname", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NONAME))
+    if (IS_SET(vict->player->punish, PUNISH_NONAME))
     {
       send_to_char("The gods grant you control over your name.\r\n", vict);
       send_to_char("NONAME removed.\r\n", ch);
@@ -5826,12 +5826,12 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("NONAME set.\r\n", ch);
       send_to_char(buf, vict);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NONAME);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NONAME);
   }
 
   if (!strncasecmp(name, "notitle", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NOTITLE))
+    if (IS_SET(vict->player->punish, PUNISH_NOTITLE))
     {
       send_to_char("The gods grant you control over your title.\r\n", vict);
       send_to_char("NOTITLE removed.\r\n", ch);
@@ -5842,14 +5842,14 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("NOTITLE set.\r\n", ch);
       send_to_char(buf, vict);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NOTITLE);
   }
 
   if (!strncasecmp(name, "unlucky", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_UNLUCKY))
+    if (IS_SET(vict->player->punish, PUNISH_UNLUCKY))
     {
-      if (!ch->pcdata->stealth)
+      if (!ch->player->stealth)
         send_to_char("The gods remove your poor luck.\r\n", vict);
       send_to_char("UNLUCKY removed.\r\n", ch);
       sprintf(buf, "%s removes %s's unlucky.", GET_NAME(ch), GET_NAME(vict));
@@ -5857,7 +5857,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     }
     else
     {
-      if (!ch->pcdata->stealth)
+      if (!ch->player->stealth)
       {
         sprintf(buf, "%s curses you with god-given bad luck!\n\r", GET_NAME(ch));
         send_to_char("UNLUCKY set.\r\n", ch);
@@ -5866,12 +5866,12 @@ int do_punish(Character *ch, char *arg, int cmd)
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_UNLUCKY);
+    TOGGLE_BIT(vict->player->punish, PUNISH_UNLUCKY);
   }
 
   if (!strncasecmp(name, "nopray", i) || !strncasecmp(name, "nemke", i))
   {
-    if (IS_SET(vict->pcdata->punish, PUNISH_NOPRAY))
+    if (IS_SET(vict->player->punish, PUNISH_NOPRAY))
     {
       send_to_char("The gods will once again hear your prayers.\r\n", vict);
       send_to_char("But not necessarily answer them...\r\n", vict);
@@ -5882,7 +5882,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       csendf(vict, "%s has removed your ability to pray!\n\r", GET_NAME(ch));
       send_to_char("NOPRAY (nemke) set.\r\n", ch);
     }
-    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOPRAY);
+    TOGGLE_BIT(vict->player->punish, PUNISH_NOPRAY);
   }
 
   display_punishes(ch, vict);
@@ -5896,40 +5896,40 @@ void display_punishes(Character *ch, Character *vict)
   sprintf(buf, "$3Punishments for %s$R: ", GET_NAME(vict));
   send_to_char(buf, ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NONAME))
+  if (IS_SET(vict->player->punish, PUNISH_NONAME))
     send_to_char("noname ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_SILENCED))
+  if (IS_SET(vict->player->punish, PUNISH_SILENCED))
     send_to_char("Silence ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NOEMOTE))
+  if (IS_SET(vict->player->punish, PUNISH_NOEMOTE))
     send_to_char("noemote ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_LOG) && GET_LEVEL(ch) > 108)
+  if (IS_SET(vict->player->punish, PUNISH_LOG) && GET_LEVEL(ch) > 108)
     send_to_char("log ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_FREEZE))
+  if (IS_SET(vict->player->punish, PUNISH_FREEZE))
     send_to_char("Freeze ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_SPAMMER))
+  if (IS_SET(vict->player->punish, PUNISH_SPAMMER))
     send_to_char("Spammer ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_STUPID))
+  if (IS_SET(vict->player->punish, PUNISH_STUPID))
     send_to_char("Stupid ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NOTELL))
+  if (IS_SET(vict->player->punish, PUNISH_NOTELL))
     send_to_char("notell ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NOARENA))
+  if (IS_SET(vict->player->punish, PUNISH_NOARENA))
     send_to_char("noarena ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NOTITLE))
+  if (IS_SET(vict->player->punish, PUNISH_NOTITLE))
     send_to_char("notitle ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_UNLUCKY))
+  if (IS_SET(vict->player->punish, PUNISH_UNLUCKY))
     send_to_char("unlucky ", ch);
 
-  if (IS_SET(vict->pcdata->punish, PUNISH_NOPRAY))
+  if (IS_SET(vict->player->punish, PUNISH_NOPRAY))
     send_to_char("nopray ", ch);
 
   send_to_char("\n\r", ch);

@@ -107,17 +107,17 @@ int do_log(Character *ch, char *argument, int cmd)
     send_to_char("Can't do that to a beast.\r\n", ch);
   else if (GET_LEVEL(vict) > GET_LEVEL(ch))
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
-  else if (IS_SET(vict->pcdata->punish, PUNISH_LOG))
+  else if (IS_SET(vict->player->punish, PUNISH_LOG))
   {
     send_to_char("LOG removed.\r\n", ch);
-    REMOVE_BIT(vict->pcdata->punish, PUNISH_LOG);
+    REMOVE_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
     logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   else
   {
     send_to_char("LOG set.\r\n", ch);
-    SET_BIT(vict->pcdata->punish, PUNISH_LOG);
+    SET_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
     logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }

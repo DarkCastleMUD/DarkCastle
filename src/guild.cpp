@@ -490,7 +490,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
     if (!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
       continue;
 
-    if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->pcdata->profession)
+    if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->player->profession)
     {
       continue;
     }
@@ -630,7 +630,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", ch->pcdata->practices);
+    sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r\r\n", ch);
 
@@ -718,13 +718,13 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     }
 
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
-    if (skilllist[skillnumber].group && IS_PC(ch) && skilllist[skillnumber].group != ch->pcdata->profession)
+    if (skilllist[skillnumber].group && IS_PC(ch) && skilllist[skillnumber].group != ch->player->profession)
     {
       csendf(ch, "You must join the %s profession in order to learn that.\r\n", find_profession(ch->c_class, skilllist[skillnumber].group));
       return eSUCCESS;
     }
   }
-  if (ch->pcdata->practices <= 0)
+  if (ch->player->practices <= 0)
   {
     send_to_char("You do not seem to be able to practice now.\r\n", ch);
     return eSUCCESS;
@@ -815,7 +815,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     }
 
   send_to_char("You practice for a while...\r\n", ch);
-  ch->pcdata->practices--;
+  ch->player->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
 
@@ -936,19 +936,19 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   { // remort crap
     int groupnumber;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A))
+    if (IS_SET(ch->player->toggles, PLR_CLS_TREE_A))
     {
-      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_A);
+      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_A);
       groupnumber = 1;
     }
-    else if (IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B))
+    else if (IS_SET(ch->player->toggles, PLR_CLS_TREE_B))
     {
-      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_B);
+      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_B);
       groupnumber = 2;
     }
-    else if (IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C))
+    else if (IS_SET(ch->player->toggles, PLR_CLS_TREE_C))
     {
-      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_C);
+      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_C);
       groupnumber = 3;
     }
     else
@@ -973,7 +973,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("You have remorted back to level 50.\r\n", ch);
     if (GET_LEVEL(ch) <= MAX_MORTAL)
       GET_LEVEL(ch) = 50;
-    SET_BIT(ch->pcdata->toggles, PLR_REMORTED);
+    SET_BIT(ch->player->toggles, PLR_REMORTED);
 
     ch->save(666);
     return eSUCCESS;
@@ -1119,7 +1119,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (!*arg)
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", ch->pcdata->practices);
+    sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r", ch);
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
@@ -1146,7 +1146,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (ch->pcdata->practices <= 0)
+  if (ch->player->practices <= 0)
   {
     send_to_char("You do not seem to be able to practice now.\r\n", ch);
     return eSUCCESS;
@@ -1165,7 +1165,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   }
 
   send_to_char("You practice for a while...\r\n", ch);
-  ch->pcdata->practices--;
+  ch->player->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
 
