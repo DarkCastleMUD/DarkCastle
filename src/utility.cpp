@@ -2442,7 +2442,7 @@ qint64 number(qint64 from, qint64 to)
   if (from > to)
   {
 
-    logentry(QString("BACKWARDS usage: numbers(%1, %2)!").arg(from).arg(to));
+    logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
     produce_coredump();
     return to;
   }
@@ -2460,7 +2460,7 @@ quint64 number(quint64 from, quint64 to)
   if (from > to)
   {
 
-    logentry(QString("BACKWARDS usage: numbers(%1, %2)!").arg(from).arg(to));
+    logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
     produce_coredump();
     return to;
   }
