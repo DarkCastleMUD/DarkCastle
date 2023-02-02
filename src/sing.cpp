@@ -612,7 +612,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 			/* Stop abusing your betters  */
 			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (!IS_NPC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
+				if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
 				{
 					send_to_char("That just might annoy them!\n\r", ch);
 					return eFAILURE;
@@ -620,7 +620,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 			/* Imps ignore safe flags  */
 			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+				if (IS_SET(world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
 				{
 					send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", tar_char);
 				}
@@ -787,7 +787,7 @@ void update_bard_singing()
 			i->songs.erase(j);
 			--j;
 			return false;
-		} else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && !IS_NPC(i)) || IS_SET(i->combat, COMBAT_STUNNED)
+		} else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || IS_SET(i->combat, COMBAT_STUNNED)
 						|| IS_SET(i->combat, COMBAT_STUNNED2) || IS_SET(i->combat, COMBAT_SHOCKED) || IS_SET(i->combat, COMBAT_SHOCKED2)
 						|| (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2)))
 				&& ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE
@@ -938,7 +938,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	(*i).song_data = 0;
 
 	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-	if (!IS_NPC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
+	if (IS_PC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
 	{
 		send_to_char("They don't seem particularily interested.\r\n", ch);
 		send_to_char("You manage to resist the entrancing lyrics.\r\n", victim);
@@ -1709,7 +1709,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	if ((!IS_NPC(target)) && (GET_LEVEL(target) >= IMMORTAL))
+	if ((IS_PC(target)) && (GET_LEVEL(target) >= IMMORTAL))
 	{
 		send_to_char("Just who do you think you are?\n\r", victim);
 		return;
@@ -1896,7 +1896,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 
 	act("$n sings to $N about beautiful rainbows.", ch, 0, victim, TO_ROOM, NOTVICT);
 
-	if (!IS_NPC(victim))
+	if (IS_PC(victim))
 	{
 		send_to_char("They seem to be looking at you really strangly.\r\n", ch);
 		send_to_char("You are sung to about butterflies and bullfrogs.\r\n", victim);
@@ -2794,7 +2794,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		return eFAILURE;
 	}
 
-	if (!IS_NPC(target))
+	if (IS_PC(target))
 	{
 		csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
 		return eFAILURE;
@@ -2942,7 +2942,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 		return eFAILURE;
 	}
 
-	if (!IS_NPC(target))
+	if (IS_PC(target))
 	{
 		send_to_char("They don't hate anyone, but they are looking at you kinda funny...\r\n", ch);
 		return eFAILURE;
@@ -3352,7 +3352,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 		}
 	}
 
-	bool ispc = !IS_NPC(victim);
+	bool ispc = IS_PC(victim);
 	char buf[MAX_STRING_LENGTH];
 	strcpy(buf, victim->short_desc);
 

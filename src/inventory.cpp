@@ -2634,7 +2634,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 {
   char buffer[MAX_STRING_LENGTH];
 
-  if (!has_skill(ch, SKILL_PALM) && !IS_NPC(ch))
+  if (!has_skill(ch, SKILL_PALM) && IS_PC(ch))
   {
     send_to_char("You aren't THAT slick there, pal.\r\n", ch);
     return eFAILURE;

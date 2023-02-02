@@ -5619,7 +5619,7 @@ void free_char(Character *ch, Trace trace)
 	while (ch->carrying)
 		extract_obj(ch->carrying);
 
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 	{
 		if (ch->name)
 			dc_free(ch->name);

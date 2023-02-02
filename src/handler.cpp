@@ -2282,7 +2282,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 		if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOKI))
 			kimore = true;
 	}
-	if (!IS_NPC(ch)) // player
+	if (IS_PC(ch)) // player
 		DC::getInstance()->zones.value(world[ch->in_room].zone).decrementPlayers();
 	if (IS_NPC(ch))
 		ch->mobdata->last_room = ch->in_room;
@@ -2348,7 +2348,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	world[room].light += ch->glow_factor;
 	int a, i;
-	if (!IS_NPC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
+	if (IS_PC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
 	{
 		for (i = 0; i < MAX_HIDE; i++)
 			ch->player->hiding_from[i] = nullptr;
@@ -2371,7 +2371,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 	}
 	for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
 	{
-		if (ISSET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
+		if (ISSET(temp->affected_by, AFF_HIDE) && IS_PC(temp))
 			for (i = 0; i < MAX_HIDE; i++)
 			{
 				if (temp->player->hiding_from[i] == nullptr || temp->player->hiding_from[i] == ch)
@@ -2389,7 +2389,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 				}
 			}
 	}
-	if (!IS_NPC(ch)) // player
+	if (IS_PC(ch)) // player
 		DC::getInstance()->zones.value(world[room].zone).incrementPlayers();
 	if (IS_NPC(ch))
 	{
@@ -2536,7 +2536,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	ch->equipment[pos] = obj;
 	obj->equipped_by = ch;
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 		for (int a = 0; a < obj->num_affects; a++)
 		{
 			if (obj->affected[a].location >= 1000)
@@ -2613,7 +2613,7 @@ class Object *unequip_char(Character *ch, int pos, int flag)
 	remove_set_stats(ch, obj, flag);
 	class Object *a, *b = nullptr;
 b: // ew
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 		for (a = ch->player->skillchange; a; a = a->next_skill)
 		{
 			if (a == (Object *)0x95959595)
@@ -3682,7 +3682,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	class Object *i;
 	Character *omast = nullptr;
 	int ret = eSUCCESS;
-	if (!IS_NPC(ch) && !ch->desc)
+	if (IS_PC(ch) && !ch->desc)
 		for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
 			if (t_desc->original == ch)
 				ret = do_return(t_desc->character, "", 0);
@@ -3700,7 +3700,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		ch->mobdata->reset->lastPop = nullptr;
 
 	remove_totem_stats(ch);
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 	{
 		void shatter_message(Character * ch);
 		void release_message(Character * ch);
@@ -4110,7 +4110,7 @@ Character *get_pc_room_vis_exact(Character *ch, const char *name)
 
 	for (i = world[ch->in_room].people; i; i = i->next_in_room)
 	{
-		if (isname(name, GET_NAME(i)) && CAN_SEE(ch, i) && !IS_NPC(i))
+		if (isname(name, GET_NAME(i)) && CAN_SEE(ch, i) && IS_PC(i))
 			return (i);
 	}
 	return nullptr;
@@ -4304,7 +4304,7 @@ get_pc(char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
-		if(!IS_NPC(i) && isname(name, GET_NAME(i)))
+		if(IS_PC(i) && isname(name, GET_NAME(i)))
 		return true;
 
 		return false; });
@@ -4396,7 +4396,7 @@ Character *get_pc_vis(Character *ch, const char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
 						  {
-		if(!IS_NPC(i) && CAN_SEE(ch, i))
+		if(IS_PC(i) && CAN_SEE(ch, i))
 		{
 			if (isname(name, GET_NAME(i)))
 			return true;
@@ -4426,7 +4426,7 @@ Character *get_pc_vis_exact(Character *ch, const char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](Character *const &i)
 						  {
-		if(!IS_NPC(i) && CAN_SEE(ch, i))
+		if(IS_PC(i) && CAN_SEE(ch, i))
 		{
 			if (!strcmp(name, GET_NAME(i)))
 			return true;

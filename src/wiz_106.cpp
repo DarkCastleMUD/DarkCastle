@@ -91,7 +91,7 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
         logentry(QString("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
-      if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict))
+      if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && IS_PC(vict))
       {
         send_to_char("Why be forceful?\n\r", ch);
         buf = format("$n has failed to force you to '{}'.", to_force);

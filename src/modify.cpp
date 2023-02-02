@@ -203,7 +203,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			return 1;
 		}
 
-		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && !IS_NPC(mob))
+		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && IS_PC(mob))
 		{
 			sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
 			send_to_char(message, ch);
@@ -213,7 +213,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		switch (field)
 		{
 		case 1:
-			if (!IS_NPC(mob) && GET_LEVEL(ch) < IMPLEMENTER)
+			if (IS_PC(mob) && GET_LEVEL(ch) < IMPLEMENTER)
 			{
 				send_to_char("You can't change that field for players.", ch);
 				return 1;
@@ -222,7 +222,7 @@ int do_string(Character *ch, char *arg, int cmd)
 				ch->desc->hashstr = &GET_NAME(mob);
 			else
 				ch->desc->strnew = &GET_NAME(mob);
-			if (!IS_NPC(mob))
+			if (IS_PC(mob))
 				send_to_char("WARNING: You have changed the name of a player.\r\n", ch);
 			break;
 		case 2:
@@ -239,7 +239,7 @@ int do_string(Character *ch, char *arg, int cmd)
 				ch->desc->strnew = &mob->short_desc;
 			break;
 		case 3:
-			if (!IS_NPC(mob))
+			if (IS_PC(mob))
 			{
 				send_to_char("That field is for monsters only.\r\n", ch);
 				return 1;
@@ -394,7 +394,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			send_to_char("String too long - truncated.\r\n", ch);
 			*(string + length[field - 1]) = '\0';
 		}
-		if (type == TP_MOB && !IS_NPC(mob))
+		if (type == TP_MOB && IS_PC(mob))
 		{
 			*ch->desc->strnew = str_dup(string);
 			ch->desc->strnew = 0;
@@ -413,7 +413,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		send_to_char("Enter string. Terminate with '~' at the beginning "
 					 "of a line.\r\n",
 					 ch);
-		if (type == TP_MOB && !IS_NPC(mob))
+		if (type == TP_MOB && IS_PC(mob))
 #ifdef LEAK_CHECK
 			(*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
 #else

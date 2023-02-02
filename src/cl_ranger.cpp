@@ -157,7 +157,7 @@ int do_tame(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_NPC(victim))
+  if (IS_PC(victim))
   {
     send_to_char("You find yourself unable to tame this player.\r\n", ch);
     return eFAILURE;
@@ -290,7 +290,7 @@ int do_track(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (*victim && !IS_NPC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL)
+  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL)
   {
     send_to_char("Only a ranger could track someone by name.\r\n", ch);
     return eFAILURE;
@@ -1434,7 +1434,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   }
 
   /* Protect the newbies! */
-  if (!IS_NPC(victim) && GET_LEVEL(victim) < 6)
+  if (IS_PC(victim) && GET_LEVEL(victim) < 6)
   {
     send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
     return eFAILURE;

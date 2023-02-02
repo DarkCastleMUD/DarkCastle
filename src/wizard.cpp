@@ -284,7 +284,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
           "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
 
-          (!IS_NPC(k) ? "PC" : "MOB"),
+          (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
           (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
           (k->in_room == DC::NOWHERE ? 0 : world[k->in_room].number),
@@ -362,7 +362,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
           "(:)====================(:)==========(:)====================================(:)\r\n",
           k->timer,
-          (!IS_NPC(ch) ? k->hometown : -1),
+          (IS_PC(ch) ? k->hometown : -1),
           buf2);         /* buf is the sex... */
   send_to_char(buf, ch); /* THIRD sprintf */
 
@@ -498,7 +498,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
   }
 
-  if (!IS_NPC(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
             k->player->saves_mods[SAVE_TYPE_FIRE],
@@ -588,7 +588,7 @@ void mob_stat(Character *ch, Character *k)
   {
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
-            (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+            (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
             (IS_NPC(k) ? k->mobdata->nr : 0),
             k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
@@ -600,7 +600,7 @@ void mob_stat(Character *ch, Character *k)
   else
   {
     sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
-            (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+            (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
   }
   send_to_char(buf, ch);
@@ -676,7 +676,7 @@ void mob_stat(Character *ch, Character *k)
     break;
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     sprintf(buf, "$3Hometown$R:[%d]\n\r", k->hometown);
     send_to_char(buf, ch);
@@ -792,7 +792,7 @@ void mob_stat(Character *ch, Character *k)
           k->saves[SAVE_TYPE_POISON]);
   send_to_char(buf, ch);
 
-  if (!IS_NPC(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
             k->player->saves_mods[SAVE_TYPE_FIRE],

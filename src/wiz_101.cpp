@@ -746,7 +746,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character))
+      if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && IS_PC(i->character))
       {
         if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
           continue;

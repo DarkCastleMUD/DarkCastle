@@ -56,7 +56,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 	class Connection *i;
 	char buf3[MAX_INPUT_LENGTH];
 
-	if (!IS_NPC(ch) && ch->player->wizinvis)
+	if (IS_PC(ch) && ch->player->wizinvis)
 		sprintf(buf3, "someone");
 	else
 		sprintf(buf3, GET_SHORT(ch));
@@ -77,7 +77,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 		for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 			if (i->character != ch && !i->connected)
 			{
-				if (!IS_NPC(ch) && ch->player->wizinvis && i->character->level < ch->player->wizinvis)
+				if (IS_PC(ch) && ch->player->wizinvis && i->character->level < ch->player->wizinvis)
 					sprintf(buf3, "Someone");
 				else
 					sprintf(buf3, GET_SHORT(ch));
@@ -345,7 +345,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 	{ /* argument supplied. destroy single object or char */
 		if ((vict = get_char_room_vis(ch, name)) && (GET_LEVEL(ch) > G_POWER))
 		{
-			if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
+			if (IS_PC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
 			{
 				sprintf(buf, "%s is surrounded with scorching flames but is"
 							 " unharmed.\r\n",
@@ -2014,7 +2014,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 			for (k = victim->followers; k; k = next_dude)
 			{
 				next_dude = k->next;
-				if (!IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_GROUP))
+				if (IS_PC(k->follower) && IS_AFFECTED(k->follower, AFF_GROUP))
 				{
 					act("$n disappears in a mushroom cloud.",
 						victim, 0, 0, TO_ROOM, 0);

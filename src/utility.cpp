@@ -1209,7 +1209,7 @@ bool check_blind(Character *ch)
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
   //    return false;
 
-  if (!IS_NPC(ch) && ch->player->holyLite)
+  if (IS_PC(ch) && ch->player->holyLite)
     return false;
 
   if (IS_AFFECTED(ch, AFF_BLIND) && number(0, 4)) // 20% chance of seeing

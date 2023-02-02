@@ -1369,7 +1369,7 @@ string calc_name(Character *ch, bool colour = false)
       name = cond_colorcodes[6];
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     name += ch->name;
   else
     name += ch->short_desc;

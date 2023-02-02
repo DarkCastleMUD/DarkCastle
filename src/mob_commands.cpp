@@ -188,7 +188,7 @@ int do_mpasound(Character *ch, char *argument, int cmd)
   int32_t was_in_room;
   int door;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -226,7 +226,7 @@ int do_mpkill(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -272,7 +272,7 @@ int do_mphit(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -319,7 +319,7 @@ int do_mpaddlag(Character *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -359,7 +359,7 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
   int location;
   bool dot = false;
   char dotbuf[MAX_INPUT_LENGTH];
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -415,7 +415,7 @@ int do_mpechoaround(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -444,7 +444,7 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
   Character *victim, *victim2;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -481,7 +481,7 @@ int do_mpechoat(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -509,7 +509,7 @@ int do_mpechoat(Character *ch, char *argument, int cmd)
 
 int do_mpecho(Character *ch, char *argument, int cmd)
 {
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -535,7 +535,7 @@ int do_mpmload(Character *ch, char *argument, int cmd)
   int realnum;
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -571,7 +571,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   int realnum;
   extern struct index_data *obj_index;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -626,7 +626,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
   Character *victim;
   Object *obj;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -677,7 +677,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!IS_NPC(victim))
+  if (IS_PC(victim))
   {
     prog_error(ch, "Mppurge - Purging a PC.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -710,7 +710,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   int32_t location = -1;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -800,7 +800,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
   int32_t original;
   int result;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -859,7 +859,7 @@ int do_mpxpreward(Character *ch, char *argument, int cmd)
 
   Character *get_pc_room_vis_exact(Character * ch, const char *name);
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -903,7 +903,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
   Connection *d;
   Character *victim;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -984,7 +984,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -1132,7 +1132,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   char skill[MAX_INPUT_LENGTH];
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -1234,7 +1234,7 @@ int do_mpsettemp(Character *ch, char *argument, int cmd)
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
   Character *victim;
-  if (!IS_NPC(ch) && cmd != CMD_OTHER)
+  if (IS_PC(ch) && cmd != CMD_OTHER)
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -1274,7 +1274,7 @@ int do_mpsettemp(Character *ch, char *argument, int cmd)
   {
     if (type == 1 && IS_NPC(victim))
       continue;
-    else if (type == 2 && !IS_NPC(victim))
+    else if (type == 2 && IS_PC(victim))
       continue;
 
     struct tempvariable *eh;
@@ -1317,7 +1317,7 @@ int do_mpsetalign(Character *ch, char *argument, int cmd)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -1363,7 +1363,7 @@ void add_dmg(Character *ch, int dmg)
   for (c = dmg_list; c; c = c->next)
   {
     if ((IS_NPC(ch) && !str_cmp(c->name, GET_SHORT(ch))) ||
-        (!IS_NPC(ch) && !str_cmp(c->name, GET_NAME(ch))))
+        (IS_PC(ch) && !str_cmp(c->name, GET_NAME(ch))))
     {
       c->damage += dmg;
       return;
@@ -1393,7 +1393,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
   int32_t hitpoints = 0;
 
   free_dmg_list();
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -1537,7 +1537,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
     for (victim = world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
-      if ((!IS_NPC(victim) && GET_LEVEL(victim) > MORTAL) || victim == ch)
+      if ((IS_PC(victim) && GET_LEVEL(victim) > MORTAL) || victim == ch)
       {
         continue;
       }
@@ -1686,7 +1686,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
   Character *victim, *owner = nullptr;
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -1750,7 +1750,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
     {
       while ((victim = victim->next_in_room))
       {
-        if (!IS_NPC(victim))
+        if (IS_PC(victim))
           break;
       }
     }
@@ -1774,7 +1774,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
 int do_mppause(Character *ch, char *argument, int cmd)
 {
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -1942,7 +1942,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
 
 int do_mppeace(Character *ch, char *argument, int cmd)
 {
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\n\r", ch);
     return eSUCCESS;
@@ -1978,7 +1978,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
 
 int do_mpretval(Character *ch, char *argument, int cmd)
 {
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -2171,7 +2171,7 @@ char *allowedData[] = {
 
 int do_mpsetmath(Character *ch, char *arg, int cmd)
 {
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;

@@ -167,7 +167,7 @@ Character *find_random_player_in_room(Character *ch)
 
   // Count the number of players in room
   for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (!IS_NPC(vict))
+    if (IS_PC(vict))
       count++;
 
   if (!count) // no players
@@ -178,7 +178,7 @@ Character *find_random_player_in_room(Character *ch)
 
   // Find the "count" player and return them
   for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (!IS_NPC(vict))
+    if (IS_PC(vict))
     {
       if (count > 1)
         count--;
@@ -330,7 +330,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
   }
 
   if (ch->equipment[WIELD] && vict->equipment[WIELD])
-    if (!IS_NPC(ch) || !IS_NPC(vict))
+    if (IS_PC(ch) || IS_PC(vict))
     {
       wielded = vict->equipment[WIELD];
       if ((!IS_SET(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
@@ -652,7 +652,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
   for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
-    if (!IS_NPC(tch))
+    if (IS_PC(tch))
       if (CAN_SEE(ch, tch))
       {
 
@@ -2055,7 +2055,7 @@ int adept(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (!IS_NPC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
@@ -2100,7 +2100,7 @@ int mud_school_adept(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
-    if (!IS_NPC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
+    if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
   if (!tch)
@@ -2413,7 +2413,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
   for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
-    if (!IS_NPC(tch))
+    if (IS_PC(tch))
       if (CAN_SEE(ch, tch))
       {
 
@@ -2798,7 +2798,7 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
   wielded = vict->equipment[WIELD];
 
   if (ch->equipment[WIELD] && vict->equipment[WIELD])
-    if (!IS_NPC(ch) || !IS_NPC(vict))
+    if (IS_PC(ch) || IS_PC(vict))
       if ((!IS_SET(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (GET_LEVEL(vict) <= MAX_MORTAL))
         if (vict == ch->fighting && GET_LEVEL(ch) > 9 && number(0, 2) == 0)
@@ -3344,7 +3344,7 @@ int gremlinthing(Character *ch)
   if (GET_POS(ch) < POSITION_STANDING)
     return eFAILURE;
 
-  if (ch->master && !IS_NPC(ch->master) && ch->master->player->golem &&
+  if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
       ch->master->player->golem->in_room == ch->in_room)
   {
     Character *gol = ch->master->player->golem;

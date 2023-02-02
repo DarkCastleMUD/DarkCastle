@@ -239,7 +239,7 @@ int do_fall(Character *ch, short dir)
 		int ppl = 0;
 		Character *k;
 		for (k = world[target].people; k; k = k->next_in_room)
-			if (!IS_NPC(k))
+			if (IS_PC(k))
 				ppl++;
 		if (ppl > 2)
 		{
@@ -253,7 +253,7 @@ int do_fall(Character *ch, short dir)
 		int ppl = 0;
 		Character *k;
 		for (k = world[target].people; k; k = k->next_in_room)
-			if (!IS_NPC(k))
+			if (IS_PC(k))
 				ppl++;
 		if (ppl > 4)
 		{
@@ -562,7 +562,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		int ppl = 0;
 		Character *k;
 		for (k = rm->people; k; k = k->next_in_room)
-			if (!IS_NPC(k))
+			if (IS_PC(k))
 				ppl++;
 		if (ppl > 2)
 		{
@@ -598,7 +598,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		int ppl = 0;
 		Character *k;
 		for (k = rm->people; k; k = k->next_in_room)
-			if (!IS_NPC(k))
+			if (IS_PC(k))
 				ppl++;
 		if (ppl > 4)
 		{
@@ -607,7 +607,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (!IS_NPC(ch) && world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+	if (IS_PC(ch) && world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
 		send_to_char("You feel air trying to explode from your lungs as you swim around.\r\n", ch);
 		// send_to_char("Underwater?!\r\n", ch);
@@ -622,7 +622,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	if ((a = has_skill(ch, SKILL_VIGOR)) && number(1, 101) < a / 10)
 		need_movement /= 2; // No skill improvement here. Too easy.
 
-	if (GET_MOVE(ch) < need_movement && !IS_NPC(ch))
+	if (GET_MOVE(ch) < need_movement && IS_PC(ch))
 	{
 		if (!following)
 			send_to_char("You are too exhausted.\r\n", ch);
@@ -646,7 +646,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (GET_LEVEL(ch) < IMMORTAL && !IS_NPC(ch))
+	if (GET_LEVEL(ch) < IMMORTAL && IS_PC(ch))
 		GET_MOVE(ch) -= need_movement;
 
 	// Everyone
@@ -824,7 +824,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	if ((GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
 		for (Character *tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
 		{
-			if (!IS_NPC(tmp_ch))
+			if (IS_PC(tmp_ch))
 				continue;
 			if (IS_AFFECTED(tmp_ch, AFF_CHARM))
 				continue;
@@ -924,7 +924,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 	{
 		send_to_char("You are unable to abandon your master.\r\n", ch);
 		act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
-		if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
+		if (IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
 		{
 			send_to_char("You struggle to maintain control.\r\n", ch->master);
 			/*

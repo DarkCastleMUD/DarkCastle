@@ -1222,7 +1222,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
               if (IS_NPC(tmp_victim))
               {
                 add_memory(tmp_victim, GET_NAME(ch), 'h');
-                if (!IS_NPC(ch) && IS_NPC(tmp_victim))
+                if (IS_PC(ch) && IS_NPC(tmp_victim))
                   if (!ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) && !tmp_victim->hunting)
                   {
                     if (GET_LEVEL(ch) - GET_LEVEL(tmp_victim) / 2 > 0)
@@ -1844,13 +1844,13 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   {
     act("$N absorbs your puny spell and seems no different!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
       act("You absorb $n's puny spell and are no different!", ch, nullptr, victim, TO_VICT, 0);
     return eSUCCESS;
   }
 
   /* save the newbies! */
-  if (!IS_NPC(ch) && !IS_NPC(victim) && (GET_LEVEL(victim) < 10))
+  if (IS_PC(ch) && IS_PC(victim) && (GET_LEVEL(victim) < 10))
   {
     send_to_char("Your cold-blooded act causes your magic to misfire!\n\r", ch);
     victim = ch;
@@ -1886,7 +1886,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   if (spellret >= 0 && (victim != ch))
   {
     act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
     {
       act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     }
@@ -1900,7 +1900,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   /* if they are too big - do a dice roll to see if they backfire */
-  if (!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10) &&
+  if (IS_PC(ch) && IS_PC(victim) && ((level - GET_LEVEL(victim)) > 10) &&
       (!IS_MINLEVEL_PC(ch, DEITY) || GET_LEVEL(victim) >= GET_LEVEL(ch)))
   {
     act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
@@ -1920,7 +1920,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   act("$n seems to be paralyzed!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("Your entire body rebels against you and you are paralyzed!\n\r", victim);
 
-  if (!IS_NPC(victim))
+  if (IS_PC(victim))
   {
     sprintf(buf, "%s was just paralyzed.", GET_NAME(victim));
     logentry(buf, OVERSEER, LogChannels::LOG_MORTAL);
@@ -1979,7 +1979,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
   if (spellret >= 0 && (victim != ch))
   {
     act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
     {
       act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
     }
@@ -2335,13 +2335,13 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       save = -30;
     }
 
-    if (!IS_NPC(victim) && GET_LEVEL(victim) < 11)
+    if (IS_PC(victim) && GET_LEVEL(victim) < 11)
     {
       send_to_char("The curse fizzles!\r\n", ch);
       return eSUCCESS;
     }
 
-    if (malediction_res(ch, victim, SPELL_CURSE) || (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL))
+    if (malediction_res(ch, victim, SPELL_CURSE) || (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL))
     {
       act("$N resists your attempt to curse $M!", ch, nullptr, victim, TO_CHAR, 0);
       act("$N resists $n's attempt to curse $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -3171,7 +3171,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
     }
     else if (IS_SET(victim->immune, ISR_POISON) ||
              malediction_res(ch, victim, SPELL_POISON) ||
-             (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL))
+             (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL))
     {
       act("$N resists your attempt to poison $M!", ch, nullptr, victim, TO_CHAR, 0);
       act("$N resists $n's attempt to poison $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -4181,7 +4181,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  if (victim->fighting && !IS_NPC(victim->fighting)) // PvP fight?
+  if (victim->fighting && IS_PC(victim->fighting)) // PvP fight?
   {
     send_to_char("The fight distracts you from casting word of recall!\r\n", victim);
     return eFAILURE;
@@ -4264,7 +4264,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     }
   }
 
-  if (!IS_NPC(victim) && victim->player->golem && victim->player->golem->in_room == victim->in_room)
+  if (IS_PC(victim) && victim->player->golem && victim->player->golem->in_room == victim->in_room)
   {
     if (victim->mana < 50)
     {
@@ -4409,7 +4409,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     if (IS_NPC(victim) || !IS_SET(victim->player->toggles, PLR_SUMMONABLE))
     {
       send_to_char("Someone has tried to summon you!\n\r", victim);
@@ -4511,7 +4511,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (!IS_NPC(victim))
+  if (IS_PC(victim))
   {
     send_to_char("You find yourself unable to charm this player.\r\n", ch);
     return eFAILURE;
@@ -4796,7 +4796,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
   else
   { /* victim */
 
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
     {
       sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\r\n",
               age(victim).year, age(victim).month,
@@ -4953,7 +4953,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
     }
 
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-        (IS_NPC(ch) ? !IS_NPC(tmp_victim) : true)) // if i'm a mob, don't hurt other mobs
+        (IS_NPC(ch) ? IS_PC(tmp_victim) : true)) // if i'm a mob, don't hurt other mobs
     {
       if (GET_DEX(tmp_victim) > number(1, 100)) // roll vs dex dodged
       {
@@ -5481,7 +5481,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
+  if (IS_PC(ch) && IS_PC(victim) && victim->fighting &&
       IS_NPC(victim->fighting))
   {
     send_to_char("You misfire!\n\r", ch);
@@ -5746,7 +5746,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
   /*
-  if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
+  if(IS_PC(ch) && IS_PC(victim) && victim->fighting &&
       IS_NPC(victim->fighting) &&
      !IS_AFFECTED(victim->fighting, AFF_CHARM))
   {
@@ -6649,7 +6649,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if ((!IS_NPC(victim)) && (GET_LEVEL(victim) >= IMMORTAL))
+  if ((IS_PC(victim)) && (GET_LEVEL(victim) >= IMMORTAL))
   {
     send_to_char("Just who do you think you are?\n\r", ch);
     return eFAILURE;
@@ -9564,7 +9564,7 @@ int cast_word_of_recall(uint8_t level, Character *ch, char *arg, int type,
          tar_ch; tar_ch = tar_ch_next)
     {
       tar_ch_next = tar_ch->next_in_room;
-      if (!IS_NPC(tar_ch))
+      if (IS_PC(tar_ch))
         targetted_word_of_recall(level, ch, tar_ch, 0, skill);
     }
     break;
@@ -12252,7 +12252,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
   send_to_char("Disabled currently,\r\n", ch);
 
   // make sure its a charmie
-  if ((!IS_NPC(victim)) || (victim->master != ch))
+  if ((IS_PC(victim)) || (victim->master != ch))
   {
     send_to_char("You can only do this to someone under your mental control.\r\n", ch);
     GET_MANA(ch) += 50;
@@ -14683,7 +14683,7 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
   {
     next_vict = victim->next_in_room;
 
-    if (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
+    if (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL)
       continue;
     if (victim == ch)
       continue; // save for last
@@ -14872,7 +14872,7 @@ int spell_boneshield(uint8_t level, Character *ch, Character *victim, Object *ob
 {
   struct affected_type af;
 
-  if (!IS_NPC(victim) || victim->master != ch)
+  if (IS_PC(victim) || victim->master != ch)
   {
     send_to_char("You cannot cast this spell on that.\r\n", ch);
     return eFAILURE;
@@ -15934,7 +15934,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   {
     next_ally = ally->next_in_room;
 
-    if (!IS_NPC(ally) && GET_POS(ally) > POSITION_SLEEPING &&
+    if (IS_PC(ally) && GET_POS(ally) > POSITION_SLEEPING &&
         (ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master)))
     {
       send_to_char("Your mind's eye focuses, you still your body, and poise yourself to react to anything!\r\n", ally);

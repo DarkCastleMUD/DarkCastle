@@ -153,7 +153,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
       // loop through my followers and process them
       for (f = k->followers; f; f = f->next)
       {
-        if (!IS_NPC(f->follower))
+        if (IS_PC(f->follower))
           if (IS_AFFECTED(f->follower, AFF_GROUP))
           {
             // If we're searching, see if this is the target
