@@ -336,7 +336,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Stop abusing your betters  */
       if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (!IS_NPC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
+        if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
         {
           send_to_char("That just might annoy them!\n\r", ch);
           return eFAILURE;
@@ -344,7 +344,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Imps ignore safe flags  */
       if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+        if (IS_SET(world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
         {
           send_to_char(
               "There is no safe haven from an angry IMPLEMENTER!\n\r",

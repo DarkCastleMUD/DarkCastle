@@ -2985,7 +2985,7 @@ void remove_totem(Object *altar, Object *totem)
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
            {
-             if (!IS_NPC(t) && t->altar == altar)
+             if (IS_PC(t) && t->altar == altar)
              {
                int j;
                for (j = 0; j < totem->num_affects; j++)
@@ -3005,7 +3005,7 @@ void add_totem(Object *altar, Object *totem)
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
            {
-             if (!IS_NPC(t) && t->altar == altar)
+             if (IS_PC(t) && t->altar == altar)
              {
                int j;
                for (j = 0; j < totem->num_affects; j++)
@@ -3082,7 +3082,7 @@ int count_plrs(int zone, int clan)
 
   int i = count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
                    {
-      if (!IS_NPC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
+      if (IS_PC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
 	  GET_LEVEL(tmpch) < 100 && GET_LEVEL(tmpch) > 10)
       return true;
       else
@@ -3228,7 +3228,7 @@ int online_clan_members(int clan)
   int i = count_if(character_list.begin(), character_list.end(),
                    [&clan](Character *const &Tmpch)
                    {
-                     if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc && GET_LEVEL(Tmpch) > 10)
+                     if (IS_PC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc && GET_LEVEL(Tmpch) > 10)
                        return true;
                      else
                        return false;

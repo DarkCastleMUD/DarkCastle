@@ -54,7 +54,7 @@ void scavenge(Character *ch);
 bool is_r_denied(Character *ch, int room)
 {
   struct deny_data *d;
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     return false;
   for (d = world[room].denied; d; d = d->next)
     if (mob_index[ch->mobdata->nr].virt == d->vnum)
@@ -290,7 +290,7 @@ void mobile_activity(void)
             act("$n growls at $N.", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
             continue;
           }
-          else if (!IS_NPC(tmp_ch))
+          else if (IS_PC(tmp_ch))
           {
             act("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, TO_ROOM, 0);
             PerfTimers["mprog_attack"].start();
@@ -454,10 +454,10 @@ void mobile_activity(void)
 
           //           continue;
 
-          if ((!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
+          if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !IS_SET(world[ch->in_room].room_flags, SAFE) &&
                !IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked !IS_NPC first
+              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
                ))
           {
             int i = 0;
@@ -580,7 +580,7 @@ void mobile_activity(void)
               }
               break;
             }
-          } // If !IS_NPC(tmp_ch)
+          } // If IS_PC(tmp_ch)
         }   // for() for the RACIST, AGG_XXX and FRIENDLY flags
 
     // Note, if you add anything to this point, you need to put if(done) continue

@@ -1816,7 +1816,7 @@ int do_look(Character *ch, char *argument, int cmd)
          else
             send_to_char("None.", ch);
          send_to_char("\n\r", ch);
-         if (!IS_NPC(ch) && ch->hunting)
+         if (IS_PC(ch) && ch->hunting)
             do_track(ch, ch->hunting, 10);
       }
          ch->in_room = original_loc;
@@ -1985,7 +1985,7 @@ int do_score(Character *ch, char *argument, int cmd)
            GET_ALIGNMENT(ch));
    send_to_char(buf, ch);
 
-   if (!IS_NPC(ch)) // mobs can't view this part
+   if (IS_PC(ch)) // mobs can't view this part
    {
       QString experience_needed;
       if (ch->isImplementer())
@@ -2265,7 +2265,7 @@ int do_score(Character *ch, char *argument, int cmd)
    if (found)
       send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
 
-   if (!IS_NPC(ch)) // mob can't view this part
+   if (IS_PC(ch)) // mob can't view this part
    {
       if (GET_LEVEL(ch) > IMMORTAL && ch->player->buildLowVnum && ch->player->buildHighVnum)
       {
@@ -2726,7 +2726,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
    for (auto &i : character_list)
    {
 
-      if ((!IS_NPC(i) &&
+      if ((IS_PC(i) &&
            (cmd != 18 || !CAN_SEE(ch, i))))
          continue;
 
@@ -2920,7 +2920,7 @@ int do_consider(Character *ch, char *argument, int cmd)
    if (Learned > 40)
    {
 
-      if (!IS_NPC(victim) && GET_LEVEL(victim) > IMMORTAL)
+      if (IS_PC(victim) && GET_LEVEL(victim) > IMMORTAL)
       {
          csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\r\n",
                 GET_SHORT(victim));
@@ -3381,7 +3381,7 @@ void check_champion_and_website_who_list()
    for (auto &ch : character_list)
    {
 
-      if (!IS_NPC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
+      if (IS_PC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
       {
          buf << GET_SHORT(ch) << endl;
       }

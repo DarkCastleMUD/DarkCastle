@@ -146,7 +146,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
     send_to_char("Yes, but WHAT do you want to say?\n\r", ch);
   else
   {
-    if (!IS_NPC(ch))
+    if (IS_PC(ch))
       MOBtrigger = false;
 
     if (IS_IMMORTAL(ch))
@@ -157,13 +157,13 @@ command_return_t do_say(Character *ch, string argument, int cmd)
     buf = fmt::format("$B$7$n says '{}$B$7'$R", argument.c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
 
-    if (!IS_NPC(ch))
+    if (IS_PC(ch))
       MOBtrigger = false;
 
     buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
     act(buf, ch, 0, 0, TO_CHAR, 0);
 
-    if (!IS_NPC(ch))
+    if (IS_PC(ch))
     {
       MOBtrigger = true;
       retval = mprog_speech_trigger(argument.c_str(), ch);
@@ -171,7 +171,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
         return SWAP_CH_VICT(retval);
     }
 
-    if (!IS_NPC(ch))
+    if (IS_PC(ch))
     {
       MOBtrigger = true;
       retval = oprog_speech_trigger(argument.c_str(), ch);
@@ -230,22 +230,22 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
     messageStr = remove_all_codes(messageStr);
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     MOBtrigger = false;
   buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_VICT, 0);
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     MOBtrigger = false;
   buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
   act(buf, ch, 0, victim, TO_CHAR, 0);
   MOBtrigger = true;
-  //   if(!IS_NPC(ch)) {
+  //   if(IS_PC(ch)) {
   //     retval = mprog_speech_trigger( message, ch );
   //     MOBtrigger = true;
   //     if(SOMEONE_DIED(retval))
@@ -340,7 +340,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
@@ -446,7 +446,7 @@ int do_auction(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
@@ -542,19 +542,19 @@ int do_shout(Character *ch, char *argument, int cmd)
     return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
   }
 
-  if (!IS_NPC(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_SILENCED))
   {
     send_to_char("You must have somehow offended the gods, for you "
                  "find yourself unable to!\n\r",
                  ch);
     return eSUCCESS;
   }
-  if (!IS_NPC(ch) && !(IS_SET(ch->misc, LogChannels::CHANNEL_SHOUT)))
+  if (IS_PC(ch) && !(IS_SET(ch->misc, LogChannels::CHANNEL_SHOUT)))
   {
     send_to_char("You told yourself not to SHOUT!!\n\r", ch);
     return eSUCCESS;
   }
-  if (!IS_NPC(ch) && GET_LEVEL(ch) < 3)
+  if (IS_PC(ch) && GET_LEVEL(ch) < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
                  "to shout.\r\n",
@@ -619,7 +619,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
     return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
@@ -719,7 +719,7 @@ int do_dream(Character *ch, char *argument, int cmd)
     do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
     return eSUCCESS;
   }
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
@@ -897,12 +897,12 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (!IS_NPC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL) && ch->level <= MAX_MORTAL)
+  if (IS_PC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL) && ch->level <= MAX_MORTAL)
   {
     send_to_char("The person is ignoring all tells right now.\r\n", ch);
     return eSUCCESS;
   }
-  else if (!IS_NPC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL))
+  else if (IS_PC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
     send_to_char("That player has tell channeled off btw...\r\n", ch);
@@ -934,7 +934,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       {
         buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
 
-        if (!IS_NPC(ch) && !IS_NPC(vict))
+        if (IS_PC(ch) && IS_PC(vict))
         {
           vict->player->last_tell = GET_NAME(ch);
         }
@@ -960,7 +960,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       else
       {
         buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
-        if (!IS_NPC(ch) && !IS_NPC(vict))
+        if (IS_PC(ch) && IS_PC(vict))
           vict->player->last_tell = GET_NAME(ch);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
@@ -990,7 +990,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       {
         buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
 
-        if (!IS_NPC(ch) && !IS_NPC(vict))
+        if (IS_PC(ch) && IS_PC(vict))
           vict->player->last_tell = GET_NAME(ch);
       }
       ansi_color(GREEN, vict);
@@ -1278,7 +1278,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
     return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     if (IS_SET(ch->player->punish, PUNISH_SILENCED))
     {

@@ -5147,7 +5147,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
       for (mob = world[room].people; mob; mob = mob->next_in_room)
       {
-        if (!IS_NPC(mob))
+        if (IS_PC(mob))
           continue;
 
         count = 0;
@@ -5372,7 +5372,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (!IS_NPC(k) ? "(PC)\n\r" : (!IS_MOB(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
+             (IS_PC(k) ? "(PC)\n\r" : (!IS_MOB(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
     }
   }
   strcat(buf, "\n\r");
@@ -5464,7 +5464,7 @@ int do_possess(Character *ch, char *argument, int cmd)
         }
       }
 
-      else if (victim->desc || (!IS_NPC(victim)))
+      else if (victim->desc || (IS_PC(victim)))
       {
         send_to_char(
             "You can't do that, the body is already in use!\n\r", ch);

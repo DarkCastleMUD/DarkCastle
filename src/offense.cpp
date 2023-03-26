@@ -195,12 +195,12 @@ int do_slay(Character *ch, char *argument, int cmd)
   }
   
 
-//  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
+//  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
 //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
 //     return eFAILURE;
 //  }
 
-  if (IS_AFFECTED(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master)) {
      act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
      return eFAILURE;
   }
@@ -251,12 +251,12 @@ int do_kill(Character *ch, char *argument, int cmd)
   }
   
 
-//  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
+//  if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim)) {
 //     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
 //     return eFAILURE;
 //  }
 
-  if (IS_AFFECTED(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && IS_PC(ch->master)) {
      act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
      return eFAILURE;
   }
@@ -361,7 +361,7 @@ int do_join(Character *ch, char *argument, int cmd)
   }
 
 
- // if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
+ // if (IS_AFFECTED(ch, AFF_CHARM) && IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && IS_PC(victim->fighting)) {
  //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
  //    return eFAILURE;
  // }

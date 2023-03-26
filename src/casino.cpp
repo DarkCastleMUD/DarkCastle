@@ -142,7 +142,7 @@ void free_player(struct player_data *plr)
       }
       prev = tmp;
    }
-   if (plr->ch && charExists(plr->ch) && !IS_NPC(plr->ch))
+   if (plr->ch && charExists(plr->ch) && IS_PC(plr->ch))
    {
       plr->ch->save(666);
    }
@@ -1298,7 +1298,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          int i = 0;
          for (tmpch = world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
-            if (!IS_NPC(tmpch))
+            if (IS_PC(tmpch))
                i++;
          if (i <= players(obj->table))
             add_timer_bj_dealer2(obj->table, 2); // end bets in 1 secs
@@ -1312,7 +1312,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          int i = 0;
          for (tmpch = world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
-            if (!IS_NPC(tmpch))
+            if (IS_PC(tmpch))
                i++;
          if (i <= players(obj->table))
          {
