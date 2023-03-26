@@ -5672,7 +5672,7 @@ void free_char(Character *ch, Trace trace)
 			delete ch->player;
 		}
 	}
-	else
+	else if (ch->mobdata != nullptr)
 	{
 		remove_memory(ch, 'f');
 		remove_memory(ch, 'h');
@@ -5685,6 +5685,10 @@ void free_char(Character *ch, Trace trace)
 			ch->mobdata->mpact = currmprog;
 		}
 		delete ch->mobdata;
+	}
+	else
+	{
+		logf(IMMORTAL, LogChannels::LOG_BUG, QString("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
 	}
 
 	if (ch->title)
