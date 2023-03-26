@@ -618,17 +618,17 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          }
 
          if (IS_AFFECTED(i, AFF_INVISIBLE))
-            buffer.append(" $1(invisible)");
+            buffer.append(" $1(invisible) ");
          if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80) || GET_LEVEL(ch) > IMMORTAL || ARE_GROUPED(i, ch)))
-            buffer.append("$4 (hidden)");
+            buffer.append(" $4(hidden) ");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
-            buffer.append("$B$4(Red Halo) ");
+            buffer.append(" $B$4(red halo) ");
          if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i))
-            buffer.append("$B$1(Blue Halo) ");
+            buffer.append(" $B$1(blue halo) ");
          if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i))
-            buffer.append("$B$5(Yellow Halo) ");
+            buffer.append(" $B$5(yellow halo) ");
          if (IS_AFFECTED(i, AFF_CHAMPION))
-            buffer.append("$B$4(Champion) ");
+            buffer.append(" $B$4(Champion) ");
 
          buffer.append("$R\n\r");
          send_to_char(buffer.c_str(), ch);
@@ -647,13 +647,13 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          }
 
          if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80)
-            buffer.append("$4(hidden) $3");
+            buffer.append(" $4(hidden) $3");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
-            buffer.append("$B$4(Red Halo)$3 ");
+            buffer.append(" $B$4(red halo)$3 ");
          if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i))
-            buffer.append("$B$1(Blue Halo)$3 ");
+            buffer.append(" $B$1(blue halo)$3 ");
          if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i))
-            buffer.append("$B$5(Yellow Halo)$3 ");
+            buffer.append(" $B$5(yellow halo)$3 ");
 
          buffer.append(i->long_desc);
 
@@ -745,7 +745,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
                {
                   send_to_char(where[j], ch);
                   show_obj_to_char(i->equipment[j], ch, 1);
-               }
+               }               
             }
          }
       }
