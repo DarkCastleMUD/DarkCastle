@@ -301,7 +301,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((GET_COND(ch, FULL) >= 24) && (GET_COND(ch, THIRST) >= 24) && !IS_NPC(ch))
+  if ((GET_COND(ch, FULL) >= 24) && (GET_COND(ch, THIRST) >= 24) && IS_PC(ch))
   {
     act("Your stomach is too full to quaff that!", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -889,7 +889,7 @@ int do_name(Character *ch, char *arg, int cmd)
   }
 
   // only free PC short descs
-  if (GET_SHORT_ONLY(ch) && !IS_NPC(ch))
+  if (GET_SHORT_ONLY(ch) && IS_PC(ch))
     dc_free(GET_SHORT_ONLY(ch));
 
   if (IS_NPC(ch))
@@ -1644,7 +1644,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     return;
   }
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
   {
     if (GET_LEVEL(ch) < obj_object->obj_flags.eq_level)
     {

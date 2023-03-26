@@ -506,7 +506,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
     send_to_char("Noone here by that name.\r\n", ch);
     return eSUCCESS;
   }
-  if (!IS_NPC(victim))
+  if (IS_PC(victim))
   {
     send_to_char("The Gods prohibit such evil.\r\n", ch);
     return eSUCCESS;
@@ -2867,7 +2867,7 @@ int mob_summoner(Character *ch, class Object *obj, int cmd, const char *arg, Cha
 
   // see if we have any players in room
   for (vict = world[obj->in_room].people; vict; vict = vict->next_in_room)
-    if (!IS_NPC(vict))
+    if (IS_PC(vict))
       break;
 
   // no?  reset pulse state and get out
@@ -3860,7 +3860,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
     }
 
-    if (!IS_NPC(vict))
+    if (IS_PC(vict))
       for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           send_to_char("You hear a large BOOM from somewhere in the distance.\r\n", i->character);
@@ -4652,7 +4652,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
       send_to_char("You have been KILLED!!\n\r\n\r", victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return eSUCCESS | eVICT_DIED;
@@ -4705,7 +4705,7 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
       send_to_char("You have been KILLED!!\n\r\n\r", victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return eSUCCESS | eVICT_DIED;

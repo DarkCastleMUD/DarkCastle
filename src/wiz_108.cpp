@@ -344,7 +344,7 @@ int do_set(Character *ch, char *argument, int cmd)
   if (GET_LEVEL(ch) < GET_LEVEL(vict))
   {
     send_to_char("Get real! You ain't that big.\r\n", ch);
-    if (!IS_NPC(vict))
+    if (IS_PC(vict))
     {
       sprintf(buf2, "%s just tried to set: %s\n\r", GET_NAME(ch), buf);
       send_to_char(buf2, vict);
@@ -352,7 +352,7 @@ int do_set(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_NPC(vict) && (GET_LEVEL(vict) == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
+  if (IS_PC(vict) && (GET_LEVEL(vict) == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
   {
     send_to_char("Forget it dweeb.\r\n", ch);
     return eFAILURE;
@@ -486,7 +486,7 @@ int do_set(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
-    if (!IS_NPC(vict) && value > GET_LEVEL(ch))
+    if (IS_PC(vict) && value > GET_LEVEL(ch))
     {
       send_to_char("That level is higher than you!\n\r", ch);
       return eFAILURE;

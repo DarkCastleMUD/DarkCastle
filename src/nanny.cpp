@@ -2249,7 +2249,7 @@ void update_characters()
       }
 
       // handle drowning
-      if (!IS_NPC(i) && GET_LEVEL(i) < IMMORTAL && world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
+      if (IS_PC(i) && GET_LEVEL(i) < IMMORTAL && world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
       {
          tmp = GET_MAX_HIT(i) / 5;
          sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
@@ -2442,7 +2442,7 @@ void checkConsecrate(int pulseType)
                      {
                         act("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
                         act("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
-                        if (!IS_NPC(tmp_ch))
+                        if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
                            send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);
@@ -2498,7 +2498,7 @@ void checkConsecrate(int pulseType)
                      {
                         act("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
                         act("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
-                        if (!IS_NPC(tmp_ch))
+                        if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
                            send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);

@@ -1018,7 +1018,7 @@ bool load_char_obj(class Connection *d, const char *name)
   ch->store_to_char_variable_data(fpsave);
   read_pc_or_mob_data(ch, fpsave);
 
-  if (!IS_NPC(ch) && ch->player->time.logon < 1117527906)
+  if (IS_PC(ch) && ch->player->time.logon < 1117527906)
   {
     extern int do_clearaff(Character * ch, char *argument, int cmd);
     do_clearaff(ch, "", 9);

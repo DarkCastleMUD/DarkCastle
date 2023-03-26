@@ -310,7 +310,7 @@ int do_zap(Character *ch, char *argument, int cmd)
 
   if (victim)
   {
-    if (!IS_NPC(victim) && (GET_LEVEL(ch) < GET_LEVEL(victim)))
+    if (IS_PC(victim) && (GET_LEVEL(ch) < GET_LEVEL(victim)))
     {
       act("$n casts a massive lightning bolt at you.", ch, 0, victim,
           TO_VICT, 0);
@@ -325,7 +325,7 @@ int do_zap(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!IS_NPC(victim))
+    if (IS_PC(victim))
     {
       sprintf(buf, "A massive bolt of lightning arcs down from the "
                    "heavens, striking you\n\rbetween the eyes. You have "

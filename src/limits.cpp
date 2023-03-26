@@ -74,7 +74,7 @@ int32_t mana_limit(Character *ch)
 {
 	int max;
 
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 		max = (ch->max_mana);
 	else
 		max = (ch->max_mana);
@@ -92,7 +92,7 @@ int32_t hit_limit(Character *ch)
 {
 	int max;
 
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 		max = (ch->max_hit) + (graf(age(ch).year, 2, 4, 17, 14, 8, 4, 3));
 	else
 		max = (ch->max_hit);
@@ -108,7 +108,7 @@ int32_t move_limit(Character *ch)
 {
 	int max;
 
-	if (!IS_NPC(ch))
+	if (IS_PC(ch))
 		/* HERE SHOULD BE CON CALCULATIONS INSTEAD */
 		max = (ch->max_move) + graf(age(ch).year, 50, 70, 160, 120, 100, 40, 20);
 	else
@@ -645,7 +645,7 @@ void gain_exp(Character *ch, int64_t gain)
 	int x = 0;
 	int64_t y;
 
-	if (!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+	if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
 		return;
 
 	y = exp_table[GET_LEVEL(ch) + 1];
@@ -664,7 +664,7 @@ void gain_exp(Character *ch, int64_t gain)
 
 	void golem_gain_exp(Character * ch);
 
-	if (!IS_NPC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
+	if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->player->golem, gain);
 
 	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
@@ -822,7 +822,7 @@ void point_update(void)
 
 		int a;
 		Character *temp;
-		if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
+		if (IS_PC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
 		{
 			int o;
 			for (o = 0; o < MAX_HIDE; o++)
@@ -1010,7 +1010,7 @@ void update_corpses_and_portals(void)
 
 void prepare_character_for_sixty(Character *ch)
 {
-	if (!IS_NPC(ch) && MAX_MORTAL == 60)
+	if (IS_PC(ch) && MAX_MORTAL == 60)
 	{
 		int skl = -1;
 		switch (GET_CLASS(ch))

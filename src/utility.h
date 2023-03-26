@@ -208,7 +208,7 @@ bool IS_DARK(int room);
 // #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
 // #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
-#define IS_PC(ch) (!IS_NPC(ch))
+#define IS_PC(ch) (!IS_NPC(ch) && ch->player != nullptr)
 #define IS_NPC(ch) (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch) (IS_NPC(ch))
 #define IS_OBJ(ch) (IS_SET((ch)->misc, MISC_IS_OBJ))

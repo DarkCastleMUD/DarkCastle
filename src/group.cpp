@@ -416,7 +416,7 @@ int do_group(Character *ch, char *argument, int cmd)
         act("$n is now a group member.", victim, 0, 0, TO_ROOM, 0);
         act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
         SETBIT(victim->affected_by, AFF_GROUP);
-        if (!IS_NPC(victim))
+        if (IS_PC(victim))
           REMOVE_BIT(victim->player->toggles, PLR_LFG);
       }
       return eSUCCESS;
@@ -522,7 +522,7 @@ int do_promote(Character *ch, char *argument, int cmd)
   for (f = ch->followers; f; f = next_f)
   {
     next_f = f->next;
-    if (!IS_NPC(f->follower))
+    if (IS_PC(f->follower))
     {
       k = f->follower;
       stop_follower(k, CHANGE_LEADER);
@@ -592,7 +592,7 @@ int do_disband(Character *ch, char *argument, int cmd)
     for (f = k->followers; f; f = next_f)
     {
       next_f = f->next;
-      if (!IS_NPC(f->follower))
+      if (IS_PC(f->follower))
       {
         stop_grouped_bards(f->follower, 1);
         stop_follower(f->follower, STOP_FOLLOW);

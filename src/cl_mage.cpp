@@ -310,7 +310,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     REMOVE_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
     affect_from_char(i, SPELL_ETHEREAL_FOCUS);
 
-    if(!IS_NPC(i) && !i->desc) // don't work if I'm linkdead
+    if(IS_PC(i) && !i->desc) // don't work if I'm linkdead
       break;
 
 
@@ -352,7 +352,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
       if(ally == ch || ally == i || ally->fighting || GET_POS(ally) != POSITION_STANDING ||
-         ( !IS_NPC(ally) && !ally->desc ) // linkdead groupies won't help
+         ( IS_PC(ally) && !ally->desc ) // linkdead groupies won't help
         )
         continue;
       // TODO - skip anyone with this toggle turned off

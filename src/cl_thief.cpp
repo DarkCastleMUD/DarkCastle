@@ -114,7 +114,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
-  if (!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY)))
+  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | eSUCCESS;
 }
@@ -208,7 +208,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
 
   int itemp = number(1, 100);
-  if (!IS_NPC(ch) && !IS_NPC(victim))
+  if (IS_PC(ch) && IS_PC(victim))
   {
     if (GET_LEVEL(victim) > GET_LEVEL(ch))
       itemp = 0; // not gonna happen
@@ -230,7 +230,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((!IS_NPC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHANGEL) || (IS_NPC(ch) && GET_LEVEL(ch) > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
+  if ((((IS_PC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHANGEL) || (IS_NPC(ch) && GET_LEVEL(ch) > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
   {
     if (skill_success(ch, victim, SKILL_DUAL_BACKSTAB) || IS_NPC(ch))
     {
@@ -257,7 +257,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
   // success
   else if (
-      ((GET_LEVEL(victim) < IMMORTAL && !IS_NPC(victim)) || IS_NPC(victim)) && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 19) && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || (!IS_NPC(victim) && IS_SET(victim->player->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING))))
+      ((GET_LEVEL(victim) < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 19) && ((IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && IS_SET(victim->player->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -759,7 +759,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   /* See how well it worked on those currently in the room. */
   int a, i;
   Character *temp;
-  if (!IS_NPC(ch) && (a = has_skill(ch, SKILL_HIDE)))
+  if (IS_PC(ch) && (a = has_skill(ch, SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = nullptr;
@@ -886,7 +886,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  /*  if(!IS_NPC(victim) &&
+  /*  if(IS_PC(victim) &&
       !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
       send_to_char("That person is not really there.\r\n", ch);
       return eFAILURE;
@@ -956,7 +956,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         {
           move_obj(obj, ch);
 
-          if (!IS_NPC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+          if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
             _exp = GET_OBJ_WEIGHT(obj) * 1000;
           else
             _exp = (GET_OBJ_WEIGHT(obj) * 1000);
@@ -972,7 +972,7 @@ int do_steal(Character *ch, char *argument, int cmd)
             send_to_char(buf, ch);
           }
 
-          if (!IS_NPC(victim))
+          if (IS_PC(victim))
           {
             victim->save(666);
             ch->save(666);
@@ -1006,7 +1006,7 @@ int do_steal(Character *ch, char *argument, int cmd)
                 affect_to_char(ch, &pthiefaf);
             }
           }
-          if (!IS_NPC(victim))
+          if (IS_PC(victim))
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%d] from %s",
@@ -1172,7 +1172,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
         act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), ch);
-        if (!IS_NPC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+        if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
@@ -1346,7 +1346,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  /*if(!IS_NPC(victim) &&
+  /*if(IS_PC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
     send_to_char("That person is not really there.\r\n", ch);
     return eFAILURE;
@@ -1395,7 +1395,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
       ch->addGold(gold);
       victim->removeGold(gold);
       _exp = gold / 100 * GET_LEVEL(victim) / 5;
-      if (!IS_NPC(victim))
+      if (IS_PC(victim))
         _exp = 0;
       if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
         _exp = 1;
@@ -1411,7 +1411,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
         send_to_char(buf, ch);
       }
 
-      if (!IS_NPC(victim))
+      if (IS_PC(victim))
       {
         victim->save(666);
         ch->save(666);
@@ -2187,7 +2187,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   // if the victim died and the character did not die
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
-    if (!IS_NPC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY))
+    if (IS_PC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }

@@ -969,7 +969,7 @@ void affect_update(int32_t duration_type)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
     // That way we don't have to traverse the entire list all over again
-    if (duration_type == DC::PULSE_TIME && !IS_NPC(i))
+    if (duration_type == DC::PULSE_TIME && IS_PC(i))
       update_char_objects(i);
 
     for (af = i->affected; af; af = next_af_dude)
@@ -1718,7 +1718,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   }
   int i = 0, learned = 0;
 
-  // if (!IS_NPC(ch)) debug_point();
+  // if (IS_PC(ch)) debug_point();
   if (!IS_MOB(ch))
   {
     i = learned = has_skill(ch, skillnum);
@@ -1747,7 +1747,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
     i -= stat_mod[get_stat(victim, stat)] * GET_LEVEL(ch) / 60; // less impact on low levels..
   i += mod;
 
-  if (!IS_NPC(ch))
+  if (IS_PC(ch))
     i = 50 + i / 2;
 
   if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DUAL_WIELD)
@@ -1854,7 +1854,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < ARCHANGEL && (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (GET_LEVEL(ch) < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {

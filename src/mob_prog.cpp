@@ -574,7 +574,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		else if (!str_cmp(right, "actflags1"))
 		{
-			if (!target || !IS_NPC(target))
+			if (!target || IS_PC(target))
 				tError = true;
 			else
 			{
@@ -584,7 +584,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		else if (!str_cmp(right, "actflags2"))
 		{
-			if (!target || !IS_NPC(target))
+			if (!target || IS_PC(target))
 				tError = true;
 			else
 			{
@@ -1651,7 +1651,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int vnum = atoi(arg);
 		for (te = world[mob->in_room].people; te; te = te->next)
 		{
-			if (!IS_NPC(te))
+			if (IS_PC(te))
 				continue;
 			if (mob_index[te->mobdata->nr].virt == vnum)
 			{
@@ -1752,7 +1752,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Character *p;
 		int count = 0;
 		for (p = world[mob->in_room].people; p; p = p->next_in_room)
-			if (!IS_NPC(p))
+			if (IS_PC(p))
 				count++;
 		return mprog_veval(count, opr, atoi(val));
 	}
@@ -1813,7 +1813,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eISPC:
 		if (fvict)
-			return !IS_NPC(fvict);
+			return IS_PC(fvict);
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
@@ -1827,27 +1827,27 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				return -1;
 		case 'n':
 			if (actor)
-				return (!IS_NPC(actor));
+				return (IS_PC(actor));
 			else
 				return 0;
 		case 't':
 			if (vict)
-				return (!IS_NPC(vict));
+				return (IS_PC(vict));
 			else
 				return 0;
 		case 'r':
 			if (rndm)
-				return (!IS_NPC(rndm));
+				return (IS_PC(rndm));
 			else
 				return 0;
 		case 'f':
 			if (actor && actor->fighting)
-				return (!IS_NPC(actor->fighting));
+				return (IS_PC(actor->fighting));
 			else
 				return 0;
 		case 'g':
 			if (mob && mob->fighting)
-				return (!IS_NPC(mob->fighting));
+				return (IS_PC(mob->fighting));
 			else
 				return 0;
 		default:
@@ -2690,7 +2690,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int lhsvl, rhsvl;
 		if (fvict)
 		{
-			if (!IS_NPC(fvict))
+			if (IS_PC(fvict))
 				return 0;
 			lhsvl = mob_index[fvict->mobdata->nr].virt;
 			rhsvl = atoi(val);
@@ -3350,7 +3350,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 			// Mobs can see them no matter what.  Use "cansee()" if you don't want that
 			//	   if ( CAN_SEE( mob,actor ) )
 			one_argument(actor->name, t);
-			if (!IS_NPC(actor))
+			if (IS_PC(actor))
 				*t = UPPER(*t);
 		}
 		else
@@ -3379,7 +3379,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		{
 			if (CAN_SEE(mob, vict))
 				one_argument(vict->name, t);
-			if (!IS_NPC(vict))
+			if (IS_PC(vict))
 				*t = UPPER(*t);
 		}
 		else
@@ -3408,7 +3408,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		{
 			if (CAN_SEE(mob, actor->fighting))
 				one_argument(actor->fighting->name, t);
-			if (!IS_NPC(actor->fighting))
+			if (IS_PC(actor->fighting))
 				*t = UPPER(*t);
 		}
 		break;
@@ -3433,7 +3433,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		{
 			if (CAN_SEE(mob, mob->fighting))
 				one_argument(mob->fighting->name, t);
-			if (!IS_NPC(mob->fighting))
+			if (IS_PC(mob->fighting))
 				*t = UPPER(*t);
 		}
 		break;
@@ -3458,7 +3458,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		{
 			if (CAN_SEE(mob, rndm))
 				one_argument(rndm->name, t);
-			if (!IS_NPC(rndm))
+			if (IS_PC(rndm))
 				*t = UPPER(*t);
 		}
 		break;
@@ -3906,7 +3906,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 	if (mob->in_room > 0)
 	{
 		for (vch = world[mob->in_room].people; vch; vch = vch->next_in_room)
-			if (CAN_SEE(mob, vch, true) && !IS_NPC(vch))
+			if (CAN_SEE(mob, vch, true) && IS_PC(vch))
 				count++;
 
 		if (count)
@@ -3916,7 +3916,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 		{
 			for (vch = world[mob->in_room].people; vch && count;)
 			{
-				if (CAN_SEE(mob, vch, true) && !IS_NPC(vch))
+				if (CAN_SEE(mob, vch, true) && IS_PC(vch))
 					count--;
 				if (count)
 					vch = vch->next_in_room;

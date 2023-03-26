@@ -458,7 +458,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  //    if (!IS_NPC(ch))
+  //    if (IS_PC(ch))
   if (!ch->equipment[WIELD])
   {
     send_to_char("You need to wield a weapon, to make it a success.\r\n", ch);
@@ -785,7 +785,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
     if (((IS_SET(wielded->obj_flags.extra_flags, ITEM_NODROP) || IS_SET(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (GET_LEVEL(victim) >= IMMORTAL)) &&
-        (!IS_NPC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
+        (IS_PC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
          mob_index[victim->mobdata->nr].virt < 2300))
       send_to_char("You can't seem to work it loose.\r\n", ch);
     else
@@ -841,7 +841,7 @@ int do_rescue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_NPC(ch) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
+  if (IS_PC(ch) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
   {
     send_to_char("Doesn't need your help!\n\r", ch);
     return eFAILURE;
