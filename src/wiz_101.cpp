@@ -24,7 +24,6 @@
 #include "const.h"
 
 using namespace std;
-using namespace fmt;
 
 queue<string> imm_history;
 queue<string> imp_history;
@@ -187,7 +186,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       loc_nr = zone.getRealBottom();
     }
 
-    send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name))));
+    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name))));
 
     if (loc_nr > top_of_world || loc_nr < 0)
     {

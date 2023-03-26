@@ -30,8 +30,6 @@
 #include "bandwidth.h"
 #endif
 
-using namespace fmt;
-
 void AuctionHandleDelete(string name);
 
 int do_linkload(Character *ch, char *arg, int cmd)
@@ -110,7 +108,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
     logentry("Unable to open whassup.txt for adding in do_processes!", IMPLEMENTER,
-        LogChannels::LOG_BUG);
+             LogChannels::LOG_BUG);
     return eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
@@ -125,7 +123,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
     logentry("Unable to open whassup.txt for reading in do_processes!", IMPLEMENTER,
-        LogChannels::LOG_BUG);
+             LogChannels::LOG_BUG);
     return eFAILURE;
   }
   tmp = fread_string(fl, 0);
@@ -478,7 +476,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
           {
             if (follower->carrying != nullptr)
             {
-              ch->send(format("Player {} has charmie {} with equipment.\r\n", GET_NAME(ch), GET_NAME(follower)));
+              ch->send(fmt::format("Player {} has charmie {} with equipment.\r\n", GET_NAME(ch), GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -550,7 +548,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
           {
             if (follower->carrying != nullptr)
             {
-              ch->send(format("Player {} has charmie {} with equipment. Use Force to override.\r\n", GET_NAME(ch), GET_NAME(follower)));
+              ch->send(fmt::format("Player {} has charmie {} with equipment. Use Force to override.\r\n", GET_NAME(ch), GET_NAME(follower)));
               return eFAILURE;
             }
           }

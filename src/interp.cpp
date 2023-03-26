@@ -49,7 +49,6 @@
 #include "const.h"
 
 using namespace std;
-using namespace fmt;
 
 #define SKILL_HIDE 337
 
@@ -1005,7 +1004,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
       // Next bit for the DUI client, they needed it.
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
-        ch->send(format("{}{}", BOLD, NTEXT));
+        ch->send(fmt::format("{}{}", BOLD, NTEXT));
       }
       // This call is here to prevent gcc from tail-chaining the
       // previous call, which screws up the debugger call stack.

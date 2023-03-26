@@ -59,7 +59,6 @@
 #include "obj.h"
 
 using namespace std;
-using namespace fmt;
 
 #define BEACON_OBJ_NUMBER 405
 
@@ -3148,7 +3147,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
   if (GET_LEVEL(ch) >= IMMORTAL)
   {
-    ch->send(format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
+    ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
 
   return eSUCCESS;

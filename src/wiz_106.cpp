@@ -16,7 +16,6 @@
 #include <fmt/format.h>
 
 using namespace std;
-using namespace fmt;
 
 int do_plats(Character *ch, char *argument, int cmd)
 {
@@ -94,19 +93,19 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
       if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && IS_PC(vict))
       {
         send_to_char("Why be forceful?\n\r", ch);
-        buf = format("$n has failed to force you to '{}'.", to_force);
+        buf = fmt::format("$n has failed to force you to '{}'.", to_force);
         act(buf, ch, 0, vict, TO_VICT, 0);
       }
       else
       {
         if (ch->player->stealth == false)
         {
-          buf = format("$n has forced you to '{}'.", to_force);
+          buf = fmt::format("$n has forced you to '{}'.", to_force);
           act(buf, ch, 0, vict, TO_VICT, 0);
           send_to_char("Ok.\r\n", ch);
         }
-        buf = format("{} just forced %s to %s.", GET_NAME(ch),
-                     GET_NAME(vict), to_force);
+        buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
+                          GET_NAME(vict), to_force);
         command_interpreter(vict, to_force);
         logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
       }
@@ -132,7 +131,7 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
         {
           if (ch->player->stealth == false || GET_LEVEL(ch) < 109)
           {
-            buf = format("$n has forced you to '{}'.", to_force);
+            buf = fmt::format("$n has forced you to '{}'.", to_force);
             act(buf, ch, 0, vict, TO_VICT, 0);
           }
           command_interpreter(vict, to_force);
@@ -140,7 +139,7 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
       }
     }
     send_to_char("Ok.\r\n", ch);
-    buf = format("{} just forced all to {}.", GET_NAME(ch), to_force);
+    buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
     logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   return eSUCCESS;

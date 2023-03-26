@@ -745,7 +745,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
                {
                   send_to_char(where[j], ch);
                   show_obj_to_char(i->equipment[j], ch, 1);
-               }               
+               }
             }
          }
       }

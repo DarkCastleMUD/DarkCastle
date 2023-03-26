@@ -5,8 +5,6 @@
 
 #include <fmt/format.h>
 
-using namespace fmt;
-
 #include "wizard.h"
 #include "utility.h"
 #include "mobile.h"

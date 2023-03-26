@@ -60,7 +60,6 @@
 #include "Trace.h"
 
 using namespace std;
-using namespace fmt;
 
 // Extern variables
 

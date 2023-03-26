@@ -45,7 +45,6 @@
 #include "newedit.h"
 
 using namespace std;
-using namespace fmt;
 
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
@@ -1970,7 +1969,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
     if (ch->player->last_obj_vnum != vnum)
     {
-      ch->send(format("$3Current obj set to:$R {}\r\n", vnum));
+      ch->send(fmt::format("$3Current obj set to:$R {}\r\n", vnum));
       ch->player->last_obj_vnum = vnum;
     }
   }

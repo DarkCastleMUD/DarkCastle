@@ -24,7 +24,6 @@
 #include "corpse.h"
 
 using namespace std;
-using namespace fmt;
 
 int count_rooms(int start, int end)
 {
@@ -1840,7 +1839,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 			if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
 			{
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-				ch->send(format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+				ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
 				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1867,7 +1866,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 	}
 
 	act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-	ch->send(format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+	ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
 	move_char(victim, destination_room);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
