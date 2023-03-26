@@ -1613,7 +1613,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   if (!is_mob && !IS_SET(retval, eCH_DIED))
   { // if it was a mob, we might have died moving
-    act("$n appears out of DC::NOWHERE.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     do_look(victim, "", 0);
   }
   return retval;

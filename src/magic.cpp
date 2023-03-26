@@ -4280,7 +4280,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
       {
         act("$n disappears.", victim->player->golem, 0, 0, TO_ROOM, INVIS_NULL);
         move_char(victim->player->golem, location);
-        act("$n appears out of DC::NOWHERE.", victim->player->golem, 0, 0, TO_ROOM, INVIS_NULL);
+        act("$n appears out of nowhere.", victim->player->golem, 0, 0, TO_ROOM, INVIS_NULL);
         GET_MANA(victim) -= 50;
       }
     }
@@ -4288,7 +4288,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   /* a location has been found. */
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   move_char(victim, location);
-  act("$n appears out of DC::NOWHERE.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   do_look(victim, "", 15);
   return eSUCCESS;
 }
@@ -12723,7 +12723,7 @@ void familiar_creation_message(Character *ch, int fam_type)
                  ch);
     break;
   case FAMILIAR_MOB_CHIPMUNK:
-    act("$n coaxs a chipmunk from DC::NOWHERE and gives it an acorn to eat.\r\n"
+    act("$n coaxs a chipmunk from nowhere and gives it an acorn to eat.\r\n"
         "A small chipmunk eats the acorn and looks at $n lovingly.",
         ch, 0, 0, TO_ROOM, 0);
     send_to_char("You whistle a little tune summoning a chipmunk to you and give it an acorn.\r\n"

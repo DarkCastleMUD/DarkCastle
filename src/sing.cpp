@@ -1748,7 +1748,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	do_look(victim, "", CMD_DEFAULT);
 	WAIT_STATE(victim, DC::PULSE_VIOLENCE);
-	act("$n appears out of DC::NOWHERE in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
+	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
 int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
