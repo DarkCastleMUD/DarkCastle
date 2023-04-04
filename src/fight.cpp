@@ -4343,8 +4343,8 @@ void make_scraps(Character *ch, class Object *obj)
   return;
 }
 
-#define MAX_NPC_CORPSE_TIME 7
-#define MAX_PC_CORPSE_TIME 7
+static constexpr uint64_t MAX_NPC_CORPSE_TIME = 10;
+static constexpr uint64_t MAX_PC_CORPSE_TIME = 30;
 
 void make_corpse(Character *ch)
 {
@@ -4356,6 +4356,7 @@ void make_corpse(Character *ch)
 
   corpse = new Object;
   clear_object(corpse);
+  corpse->setOwner(GET_NAME(ch));
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;

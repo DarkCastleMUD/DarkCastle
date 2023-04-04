@@ -46,11 +46,20 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (!sub_object || sub_object->carried_by != ch)
   {
-    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(ch))
+    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
     {
-      send_to_char("You cannot get that item.\r\n", ch);
-      return;
+      if (IS_NPC(ch))
+      {
+        send_to_char("You cannot get that item.\r\n", ch);
+        return;
+      }
+      else if (obj_object->getOwner().isEmpty() == false && obj_object->getOwner() != GET_NAME(ch))
+      {
+        ch->send(QString("You cannot get that item because it's marked NO_TRADE and owned by %1\r\n").arg(obj_object->getOwner()));
+        return;
+      }
     }
+
     // we only have to check for uniqueness if the container is not on the character
     // or if there is no container
     if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
