@@ -151,13 +151,13 @@ void showObjectVault(const char *owner, Object *obj)
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.size,Object::size_bits, buf);
+  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
+  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
   cout << buf << ":";
 
   showObjectAffects(obj);
@@ -173,13 +173,13 @@ void showObject(Character *ch, Object *obj)
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.size,Object::size_bits, buf);
+  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
+  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
   cout << buf << ":";
 
   showObjectAffects(obj);
@@ -189,6 +189,8 @@ void showObject(Character *ch, Object *obj)
 
 int main(int argc, char **argv)
 {
+  DC dcastle(argc, argv);
+
   // Tests only
   if (argc < 2)
   {
