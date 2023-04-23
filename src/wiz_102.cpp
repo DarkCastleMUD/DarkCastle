@@ -5552,9 +5552,16 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
         continue;
     }
 
-    if (name.isEmpty() == false && QString(d->host).contains(name) == false && (d->character == nullptr || !isname(name, GET_NAME(d->character))))
+    if (name.isEmpty() == false)
     {
-      continue;
+      if (QString(d->host).contains(name) == false)
+      {
+        continue;
+      }
+      if (d->character != nullptr && isname(name, GET_NAME(d->character)) == false)
+      {
+        continue;
+      }
     }
 
     bool duplicate = false;
@@ -5580,7 +5587,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     {
       connection_character_name = "NONE";
     }
-    buf = QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->host, -15).arg(connection_character_name, -16);
+    buf += QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->host, -15).arg(connection_character_name, -16);
 
     if (const char *pStr = constindex(d->connected, connected_states))
     {
