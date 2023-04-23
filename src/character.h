@@ -565,6 +565,7 @@ public:
     command_return_t do_recall(QStringList arguments, int cmd);
     command_return_t do_cdeposit(QStringList arguments, int cmd);
     command_return_t generic_command(QStringList arguments, int cmd);
+    command_return_t do_sockets(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);

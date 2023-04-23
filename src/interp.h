@@ -540,7 +540,6 @@ command_return_t do_slip(Character *ch, char *argument, int cmd);
 command_return_t do_smite(Character *ch, char *argument, int cmd);
 command_return_t do_sneak(Character *ch, char *argument, int cmd);
 command_return_t do_snoop(Character *ch, char *argument, int cmd);
-command_return_t do_sockets(Character *ch, char *argument, int cmd);
 command_return_t do_spells(Character *ch, char *argument, int cmd);
 command_return_t do_sqedit(Character *ch, char *argument, int cmd);
 command_return_t do_stalk(Character *ch, char *argument, int cmd);

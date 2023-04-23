@@ -458,7 +458,7 @@ struct command_info cmd_info[] =
         {"range", do_range, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         // { "pshopedit",	do_pshopedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1  ,CommandType::all},
         {"sedit", do_sedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"sockets", do_sockets, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"sockets", nullptr, nullptr, &Character::do_sockets, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::immortals_only},
         {"punish", do_punish, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sqedit", do_sqedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"qedit", do_qedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},

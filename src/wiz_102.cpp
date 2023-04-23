@@ -5522,30 +5522,19 @@ int do_return(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sockets(Character *ch, char *argument, int cmd)
+command_return_t Character::do_sockets(QStringList arguments, int cmd)
 {
-  const char *pStr = 0;
-  int num_can_see = 0;
-
-  char name[200];
-  char buf[MAX_STRING_LENGTH];
-
-  Connection *d = 0, *ad = 0;
-
-  if (IS_NPC(ch))
+  QString name;
+  if (arguments.isEmpty() == false)
   {
-    send_to_char("Monsters don't care who's logged in.\r\n", ch);
-    return eFAILURE;
+    name = arguments.at(1);
   }
 
-  buf[0] = '\0';
-  name[0] = '\0';
-
-  one_argument(argument, name);
-
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  uint64_t num_can_see = 0;
+  QString buf;
+  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    if (GET_LEVEL(ch) < OVERSEER)
+    if (GET_LEVEL(this) < OVERSEER)
     {
       if (d->character == nullptr)
         continue;
@@ -5554,41 +5543,59 @@ int do_sockets(Character *ch, char *argument, int cmd)
     }
     if (d->character)
     {
-      if (!CAN_SEE(ch, d->character))
+      if (!CAN_SEE(this, d->character))
         continue;
-      if (GET_LEVEL(ch) < GET_LEVEL(d->character))
+      if (GET_LEVEL(this) < GET_LEVEL(d->character))
         continue;
       if ((d->connected != Connection::states::PLAYING) &&
-          (GET_LEVEL(ch) < GET_LEVEL(d->character)))
+          (GET_LEVEL(this) < GET_LEVEL(d->character)))
         continue;
     }
 
-    if (*name &&
-        !str_str(d->host, name) && (!d->character || !isname(name, GET_NAME(d->character))))
+    if (name.isEmpty() == false && QString(d->host).contains(name) == false && (d->character == nullptr || !isname(name, GET_NAME(d->character))))
+    {
       continue;
+    }
+
     bool duplicate = false;
-    for (ad = DC::getInstance()->descriptor_list; ad; ad = ad->next)
+    for (Connection *ad = DC::getInstance()->descriptor_list; ad != nullptr; ad = ad->next)
+    {
       if (ad != d && !str_cmp(d->host, ad->host))
-        if (!ad->character ||
-            GET_LEVEL(ad->character) <= GET_LEVEL(ch))
+      {
+        if (!ad->character || GET_LEVEL(ad->character) <= GET_LEVEL(this))
         {
           duplicate = true;
           break;
         }
+      }
+    }
     num_can_see++;
 
-    sprintf(buf + strlen(buf), "%s%3d : %-15s | %-16s$R |", duplicate ? "$B$4" : "", d->descriptor, d->host, (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
-
-    if ((pStr = constindex(d->connected, connected_states)))
-      sprintf(buf + strlen(buf), "%-20s |", pStr);
+    QString connection_character_name;
+    if (d && d->character && d->character->name)
+    {
+      connection_character_name = d->character->name;
+    }
     else
-      sprintf(buf + strlen(buf), "***UNKNOWN*** | ");
-    sprintf(buf + strlen(buf), "%d\r\n", d->idle_time / DC::PASSES_PER_SEC);
+    {
+      connection_character_name = "NONE";
+    }
+    buf = QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->host, -15).arg(connection_character_name, -16);
+
+    if (const char *pStr = constindex(d->connected, connected_states))
+    {
+      buf += QString("%1 |").arg(pStr, -20);
+    }
+    else
+    {
+      buf += "***UNKNOWN*** | ";
+    }
+    buf += QString("%1s\r\n").arg(d->idle_time / DC::PASSES_PER_SEC);
 
   } // for
 
-  sprintf(buf + strlen(buf), "\n\r\n\rThere are %d connections.\r\n", num_can_see);
-  page_string(ch->desc, buf, 1);
+  buf += QString("\n\r\n\rThere are %1 connections.\r\n").arg(num_can_see);
+  page_string(desc, buf.toStdString().c_str(), 1);
   return eSUCCESS;
 }
 
