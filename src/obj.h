@@ -273,6 +273,11 @@ public:
     uint64_t getLevel(void);
 
     int keywordfind(void);
+    void setOwner(QString owner) { owner_ = owner; }
+    QString getOwner(void) { return owner_; }
+
+private:
+    QString owner_;
 };
 
 /* For 'equipment' */

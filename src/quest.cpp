@@ -1134,6 +1134,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
                  "       qedit save                      (saves all quests)\n\r"
                  "       qedit stat <playername>         (show player's current qpoints)\n\r"
                  "       qedit set <playername> <value>  (alter player's current qpoints)\n\r"
+                 "       qedut reset <playername>\r\n"
                  "\n\r"
                  "Valid qedit fields:\n\r");
 
@@ -1212,6 +1213,30 @@ int do_qedit(Character *ch, char *argument, int cmd)
          csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->player->quest_points);
       }
       return eSUCCESS;
+   }
+
+   if (is_abbrev(arg, "reset"))
+   {
+      if (!*field)
+      {
+         send_to_char("Usage: qedit reset <playername>\n\r", ch);
+         return eFAILURE;
+      }
+      else
+      {
+         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         {
+            send_to_char("No living thing by that name.\r\n", ch);
+            return eFAILURE;
+         }
+
+         memset(vict->player->quest_cancel, 0, sizeof(vict->player->quest_cancel));
+         memset(vict->player->quest_complete, 0, sizeof(vict->player->quest_complete));
+
+         ch->send(QString("Reset quests for player %1\r\n").arg(GET_NAME(vict)));
+         vict->save(666);
+         return eSUCCESS;
+      }
    }
 
    if (is_abbrev(arg, "set"))

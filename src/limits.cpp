@@ -944,43 +944,52 @@ void update_corpses_and_portals(void)
 					{
 						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
+							/*
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
 							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
+							*/
+							jj->setOwner(j->getOwner());
 						}
-						else
-							move_obj(jj, j->in_obj);
+
+						move_obj(jj, j->in_obj);
 					}
 					else if (j->carried_by)
 					{
 						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
+							/*
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing->in_obj == jj)
 								next_thing = next_thing->next;
 							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
+							*/
+							jj->setOwner(j->getOwner());
 						}
-						else
-							move_obj(jj, j->carried_by);
+
+						move_obj(jj, j->carried_by);
 					}
 					else if (j->in_room != DC::NOWHERE)
 					{
 						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
+							/*
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
 							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
+							*/
+							jj->setOwner(j->getOwner());
 						}
-						else
-							move_obj(jj, j->in_room);
+
+						move_obj(jj, j->in_room);
 					}
 					else
 					{
