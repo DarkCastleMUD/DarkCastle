@@ -5525,9 +5525,10 @@ int do_return(Character *ch, char *argument, int cmd)
 command_return_t Character::do_sockets(QStringList arguments, int cmd)
 {
   QString name;
-  if (arguments.count() >= 2)
+  qDebug() << arguments;
+  if (arguments.isEmpty() == false)
   {
-    name = arguments.at(1);
+    name = arguments.at(0);
   }
 
   uint64_t num_can_see = 0;
