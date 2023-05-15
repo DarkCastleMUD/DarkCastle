@@ -48,8 +48,13 @@ Now build the DarkCastle project. Change -j # option below to match the number o
 ```
 git clone https://github.com/DarkCastleMUD/DarkCastle.git
 cd DarkCastle
-cmake -S src -B build
-make -C build -j 128
+cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+or 
+cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug
+make -C build clean
+make -C build -j
+or
+make -C build -j VERBOSE=1
 ```
 
 Run DarkCastle server
