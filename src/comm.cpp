@@ -284,19 +284,38 @@ int write_hotboot_file(char **new_argv)
   char **argv = new char *[arguments.size() + 1];
   for (auto i = 0; i < arguments.size(); ++i)
   {
-    argv[i] = new char[strlen(arguments.at(i).toStdString().c_str()) + 1];
-    strcpy(argv[i], arguments.at(i).toStdString().c_str());
+    auto size = arguments.at(i).length();
+    argv[i] = new char[size + 1];
+    strncpy(argv[i], arguments.at(i).toStdString().c_str(), size);
+    argv[i][size] = '\0';
   }
   argv[arguments.size()] = nullptr;
 
   DC::getInstance()->ssh.close();
   char *const *argv2 = argv;
-  if (-1 == execv(DC::getInstance()->applicationFilePath().toStdString().c_str(), argv2))
+  if (execv(DC::getInstance()->applicationFilePath().toStdString().c_str(), argv2) == -1)
   {
-    logentry("Hotboot execv call failed.", 0, LogChannels::LOG_MISC);
-    perror(DC::getInstance()->applicationFilePath().toStdString().c_str());
+    char execv_strerror[1024] = {};
+    strerror_r(errno, execv_strerror, sizeof(execv_strerror));
+
+    logentry(QString("Hotboot execv(%1, argv) failed with error: %2").arg(DC::getInstance()->applicationFilePath()).arg(execv_strerror), 0, LogChannels::LOG_MISC);
+
+    // wipe the file since we can't use it anyway
+    if (unlink("hotboot") == -1)
+    {
+      char unlink_strerror[1024] = {};
+      strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
+
+      logentry(QString("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, LogChannels::LOG_MISC);
+    }
+
+    for (auto i = 0; i < arguments.size(); ++i)
+    {
+      delete argv[i];
+    }
+    delete argv;
+
     chdir(DFLT_DIR);
-    unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
   }
 
