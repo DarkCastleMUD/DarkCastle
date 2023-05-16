@@ -5527,7 +5527,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
   QString name;
   if (arguments.isEmpty() == false)
   {
-    name = arguments.at(1);
+    name = arguments.at(0);
   }
 
   uint64_t num_can_see = 0;
@@ -5554,11 +5554,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
 
     if (name.isEmpty() == false)
     {
-      if (QString(d->host).contains(name) == false)
-      {
-        continue;
-      }
-      if (d->character != nullptr && isname(name, GET_NAME(d->character)) == false)
+      if (QString(d->host).contains(name) == false && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
       {
         continue;
       }
