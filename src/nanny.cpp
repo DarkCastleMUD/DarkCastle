@@ -1765,14 +1765,13 @@ void nanny(class Connection *d, string arg)
             load_char_obj(d, tmp_name);
             ch = d->character;
 
-            if (!DC::getInstance()->cf.implementer.isEmpty())
+            if (DC::getInstance()->cf.implementer.isEmpty() == false)
             {
                if (QString(GET_NAME(ch)).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
                {
                   GET_LEVEL(ch) = 110;
                }
             }
-            qDebug() << DC::getInstance()->cf.implementer << QString(GET_NAME(ch));
 
             if (!ch)
             {

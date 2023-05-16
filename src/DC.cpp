@@ -237,7 +237,6 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 	}
 
 	QString cipher = d.character->player->pwd;
-	qDebug() << cipher << password << crypt(password.toStdString().c_str(), cipher.toStdString().c_str());
 	if (crypt(password.toStdString().c_str(), cipher.toStdString().c_str()) == cipher)
 	{
 		if (GET_LEVEL(d.character) >= level)
