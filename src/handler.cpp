@@ -108,7 +108,7 @@ bool is_wearing(Character *ch, Object *item)
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
 // puts it in a static char buffer, and returns it.
-char *fname(const char *namelist) char *fname(const char *namelist)
+char *fname(const char *namelist)
 {
 	static char holder[30];
 	char *point;
