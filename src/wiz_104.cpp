@@ -167,10 +167,10 @@ int do_load(Character *ch, char *arg, int cmd)
 			if ((num = real_object(x)) < 0)
 				continue;
 
-			if (isname("prize", ((class Object *)(obj_index[num].item))->name))
+			if (isname("prize", ((class Object *)(obj_index[num].item))->getName().toStdString().c_str()))
 			{
 				cnt++;
-				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(obj_index[num].item))->short_description);
+				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(obj_index[num].item))->getShortDescriptionC());
 				send_to_char(buf, ch);
 			}
 
@@ -227,7 +227,7 @@ int do_load(Character *ch, char *arg, int cmd)
 	{
 	default:
 		send_to_char("Problem...fuck up in do_load.\r\n", ch);
-		logentry("Default in do_load...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+		logentry("Default in do_load...should NOT happen.", ARCHITECT, LogChannels::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
 		if ((number = number_or_name(&c, &num)) == 0)
@@ -270,7 +270,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				send_to_char("Why would you want to load that?\n\r", ch);
 				return eFAILURE;
 			}
-			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->name))
+			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->getName().toStdString().c_str()))
 			{
 				send_to_char("This command can only load prize items.\r\n", ch);
 				return eFAILURE;
@@ -316,7 +316,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			send_to_char("Why would you want to load that?\n\r", ch);
 			return eFAILURE;
 		}
-		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->name))
+		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->getName().toStdString().c_str()))
 		{
 			send_to_char("This command can only load prize items.\r\n", ch);
 			return eFAILURE;
@@ -342,7 +342,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 
 	if (*name)
 	{ /* argument supplied. destroy single object or char */
-		if ((vict = get_char_room_vis(ch, name)) && (GET_LEVEL(ch) > G_POWER))
+		if ((vict = get_char_room_vis(ch, name)) && (GET_LEVEL(ch) > DEITY))
 		{
 			if (IS_PC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
 			{
@@ -602,7 +602,7 @@ int show_zone_commands(Character *ch, int zone_key, int start)
 			else
 				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j].arg2);
 			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j].arg3);
-			if (ch && !str_cmp(ch->name, "Urizen"))
+			if (ch && !str_cmp(ch->name, "Julian"))
 			{
 				sprintf(buf, "%s [%d] [%d] %s", buf,
 						zone.cmd[j].lastPop ? 1 : 0, charExists(zone.cmd[j].lastPop),
@@ -991,7 +991,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				{
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->getShortDescriptionC());
 					send_to_char(buf, ch);
 				}
 			}
@@ -1006,7 +1006,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->getShortDescriptionC());
 					send_to_char(buf, ch);
 
 					if (count > 200)
@@ -1030,12 +1030,12 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 
 				if (isname(name,
-						   ((class Object *)(obj_index[nr].item))->name))
+						   ((class Object *)(obj_index[nr].item))->getName().toStdString().c_str()))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(obj_index[nr].item))->short_description);
+							((class Object *)(obj_index[nr].item))->getShortDescriptionC());
 					send_to_char(buf, ch);
 				}
 
@@ -1408,7 +1408,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < ACT_MAX; i++)
 					if (ISSET(act, i))
 						if (!ISSET(
-								((Character *)(mob_index[nr].item))->mobdata->actflags,
+								((Character *)(mob_index[nr].item))->mobile->actflags,
 								i + 1))
 							goto eheh;
 			if (*affect)
@@ -1750,7 +1750,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
 					((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
-					((class Object *)(obj_index[nr].item))->short_description);
+					((class Object *)(obj_index[nr].item))->getShortDescriptionC());
 			send_to_char(buf, ch);
 		endLoop:
 			continue;
@@ -2075,7 +2075,7 @@ void opstat(Character *ch, int vnum)
 	}
 	obj = (Object *)obj_index[num].item;
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
-			obj->name, vnum);
+			obj->getName().toStdString().c_str(), vnum);
 	send_to_char(buf, ch);
 	if (obj_index[num].progtypes == 0)
 	{
@@ -2454,7 +2454,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	}
 
 	/*
-	  if(obj_index[obj->item_number].non_combat_func ||
+	  if(obj_index[obj->getNumber()].non_combat_func ||
 			obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 			has_random(obj)) {
 		DC::getInstance()->obj_free_list.insert(obj);
@@ -2462,12 +2462,12 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	*/
 
 	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\r\n",
-		   v1, ((Object *)obj_index[real_object(v1)].item)->short_description,
-		   v2, ((Object *)obj_index[real_object(v2)].item)->short_description);
+		   v1, ((Object *)obj_index[real_object(v1)].item)->getShortDescriptionC(),
+		   v2, ((Object *)obj_index[real_object(v2)].item)->getShortDescriptionC());
 
 	object_list = object_list->next;
 	otmp = (Object *)obj_index[r2].item;
-	obj->item_number = r2;
+	obj->setNumber(r2);
 	obj_index[r2].item = (void *)obj;
 	obj_index[r2].non_combat_func = 0;
 	obj_index[r2].number = 0;
@@ -2537,18 +2537,18 @@ int do_mclone(Character *ch, char *argument, int cmd)
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.erase(mob);
-	mob->mobdata->nr = dst;
+	mob->mobile->setNumber(dst);
 
 	// Find old mobile in world and remove
 	Character *old_mob = (Character *)mob_index[dst].item;
-	if (old_mob && old_mob->mobdata)
+	if (old_mob && old_mob->mobile)
 	{
 		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmpch : character_list)
 		{
-			if (!tmpch->mobdata)
+			if (!tmpch->mobile)
 				continue;
-			if (old_mob->mobdata->nr == tmpch->mobdata->nr)
+			if (old_mob->mobile->getNumber() == tmpch->mobile->getNumber())
 				extract_char(tmpch, true);
 		}
 	}

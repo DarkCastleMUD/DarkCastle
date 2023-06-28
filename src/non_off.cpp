@@ -91,7 +91,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   if (obj == nullptr)
   {
     obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
+    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->getName().toStdString().c_str()) || isname("pc", obj->getName().toStdString().c_str()))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
       return eFAILURE;
@@ -109,25 +109,25 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
       send_to_char("(This item is cursed, BTW.)\n\r", ch);
   }
 
-  if (obj->obj_flags.value[3] == 1 && isname("pc", obj->name))
+  if (obj->obj_flags.value[3] == 1 && isname("pc", obj->getName().toStdString().c_str()))
   {
     send_to_char("You probably don't *really* want to do that.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ARCHITECT)
   {
     send_to_char("God, what a stupid fucking thing for you to do.\r\n", ch);
     return eFAILURE;
   }
 
-  if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
+  if (obj_index[obj->getNumber()].virt == CHAMPION_ITEM)
   {
     send_to_char("In soviet russia, champion flag sacrifice YOU!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (IS_AFFECTED(ch, AFF_CANTQUIT) && IS_PC(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
     send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return eFAILURE;
@@ -213,7 +213,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (IS_AFFECTED(ch, AFF_CANTQUIT) && IS_PC(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
     send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return eFAILURE;
@@ -314,12 +314,12 @@ int do_donate(Character *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
+    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->getName().toStdString().c_str(), obj_index[obj->getNumber()].virt);
     logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
-           loop_obj->short_description,
-           obj_index[loop_obj->item_number].virt);
+      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->getShortDescriptionC(),
+           loop_obj->getShortDescriptionC(),
+           obj_index[loop_obj->getNumber()].virt);
   }
 
   location = real_room(room);
@@ -348,7 +348,7 @@ int do_title(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOTITLE))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_NOTITLE))
   {
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
@@ -1674,7 +1674,7 @@ void CVoteData::OutToFile()
 
   if (!the_file)
   {
-    logentry("Unable to open/create save file for vote data", ANGEL,
+    logentry("Unable to open/create save file for vote data", ARCHITECT,
              LogChannels::LOG_BUG);
     return;
   }

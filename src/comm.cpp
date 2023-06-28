@@ -978,7 +978,7 @@ void DC::game_loop_init(void)
 
                  QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf.toStdString().c_str());
-                 logentry(buf, ANGEL, LogChannels::LOG_GOD);
+                 logentry(buf, ARCHITECT, LogChannels::LOG_GOD);
                  logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
 
                  for (auto &ch : dc->character_list)
@@ -2790,7 +2790,7 @@ int close_socket(class Connection *d)
               world[d->character->in_room].number);
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
         sprintf(buf, "%s with CQ.", buf);
-      logentry(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
+      logentry(buf, GET_LEVEL(d->character) > ARCHITECT ? GET_LEVEL(d->character) : ARCHITECT, LogChannels::LOG_SOCKET);
       d->character->desc = nullptr;
     }
     else
@@ -2809,7 +2809,7 @@ int close_socket(class Connection *d)
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    logentry("Losing descriptor without char.", ANGEL, LogChannels::LOG_SOCKET);
+  //    logentry("Losing descriptor without char.", ARCHITECT, LogChannels::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
@@ -2878,7 +2878,7 @@ void checkpointing(int sig)
 {
   if (!tics)
   {
-    logentry("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LogChannels::LOG_BUG);
+    logentry("SYSERR: CHECKPOINT shutdown: tics not updated", ARCHITECT, LogChannels::LOG_BUG);
     abort();
   }
   else
@@ -2889,11 +2889,11 @@ void report_debug_logging()
 {
   extern int last_char_room;
 
-  logentry("Last cmd:", ANGEL, LogChannels::LOG_BUG);
-  logentry(QString::fromStdString(last_processed_cmd), ANGEL, LogChannels::LOG_BUG);
-  logentry("Owner's Name:", ANGEL, LogChannels::LOG_BUG);
-  logentry(QString::fromStdString(last_char_name), ANGEL, LogChannels::LOG_BUG);
-  logf(ANGEL, LogChannels::LOG_BUG, "Last room: %d", last_char_room);
+  logentry("Last cmd:", ARCHITECT, LogChannels::LOG_BUG);
+  logentry(QString::fromStdString(last_processed_cmd), ARCHITECT, LogChannels::LOG_BUG);
+  logentry("Owner's Name:", ARCHITECT, LogChannels::LOG_BUG);
+  logentry(QString::fromStdString(last_char_name), ARCHITECT, LogChannels::LOG_BUG);
+  logf(ARCHITECT, LogChannels::LOG_BUG, "Last room: %d", last_char_room);
 }
 
 void crash_hotboot()
@@ -2918,10 +2918,10 @@ void crash_hotboot()
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    logentry("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Attempting to hotboot from the crash.", ARCHITECT, LogChannels::LOG_BUG);
     write_hotboot_file(0);
     // we shouldn't return from there unless we failed
-    logentry("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Hotboot crash recovery failed.  Exiting.", ARCHITECT, LogChannels::LOG_BUG);
     for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
@@ -2937,18 +2937,18 @@ void crash_hotboot()
 void crashill(int sig)
 {
   report_debug_logging();
-  logentry("Recieved SIGFPE (Illegal Instruction)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGFPE (Illegal Instruction)", ARCHITECT, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGFPE.", ARCHITECT, LogChannels::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(int sig)
 {
   report_debug_logging();
-  logentry("Recieved SIGFPE (Arithmetic Error)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGFPE (Arithmetic Error)", ARCHITECT, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGFPE.", ARCHITECT, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2962,13 +2962,13 @@ void crashsig(int sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    logentry("Hit 'died_from_sigsegv > 2'", ANGEL, LogChannels::LOG_BUG);
+    logentry("Hit 'died_from_sigsegv > 2'", ARCHITECT, LogChannels::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  logentry("Recieved SIGSEGV (Segmentation fault)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGSEGV (Segmentation fault)", ARCHITECT, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGSEGV.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGSEGV.", ARCHITECT, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2978,7 +2978,7 @@ void unrestrict_game(int sig)
   extern int num_invalid;
 
   logentry("Received SIGUSR2 - completely unrestricting game (emergent)",
-           ANGEL, LogChannels::LOG_GOD);
+           ARCHITECT, LogChannels::LOG_GOD);
   ban_list = nullptr;
   restrict = 0;
   num_invalid = 0;
@@ -3046,7 +3046,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(buf.data());
-    logentry(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ARCHITECT, LogChannels::LOG_GOD);
     logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
     if (!write_hotboot_file(new_argv))
     {
@@ -3237,11 +3237,11 @@ void ansi_color(char *txt, Character *ch)
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
   {
-    if (!IS_MOB(ch) &&
+    if (IS_PC(ch) &&
         !IS_SET(GET_TOGGLES(ch), PLR_ANSI) &&
         !IS_SET(GET_TOGGLES(ch), PLR_VT100))
       return;
-    else if (!IS_MOB(ch) &&
+    else if (IS_PC(ch) &&
              IS_SET(GET_TOGGLES(ch), PLR_VT100) &&
              !IS_SET(GET_TOGGLES(ch), PLR_ANSI))
     {
@@ -3266,7 +3266,7 @@ void send_info(const char *messg)
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
       if (!(i->character) ||
-          !IS_SET(i->character->misc, LogChannels::CHANNEL_INFO))
+          !IS_SET(i->character->getMisc(), LogChannels::CHANNEL_INFO))
         continue;
       if ((!i->connected) && !is_busy(i->character))
         SEND_TO_Q(messg, i);

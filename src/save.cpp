@@ -207,9 +207,10 @@ char *fread_var_string(FILE *fpsave)
   return nullptr;
 }
 
-void save_mob_data(struct mob_data *i, FILE *fpsave)
+void save_Mobile(class Mobile *i, FILE *fpsave)
 {
-  fwrite(&(i->nr), sizeof(i->nr), 1, fpsave);
+  int32_t number = i->getNumber();
+  fwrite(&number, sizeof(number), 1, fpsave);
   fwrite(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
   fwrite(&(i->attack_type), sizeof(i->attack_type), 1, fpsave);
   fwrite(&(i->actflags), sizeof(i->actflags), 1, fpsave);
@@ -217,16 +218,19 @@ void save_mob_data(struct mob_data *i, FILE *fpsave)
   fwrite(&(i->damsizedice), sizeof(i->damsizedice), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate strcmp statement in the read_Mobile object
 
   fwrite("STP", sizeof(char), 3, fpsave);
 }
 
-void read_mob_data(struct mob_data *i, FILE *fpsave)
+void read_Mobile(class Mobile *i, FILE *fpsave)
 {
   char typeflag[4];
 
-  fread(&(i->nr), sizeof(i->nr), 1, fpsave);
+  int32_t number = {};
+  fread(&number, sizeof(number), 1, fpsave);
+  i->setNumber(number);
+
   fread(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
   fread(&(i->attack_type), sizeof(i->attack_type), 1, fpsave);
   fread(&(i->actflags), sizeof(i->actflags), 1, fpsave);
@@ -388,7 +392,7 @@ void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
   }
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate strcmp statement in the read_Mobile object
 
   fwrite("STP", sizeof(char), 3, fpsave);
 }
@@ -574,31 +578,29 @@ void read_Player(Character *ch, FILE *fpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-int save_pc_or_mob_data(Character *ch, FILE *fpsave, struct time_data tmpage)
+int save_pc_or_Mobile(Character *ch, FILE *fpsave, struct time_data tmpage)
 {
   if (IS_MOB(ch))
-    save_mob_data(ch->mobdata, fpsave);
+    save_Mobile(ch->mobile, fpsave);
   else
     save_Player(ch->player, fpsave, tmpage);
 
   return 1;
 }
 
-int read_pc_or_mob_data(Character *ch, FILE *fpsave)
+int read_pc_or_Mobile(Character *ch, FILE *fpsave)
 {
   if (IS_MOB(ch))
   {
     ch->player = nullptr;
-#ifdef LEAK_CHECK
-    ch->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
-#else
-    ch->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
-#endif
-    read_mob_data(ch->mobdata, fpsave);
+
+    ch->mobile = new Mobile;
+    ;
+    read_Mobile(ch->mobile, fpsave);
   }
   else
   {
-    ch->mobdata = nullptr;
+    ch->mobile = nullptr;
     ch->player = new Player;
     read_Player(ch, fpsave);
   }
@@ -675,10 +677,10 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   }
 
   fwrite("GLD", sizeof(char), 3, fpsave);
-  fwrite(&this->gold_, sizeof(this->gold_), 1, fpsave);
+  fwrite(&this->data_.gold_, sizeof(this->data_.gold_), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
-  // and appropriate strcmp statement in the read_mob_data object
+  // and appropriate strcmp statement in the read_Mobile object
 
   fwrite("STP", sizeof(char), 3, fpsave);
 
@@ -776,7 +778,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
   }
   if (!strcmp(typeflag, "GLD"))
   {
-    fread(&(this->gold_), sizeof(this->gold_), 1, fpsave);
+    fread(&(this->data_.gold_), sizeof(this->data_.gold_), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   // Add new items in this format
@@ -830,7 +832,7 @@ void save_char_obj_db(Character *ch)
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
-     (save_pc_or_mob_data(ch, fpsave, tmpage))                &&
+     (save_pc_or_Mobile(ch, fpsave, tmpage))                &&
      (obj_to_store (this->carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
@@ -847,7 +849,7 @@ void save_char_obj_db(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char ("WARNING: file problem. You did not save!", ch);
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ARCHITECT, LogChannels::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -898,7 +900,7 @@ void save_char_obj(Character *ch)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
 
@@ -924,7 +926,7 @@ void save_char_obj(Character *ch)
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
       (ch->char_to_store_variable_data(fpsave)) &&
-      (save_pc_or_mob_data(ch, fpsave, tmpage)) &&
+      (save_pc_or_Mobile(ch, fpsave, tmpage)) &&
       (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
       (store_worn_eq(ch, fpsave)))
   {
@@ -943,7 +945,7 @@ void save_char_obj(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char("WARNING: file problem. You did not save!", ch);
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ARCHITECT, LogChannels::LOG_BUG);
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -958,7 +960,7 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH])
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "Load_char_obj: %s", strsave);
   perror(log_buf);
-  logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+  logentry(log_buf, ARCHITECT, LogChannels::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
@@ -975,7 +977,7 @@ bool load_char_obj(class Connection *d, const char *name)
   if (!name || !strcmp(name, ""))
     return false;
 
-  ch = new Character;
+  ch = new Character(DC::getInstance());
   auto &free_list = DC::getInstance()->free_list;
   free_list.erase(ch);
 
@@ -1016,7 +1018,7 @@ bool load_char_obj(class Connection *d, const char *name)
 
   store_to_char(&uchar, ch);
   ch->store_to_char_variable_data(fpsave);
-  read_pc_or_mob_data(ch, fpsave);
+  read_pc_or_Mobile(ch, fpsave);
 
   if (IS_PC(ch) && ch->player->time.logon < 1117527906)
   {
@@ -1026,7 +1028,7 @@ bool load_char_obj(class Connection *d, const char *name)
   }
 
   // stored names only matter for mobs
-  if (!IS_MOB(ch))
+  if (IS_PC(ch))
   {
     dc_free(GET_NAME(ch));
     GET_NAME(ch) = str_dup(name);
@@ -1045,16 +1047,16 @@ bool load_char_obj(class Connection *d, const char *name)
 // read data from file for an item.
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont)
 {
-  class Object *obj;
+  class Object *obj = {};
   //  struct extra_descr_data *new_new_descr;
   //  struct extra_descr_data *ed, *next_ed;
 
-  int j;
-  int nr;
-  uint16_t length; // do not change this type
-  int wear_pos;
-  char mod_type[4];
-  char buf[MAX_STRING_LENGTH];
+  int j = {};
+  int nr = {};
+  uint16_t length = {}; // do not change this type
+  int wear_pos = {};
+  char mod_type[4] = {};
+  char buf[MAX_STRING_LENGTH] = {};
 
   // read in the standard file data
   struct obj_file_elem object;
@@ -1186,7 +1188,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->name = str_hsh(buf);
+    obj->setName(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("DES", mod_type))
@@ -1202,7 +1204,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->short_description = str_hsh(buf);
+    obj->setShortDescription(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("ADE", mod_type))
@@ -1256,7 +1258,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && obj_index[last_cont->item_number].virt != 536)
+      if (!last_cont->equipped_by && obj_index[last_cont->getNumber()].virt != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1334,12 +1336,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (obj->item_number < 0)
+  if (obj->getNumber() < 0)
     return true;
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = obj_index[obj->item_number].virt;
+  object.item_number = obj_index[obj->getNumber()].virt;
   object.timer = obj->obj_flags.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1352,7 +1354,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = ((class Object *)obj_index[obj->item_number].item);
+  standard_obj = ((class Object *)obj_index[obj->getNumber()].item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1483,12 +1485,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (obj->name && strcmp(obj->name, standard_obj->name))
+  if (obj->getName().toStdString().c_str() && strcmp(obj->getName().toStdString().c_str(), standard_obj->getName().toStdString().c_str()))
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
-    length = strlen(obj->name);
+    length = strlen(obj->getName().toStdString().c_str());
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->name, sizeof(char), length, fpsave);
+    fwrite(obj->getName().toStdString().c_str(), sizeof(char), length, fpsave);
   }
   if (obj->description && strcmp(obj->description, standard_obj->description))
   {
@@ -1497,12 +1499,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->description, sizeof(char), length, fpsave);
   }
-  if (obj->short_description && strcmp(obj->short_description, standard_obj->short_description))
+  if (obj->getShortDescriptionC() && strcmp(obj->getShortDescriptionC(), standard_obj->getShortDescriptionC()))
   {
     fwrite("SDE", sizeof(char), 3, fpsave);
-    length = strlen(obj->short_description);
+    length = strlen(obj->getShortDescriptionC());
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->short_description, sizeof(char), length, fpsave);
+    fwrite(obj->getShortDescriptionC(), sizeof(char), length, fpsave);
   }
   if (obj->action_description && strcmp(obj->action_description, standard_obj->action_description))
   {
@@ -1554,7 +1556,7 @@ void restore_weight(class Object *obj)
 
   if (obj == nullptr)
     return;
-  if (obj_index[obj->item_number].virt == 536)
+  if (obj_index[obj->getNumber()].virt == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1570,7 +1572,19 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
   ch->clan = st->clan;
 
-  GET_SEX(ch) = st->sex;
+  switch (st->sex)
+  {
+  case sex_t::NEUTRAL:
+    ch->setNeutral();
+    break;
+  case sex_t::MALE:
+    ch->setMale();
+    break;
+  case sex_t::FEMALE:
+    ch->setFemale();
+    break;
+  }
+
   GET_CLASS(ch) = st->c_class;
   GET_RACE(ch) = st->race;
   GET_LEVEL(ch) = st->level;
@@ -1606,7 +1620,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   GET_RAW_KI(ch) = st->raw_ki;
 
   ch->alignment = st->alignment;
-  ch->misc = st->misc;
+  ch->setMisc(st->misc);
 
   GET_HP_METAS(ch) = st->hpmetas;
   GET_MANA_METAS(ch) = st->manametas;
@@ -1707,7 +1721,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   st->resist = ch->resist;
   st->suscept = ch->suscept;
   st->alignment = ch->alignment;
-  st->misc = ch->misc;
+  st->misc = ch->getMisc();
 
   st->hpmetas = GET_HP_METAS(ch);
   st->manametas = GET_MANA_METAS(ch);

@@ -143,7 +143,7 @@ void eq_remove_damage(Object *obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(Object *obj)
 {
-  if (obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (obj_index[obj->getNumber()].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -170,7 +170,7 @@ void object_activity(uint64_t pulse_type)
 {
   for (auto &obj : DC::getInstance()->active_obj_list)
   {
-    int32_t item_number = obj->item_number;
+    uint64_t item_number = obj->getNumber();
 
     if (obj_index[item_number].non_combat_func)
     {
@@ -204,15 +204,13 @@ void object_activity(uint64_t pulse_type)
 void name_from_drinkcon(class Object *obj)
 {
   int i;
-  char *new_new_name;
 
-  for (i = 0; (*((obj->name) + i) != ' ') && (*((obj->name) + i) != '\0'); i++)
+  for (i = 0; (*((obj->getName().toStdString().c_str()) + i) != ' ') && (*((obj->getName().toStdString().c_str()) + i) != '\0'); i++)
     ;
 
-  if (*((obj->name) + i) == ' ')
+  if (*((obj->getName().toStdString().c_str()) + i) == ' ')
   {
-    new_new_name = str_hsh((obj->name) + i + 1);
-    obj->name = new_new_name;
+    obj->setName((obj->getName().toStdString().c_str()) + i + 1);
   }
 }
 
@@ -278,11 +276,11 @@ int do_quaff(Character *ch, char *argument, int cmd)
     temp = ch->equipment[HOLD];
     equipped = true;
     pos = HOLD;
-    if ((temp == 0) || !isname(buf, temp->name))
+    if ((temp == 0) || !isname(buf, temp->getName()))
     {
       temp = ch->equipment[HOLD2];
       pos = HOLD2;
-      if ((temp == 0) || !isname(buf, temp->name))
+      if ((temp == 0) || !isname(buf, temp->getName()))
       {
         equipped = false;
         pos = -2;
@@ -382,11 +380,11 @@ int do_recite(Character *ch, char *argument, int cmd)
     scroll = ch->equipment[HOLD];
     equipped = true;
     pos = HOLD;
-    if ((scroll == 0) || !isname(buf, scroll->name))
+    if ((scroll == 0) || !isname(buf, scroll->getName()))
     {
       scroll = ch->equipment[HOLD2];
       pos = HOLD2;
-      if ((scroll == 0) || !isname(buf, scroll->name))
+      if ((scroll == 0) || !isname(buf, scroll->getName()))
       {
         act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
         return eFAILURE;
@@ -450,7 +448,7 @@ int do_recite(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
         {
-          logf(100, LogChannels::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", obj_index[scroll->item_number].virt, i, i);
+          logf(100, LogChannels::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", obj_index[scroll->getNumber()].virt, i, i);
           continue;
         }
         else
@@ -484,7 +482,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->short_description);
+  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->getShortDescriptionC());
   send_to_char(buf, ch);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -505,7 +503,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->short_description);
+  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->getShortDescriptionC());
   send_to_char(buf, ch);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -604,7 +602,7 @@ void set_catstink(Character *ch, class Object *obj)
   char buf[200];
   extern const char *sector_types[];
 
-  sprintf(buf, "You sprinkle the %s all around you.\r\n", obj->short_description);
+  sprintf(buf, "You sprinkle the %s all around you.\r\n", obj->getShortDescriptionC());
   send_to_char(buf, ch);
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -619,7 +617,7 @@ void set_catstink(Character *ch, class Object *obj)
     }
 
     sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
-            obj->short_description, sector_types[obj->obj_flags.value[1]]);
+            obj->getShortDescriptionC(), sector_types[obj->obj_flags.value[1]]);
     send_to_char(buf, ch);
 
     // small chance of success
@@ -726,13 +724,13 @@ int do_use(Character *ch, char *argument, int cmd)
 
   argument = one_argument(argument, buf);
 
-  if ((ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->name)) &&
-      (ch->equipment[HOLD2] == 0 || !isname(buf, ch->equipment[HOLD2]->name)))
+  if ((ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->getName().toStdString().c_str())) &&
+      (ch->equipment[HOLD2] == 0 || !isname(buf, ch->equipment[HOLD2]->getName().toStdString().c_str())))
   {
     act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->name))
+  if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->getName().toStdString().c_str()))
     stick = ch->equipment[HOLD];
   else
     stick = ch->equipment[HOLD2];
@@ -815,7 +813,7 @@ int do_name(Character *ch, char *arg, int cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NONAME))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_NONAME))
   {
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
@@ -900,85 +898,91 @@ int do_name(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_drink(Character *ch, char *argument, int cmd)
+int Character::do_drink(QStringList arguments, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
-  class Object *temp;
-  struct affected_type af;
-  int amount;
+  class Object *temp = nullptr;
+  struct affected_type af = {};
+  qulonglong amount = {};
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(world[this->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", this);
     return eFAILURE;
   }
 
-  if ((GET_COND(ch, DRUNK) > 10) && (GET_COND(ch, THIRST) > 0)) /* The pig is drunk */
+  if ((GET_COND(this, DRUNK) > 10) && (GET_COND(this, THIRST) > 0)) /* The pig is drunk */
   {
-    act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
-    act("$n tried to drink but missed $s mouth!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act("You simply fail to reach your mouth!", this, 0, 0, TO_CHAR, 0);
+    act("$n tried to drink but missed $s mouth!", this, 0, 0, TO_ROOM, INVIS_NULL);
     return eFAILURE;
   }
 
-  if (GET_COND(ch, FULL) > 20 && GET_COND(ch, THIRST) > 20) /* Stomach full */
+  if (GET_COND(this, FULL) > 20 && GET_COND(this, THIRST) > 20) /* Stomach full */
   {
-    act("Your stomach cannot contain anymore!", ch, 0, 0, TO_CHAR, 0);
+    act("Your stomach cannot contain anymore!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  one_argument(argument, buf);
-
-  if ((temp = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(ch, temp))
+  if (arguments.isEmpty())
   {
-    act("You drink from $p.", ch, temp, 0, TO_CHAR, 0);
-    act("$n drinks from $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
-    act("You are full.", ch, 0, 0, TO_CHAR, 0);
-    act("You are not thirsty anymore.", ch, 0, 0, TO_CHAR, 0);
+    this->send("Drink what?\r\n");
+    return eFAILURE;
+  }
 
-    if (GET_LEVEL(ch) >= IMMORTAL)
+  QString arg1 = arguments.at(0);
+
+  if ((temp = get_obj_in_list_vis(this, arg1, world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
+  {
+    act("You drink from $p.", this, temp, 0, TO_CHAR, 0);
+    act("$n drinks from $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
+    act("You are full.", this, 0, 0, TO_CHAR, 0);
+    act("You are not thirsty anymore.", this, 0, 0, TO_CHAR, 0);
+
+    if (GET_LEVEL(this) >= IMMORTAL)
       return eSUCCESS;
 
-    if (GET_COND(ch, FULL) != -1)
-      GET_COND(ch, FULL) = 22 + number(0, 5);
-    if (GET_COND(ch, THIRST) != -1)
-      GET_COND(ch, THIRST) = 22 + number(0, 5);
+    if (GET_COND(this, FULL) != -1)
+      GET_COND(this, FULL) = 22 + number(0, 5);
+    if (GET_COND(this, THIRST) != -1)
+      GET_COND(this, THIRST) = 22 + number(0, 5);
 
     return eSUCCESS;
   }
 
-  if (GET_COND(ch, THIRST) > 20)
+  if (GET_COND(this, THIRST) > 20)
   {
-    send_to_char("Your stomach cannot contain anymore liquid!\r\n", ch);
+    send_to_char("Your stomach cannot contain anymore liquid!\r\n", this);
     return eFAILURE;
   }
 
-  if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying)))
+  if (!(temp = get_obj_in_list_vis(this, arg1, this->carrying)))
   {
-    act("You cannot find it!", ch, 0, 0, TO_CHAR, 0);
+    act("You cannot find it!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
   if (temp->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    act("You can't drink from that!", ch, 0, 0, TO_CHAR, 0);
+    act("You can't drink from that!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
+  QString buffer;
   if (temp->obj_flags.type_flag == ITEM_DRINKCON)
   {
     if (temp->obj_flags.value[1] > 0) /* Not empty */
     {
-      sprintf(buf, "$n drinks %s from $p.", drinks[temp->obj_flags.value[2]]);
-      act(buf, ch, temp, 0, TO_ROOM, INVIS_NULL);
-      sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
-      send_to_char(buf, ch);
+      buffer = QString("$n drinks {} from $p.").arg(drinks[temp->obj_flags.value[2]]);
+      act(buffer.toStdString(), this, temp, 0, TO_ROOM, INVIS_NULL);
+      buffer = QString("You drink the {}.\r\n").arg(drinks[temp->obj_flags.value[2]]);
+      send_to_char(buffer, this);
 
-      if (GET_LEVEL(ch) >= IMMORTAL)
+      if (GET_LEVEL(this) >= IMMORTAL)
         return eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
       if (drink_aff[temp->obj_flags.value[2]][DRUNK] > 0)
-        amount = (25 - GET_COND(ch, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
+        amount = (25 - GET_COND(this, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
       else
         amount = number(3, 10);
 
@@ -986,38 +990,38 @@ int do_drink(Character *ch, char *argument, int cmd)
 
       /* You can't subtract more than the object weighs */
 
-      gain_condition(ch, DRUNK, (int)((int)drink_aff[temp->obj_flags.value[2]][DRUNK] * amount) / 4);
+      gain_condition(this, DRUNK, (int)((int)drink_aff[temp->obj_flags.value[2]][DRUNK] * amount) / 4);
 
-      gain_condition(ch, FULL, (int)((int)drink_aff[temp->obj_flags.value[2]][FULL] * amount) / 4);
+      gain_condition(this, FULL, (int)((int)drink_aff[temp->obj_flags.value[2]][FULL] * amount) / 4);
 
-      gain_condition(ch, THIRST, (int)((int)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
+      gain_condition(this, THIRST, (int)((int)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
 
-      if (GET_COND(ch, DRUNK) > 10)
-        act("You feel drunk.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, DRUNK) > 10)
+        act("You feel drunk.", this, 0, 0, TO_CHAR, 0);
 
-      if (GET_COND(ch, THIRST) > 20)
-        act("You do not feel thirsty.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, THIRST) > 20)
+        act("You do not feel thirsty.", this, 0, 0, TO_CHAR, 0);
 
-      if (GET_COND(ch, FULL) > 20)
-        act("You are full.", ch, 0, 0, TO_CHAR, 0);
+      if (GET_COND(this, FULL) > 20)
+        act("You are full.", this, 0, 0, TO_CHAR, 0);
 
       if (temp->obj_flags.value[2] == LIQ_HOLYWATER &&
-          ch->getHP() < GET_MAX_HIT(ch) &&
+          this->getHP() < GET_MAX_HIT(this) &&
           number(0, 1))
       {
-        send_to_char("You feel refreshed!\r\n", ch);
-        ch->addHP(10);
+        send_to_char("You feel refreshed!\r\n", this);
+        this->addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (GET_LEVEL(ch) < IMMORTAL))
+      if (temp->obj_flags.value[3] && (GET_LEVEL(this) < IMMORTAL))
       {
         /* The shit was poisoned ! */
-        act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
+        act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
         act("$n chokes and utters some strange sounds.",
-            ch, 0, 0, TO_ROOM, 0);
-        if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
+            this, 0, 0, TO_ROOM, 0);
+        if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
-          send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
+          send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", this);
         }
         else
         {
@@ -1026,7 +1030,7 @@ int do_drink(Character *ch, char *argument, int cmd)
           af.modifier = 0;
           af.location = APPLY_NONE;
           af.bitvector = AFF_POISON;
-          affect_join(ch, &af, false, false);
+          affect_join(this, &af, false, false);
         }
       }
 
@@ -1040,7 +1044,7 @@ int do_drink(Character *ch, char *argument, int cmd)
       /*
               if(temp->obj_flags.value[1]<=0) {
                 act("It is now empty, and it magically disappears in a puff of smoke!",
-                  ch,0,0,TO_CHAR, 0);
+                  this,0,0,TO_CHAR, 0);
                 extract_obj(temp);
               }
       */
@@ -1048,59 +1052,63 @@ int do_drink(Character *ch, char *argument, int cmd)
     }
   }
 
-  act("It's empty already.", ch, 0, 0, TO_CHAR, 0);
+  act("It's empty already.", this, 0, 0, TO_CHAR, 0);
   return eFAILURE;
 }
 
-int do_eat(Character *ch, char *argument, int cmd)
+int Character::do_eat(QStringList arguments, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH + 1];
-  class Object *temp;
   struct affected_type af;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(world[this->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", this);
     return eFAILURE;
   }
 
-  one_argument(argument, buf);
-
-  if (!(temp = get_obj_in_list_vis(ch, buf, ch->carrying)))
+  if (arguments.isEmpty())
   {
-    act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+    this->send("Eat what?\r\n");
     return eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (GET_LEVEL(ch) < IMMORTAL))
+  QString arg1 = arguments.at(0);
+  class Object *temp;
+  if ((temp = get_obj_in_list_vis(this, arg1, this->carrying)) == nullptr)
   {
-    act("Your stomach refuses to eat that!?!", ch, 0, 0, TO_CHAR, 0);
+    act("You can't find it!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (GET_COND(ch, FULL) > 20) /* Stomach full */
+  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (GET_LEVEL(this) < IMMORTAL))
   {
-    act("You are too full to eat more!", ch, 0, 0, TO_CHAR, 0);
+    act("Your stomach refuses to eat that!?!", this, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  act("$n eats $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  act("You eat the $o.", ch, temp, 0, TO_CHAR, 0);
+  if (GET_COND(this, FULL) > 20) /* Stomach full */
+  {
+    act("You are too full to eat more!", this, 0, 0, TO_CHAR, 0);
+    return eFAILURE;
+  }
 
-  gain_condition(ch, FULL, temp->obj_flags.value[0]);
+  act("$n eats $p.", this, temp, 0, TO_ROOM, INVIS_NULL);
+  act("You eat the $o.", this, temp, 0, TO_CHAR, 0);
 
-  if (GET_COND(ch, FULL) > 20)
-    act("You are full.", ch, 0, 0, TO_CHAR, 0);
+  gain_condition(this, FULL, temp->obj_flags.value[0]);
 
-  if (temp->obj_flags.value[3] && (GET_LEVEL(ch) < IMMORTAL))
+  if (GET_COND(this, FULL) > 20)
+    act("You are full.", this, 0, 0, TO_CHAR, 0);
+
+  if (temp->obj_flags.value[3] && (GET_LEVEL(this) < IMMORTAL))
   {
     /* The shit was poisoned ! */
-    act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
-    act("$n coughs and utters some strange sounds.", ch, 0, 0, TO_ROOM, 0);
+    act("Ooups, it tasted rather strange ?!!?", this, 0, 0, TO_CHAR, 0);
+    act("$n coughs and utters some strange sounds.", this, 0, 0, TO_ROOM, 0);
 
-    if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
+    if (number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
     {
-      send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
+      send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", this);
     }
     else
     {
@@ -1109,7 +1117,7 @@ int do_eat(Character *ch, char *argument, int cmd)
       af.modifier = 0;
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
-      affect_join(ch, &af, false, false);
+      affect_join(this, &af, false, false);
     }
   }
 
@@ -1447,9 +1455,9 @@ int class_restricted(Character *ch, class Object *obj)
 int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
 {
   return false; // sigh, work for nohin'
-  if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
+  if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobile)
   {
-    int vnum = mob_index[ch->mobdata->nr].virt;
+    int vnum = mob_index[ch->mobile->getNumber()].virt;
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1562,19 +1570,19 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // temporarily affect the person's height
   if (add)
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  logf(ARCHITECT, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
   else
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ARCHITECT, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
 
   if (add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ARCHITECT, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
     send_to_char("After modifying your height that item would not fit!\r\n", ch);
     return true;
@@ -1596,21 +1604,21 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // fix height back to normal
   if (add)
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ARCHITECT, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
   else
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  logf(ARCHITECT, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
 
   if (problem)
   {
     if (add)
-      csendf(ch, "Wearing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->short_description);
+      csendf(ch, "Wearing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->getShortDescriptionC());
     else
-      csendf(ch, "Removing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->short_description);
+      csendf(ch, "Removing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->getShortDescriptionC());
 
     return true;
   }
@@ -1656,7 +1664,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   }
   else
   {
-    if (mob_index[ch->mobdata->nr].virt != 8)
+    if (mob_index[ch->mobile->getNumber()].virt != 8)
       if (GET_LEVEL(ch) < obj_object->obj_flags.eq_level)
       {
         sprintf(buffer, "You must be level %d to use $p.",
@@ -1665,14 +1673,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         return;
       }
   }
-  /*  if (IS_NPC(ch) && (mob_index[ch->mobdata->nr].virt < 22394 &&
-    mob_index[ch->mobdata->nr].virt > 22388))
+  /*  if (IS_NPC(ch) && (mob_index[ch->mobile->getNumber()].virt < 22394 &&
+    mob_index[ch->mobile->getNumber()].virt > 22388))
     {
        return;
     }*/
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMPLEMENTER)
+      !isname(GET_NAME(ch), obj->getName().toStdString().c_str()) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;
@@ -1702,7 +1710,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         if (ch->equipment[WEAR_FINGER_L])
         {
           sprintf(buffer, "You put the %s on your right ring-finger.\r\n",
-                  fname(obj_object->name));
+                  fname(obj_object->getName().toStdString().c_str()));
           send_to_char(buffer, ch);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_R);
@@ -1710,7 +1718,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         else
         {
           sprintf(buffer, "You put the %s on your left ring-finger.\r\n",
-                  fname(obj_object->name));
+                  fname(obj_object->getName().toStdString().c_str()));
           send_to_char(buffer, ch);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_L);
@@ -1937,14 +1945,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         if (ch->equipment[WEAR_WRIST_L])
         {
           sprintf(buffer, "You wear the %s around your right wrist.\r\n",
-                  fname(obj_object->name));
+                  fname(obj_object->getName().toStdString().c_str()));
           send_to_char(buffer, ch);
           equip_char(ch, obj_object, WEAR_WRIST_R);
         }
         else
         {
           sprintf(buffer, "You wear the %s around your left wrist.\r\n",
-                  fname(obj_object->name));
+                  fname(obj_object->getName().toStdString().c_str()));
           send_to_char(buffer, ch);
           equip_char(ch, obj_object, WEAR_WRIST_L);
         }
@@ -2176,20 +2184,20 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name));
+    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->getName().toStdString().c_str()));
     send_to_char(buffer, ch);
   }
   break;
   case -2:
   {
     sprintf(buffer, "You can't wear the %s.\r\n",
-            fname(obj_object->name));
+            fname(obj_object->getName().toStdString().c_str()));
     send_to_char(buffer, ch);
   }
   break;
   default:
   {
-    logentry("Unknown type called in wear.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Unknown type called in wear.", ARCHITECT, LogChannels::LOG_BUG);
   }
   break;
   }
@@ -2508,17 +2516,17 @@ int do_remove(Character *ch, char *argument, int cmd)
             obj_object = ch->equipment[j];
             if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL)
             {
-              sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
+              sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->getShortDescriptionC());
               send_to_char(arg1, ch);
               continue;
             }
-            if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+            if (obj_index[obj_object->getNumber()].virt == 30010 && obj_object->obj_flags.timer < 40)
             {
               csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
               continue;
             }
 
-            if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (obj_index[obj_object->getNumber()].virt == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2551,11 +2559,11 @@ int do_remove(Character *ch, char *argument, int cmd)
         {
           if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL)
           {
-            sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
+            sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->getShortDescriptionC());
             send_to_char(arg1, ch);
             return eFAILURE;
           }
-          if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+          if (obj_index[obj_object->getNumber()].virt == 30010 && obj_object->obj_flags.timer < 40)
           {
             csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
             return eFAILURE;
@@ -2572,7 +2580,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
-          else if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (obj_index[obj_object->getNumber()].virt == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
@@ -2643,7 +2651,7 @@ bool fullSave(Object *obj)
   if (!tmp_obj)
   {
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->name);
+    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->getName().toStdString().c_str());
     logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
     return 0;
   }
@@ -2666,7 +2674,7 @@ bool fullSave(Object *obj)
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 
-  if (strcmp(obj->name, tmp_obj->name)) // GL. and stuff.
+  if (strcmp(obj->getName().toStdString().c_str(), tmp_obj->getName().toStdString().c_str())) // GL. and stuff.
     return 1;
 
   if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)

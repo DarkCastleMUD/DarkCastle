@@ -216,7 +216,7 @@ int do_advance(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((new_newlevel > MAX_MORTAL) && (new_newlevel < MIN_GOD))
+  if ((new_newlevel > MAX_MORTAL) && (new_newlevel < IMMORTAL))
   {
     send_to_char("That level doesn't exist!!\n\r", ch);
     return eFAILURE;
@@ -358,7 +358,7 @@ int do_zap(Character *ch, char *argument, int cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(buf, ARCHITECT, LogChannels::LOG_GOD);
   }
 
   else
@@ -460,7 +460,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
   {
     sprintf(buf, "Shutdown by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(buf, ARCHITECT, LogChannels::LOG_GOD);
     _shutdown = 1;
   }
   else if (!strcmp(arg1, "hot"))
@@ -487,7 +487,7 @@ int do_shutdown(Character *ch, char *argument, int cmd)
     do_not_save_corpses = 1;
     sprintf(buf, "Hot reboot by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(buf, ARCHITECT, LogChannels::LOG_GOD);
     logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
     do_force(ch, "all save", CMD_FORCE);
     if (!write_hotboot_file(new_argv))

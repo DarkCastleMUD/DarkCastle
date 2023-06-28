@@ -20,7 +20,7 @@ extern "C"
 #include "room.h"
 #include "character.h" // Character
 #include "obj.h"       // Object
-#include "levels.h"    // MIN_GOD
+#include "levels.h"    // IMMORTAL
 #include "utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "terminal.h"  // colors
 #include "act.h"       // act flags
@@ -171,7 +171,7 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";
-  if ((GET_LEVEL(send_to) < MIN_GOD) && (flags & GODS))
+  if ((GET_LEVEL(send_to) < IMMORTAL) && (flags & GODS))
     return "";
   if ((GET_POS(send_to) <= POSITION_SLEEPING) && !(flags & ASLEEP))
     return "";
@@ -204,8 +204,8 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
       cerr << "It's ansi or vt100 code" << endl;
 #endif
       if (IS_MOB(send_to) ||
-          (IS_SET(send_to->player->toggles, PLR_ANSI) && current->IsAnsi()) ||
-          (IS_SET(send_to->player->toggles, PLR_VT100) && current->IsVt100()))
+          (IS_PC(send_to) && IS_SET(send_to->player->toggles, PLR_ANSI) && current->IsAnsi()) ||
+          (IS_PC(send_to) && IS_SET(send_to->player->toggles, PLR_VT100) && current->IsVt100()))
       {
         switch (current->GetBuf()[1])
         {
@@ -352,7 +352,7 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
         interp += HSSH((Character *)vict_obj);
         break;
       case 'o':
-        if (send_to == nullptr || obj == nullptr || obj->name == nullptr)
+        if (send_to == nullptr || obj == nullptr || obj->getName().toStdString().c_str() == nullptr)
         {
           break;
         }
@@ -363,18 +363,18 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
             return {};
           else if (flags & INVIS_VISIBLE)
           {
-            interp += fname(obj->name);
+            interp += fname(obj->getName().toStdString().c_str());
           }
           else
             interp += "something";
         }
         else
         {
-          interp += fname(obj->name);
+          interp += fname(obj->getName().toStdString().c_str());
         }
         break;
       case 'O':
-        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->name == nullptr)
+        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->getName().toStdString().c_str() == nullptr)
         {
           break;
         }
@@ -383,17 +383,17 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += fname(((Object *)vict_obj)->name);
+            interp += fname(((Object *)vict_obj)->getName().toStdString().c_str());
           else
             interp += "something";
         }
         else
         {
-          interp += fname(((Object *)vict_obj)->name);
+          interp += fname(((Object *)vict_obj)->getName().toStdString().c_str());
         }
         break;
       case 'p':
-        if (send_to == nullptr || obj == nullptr || obj->short_description == nullptr)
+        if (send_to == nullptr || obj == nullptr || obj->getShortDescriptionC() == nullptr)
         {
           break;
         }
@@ -403,17 +403,17 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += obj->short_description;
+            interp += obj->getShortDescriptionC();
           else
             interp += "something";
         }
         else
         {
-          interp += obj->short_description;
+          interp += obj->getShortDescriptionC();
         }
         break;
       case 'P':
-        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->short_description == nullptr)
+        if (send_to == nullptr || vict_obj == nullptr || ((Object *)vict_obj)->getShortDescriptionC() == nullptr)
         {
           break;
         }
@@ -423,22 +423,22 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += ((Object *)vict_obj)->short_description;
+            interp += ((Object *)vict_obj)->getShortDescriptionC();
           else
             interp += "something";
         }
         else
         {
-          interp += ((Object *)vict_obj)->short_description;
+          interp += ((Object *)vict_obj)->getShortDescriptionC();
         }
         break;
       case 'a':
-        if (obj == nullptr || obj->name == nullptr)
+        if (obj == nullptr || obj->getName().toStdString().c_str() == nullptr)
         {
           break;
         }
 
-        switch (*(obj)->name)
+        switch (*(obj)->getName().toStdString().c_str())
         {
         case 'a':
         case 'A':
@@ -460,9 +460,9 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
         }
         break;
       case 'A':
-        if (vict_obj != nullptr && ((Object *)vict_obj)->name != nullptr)
+        if (vict_obj != nullptr && ((Object *)vict_obj)->getName().toStdString().c_str() != nullptr)
         {
-          switch (*((Object *)vict_obj)->name)
+          switch (*((Object *)vict_obj)->getName().toStdString().c_str())
           {
           case 'a':
           case 'A':

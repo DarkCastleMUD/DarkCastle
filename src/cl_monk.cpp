@@ -156,7 +156,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(GET_KI(ch) < 40 && GET_LEVEL(ch) < ARCHANGEL) {
+  if(GET_KI(ch) < 40 && GET_LEVEL(ch) < ARCHITECT) {
     send_to_char("You don't possess enough ki!\r\n", ch);
     return eFAILURE;
   }
@@ -265,19 +265,19 @@ int do_stun(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if(IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE))
   {
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if(IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM))
   {
     send_to_char("You cannot pick just one of them to stun!\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if(IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY))
   {
     act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;

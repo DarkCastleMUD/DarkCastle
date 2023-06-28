@@ -439,7 +439,7 @@ void do_on_login_stuff(Character *ch)
    isr_set(ch);
    ch->altar = clan_altar(ch);
 
-   if (!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL)
+   if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
    {
       ch->player->holyLite = true;
       GET_COND(ch, THIRST) = -1;
@@ -499,7 +499,7 @@ void do_on_login_stuff(Character *ch)
          ch->player->quest_complete[i] = 0;
    }
    if (ch->player->time.logon < 1151504181)
-      SET_BIT(ch->misc, LogChannels::CHANNEL_TELL);
+      SET_BIT(ch->getMiscReference(), LogChannels::CHANNEL_TELL);
 
    if (ch->player->time.logon < 1171757100)
    {
@@ -837,9 +837,9 @@ void check_hw(Character *ch)
 void set_hw(Character *ch)
 {
    ch->height = number(races[ch->race].min_height, races[ch->race].max_height);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
+   logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
    ch->weight = number(races[ch->race].min_weight, races[ch->race].max_weight);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
+   logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -1062,7 +1062,7 @@ void nanny(class Connection *d, string arg)
             if (d->character->player->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
-               logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
+               logentry(log_buf, ARCHITECT, LogChannels::LOG_SOCKET);
             }
             else
             {
@@ -1080,7 +1080,7 @@ void nanny(class Connection *d, string arg)
          return;
 
       sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->host);
-      if (GET_LEVEL(ch) < ANGEL)
+      if (GET_LEVEL(ch) < ARCHITECT)
          logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       else
          logentry(log_buf, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
@@ -1248,11 +1248,11 @@ void nanny(class Connection *d, string arg)
       {
       case 'm':
       case 'M':
-         ch->sex = SEX_MALE;
+         ch->setMale();
          break;
       case 'f':
       case 'F':
-         ch->sex = SEX_FEMALE;
+         ch->setFemale();
          break;
       default:
          SEND_TO_Q("That's not a sex.\r\n", d);
@@ -1988,7 +1988,7 @@ void nanny(class Connection *d, string arg)
          strcpy(ch->player->pwd, blah2);
          save_char_obj(ch);
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
-         logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
+         logentry(log_buf, ARCHITECT, LogChannels::LOG_SOCKET);
       }
 
       break;
@@ -2051,7 +2051,7 @@ bool check_deny(class Connection *d, char *name)
 
    char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->host);
-   logentry(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
+   logentry(log_buf, ARCHITECT, LogChannels::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
@@ -2206,7 +2206,7 @@ void update_characters()
    for (auto &i : character_list)
    {
 
-      if (i->brace_at) // if character is bracing
+      if (i->brace_at != nullptr) // if character is bracing
       {
          if (!charge_moves(i, SKILL_BATTERBRACE, 0.5) || !is_bracing(i, i->brace_at))
          {
@@ -2220,7 +2220,7 @@ void update_characters()
       }
       if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON)))
       {
-         logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+         logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getName());
          REMBIT(i->affected_by, AFF_POISON);
       }
 
@@ -2305,7 +2305,7 @@ void check_silence_beacons(void)
    for (obj = object_list; obj; obj = tmp_obj)
    {
       tmp_obj = obj->next;
-      if (obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if (obj_index[obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
       {
          if (obj->obj_flags.value[0] == 0)
             extract_obj(obj);
@@ -2329,7 +2329,7 @@ void checkConsecrate(int pulseType)
       for (obj = object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+         if (obj_index[obj->getNumber()].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             obj->obj_flags.value[1]--;
@@ -2394,7 +2394,7 @@ void checkConsecrate(int pulseType)
       for (obj = object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+         if (obj_index[obj->getNumber()].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             if (charExists(obj->obj_flags.origin))

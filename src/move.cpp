@@ -125,9 +125,9 @@ void record_track_data(Character *ch, int cmd)
 	newScent->direction = cmd;
 	newScent->weight = (int)ch->weight;
 	newScent->race = (int)ch->race;
-	newScent->sex = (int)ch->sex;
+	newScent->sex = ch->getSex();
 	newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
-	newScent->next = nullptr;	   // just in case
+	newScent->next = nullptr;	  // just in case
 	newScent->previous = nullptr; // just in case
 
 	if (IS_NPC(ch))
@@ -615,7 +615,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	}
 
 	// if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
-	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(world[world[ch->in_room].dir_option[cmd]->to_room].zone).isTown())
+	if (IS_NPC(ch) && ISSET(ch->mobile->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(world[world[ch->in_room].dir_option[cmd]->to_room].zone).isTown())
 		return eFAILURE;
 
 	int a = 0;
@@ -706,11 +706,11 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	Object *tmp_obj;
 	for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (obj_index[tmp_obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
 			send_to_char("The sounds around you fade to nothing as the silence takes hold...\r\n", ch);
 
 	for (tmp_obj = world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (obj_index[tmp_obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
 			send_to_char("The noise around you returns as you leave the silenced area!\n\r", ch);
 
 	if (!IS_SET(retval, eSUCCESS))
@@ -753,7 +753,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		// This might be a bad idea...cause track calls move, which calls track, which...
 		if (IS_NPC(chaser))
 		{
-			retval = do_track(chaser, chaser->mobdata->hatred, CMD_DEFAULT);
+			retval = do_track(chaser, chaser->mobile->hatred, CMD_DEFAULT);
 			if (SOMEONE_DIED(retval))
 				return retval;
 		}
@@ -772,7 +772,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	// Elemental stuff goes HERE
 	if (IS_NPC(ch))
 	{
-		int a = mob_index[ch->mobdata->nr].virt;
+		int a = mob_index[ch->mobile->getNumber()].virt;
 		// code a bit repeaty, but whatever ;)
 		if (a == 88 && world[ch->in_room].sector_type == SECT_UNDERWATER)
 		{
@@ -835,12 +835,12 @@ int do_simple_move(Character *ch, int cmd, int following)
 			if (!number(0, 1))
 				continue;
 
-			if (GET_CLASS(ch) == CLASS_BARD && ISSET(tmp_ch->mobdata->actflags, ACT_BARDCHARM))
+			if (GET_CLASS(ch) == CLASS_BARD && ISSET(tmp_ch->mobile->actflags, ACT_BARDCHARM))
 			{
 				act("$N looks at you expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_CHAR, 0);
 				act("$N looks at $n expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
 			}
-			else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch) && CAN_SEE(tmp_ch, ch))
+			else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobile->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch) && CAN_SEE(tmp_ch, ch))
 			{
 				act("$N moves submissively out of your way.", ch, nullptr, tmp_ch, TO_CHAR, 0);
 				act("$N moves submissively out of $n's way.", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
@@ -1055,7 +1055,7 @@ int do_leave(Character *ch, char *arguement, int cmd)
 							return eFAILURE;
 						}
 						do_look(ch, "", CMD_DEFAULT);
-						sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
+						sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->getShortDescriptionC());
 						act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 						return ambush(ch);
 					}
@@ -1102,7 +1102,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if (real_room(portal->obj_flags.value[0]) < 0)
 	{
-		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
+		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->getNumber());
 		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
 		send_to_char("You can't enter that.\r\n", ch);
 		return eFAILURE;
@@ -1120,7 +1120,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8)
+	if (IS_NPC(ch) && ch->master && mob_index[ch->mobile->getNumber()].virt == 8)
 	{
 		sesame = ch->master;
 		if (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
@@ -1155,14 +1155,14 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) && (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+	if (IS_PC(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) && (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
 	{
 		send_to_char("The portal's destination rebels against you.\r\n", ch);
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
 
-	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name))
+	if (isname("only", portal->getName()) && !isname(GET_NAME(sesame), portal->getName()))
 	{
 		send_to_char("The portal fades when you draw near, then shimmers as you withdraw.\r\n", ch);
 		return eFAILURE;
@@ -1176,16 +1176,16 @@ int do_enter(Character *ch, char *argument, int cmd)
 		break;
 	case 1:
 	case 2:
-		sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
+		sprintf(buf, "You take a bold step towards %s.\r\n", portal->getShortDescriptionC());
 		send_to_char(buf, ch);
-		sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), portal->short_description);
+		sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), portal->getShortDescriptionC());
 		act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 		break;
 	case 3:
 		send_to_char("You cannot enter that.\r\n", ch);
 		return eFAILURE;
 	default:
-		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
+		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->getNumber());
 		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
 		return eFAILURE;
 	}
@@ -1211,7 +1211,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		break;
 	case 1:
 	case 2:
-		sprintf(buf, "%s has entered %s.", GET_NAME(ch), portal->short_description);
+		sprintf(buf, "%s has entered %s.", GET_NAME(ch), portal->getShortDescriptionC());
 		act(buf, ch, 0, 0, TO_ROOM, STAYHIDE);
 		do_look(ch, "", CMD_DEFAULT);
 		break;
@@ -1291,13 +1291,13 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	if (real_room(dest) < 0)
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->item_number].virt);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->getNumber()].virt);
 		send_to_char("You can't climb that.\r\n", ch);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
 	act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-	sprintf(buf, "You carefully climb %s.\r\n", obj->short_description);
+	sprintf(buf, "You carefully climb %s.\r\n", obj->getShortDescriptionC());
 	send_to_char(buf, ch);
 	int retval = move_char(ch, real_room(dest));
 
@@ -1330,7 +1330,7 @@ int ambush(Character *ch)
 			(IS_SET(world[i->in_room].room_flags, SAFE) &&
 			 !IS_AFFECTED(ch, AFF_CANTQUIT)))
 			continue;
-		if (!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
+		if (IS_PC(i) && !i->desc) // don't work if I'm linkdead
 			continue;
 		if (isname(i->ambush, GET_NAME(ch)))
 		{
@@ -1359,7 +1359,7 @@ int ambush(Character *ch)
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
 				if (IS_SET(retval, eCH_DIED))
 					return (eSUCCESS); // doesn't matter, but don't lag vict
-				if (!IS_MOB(i) && IS_SET(i->player->toggles, PLR_WIMPY))
+				if (IS_PC(i) && IS_SET(i->player->toggles, PLR_WIMPY))
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
 				else
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);

@@ -32,8 +32,9 @@ public:
   bool decrease(uint64_t points = 1);
 };
 
-class Connection
+class Connection : public QObject
 {
+  Q_OBJECT
 public:
   enum states
   {
@@ -83,6 +84,16 @@ public:
     GET_STATS
   };
 
+  Connection(QObject *parent = nullptr) : QObject(parent) {}
+  Connection(Connection &connection, QObject *parent = nullptr) {}
+
+  void duplicate(Connection &connection) {}
+  void clear(void)
+  {
+    Connection c;
+    duplicate(c);
+  }
+
   int descriptor = {}; /* file descriptor for socket	*/
   int desc_num = {};
   char *name = {};       /* Copy of the player name	*/
@@ -122,7 +133,10 @@ public:
   bool color = {};
   bool server_size_echo = false;
   bool allowColor = 1;
+
   void send(QString txt);
+
+private:
 };
 
 #endif

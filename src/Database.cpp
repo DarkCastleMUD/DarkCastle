@@ -22,7 +22,7 @@ Database::Database()
     {
       stringstream errormsg;
       errormsg << "Unable to connect to database in Database::Database(): " << PQerrorMessage(conn);
-      logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
+      logentry(errormsg.str().c_str(), ARCHITECT, LogChannels::LOG_DATABASE);
       return;
     }
 
@@ -30,7 +30,7 @@ Database::Database()
     {
       stringstream errormsg;
       errormsg << "Unable to set database connection non-blocking: " << PQerrorMessage(conn);
-      logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
+      logentry(errormsg.str().c_str(), ARCHITECT, LogChannels::LOG_DATABASE);
     }
   }
 }
@@ -259,7 +259,7 @@ void Database::processqueue(void)
       {
         stringstream errormsg;
         errormsg << "Error in result found in Database::processqueue(): " << status;
-        logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
+        logentry(errormsg.str().c_str(), ARCHITECT, LogChannels::LOG_DATABASE);
       }
 
       PQclear(res);

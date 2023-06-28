@@ -71,14 +71,14 @@ int call_for_help_in_room(Character *ch, int iFriendId)
   // Any friends in the room?  Call for help!   int friends = 0;
   for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (IS_PC(ally))
       continue;
     if (ally == ch)
       continue;
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobile->getNumber())
     {
       if (!can_be_attacked(ally, ch->fighting))
         continue;
@@ -116,7 +116,7 @@ int protect(Character *ch, int iFriendId)
   // Any one I need to protect in the room?
   for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (IS_PC(ally))
       continue;
     if (!ally->fighting) // if they arne't fighting, they're safe
       continue;
@@ -125,7 +125,7 @@ int protect(Character *ch, int iFriendId)
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobile->getNumber())
     {
       // obscure whitney houston joke
       do_say(ch, "and IiiiIIiiii will always, looove yooooou!", CMD_DEFAULT);
@@ -233,9 +233,9 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
   auto &character_list = DC::getInstance()->character_list;
   for (auto &victim : character_list)
   {
-    if (!IS_MOB(victim))
+    if (IS_PC(victim))
       continue;
-    if (real_mobile(iFriendId) == victim->mobdata->nr)
+    if (real_mobile(iFriendId) == victim->mobile->getNumber())
     {
       move_char(victim, ch->in_room);
     }
@@ -256,9 +256,9 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
   // Is my friend in the room?
   for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (IS_PC(ally))
       continue;
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobile->getNumber())
       return ally;
   }
   return nullptr;
@@ -659,7 +659,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return eFAILURE;
 
-        if (!IS_MOB(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
+        if (IS_PC(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -998,11 +998,11 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   // 1 = north, 4  = west, 6 = down
 
   // If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
-  if (IS_MOB(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (IS_MOB(owner) && owner->mobile->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
-    guard_room = owner->mobdata->mob_flags.value[0];
-    guard_direction = owner->mobdata->mob_flags.value[1];
-    guard_clan = owner->mobdata->mob_flags.value[2];
+    guard_room = owner->mobile->mob_flags.value[0];
+    guard_direction = owner->mobile->mob_flags.value[1];
+    guard_clan = owner->mobile->mob_flags.value[2];
 
     if (in_room != real_room(guard_room) || cmd != guard_direction)
     {
@@ -1037,7 +1037,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   int clan_num = ch->clan;
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
   {
-    int b = mob_index[ch->mobdata->nr].virt;
+    int b = mob_index[ch->mobile->getNumber()].virt;
     switch (b)
     {
     case 8:     // golem
@@ -1063,7 +1063,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     }
   }
 
-  if (IS_MOB(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (IS_MOB(owner) && owner->mobile->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
@@ -1984,7 +1984,7 @@ int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
     if (IS_SET(i->obj_flags.wear_flags, ITEM_TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !IS_SET(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        obj_index[i->item_number].virt != CHAMPION_ITEM)
+        obj_index[i->getNumber()].virt != CHAMPION_ITEM)
     {
       act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
       move_obj(i, ch);
@@ -2008,7 +2008,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
   if (GET_POS(ch) == POSITION_FIGHTING)
     return eFAILURE;
 
-  if (!ch->mobdata->hatred)
+  if (!ch->mobile->hatred)
     return eFAILURE;
 
   if (ch->fighting)
@@ -2269,7 +2269,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
      * Should be some code here to defend against weird monsters
      * getting loaded into the pet shop back room.  -- Furey
      */
-    pet = clone_mobile(pet->mobdata->nr);
+    pet = clone_mobile(pet->mobile->getNumber());
     GET_EXP(pet) = 0;
     SETBIT(pet->affected_by, AFF_CHARM);
 
@@ -2420,7 +2420,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_MOB(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
+        if (IS_PC(tch) && IS_SET(tch->player->toggles, PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -2844,7 +2844,7 @@ int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   mob = clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    logentry("Foggy combat mobile missing", ANGEL, LogChannels::LOG_BUG);
+    logentry("Foggy combat mobile missing", ARCHITECT, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   // put it in the room ch is in
@@ -3614,7 +3614,7 @@ int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  switch (mob_index[ch->mobdata->nr].virt)
+  switch (mob_index[ch->mobile->getNumber()].virt)
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

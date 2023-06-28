@@ -202,7 +202,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
 
   for (k = object_list, j = 1; k && (j <= nIndex); k = k->next)
   {
-    if (!(isname(pBuf, k->name)))
+    if (!(isname(pBuf, k->getName())))
       continue;
     if (!CAN_SEE_OBJ(ch, k))
       continue;
@@ -261,13 +261,13 @@ int do_purloin(Character *ch, char *argument, int cmd)
       if (vict != nullptr)
       {
         csendf(ch, "You purloin %s from %s.\r\n",
-               k->short_description, GET_NAME(vict));
+               k->getShortDescriptionC(), GET_NAME(vict));
         logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s purloins %s from %s",
-             GET_NAME(ch), k->short_description, GET_NAME(vict));
+             GET_NAME(ch), k->getShortDescriptionC(), GET_NAME(vict));
       }
       else
       {
-        csendf(ch, "You purloin %s.\r\n", k->short_description);
+        csendf(ch, "You purloin %s.\r\n", k->getShortDescriptionC());
       }
       move_obj(k, ch);
       return eSUCCESS;
@@ -404,13 +404,13 @@ int do_set(Character *ch, char *argument, int cmd)
     switch (*buf)
     {
     case 'm':
-      vict->sex = SEX_MALE;
+      vict->setMale();
       break;
     case 'f':
-      vict->sex = SEX_FEMALE;
+      vict->setFemale();
       break;
     case 'n':
-      vict->sex = SEX_NEUTRAL;
+      vict->setNeutral();
       break;
     }
   }
@@ -474,7 +474,7 @@ int do_set(Character *ch, char *argument, int cmd)
   case 3: /* level */
   {
     value = atoi(buf);
-    if (value > MAX_MORTAL && value < MIN_GOD)
+    if (value > MAX_MORTAL && value < IMMORTAL)
     {
       send_to_char("That level doesn't exist!\n\r", ch);
       return eFAILURE;

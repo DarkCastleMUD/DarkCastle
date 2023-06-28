@@ -26,7 +26,7 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
-int read_pc_or_mob_data(Character *ch, FILE *fpsave);
+int read_pc_or_Mobile(Character *ch, FILE *fpsave);
 void init_random();
 void load_vaults();
 
@@ -40,7 +40,7 @@ bool verbose_mode = false;
 void test_handle_ansi(string test)
 {
   cout << "Testing '" << test << "'" << endl;
-  Character *ch = new Character;
+  Character *ch = new Character(DC::getInstance());
   ch->player = new Player;
   SET_BIT(ch->player->toggles, PLR_ANSI);
   GET_LEVEL(ch) = 1;
@@ -145,7 +145,7 @@ void showObjectAffects(Object *obj)
 
 void showObjectVault(const char *owner, Object *obj)
 {
-  cout << obj_index[obj->item_number].virt << ":";
+  cout << obj_index[obj->getNumber()].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
@@ -162,12 +162,12 @@ void showObjectVault(const char *owner, Object *obj)
 
   showObjectAffects(obj);
 
-  cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
+  cout << " " << obj->getShortDescriptionC() << " in " << owner << "'s vault." << endl;
 }
 
 void showObject(Character *ch, Object *obj)
 {
-  cout << obj_index[obj->item_number].virt << ":";
+  cout << obj_index[obj->getNumber()].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
@@ -184,50 +184,44 @@ void showObject(Character *ch, Object *obj)
 
   showObjectAffects(obj);
 
-  cout << " " << obj->short_description << " in " << GET_NAME(ch) << endl;
+  cout << " " << obj->getShortDescriptionC() << " in " << GET_NAME(ch) << endl;
 }
+
+void pulse_takeover(void);
+void zone_update(void);
+void affect_update(int32_t duration_type);
+void point_update(void);
+void food_update(void);
+void mobile_activity(void);
+void object_activity(uint64_t pulse_type);
+void update_corpses_and_portals(void);
+void string_hash_add(class Connection *d, char *str);
+void perform_violence(void);
+int isbanned(char *hostname);
+void time_update();
+void weather_update();
+void send_hint();
+extern void pulse_command_lag();
+void checkConsecrate(int);
+void update_max_who(void);
+void short_activity(void);
+void update_bard_singing(void);
+void update_mprog_throws(void);
+void update_characters(void);
+void check_silence_beacons(void);
+void affect_update(int32_t duration_type);
+void auction_expire(void);
+void weather_update(void);
+void checkConsecrate(int32_t);
+void check_idle_passwords(void);
+void check_champion_and_website_who_list(void);
+void save_slot_machines(void);
+void pulse_hunts(void);
+void redo_shop_profit(void);
 
 int main(int argc, char **argv)
 {
   DC dcastle(argc, argv);
-
-  // Tests only
-  if (argc < 2)
-  {
-    test_handle_ansi("");
-    test_handle_ansi("$");
-    test_handle_ansi("$$");
-    test_handle_ansi("$$$");
-    test_handle_ansi("$ $$ $$$");
-    test_handle_ansi("$$$$$$$$");
-    test_handle_ansi("$ ");
-    test_handle_ansi("$x");
-    test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
-
-    string arg1 = {}, remainder = "charm sleep ";
-    do
-    {
-      tie(arg1, remainder) = half_chop(remainder);
-      cerr << "[" << arg1 << "]"
-           << "[" << remainder << "]" << endl;
-    } while (arg1.empty() == false);
-
-    char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
-    do
-    {
-      half_chop(c_input, c_arg1, c_arg2);
-      cerr << "[" << c_arg1 << "]"
-           << "[" << c_arg2 << "]" << endl;
-      strncpy(c_input, c_arg2, sizeof(c_input) - 1);
-    } while (c_arg1[0] != '\0');
-
-    cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
-
-    exit(0);
-  }
-
-  DC debug(argc, argv);
-
   string orig_cwd, dclib;
   if (getenv("DCLIB"))
   {
@@ -264,6 +258,40 @@ int main(int argc, char **argv)
   logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
   renum_zone_table();
 
+  mobile_activity();
+  object_activity(DC::PULSE_MOBILE);
+  check_timer();
+  affect_update(DC::PULSE_TIMER);
+  short_activity();
+  pulse_command_lag();
+  update_bard_singing();
+  update_mprog_throws();             // convienant place to put it
+  update_make_camp_and_leadership(); // and this, too
+  perform_violence();
+  update_characters();
+  affect_update(DC::PULSE_VIOLENCE);
+  check_silence_beacons();
+  checkConsecrate(DC::PULSE_TENSEC);
+  weather_update();
+  auction_expire();
+  point_update();
+  pulse_takeover();
+  affect_update(DC::PULSE_REGEN);
+  checkConsecrate(DC::PULSE_REGEN);
+  dcastle.send_hint();
+  zone_update();
+  time_update();
+  food_update();
+  affect_update(DC::PULSE_TIME);
+  update_corpses_and_portals();
+  check_idle_passwords();
+  quest_update();
+  leaderboard.check(); // good place to put this
+  check_champion_and_website_who_list();
+  save_slot_machines();
+  pulse_hunts();
+  redo_shop_profit();
+
   class Connection *d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
@@ -282,7 +310,7 @@ int main(int argc, char **argv)
   }
 
   d = new Connection;
-  Character *ch = new Character;
+  Character *ch = new Character(DC::getInstance());
   ch->name = strdup("DebugIMP");
   ch->player = new Player;
 
@@ -300,7 +328,7 @@ int main(int argc, char **argv)
   do_look(ch, "", CMD_LOOK);
   process_output(d);
 
-  if (argv[1] == string("all") || argv[1] == string("leaderboard"))
+  if (argc > 1 && QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard")
   {
     Object *obj = nullptr;
     string savepath = dclib + "../save/";
@@ -337,7 +365,7 @@ int main(int argc, char **argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+                    if (vnum > 0 && obj_index[obj->getNumber()].virt == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -347,7 +375,7 @@ int main(int argc, char **argv)
 
               for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
+                if (vnum == 0 || (vnum > 0 && obj_index[obj->getNumber()].virt == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -356,7 +384,7 @@ int main(int argc, char **argv)
                 {
                   for (Object *container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && obj_index[container->item_number].virt == vnum)
+                    if (vnum > 0 && obj_index[container->getNumber()].virt == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -421,7 +449,7 @@ int main(int argc, char **argv)
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+        if (vnum > 0 && obj_index[obj->getNumber()].virt == vnum)
         {
           showObjectVault(vault->owner, obj);
         }

@@ -116,7 +116,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      int vnum = obj_index[curr->item_number].virt;
+      int vnum = obj_index[curr->getNumber()].virt;
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -134,11 +134,11 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == obj_index[curr->item_number].virt)
+      if (golem_list[golemtype].components[i] == obj_index[curr->getNumber()].virt)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
-          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
+          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->getShortDescriptionC());
           send_to_char(buf, ch);
           obj_from_char(curr);
           extract_obj(curr);
@@ -146,7 +146,7 @@ int verify_existing_components(Character *ch, int golemtype)
         }
         else
         {
-          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", curr->short_description);
+          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", curr->getShortDescriptionC());
           send_to_char(buf, ch);
           break;
         }
@@ -167,7 +167,7 @@ void save_golem_data(Character *ch)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
+    logentry("Error while opening file in save_golem_data[golem.cpp].", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
@@ -202,7 +202,7 @@ void save_charmie_data(Character *ch)
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->name[0], ch->name, 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      logf(ANGEL, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      logf(ARCHITECT, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
@@ -238,20 +238,20 @@ void set_golem(Character *golem, int golemtype)
     SETBIT(golem->affected_by, AFF_GOLEM);
   SETBIT(golem->affected_by, AFF_INFRARED);
   SETBIT(golem->affected_by, AFF_STABILITY);
-  SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
-  golem->misc = MISC_IS_MOB;
+  SETBIT(golem->mobile->actflags, ACT_2ND_ATTACK);
+  golem->setMisc(MISC_IS_MOB);
   golem->armor = 0;
   golem->level = 1;
   golem->hitroll = golem_list[golemtype].hit / 20;
   golem->damroll = golem_list[golemtype].dam / 20;
   golem->armor = golem_list[golemtype].ac / 20;
   golem->raw_hit = golem->max_hit = golem->hit = golem_list[golemtype].max_hp / 20;
-  golem->mobdata->damnodice = golem_list[golemtype].roll1;
-  golem->mobdata->damsizedice = golem_list[golemtype].roll2;
+  golem->mobile->damnodice = golem_list[golemtype].roll1;
+  golem->mobile->damsizedice = golem_list[golemtype].roll2;
   golem->setGold(0);
   golem->plat = 0;
   golem->move = golem->max_move = golem->mana = golem->max_mana = 100;
-  golem->mobdata->last_room = 0;
+  golem->mobile->last_room = 0;
   golem->position = POSITION_STANDING;
   golem->immune = golem->suscept = golem->resist = 0;
   golem->c_class = 0;
@@ -557,7 +557,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
+    if (IS_NPC(fol->follower) && mob_index[fol->follower->mobile->getNumber()].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

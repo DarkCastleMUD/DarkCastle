@@ -188,9 +188,9 @@ struct command_info cmd_info[] =
         {"brace", do_brace, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"close", do_close, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
         {"donate", do_donate, nullptr, nullptr, POSITION_RESTING, 0, CMD_DONATE, COM_CHARMIE_OK, 1, CommandType::all},
-        {"drink", do_drink, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
+        {"drink", nullptr, nullptr, &Character::do_drink, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
         {"drop", do_drop, nullptr, nullptr, POSITION_RESTING, 0, CMD_DROP, COM_CHARMIE_OK, 25, CommandType::all},
-        {"eat", do_eat, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
+        {"eat", nullptr, nullptr, &Character::do_eat, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
         {"fill", do_fill, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
         {"give", do_give, nullptr, nullptr, POSITION_RESTING, 0, CMD_GIVE, COM_CHARMIE_OK, 25, CommandType::all},
         {"grab", do_grab, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
@@ -469,38 +469,38 @@ struct command_info cmd_info[] =
         {"reload", do_reload, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"plats", do_plats, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"bellow", do_thunder, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_BELLOW, 0, 1, CommandType::all},
-        {"string", do_string, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"string", nullptr, nullptr, &Character::do_string, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"transfer", nullptr, do_transfer, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"gtrans", do_gtrans, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"boot", do_boot, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"linkdead", do_linkdead, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"teleport", do_teleport, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purge", do_purge, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"show", do_show, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"show", do_show, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
         {"search", nullptr, nullptr, &Character::do_search, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"fighting", do_fighting, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"peace", do_peace, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"peace", do_peace, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
         {"check", do_check, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"zoneexits", do_zoneexits, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"find", do_find, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"stat", do_stat, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"redit", do_redit, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"guild", do_guild, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"oedit", do_oedit, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"clear", do_clear, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"repop", nullptr, do_repop, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"medit", do_medit, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"rdelete", do_rdelete, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"oneway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 1, 0, 1, CommandType::all},
-        {"twoway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 2, 0, 1, CommandType::all},
-        {"zsave", nullptr, nullptr, &Character::do_zsave, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"rsave", do_rsave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"msave", do_msave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"osave", do_osave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"rstat", do_rstat, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"redit", do_redit, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"guild", do_guild, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"oedit", do_oedit, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"clear", do_clear, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"repop", nullptr, do_repop, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"medit", do_medit, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"rdelete", do_rdelete, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"oneway", do_oneway, nullptr, nullptr, POSITION_DEAD, ARCHITECT, 1, 0, 1, CommandType::all},
+        {"twoway", do_oneway, nullptr, nullptr, POSITION_DEAD, ARCHITECT, 2, 0, 1, CommandType::all},
+        {"zsave", nullptr, nullptr, &Character::do_zsave, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"rsave", do_rsave, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"msave", do_msave, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"osave", do_osave, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"rstat", do_rstat, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
         {"possess", do_possess, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"fsave", nullptr, do_fsave, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"zedit", do_zedit, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"zedit", do_zedit, nullptr, nullptr, POSITION_DEAD, ARCHITECT, CMD_DEFAULT, 0, 1, CommandType::all},
         {"colors", do_colors, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"colours", do_colors, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"incognito", do_incognito, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -932,7 +932,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::non_players_only:
-        if (ch == nullptr || ch->mobdata == nullptr)
+        if (ch == nullptr || ch->mobile == nullptr)
         {
           return eFAILURE;
         }
@@ -1340,24 +1340,6 @@ const char *one_argument_long(const char *argument, char *first_arg)
 char *one_argument(char *argument, char *first_arg)
 {
   return one_argument_long(argument, first_arg);
-  int begin, look_at;
-
-  begin = 0;
-
-  do
-  {
-    /* Find first non blank */
-    for (; isspace(*(argument + begin)); begin++)
-      ;
-    /* Find length of first word */
-    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-      /* Make all letters lower case, and copy them to first_arg */
-      *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-    *(first_arg + look_at) = '\0';
-    begin += look_at;
-  } while (fill_word(first_arg));
-
-  return (argument + begin);
 }
 
 const char *one_argument(const char *argument, char *first_arg)
@@ -1609,20 +1591,20 @@ int special(Character *ch, int cmd, char *arg)
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (ch->equipment[j] && ch->equipment[j]->item_number >= 0)
-      if (obj_index[ch->equipment[j]->item_number].non_combat_func)
+    if (ch->equipment[j] && ch->equipment[j]->getNumber() >= 0)
+      if (obj_index[ch->equipment[j]->getNumber()].non_combat_func)
       {
-        retval = ((*obj_index[ch->equipment[j]->item_number].non_combat_func)(ch, ch->equipment[j], cmd, arg, ch));
+        retval = ((*obj_index[ch->equipment[j]->getNumber()].non_combat_func)(ch, ch->equipment[j], cmd, arg, ch));
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
       }
 
   /* special in inventory? */
   for (i = ch->carrying; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (obj_index[i->item_number].non_combat_func)
+    if (i->getNumber() >= 0)
+      if (obj_index[i->getNumber()].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
+        retval = ((*obj_index[i->getNumber()].non_combat_func)(ch, i, cmd, arg, ch));
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
       }
@@ -1632,16 +1614,16 @@ int special(Character *ch, int cmd, char *arg)
   {
     if (IS_MOB(k))
     {
-      if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((Character *)mob_index[k->mobile->getNumber()].item)->mobile->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(ch, 0, cmd, arg, k);
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
       }
-      else if (mob_index[k->mobdata->nr].non_combat_func)
+      else if (mob_index[k->mobile->getNumber()].non_combat_func)
       {
-        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
-                                                               cmd, arg, k));
+        retval = ((*mob_index[k->mobile->getNumber()].non_combat_func)(ch, 0,
+                                                                       cmd, arg, k));
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
       }
@@ -1650,10 +1632,10 @@ int special(Character *ch, int cmd, char *arg)
 
   /* special in object present? */
   for (i = world[ch->in_room].contents; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (obj_index[i->item_number].non_combat_func)
+    if (i->getNumber() >= 0)
+      if (obj_index[i->getNumber()].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
+        retval = ((*obj_index[i->getNumber()].non_combat_func)(ch, i, cmd, arg, ch));
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
       }

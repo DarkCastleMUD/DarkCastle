@@ -119,9 +119,10 @@ int do_kick(Character *ch, char *argument, int cmd)
     if (SOMEONE_DIED(retval))
       return retval;
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-    if (obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+    if (obj_index[ch->equipment[WEAR_FEET]->getNumber()].combat_func)
+    if (obj_index[ch->equipment[WEAR_FEET]->getNumber()].combat_func)
     {
-      retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
+      retval = ((*obj_index[ch->equipment[WEAR_FEET]->getNumber()].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -150,9 +151,9 @@ int do_kick(Character *ch, char *argument, int cmd)
       if (SOMEONE_DIED(retval))
         return retval;
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-      if (obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+      if (obj_index[ch->equipment[WEAR_FEET]->getNumber()].combat_func)
       {
-        retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
+        retval = ((*obj_index[ch->equipment[WEAR_FEET]->getNumber()].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
       }
     }
   }
@@ -381,7 +382,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
 int do_hitall(Character *ch, char *argument, int cmd)
 {
-  if (IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_HITALL))
+  if (IS_PC(ch) && GET_LEVEL(ch) < ARCHITECT && !has_skill(ch, SKILL_HITALL))
   {
     send_to_char("You better learn how to first...\r\n", ch);
     return eFAILURE;
@@ -482,19 +483,19 @@ int do_bash(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE))
   {
     send_to_char("You cannot bash something that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM))
   {
     send_to_char("You cannot pick just one to bash!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY))
   {
     send_to_char("You cannot target something that tiny!\n\r", ch);
     return eFAILURE;
@@ -616,9 +617,9 @@ int do_bash(Character *ch, char *argument, int cmd)
   // if our shield has a combat proc and we hit them, let'um have it!
   if (hit && ch->equipment[WEAR_SHIELD])
   {
-    if (obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
+    if (obj_index[ch->equipment[WEAR_SHIELD]->getNumber()].combat_func)
     {
-      retval = ((*obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], 0, "", ch));
+      retval = ((*obj_index[ch->equipment[WEAR_SHIELD]->getNumber()].combat_func)(ch, ch->equipment[WEAR_SHIELD], 0, "", ch));
     }
   }
 
@@ -751,7 +752,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
       send_to_char("You can't seem to work it loose.\r\n", ch);
       return eFAILURE;
     }
-    if (obj_index[ch->equipment[WIELD]->item_number].virt == 27997)
+    if (obj_index[ch->equipment[WIELD]->getNumber()].virt == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
       return eSUCCESS;
@@ -785,8 +786,8 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
     if (((IS_SET(wielded->obj_flags.extra_flags, ITEM_NODROP) || IS_SET(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (GET_LEVEL(victim) >= IMMORTAL)) &&
-        (IS_PC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
-         mob_index[victim->mobdata->nr].virt < 2300))
+        (IS_PC(victim) || mob_index[victim->mobile->getNumber()].virt > 2400 ||
+         mob_index[victim->mobile->getNumber()].virt < 2300))
       send_to_char("You can't seem to work it loose.\r\n", ch);
     else
       disarm(ch, victim);
@@ -1078,7 +1079,7 @@ int do_guard(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
 
-  if (!IS_MOB(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE)))
+  if (IS_PC(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE)))
   {
     send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
     return eFAILURE;
@@ -1206,7 +1207,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_MAKE_CAMP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("You do not know how to set up a safe camp.\r\n", ch);
     return eFAILURE;
@@ -1369,7 +1370,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_BATTLESENSE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("You do not know how to heighten your battle awareness.\r\n", ch);
     return eFAILURE;
@@ -1411,7 +1412,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("You do not know how to smite your enemies effectively.\r\n", ch);
     return eFAILURE;
@@ -1495,7 +1496,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_LEADERSHIP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("You do not know that ability.\r\n", ch);
     return eFAILURE;
@@ -1554,7 +1555,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_PERSEVERANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("Your lack of fortitude is stunning.\r\n", ch);
     return eFAILURE;
@@ -1595,7 +1596,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (IS_PC(ch) && GET_LEVEL(ch) <= ARCHITECT && !learned)
   {
     send_to_char("You do not know how to use this to your advantage.\r\n", ch);
     return eFAILURE;

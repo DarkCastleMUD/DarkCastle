@@ -591,11 +591,11 @@ int start_quest(Character *ch, struct quest_info *quest)
    }
 
    obj = clone_object(real_object(quest->objnum));
-   obj->short_description = str_hsh(quest->objshort);
+   obj->setShortDescription(quest->objshort);
    obj->description = str_hsh(quest->objlong);
 
    sprintf(buf, "%s %s q%d", quest->objkey, GET_NAME(ch), quest->number);
-   obj->name = str_hsh(buf);
+   obj->setName(buf);
 
    SET_BIT(obj->obj_flags.extra_flags, ITEM_SPECIAL);
    SET_BIT(obj->obj_flags.extra_flags, ITEM_QUEST);
@@ -790,10 +790,10 @@ void quest_update()
                if ((mob = get_mob_vnum(quest->mobnum)))
                {
                   obj = clone_object(quest->objnum);
-                  obj->short_description = str_hsh(quest->objshort);
+                  obj->setShortDescription(quest->objshort);
                   obj->description = str_hsh(quest->objlong);
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
-                  obj->name = str_hsh(buf);
+                  obj->setName(buf);
                   obj_to_char(obj, mob);
                   wear(mob, obj, obj->keywordfind());
                }
@@ -1591,7 +1591,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
            return eSUCCESS;
             } else */
       if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
-          search_char_for_item(ch, obj->item_number, false))
+          search_char_for_item(ch, obj->getNumber(), false))
       {
          sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
          do_tell(owner, buf, 0);
@@ -1614,7 +1614,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
       obj_to_char(obj, ch);
-      sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
+      sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->getShortDescriptionC());
       do_tell(owner, buf, 0);
       return eSUCCESS;
    }
@@ -1631,11 +1631,11 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (!isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) &&
-          obj_index[obj->item_number].virt != 3124 &&
-          obj_index[obj->item_number].virt != 3125 &&
-          obj_index[obj->item_number].virt != 3126 &&
-          obj_index[obj->item_number].virt != 3127)
+      if (!isname("quest", ((Object *)(obj_index[obj->getNumber()].item))->getName().toStdString().c_str()) &&
+          obj_index[obj->getNumber()].virt != 3124 &&
+          obj_index[obj->getNumber()].virt != 3125 &&
+          obj_index[obj->getNumber()].virt != 3126 &&
+          obj_index[obj->getNumber()].virt != 3127)
       {
          sprintf(buf, "%s I only buy quest equipment.", GET_NAME(ch));
          do_tell(owner, buf, 0);

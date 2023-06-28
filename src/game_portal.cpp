@@ -189,7 +189,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 #else
   from_portal = (class Object *)dc_alloc(1, sizeof(class Object));
 #endif
-  clear_object(from_portal);
+  from_portal->clear();
 
   if (real_room(from_room) == DC::NOWHERE)
   {
@@ -208,13 +208,13 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
   if (duplicate < 0) /* Make a generic portal */
   {
-    from_portal->name = str_hsh("portal");
-    from_portal->short_description = str_hsh("a path to a hidden world");
+    from_portal->setName("portal");
+    from_portal->setShortDescription("a path to a hidden world");
     from_portal->description = str_hsh("A mystical path to a hidden world "
                                        "shimmers in the air before you.");
 
     from_portal->obj_flags.type_flag = ITEM_PORTAL;
-    from_portal->item_number = (-1);
+    from_portal->setNumber(0);
 
     /* Only need to do this if I didn't clone it */
     from_portal->next = object_list;
@@ -273,7 +273,7 @@ void find_and_remove_player_portal(Character *ch)
   {
     next_k = k->next;
     if (GET_ITEM_TYPE(k) != ITEM_PORTAL ||
-        !strstr(k->name, searchstr))
+        !strstr(k->getName().toStdString().c_str(), searchstr))
       continue;
 
     // at this point, the portal belongs to the person that quit

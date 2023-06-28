@@ -39,6 +39,7 @@
 #include "inventory.h"
 #include "const.h"
 #include "wizard.h"
+#include "LegacyFile.h"
 
 extern struct index_data *mob_index;
 
@@ -140,7 +141,7 @@ int unlimited_supply(class Object *item, int shop_nr)
 
   for (obj = shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
-    if (item->item_number == obj->item_number)
+    if (item->getNumber() == obj->getNumber())
       return true;
   }
 
@@ -157,7 +158,7 @@ void restock_keeper(Character *keeper, int shop_nr)
 
   for (obj = shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
-    obj2 = clone_object(obj->item_number);
+    obj2 = clone_object(obj->getNumber());
     obj_to_char(obj2, keeper);
   }
 }
@@ -184,7 +185,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+  if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
   {
     send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return;
@@ -237,7 +238,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(ch, obj->item_number, false))
+    if (search_char_for_item(ch, obj->getNumber(), false))
     {
       send_to_char("The item's uniqueness prevents it!\r\n", ch);
       return;
@@ -247,7 +248,7 @@ void shopping_buy(const char *arg, Character *ch,
   act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
   sprintf(buf, shop_index[shop_nr].message_buy, GET_NAME(ch), cost);
   do_tell(keeper, buf, 0);
-  sprintf(buf, "You now have %s.\r\n", obj->short_description);
+  sprintf(buf, "You now have %s.\r\n", obj->getShortDescriptionC());
   send_to_char(buf, ch);
   ch->removeGold(cost);
   keeper->addGold(cost);
@@ -258,13 +259,13 @@ void shopping_buy(const char *arg, Character *ch,
   // Wormhole to map_eq_level
   /*
   if( obj->obj_flags.eq_level == 1000 )
-       obj = clone_object(obj->item_number);
+       obj = clone_object(obj->getNumber());
   else
       obj_from_char( obj );
   */
 
   if (unlimited_supply(obj, shop_nr))
-    obj = clone_object(obj->item_number);
+    obj = clone_object(obj->getNumber());
   else
     obj_from_char(obj);
 
@@ -297,7 +298,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (IS_PC(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
     send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return;
@@ -340,9 +341,9 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  int virt = obj_index[obj->item_number].virt;
+  int virt = obj_index[obj->getNumber()].virt;
   if (virt >= 13400 && virt <= 13707 &&
-      mob_index[keeper->mobdata->nr].virt != 13416)
+      mob_index[keeper->mobile->getNumber()].virt != 13416)
   {
     sprintf(buf, "%s There is only one merchant in the land that deals with such fine jewels.", GET_NAME(ch));
     do_tell(keeper, buf, 0);
@@ -368,12 +369,12 @@ void shopping_sell(const char *arg, Character *ch,
   act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
   sprintf(buf, shop_index[shop_nr].message_sell, GET_NAME(ch), cost);
   do_tell(keeper, buf, 0);
-  sprintf(buf, "The shopkeeper now has %s.\r\n", obj->short_description);
+  sprintf(buf, "The shopkeeper now has %s.\r\n", obj->getShortDescriptionC());
   send_to_char(buf, ch);
   ch->addGold(cost);
   keeper->removeGold(cost);
 
-  strcpy(argm, obj->name);
+  strcpy(argm, obj->getName().toStdString().c_str());
 
   if (get_obj_in_list(argm, keeper->carrying) || GET_ITEM_TYPE(obj) == ITEM_TRASH || unlimited_supply(obj, shop_nr))
   {
@@ -423,7 +424,7 @@ void shopping_value(const char *arg, Character *ch,
     }
   }
 
-  if (mob_index[keeper->mobdata->nr].virt == 3003)
+  if (mob_index[keeper->mobile->getNumber()].virt == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -440,8 +441,8 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintf(buf, "Well, %s is able to be used by ", obj->getShortDescriptionC());
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be wielded by these classes: ");
@@ -472,7 +473,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.", CMD_DEFAULT);
   }
-  if (mob_index[keeper->mobdata->nr].virt == 3004)
+  if (mob_index[keeper->mobile->getNumber()].virt == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -489,8 +490,8 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintf(buf, "Ah yes, %s can be worn by ", obj->getShortDescriptionC());
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
@@ -516,7 +517,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I deal with armor exclusively.", CMD_DEFAULT);
   }
-  if (mob_index[keeper->mobdata->nr].virt == 3000)
+  if (mob_index[keeper->mobile->getNumber()].virt == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -533,7 +534,7 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.value[0] < 20)
       {
-        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
+        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->getShortDescriptionC(), obj->obj_flags.value[0]);
         do_say(keeper, buf, CMD_DEFAULT);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
@@ -573,7 +574,7 @@ void shopping_value(const char *arg, Character *ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", CMD_DEFAULT);
   }
 
-  if (mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
+  if (mob_index[keeper->mobile->getNumber()].virt == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
@@ -581,8 +582,8 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintf(buf, "Ah yes, %s can be worn by ", obj->getShortDescriptionC());
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
@@ -660,7 +661,7 @@ void shopping_list(const char *arg, Character *ch,
 
     cost = (int)(obj->obj_flags.cost * shop_index[shop_nr].profit_buy);
 
-    int vnum = obj_index[obj->item_number].virt;
+    int vnum = obj_index[obj->getNumber()].virt;
     bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
@@ -668,23 +669,23 @@ void shopping_list(const char *arg, Character *ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = obj_index[obj->item_number].virt;
+      done[i++] = obj_index[obj->getNumber()].virt;
     else
       break;
     a = 0;
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (obj_index[tobj->item_number].virt == obj_index[obj->item_number].virt)
+      if (obj_index[tobj->getNumber()].virt == obj_index[obj->getNumber()].virt)
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
                 sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
-                    a, cost, obj->short_description,
+                    a, cost, obj->getShortDescriptionC(),
                     drinks[obj->obj_flags.value[2]] );
             }
             else
             {*/
     sprintf(buf, "[%3d] [%7d] %s.\r\n",
-            a, cost, obj->short_description);
+            a, cost, obj->getShortDescriptionC());
     //        }
     send_to_char(buf, ch);
   }
@@ -709,7 +710,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( IS_MOB(keeper) && mob_index[keeper->mobile->getNumber()].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -717,17 +718,17 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Shop_keeper: keeper not found.", ARCHITECT, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
   // LFound1:
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
   {
-    if (shop_index[shop_nr].keeper == keeper->mobdata->nr)
+    if (shop_index[shop_nr].keeper == keeper->mobile->getNumber())
       goto LFound2;
   }
-  logentry("Shop_keeper: shop_nr not found.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Shop_keeper: shop_nr not found.", ARCHITECT, LogChannels::LOG_BUG);
   return eFAILURE;
 
 LFound2:
@@ -898,10 +899,10 @@ void assign_the_shopkeepers()
 
 void fix_shopkeepers_inventory()
 {
-  int shop_nr;
+  int shop_nr = {};
 
-  Character *keeper = 0;
-  class Object *obj, *last_obj, *cloned;
+  Character *keeper = nullptr;
+  class Object *obj = nullptr, *last_obj = nullptr, *cloned = nullptr;
 
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
@@ -909,17 +910,20 @@ void fix_shopkeepers_inventory()
     for (keeper = world[shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (IS_MOB(keeper) && mob_index[keeper->mobile->getNumber()].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
-          last_obj = clone_object(keeper->carrying->item_number);
+          last_obj = clone_object(keeper->carrying->getNumber());
           shop_index[shop_nr].inventory = last_obj;
           for (obj = keeper->carrying->next_content; obj;
                obj = obj->next_content)
           {
-            cloned = clone_object(obj->item_number);
-            last_obj->next_content = cloned;
+            cloned = clone_object(obj->getNumber());
+            if (last_obj != nullptr)
+            {
+              last_obj->next_content = cloned;
+            }
             last_obj = cloned;
           }
         }
@@ -1055,15 +1059,16 @@ void save_player_shop_world_range()
     exit(1);
   }
 
-  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.")) == nullptr)
+  LegacyFile world_file("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.");
+  if (world_file.getStream() == nullptr)
   {
     return;
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
+  {
     write_one_room(f, x);
-  fprintf(f, "$~\n");
-  fclose(f);
+  }
 }
 
 void boot_player_shops()
@@ -1181,7 +1186,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   // add it to list
   player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
-  newitem->item_vnum = obj_index[obj->item_number].virt;
+  newitem->item_vnum = obj_index[obj->getNumber()].virt;
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1449,7 +1454,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       if (robj < 0)
         csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, "INVALID ITEM NUMBER", item->price);
       else
-        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, ((Object *)obj_index[robj].item)->short_description, item->price);
+        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, ((Object *)obj_index[robj].item)->getShortDescriptionC(), item->price);
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
@@ -1462,7 +1467,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
 
   if (!(keeper = invoker))
   {
-    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Shop_keeper: keeper not found.", ARCHITECT, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1690,7 +1695,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, ((Object *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+        strncpy(item_buf, ((Object *)obj_index[real_object(eddie[i].item_vnum)].item)->getShortDescriptionC(), 1024);
       }
       else
       {
@@ -1699,7 +1704,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, ((Object *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+        strncpy(cost_buf, ((Object *)obj_index[real_object(eddie[i].cost_vnum)].item)->getShortDescriptionC(), 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1842,7 +1847,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
           act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
           act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
 
-          sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
+          sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->getName().toStdString().c_str(),
                   GET_NAME(owner));
           logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
         }
@@ -1866,7 +1871,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
         act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
 
-        sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
+        sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->getName().toStdString().c_str(),
                 GET_NAME(ch));
         logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
       }
@@ -1955,16 +1960,16 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
           return eSUCCESS;
         }
 
-        if (isname("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            isname("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
+        if (isname("godload", ((Object *)(obj_index[obj->getNumber()].item))->getName().toStdString().c_str()) ||
+            isname("gl", ((Object *)(obj_index[obj->getNumber()].item))->getName().toStdString().c_str()) ||
             IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
+        if (isname("quest", ((Object *)(obj_index[obj->getNumber()].item))->getName().toStdString().c_str()) ||
+            obj_index[obj->getNumber()].virt >= 3124 && obj_index[obj->getNumber()].virt <= 3127)
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
           return eSUCCESS;
@@ -2003,7 +2008,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->getName().toStdString().c_str()).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -2012,7 +2017,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->getName().toStdString().c_str()).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       }
       else
       {
@@ -2062,7 +2067,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->getName().toStdString().c_str()).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2079,7 +2084,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->getName().toStdString().c_str()).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2097,7 +2102,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->getName().toStdString().c_str()).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2125,7 +2130,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+      logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->getName().toStdString().c_str()).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

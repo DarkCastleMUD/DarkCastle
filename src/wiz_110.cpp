@@ -294,14 +294,14 @@ int do_wizlock(Character *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
-    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ARCHITECT, LogChannels::LOG_GOD);
     send_to_char("Game wizlocked.\r\n", ch);
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
-    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ARCHITECT, LogChannels::LOG_GOD);
     send_to_char("Game un-wizlocked.\r\n", ch);
   }
   return eSUCCESS;
@@ -470,10 +470,10 @@ int do_rename_char(Character *ch, char *arg, int cmd)
         IS_SET(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
-      sprintf(tmp, "%s", victim->equipment[iWear]->name);
+      sprintf(tmp, "%s", victim->equipment[iWear]->getName().toStdString().c_str());
       tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
       sprintf(tmp, "%s %s", tmp, newname);
-      victim->equipment[iWear]->name = str_hsh(tmp);
+      victim->equipment[iWear]->setName(tmp);
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
     {
@@ -482,10 +482,10 @@ int do_rename_char(Character *ch, char *arg, int cmd)
         if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           char tmp[256];
-          sprintf(tmp, "%s", obj->name);
+          sprintf(tmp, "%s", obj->getName().toStdString().c_str());
           tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
           sprintf(tmp, "%s %s", tmp, newname);
-          obj->name = str_hsh(tmp);
+          obj->setName(tmp);
         }
       }
     }
@@ -497,10 +497,10 @@ int do_rename_char(Character *ch, char *arg, int cmd)
     if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
-      sprintf(tmp, "%s", obj->name);
+      sprintf(tmp, "%s", obj->getName().toStdString().c_str());
       tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
       sprintf(tmp, "%s %s", tmp, newname);
-      obj->name = str_hsh(tmp);
+      obj->setName(tmp);
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
@@ -510,10 +510,10 @@ int do_rename_char(Character *ch, char *arg, int cmd)
         if (IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           char tmp[256];
-          sprintf(tmp, "%s", obj2->name);
+          sprintf(tmp, "%s", obj2->getName().toStdString().c_str());
           tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
           sprintf(tmp, "%s %s", tmp, newname);
-          obj2->name = str_hsh(tmp);
+          obj2->setName(tmp);
         }
       }
     }
@@ -899,7 +899,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, obj_index[r].virt, ac);
+            o % 2 == 0 ? "$2" : "$3", o, obj->getShortDescriptionC(), obj_index[r].virt, ac);
     send_to_char(buf, ch);
     o++;
     if (o == 150)

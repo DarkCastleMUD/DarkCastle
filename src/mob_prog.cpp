@@ -416,7 +416,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
 			if ((cmp->in_room != DC::NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
-				if (isname(left, otmp->name))
+				if (isname(left, otmp->getName()))
 				{
 					otarget = otmp;
 					break;
@@ -527,17 +527,17 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			{
 				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
 			}
-			else if (mob->mobdata == nullptr)
+			else if (mob->mobile == nullptr)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobile == nullptr", left, right);
 			}
-			else if (mob->mobdata->nr < 0)
+			else if (mob->mobile->getNumber() < 0)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobile->getNumber() = %d < 0 ", left, right, mob->mobile->getNumber());
 			}
 			else
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobile->getNumber()].virt);
 			}
 		}
 		return;
@@ -551,6 +551,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	int64_t *llval = nullptr;
 	uint64_t *ullval = nullptr;
 	int8_t *sbval = nullptr;
+	uint8_t *bval = nullptr;
 	bool tError = false;
 
 	/*
@@ -577,7 +578,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else
 			{
-				uintval = &target->mobdata->actflags[0];
+				uintval = &target->mobile->actflags[0];
 				break;
 			}
 		}
@@ -587,7 +588,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else
 			{
-				uintval = &target->mobdata->actflags[1];
+				uintval = &target->mobile->actflags[1];
 				break;
 			}
 		}
@@ -854,7 +855,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				{
 					logf(IMMORTAL, LogChannels::LOG_WORLD,
 						 "translate_value: Mob: %d invalid skillnumber in hasskill",
-						 mob_index[mob->mobdata->nr].virt);
+						 mob_index[mob->mobile->getNumber()].virt);
 					tError = true;
 				}
 				int16_t sklint = has_skill(target, skl);
@@ -1025,7 +1026,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				uintval = &target->misc;
+				uintval = &target->getMiscReference();
 		}
 		else if (!str_cmp(right, "more"))
 		{
@@ -1179,7 +1180,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				sbval = &target->sex;
+			{
+				sex_t *s = &target->getSexReference();
+				sbval = (int8_t *)s;
+			}
 		}
 		else if (!str_cmp(right, "size"))
 		{
@@ -1196,7 +1200,8 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (otarget)
 			{
-				stringval = &otarget->short_description;
+				// TODO FIXME
+				// stringval = &otarget->getShortDescriptionC();
 			}
 			else
 				stringval = &target->short_desc;
@@ -1341,17 +1346,17 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 
 		if (mob)
 		{
-			if (mob->mobdata == nullptr)
+			if (mob->mobile == nullptr)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobile == nullptr", left, right);
 			}
-			else if (mob->mobdata->nr < 0)
+			else if (mob->mobile->getNumber() < 0)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobile->getNumber() = %d < 0 ", left, right, mob->mobile->getNumber());
 			}
 			else
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", mob_index[mob->mobile->getNumber()].virt);
 			}
 		}
 		return;
@@ -1498,7 +1503,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	if (*point == '\0')
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 		return -1;
 	}
 	/* skip leading spaces */
@@ -1525,7 +1530,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		else if (*point == '\0')
 		{
 			prog_error(mob, "ifchck syntax error");
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		else if (*point == ' ')
@@ -1547,7 +1552,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		else if (*point == ' ')
@@ -1573,7 +1578,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		while ((*point != ' ') && (!isalnum(*point)))
 			if (*point == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 				return -1;
 			}
 			else
@@ -1652,7 +1657,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		{
 			if (IS_PC(te))
 				continue;
-			if (mob_index[te->mobdata->nr].virt == vnum)
+			if (mob_index[te->mobile->getNumber()].virt == vnum)
 			{
 				fvict = te;
 				break;
@@ -1766,7 +1771,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		count = count_if(character_list.begin(), character_list.end(),
 						 [&target](Character *vch)
 						 {
-							 if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobdata->nr].virt == target)
+							 if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobile->getNumber()].virt == target)
 							 {
 								 return true;
 							 }
@@ -1787,7 +1792,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Object *p;
 		for (p = object_list; p; p = p->next)
 		{
-			if (obj_index[p->item_number].virt == target)
+			if (obj_index[p->getNumber()].virt == target)
 			{
 				count++;
 			}
@@ -1803,7 +1808,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Character *p;
 		int count = 0;
 		for (p = world[mob->in_room].people; p; p = p->next_in_room)
-			if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
+			if (IS_MOB(p) && mob_index[p->mobile->getNumber()].virt == target)
 				count++;
 
 		return mprog_veval(count, opr, atoi(val));
@@ -1850,7 +1855,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ispc'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -1896,7 +1901,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -1934,7 +1939,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -1972,7 +1977,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2008,7 +2013,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2044,7 +2049,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2080,7 +2085,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2116,7 +2121,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2124,9 +2129,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	case eISWORN:
 	{
 		Object *o = nullptr;
-		if (mob->mobdata->isObject())
+		if (mob->mobile->isObject())
 		{
-			o = mob->mobdata->getObject();
+			o = mob->mobile->getObject();
 		}
 		if (fvict)
 			return is_wearing(fvict, o);
@@ -2157,7 +2162,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 	}
@@ -2194,7 +2199,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2230,7 +2235,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2266,7 +2271,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", mob_index[mob->mobile->getNumber()].virt, mob->mobile->getNumber(), ifchck);
 			return -1;
 		}
 		break;
@@ -2304,7 +2309,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				return -1;
 		default:
 			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ischarmed'",
-				 mob_index[mob->mobdata->nr].virt);
+				 mob_index[mob->mobile->getNumber()].virt);
 
 			return -1;
 		}
@@ -2340,7 +2345,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2393,7 +2398,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				break;
 			default:
 				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
-					 mob_index[mob->mobdata->nr].virt);
+					 mob_index[mob->mobile->getNumber()].virt);
 				return -1;
 			}
 		}
@@ -2438,7 +2443,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				return 0;
 		default:
 			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
-				 mob_index[mob->mobdata->nr].virt);
+				 mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 	}
@@ -2477,7 +2482,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				return -1;
 		default:
 			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isaffected'",
-				 mob_index[mob->mobdata->nr].virt);
+				 mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2537,7 +2542,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 	}
@@ -2589,7 +2594,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				take = rndm;
 				break;
 			default:
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobile->getNumber()].virt);
 				return -1;
 			}
 		}
@@ -2659,7 +2664,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				take = rndm;
 				break;
 			default:
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobile->getNumber()].virt);
 				return -1;
 			}
 		}
@@ -2691,7 +2696,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		{
 			if (IS_PC(fvict))
 				return 0;
-			lhsvl = mob_index[fvict->mobdata->nr].virt;
+			lhsvl = mob_index[fvict->mobile->getNumber()].virt;
 			rhsvl = atoi(val);
 			return mprog_veval(lhsvl, opr, rhsvl);
 		}
@@ -2701,7 +2706,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			lhsvl = mob_index[mob->mobdata->nr].virt;
+			lhsvl = mob_index[mob->mobile->getNumber()].virt;
 			rhsvl = atoi(val);
 			return mprog_veval(lhsvl, opr, rhsvl);
 		case 'z':
@@ -2709,7 +2714,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			{
 				if (IS_NPC(((Character *)mob->beacon)))
 				{
-					lhsvl = mob_index[((Character *)mob->beacon)->mobdata->nr].virt;
+					lhsvl = mob_index[((Character *)mob->beacon)->mobile->getNumber()].virt;
 					rhsvl = atoi(val);
 					return mprog_veval(lhsvl, opr, rhsvl);
 				}
@@ -2724,7 +2729,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			{
 				if IS_NPC (actor)
 				{
-					lhsvl = mob_index[actor->mobdata->nr].virt;
+					lhsvl = mob_index[actor->mobile->getNumber()].virt;
 					rhsvl = atoi(val);
 					return mprog_veval(lhsvl, opr, rhsvl);
 				}
@@ -2736,7 +2741,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			{
 				if IS_NPC (actor)
 				{
-					lhsvl = mob_index[vict->mobdata->nr].virt;
+					lhsvl = mob_index[vict->mobile->getNumber()].virt;
 					rhsvl = atoi(val);
 					return mprog_veval(lhsvl, opr, rhsvl);
 				}
@@ -2748,7 +2753,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			{
 				if IS_NPC (actor)
 				{
-					lhsvl = mob_index[rndm->mobdata->nr].virt;
+					lhsvl = mob_index[rndm->mobile->getNumber()].virt;
 					rhsvl = atoi(val);
 					return mprog_veval(lhsvl, opr, rhsvl);
 				}
@@ -2758,7 +2763,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'o':
 			if (obj)
 			{
-				lhsvl = obj_index[obj->item_number].virt;
+				lhsvl = obj_index[obj->getNumber()].virt;
 				rhsvl = atoi(val);
 				return mprog_veval(lhsvl, opr, rhsvl);
 			}
@@ -2767,14 +2772,14 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'p':
 			if (v_obj)
 			{
-				lhsvl = obj_index[v_obj->item_number].virt;
+				lhsvl = obj_index[v_obj->getNumber()].virt;
 				rhsvl = atoi(val);
 				return mprog_veval(lhsvl, opr, rhsvl);
 			}
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'number'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'number'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 	}
@@ -2785,7 +2790,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		char buf4[MAX_STRING_LENGTH], *buf4pt;
 		if (arg[2] != '[')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		buf4pt = &arg[3];
@@ -2795,7 +2800,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			buf4pt++;
 		if (*buf4pt == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad target to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad target to 'tempvar'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		*buf4pt = '\0';
@@ -2837,7 +2842,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'p':
 			return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 	}
@@ -2854,7 +2859,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		{
 			if (IS_NPC(vch) &&
 				vch != mob &&
-				mob_index[vch->mobdata->nr].virt == target)
+				mob_index[vch->mobile->getNumber()].virt == target)
 				return 1;
 		}
 		return 0;
@@ -2870,7 +2875,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			 obj;
 			 obj = obj->next_content)
 		{
-			if (obj_index[obj->item_number].virt == target)
+			if (obj_index[obj->getNumber()].virt == target)
 				return 1;
 		}
 		return 0;
@@ -2904,7 +2909,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2931,7 +2936,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2955,7 +2960,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobile->getNumber()].virt);
 			return -1;
 		}
 		break;
@@ -2977,7 +2982,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		 * odd happened.  So report the bug and abort the MOBprogram (return error)
 		 */
 		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d unknown ifchck  \"%s\" value %d",
-			 mob_index[mob->mobdata->nr].virt, buf, ifcheck[buf]);
+			 mob_index[mob->mobile->getNumber()].virt, buf, ifcheck[buf]);
 		return -1;
 	}
 }
@@ -3054,7 +3059,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			cmnd++;
 		if (*cmnd == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d no commands after IF/OR", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d no commands after IF/OR", mob_index[mob->mobile->getNumber()].virt);
 			return null;
 		}
 		morebuf = one_argument(cmnd, buf);
@@ -3126,7 +3131,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 					if (*cmnd == '\0')
 					{
 						logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif after else",
-							 mob_index[mob->mobdata->nr].virt);
+							 mob_index[mob->mobile->getNumber()].virt);
 						return null;
 					}
 					morebuf = one_argument(cmnd, buf);
@@ -3138,7 +3143,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			{
 
 #ifdef DEBUG_MPROG
-				if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821)
+				if (mob && mob->mobile != (Mobile *)0x95959595 && mob_index[mob->mobile->getNumber()].virt == 4821)
 				{
 					fprintf(stderr, "debug: ");
 					if (cmnd)
@@ -3160,7 +3165,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
 
 #ifdef DEBUG_MPROG
-				if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821)
+				if (mob && mob->mobile != (Mobile *)0x95959595 && mob_index[mob->mobile->getNumber()].virt == 4821)
 				{
 					if (IS_SET(mprog_cur_result, eFAILURE))
 						fprintf(stderr, "eFAILURE ");
@@ -3193,7 +3198,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				cmnd++;
 			if (*cmnd == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing else or endif", mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing else or endif", mob_index[mob->mobile->getNumber()].virt);
 				return null;
 			}
 			morebuf = one_argument(cmnd, buf);
@@ -3222,7 +3227,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			if (*cmnd == '\0')
 			{
 				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing an else or endif",
-					 mob_index[mob->mobdata->nr].virt);
+					 mob_index[mob->mobile->getNumber()].virt);
 				return null;
 			}
 			morebuf = one_argument(cmnd, buf);
@@ -3237,7 +3242,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			cmnd++;
 		if (*cmnd == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif", mob_index[mob->mobile->getNumber()].virt);
 			return null;
 		}
 		morebuf = one_argument(cmnd, buf);
@@ -3262,7 +3267,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			if (!str_cmp(buf, "else"))
 			{
 				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d found else in an else section",
-					 mob_index[mob->mobdata->nr].virt);
+					 mob_index[mob->mobile->getNumber()].virt);
 				return null;
 			}
 			if (!str_cmp(buf, "break"))
@@ -3283,7 +3288,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			if (*cmnd == '\0')
 			{
 				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif in else section",
-					 mob_index[mob->mobdata->nr].virt);
+					 mob_index[mob->mobile->getNumber()].virt);
 				return null;
 			}
 			morebuf = one_argument(cmnd, buf);
@@ -3353,7 +3358,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 				*t = UPPER(*t);
 		}
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", mob_index[mob->mobile->getNumber()].virt);
 		break;
 
 	case 'N':
@@ -3370,7 +3375,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 			else
 				strcpy(t, "someone");
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", mob_index[mob->mobile->getNumber()].virt);
 		break;
 
 	case 't':
@@ -3382,7 +3387,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 				*t = UPPER(*t);
 		}
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", mob_index[mob->mobile->getNumber()].virt);
 		break;
 
 	case 'T':
@@ -3399,7 +3404,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 			else
 				strcpy(t, "someone");
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobile->getNumber()].virt);
 		break;
 
 	case 'f':
@@ -3487,101 +3492,101 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'e':
 		if (actor)
-			CAN_SEE(mob, actor) ? strcpy(t, he_she[actor->sex])
+			CAN_SEE(mob, actor) ? strcpy(t, he_she[actor->getSex()])
 								: strcpy(t, "someone");
 		break;
 
 	case 'm':
 		if (actor)
-			CAN_SEE(mob, actor) ? strcpy(t, him_her[actor->sex])
+			CAN_SEE(mob, actor) ? strcpy(t, him_her[actor->getSex()])
 								: strcpy(t, "someone");
 		break;
 
 	case 's':
 		if (actor)
-			CAN_SEE(mob, actor) ? strcpy(t, his_her[actor->sex])
+			CAN_SEE(mob, actor) ? strcpy(t, his_her[actor->getSex()])
 								: strcpy(t, "someone's");
 		break;
 
 	case 'E':
 		if (vict)
-			CAN_SEE(mob, vict) ? strcpy(t, he_she[vict->sex])
+			CAN_SEE(mob, vict) ? strcpy(t, he_she[vict->getSex()])
 							   : strcpy(t, "someone");
 		break;
 
 	case 'M':
 		if (vict)
-			CAN_SEE(mob, vict) ? strcpy(t, him_her[vict->sex])
+			CAN_SEE(mob, vict) ? strcpy(t, him_her[vict->getSex()])
 							   : strcpy(t, "someone");
 		break;
 
 	case 'S':
 		if (vict)
-			CAN_SEE(mob, vict) ? strcpy(t, his_her[vict->sex])
+			CAN_SEE(mob, vict) ? strcpy(t, his_her[vict->getSex()])
 							   : strcpy(t, "someone's");
 		break;
 	case 'q':
 		char buf[15];
-		sprintf(buf, "%d", mob_index[mob->mobdata->nr].virt);
+		sprintf(buf, "%d", mob_index[mob->mobile->getNumber()].virt);
 		strcpy(t, buf);
 		break;
 	case 'j':
-		strcpy(t, he_she[mob->sex]);
+		strcpy(t, he_she[mob->getSex()]);
 		break;
 
 	case 'k':
-		strcpy(t, him_her[mob->sex]);
+		strcpy(t, him_her[mob->getSex()]);
 		break;
 
 	case 'l':
-		strcpy(t, his_her[mob->sex]);
+		strcpy(t, his_her[mob->getSex()]);
 		break;
 
 	case 'J':
 		if (rndm)
-			CAN_SEE(mob, rndm) ? strcpy(t, he_she[rndm->sex])
+			CAN_SEE(mob, rndm) ? strcpy(t, he_she[rndm->getSex()])
 							   : strcpy(t, "someone");
 		break;
 
 	case 'K':
 		if (rndm)
-			CAN_SEE(mob, rndm) ? strcpy(t, him_her[rndm->sex])
+			CAN_SEE(mob, rndm) ? strcpy(t, him_her[rndm->getSex()])
 							   : strcpy(t, "someone");
 		break;
 
 	case 'L':
 		if (rndm)
-			CAN_SEE(mob, rndm) ? strcpy(t, his_her[rndm->sex])
+			CAN_SEE(mob, rndm) ? strcpy(t, his_her[rndm->getSex()])
 							   : strcpy(t, "someone's");
 		break;
 
 	case 'o':
 		if (obj)
-			CAN_SEE_OBJ(mob, obj) ? one_argument(obj->name, t)
+			CAN_SEE_OBJ(mob, obj) ? one_argument(obj->getName().toStdString().c_str(), t)
 								  : strcpy(t, "something");
 		break;
 
 	case 'O':
 		if (obj)
-			CAN_SEE_OBJ(mob, obj) ? strcpy(t, obj->short_description)
+			CAN_SEE_OBJ(mob, obj) ? strcpy(t, obj->getShortDescriptionC())
 								  : strcpy(t, "something");
 		break;
 
 	case 'p':
 		if (v_obj)
-			CAN_SEE_OBJ(mob, v_obj) ? one_argument(v_obj->name, t)
+			CAN_SEE_OBJ(mob, v_obj) ? one_argument(v_obj->getName().toStdString().c_str(), t)
 									: strcpy(t, "something");
 		break;
 
 	case 'P':
 		if (v_obj)
-			CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, v_obj->short_description)
+			CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, v_obj->getShortDescriptionC())
 									: strcpy(t, "something");
 		break;
 
 	case 'a':
 		if (obj)
-			switch (*(obj->name))
+			switch (*(obj->getName().toStdString().c_str()))
 			{
 			case 'a':
 			case 'e':
@@ -3597,7 +3602,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
 	case 'A':
 		if (v_obj)
-			switch (*(v_obj->name))
+			switch (*(v_obj->getName().toStdString().c_str()))
 			{
 			case 'a':
 			case 'e':
@@ -3616,7 +3621,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		break;
 
 	default:
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad $$var : %c", mob_index[mob->mobdata->nr].virt, ch);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad $$var : %c", mob_index[mob->mobile->getNumber()].virt, ch);
 		break;
 	}
 
@@ -3871,7 +3876,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 	activeProgs++;
 	if (activeProgs > 20)
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", mob_index[mob->mobdata->nr].virt);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", mob_index[mob->mobile->getNumber()].virt);
 		activeProgs--;
 		return;
 	}
@@ -4004,13 +4009,13 @@ int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
 	int i;
 	int retval = 0;
 	bool done = false;
-	//  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != nullptr; mprg
+	//  for ( mprg = mob_index[mob->mobile->getNumber()].mobprogs; mprg != nullptr; mprg
 	//= next )
-	mprg = mob_index[mob->mobdata->nr].mobprogs;
+	mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 	if (!mprg)
 	{
 		done = true;
-		mprg = mob_index[mob->mobdata->nr].mobspec;
+		mprg = mob_index[mob->mobile->getNumber()].mobspec;
 	}
 
 	mprog_command_num = 0;
@@ -4081,7 +4086,7 @@ int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
 		if (next == nullptr && !done)
 		{
 			done = true;
-			next = mob_index[mob->mobdata->nr].mobspec;
+			next = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 	}
 	return retval;
@@ -4093,14 +4098,14 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
 	mob_prog_data *mprg;
 	mob_prog_data *next;
 	bool done = false;
-	mprg = mob_index[mob->mobdata->nr].mobprogs;
+	mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 	if (!mprg)
 	{
 		done = true;
-		mprg = mob_index[mob->mobdata->nr].mobspec;
+		mprg = mob_index[mob->mobile->getNumber()].mobspec;
 	}
 
-	if (mob_index[mob->mobdata->nr].virt == 30013)
+	if (mob_index[mob->mobile->getNumber()].virt == 30013)
 	{
 		debugpoint();
 	}
@@ -4121,7 +4126,7 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
 		if (!next && !done)
 		{
 			done = true;
-			next = mob_index[mob->mobdata->nr].mobspec;
+			next = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 	}
 	return;
@@ -4147,14 +4152,14 @@ int mprog_act_trigger(string buf, Character *mob, Character *ch,
 	if (!MOBtrigger)
 		return mprog_cur_result;
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ACT_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & ACT_PROG) && isPaused(mob) == false)
 		mprog_wordlist_check(buf.c_str(), mob, ch,
 							 obj, vo, ACT_PROG);
 
 	/* Why oh why was it like this? They can add lag themselves if needed.
 	  if
 	( IS_NPC( mob )
-		  && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
+		  && ( mob_index[mob->mobile->getNumber()].progtypes & ACT_PROG ) )
 		{
 	#ifdef LEAK_CHECK
 		  tmp_act = (mob_prog_act_list *) calloc( 1, sizeof( mob_prog_act_list ) );
@@ -4162,10 +4167,10 @@ int mprog_act_trigger(string buf, Character *mob, Character *ch,
 		  tmp_act = (mob_prog_act_list *) dc_alloc( 1, sizeof( mob_prog_act_list ) );
 	#endif
 
-		  if(!mob->mobdata->mpact)
-			mob->mobdata->mpact = tmp_act;
+		  if(!mob->mobile->mpact)
+			mob->mobile->mpact = tmp_act;
 		  else {
-			curr = mob->mobdata->mpact;
+			curr = mob->mobile->mpact;
 			while(curr->next)
 			  curr = curr->next;
 			curr->next = tmp_act;
@@ -4176,7 +4181,7 @@ int mprog_act_trigger(string buf, Character *mob, Character *ch,
 		  tmp_act->ch  = ch;
 		  tmp_act->obj = obj;
 		  tmp_act->vo  = vo;
-		  mob->mobdata->mpactnum++;
+		  mob->mobile->mpactnum++;
 
 		}
 	*/
@@ -4191,15 +4196,15 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 	Object *obj = 0;
 	bool done = false;
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & BRIBE_PROG) && isPaused(mob) == false)
 	{
 		mob->removeGold(amount);
 
-		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 		if (!mprg)
 		{
 			done = true;
-			mprg = mob_index[mob->mobdata->nr].mobspec;
+			mprg = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 
 		mprog_command_num = 0;
@@ -4218,7 +4223,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 
 			if (!next && !done)
 			{
-				next = mob_index[mob->mobdata->nr].mobspec;
+				next = mob_index[mob->mobile->getNumber()].mobspec;
 				done = true;
 			}
 		}
@@ -4234,14 +4239,14 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 	mob_prog_data *next = 0;
 	Object *obj = 0;
 	bool done = false;
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
 	{
-		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 
 		if (!mprg)
 		{
 			done = true;
-			mprg = mob_index[mob->mobdata->nr].mobspec;
+			mprg = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 
 		mprog_command_num = 0;
@@ -4259,7 +4264,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 			}
 			if (!next && !done)
 			{
-				next = mob_index[mob->mobdata->nr].mobspec;
+				next = mob_index[mob->mobile->getNumber()].mobspec;
 				done = true;
 			}
 		}
@@ -4271,7 +4276,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 int mprog_death_trigger(Character *mob, Character *killer)
 {
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & DEATH_PROG) && isPaused(mob) == false)
 	{
 		mprog_percent_check(mob, killer, nullptr, nullptr, DEATH_PROG);
 	}
@@ -4283,7 +4288,7 @@ int mprog_death_trigger(Character *mob, Character *killer)
 int mprog_entry_trigger(Character *mob)
 {
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & ENTRY_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, nullptr, nullptr, nullptr, ENTRY_PROG);
 
 	return mprog_cur_result;
@@ -4292,7 +4297,7 @@ int mprog_entry_trigger(Character *mob)
 int mprog_fight_trigger(Character *mob, Character *ch)
 {
 
-	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobile->getNumber()].progtypes & FIGHT_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, ch, nullptr, nullptr, FIGHT_PROG);
 
 	return mprog_cur_result;
@@ -4301,7 +4306,7 @@ int mprog_fight_trigger(Character *mob, Character *ch)
 int mprog_attack_trigger(Character *mob, Character *ch)
 {
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & ATTACK_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, ch, nullptr, nullptr, ATTACK_PROG);
 
 	return mprog_cur_result;
@@ -4314,13 +4319,13 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 	mob_prog_data *mprg;
 	mob_prog_data *next;
 	bool done = false, okay = false;
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & GIVE_PROG) && isPaused(mob) == false)
 	{
-		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 		if (!mprg)
 		{
 			done = true;
-			mprg = mob_index[mob->mobdata->nr].mobspec;
+			mprg = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 
 		mprog_command_num = 0;
@@ -4330,7 +4335,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 
 			next = mprg->next;
 			one_argument(mprg->arglist, buf);
-			if ((mprg->type & GIVE_PROG) && ((!str_cmp(obj->name, mprg->arglist)) || (!str_cmp("all", buf))))
+			if ((mprg->type & GIVE_PROG) && ((!str_cmp(obj->getName().toStdString().c_str(), mprg->arglist)) || (!str_cmp("all", buf))))
 			{
 				okay = true;
 				mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
@@ -4342,7 +4347,7 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 			if (!next && !done)
 			{
 				done = true;
-				next = mob_index[mob->mobdata->nr].mobspec;
+				next = mob_index[mob->mobile->getNumber()].mobspec;
 			}
 		}
 	}
@@ -4371,9 +4376,9 @@ int mprog_greet_trigger(Character *ch)
 	for (vmob = world[ch->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
 		{
-			if (ch != vmob && CAN_SEE(vmob, ch) && (mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
+			if (ch != vmob && CAN_SEE(vmob, ch) && (mob_index[vmob->mobile->getNumber()].progtypes & GREET_PROG) && isPaused(vmob) == false)
 				mprog_percent_check(vmob, ch, nullptr, nullptr, GREET_PROG);
-			else if ((mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
+			else if ((mob_index[vmob->mobile->getNumber()].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
 				mprog_percent_check(vmob, ch, nullptr, nullptr, ALL_GREET_PROG);
 
 			if (SOMEONE_DIED(mprog_cur_result) || selfpurge)
@@ -4388,13 +4393,13 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
 	mob_prog_data *next;
 	bool done = false;
 
-	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobile->getNumber()].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
 	{
-		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 		if (!mprg)
 		{
 			done = true;
-			mprg = mob_index[mob->mobdata->nr].mobspec;
+			mprg = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 
 		mprog_command_num = 0;
@@ -4414,7 +4419,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
 			if (!next && !done)
 			{
 				done = true;
-				next = mob_index[mob->mobdata->nr].mobspec;
+				next = mob_index[mob->mobile->getNumber()].mobspec;
 			}
 		}
 	}
@@ -4426,7 +4431,7 @@ int mprog_random_trigger(Character *mob)
 {
 	mprog_cur_result = eSUCCESS;
 
-	if ((mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
+	if ((mob_index[mob->mobile->getNumber()].progtypes & RAND_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, nullptr, nullptr, nullptr, RAND_PROG);
 
 	return mprog_cur_result;
@@ -4440,7 +4445,7 @@ int mprog_load_trigger(Character *mob)
 	}
 
 	mprog_cur_result = eSUCCESS;
-	if ((mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
+	if ((mob_index[mob->mobile->getNumber()].progtypes & LOAD_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, nullptr, nullptr, nullptr, LOAD_PROG);
 	return mprog_cur_result;
 }
@@ -4452,7 +4457,7 @@ int mprog_arandom_trigger(Character *mob)
 		return eFAILURE;
 	}
 	mprog_cur_result = eSUCCESS;
-	if ((mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
+	if ((mob_index[mob->mobile->getNumber()].progtypes & ARAND_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, nullptr, nullptr, nullptr, ARAND_PROG);
 	return mprog_cur_result;
 }
@@ -4470,7 +4475,7 @@ int mprog_can_see_trigger(Character *ch, Character *mob)
 	}
 
 	mprog_cur_result = eSUCCESS;
-	if ((mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
+	if ((mob_index[mob->mobile->getNumber()].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
 		mprog_percent_check(mob, ch, nullptr, nullptr, CAN_SEE_PROG);
 
 	return mprog_cur_result;
@@ -4488,7 +4493,7 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 	mprog_cur_result = eSUCCESS;
 
 	for (vmob = world[mob->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
-		if (IS_NPC(vmob) && (mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
+		if (IS_NPC(vmob) && (mob_index[vmob->mobile->getNumber()].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
 		{
 			if (mprog_wordlist_check(txt, vmob, mob, nullptr, nullptr, SPEECH_PROG))
 				break;
@@ -4510,13 +4515,13 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 	bool done = false;
 	mprog_cur_result = eFAILURE;
 
-	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
+	if (IS_NPC(mob) && (mob_index[mob->mobile->getNumber()].progtypes & CATCH_PROG) && isPaused(mob) == false)
 	{
-		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		mprg = mob_index[mob->mobile->getNumber()].mobprogs;
 		if (!mprg || (opt & 1))
 		{
 			done = true;
-			mprg = mob_index[mob->mobdata->nr].mobspec;
+			mprg = mob_index[mob->mobile->getNumber()].mobspec;
 		}
 
 		mprog_command_num = 0;
@@ -4529,7 +4534,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
 					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
-						 mob_index[mob->mobdata->nr].virt);
+						 mob_index[mob->mobile->getNumber()].virt);
 					return eFAILURE;
 				}
 				if (curr_catch == catch_num)
@@ -4573,7 +4578,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 			if (!next && !done)
 			{
 				done = true;
-				next = mob_index[mob->mobdata->nr].mobspec;
+				next = mob_index[mob->mobile->getNumber()].mobspec;
 			}
 		}
 	}
@@ -4660,7 +4665,7 @@ void update_mprog_throws()
 		{
 			if (isPaused(action->tMob))
 			{
-				action->tMob->mobdata->paused = false;
+				action->tMob->mobile->paused = false;
 			}
 			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
 			dc_free(action->orig);
@@ -4686,8 +4691,8 @@ Character *initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
 	Character *temp;
 	temp = clone_mobile(real_mobile(12));
-	mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
-	mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
+	mob_index[real_mobile(12)].mobprogs = obj_index[obj->getNumber()].mobprogs;
+	mob_index[real_mobile(12)].progtypes = obj_index[obj->getNumber()].progtypes;
 
 	if (ch)
 		char_to_room(temp, ch->in_room);
@@ -4695,13 +4700,13 @@ Character *initiate_oproc(Character *ch, Object *obj)
 		char_to_room(temp, obj->in_room);
 	if (ch)
 		temp->beacon = (Object *)ch;
-	temp->mobdata->setObject(obj);
+	temp->mobile->setObject(obj);
 	//  temp->master = ch;
 	// dc_free(temp->short_desc);
-	temp->short_desc = str_hsh(obj->short_description);
+	temp->short_desc = str_hsh(obj->getShortDescriptionC());
 	// dc_free(temp->name);
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "%s", obj->name);
+	sprintf(buf, "%s", obj->getName().toStdString().c_str());
 	for (int i = strlen(buf) - 1; i > 0; i--)
 		if (buf[i] == ' ')
 		{
@@ -4710,8 +4715,8 @@ Character *initiate_oproc(Character *ch, Object *obj)
 		}
 	temp->name = str_hsh(buf);
 
-	SET_BIT(temp->misc, MISC_IS_OBJ);
-	temp->objdata = obj;
+	SET_BIT(temp->getMiscReference(), MISC_IS_OBJ);
+	temp->object = obj;
 
 	return temp;
 }
@@ -4748,7 +4753,7 @@ int oprog_can_see_trigger(Character *ch, Object *item)
 	Character *vmob;
 	mprog_cur_result = eSUCCESS;
 
-	if (obj_index[item->item_number].progtypes & CAN_SEE_PROG)
+	if (obj_index[item->getNumber()].progtypes & CAN_SEE_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, CAN_SEE_PROG);
@@ -4771,7 +4776,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 	mprog_cur_result = eSUCCESS;
 
 	for (item = world[ch->in_room].contents; item; item = item->next_content)
-		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+		if (obj_index[item->getNumber()].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4782,7 +4787,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 			end_oproc(vmob, Trace("oprog_speech_trigger2"));
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+		if (obj_index[item->getNumber()].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4795,7 +4800,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
+			if (obj_index[ch->equipment[i]->getNumber()].progtypes & SPEECH_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
 				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4814,9 +4819,9 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 	mprog_cur_result = eFAILURE;
 	Character *vmob;
 
-	if (obj_index[obj->item_number].progtypes & CATCH_PROG)
+	if (obj_index[obj->getNumber()].progtypes & CATCH_PROG)
 	{
-		mprg = obj_index[obj->item_number].mobprogs;
+		mprg = obj_index[obj->getNumber()].mobprogs;
 		mprog_command_num = 0;
 		for (; mprg != nullptr; mprg = mprg->next)
 		{
@@ -4827,7 +4832,7 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
 					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
-						 obj_index[obj->item_number].virt);
+						 obj_index[obj->getNumber()].virt);
 					return eFAILURE;
 				}
 				if (curr_catch == catch_num)
@@ -4880,7 +4885,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	for (item = world[ch->in_room].contents; item; item =
 													   item->next_content)
-		if (obj_index[item->item_number].progtypes & ACT_PROG)
+		if (obj_index[item->getNumber()].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4891,7 +4896,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 			end_oproc(vmob, Trace("oprog_act_trigger2"));
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (obj_index[item->item_number].progtypes & ACT_PROG)
+		if (obj_index[item->getNumber()].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4904,7 +4909,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
+			if (obj_index[ch->equipment[i]->getNumber()].progtypes & ACT_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
 				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4931,7 +4936,7 @@ int oprog_greet_trigger(Character *ch)
 
 	for (item = world[ch->in_room].contents; item; item =
 													   item->next_content)
-		if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
+		if (obj_index[item->getNumber()].progtypes & ALL_GREET_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, ALL_GREET_PROG);
@@ -4951,7 +4956,7 @@ int oprog_rand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (obj_index[item->item_number].progtypes & RAND_PROG)
+	if (obj_index[item->getNumber()].progtypes & RAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, RAND_PROG);
@@ -4971,7 +4976,7 @@ int oprog_arand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (obj_index[item->item_number].progtypes & ARAND_PROG)
+	if (obj_index[item->getNumber()].progtypes & ARAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, ARAND_PROG);
@@ -4991,7 +4996,7 @@ int oprog_load_trigger(Character *ch)
 
 	for (item = world[ch->in_room].contents; item; item =
 													   item->next_content)
-		if (obj_index[item->item_number].progtypes & LOAD_PROG)
+		if (obj_index[item->getNumber()].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -4999,7 +5004,7 @@ int oprog_load_trigger(Character *ch)
 			return mprog_cur_result;
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (obj_index[item->item_number].progtypes & LOAD_PROG)
+		if (obj_index[item->getNumber()].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -5009,7 +5014,7 @@ int oprog_load_trigger(Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
+			if (obj_index[ch->equipment[i]->getNumber()].progtypes & LOAD_PROG)
 			{
 				vmob = initiate_oproc(ch, item);
 				mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -5030,7 +5035,7 @@ int oprog_weapon_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (obj_index[item->item_number].progtypes & WEAPON_PROG)
+	if (obj_index[item->getNumber()].progtypes & WEAPON_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, WEAPON_PROG);
@@ -5052,7 +5057,7 @@ int oprog_armour_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (obj_index[item->item_number].progtypes & ARMOUR_PROG)
+	if (obj_index[item->getNumber()].progtypes & ARMOUR_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, ARMOUR_PROG);
@@ -5078,7 +5083,7 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 	{
 		for (item = world[ch->in_room].contents; item; item = item->next_content)
 		{
-			if (obj_index[item->item_number].progtypes & COMMAND_PROG)
+			if (obj_index[item->getNumber()].progtypes & COMMAND_PROG)
 			{
 				if (arg && *arg)
 				{
@@ -5099,7 +5104,7 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 
 	for (item = ch->carrying; item; item = item->next_content)
 	{
-		if (obj_index[item->item_number].progtypes & COMMAND_PROG)
+		if (obj_index[item->getNumber()].progtypes & COMMAND_PROG)
 		{
 			if (arg && *arg)
 			{
@@ -5120,7 +5125,7 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 	{
 		if (ch->equipment[i])
 		{
-			if (obj_index[ch->equipment[i]->item_number].progtypes & COMMAND_PROG)
+			if (obj_index[ch->equipment[i]->getNumber()].progtypes & COMMAND_PROG)
 			{
 				if (arg && *arg)
 				{
@@ -5153,12 +5158,12 @@ bool isPaused(Character *mob)
 		return false;
 	}
 
-	if (mob->mobdata == nullptr || mob->mobdata == (mob_data *)0x95959595)
+	if (mob->mobile == nullptr || mob->mobile == (Mobile *)0x95959595)
 	{
 		return false;
 	}
 
-	if (mob->mobdata->paused == true)
+	if (mob->mobile->paused == true)
 	{
 		return true;
 	}

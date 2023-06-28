@@ -225,7 +225,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 		return false;
 	}
 
-	Connection d;
+	Connection d(this);
 	if (!load_char_obj(&d, username.toStdString().c_str()))
 	{
 		return false;

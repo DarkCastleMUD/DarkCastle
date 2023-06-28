@@ -836,7 +836,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == 171 && !IS_MOB(ch))
+  if (cmd == 171 && IS_PC(ch))
   { /*   gain crap...  */
 
     if ((GET_LEVEL(ch) >= IMMORTAL) || (GET_LEVEL(ch) == MAX_MORTAL))

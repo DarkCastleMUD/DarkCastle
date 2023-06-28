@@ -192,7 +192,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   Object *reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  csendf(ch, "You succesfully make a %s!\r\n", reward->short_description);
+  csendf(ch, "You succesfully make a %s!\r\n", reward->getShortDescriptionC());
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return eSUCCESS;
@@ -240,7 +240,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 
   int found = -1;
   for (int i = 0; poison_vial_data[i].result != -1; i++)
-    if (poison_vial_data[i].result == obj_index[vial->item_number].virt)
+    if (poison_vial_data[i].result == obj_index[vial->getNumber()].virt)
     {
       found = i;
       break;
@@ -248,7 +248,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 
   if (found < 0)
   {
-    csendf(ch, "The %s is not a valid weapon poison.\r\n", vial->short_description);
+    csendf(ch, "The %s is not a valid weapon poison.\r\n", vial->getShortDescriptionC());
     return eFAILURE;
   }
 
@@ -279,7 +279,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 {
   if (!(container->contains))
   {
-    csendf(ch, "Your %s appears to be empty.\r\n", container->short_description);
+    csendf(ch, "Your %s appears to be empty.\r\n", container->getShortDescriptionC());
     return -2;
   }
 
@@ -287,8 +287,8 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 
   // take all the items in our container and put them in an array by vnum
   for (Object *j = container->contains; j; j = j->next_content)
-    if (j->item_number >= 0)
-      current.push_back(obj_index[j->item_number].virt);
+    if (j->getNumber() >= 0)
+      current.push_back(obj_index[j->getNumber()].virt);
     else
       return -1; // only valid object ingrediants will match
 
@@ -555,7 +555,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   const char *potion_color;
   // Determine color to use in message based on herb used
-  switch (obj_index[herbobj->item_number].virt)
+  switch (obj_index[herbobj->getNumber()].virt)
   {
   case 6301:
     potion_color = "$B$2green$R and $B$4red$R";
@@ -599,15 +599,15 @@ int do_brew(Character *ch, char *argument, int cmd)
   }
 
   // Search for the current combination as a recipe
-  Brew::recipe r = {obj_index[herbobj->item_number].virt,
+  Brew::recipe r = {obj_index[herbobj->getNumber()].virt,
                     liquidobj->obj_flags.value[2],
-                    obj_index[containerobj->item_number].virt};
+                    obj_index[containerobj->getNumber()].virt};
   int spell = b.find(r);
 
   //  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
-  //	 obj_index[herbobj->item_number].virt, GET_OBJ_SHORT(herbobj),
+  //	 obj_index[herbobj->getNumber()].virt, GET_OBJ_SHORT(herbobj),
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
-  //	 obj_index[containerobj->item_number].virt, GET_OBJ_SHORT(containerobj), spell);
+  //	 obj_index[containerobj->getNumber()].virt, GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
   {
@@ -640,7 +640,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
     // Find container key (crude, plain, etc)
     char container_key[MAX_STRING_LENGTH];
-    char *conargs = one_argument(containerobj->name, container_key);
+    const char *conargs = one_argument(containerobj->getName().toStdString().c_str(), container_key);
     conargs = one_argument(conargs, container_key);
     one_argument(conargs, container_key);
 
@@ -673,8 +673,8 @@ int do_brew(Character *ch, char *argument, int cmd)
     containerobj->obj_flags.value[1] = spell;
     containerobj->obj_flags.value[2] = 0;
     containerobj->obj_flags.value[3] = 0;
-    containerobj->name = str_dup(potionname.str().c_str());
-    GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
+    containerobj->setName(potionname);
+    containerobj->setShortDescription(potionshort);
     containerobj->description = str_dup(potionlong.str().c_str());
     // We set the item to custom so that it will save everytime uniquely
     SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
@@ -1069,10 +1069,10 @@ int do_scribe(Character *ch, char *argument, int cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
-  Scribe::recipe r = {obj_index[inkobj->item_number].virt,
-                      obj_index[dustobj->item_number].virt,
-                      obj_index[penobj->item_number].virt,
-                      obj_index[paperobj->item_number].virt};
+  Scribe::recipe r = {obj_index[inkobj->getNumber()].virt,
+                      obj_index[dustobj->getNumber()].virt,
+                      obj_index[penobj->getNumber()].virt,
+                      obj_index[paperobj->getNumber()].virt};
   int spell = s.find(r);
 
   act("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, TO_CHAR, 0);
@@ -1122,21 +1122,21 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
     char ink_key[MAX_STRING_LENGTH], dust_key[MAX_STRING_LENGTH],
         pen_key[MAX_STRING_LENGTH], paper_key[MAX_STRING_LENGTH];
-    char *args;
+    const char *args;
 
-    args = one_argument(inkobj->name, ink_key);
+    args = one_argument(inkobj->getName().toStdString().c_str(), ink_key);
     args = one_argument(args, ink_key);
     args = one_argument(args, ink_key);
 
-    args = one_argument(dustobj->name, dust_key);
+    args = one_argument(dustobj->getName().toStdString().c_str(), dust_key);
     args = one_argument(args, dust_key);
     args = one_argument(args, dust_key);
 
-    args = one_argument(penobj->name, pen_key);
+    args = one_argument(penobj->getName().toStdString().c_str(), pen_key);
     args = one_argument(args, pen_key);
     args = one_argument(args, pen_key);
 
-    args = one_argument(paperobj->name, paper_key);
+    args = one_argument(paperobj->getName().toStdString().c_str(), paper_key);
     args = one_argument(args, paper_key);
     args = one_argument(args, paper_key);
 
@@ -1151,8 +1151,8 @@ int do_scribe(Character *ch, char *argument, int cmd)
     paperobj->obj_flags.value[1] = spell;
     paperobj->obj_flags.value[2] = 0;
     paperobj->obj_flags.value[3] = 0;
-    paperobj->name = str_dup(scrollname.str().c_str());
-    GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
+    paperobj->setName(scrollname);
+    paperobj->setShortDescription(scrollshort.str().c_str());
     paperobj->description = str_dup(scrolllong.str().c_str());
 
     // We set the item to custom so that it will save uniquely every time

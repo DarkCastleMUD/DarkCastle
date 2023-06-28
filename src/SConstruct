@@ -33,7 +33,6 @@ if os.path.exists('/usr/bin/g++-12'):
 
 debug=ARGUMENTS.get('debug', 0)
 profile=ARGUMENTS.get('profile', 0)
-twitter=ARGUMENTS.get('twitter', 0)
 warning=ARGUMENTS.get('warning', 0)
 
 if int(debug):
@@ -65,11 +64,6 @@ wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 libdcastle_src = glob.glob('[abc]*.cpp') + glob.glob('[e-l]*.cpp') + glob.glob('[n-r]*.cpp') + glob.glob('[t-w,yz]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp','Timer.cpp', 'Trace.cpp', 'db.cpp', 'save.cpp', 'shop.cpp', 'sing.cpp', 'social.cpp', 'spec.cpp',  'spells.cpp', 'stat.cpp', 'CommandStack.cpp'] + wizard_src + class_src + backend_src
-
-if not int(twitter):
-    env.Append(CPPDEFINES=['LINUX'])
-else:
-    env.Append(CPPDEFINES=['LINUX', 'TWITTER'])
     
 env.Append(CPPPATH = ['include'])
 env.Append(LIBPATH = ['/usr/local/lib', '.'])

@@ -44,8 +44,6 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
 
-
-
 extern Character *initiate_oproc(Character *ch, Object *obj);
 
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -374,7 +372,7 @@ int pushwand(Character *ch, class Object *obj, int cmd, const char *arg,
     class Object *curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
     {
-      if (obj_index[curr->item_number].virt == 22427) // red dragon snout
+      if (obj_index[curr->getNumber()].virt == 22427) // red dragon snout
       {
         obj->obj_flags.value[2] = 5;
         send_to_char("The wand absorbs the dragon snout and pulses with energy.\r\n", ch);
@@ -523,7 +521,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
     return eSUCCESS;
   }
 
-  if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || GET_LEVEL(victim) > 50)
+  if ((!ISSET(victim->mobile->actflags, ACT_BARDCHARM) && !ISSET(victim->mobile->actflags, ACT_CHARM)) || GET_LEVEL(victim) > 50)
   {
     act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
     return eSUCCESS;
@@ -574,13 +572,13 @@ int orrowand(Character *ch, class Object *obj, int cmd, const char *arg, Charact
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
-    if (obj_index[curr->item_number].virt == 17399)
+    if (obj_index[curr->getNumber()].virt == 17399)
       diamond = curr;
-    else if (obj_index[curr->item_number].virt == 27903 && firstP != nullptr)
+    else if (obj_index[curr->getNumber()].virt == 27903 && firstP != nullptr)
       secondP = curr;
-    else if (obj_index[curr->item_number].virt == 27903)
+    else if (obj_index[curr->getNumber()].virt == 27903)
       firstP = curr;
-    else if (obj_index[curr->item_number].virt == 27904)
+    else if (obj_index[curr->getNumber()].virt == 27904)
       vial = curr;
   }
 
@@ -630,8 +628,8 @@ int holyavenger(Character *ch, class Object *obj, int cmd, const char *arg,
           if (chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH))
           {
             if ((
-                    (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-                    (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+                    (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->getNumber()].virt == 518) ||
+                    (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->getNumber()].virt == 518)) &&
                 !number(0, 1))
             { // tarrasque's leash..
               act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
@@ -687,7 +685,7 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, int cmd,
     eq_destroyed(victim, victim->equipment[which], which);
   else
   {
-    if (obj_index[obj->item_number].virt == 17904)
+    if (obj_index[obj->getNumber()].virt == 17904)
     {
       act("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, TO_VICT, 0);
       act("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, TO_ROOM, NOTVICT);
@@ -770,7 +768,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   /* deposit */
   if (cmd == CMD_DEPOSIT)
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
     {
       send_to_char("Your criminal acts prohibit it.\r\n", ch);
       return eFAILURE;
@@ -1023,7 +1021,7 @@ int search_assemble_items(int vnum)
   // This should never happen
   if (vnum < 1)
   {
-    logf(ANGEL, LogChannels::LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
+    logf(ARCHITECT, LogChannels::LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
     produce_coredump();
     return -1;
   }
@@ -1049,7 +1047,7 @@ bool assemble_item_index(Character *ch, int item_index)
   // This should never happen
   if (item_index < 0)
   {
-    logf(ANGEL, LogChannels::LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
+    logf(ARCHITECT, LogChannels::LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
     produce_coredump();
     return false;
   }
@@ -1067,7 +1065,7 @@ bool assemble_item_index(Character *ch, int item_index)
     int component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, LogChannels::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+      logf(ARCHITECT, LogChannels::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
       send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\r\n", ch);
@@ -1112,7 +1110,7 @@ bool assemble_item_index(Character *ch, int item_index)
     int component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, LogChannels::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
+      logf(ARCHITECT, LogChannels::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
       send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\r\n", ch);
@@ -1128,7 +1126,7 @@ bool assemble_item_index(Character *ch, int item_index)
   Object *reward_item = clone_object(item_real);
   if (reward_item == 0)
   {
-    logf(ANGEL, LogChannels::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
+    logf(ARCHITECT, LogChannels::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
     send_to_char("There was an internal malfunction cloning the new item. Contact an Immortal.\r\n", ch);
     return true;
   }
@@ -1156,7 +1154,7 @@ int do_assemble(Character *ch, char *argument, int cmd)
       // if we can see it
       if (CAN_SEE_OBJ(ch, obj, false))
       {
-        vnum = obj_index[obj->item_number].virt;
+        vnum = obj_index[obj->getNumber()].virt;
         item_index = search_assemble_items(vnum);
 
         // check if it's a component of an item to be assembled
@@ -1214,7 +1212,7 @@ int do_assemble(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  vnum = obj_index[obj->item_number].virt;
+  vnum = obj_index[obj->getNumber()].virt;
   item_index = search_assemble_items(vnum);
 
   // Object specified is not part of an item that can be assembled
@@ -1266,7 +1264,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
   one_argument(arg, vict);
   if (cmd != CMD_GAZE)
     return eFAILURE;
-  if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
+  if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->getNumber())
     return eFAILURE;
 
   if (affected_by_spell(ch, SKILL_FEARGAZE))
@@ -1324,7 +1322,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
   int j;
 
   class Object *get_object_in_equip_vis(Character * ch,
-                                           char *arg, class Object *equipment[], int *j, bool blindfighting);
+                                        char *arg, class Object *equipment[], int *j, bool blindfighting);
 
   if (!cmd && obj) // This is where we recharge
     if (obj->obj_flags.value[3])
@@ -1337,10 +1335,10 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!ch)
     return eFAILURE;
   int pos = HOLD;
-  if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
+  if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->getNumber())
   {
     pos = HOLD2;
-    if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
+    if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->getNumber())
       return eFAILURE;
   }
 
@@ -1398,7 +1396,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     if (obj_object != ch->equipment[HOLD] &&
         obj_object != ch->equipment[HOLD2])
       return eFAILURE;
-    if (obj_object->item_number != real_object(3611))
+    if (obj_object->getNumber() != real_object(3611))
       return eFAILURE;
 
     if (affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL))
@@ -1427,7 +1425,7 @@ int devilsword(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!ch || !ch->equipment || !ch->equipment[WIELD])
     return eFAILURE;
 
-  if (real_object(185) != ch->equipment[WIELD]->item_number)
+  if (real_object(185) != ch->equipment[WIELD]->getNumber())
     return eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -1601,7 +1599,7 @@ int eliara_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!ch || !ch->equipment || !ch->equipment[WIELD])
     return eFAILURE;
 
-  if (real_object(30627) != ch->equipment[WIELD]->item_number)
+  if (real_object(30627) != ch->equipment[WIELD]->getNumber())
   {
     remove_eliara(ch);
     return eFAILURE;
@@ -1629,7 +1627,7 @@ int eliara_non_combat(Character *ch, class Object *obj, int cmd, const char *arg
   if (!ch)
     return eFAILURE;
 
-  if (cmd == CMD_REMOVE && GET_POS(ch) == POSITION_FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->item_number == real_object(30627))
+  if (cmd == CMD_REMOVE && GET_POS(ch) == POSITION_FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->getNumber() == real_object(30627))
   {
     send_to_char("Eliara refuses to allow you to remove equipment during battle!\r\n", ch);
     return eSUCCESS;
@@ -1796,12 +1794,12 @@ int restring_machine(Character *ch, class Object *obj, int cmd, const char *arg,
 
   GET_PLATINUM(ch) -= (GET_LEVEL(ch));
 
-  //  dc_free(target_obj->short_description);
-  //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
-  //  strcpy(target_obj->short_description, buf);
+  //  dc_free(target_obj->getShortDescriptionC());
+  //  target_obj->getShortDescriptionC() = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
+  //  strcpy(target_obj->getShortDescriptionC(), buf);
   char zarg[MAX_STRING_LENGTH];
   sprintf(zarg, "$B$7%s$R", buf);
-  target_obj->short_description = str_hsh(zarg);
+  target_obj->setShortDescription(zarg);
 
   send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
                "You put your item into the machine and close the lid.\r\n"
@@ -1948,7 +1946,7 @@ int generic_push_proc(Character *ch, class Object *obj, int cmd, const char *arg
   if (cmd != CMD_PUSH) // push
     return eFAILURE;
 
-  int obj_vnum = obj_index[obj->item_number].virt;
+  int obj_vnum = obj_index[obj->getNumber()].virt;
 
   switch (obj_vnum)
   {
@@ -2370,7 +2368,7 @@ int pull_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   if (cmd != CMD_PULL) // pull
     return eFAILURE;
 
-  int obj_vnum = obj_index[obj->item_number].virt;
+  int obj_vnum = obj_index[obj->getNumber()].virt;
 
   switch (obj_vnum)
   {
@@ -2425,7 +2423,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     bool first = true;
     for (p = object_list; p; p = p->next)
     {
-      if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
+      if (obj_index[p->getNumber()].virt == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
       {
         first = false;
         break;
@@ -2479,7 +2477,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     for (p = object_list; p; p = n)
     {
       n = p->next;
-      if (obj_index[p->item_number].virt == 30097)
+      if (obj_index[p->getNumber()].virt == 30097)
       {
         Character *v = nullptr;
 
@@ -2588,7 +2586,7 @@ int moving_portals(Character *ch, class Object *obj, int cmd,
   if (cmd)
     return eFAILURE;
 
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 11300:
   case 11301:
@@ -2668,7 +2666,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
 
   for (; vict; vict = vict->next_in_room)
   {
-    if (IS_NPC(vict) && (mob_index[vict->mobdata->nr].virt == 9544
+    if (IS_NPC(vict) && (mob_index[vict->mobile->getNumber()].virt == 9544
                          // to add a new mob to this list, just add || and the next check
                          ))
       break;
@@ -2728,13 +2726,13 @@ int boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 
   // figure out which boat I am
   int *boat_list = nullptr;
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 9531:
     boat_list = dk_boat;
     break;
   default:
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", obj_index[obj->item_number].virt);
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", obj_index[obj->getNumber()].virt);
     break;
   }
 
@@ -2765,7 +2763,7 @@ int boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
+        send_to_boat(obj_index[obj->getNumber()].virt, "The ship docks at its destination.\r\n");
       }
     }
     else
@@ -2775,11 +2773,11 @@ int boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
+        send_to_boat(obj_index[obj->getNumber()].virt, "The ship docks at its destination.\r\n");
       }
     }
     send_to_room("The ship sails away.\r\n", obj->in_room, true);
-    send_to_boat(obj_index[obj->item_number].virt, "The ship sails onwards.\r\n");
+    send_to_boat(obj_index[obj->getNumber()].virt, "The ship sails onwards.\r\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
     send_to_room("A ship sails in.\r\n", obj->in_room, true);
@@ -2800,14 +2798,14 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
     return eFAILURE; // someone loaded me
 
   // switch off depending on what item we are
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 9532: // dk boat ramp
     // find the dk boat (9531)
     i = real_object(9531);
     for (obj2 = object_list; obj2; obj2 = obj2->next)
     {
-      if (obj2->item_number == i)
+      if (obj2->getNumber() == i)
         break;
     }
 
@@ -2841,7 +2839,7 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
     return eSUCCESS;
     break;
   default:
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", obj_index[obj->item_number].virt);
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", obj_index[obj->getNumber()].virt);
     break;
   }
 
@@ -3060,7 +3058,7 @@ int shield_combat_procs(Character *ch, class Object *obj, int cmd, const char *a
   if (ch->equipment[WEAR_SHIELD] != obj)
     return eFAILURE;
 
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 2715: // shield of ares
     if (number(0, 3))
@@ -3107,13 +3105,13 @@ int generic_weapon_combat(Character *ch, class Object *obj, int cmd, char *arg,
                ch->equipment[SECOND_WIELD] != obj))
     return eFAILURE;
 
-  if (obj->item_number < 0 || obj->item_number > top_of_objt)
+  if (obj->getNumber() < 0 || obj->getNumber() > top_of_objt)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+    logf(IMMORTAL, LogChannels::LOG_BUG, "generic_weapon_combat: illegal obj->getNumber()");
     return eFAILURE;
   }
 
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 16903: // valhalla hammer
     if (number(1, 100) > GET_DEX(ch) / 4)
@@ -3157,7 +3155,7 @@ int TOHS_locator(Character *ch, class Object *obj, int cmd, const char *arg,
   int searchnum = real_object(1406);
 
   for (victim = object_list; victim; victim = victim->next)
-    if (victim->item_number == searchnum)
+    if (victim->getNumber() == searchnum)
       break;
 
   if (!victim || victim->in_room < 0) // couldn't find it?!
@@ -3176,7 +3174,7 @@ int TOHS_locator(Character *ch, class Object *obj, int cmd, const char *arg,
 
 /*int no_magic_item(Character *ch, class Object *obj, cmd, char
 *arg, Character *invoker)
-{ // mobdata last_direction
+{ // mobile last_direction
    if (cmd)  // Not activated through commands..
      return eFAILURE;
 //   if (
@@ -3242,7 +3240,7 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      csendf(obj->equipped_by, "The %s loses it's grip on your body.\r\n", obj->short_description);
+      csendf(obj->equipped_by, "The %s loses it's grip on your body.\r\n", obj->getShortDescriptionC());
     return eSUCCESS;
   }
   if (!cmd && obj->obj_flags.value[3] <= 0)
@@ -3250,13 +3248,13 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
     if (number(0, 4))
       return eSUCCESS;
     csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n",
-           obj->short_description);
+           obj->getShortDescriptionC());
     obj->obj_flags.value[3] = 5;
     return eSUCCESS;
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    csendf(obj->equipped_by, "The %s refuses to let you remove anything!\r\n", obj->short_description);
+    csendf(obj->equipped_by, "The %s refuses to let you remove anything!\r\n", obj->getShortDescriptionC());
     return eSUCCESS;
   }
   return eFAILURE;
@@ -3274,7 +3272,7 @@ int glove_combat_procs(Character *ch, class Object *obj, int cmd, char *arg,
 
   int dam;
 
-  switch (obj_index[obj->item_number].virt)
+  switch (obj_index[obj->getNumber()].virt)
   {
   case 9806: // muddy gloves
     if (number(0, 17))
@@ -3708,7 +3706,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
       if (rnd == unequip)
       {
 
-        if (vict->equipment[WIELD] && obj_index[vict->equipment[WIELD]->item_number].virt == 27997)
+        if (vict->equipment[WIELD] && obj_index[vict->equipment[WIELD]->getNumber()].virt == 27997)
         {
 
           act("Your $p unequips itself.",
@@ -3724,7 +3722,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
             equip_char(vict, weapon, WIELD);
           }
         }
-        else if (vict->equipment[SECOND_WIELD] && obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
+        else if (vict->equipment[SECOND_WIELD] && obj_index[vict->equipment[SECOND_WIELD]->getNumber()].virt == 27997)
         {
 
           act("Your $p unequips itself.",
@@ -4393,9 +4391,9 @@ void destroy_spellcraft_glyphs(Character *ch)
   {
     if (GET_ITEM_TYPE(tmp_obj) == ITEM_CONTAINER)
       for (loop_obj = tmp_obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-        if (obj_index[tmp_obj->item_number].virt == 6351 || obj_index[tmp_obj->item_number].virt == 6352 || obj_index[tmp_obj->item_number].virt == 6353)
+        if (obj_index[tmp_obj->getNumber()].virt == 6351 || obj_index[tmp_obj->getNumber()].virt == 6352 || obj_index[tmp_obj->getNumber()].virt == 6353)
           move_obj(loop_obj, ch);
-    if (obj_index[tmp_obj->item_number].virt == 6351 || obj_index[tmp_obj->item_number].virt == 6352 || obj_index[tmp_obj->item_number].virt == 6353)
+    if (obj_index[tmp_obj->getNumber()].virt == 6351 || obj_index[tmp_obj->getNumber()].virt == 6352 || obj_index[tmp_obj->getNumber()].virt == 6353)
       obj_from_char(tmp_obj);
   }
   ch->spellcraftglyph = 0;

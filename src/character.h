@@ -23,6 +23,8 @@ using namespace std;
 #include <QMap>
 
 class Character;
+class Connection;
+#include "utility.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include "structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -33,7 +35,8 @@ class Character;
 #include "sing.h"
 #include "quest.h"
 #include "interp.h"
-#include "utility.h"
+#include "Entity.h"
+#include "player.h"
 
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);
@@ -97,10 +100,6 @@ private:
 | max stuff - this is needed almost everywhere
 */
 #define MAX_WEAR 23
-
-#define SEX_NEUTRAL 0
-#define SEX_MALE 1
-#define SEX_FEMALE 2
 
 #define POSITION_DEAD 0
 // #define POSITION_MORTALLYW   1
@@ -226,6 +225,14 @@ struct follow_type
 class Player
 {
 public:
+    explicit Player(void) {}
+    Player(Player &player) {}
+    void duplicate(Player &player) {}
+
+    QString getJoining(void);
+    void setJoining(QString list);
+    void toggleJoining(QString key);
+
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */
 
@@ -305,10 +312,6 @@ public:
     bool multi = {};
     PlayerConfig *config = {};
 
-    QString getJoining(void);
-    void setJoining(QString list);
-    void toggleJoining(QString key);
-
 private:
 };
 
@@ -328,10 +331,13 @@ struct mob_flag_data
     mob_type_t type;               /* Type of mobile                     */
 };
 
-struct mob_data
+class Mobile : public Entity
 {
 public:
-    int32_t nr = {};
+    explicit Mobile(void) {}
+    explicit Mobile(const Mobile &mobile) { duplicate(mobile); }
+    void duplicate(const Mobile &mobile) {}
+
     int8_t default_pos = {};                     // Default position for NPC
     int8_t last_direction = {};                  // Last direction the mobile went in
     uint32_t attack_type = {};                   // Bitvector of damage type for bare-handed combat
@@ -360,31 +366,100 @@ private:
     Object *object = {};
 };
 
+enum sex_t
+{
+    NEUTRAL = 0,
+    MALE = 1,
+    FEMALE = 2
+};
+
+template <typename T>
+inline T *duplicateClass(T *source)
+{
+    if (source != nullptr)
+    {
+        T *destination = new T(*source);
+        return destination;
+    }
+    return nullptr;
+}
+
+inline char *duplicateCString(const char *source)
+{
+    if (source == nullptr)
+    {
+        return strdup("");
+    }
+    else
+    {
+        return strdup(source);
+    }
+}
+
 // Character, Character
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
-class Character
+class Character : public QObject
 {
+    Q_OBJECT
 public:
     static constexpr uint64_t MIN_NAME_SIZE = 3;
     static constexpr uint64_t MAX_NAME_SIZE = 12;
     static const QList<int> wear_to_item_wear;
     static bool validateName(QString name);
 
-    struct mob_data *mobdata = nullptr;
+    explicit Character(QObject *parent = nullptr) : QObject(parent) {}
+    explicit Character(const Character &character, QObject *parent = nullptr) : QObject(parent) { duplicate(character); }
+    void duplicate(const Character &character);
+    void clear(void);
+
+    class Mobile *mobile = nullptr;
+    inline Mobile *getMobile(void) { return mobile; }
+
     class Player *player = nullptr;
-    class Object *objdata = nullptr;
+    inline Player *getPlayer(void) { return player; }
+
+    class Object *object = nullptr;
+    inline Object *getObject(void) { return object; }
 
     class Connection *desc = nullptr; // nullptr normally for mobs
+    inline Connection *getConnection(void) { return desc; }
 
-    char *name = nullptr;        // Keyword 'kill X'
-    char *short_desc = nullptr;  // Action 'X hits you.'
-    char *long_desc = nullptr;   // For 'look room'
+    char *name = nullptr; // Keyword 'kill X'
+    inline QString getName(void) const { return name; }
+    void setName(QString n) { name = strdup(n.toStdString().c_str()); }
+
+    char *short_desc = nullptr; // Action 'X hits you.'
+    inline char *getShortDescriptionC(void) { return short_desc; }
+    inline QString getShortDescription(void) { return short_desc; }
+    void setShortDescription(QString sd) { short_desc = strdup(sd.toStdString().c_str()); }
+
+    char *long_desc = nullptr; // For 'look room'
+    inline char *getLongDescriptionC(void) { return long_desc; }
+    inline QString getLongDescription(void) { return long_desc; }
+    void setLongDescription(QString ld) { long_desc = strdup(ld.toStdString().c_str()); }
+
     char *description = nullptr; // For 'look mob'
-    char *title = nullptr;
+    inline char *getDescriptionC(void) { return description; }
+    inline QString getDescription(void) { return description; }
+    void setDescription(QString d) { description = strdup(d.toStdString().c_str()); }
 
-    int8_t sex = {};
+    char *title = nullptr;
+    inline char *getTitleC(void) { return title; }
+    inline QString getTitle(void) { return title; }
+    void setTitle(QString t) { title = strdup(t.toStdString().c_str()); }
+
+    void setNeutral(void) { data_.sex_ = sex_t::NEUTRAL; }
+    void setMale(void) { data_.sex_ = sex_t::MALE; }
+    void setFemale(void) { data_.sex_ = sex_t::FEMALE; }
+    sex_t getSex(void) { return data_.sex_; }
+    void setSex(sex_t s) { data_.sex_ = s; }
+    sex_t &getSexReference(void);
+    bool isMale(void) { return data_.sex_ == sex_t::MALE; }
+    bool isFemale(void) { return data_.sex_ == sex_t::FEMALE; }
+    bool isNeutral(void) { return data_.sex_ == sex_t::NEUTRAL; }
+
     int8_t c_class = {};
     int8_t race = {};
     int8_t level = {};
@@ -487,7 +562,6 @@ public:
 
     uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
     uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
-    uint32_t misc = {};                             // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
     Character *fighting = {};      /* Opponent     */
     Character *next = {};          /* Next anywhere in game */
@@ -520,15 +594,15 @@ public:
     int player_id = {};
 #endif
     int spec = {};
-
-    struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
-    void tell_history(Character *sender, string message);
-    void gtell_history(Character *sender, string message);
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};
     time_t last_damage = {};
     uint64_t damage_per_second = {};
+    struct room_direction_data *brace_at = {}, *brace_exit = {}; // exits affected by brace
+
+    void tell_history(Character *sender, string message);
+    void gtell_history(Character *sender, string message);
     void setPOSFighting();
     int32_t getHP(void);
     void setHP(int hp, Character *causer = nullptr);
@@ -564,6 +638,9 @@ public:
     command_return_t do_identify(QStringList arguments, int cmd);
     command_return_t do_recall(QStringList arguments, int cmd);
     command_return_t do_cdeposit(QStringList arguments, int cmd);
+    command_return_t do_drink(QStringList arguments, int cmd);
+    command_return_t do_eat(QStringList arguments, int cmd);
+    command_return_t do_string(QStringList arguments, int cmd);
     command_return_t generic_command(QStringList arguments, int cmd);
     command_return_t do_sockets(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
@@ -574,6 +651,8 @@ public:
     bool isMortal(void);
     bool isImmortal(void);
     bool isImplementer(void);
+    inline bool isPlayer(void) { return isMobile() == false && player != nullptr; }
+    bool isMobile(void);
     uint64_t getGold(void);
     uint64_t &getGoldReference(void);
     void setGold(uint64_t gold);
@@ -584,8 +663,17 @@ public:
     int char_to_store_variable_data(FILE *fpsave);
     bool load_charmie_equipment(QString name, bool previous = false);
 
+    uint32_t getMisc(void) const { return data_.misc_; }
+    uint32_t &getMiscReference(void) { return data_.misc_; }
+    void setMisc(uint32_t misc) { data_.misc_ = misc; }
+
 private:
-    uint64_t gold_ = {}; /* Money carried                           */
+    struct Character_data_t
+    {
+        sex_t sex_ = {};
+        uint64_t gold_ = {}; /* Money carried */
+        uint32_t misc_ = {}; // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
+    } data_;
 };
 
 class communication

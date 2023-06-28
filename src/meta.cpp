@@ -682,7 +682,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	move_cost = meta_get_moves_plat_cost(ch, 1);
 	mana_cost = meta_get_mana_plat_cost(ch, 1);
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 	{
 		ki_exp = meta_get_ki_exp_cost(ch);
 		ki_cost = meta_get_ki_plat_cost(ch);
@@ -788,11 +788,11 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 		send_to_char("$BUse 'estimate' command to get costs for higher intervals.\r\n", ch);
 
-		if (!IS_MOB(ch) && ki_cost && ki_exp)
+		if (IS_PC(ch) && ki_cost && ki_exp)
 		{ // mobs can't meta ki
 			csendf(ch, "$B$312)$R Add a point of ki:        %lld experience points and %lld Platinum.\r\n", ki_exp, ki_cost);
 		}
-		else if (!IS_MOB(ch))
+		else if (IS_PC(ch))
 			csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
 
 		send_to_char("$BMonetary Exchange:$R\r\n", ch);
@@ -807,7 +807,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			"$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
 			"$B$320)$R Buy a practice session for 25 plats.\r\n",
 			ch);
-		if (!IS_MOB(ch))
+		if (IS_PC(ch))
 		{
 			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			send_to_char("$B$322)$R Add 2,000,000 experience for 1 qpoint.\r\n", ch);
@@ -1137,7 +1137,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		}
 		if (choice == 15)
 		{
-			if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+			if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 			{
 				send_to_char("Your criminal acts prohibit it.\r\n", ch);
 				return eSUCCESS;
@@ -1497,8 +1497,8 @@ void set_heightweight(Character *ch)
 		ch->weight = number(240, 280);
 		break;
 	}
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
+	logf(ARCHITECT, LogChannels::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
+	logf(ARCHITECT, LogChannels::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
 int changecost(int oldrace, int newrace)
@@ -1737,7 +1737,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 1000;
-			GET_SEX(ch) = newsex;
+			ch->setSex((sex_t)newsex);
 			send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n", ch);
 			send_to_char("After a brief moment of pain you are reborn!\r\n", ch);
 			return eSUCCESS;
@@ -1809,22 +1809,22 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			if (choice == 3)
 			{
 				ch->height++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 4)
 			{
 				ch->height--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 5)
 			{
 				ch->weight++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			if (choice == 6)
 			{
 				ch->weight--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ARCHITECT, LogChannels::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			return eSUCCESS;
 		}

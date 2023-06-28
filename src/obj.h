@@ -20,8 +20,7 @@
 
 #include "structs.h" // uint8_t
 #include "character.h"
-
-using namespace std;
+#include "Entity.h"
 
 /* The following defs are for Object  */
 
@@ -233,8 +232,10 @@ struct obj_affected_type
 };
 
 /* ======================== Structure for object ========================= */
-class Object
+
+class Object : public QObject, public Entity
 {
+    Q_OBJECT
 public:
     static const QStringList wear_bits;
     static const QStringList size_bits;
@@ -242,16 +243,27 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
-    int32_t item_number = {};     /* Where in data-base               */
+    Object(QObject *parent = nullptr) : QObject(parent) {}
+    Object(Object &object, QObject *parent = nullptr) : QObject(parent) { *this = object; }
+
+    void clear(void) { *this = Object(); }
+    Object &operator=(const Object &object)
+    {
+        name_ = object.name_;
+        number_ = object.number_;
+        virtual_number_ = object.virtual_number_;
+        uuid_ = object.uuid_;
+        short_description_ = object.short_description_;
+        return *this;
+    }
     room_t in_room = {};          /* In what room -1 when conta/carr  */
     int vroom = {};               /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    char *name = {};                       /* Title of object :get etc.        */
-    char *description = {};                /* When in room                     */
-    char *short_description = {};          /* when worn/carry/in cont.         */
+    char *description = {}; /* When in room                     */
+
     char *action_description = {};         /* What to write when used          */
     extra_descr_data *ex_description = {}; /* extra descriptions     */
     Character *carried_by = {};            /* Carried by :NULL in room/conta   */
@@ -275,9 +287,14 @@ public:
     int keywordfind(void);
     void setOwner(QString owner) { owner_ = owner; }
     QString getOwner(void) { return owner_; }
+    QString getShortDescription(void) { return short_description_; }
+    const char *getShortDescriptionC(void) { return short_description_.toStdString().c_str(); }
+    void setShortDescription(QString short_description) { short_description_ = short_description; }
+    void setShortDescription(std::stringstream &short_description) { short_description_ = short_description.str().c_str(); }
 
 private:
     QString owner_;
+    QString short_description_; /* when worn/carry/in cont.         */
 };
 
 /* For 'equipment' */
@@ -316,7 +333,7 @@ private:
 struct obj_file_elem
 {
     int16_t version = {};
-    int32_t item_number = {};
+    uint64_t item_number = {};
     int16_t timer = {};
     int16_t wear_pos = {};
     int16_t container_depth = {};
@@ -336,6 +353,7 @@ bool fullSave(Object *obj);
 void heightweight(Character *ch, bool add);
 void wear(Character *ch, class Object *obj_object, int keyword);
 int obj_from(Object *obj);
+int FOUNTAINisPresent(Character *ch);
 
 typedef QStringList item_types_t;
 

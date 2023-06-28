@@ -119,7 +119,6 @@ int create_entry(char *name);
 void zone_update(void);
 void init_char(Character *ch);
 void clear_char(Character *ch);
-void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
@@ -151,8 +150,8 @@ Character *read_mobile(int nr, FILE *fl);
 class Object *clone_object(int nr);
 Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
-void string_to_file(FILE *f, char *string);
-void string_to_file(ofstream &f, char *string);
+void string_to_file(FILE *f, QString str);
+void string_to_file(ofstream &f, QString str);
 ofstream &operator<<(ofstream &out, Object *obj);
 ifstream &operator>>(ifstream &in, Object *obj);
 string lf_to_crlf(string &s1);
@@ -160,7 +159,6 @@ void copySaveData(Object *new_obj, Object *obj);
 bool verify_item(class Object **obj);
 bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
-FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */
@@ -202,11 +200,11 @@ struct reset_com
 /* element in monster and object index-tables   */
 struct index_data
 {
-  int virt;                                                                               /* virt number of ths mob/obj           */
-  int number;                                                                             /* number of existing units of ths mob/obj */
+  int virt;                                                                            /* virt number of ths mob/obj           */
+  int number;                                                                          /* number of existing units of ths mob/obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
-  void *item;                                                                             /* the mobile/object itself                 */
+  void *item;                                                                          /* the mobile/object itself                 */
 
   mob_prog_data *mobprogs;
   mob_prog_data *mobspec;

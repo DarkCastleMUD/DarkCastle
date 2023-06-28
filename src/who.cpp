@@ -135,7 +135,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
         foundtarget = 1;
 
       // First, if they're not anonymous
-      if ((!IS_MOB(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
+      if ((IS_PC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
                 "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
@@ -236,7 +236,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
                   "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
-                  i->name,
+                  i->getName(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
                   IS_MOB(i) ? 0 : i->player->totalpkills,
@@ -245,7 +245,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
         else
           sprintf(tempbuffer,
                   "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
-                  i->name,
+                  i->getName(),
                   races[(int)GET_RACE(i)].singular_name,
                   IS_MOB(i) ? 0 : i->player->totalpkills,
                   IS_MOB(i) ? 0 : i->player->pdeathslogin,
@@ -362,7 +362,7 @@ int do_who(Character *ch, char *argument, int cmd)
     else if (is_abbrev(oneword, "penis"))
     {
       sexcheck = 1;
-      sextype = SEX_MALE;
+      sextype = sex_t::MALE;
     }
     else if (is_abbrev(oneword, "guide"))
     {
@@ -371,12 +371,12 @@ int do_who(Character *ch, char *argument, int cmd)
     else if (is_abbrev(oneword, "vagina"))
     {
       sexcheck = 1;
-      sextype = SEX_FEMALE;
+      sextype = sex_t::FEMALE;
     }
     else if (is_abbrev(oneword, "other"))
     {
       sexcheck = 1;
-      sextype = SEX_NEUTRAL;
+      sextype = sex_t::NEUTRAL;
     }
     else if (is_abbrev(oneword, "lfg"))
     {
@@ -470,7 +470,7 @@ int do_who(Character *ch, char *argument, int cmd)
       continue;
     }
 
-    if (clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)
+    if (clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < IMMORTAL)
     {
       continue;
     }
@@ -556,9 +556,9 @@ int do_who(Character *ch, char *argument, int cmd)
         infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
       }
 
-      if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
+      if (GET_LEVEL(ch) >= IMMORTAL && IS_PC(i) && i->player->wizinvis > 0)
       {
-        if (!IS_MOB(i) && i->player->incognito == true)
+        if (IS_PC(i) && i->player->incognito == true)
         {
           sprintf(extraBuf, " (Incognito / WizInvis %ld)", i->player->wizinvis);
         }
@@ -781,7 +781,7 @@ int do_where(Character *ch, char *argument, int cmd)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
-          CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
+          CAN_SEE(ch, d->character) && IS_PC(d->character) /*Don't show snooped mobs*/)
       {
         if (world[d->character->in_room].zone == zonenumber)
           csendf(ch, "%-20s - %s$R\n\r", d->character->name,

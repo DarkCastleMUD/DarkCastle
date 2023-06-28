@@ -5,8 +5,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always")
-#set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
+#set(CMAKE_CXX_FLAGS "-O0 -ggdb -Wno-write-strings -fdiagnostics-color=always")
+set(CMAKE_CXX_FLAGS "-O0 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 
@@ -60,6 +60,7 @@ add_library(DC STATIC
     inventory.cpp
     ki.cpp
     Leaderboard.cpp
+    LegacyFile.cpp
     limits.cpp
     magic.cpp
     memory.cpp
@@ -128,6 +129,7 @@ add_library(DC STATIC
     db.h
     DC.h
     dc_xmlrpc.h
+    Entity.h
     event.h
     fight.h
     fileinfo.h
@@ -142,6 +144,7 @@ add_library(DC STATIC
     ki.h
     language.h
     Leaderboard.h
+    LegacyFile.h
     levels.h
     magic.h
     memory.h

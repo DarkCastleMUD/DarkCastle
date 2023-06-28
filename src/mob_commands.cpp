@@ -153,7 +153,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
-          victim->name, mob_index[victim->mobdata->nr].virt);
+          victim->name, mob_index[victim->mobile->getNumber()].virt);
   send_to_char(buf, ch);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -161,13 +161,13 @@ void mpstat(Character *ch, Character *victim)
           victim->long_desc ? victim->long_desc : "(nullptr)");
   send_to_char(buf, ch);
 
-  if (!(mob_index[victim->mobdata->nr].progtypes))
+  if (!(mob_index[victim->mobile->getNumber()].progtypes))
   {
     send_to_char("That mob has no programs set.\r\n", ch);
     return;
   }
 
-  for (mprg = mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
+  for (mprg = mob_index[victim->mobile->getNumber()].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
@@ -393,14 +393,14 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
 
     for (int l = 0; l < MAX_WEAR; l++)
       if (ch->equipment[l])
-        if (!dot || isname(dotbuf, ch->equipment[l]->name))
+        if (!dot || isname(dotbuf, ch->equipment[l]->getName()))
           extract_obj(unequip_char(ch, l));
 
     Object *x, *v;
     for (x = ch->carrying; x; x = v)
     {
       v = x->next_content;
-      if (!dot || isname(dotbuf, x->name))
+      if (!dot || isname(dotbuf, x->getName()))
         extract_obj(x);
     }
     return eSUCCESS;
@@ -593,7 +593,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (obj_index[obj->item_number].virt == 393 && IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+  if (obj_index[obj->getNumber()].virt == 393 && IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
   {
     return eFAILURE;
   }
@@ -761,7 +761,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
     {
       location = vict->in_room;
     }
-    else if ((obj = get_obj_vis(ch, arg)) && obj->in_room >= 0)
+    else if ((obj = get_obj_vis(ch, QString(arg))) && obj->in_room >= 0)
     {
       location = obj->in_room;
     }
@@ -1247,7 +1247,7 @@ int do_mpsettemp(Character *ch, char *argument, int cmd)
   {
     if (IS_NPC(ch))
     {
-      int num = mob_index[ch->mobdata->nr].virt;
+      int num = mob_index[ch->mobile->getNumber()].virt;
       sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
       logf(104, LogChannels::LOG_BUG, arg);
     }
@@ -1798,9 +1798,9 @@ int do_mppause(Character *ch, char *argument, int cmd)
     }
     throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
 
-    if (ch && ch->mobdata)
+    if (ch && ch->mobile)
     {
-      ch->mobdata->paused = true;
+      ch->mobile->paused = true;
       throwitem->data_num = -1000;
     }
   }
@@ -1817,7 +1817,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(ch))
   {
-    throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
+    throwitem->target_mob_num = mob_index[ch->mobile->getNumber()].virt;
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -1928,7 +1928,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
            IS_SET(world[to_room].room_flags, ARENA) ||
            (world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
            DC::getInstance()->zones.value(world[to_room].zone).isNoTeleport() ||
-           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(world[to_room].zone).isTown()) : false) ||
+           ((IS_NPC(victim) && ISSET(victim->mobile->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(world[to_room].zone).isTown()) : false) ||
            (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
@@ -1960,7 +1960,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
       prog_error(ch, "Mppeace - Vict not found.");
       return eFAILURE;
     }
-    if (IS_MOB(vict) && vict->mobdata->hatred != nullptr)
+    if (IS_MOB(vict) && vict->mobile->hatred != nullptr)
       remove_memory(vict, 'h');
     if (vict->fighting != nullptr)
       stop_fighting(vict);
@@ -1968,7 +1968,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
   }
   for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
+    if (IS_MOB(rch) && rch->mobile->hatred != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
@@ -2258,19 +2258,19 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   {
     *lvali = i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, mob_index[ch->mobile->getNumber()].virt );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, mob_index[ch->mobile->getNumber()].virt );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, mob_index[ch->mobile->getNumber()].virt );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2295,13 +2295,13 @@ void prog_error(Character *ch, char *format, ...)
   if (ch && IS_OBJ(ch))
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Obj %d, com %d, line %d: %s",
-         obj_index[ch->objdata->item_number].virt, mprog_command_num,
+         obj_index[ch->object->getNumber()].virt, mprog_command_num,
          mprog_line_num, buffer);
   }
   else if (ch && IS_MOB(ch))
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d, com %d, line %d: %s",
-         mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
+         mob_index[ch->mobile->getNumber()].virt, mprog_command_num, mprog_line_num,
          buffer);
   }
   else

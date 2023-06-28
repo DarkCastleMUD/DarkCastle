@@ -156,7 +156,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     send_to_char("The arena is not open for anyone your level.\r\n", ch);
     return eFAILURE;
   }
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOARENA))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_NOARENA))
   {
     send_to_char("You have been banned from arenas.\r\n", ch);
     return eFAILURE;

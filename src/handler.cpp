@@ -108,7 +108,7 @@ bool is_wearing(Character *ch, Object *item)
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
 // puts it in a static char buffer, and returns it.
-char *fname(char *namelist)
+char *fname(const char *namelist) char *fname(const char *namelist)
 {
 	static char holder[30];
 	char *point;
@@ -119,7 +119,7 @@ char *fname(char *namelist)
 	// we seem to use this alot, and 30 chars isn't a whole lot.....
 	// let's just put this here for the heck of it -pir 2/28/01
 	if (point > (holder + 29))
-		logentry("point overran holder in fname (handler.c)", ANGEL, LogChannels::LOG_BUG);
+		logentry("point overran holder in fname (handler.c)", ARCHITECT, LogChannels::LOG_BUG);
 
 	*point = '\0';
 
@@ -525,7 +525,7 @@ const struct set_data set_list[] = {
 void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 {
 	// obj has just been worn
-	int obj_vnum = obj_index[obj->item_number].virt;
+	int obj_vnum = obj_index[obj->getNumber()].virt;
 	int i;
 	int z = 0, y;
 	// Quadruple nested for. Annoying, but it's gotta be done.
@@ -545,7 +545,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && obj_index[ch->equipment[i]->getNumber()].virt == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -796,7 +796,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 void remove_set_stats(Character *ch, Object *obj, int flag)
 {
 	// obj has just been removed
-	int obj_vnum = obj_index[obj->item_number].virt;
+	int obj_vnum = obj_index[obj->getNumber()].virt;
 	int i;
 	int z = 0, y;
 	// Quadruply nested for. Annoying, but it's gotta be done.
@@ -814,7 +814,7 @@ void remove_set_stats(Character *ch, Object *obj, int flag)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && obj_index[ch->equipment[i]->getNumber()].virt == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -843,7 +843,7 @@ void check_weapon_weights(Character *ch)
 	if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 		return;
 	// make sure we're still strong enough to wield our weapons
-	if (!IS_MOB(ch) && ch->equipment[WIELD] &&
+	if (IS_PC(ch) && ch->equipment[WIELD] &&
 		GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -1011,11 +1011,11 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		switch (GET_SEX(ch))
 		{
-		case SEX_MALE:
-			GET_SEX(ch) = SEX_FEMALE;
+		case sex_t::MALE:
+			ch->setMale();
 			break;
-		case SEX_FEMALE:
-			GET_SEX(ch) = SEX_MALE;
+		case sex_t::FEMALE:
+			ch->setFemale();
 			break;
 		default:
 			break;
@@ -1032,7 +1032,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		break;
 
 	case APPLY_AGE:
-		if (!IS_MOB(ch))
+		if (IS_PC(ch))
 			ch->player->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
 		break;
 
@@ -1702,9 +1702,9 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 
 		if (hjp->next != af)
 		{
-			logentry("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LogChannels::LOG_BUG);
+			logentry("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ARCHITECT, LogChannels::LOG_BUG);
 			sprintf(buf, "Problem With: %s    Affect type: %d", ch->name, af->type);
-			logentry(buf, ANGEL, LogChannels::LOG_BUG);
+			logentry(buf, ARCHITECT, LogChannels::LOG_BUG);
 			return;
 		}
 		hjp->next = af->next; /* skip the af element */
@@ -2271,34 +2271,34 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 			if (i->next_in_room == ch)
 				i->next_in_room = ch->next_in_room;
 		}
-	//  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
+	//  if (IS_NPC(ch) && ISSET(ch->mobile->actflags, ACT_NOMAGIC))
 	//	debugpoint();
 	for (i = world[ch->in_room].people; i; i = i->next_in_room)
 	{
-		if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
+		if (IS_NPC(i) && ISSET(i->mobile->actflags, ACT_NOMAGIC))
 			Other = true;
-		if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOTRACK))
+		if (IS_NPC(i) && ISSET(i->mobile->actflags, ACT_NOTRACK))
 			More = true;
-		if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOKI))
+		if (IS_NPC(i) && ISSET(i->mobile->actflags, ACT_NOKI))
 			kimore = true;
 	}
 	if (IS_PC(ch)) // player
 		DC::getInstance()->zones.value(world[ch->in_room].zone).decrementPlayers();
 	if (IS_NPC(ch))
-		ch->mobdata->last_room = ch->in_room;
+		ch->mobile->last_room = ch->in_room;
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+		if (ISSET(ch->mobile->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
 		{
 			REMOVE_BIT(world[ch->in_room].iFlags, NO_TRACK);
 			REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
 		}
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_KI))
+		if (ISSET(ch->mobile->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_KI))
 		{
 			REMOVE_BIT(world[ch->in_room].iFlags, NO_KI);
 			REMOVE_BIT(world[ch->in_room].room_flags, NO_KI);
 		}
-	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+	if (IS_NPC(ch) && ISSET(ch->mobile->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
 	{
 		REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
 		REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
@@ -2338,7 +2338,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	if (world[room].people == ch)
 	{
-		logentry("Error: world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
+		logentry("Error: world[room].people == ch in char_to_room().", ARCHITECT, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2393,17 +2393,17 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 		DC::getInstance()->zones.value(world[room].zone).incrementPlayers();
 	if (IS_NPC(ch))
 	{
-		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
+		if (ISSET(ch->mobile->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
 		{
 			SET_BIT(world[room].iFlags, NO_MAGIC);
 			SET_BIT(world[room].room_flags, NO_MAGIC);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
+		if (ISSET(ch->mobile->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
 		{
 			SET_BIT(world[room].iFlags, NO_KI);
 			SET_BIT(world[room].room_flags, NO_KI);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
+		if (ISSET(ch->mobile->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
 		{
 			SET_BIT(world[room].iFlags, NO_TRACK);
 			SET_BIT(world[room].room_flags, NO_TRACK);
@@ -2447,17 +2447,17 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (!ch || !obj)
 	{
-		logentry("Null ch or obj in equip_char()!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Null ch or obj in equip_char()!", ARCHITECT, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
 	{
-		logentry("Invalid eq position in equip_char!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Invalid eq position in equip_char!", ARCHITECT, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (ch->equipment[pos])
 	{
-		logf(ANGEL, LogChannels::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
+		logf(ARCHITECT, LogChannels::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
 		produce_coredump();
 		return 0;
 	}
@@ -2470,13 +2470,13 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (obj->carried_by)
 	{
-		logentry("EQUIP: Obj is carried_by when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry("EQUIP: Obj is carried_by when equip.", ARCHITECT, LogChannels::LOG_BUG);
 		return 0;
 	}
 
 	if (obj->in_room != DC::NOWHERE)
 	{
-		logentry("EQUIP: Obj is in_room when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry("EQUIP: Obj is in_room when equip.", ARCHITECT, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2511,24 +2511,24 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		}
 	}
 
-	if (obj_index[obj->item_number].virt == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
 		act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
@@ -2591,17 +2591,17 @@ class Object *unequip_char(Character *ch, int pos, int flag)
 
 	obj = ch->equipment[pos];
 
-	if (obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", ch, obj, 0, TO_CHAR, 0);
 		GET_MANA(ch) = GET_MANA(ch) / 2;
 	}
-	if (obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
 		ch->setHP(ch->getHP() / 2);
 	}
-	if (obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj_index[obj->getNumber()].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The spring in your step has subsided.", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
@@ -2677,6 +2677,29 @@ b: // ew
 	return (obj);
 }
 
+int get_number(QString name)
+{
+
+	auto pos = name.indexOf(".");
+	if (pos == -1)
+	{
+		return 1;
+	}
+
+	auto number_str = name.left(pos);
+
+	try
+	{
+		auto str_str = name.left(pos + 1);
+		name = str_str;
+		return number_str.toInt();
+	}
+	catch (...)
+	{
+		return 1;
+	}
+}
+
 int get_number(string &name)
 {
 	size_t pos = name.find(".");
@@ -2743,7 +2766,7 @@ class Object *get_obj_in_list(char *name, class Object *list)
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isname(tmp, i->name))
+		if (isname(tmp, i->getName()))
 		{
 			if (j == number)
 				return i;
@@ -2759,7 +2782,7 @@ class Object *get_obj_in_list_num(int num, class Object *list)
 	class Object *i;
 
 	for (i = list; i; i = i->next_content)
-		if (i->item_number == num)
+		if (i->getNumber() == num)
 			return (i);
 
 	return (0);
@@ -2779,7 +2802,7 @@ class Object *get_obj(char *name)
 		return (0);
 
 	for (i = object_list, j = 1; i && (j <= number); i = i->next)
-		if (isname(tmp, i->name))
+		if (isname(tmp, i->getName()))
 		{
 			if (j == number)
 				return (i);
@@ -2802,7 +2825,7 @@ class Object *get_obj_num(int nr)
 	class Object *i;
 
 	for (i = object_list; i; i = i->next)
-		if (i->item_number == nr)
+		if (i->getNumber() == nr)
 			return (i);
 
 	return (0);
@@ -2830,7 +2853,7 @@ Character *get_char_room(char *name, int room, bool careful)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isname(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && mob_index[i->mobdata->nr].virt == 12))
+			if (isname(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && mob_index[i->mobile->getNumber()].virt == 12))
 				return (i);
 			else if (isname2(tmp, GET_NAME(i)))
 			{
@@ -2913,7 +2936,7 @@ Character *get_mob(char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
-		if(!IS_MOB(i)) {
+		if(IS_PC(i)) {
 			return false;
 		}
 		if (isname(name, GET_NAME(i))) {
@@ -2935,7 +2958,7 @@ Character *get_char_num(int nr)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
 						  {
-		if (IS_MOB(i) && i->mobdata->nr == nr) {
+		if (IS_MOB(i) && i->mobile->getNumber() == nr) {
 			return true;
 		}
 		return false; });
@@ -2964,7 +2987,7 @@ int move_obj(Object *obj, int dest)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->name);
+		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->getName().toStdString().c_str());
 		abort();
 	}
 
@@ -2973,7 +2996,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->getName().toStdString().c_str(), world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -2985,7 +3008,7 @@ int move_obj(Object *obj, int dest)
 			// Couldn't move obj from the room
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -2997,7 +3020,7 @@ int move_obj(Object *obj, int dest)
 			// Couldn't move obj from its container
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3009,23 +3032,23 @@ int move_obj(Object *obj, int dest)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (1): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (1): %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (2) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (2) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (3) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (3) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to destination: %d", obj->name, world[dest].number);
+		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to destination: %d", obj->getName().toStdString().c_str(), world[dest].number);
 		return 0;
 	}
 
@@ -3049,7 +3072,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->name);
+		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->getName().toStdString().c_str());
 		abort();
 	}
 
@@ -3058,7 +3081,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->getName().toStdString().c_str(), world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3070,7 +3093,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			// Couldn't move obj from the room
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3082,7 +3105,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			// Couldn't move obj from its container
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3094,23 +3117,23 @@ int move_obj(Object *obj, Object *dest_obj)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (4): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (4): %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (5) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (5) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (6) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (6) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
+		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to container: %s", obj->getName().toStdString().c_str(), dest_obj->getName().toStdString().c_str());
 		return 0;
 	}
 	add_totem(dest_obj, obj);
@@ -3136,7 +3159,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->name);
+		fprintf(stderr, "FATAL: Object move_obj() while equipped: %s.\n", obj->getName().toStdString().c_str());
 		abort();
 	}
 
@@ -3145,7 +3168,7 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->getName().toStdString().c_str(), world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3157,7 +3180,7 @@ int move_obj(Object *obj, Character *ch)
 			// Couldn't move obj from the room
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3172,7 +3195,7 @@ int move_obj(Object *obj, Character *ch)
 			// Couldn't move obj from its container
 			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't "
 												 "remove it!",
-				 obj->name, GET_NAME(obj->carried_by));
+				 obj->getName().toStdString().c_str(), GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3197,23 +3220,23 @@ int move_obj(Object *obj, Character *ch)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (7): %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (7): %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (8) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (8) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (9) : %s.\n", obj->name);
+			fprintf(stderr, "FATAL: Object stuck in DC::NOWHERE (9) : %s.\n", obj->getName().toStdString().c_str());
 			abort();
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
+		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to character: %s", obj->getName().toStdString().c_str(), GET_NAME(ch));
 		return 0;
 	}
 
@@ -3228,7 +3251,7 @@ int obj_to_char(class Object *object, Character *ch)
 	// class Object *obj;
 	/*
 	 if(!(obj = ch->carrying) ||
-	 (!obj->next_content && obj->item_number > object->item_number))
+	 (!obj->next_content && obj->getNumber() > object->getNumber()))
 	 {
 	 */
 	object->next_content = ch->carrying;
@@ -3247,7 +3270,7 @@ int obj_to_char(class Object *object, Character *ch)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->item_number < object->item_number)
+	 obj->next_content->getNumber() < object->getNumber())
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3337,7 +3360,7 @@ int obj_to_room(class Object *object, int room)
 	// search through for the last object, or another object just like this one
 	for (obj = world[room].contents; obj && obj->next_content; obj = obj->next_content)
 	{
-		if (obj->item_number == object->item_number)
+		if (obj->getNumber() == object->getNumber())
 			break;
 	}
 
@@ -3359,7 +3382,7 @@ int obj_to_room(class Object *object, int room)
 
 	/*
 	 if(!(obj = world[room].contents) ||
-	 (!obj->next_content && obj->item_number > object->item_number))
+	 (!obj->next_content && obj->getNumber() > object->getNumber()))
 	 {
 	 object->next_content = world[room].contents;
 	 world[room].contents = object;
@@ -3372,7 +3395,7 @@ int obj_to_room(class Object *object, int room)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->item_number < object->item_number)
+	 obj->next_content->getNumber() < object->getNumber())
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3434,7 +3457,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 	// search through for the last object, or another object just like this one
 	for (tobj = obj_to->contains; tobj && tobj->next_content; tobj = tobj->next_content)
 	{
-		if (tobj->item_number == obj->item_number)
+		if (tobj->getNumber() == obj->getNumber())
 			break;
 	}
 
@@ -3452,7 +3475,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 
 	// recursively upwards add the weight.  Since we only have 1 layer of containers,
 	// this loop only happens once, but it's good to leave later in case we change our mind
-	if (obj_index[obj_to->item_number].virt != 536)
+	if (obj_index[obj_to->getNumber()].virt != 536)
 	{
 		for (tobj = obj->in_obj; tobj;
 			 GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3496,7 +3519,7 @@ int obj_from_obj(class Object *obj)
 
 	// Subtract weight from containers container
 
-	if (!obj_from || obj_index[obj_from->item_number].virt != 536)
+	if (!obj_from || obj_index[obj_from->getNumber()].virt != 536)
 	{
 		for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
 			GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3593,9 +3616,9 @@ void extract_obj(class Object *obj)
 			temp1->next = obj->next;
 	}
 
-	if (obj->item_number >= 0)
+	if (obj->getNumber() >= 0)
 	{
-		(obj_index[obj->item_number].number)--;
+		(obj_index[obj->getNumber()].number)--;
 	}
 
 	for (auto &r : reroll_sessions)
@@ -3619,7 +3642,7 @@ void extract_obj(class Object *obj)
 
 void update_object(class Object *obj, int use)
 {
-	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 && obj_index[obj->item_number].virt != 30033 && obj_index[obj->item_number].virt != 30097 && obj_index[obj->item_number].virt != 30019))
+	if (obj->obj_flags.timer > 0 && (obj_index[obj->getNumber()].virt != 30010 && obj_index[obj->getNumber()].virt != 30036 && obj_index[obj->getNumber()].virt != 30033 && obj_index[obj->getNumber()].virt != 30097 && obj_index[obj->getNumber()].virt != 30019))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);
@@ -3649,7 +3672,7 @@ void update_char_objects(Character *ch)
 	{
 		if (ch->equipment[i])
 		{
-			if (obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+			if (obj_index[ch->equipment[i]->getNumber()].virt == SPIRIT_SHIELD_OBJ_NUMBER)
 			{
 				update_object(ch->equipment[i], 1);
 
@@ -3692,12 +3715,12 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 	if (ch->in_room == DC::NOWHERE)
 	{
-		logentry("Extract_char: DC::NOWHERE", ANGEL, LogChannels::LOG_BUG);
+		logentry("Extract_char: DC::NOWHERE", ARCHITECT, LogChannels::LOG_BUG);
 		return;
 	}
 
-	if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
-		ch->mobdata->reset->lastPop = nullptr;
+	if (IS_NPC(ch) && ch->mobile && ch->mobile->reset && ch->mobile->reset->lastPop)
+		ch->mobile->reset->lastPop = nullptr;
 
 	remove_totem_stats(ch);
 	if (IS_PC(ch))
@@ -3711,7 +3734,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 			extract_char(ch->player->golem, false);
 		}
 	}
-	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
+	if (IS_NPC(ch) && mob_index[ch->mobile->getNumber()].virt == 8)
 	{
 		isGolem = true;
 		if (pull)
@@ -3867,8 +3890,8 @@ void extract_char(Character *ch, bool pull, Trace t)
 	if (ch->desc && ch->desc->original)
 		do_return(ch, "", 12);
 
-	if (IS_NPC(ch) && ch->mobdata->nr > -1)
-		mob_index[ch->mobdata->nr].number--;
+	if (IS_NPC(ch) && ch->mobile->getNumber() > -1)
+		mob_index[ch->mobile->getNumber()].number--;
 
 	if (pull || isGolem)
 	{
@@ -3957,7 +3980,7 @@ void lastseen_targeted(Character *ch, Character *victim)
 	if (ch->player->lastseen == 0)
 		ch->player->lastseen = new multimap<int, pair<timeval, timeval>>;
 
-	int nr = victim->mobdata->nr;
+	int nr = victim->mobile->getNumber();
 
 	multimap<int, pair<timeval, timeval>>::iterator i;
 	i = ch->player->lastseen->find(nr);
@@ -4073,7 +4096,7 @@ Character *get_mob_room_vis(Character *ch, char *name)
 
 	for (i = world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
 	{
-		if (!IS_MOB(i))
+		if (IS_PC(i))
 			continue;
 
 		if (number == 1)
@@ -4176,7 +4199,7 @@ Object *get_obj_vnum(int vnum)
 	Object *i;
 	int num = real_object(vnum);
 	for (i = object_list; i; i = i->next)
-		if (i->item_number == num)
+		if (i->getNumber() == num)
 			return i;
 	return nullptr;
 }
@@ -4191,7 +4214,7 @@ Character *get_random_mob_vnum(int vnum)
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
 						  {
-		if(IS_NPC(i) && i->mobdata->nr == num)
+		if(IS_NPC(i) && i->mobile->getNumber() == num)
 		{
 			if (total == which)
 			return true;
@@ -4216,7 +4239,7 @@ Character *get_mob_vnum(int vnum)
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
 						  {
-		if(IS_NPC(i) && i->mobdata->nr == number) {
+		if(IS_NPC(i) && i->mobile->getNumber() == number) {
 			return true;
 		}
 		return false; });
@@ -4226,6 +4249,11 @@ Character *get_mob_vnum(int vnum)
 	}
 	return nullptr;
 }
+Character *get_char_vis(Character *ch, QString name)
+{
+	return get_char_vis(ch, name.toStdString().c_str());
+}
+
 Character *get_char_vis(Character *ch, const string &name)
 {
 	return get_char_vis(ch, name.c_str());
@@ -4487,7 +4515,7 @@ class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *lis
 		return nullptr;
 
 	for (i = list; i; i = i->next_content)
-		if (i->item_number == number && CAN_SEE_OBJ(ch, i, blindfighting))
+		if (i->getNumber() == number && CAN_SEE_OBJ(ch, i, blindfighting))
 			return i;
 
 	return nullptr;
@@ -4506,29 +4534,50 @@ class Object *get_obj_in_list_vis(Character *ch, const char *name, class Object 
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isname(tmp, i->name))
-			if (CAN_SEE_OBJ(ch, i, blindfighting))
-			{
-				if (j == number)
-					return (i);
-				j++;
-			}
+		if (isname(tmp, i->getName()))
+			if (isname(tmp, i->getName()))
+				if (CAN_SEE_OBJ(ch, i, blindfighting))
+				{
+					if (j == number)
+						return (i);
+					j++;
+				}
 	return (0);
 }
 
-class Object *get_obj_vis(Character *ch, string name, bool loc)
+class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool blindfighting)
 {
-	/*search the entire world for an object, and return a pointer  */
-	return get_obj_vis(ch, name.c_str(), loc);
+	bool ok = false;
+	qulonglong number = name.toULongLong(&ok);
+	if (ok == false)
+	{
+		return nullptr;
+	}
+
+	qulonglong j = {};
+	for (class Object *i = list; i != nullptr && (j <= number); i = i->next_content)
+	{
+		if (isname(name, i->getName()))
+		{
+			if (CAN_SEE_OBJ(ch, i, blindfighting))
+			{
+				if (j == number)
+					return i;
+				j++;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 /*search the entire world for an object, and return a pointer  */
-class Object *get_obj_vis(Character *ch, const char *name, bool loc)
+class Object *get_obj_vis(Character *ch, QString name, bool loc)
 {
 	class Object *i;
 	int j, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp;
+	QString tmpname;
+	QString tmp;
 
 	/* scan items carried */
 	if ((i = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
@@ -4538,22 +4587,22 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 	if ((i = get_obj_in_list_vis(ch, name, world[ch->in_room].contents)) != nullptr)
 		return (i);
 
-	strcpy(tmpname, name);
+	tmpname = name;
 	tmp = tmpname;
-	if ((number = get_number(&tmp)) < 0)
+	if ((number = get_number(tmp)) < 0)
 		return (0);
 
 	/* ok.. no luck yet. scan the entire obj list   */
 	for (i = object_list, j = 1; i && (j <= number); i = i->next)
 	{
 		// TODO
-		// For now they want me to remove this becuase portals and corpses are item_number -1
-		// if (i->item_number == -1) continue;
+		// For now they want me to remove this becuase portals and corpses are getNumber() -1
+		// if (i->getNumber() == -1) continue;
 		//
 		if (loc && IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			GET_LEVEL(ch) < 101)
 			continue;
-		if (isname(tmp, i->name))
+		if (isname(tmp, i->getName()))
 			if (CAN_SEE_OBJ(ch, i))
 			{
 				if (j == number)
@@ -4564,6 +4613,11 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 	return (0);
 }
 
+class Object *get_obj_vis(Character *ch, string name, bool loc)
+{
+	/*search the entire world for an object, and return a pointer  */
+	return get_obj_vis(ch, QString(name.c_str()), loc);
+}
 class Object *create_money(int amount)
 {
 	class Object *obj;
@@ -4571,19 +4625,19 @@ class Object *create_money(int amount)
 
 	if (amount <= 0)
 	{
-		logentry("ERROR: Try to create negative money.", ANGEL, LogChannels::LOG_BUG);
+		logentry("ERROR: Try to create negative money.", ARCHITECT, LogChannels::LOG_BUG);
 		return (0);
 	}
 
 	obj = new Object;
 	new_new_descr = new extra_descr_data;
 
-	clear_object(obj);
+	obj->clear();
 
 	if (amount == 1)
 	{
-		obj->name = str_hsh("coin gold");
-		obj->short_description = str_hsh("a gold coin");
+		obj->setName("coin gold");
+		obj->setShortDescription("a gold coin");
 		obj->description = str_hsh("One miserable gold coin.");
 
 		new_new_descr->keyword = str_hsh("coin gold");
@@ -4591,8 +4645,8 @@ class Object *create_money(int amount)
 	}
 	else
 	{
-		obj->name = str_hsh("coins gold");
-		obj->short_description = str_hsh("gold coins");
+		obj->setName("coins gold");
+		obj->setShortDescription("gold coins");
 		obj->description = str_hsh("A pile of gold coins.");
 
 		new_new_descr->keyword = str_hsh("coins gold");
@@ -4606,7 +4660,7 @@ class Object *create_money(int amount)
 	obj->obj_flags.wear_flags = ITEM_TAKE;
 	obj->obj_flags.value[0] = amount;
 	obj->obj_flags.cost = amount;
-	obj->item_number = -1;
+	obj->setNumber(0);
 
 	obj->next = object_list;
 	object_list = obj;
@@ -4714,13 +4768,13 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		{
 			if (verbose)
 			{
-				if ((*tar_obj)->short_description)
+				if ((*tar_obj)->getShortDescriptionC())
 				{
-					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->getShortDescriptionC());
 				}
-				else if ((*tar_obj)->name)
+				else if ((*tar_obj)->getName().isEmpty() == false)
 				{
-					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->getName().toStdString().c_str());
 				}
 				else
 				{
@@ -4735,7 +4789,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 	{
 		for (found = false, i = 0; i < MAX_WEAR && !found; i++)
 		{
-			if (ch->equipment[i] && isname(name, ch->equipment[i]->name) && CAN_SEE_OBJ(ch, ch->equipment[i]))
+			if (ch->equipment[i] && isname(name, ch->equipment[i]->getName()) && CAN_SEE_OBJ(ch, ch->equipment[i]))
 			{
 				*tar_obj = ch->equipment[i];
 				found = true;
@@ -4745,13 +4799,13 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		{
 			if (verbose)
 			{
-				if ((*tar_obj)->short_description)
+				if ((*tar_obj)->getShortDescriptionC())
 				{
-					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->getShortDescriptionC());
 				}
-				else if ((*tar_obj)->name)
+				else if ((*tar_obj)->getName().isEmpty() == false)
 				{
-					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->getName().toStdString().c_str());
 				}
 				else
 				{
@@ -4769,13 +4823,13 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		{
 			if (verbose)
 			{
-				if ((*tar_obj)->short_description)
+				if ((*tar_obj)->getShortDescriptionC())
 				{
-					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->getShortDescriptionC());
 				}
-				else if ((*tar_obj)->name)
+				else if ((*tar_obj)->getName().isEmpty() == false)
 				{
-					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->getName().toStdString().c_str());
 				}
 				else
 				{
@@ -4788,18 +4842,18 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 
 	if (IS_SET(bitvector, FIND_OBJ_WORLD))
 	{
-		*tar_obj = get_obj_vis(ch, name);
+		*tar_obj = get_obj_vis(ch, QString(name));
 		if (*tar_obj)
 		{
 			if (verbose)
 			{
-				if ((*tar_obj)->short_description)
+				if ((*tar_obj)->getShortDescriptionC())
 				{
-					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_obj)->getShortDescriptionC());
 				}
-				else if ((*tar_obj)->name)
+				else if ((*tar_obj)->getName().isEmpty() == false)
 				{
-					csendf(ch, "You find %s somewhere in the world\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s somewhere in the world\r\n", (*tar_obj)->getName().toStdString().c_str());
 				}
 				else
 				{
@@ -4821,16 +4875,16 @@ char *get_random_hate(Character *ch)
 	char buf[128];
 	char *name = nullptr;
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return nullptr;
 
-	if (!ch->mobdata->hatred)
+	if (!ch->mobile->hatred)
 		return nullptr;
 
-	if (!strstr(ch->mobdata->hatred, " "))
-		return (ch->mobdata->hatred);
+	if (!strstr(ch->mobile->hatred, " "))
+		return (ch->mobile->hatred);
 
-	one_argument(ch->mobdata->hatred, buf);
+	one_argument(ch->mobile->hatred, buf);
 
 	name = str_hsh(buf);
 
@@ -4844,32 +4898,32 @@ void swap_hate_memory(Character *ch)
 	char temp[32];
 	char buf[MAX_STRING_LENGTH];
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return;
 
-	if (!(curr = strstr(ch->mobdata->hatred, " ")))
+	if (!(curr = strstr(ch->mobile->hatred, " ")))
 		return;
 
 	*curr = '\0';
-	strcpy(temp, ch->mobdata->hatred);
-	sprintf(buf, "%s %s", curr + 1, ch->mobdata->hatred);
-	strcpy(ch->mobdata->hatred, buf);
+	strcpy(temp, ch->mobile->hatred);
+	sprintf(buf, "%s %s", curr + 1, ch->mobile->hatred);
+	strcpy(ch->mobile->hatred, buf);
 }
 
 int hates_someone(Character *ch)
 {
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return 0;
 
-	return (ch->mobdata->hatred != nullptr);
+	return (ch->mobile->hatred != nullptr);
 }
 
 int fears_someone(Character *ch)
 {
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return 0;
 
-	return (ch->mobdata->fears != nullptr);
+	return (ch->mobile->fears != nullptr);
 }
 
 void remove_memory(Character *ch, char type, Character *vict)
@@ -4880,55 +4934,55 @@ void remove_memory(Character *ch, char type, Character *vict)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return;
 
 	if (type == 'h')
 	{
-		if (!ch->mobdata->hatred)
+		if (!ch->mobile->hatred)
 			return;
-		if (!isname(GET_NAME(vict), ch->mobdata->hatred))
+		if (!isname(GET_NAME(vict), ch->mobile->hatred))
 			return;
-		if (strstr(ch->mobdata->hatred, " "))
+		if (strstr(ch->mobile->hatred, " "))
 		{
 #ifdef LEAK_CHECK
-			temp = (char *)calloc((strlen(ch->mobdata->hatred) - strlen(GET_NAME(vict))), sizeof(char));
+			temp = (char *)calloc((strlen(ch->mobile->hatred) - strlen(GET_NAME(vict))), sizeof(char));
 #else
-			temp = (char *)dc_alloc((strlen(ch->mobdata->hatred) - strlen(GET_NAME(vict))), sizeof(char));
+			temp = (char *)dc_alloc((strlen(ch->mobile->hatred) - strlen(GET_NAME(vict))), sizeof(char));
 #endif
-			curr = strstr(ch->mobdata->hatred, GET_NAME(vict));
-			if (curr == ch->mobdata->hatred)
+			curr = strstr(ch->mobile->hatred, GET_NAME(vict));
+			if (curr == ch->mobile->hatred)
 			{
 				// This has to work, cause we checked it on our first if statement
 				curr = strstr(curr, " ");
 				strcpy(temp, curr + 1);
-				dc_free(ch->mobdata->hatred);
-				ch->mobdata->hatred = temp;
+				dc_free(ch->mobile->hatred);
+				ch->mobile->hatred = temp;
 				return;
 			}
 			// This works because we made sure curr is not the first item in array
 			// We're turning the 'space' into an end
 			*(curr - 1) = '\0';
-			strcpy(temp, ch->mobdata->hatred);
+			strcpy(temp, ch->mobile->hatred);
 			// If there is anything else after the one we removed, slap it (and space) in
 			if ((curr = strstr(curr, " ")))
 				strcat(temp, curr);
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = temp;
+			dc_free(ch->mobile->hatred);
+			ch->mobile->hatred = temp;
 		}
 		else
 		{
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = nullptr;
+			dc_free(ch->mobile->hatred);
+			ch->mobile->hatred = nullptr;
 		}
 	}
 
 	//  if(type == 'h')
-	//    ch->mobdata->hatred = 0;
+	//    ch->mobile->hatred = 0;
 
 	// these two are str_hsh'd, so just null them out
 	if (type == 'f')
-		ch->mobdata->fears = 0;
+		ch->mobile->fears = 0;
 }
 
 void room_mobs_only_hate(Character *ch)
@@ -4949,24 +5003,24 @@ void remove_memory(Character *ch, char type)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return;
 
-	if (type == 'h' && ch->mobdata->hatred)
+	if (type == 'h' && ch->mobile->hatred)
 	{
-		dc_free(ch->mobdata->hatred);
-		ch->mobdata->hatred = nullptr;
+		dc_free(ch->mobile->hatred);
+		ch->mobile->hatred = nullptr;
 	}
 
 	if (type == 'f')
-		ch->mobdata->fears = 0;
+		ch->mobile->fears = 0;
 }
 
 void add_memory(Character *ch, char *victim, char type)
 {
 	char *buf = nullptr;
 
-	if (!IS_MOB(ch))
+	if (IS_PC(ch))
 		return;
 
 	// pets don't know to hate people
@@ -4975,27 +5029,27 @@ void add_memory(Character *ch, char *victim, char type)
 
 	if (type == 'h')
 	{
-		if (!ch->mobdata->hatred)
-			ch->mobdata->hatred = str_dup(victim);
+		if (!ch->mobile->hatred)
+			ch->mobile->hatred = str_dup(victim);
 		else
 		{
 			// Don't put same name twice
-			if (isname(victim, ch->mobdata->hatred))
+			if (isname(victim, ch->mobile->hatred))
 				return;
 
 				// name 1 + name 2 + a space + terminator
 #ifdef LEAK_CHECK
-			buf = (char *)calloc((strlen(ch->mobdata->hatred) + strlen(victim) + 2), sizeof(char));
+			buf = (char *)calloc((strlen(ch->mobile->hatred) + strlen(victim) + 2), sizeof(char));
 #else
-			buf = (char *)dc_alloc((strlen(ch->mobdata->hatred) + strlen(victim) + 2), sizeof(char));
+			buf = (char *)dc_alloc((strlen(ch->mobile->hatred) + strlen(victim) + 2), sizeof(char));
 #endif
-			sprintf(buf, "%s %s", ch->mobdata->hatred, victim);
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = buf;
+			sprintf(buf, "%s %s", ch->mobile->hatred, victim);
+			dc_free(ch->mobile->hatred);
+			ch->mobile->hatred = buf;
 		}
 	}
 	else if (type == 'f')
-		ch->mobdata->fears = str_hsh(victim);
+		ch->mobile->fears = str_hsh(victim);
 	else if (type == 't')
 		ch->hunting = str_dup(victim);
 }

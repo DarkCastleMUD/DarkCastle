@@ -411,7 +411,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		}
 		else
 		{
-			if (GET_LEVEL(ch) < ARCHANGEL && spl != 0 && spl != 2)
+			if (GET_LEVEL(ch) < ARCHITECT && spl != 0 && spl != 2)
 				if (!(learned = has_skill(ch, song_info[spl].skill_num)))
 				{
 					if (IS_MOB(ch) && !ch->master)
@@ -467,7 +467,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_EQUIP))
 				{
 					for (int i = 0; i < MAX_WEAR && !target_ok; i++)
-						if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
+						if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->getName().toStdString().c_str()) == 0)
 						{
 							tar_obj = ch->equipment[i];
 							target_ok = true;
@@ -475,11 +475,11 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 
 				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_WORLD))
-					if ((tar_obj = get_obj_vis(ch, name)) != nullptr)
+					if ((tar_obj = get_obj_vis(ch, QString(name))) != nullptr)
 						target_ok = true;
 
 				if (!target_ok && IS_SET(song_info[spl].targets, TAR_SELF_ONLY))
-					if (str_cmp(GET_NAME(ch), name) == 0)
+					if (ch->getName().compare(name, Qt::CaseInsensitive) == 0)
 					{
 						tar_char = ch;
 						target_ok = true;
@@ -570,7 +570,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-		if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch) &&
+		if (GET_LEVEL(ch) < ARCHITECT && IS_PC(ch) &&
 			GET_KI(ch) < use_song(ch, spl))
 		{
 			send_to_char("You do not have enough ki!\n\r", ch);
@@ -612,7 +612,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 			/* Stop abusing your betters  */
 			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
+				if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHITECT) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
 				{
 					send_to_char("That just might annoy them!\n\r", ch);
 					return eFAILURE;
@@ -891,7 +891,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 
 	if (!victim || !ch)
 	{
-		logentry("Serious problem in song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in song_hypnotic_harmony!", ARCHITECT, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 	act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
@@ -917,7 +917,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	if (!ch || ch->songs.empty())
 	{
-		logentry("Serious problem in execute_song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in execute_song_hypnotic_harmony!", ARCHITECT, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -938,7 +938,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	(*i).song_data = 0;
 
 	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-	if (IS_PC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
+	if (IS_PC(victim) || !ISSET(victim->mobile->actflags, ACT_BARDCHARM))
 	{
 		send_to_char("They don't seem particularily interested.\r\n", ch);
 		send_to_char("You manage to resist the entrancing lyrics.\r\n", victim);
@@ -987,7 +987,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 {
 	if (!victim || !ch)
 	{
-		logentry("Serious problem in song_disrupt!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in song_disrupt!", ARCHITECT, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1040,7 +1040,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 
 	if (!victim)
 	{
-		logentry("No vict send to song whistle sharp!", ANGEL, LogChannels::LOG_BUG);
+		logentry("No vict send to song whistle sharp!", ARCHITECT, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1331,7 +1331,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 	}
 	else if (skill > 80 && corpse)
 	{
-		sprintf(buf, "Corpse '%s'\n\r", corpse->name);
+		sprintf(buf, "Corpse '%s'\n\r", corpse->getName().toStdString().c_str());
 		send_to_char(buf, ch);
 		spell_identify(GET_LEVEL(ch), ch, 0, corpse, 0);
 	}
@@ -1996,7 +1996,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 		send_to_char("You can't shatter that!\r\n", ch);
 		return eFAILURE;
 	}
-	if (!isname("pcportal", obj->name))
+	if (!isname("pcportal", obj->getName().toStdString().c_str()))
 	{
 		send_to_char("The portal resists your song.\r\n", ch);
 		return eFAILURE;
@@ -2805,11 +2805,11 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		return eFAILURE;
 	}
 	int type = 0;
-	if (mob_index[target->mobdata->nr].virt == 8)
+	if (mob_index[target->mobile->getNumber()].virt == 8)
 		type = 4;
 	else if (IS_AFFECTED(target, AFF_FAMILIAR))
 		type = 3;
-	else if (mob_index[target->mobdata->nr].virt >= 22394 && mob_index[target->mobdata->nr].virt <= 22398)
+	else if (mob_index[target->mobile->getNumber()].virt >= 22394 && mob_index[target->mobile->getNumber()].virt <= 22398)
 		type = 2;
 	else
 		type = 1;
@@ -2823,7 +2823,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
 	// int i;
 	/*   for (i = 22394; i < 22399; i++)
-	 if (real_mobile(i) == target->mobdata->nr)
+	 if (real_mobile(i) == target->mobile->getNumber())
 	 {
 	 send_to_char("The undead being is unaffected by your song.\r\n",ch);
 	 return eFAILURE;

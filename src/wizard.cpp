@@ -182,7 +182,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", obj->short_description));
+  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", obj->getShortDescriptionC()));
 
   buf = fmt::format("{} loads {} {}{} of obj {} ({}) at room {} ({}).",
                     GET_NAME(ch),
@@ -190,7 +190,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
                     random ? "randomized " : "",
                     cnt > 1 ? "copies" : "copy",
                     GET_OBJ_VNUM(obj),
-                    obj->short_description,
+                    obj->getShortDescriptionC(),
                     world[ch->in_room].number,
                     world[ch->in_room].name);
   logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
@@ -230,7 +230,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->short_description);
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->getShortDescriptionC());
 
   send_to_char(buf, ch);
   if (cnt > 1)
@@ -240,7 +240,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             obj->getShortDescriptionC(),
              world[ch->in_room].number,
              world[ch->in_room].name);
   }
@@ -251,7 +251,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             obj->getShortDescriptionC(),
              world[ch->in_room].number,
              world[ch->in_room].name);
   }
@@ -286,12 +286,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
-          (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+          (IS_NPC(k) ? mob_index[k->mobile->getNumber()].virt : 0),
           (k->in_room == DC::NOWHERE ? 0 : world[k->in_room].number),
           /* end of first line */
 
           (k->short_desc ? k->short_desc : "None"),
-          (int32_t)(IS_NPC(k) ? k->mobdata->nr : 0),
+          (int32_t)(IS_NPC(k) ? k->mobile->getNumber() : 0),
           /* end of second line */
 
           (k->long_desc ? k->long_desc : "None"),
@@ -311,8 +311,8 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (IS_MOB(k))
   {
-    sprintf(buf2, "%s", (k->mobdata->hatred ? k->mobdata->hatred : "NOBODY"));
-    sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
+    sprintf(buf2, "%s", (k->mobile->hatred ? k->mobile->hatred : "NOBODY"));
+    sprintf(buf3, "%s", (k->mobile->fears ? k->mobile->fears : "NOBODY"));
   }
   else
   {
@@ -342,15 +342,15 @@ void boro_mob_stat(Character *ch, Character *k)
   send_to_char(buf, ch);
   /* end of second sprintf */
 
-  switch (k->sex)
+  switch (k->getSex())
   {
-  case SEX_NEUTRAL:
+  case sex_t::NEUTRAL:
     sprintf(buf2, "Neutral");
     break;
-  case SEX_MALE:
+  case sex_t::MALE:
     sprintf(buf2, "Male");
     break;
-  case SEX_FEMALE:
+  case sex_t::FEMALE:
     sprintf(buf2, "Female");
     break;
   default:
@@ -368,12 +368,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (IS_MOB(k))
   {
-    if (mob_index[k->mobdata->nr].non_combat_func)
+    if (mob_index[k->mobile->getNumber()].non_combat_func)
       strcpy(buf2, "Exists");
     else
       strcpy(buf2, "None");
 
-    if (mob_index[k->mobdata->nr].combat_func)
+    if (mob_index[k->mobile->getNumber()].combat_func)
       strcpy(buf3, "Exists");
     else
       strcpy(buf3, "None");
@@ -394,7 +394,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   sprinttype(GET_POS(k), position_types, buf2);
   if (IS_NPC(k))
-    sprinttype((k->mobdata->default_pos), position_types, buf3);
+    sprinttype((k->mobile->default_pos), position_types, buf3);
   else
     strcpy(buf3, "PC");
 
@@ -444,7 +444,7 @@ void boro_mob_stat(Character *ch, Character *k)
   send_to_char(buf, ch);
 
   if (IS_MOB(k)) // AND THIS
-    sprintbit(k->mobdata->actflags, action_bits, buf2);
+    sprintbit(k->mobile->actflags, action_bits, buf2);
   else
     strcpy(buf2, "Not a mob");
   sprintbit(k->combat, combat_bits, buf3);
@@ -478,7 +478,7 @@ void boro_mob_stat(Character *ch, Character *k)
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -491,7 +491,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
   }
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
@@ -510,7 +510,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
   }
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     send_to_char(buf, ch);
@@ -557,7 +557,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char("\n\r", ch);
   }
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
     display_punishes(ch, k);
 
   if (k->desc)
@@ -589,8 +589,8 @@ void mob_stat(Character *ch, Character *k)
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
-            (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
-            (IS_NPC(k) ? k->mobdata->nr : 0),
+            (IS_NPC(k) ? mob_index[k->mobile->getNumber()].virt : 0),
+            (IS_NPC(k) ? k->mobile->getNumber() : 0),
             k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
@@ -640,7 +640,7 @@ void mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   send_to_char(buf, ch);
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -654,21 +654,21 @@ void mob_stat(Character *ch, Character *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
+    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobile->getNumber()].mobspec), mob_index[k->mobile->getNumber()].progtypes);
     send_to_char(buf, ch);
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   send_to_char(buf, ch);
 
-  switch (k->sex)
+  switch (k->getSex())
   {
-  case SEX_NEUTRAL:
+  case sex_t::NEUTRAL:
     send_to_char("NEUTRAL]  ", ch);
     break;
-  case SEX_MALE:
+  case sex_t::MALE:
     send_to_char("MALE]  ", ch);
     break;
-  case SEX_FEMALE:
+  case sex_t::FEMALE:
     send_to_char("FEMALE]  ", ch);
     break;
   default:
@@ -704,7 +704,7 @@ void mob_stat(Character *ch, Character *k)
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   send_to_char(buf, ch);
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
@@ -726,7 +726,7 @@ void mob_stat(Character *ch, Character *k)
   if (IS_NPC(k))
   {
     strcpy(buf, "$3Default position$R: ");
-    sprinttype((k->mobdata->default_pos), position_types, buf2);
+    sprinttype((k->mobile->default_pos), position_types, buf2);
     strcat(buf, buf2);
     send_to_char(buf, ch);
   }
@@ -736,8 +736,8 @@ void mob_stat(Character *ch, Character *k)
 
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
-    sprintbit(k->mobdata->actflags, action_bits, buf2);
+    sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobile->actflags[0], k->mobile->actflags[1]);
+    sprintbit(k->mobile->actflags, action_bits, buf2);
   }
   else
   {
@@ -750,20 +750,20 @@ void mob_stat(Character *ch, Character *k)
   if (IS_MOB(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
+    strcat(buf, (mob_index[k->mobile->getNumber()].non_combat_func ? "Exists  " : "None  "));
     send_to_char(buf, ch);
     strcpy(buf, "$3Combat Special Proc$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].combat_func ? "Exists  " : "None  "));
+    strcat(buf, (mob_index[k->mobile->getNumber()].combat_func ? "Exists  " : "None  "));
     send_to_char(buf, ch);
     strcpy(buf, "$3Mob Progs$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
+    strcat(buf, (mob_index[k->mobile->getNumber()].mobprogs ? "Exist\r\n" : "None\r\n"));
     send_to_char(buf, ch);
   }
 
   if (IS_NPC(k))
   {
     sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
-            k->mobdata->damnodice, k->mobdata->damsizedice);
+            k->mobile->damnodice, k->mobile->damsizedice);
     send_to_char(buf, ch);
   }
 
@@ -819,11 +819,11 @@ void mob_stat(Character *ch, Character *k)
   if (IS_MOB(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
-            ((k->mobdata->hatred) ? k->mobdata->hatred : "NOBODY"));
+            ((k->mobile->hatred) ? k->mobile->hatred : "NOBODY"));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Fears$R: '%s'\n\r",
-            ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
+            ((k->mobile->fears) ? k->mobile->fears : "NOBODY"));
     send_to_char(buf, ch);
   }
 
@@ -838,7 +838,7 @@ void mob_stat(Character *ch, Character *k)
   sprintbit(k->combat, combat_bits, buf);
   csendf(ch, "$3Combat flags$R: %s\n\r", buf);
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
@@ -853,7 +853,7 @@ void mob_stat(Character *ch, Character *k)
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
 
-  if (!IS_MOB(k))
+  if (IS_PC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     send_to_char(buf, ch);
@@ -920,7 +920,7 @@ void mob_stat(Character *ch, Character *k)
 
   if (IS_MOB(k))
   {
-    switch (k->mobdata->mob_flags.type)
+    switch (k->mobile->mob_flags.type)
     {
     case mob_type_t::MOB_NORMAL:
       break;
@@ -929,8 +929,8 @@ void mob_stat(Character *ch, Character *k)
                    " $3Direction (v2)$R: [%d]\n\r"
                    "    $3Unused (v3)$R: [%d]\n\r"
                    "    $3Unused (v4)$R: [%d]\n\r",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+              k->mobile->mob_flags.value[0], k->mobile->mob_flags.value[1],
+              k->mobile->mob_flags.value[2], k->mobile->mob_flags.value[3]);
       send_to_char(buf, ch);
       break;
     case mob_type_t::MOB_CLAN_GUARD:
@@ -938,14 +938,14 @@ void mob_stat(Character *ch, Character *k)
                    " $3Direction (v2)$R: [%d]\n\r"
                    "  $3Clan num (v3)$R: [%d]\n\r"
                    "    $3Unused (v4)$R: [%d]\n\r",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+              k->mobile->mob_flags.value[0], k->mobile->mob_flags.value[1],
+              k->mobile->mob_flags.value[2], k->mobile->mob_flags.value[3]);
       send_to_char(buf, ch);
       break;
     default:
       sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
-              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+              k->mobile->mob_flags.value[0], k->mobile->mob_flags.value[1],
+              k->mobile->mob_flags.value[2], k->mobile->mob_flags.value[3]);
       send_to_char(buf, ch);
       break;
     }
@@ -966,16 +966,15 @@ void obj_stat(Character *ch, class Object *j)
   int its;
 
   /*
-    if(IS_SET(j->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
+    if(IS_SET(j->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < DEITY)
     {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
       return;
     }
 */
 
-  virt = (j->item_number >= 0) ? obj_index[j->item_number].virt : 0;
-  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-          j->name, j->item_number, virt);
+  virt = (j->getNumber() >= 0) ? obj_index[j->getNumber()].virt : 0;
+  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ", j->getName().toStdString().c_str(), j->getNumber(), virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
@@ -983,7 +982,7 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
-          ((j->short_description) ? j->short_description : "None"),
+          ((j->getShortDescriptionC()) ? j->getShortDescriptionC() : "None"),
           ((j->description) ? j->description : "None"));
   send_to_char(buf, ch);
   if (j->ex_description)
@@ -1039,7 +1038,7 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
-  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name)));
+  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->getName().toStdString().c_str())));
   strcat(buf, "  $3Carried by$R: ");
   strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
   strcat(buf, "\n\r");
@@ -1295,14 +1294,14 @@ void obj_stat(Character *ch, class Object *j)
   send_to_char(buf, ch);
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
-  if (j->item_number >= 0)
-    strcat(buf, (obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
+  if (j->getNumber() >= 0)
+    strcat(buf, (obj_index[j->getNumber()].non_combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
   send_to_char(buf, ch);
   strcpy(buf, "$3Combat Special procedure$R : ");
-  if (j->item_number >= 0)
-    strcat(buf, (obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
+  if (j->getNumber() >= 0)
+    strcat(buf, (obj_index[j->getNumber()].combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
   send_to_char(buf, ch);
@@ -1310,7 +1309,7 @@ void obj_stat(Character *ch, class Object *j)
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
-    strcat(buf, fname(j2->name));
+    strcat(buf, fname(j2->getName().toStdString().c_str()));
     strcat(buf, "\n\r");
     found = true;
   }
@@ -1696,9 +1695,9 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->getShortDescriptionC());
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->getShortDescriptionC());
       }
     }
     else
@@ -1709,7 +1708,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->getShortDescriptionC());
       }
     }
     send_info(buf);
@@ -1951,9 +1950,9 @@ void pick_up_item(Character *ch, class Object *obj)
         p->next = in;
       else
         hunt_items_list = in;
-      int vnum = obj_index[obj->item_number].virt;
+      int vnum = obj_index[obj->getNumber()].virt;
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-              obj->short_description, i->mobname, ch->name);
+              obj->getShortDescriptionC(), i->mobname, ch->name);
       send_info(buf);
       struct hunt_data *h = i->hunt;
       class Object *oitem = nullptr, *citem;
@@ -1968,20 +1967,20 @@ void pick_up_item(Character *ch, class Object *obj)
         {
           oitem = clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  obj->getShortDescriptionC(), oitem->getShortDescriptionC());
           send_to_char(buf, ch);
           sprintf(buf, "## %s turned into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  obj->getShortDescriptionC(), oitem->getShortDescriptionC());
           send_info(buf);
           if (IS_SET(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (search_char_for_item(ch, oitem->item_number, false))
+            if (search_char_for_item(ch, oitem->getNumber(), false))
             {
               if (IS_SET(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
               {
                 send_to_char("You already have this item - Timer has been reset!\r\n", ch);
                 extract_obj(oitem);
-                citem = search_char_for_item(ch, oitem->item_number, false);
+                citem = search_char_for_item(ch, oitem->getNumber(), false);
                 citem->save_expiration = time(nullptr) + (60 * 60 * 24);
                 break; // Used to crash it.
               }
@@ -2003,7 +2002,7 @@ void pick_up_item(Character *ch, class Object *obj)
           send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n", ch);
           break;
         }
-        if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
+        if (obj_index[oitem->getNumber()].virt < 27915 || obj_index[oitem->getNumber()].virt > 27918)
           break;
         else
           obj = oitem; // Gold! Continue on to the next cases.
@@ -2014,7 +2013,7 @@ void pick_up_item(Character *ch, class Object *obj)
       case 27918:
         gold = obj->obj_flags.value[0];
         sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-                obj->short_description, gold);
+                obj->getShortDescriptionC(), gold);
         send_to_char(buf, ch);
 
         ch->addGold(gold);
@@ -2084,11 +2083,11 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)obj_index[real_object(h->itemnum)].item)->getShortDescriptionC(), h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->getShortDescriptionC(), h->time));
     }
 
     int itemsleft = 0;
@@ -2114,40 +2113,6 @@ int do_showhunt(Character *ch, char *arg, int cmd)
 int do_huntstart(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-#ifdef TWITTER
-  twitCurl twitterObj;
-  string authUrl, replyMsg;
-  string myOAuthAccessTokenKey("");
-  string myOAuthAccessTokenSecret("");
-  string userName("");
-  string passWord("");
-  string message("");
-
-  userName = "username";
-  passWord = "password";
-
-  twitterObj.setTwitterUsername(userName);
-  twitterObj.setTwitterPassword(passWord);
-
-  twitterObj.getOAuth().setConsumerKey(string("xyz"));
-  twitterObj.getOAuth().setConsumerSecret(string("xyz"));
-
-  twitterObj.getOAuth().setOAuthTokenKey(string("xyz-xyz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(string("xyz"));
-
-  if (twitterObj.accountVerifyCredGet())
-  {
-    //    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
-  }
-  else
-  {
-    twitterObj.getLastCurlError(replyMsg);
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
-  }
-#endif
 
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg2);
@@ -2195,30 +2160,6 @@ int do_huntstart(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n", huntname, num, time);
   send_info(buf);
-
-#ifdef TWITTER
-  string holding[3] = {
-      "Get your ass to MAHS... err, DC.  There's a hunt!",
-      "You may be wondering why I've gathered you here today.  There's a hunt!",
-      "Aussie Aussie Aussie! Oi Oi Hunt!!"};
-
-  int pos = rand() % 3;
-
-  message = holding[pos];
-
-  if (twitterObj.statusUpdate(message))
-  {
-    //    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
-  }
-  else
-  {
-    twitterObj.getLastCurlError(replyMsg);
-    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
-  }
-#endif
 
   return eSUCCESS;
 }

@@ -166,155 +166,160 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string)
 }
 
 /* modification of malloc'ed strings in chars/objects */
-int do_string(Character *ch, char *arg, int cmd)
+command_return_t Character::do_string(QStringList arguments, int cmd)
 {
-	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
-	char message[100];
-	int field, type, ctr;
-	Character *mob = nullptr;
-	class Object *obj;
-	struct extra_descr_data *ed, *tmp;
+	if (IS_NPC(this))
+		return eFAILURE;
 
-	if (IS_NPC(ch))
-		return 1;
-
-	quad_arg(arg, &type, name, &field, string);
-
-	if (type == TP_ERROR)
+	if (arguments.length() < 3)
 	{
 		send_to_char("Syntax:\n\rstring ('obj'|'char') <name> <field>"
 					 " [<string>].\r\n",
-					 ch);
+					 this);
 		return 1;
 	}
 
-	if (!field)
+	QString type = arguments.at(0);
+	QString name = arguments.at(1);
+	name = name.toLower();
+	QString field = arguments.at(2);
+	QString value;
+	if (arguments.length() > 3)
 	{
-		send_to_char("No field by that name. Try 'help string'.\r\n", ch);
+		value = arguments.at(3);
+	}
+
+	if (field != "name" && field != "short" && field != "long" && field != "title" && field != "description" && field != "delete-description")
+	{
+		send_to_char("No field by that name. Try 'help string'.\r\n", this);
 		return 1;
 	}
 
-	if (type == TP_MOB)
+	Character *victim = nullptr;
+	if (type == "char")
 	{
 		/* locate the beast */
-		if (!(mob = get_char_vis(ch, name)))
+		if (!(victim = get_char_vis(this, name)))
 		{
-			send_to_char("I don't know anyone by that name...\r\n", ch);
+			send_to_char("I don't know anyone by that name...\r\n", this);
 			return 1;
 		}
 
-		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && IS_PC(mob))
+		if ((GET_LEVEL(victim) > GET_LEVEL(this)) && IS_PC(victim))
 		{
-			sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
-			send_to_char(message, ch);
+			send(QString("%1 can string himself, thank you.\r\n").arg(GET_SHORT(victim)));
 			return 1;
 		}
 
-		switch (field)
+		if (field == "name")
 		{
-		case 1:
-			if (IS_PC(mob) && GET_LEVEL(ch) < IMPLEMENTER)
+			if (victim->isPlayer() && isImplementer() == false)
 			{
-				send_to_char("You can't change that field for players.", ch);
+				send_to_char("You can't change that field for players.", this);
 				return 1;
 			}
-			if (IS_NPC(mob))
-				ch->desc->hashstr = &GET_NAME(mob);
-			else
-				ch->desc->strnew = &GET_NAME(mob);
-			if (IS_PC(mob))
-				send_to_char("WARNING: You have changed the name of a player.\r\n", ch);
-			break;
-		case 2:
-			if (GET_LEVEL(ch) < POWER)
+
+			victim->setName(value);
+
+			if (victim->isPlayer())
 			{
-				send_to_char("You must be a God to do that.\r\n", ch);
-				return 1;
+				send("WARNING: You have changed the name of a player.\r\n");
 			}
-			sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
+		}
+		else if (field == "short")
+		{
+			if (GET_LEVEL(this) < DEITY)
+			{
+				send("You must be a God to do that.\r\n");
+				return eFAILURE;
+			}
+			QString message = QString("%1 just restrung short on %2").arg(GET_NAME(this)).arg(GET_NAME(victim));
 			logentry(message, IMPLEMENTER, LogChannels::LOG_GOD);
-			if (IS_NPC(mob))
-				ch->desc->hashstr = &mob->short_desc;
-			else
-				ch->desc->strnew = &mob->short_desc;
-			break;
-		case 3:
-			if (IS_PC(mob))
+			victim->setShortDescription(value);
+		}
+		else if (field == "long")
+		{
+			if (victim->isPlayer())
 			{
-				send_to_char("That field is for monsters only.\r\n", ch);
+				send("That field is for mobiles only.\r\n");
 				return 1;
 			}
-			ch->desc->hashstr = &mob->long_desc;
-			break;
-		case 4:
-			if (IS_NPC(mob))
-				ch->desc->hashstr = &mob->description;
-			else
-				ch->desc->strnew = &mob->description;
-			break;
-		case 5:
-			if (IS_NPC(mob))
+			victim->setLongDescription(value);
+		}
+		else if (field == "description")
+		{
+			victim->setDescription(value);
+		}
+		else if (field == "title")
+		{
+			if (victim->isMobile())
 			{
-				send_to_char("Monsters have no titles.\r\n", ch);
-				return 1;
+				send("Mobiles have no titles.\r\n");
+				return eFAILURE;
 			}
-			ch->desc->strnew = &mob->title;
-			break;
-		default:
-			send_to_char("That field is undefined for monsters.\r\n", ch);
+			victim->setTitle(value);
+		}
+		else
+		{
+			send_to_char("That field is undefined for monsters.\r\n", this);
 			return 1;
 		}
 	}
-
-	/* type == TP_OBJ */
-	else
+	else if (type == "obj")
 	{
+		Object *obj = nullptr;
 		/* locate the object */
-		if (!(obj = get_obj_vis(ch, name)))
+		if ((obj = get_obj_vis(this, name)) == nullptr)
 		{
-			send_to_char("Can't find such a thing here..\r\n", ch);
+			send_to_char("Can't find such a thing here..\r\n", this);
 			return 1;
 		}
 
 		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
 		{
-			if (GET_LEVEL(ch) < IMPLEMENTER)
+			if (GET_LEVEL(this) < IMPLEMENTER)
 			{
-				send_to_char("That item is not restringable.\r\n", ch);
+				send_to_char("That item is not restringable.\r\n", this);
 				return 1;
 			}
 			else
-				send_to_char("That item is NO_RESTRING btw.\r\n", ch);
+				send_to_char("That item is NO_RESTRING btw.\r\n", this);
 		}
 
-		switch (field)
+		if (field == "name")
 		{
-		case 1:
-			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110)
+			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(this) < 110)
 			{
-				send_to_char("The moose will get you if you do that.\r\n", ch);
+				send_to_char("The moose will get you if you do that.\r\n", this);
 				return 1;
 			}
-			ch->desc->hashstr = &obj->name;
-			break;
-		case 2:
-			ch->desc->hashstr = &obj->short_description;
-			break;
-		case 3:
-			ch->desc->hashstr = &obj->description;
-			break;
-		case 4:
+
+			// TODO fix
+			//  ch->desc->hashstr = &(obj->getName().toStdString().c_str());
+		}
+		else if (field == "short")
+		{
+			// TODO FIXME
+			// ch->desc->hashstr = &obj->getShortDescriptionC();
+		}
+		else if (field == "long")
+		{
+			// TODO FIXME
+			// ch->desc->hashstr = &obj->description;
+		}
+		else if (field == "description")
+		{
 			// TODO - remove this when the obj pfile saving keeps track of extra descs
-			send_to_char("Noone may restring object extra descs at this time. -pir", ch);
+			send_to_char("Noone may restring object extra descs at this time. -pir", this);
 			return 1;
 
-			if (!*string)
+			if (value.isEmpty())
 			{
-				send_to_char("You have to supply a keyword.\r\n", ch);
+				send_to_char("You have to supply a keyword.\r\n", this);
 				return 1;
 			}
 			/* try to locate extra description */
-			for (ed = obj->ex_description;; ed = ed->next)
+			for (extra_descr_data *ed = obj->ex_description;; ed = ed->next)
 				if (!ed)
 				{ /* the field was not found. create a new_new one. */
 #ifdef LEAK_CHECK
@@ -325,109 +330,70 @@ int do_string(Character *ch, char *arg, int cmd)
 #endif
 					ed->next = obj->ex_description;
 					obj->ex_description = ed;
-					ed->keyword = str_hsh(string);
+					ed->keyword = str_hsh(value.toStdString().c_str());
 					ed->description = 0;
-					ch->desc->hashstr = &ed->description;
-					send_to_char("New field.\r\n", ch);
+					// TODO FIXME
+					// ch->desc->hashstr = &ed->description;
+					send_to_char("New field.\r\n", this);
 					break;
 				}
-				else if (!str_cmp(ed->keyword, string))
+				else if (!str_cmp(ed->keyword, value.toStdString().c_str()))
 				{
 					/* the field exists */
 					ed->description = 0;
-					ch->desc->hashstr = &ed->description;
-					send_to_char("Modifying description.\r\n", ch);
+					// TODO FIXME
+					// ch->desc->hashstr = &ed->description;
+					send_to_char("Modifying description.\r\n", this);
 					break;
 				}
-			ch->desc->max_str = MAX_STRING_LENGTH;
+			desc->max_str = MAX_STRING_LENGTH;
 			/* the stndrd (see below) procedure does not apply here */
 			return 1;
-			break;
-		case 6:
-			if (!*string)
+		}
+		else if (field == "")
+		{
+			if (value.isEmpty())
 			{
-				send_to_char("You must supply a field name.\r\n", ch);
+				send_to_char("You must supply a field name.\r\n", this);
 				return 1;
 			}
 			/* try to locate field */
-			for (ed = obj->ex_description;; ed = ed->next)
+			for (extra_descr_data *ed = obj->ex_description;; ed = ed->next)
 				if (!ed)
 				{
-					send_to_char("No field with that keyword.\r\n", ch);
+					send_to_char("No field with that keyword.\r\n", this);
 					return 1;
 				}
-				else if (!str_cmp(ed->keyword, string))
+				else if (!str_cmp(ed->keyword, value.toStdString().c_str()))
 				{
 					/* delete the entry in the desr list */
 					if (ed == obj->ex_description)
 						obj->ex_description = ed->next;
 					else
 					{
+						extra_descr_data *tmp = nullptr;
 						for (tmp = obj->ex_description; tmp->next != ed; tmp = tmp->next)
 							;
-						tmp->next = ed->next;
+						if (tmp != nullptr)
+						{
+							tmp->next = ed->next;
+						}
 					}
 					dc_free(ed);
-					send_to_char("Field deleted.\r\n", ch);
+					send_to_char("Field deleted.\r\n", this);
 					return 1;
 				}
-			break;
-		default:
-			send_to_char("That field is undefined for objects.\r\n", ch);
+		}
+		else
+		{
+			send_to_char("That field is undefined for objects.\r\n", this);
 			return 1;
 		}
 	}
 
-	/* there was a string in the argument array */
-	if (*string)
-	{
-		for (ctr = 0; (unsigned)ctr <= strlen(string); ctr++)
-		{
-			if (string[ctr] == '$')
-			{
-				string[ctr] = ' ';
-			}
-		}
+	send_to_char("Ok.\r\n", this);
 
-		if (strlen(string) > (unsigned)length[field - 1])
-		{
-			send_to_char("String too long - truncated.\r\n", ch);
-			*(string + length[field - 1]) = '\0';
-		}
-		if (type == TP_MOB && IS_PC(mob))
-		{
-			*ch->desc->strnew = str_dup(string);
-			ch->desc->strnew = 0;
-		}
-		else
-		{
-			*ch->desc->hashstr = str_hsh(string);
-			ch->desc->hashstr = 0;
-		}
-		send_to_char("Ok.\r\n", ch);
-	}
-
-	/* there was no string. enter string mode */
-	else
-	{
-		send_to_char("Enter string. Terminate with '~' at the beginning "
-					 "of a line.\r\n",
-					 ch);
-		if (type == TP_MOB && IS_PC(mob))
-#ifdef LEAK_CHECK
-			(*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
-#else
-			(*ch->desc->strnew) = (char *)dc_alloc(length[field - 1], sizeof(char));
-#endif
-		else
-#ifdef LEAK_CHECK
-			(*ch->desc->hashstr) = (char *)calloc(length[field - 1], sizeof(char));
-#else
-			(*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
-#endif
-		ch->desc->max_str = length[field - 1];
-		ch->desc->connected = Connection::states::EDITING;
-	}
+	desc->connected = Connection::states::EDITING;
 	return 1;
 }
 
@@ -571,7 +537,7 @@ const char *next_page(const char *str)
 		{
 			if (*(str + 1) == '\0')
 			{ // this should never happen
-				logentry("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
+				logentry("String ended in $ in next_page", ARCHITECT, LogChannels::LOG_BUG);
 				//*str = '\0'; // overwrite the $ so it doesn't mess up anything
 				return nullptr;
 			}

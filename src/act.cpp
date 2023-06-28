@@ -38,33 +38,31 @@ act_return act(const string &str, Character *ch, Object *obj, void *vict_obj, in
 }
 
 act_return act(
-    const char *str,   // Buffer
-    Character *ch,     // Character from
-    Object *obj,     // Object
-    void *vict_obj,    // Victim object
+    const char *str,     // Buffer
+    Character *ch,       // Character from
+    Object *obj,         // Object
+    void *vict_obj,      // Victim object
     int16_t destination, // Destination flags
     int16_t flags        // Optional flags
 )
 {
   class Connection *i;
   int retval = 0;
-  TokenList *tokens;
 
   send_tokens_return st_return;
   st_return.str = string();
   st_return.retval = 0;
-  
+
   act_return ar;
   ar.str = string();
   ar.retval = 0;
 
-  tokens = new TokenList(str);
+  TokenList tokens{str};
 
   // This shouldn't happen
   if (ch == 0)
   {
     logentry("Error in act(), character equal to 0", OVERSEER, LogChannels::LOG_BUG);
-    delete tokens;
     ar.retval = eFAILURE;
     return ar;
   }
@@ -78,7 +76,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (Character *)vict_obj);
+    st_return = send_tokens(&tokens, ch, obj, vict_obj, flags, (Character *)vict_obj);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -87,7 +85,7 @@ act_return act(
   {
     if (!IS_SET(flags, BARDSONG) || ch->player == nullptr || !IS_SET(ch->player->toggles, PLR_BARD_SONG))
     {
-      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
+      st_return = send_tokens(&tokens, ch, obj, vict_obj, flags, ch);
       retval |= st_return.retval;
       ar.str = st_return.str;
       ar.retval = retval;
@@ -114,7 +112,7 @@ act_return act(
         {
           if (!IS_SET(flags, BARDSONG) || tmp_char->player == nullptr || !IS_SET(tmp_char->player->toggles, PLR_BARD_SONG))
           {
-            st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char);
+            st_return = send_tokens(&tokens, ch, obj, vict_obj, flags, tmp_char);
             retval |= st_return.retval;
             ar.str = st_return.str;
             ar.retval = retval;
@@ -129,7 +127,6 @@ act_return act(
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
       logentry("Error in act(), invalid value sent as 'destination'", OVERSEER, LogChannels::LOG_BUG);
-      delete tokens;
       ar.retval = eFAILURE;
       return ar;
     }
@@ -142,14 +139,13 @@ act_return act(
         continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
-      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character);
+      st_return = send_tokens(&tokens, ch, obj, vict_obj, flags, i->character);
       retval |= st_return.retval;
       ar.str = st_return.str;
       ar.retval = retval;
     }
   }
 
-  delete tokens;
   return ar;
 }
 
@@ -161,9 +157,12 @@ act_return act(
 void send_message(const char *str, Character *to)
 {
   // This will happen when a token shouldn't be interpreted
-  if(str == 0)  return;
-  if(!to)       return;
-  if(!to->desc) return;
+  if (str == 0)
+    return;
+  if (!to)
+    return;
+  if (!to->desc)
+    return;
 
   SEND_TO_Q((char *)str, to->desc);
 }
@@ -173,23 +172,23 @@ void send_message(string str, Character *to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList * tokens, Character *ch, Object * obj, void * vict_obj, int flags, Character *to)
+send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to)
 {
   int retval = 0;
   string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
-  
+
   // Uppercase first letter of sentence.
   if (buf.empty() == false && buf[0] != 0)
   {
     buf[0] = toupper(buf[0]);
   }
   send_message(buf, to);
-  
+
   if (MOBtrigger && buf.empty() == false)
-    retval |= mprog_act_trigger( buf, to, ch, obj, vict_obj );
+    retval |= mprog_act_trigger(buf, to, ch, obj, vict_obj);
   if (MOBtrigger && buf.empty() == false)
-    retval |= oprog_act_trigger( buf.c_str(), ch);
-    
+    retval |= oprog_act_trigger(buf.c_str(), ch);
+
   MOBtrigger = true;
   if (buf.empty())
   {
@@ -203,7 +202,7 @@ send_tokens_return send_tokens(TokenList * tokens, Character *ch, Object * obj, 
   if (buf_len >= 2)
   {
     // Remove \r\n at end before returning string
-    buf[buf_len-2] = '\0';    
+    buf[buf_len - 2] = '\0';
   }
   send_tokens_return str;
   str.str = buf;
@@ -211,6 +210,4 @@ send_tokens_return send_tokens(TokenList * tokens, Character *ch, Object * obj, 
   return str;
 }
 
-
 // The End
-

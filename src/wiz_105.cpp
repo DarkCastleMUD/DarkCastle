@@ -767,7 +767,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = obj_index[obj->item_number].virt;
+              last_vnum[0][o] = obj_index[obj->getNumber()].virt;
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -781,7 +781,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
               for (v = 0; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = obj_index[obj->item_number].virt;
+                  last_vnum[v][o] = obj_index[obj->getNumber()].virt;
                   break;
                 }
             }
@@ -804,7 +804,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)obj_index[real_object(last_vnum[a][i])].item)->getShortDescriptionC(), last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -927,7 +927,7 @@ int do_listproc(Character *ch, char *argument, int a)
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)obj_index[real_object(i)].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)obj_index[real_object(i)].item)->getName().toStdString().c_str());
     }
   }
   send_to_char(buf, ch);

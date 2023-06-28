@@ -190,8 +190,8 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_tmp["board builder"] = board_struct;
 
   board_struct.min_read_level = 0;
-  board_struct.min_write_level = SERAPH;
-  board_struct.min_remove_level = SERAPH;
+  board_struct.min_write_level = ARCHITECT;
+  board_struct.min_remove_level = ARCHITECT;
   board_struct.type = ANY_BOARD;
   board_struct.owner = NO_OWNER;
   board_struct.save_file = "board/quest";
@@ -580,7 +580,7 @@ int save_boards()
 
   if (!the_file)
   {
-    logentry("Unable to open/create save file for bulletin board index", ANGEL,
+    logentry("Unable to open/create save file for bulletin board index", ARCHITECT,
              LogChannels::LOG_BUG);
     return eFAILURE;
   }
@@ -632,7 +632,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   if (!obj)
     return eFAILURE;
 
-  board = board_db.find(obj->name);
+  board = board_db.find(obj->getName().toStdString().c_str());
 
   if (board == board_db.end())
     return eFAILURE;
@@ -640,7 +640,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
-  if (!isname(arg1, obj->name) && cmd == CMD_LOOK)
+  if (!isname(arg1, obj->getName().toStdString().c_str()) && cmd == CMD_LOOK)
     return eFAILURE;
 
   switch (cmd)
@@ -670,7 +670,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
       return eSUCCESS;
     }
     if (
-        ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && GET_LEVEL(ch) < PATRON))
+        ((!strcmp(obj->getName().toStdString().c_str(), "board uruk")) && ch->clan != CLAN_NAZGUL && GET_LEVEL(ch) < DEITY))
     {
       send_to_char("You can't erase posts from this board.\r\n", ch);
       return eSUCCESS;
@@ -888,7 +888,7 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    logentry("Unable to open/create save file for bulletin board", ANGEL,
+    logentry("Unable to open/create save file for bulletin board", ARCHITECT,
              LogChannels::LOG_BUG);
     return;
   }
@@ -1047,7 +1047,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     return eSUCCESS;
   }
 
-  if (!IS_MOB(ch))
+  if (IS_PC(ch))
     ch->player->last_mess_read = tmessage;
 
   sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());

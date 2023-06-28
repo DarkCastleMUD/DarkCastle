@@ -119,7 +119,7 @@ struct room_track_data
     int weight;
     int race;
     int direction;
-    int sex;
+    sex_t sex;
     int condition;
     char *trackee;
 

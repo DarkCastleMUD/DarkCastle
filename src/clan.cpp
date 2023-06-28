@@ -44,7 +44,6 @@ uint64_t i = UINT64_MAX;
 
 using namespace std;
 
-
 extern index_data *obj_index;
 extern CWorld world;
 
@@ -542,7 +541,7 @@ void add_clan_member(clan_data *theClan, Character *ch)
 
   if (!ch || !theClan)
   {
-    logentry("add_clan_member(clan, ch) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry("add_clan_member(clan, ch) called with a null.", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
 
@@ -575,13 +574,13 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (!new_new_member || !theClan)
   {
-    logentry("add_clan_member(clan, member) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry("add_clan_member(clan, member) called with a null.", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
 
   if (!*new_new_member->member_name)
   {
-    logentry("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Attempt to add a blank member name to a clan.", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
 
@@ -602,7 +601,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (result == 0)
   { // found um, get out
-    logentry("Tried to add already existing clan member.  Possible memory leak.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Tried to add already existing clan member.  Possible memory leak.", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
 
@@ -1067,7 +1066,7 @@ int do_outcast(Character *ch, char *arg, int cmd)
   {
 
     // must be done to clear out "d" before it is used
-    d = {};
+    d.clear();
 
     if (!(load_char_obj(&d, buf)))
     {
@@ -1553,7 +1552,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (obj_index[tmp_obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
       return eFAILURE;
@@ -1567,7 +1566,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!(IS_SET(ch->misc, LogChannels::CHANNEL_CLAN)))
+  if (!(IS_SET(ch->getMisc(), LogChannels::CHANNEL_CLAN)))
   {
     send_to_char("You have that channel off!!\n\r", ch);
     return eFAILURE;
@@ -1605,13 +1604,13 @@ int do_ctell(Character *ch, char *arg, int cmd)
     if (desc->connected || !(pch = desc->character))
       continue;
     if (pch == ch || pch->clan != ch->clan ||
-        !IS_SET(pch->misc, LogChannels::CHANNEL_CLAN))
+        !IS_SET(pch->getMisc(), LogChannels::CHANNEL_CLAN))
       continue;
     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level <= MAX_MORTAL)
       continue;
 
     for (tmp_obj = world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if (obj_index[tmp_obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
       {
         yes = true;
         break;
@@ -2705,7 +2704,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
           clan->description ? clan->description : "(No Description)\r\n");
   send_to_char(buf, ch);
 
-  if (GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
+  if (GET_LEVEL(ch) >= DEITY || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MESSAGES)))
   {
     sprintf(buf, "$3Login$R:          %s\r\n"
@@ -2716,7 +2715,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
             clan->death_message ? clan->death_message : "(No Message)");
     send_to_char(buf, ch);
   }
-  if (GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
+  if (GET_LEVEL(ch) >= DEITY || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
     sprintf(buf, "$3Balance$R:         %llu coins\r\n", clan->getBalance());

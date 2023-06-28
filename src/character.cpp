@@ -52,17 +52,17 @@ QString Character::getSetting(QString key, QString defaultValue)
     return defaultValue;
 }
 
-void mob_data::setObject(Object *o)
+void Mobile::setObject(Object *o)
 {
     object = o;
 }
 
-Object *mob_data::getObject(void)
+Object *Mobile::getObject(void)
 {
     return object;
 }
 
-bool mob_data::isObject(void)
+bool Mobile::isObject(void)
 {
     return object != nullptr;
 }
@@ -183,50 +183,55 @@ bool Character::isImplementer(void)
 
 uint64_t Character::getGold(void)
 {
-    return gold_;
+    return data_.gold_;
 }
 
 void Character::setGold(uint64_t gold)
 {
-    gold_ = gold;
+    data_.gold_ = gold;
 }
 
 bool Character::addGold(uint64_t gold)
 {
-    if (gold_ + gold < gold)
+    if (data_.gold_ + gold < gold)
     {
         return false;
     }
 
-    gold_ += gold;
+    data_.gold_ += gold;
     return true;
 }
 
 bool Character::removeGold(uint64_t gold)
 {
-    if (gold > gold_)
+    if (gold > data_.gold_)
     {
         return false;
     }
 
-    gold_ -= gold;
+    data_.gold_ -= gold;
     return true;
 }
 
 bool Character::multiplyGold(double mult)
 {
-    if (gold_ * mult < gold_)
+    if (data_.gold_ * mult < data_.gold_)
     {
         return false;
     }
 
-    gold_ *= mult;
+    data_.gold_ *= mult;
     return true;
 }
 
 uint64_t &Character::getGoldReference(void)
 {
-    return gold_;
+    return data_.gold_;
+}
+
+sex_t &Character::getSexReference(void)
+{
+    return data_.sex_;
 }
 
 bool Character::load_charmie_equipment(QString player_name, bool previous)
@@ -338,6 +343,32 @@ void Connection::send(QString txt)
     }
 
     output += txt.toStdString();
+}
+
+void Character::clear(void)
+{
+    Character ch;
+    duplicate(ch);
+}
+
+void Character::duplicate(const Character &source)
+{
+    mobile = duplicateClass<Mobile>(source.mobile);
+    player = duplicateClass<Player>(source.player);
+    object = duplicateClass<Object>(source.object);
+    desc = duplicateClass<Connection>(source.desc);
+    name = duplicateCString(source.getName().toStdString().c_str());
+    short_desc = duplicateCString(source.short_desc);
+    long_desc = duplicateCString(source.long_desc);
+    description = duplicateCString(source.description);
+    title = duplicateCString(source.title);
+
+    data_ = source.data_;
+}
+
+bool Character::isMobile(void)
+{
+    return IS_SET(getMisc(), MISC_IS_MOB);
 }
 
 const QStringList Object::apply_types =

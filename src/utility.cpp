@@ -222,7 +222,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   if (!arg1 || !arg2)
   {
-    logentry("nullptr args sent to str_cmp in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr args sent to str_cmp in utility.c!", ARCHITECT, LogChannels::LOG_BUG);
     return 0;
   }
 
@@ -348,6 +348,23 @@ void logentry(QString str, int god_level, LogChannels type, Character *vict)
     logpath << "../log/";
   }
 
+  time_t t = time(0);
+  const tm *lt = localtime(&t);
+  char *tmstr = asctime(lt);
+  *(tmstr + strlen(tmstr) - 1) = '\0';
+
+  if (stream == STDIN_FILENO || type == LogChannels::LOG_BUG)
+  {
+    if (cf.stderr_timestamp == true)
+    {
+      cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << endl;
+    }
+    else
+    {
+      cerr << QString("%1:%2").arg(type).arg(str).toStdString() << endl;
+    }
+  }
+
   switch (type)
   {
   default:
@@ -461,23 +478,6 @@ void logentry(QString str, int god_level, LogChannels type, Character *vict)
       exit(1);
     }
     break;
-  }
-
-  time_t t = time(0);
-  const tm *lt = localtime(&t);
-  char *tmstr = asctime(lt);
-  *(tmstr + strlen(tmstr) - 1) = '\0';
-
-  if (stream == STDIN_FILENO || type == LogChannels::LOG_BUG)
-  {
-    if (cf.stderr_timestamp == true)
-    {
-      cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << endl;
-    }
-    else
-    {
-      cerr << QString("%1:%2").arg(type).arg(str).toStdString() << endl;
-    }
   }
 
   if (stream != STDIN_FILENO)
@@ -1049,11 +1049,11 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!sub || !obj)
   {
-    logentry("Invalid pointer passed to CAN_SEE!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Invalid pointer passed to CAN_SEE!", ARCHITECT, LogChannels::LOG_BUG);
     return false;
   }
 
-  if (!IS_MOB(obj))
+  if (IS_PC(obj))
   {
     if (!obj->player) // noncreated char
       return true;
@@ -1142,7 +1142,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   int skill = 0;
   struct affected_type *cur_af;
 
-  if (!IS_MOB(sub) && sub->player->holyLite)
+  if (IS_PC(sub) && sub->player->holyLite)
     return true;
 
   int prog = oprog_can_see_trigger(sub, obj);
@@ -1742,7 +1742,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   {
     fol_next = fol->next;
     if (IS_NPC(fol->follower) &&
-        mob_index[fol->follower->mobdata->nr].virt == 8)
+        mob_index[fol->follower->mobile->getNumber()].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);
@@ -1764,7 +1764,7 @@ int do_quit(Character *ch, char *argument, int cmd)
     for (obj = object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+      if (obj_index[obj->getNumber()].virt == CONSECRATE_OBJ_NUMBER)
         if (ch == (Character *)(obj->obj_flags.origin))
           extract_obj(obj);
     }
@@ -1791,7 +1791,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   update_wizlist(ch);
 
-  if (!IS_MOB(ch) && ch->desc && ch->desc->host)
+  if (IS_PC(ch) && ch->desc && ch->desc->host)
   {
     if (ch->player->last_site)
       dc_free(ch->player->last_site);
@@ -2388,7 +2388,7 @@ int number(int from, int to)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
-    logentry(buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(buf, ARCHITECT, LogChannels::LOG_BUG);
     produce_coredump();
     return to;
   }
@@ -2486,7 +2486,7 @@ bool is_in_game(Character *ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    logentry("nullptr args sent to is_pc_playing in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr args sent to is_pc_playing in utility.c!", ARCHITECT, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -2860,8 +2860,8 @@ void unique_scan(Character *victim)
     {
       if (IS_SET(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
       {
-        if (virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->item_number].virt))
-          virtnums[obj_index[victim->equipment[k]->item_number].virt] = 1;
+        if (virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->getNumber()].virt))
+          virtnums[obj_index[victim->equipment[k]->getNumber()].virt] = 1;
         else
           found_items.push(victim->equipment[k]);
       }
@@ -2871,8 +2871,8 @@ void unique_scan(Character *victim)
         {
           if (IS_SET(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
-              virtnums[obj_index[j->item_number].virt] = 1;
+            if (virtnums.end() == virtnums.find(obj_index[j->getNumber()].virt))
+              virtnums[obj_index[j->getNumber()].virt] = 1;
             else
               found_items.push(j);
           }
@@ -2885,8 +2885,8 @@ void unique_scan(Character *victim)
   {
     if (IS_SET(i->obj_flags.more_flags, ITEM_UNIQUE))
     {
-      if (virtnums.end() == virtnums.find(obj_index[i->item_number].virt))
-        virtnums[obj_index[i->item_number].virt] = 1;
+      if (virtnums.end() == virtnums.find(obj_index[i->getNumber()].virt))
+        virtnums[obj_index[i->getNumber()].virt] = 1;
       else
         found_items.push(i);
     }
@@ -2898,8 +2898,8 @@ void unique_scan(Character *victim)
       {
         if (IS_SET(j->obj_flags.more_flags, ITEM_UNIQUE))
         {
-          if (virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
-            virtnums[obj_index[j->item_number].virt] = 1;
+          if (virtnums.end() == virtnums.find(obj_index[j->getNumber()].virt))
+            virtnums[obj_index[j->getNumber()].virt] = 1;
           else
             found_items.push(j);
         }
@@ -2912,7 +2912,7 @@ void unique_scan(Character *victim)
     logf(IMMORTAL, LogChannels::LOG_WARNINGS, "Player %s has duplicate unique items.", GET_NAME(victim));
     while (!found_items.empty())
     {
-      logf(IMMORTAL, LogChannels::LOG_WARNINGS, "%s", found_items.front()->short_description);
+      logf(IMMORTAL, LogChannels::LOG_WARNINGS, "%s", found_items.front()->getShortDescriptionC());
       found_items.pop();
     }
   }

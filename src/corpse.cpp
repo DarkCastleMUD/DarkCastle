@@ -163,8 +163,8 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 			"%s~\n"
 			"%s~\n"
 			"%d %d %d %d %d\n",
-			obj->name ? obj->name : "undefined",
-			obj->short_description ? obj->short_description : "undefined",
+			obj->getName().toStdString().c_str() ? obj->getName().toStdString().c_str() : "undefined",
+			obj->getShortDescriptionC() ? obj->getShortDescriptionC() : "undefined",
 			obj->description ? obj->description : "undefined",
 			buf1,
 			GET_OBJ_TYPE(obj),
@@ -305,7 +305,7 @@ void load_corpses(void)
 			if (nr == -1)
 			{ /* then it is unique */
 				temp = create_obj_new();
-				temp->item_number = nr;
+				temp->setNumber(nr);
 			}
 			else if (nr < 0)
 			{
@@ -351,29 +351,36 @@ void load_corpses(void)
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					logentry("XAP Found", 0, LogChannels::LOG_MISC);
-				if ((temp->name = fread_string_new(fp, buf2)) == nullptr)
 				{
-					temp->name = "undefined";
+					logentry("XAP Found", 0, LogChannels::LOG_MISC);
+				}
+
+				const char *str = fread_string_new(fp, buf2);
+				if (str == nullptr)
+				{
+					temp->setName("undefined");
 				}
 				else
 				{
+					temp->setName(str);
 					if (debug == 1)
 					{
-						sprintf(buf3, "   -NAME: %s\n", temp->name);
+						sprintf(buf3, "   -NAME: %s\n", temp->getName().toStdString().c_str());
 						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 
-				if ((temp->short_description = fread_string_new(fp, buf2)) == nullptr)
+				const char *s = fread_string_new(fp, buf2);
+				if (s == nullptr)
 				{
-					temp->short_description = "undefined";
+					temp->setShortDescription("undefined");
 				}
 				else
 				{
+					temp->setShortDescription(s);
 					if (debug == 1)
 					{
-						sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
+						sprintf(buf3, "   -SHORT: %s\n", temp->getShortDescriptionC());
 						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
@@ -509,7 +516,7 @@ void load_corpses(void)
 						{
 							if (debug == 1)
 							{
-								sprintf(buf3, "  -Moving [%s] to [%s]", obj->name, temp->name);
+								sprintf(buf3, "  -Moving [%s] to [%s]", obj->getName().toStdString().c_str(), temp->getName().toStdString().c_str());
 								logentry(buf3, 0, LogChannels::LOG_MISC);
 							}
 							obj_from_room(obj);	   /* get those objs from that room */
@@ -521,7 +528,7 @@ void load_corpses(void)
 						/* put the corpse in the right room */
 						if (debug == 1)
 						{
-							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->name, GET_OBJ_VROOM(temp));
+							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->getName().toStdString().c_str(), GET_OBJ_VROOM(temp));
 							logentry(buf3, 0, LogChannels::LOG_MISC);
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
@@ -532,7 +539,7 @@ void load_corpses(void)
 					/* just a plain obj..send it to a temp room until we load a corpse */
 					if (debug == 1)
 					{
-						sprintf(buf3, "  -Moving corpse [%s] to holding room.", temp->name);
+						sprintf(buf3, "  -Moving corpse [%s] to holding room.", temp->getName().toStdString().c_str());
 						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 					obj_to_room(temp, real_room(frozen_start_room));
@@ -592,7 +599,7 @@ class Object *create_obj_new(void)
 	class Object *obj;
 
 	CREATE(obj, class Object, 1);
-	clear_object(obj);
+	obj->clear();
 	obj->next = object_list;
 	object_list = obj;
 	/* Corpse saving stuff */
@@ -627,7 +634,7 @@ class Object *read_object_new(int nr, int type)
 		i = nr;
 
 	CREATE(obj, class Object, 1);
-	clear_object(obj);
+	obj->clear();
 	//  *obj = obj_proto[i];
 	obj->next = object_list;
 	object_list = obj;

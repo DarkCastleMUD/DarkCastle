@@ -235,7 +235,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(QString("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
+          send(QString("Going to object %1 in room %2.\r\n").arg(target_obj->getName()).arg(location));
         }
         else
         {
@@ -314,10 +314,10 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   send("\r\n");
 
-  if (!IS_MOB(this))
+  if (IS_PC(this))
     for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > DEITY))
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -336,10 +336,10 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   move_char(this, location);
 
-  if (!IS_MOB(this))
+  if (IS_PC(this))
     for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > DEITY))
       {
 
         ansi_color(RED, tmp_ch);
@@ -509,7 +509,7 @@ int do_at(Character *ch, char *argument, int cmd)
   }
   else if ((target_mob = get_char_vis(ch, loc_str)) != nullptr)
     location = target_mob->in_room;
-  else if ((target_obj = get_obj_vis(ch, loc_str)) != nullptr)
+  else if ((target_obj = get_obj_vis(ch, QString(loc_str))) != nullptr)
     if (target_obj->in_room != DC::NOWHERE)
       location = target_obj->in_room;
     else

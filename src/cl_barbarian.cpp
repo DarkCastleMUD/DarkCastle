@@ -663,25 +663,25 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86)
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86)
   {
     send_to_char("You are too puny to headbutt someone that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM))
   {
     send_to_char("You cannot pick just one to headbutt!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY))
   {
     act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_NOHEADBUTT))
   {
     send_to_char("That would be like smashing your head into a wall!\n\r", ch);
     return eFAILURE;
@@ -710,7 +710,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   }
 
   int mod = 0;
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE))
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
@@ -764,7 +764,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
+          ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->getNumber()].virt == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
@@ -1138,20 +1138,20 @@ int do_knockback(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE))
     {
       send_to_char("You are too tiny to knock someone that HUGE anywhere!\n\r",
                    ch);
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+    if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM))
     {
       send_to_char("You cannot pick just one to knockback!\n\r", ch);
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+    if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY))
     {
       act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;

@@ -565,10 +565,10 @@ void rename_vault_owner(char *oldname, char *newname)
     if (items->obj && IS_SET(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
-      sprintf(tmp, "%s", items->obj->name);
+      sprintf(tmp, "%s", items->obj->getName().toStdString().c_str());
       tmp[strlen(tmp) - strlen(oldname) - 1] = '\0';
       sprintf(tmp, "%s %s", tmp, newname);
-      items->obj->name = str_hsh(tmp);
+      items->obj->setName(tmp);
     }
   }
   save_vault(newname);
@@ -688,7 +688,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
   sprintf(buf, "Deleting %s's vault.", name);
-  logentry(buf, ANGEL, LogChannels::LOG_VAULT);
+  logentry(buf, ARCHITECT, LogChannels::LOG_VAULT);
 
   if (!(vault = has_vault(name)))
     return;
@@ -1254,7 +1254,7 @@ void vault_get(Character *ch, char *object, char *owner)
 
       for (int j = 0; j < items->count; j++, i++)
       {
-        strncpy(obj_list[i], fname(obj->name), sizeof(obj_list[i]));
+        strncpy(obj_list[i], fname(obj->getName().toStdString().c_str()), sizeof(obj_list[i]));
         if (i > 49)
         {
           send_to_char("You can only take out 50 items at a time.\r\n", ch);
@@ -1312,7 +1312,7 @@ void vault_get(Character *ch, char *object, char *owner)
       return;
     }
 
-    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->getNumber(), false))
     {
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
@@ -1950,9 +1950,9 @@ void vault_list(Character *ch, char *owner)
       ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
     }
 
-    if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
+    if (GET_LEVEL(ch) > IMMORTAL && obj->getNumber() > 0)
     {
-      ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
+      ch->send(fmt::format(" [{}]", obj_index[obj->getNumber()].virt));
     }
     ch->send("\r\n");
   }
@@ -2516,9 +2516,9 @@ int vault_search(Character *ch, const char *args)
           ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
         }
 
-        if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
+        if (GET_LEVEL(ch) > IMMORTAL && obj->getNumber() > 0)
         {
-          ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
+          ch->send(fmt::format(" [{}]", obj_index[obj->getNumber()].virt));
         }
         ch->send("\r\n");
       } // for loop of objects

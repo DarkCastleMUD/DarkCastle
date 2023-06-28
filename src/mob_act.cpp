@@ -57,7 +57,7 @@ bool is_r_denied(Character *ch, int room)
   if (IS_PC(ch))
     return false;
   for (d = world[room].denied; d; d = d->next)
-    if (mob_index[ch->mobdata->nr].virt == d->vnum)
+    if (mob_index[ch->mobile->getNumber()].virt == d->vnum)
       return true;
   return false;
 }
@@ -81,7 +81,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (!IS_MOB(ch))
+    if (IS_PC(ch))
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
@@ -110,16 +110,16 @@ void mobile_activity(void)
     // combat for stuff he shouldn't be able to do while fighting:)
     // And paralyze...
 
-    if (ch->mobdata == nullptr)
+    if (ch->mobile == nullptr)
     {
       continue;
     }
 
-    if (mob_index[ch->mobdata->nr].non_combat_func)
+    if (mob_index[ch->mobile->getNumber()].non_combat_func)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
+      retval = ((*mob_index[ch->mobile->getNumber()].non_combat_func)(ch, 0, 0, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!IS_SET(retval, eFAILURE) || SOMEONE_DIED(retval) || isDead(ch) || isNowhere(ch))
@@ -164,10 +164,10 @@ void mobile_activity(void)
     }
 
     // activate mprog act triggers
-    if (ch->mobdata->mpactnum > 0) // we check to make sure ch is mob in very beginning, so safe
+    if (ch->mobile->mpactnum > 0) // we check to make sure ch is mob in very beginning, so safe
     {
       mob_prog_act_list *tmp_act, *tmp2_act;
-      for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp_act->next)
+      for (tmp_act = ch->mobile->mpact; tmp_act != nullptr; tmp_act = tmp_act->next)
       {
         PerfTimers["mprog_wordlist"].start();
         mprog_wordlist_check(tmp_act->buf, ch, tmp_act->ch,
@@ -181,14 +181,14 @@ void mobile_activity(void)
       if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
         continue; // move on to next mob, this one is dead
 
-      for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
+      for (tmp_act = ch->mobile->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
       {
         tmp2_act = tmp_act->next;
         dc_free(tmp_act->buf);
         dc_free(tmp_act);
       }
-      ch->mobdata->mpactnum = 0;
-      ch->mobdata->mpact = nullptr;
+      ch->mobile->mpactnum = 0;
+      ch->mobile->mpact = nullptr;
     }
 
     PerfTimers["scavenge"].start();
@@ -196,7 +196,7 @@ void mobile_activity(void)
     //    see what I mean.
 
     if (world[ch->in_room].contents &&
-        ISSET(ch->mobdata->actflags, ACT_SCAVENGER) &&
+        ISSET(ch->mobile->actflags, ACT_SCAVENGER) &&
         !IS_AFFECTED(ch, AFF_CHARM) &&
         number(0, 2) == 0)
     {
@@ -210,7 +210,7 @@ void mobile_activity(void)
     // into the above SCAVENGER if statement, and streamline them both to be more effecient
 
     // Scavenge
-    if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && world[ch->in_room].contents && number(0, 4) == 0)
+    if (ISSET(ch->mobile->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && world[ch->in_room].contents && number(0, 4) == 0)
     {
       max = 1;
       best_obj = 0;
@@ -236,7 +236,7 @@ void mobile_activity(void)
     PerfTimers["scavenge"].stop();
 
     /* Wander */
-    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && GET_POS(ch) == POSITION_STANDING)
+    if (!ISSET(ch->mobile->actflags, ACT_SENTINEL) && GET_POS(ch) == POSITION_STANDING)
     {
       door = number(0, 30);
       if (door <= 5 && CAN_GO(ch, door))
@@ -248,14 +248,14 @@ void mobile_activity(void)
           continue;
         }
         Room room_past_door = world[room_nr_past_door];
-        if (!IS_SET(room_past_door.room_flags, NO_MOB) && !IS_SET(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !IS_SET(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == world[ch->in_room].zone))
+        if (!IS_SET(room_past_door.room_flags, NO_MOB) && !IS_SET(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !IS_SET(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobile->actflags, ACT_STAY_ZONE) || room_past_door.zone == world[ch->in_room].zone))
         {
-          if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
-            ch->mobdata->last_direction = -1;
-          else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+          if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobile->last_direction == door)
+            ch->mobile->last_direction = -1;
+          else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobile->actflags, ACT_STAY_NO_TOWN) ||
                                                                  !DC::getInstance()->zones.value(world[EXIT(ch, door)->to_room].zone).isTown()))
           {
-            ch->mobdata->last_direction = door;
+            ch->mobile->last_direction = door;
             retval = attempt_move(ch, ++door);
             if (IS_SET(retval, eCH_DIED))
               continue;
@@ -265,7 +265,7 @@ void mobile_activity(void)
     }
 
     // check hatred
-    if ((ch->mobdata->hatred != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
+    if ((ch->mobile->hatred != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
       send_to_char("You're hating.\r\n", ch);
       Character *next_blah;
@@ -278,10 +278,10 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE))
+        if (IS_PC(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
-        if (isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
+        if (isname(GET_NAME(tmp_ch), ch->mobile->hatred)) // use isname since hatred is a list
         {
           if (IS_SET(world[ch->in_room].room_flags, SAFE))
           {
@@ -309,7 +309,7 @@ void mobile_activity(void)
       if (done)
         continue;
 
-      if (!ISSET(ch->mobdata->actflags, ACT_STUPID))
+      if (!ISSET(ch->mobile->actflags, ACT_STUPID))
       {
         if (GET_POS(ch) > POSITION_SITTING)
         {
@@ -330,7 +330,7 @@ void mobile_activity(void)
 
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
-      if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
+      if (ISSET(ch->mobile->actflags, ACT_AGGRESSIVE) &&
           !IS_SET(world[ch->in_room].room_flags, SAFE))
       {
         Character *next_aggro;
@@ -362,10 +362,10 @@ void mobile_activity(void)
               continue;
             if (IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
               continue;
-            if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
+            if (ISSET(ch->mobile->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                       IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
+            if ((IS_PC(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                     IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -395,10 +395,10 @@ void mobile_activity(void)
       } // if aggressive
 
     if (!ch->fighting)
-      if (ch->mobdata->fears)
-        if (get_char_room_vis(ch, ch->mobdata->fears))
+      if (ch->mobile->fears)
+        if (get_char_room_vis(ch, ch->mobile->fears))
         {
-          if (ch->mobdata->hatred != nullptr)
+          if (ch->mobile->hatred != nullptr)
             remove_memory(ch, 'h');
           act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
           do_flee(ch, "", 0);
@@ -406,11 +406,11 @@ void mobile_activity(void)
         }
 
     if (!ch->fighting)
-      if (ISSET(ch->mobdata->actflags, ACT_RACIST) ||
-          ISSET(ch->mobdata->actflags, ACT_FRIENDLY) ||
-          ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) ||
-          ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) ||
-          ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD))
+      if (ISSET(ch->mobile->actflags, ACT_RACIST) ||
+          ISSET(ch->mobile->actflags, ACT_FRIENDLY) ||
+          ISSET(ch->mobile->actflags, ACT_AGGR_EVIL) ||
+          ISSET(ch->mobile->actflags, ACT_AGGR_NEUT) ||
+          ISSET(ch->mobile->actflags, ACT_AGGR_GOOD))
         for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = pch)
         {
           pch = tmp_ch->next_in_room;
@@ -420,8 +420,8 @@ void mobile_activity(void)
 
           tmp_bitv = GET_BITV(tmp_ch);
 
-          if (ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
-              (!ch->mobdata->hatred || !isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) &&
+          if (ISSET(ch->mobile->actflags, ACT_FRIENDLY) &&
+              (!ch->mobile->hatred || !isname(GET_NAME(tmp_ch), ch->mobile->hatred)) &&
               tmp_ch->fighting &&
               CAN_SEE(ch, tmp_ch) &&
               (IS_SET(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
@@ -484,7 +484,7 @@ void mobile_activity(void)
               break;
             }
 
-            if (ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) &&
+            if (ISSET(ch->mobile->actflags, ACT_AGGR_EVIL) &&
                 GET_ALIGNMENT(tmp_ch) <= -350)
             {
               if (i == 1)
@@ -510,7 +510,7 @@ void mobile_activity(void)
               break;
             }
 
-            if (ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD) &&
+            if (ISSET(ch->mobile->actflags, ACT_AGGR_GOOD) &&
                 GET_ALIGNMENT(tmp_ch) >= 350)
             {
               if (i == 1)
@@ -535,7 +535,7 @@ void mobile_activity(void)
               break;
             }
 
-            if (ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) &&
+            if (ISSET(ch->mobile->actflags, ACT_AGGR_NEUT) &&
                 GET_ALIGNMENT(tmp_ch) > -350 &&
                 GET_ALIGNMENT(tmp_ch) < 350)
             {
@@ -554,11 +554,11 @@ void mobile_activity(void)
               break;
             }
 
-            if (ISSET(ch->mobdata->actflags, ACT_RACIST) &&
+            if (ISSET(ch->mobile->actflags, ACT_RACIST) &&
                 IS_SET(races[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
             {
               tmp_race = GET_RACE(tmp_ch);
-              bool wimpy = ISSET(ch->mobdata->actflags, ACT_WIMPY);
+              bool wimpy = ISSET(ch->mobile->actflags, ACT_WIMPY);
 
               // if mob isn't wimpy, always attack
               // if mob is wimpy, but is equal or greater, attack
@@ -681,7 +681,7 @@ void scavenge(Character *ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (obj_index[obj->getNumber()].virt == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

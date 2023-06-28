@@ -57,9 +57,9 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    if (GET_SEX(ch) == SEX_MALE)
+    if (GET_SEX(ch) == sex_t::MALE)
       send_to_char("You'd wither it!\n\r", ch);
-    else if (GET_SEX(ch) == SEX_FEMALE)
+    else if (GET_SEX(ch) == sex_t::FEMALE)
       send_to_char("You naughty naughty girl...at least wait until someone's filming.\r\n", ch);
     else
       send_to_char("Looks like you've already harm touched yourself...\r\n", ch);
@@ -288,7 +288,7 @@ int do_behead(Character *ch, char *argument, int cmd)
   if ((number(0, 99) < chance) && !IS_SET(vict->immune, ISR_SLASH) && !IS_SET(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) || (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->getNumber()].virt == 518) || (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->getNumber()].virt == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);

@@ -31,7 +31,7 @@ int do_archive(Character *ch, char *argument, int cmd)
   if (!(victim = get_pc(name)))
     return eFAILURE;
 
-  if (GET_LEVEL(victim) >= MIN_GOD)
+  if (GET_LEVEL(victim) >= IMMORTAL)
   {
     act("I think $N can archive $Mself, thank you.", ch, 0, victim,
         TO_CHAR, 0);

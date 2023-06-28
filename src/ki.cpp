@@ -120,7 +120,7 @@ int do_ki(Character *ch, char *argument, int cmd)
   bool target_ok;
   int learned;
 
-  if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
+  if (GET_LEVEL(ch) < ARCHITECT && GET_CLASS(ch) != CLASS_MONK)
   {
     send_to_char("You are unable to control your ki in this way!\n\r", ch);
     return eFAILURE;
@@ -211,7 +211,7 @@ int do_ki(Character *ch, char *argument, int cmd)
             target_ok = true;
 
         if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
-          if (str_cmp(GET_NAME(ch), name) == 0)
+          if (ch->getName().compare(name, Qt::CaseInsensitive) == 0)
           {
             tar_char = ch;
             target_ok = true;
@@ -303,7 +303,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         return eFAILURE;
 
-    if (GET_LEVEL(ch) < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
+    if (GET_LEVEL(ch) < ARCHITECT && GET_KI(ch) < use_ki(ch, spl))
     {
       send_to_char("You do not have enough ki!\n\r", ch);
       return eFAILURE;
@@ -336,7 +336,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Stop abusing your betters  */
       if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
+        if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHITECT) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
         {
           send_to_char("That just might annoy them!\n\r", ch);
           return eFAILURE;
@@ -432,7 +432,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry("Serious problem in ki blast!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious problem in ki blast!", ARCHITECT, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -510,7 +510,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logf(ANGEL, LogChannels::LOG_BUG, "Serious problem in ki punch!", ANGEL, LogChannels::LOG_BUG);
+    logf(ARCHITECT, LogChannels::LOG_BUG, "Serious problem in ki punch!", ARCHITECT, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -627,7 +627,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry("Null victim sent to ki speed", ANGEL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to ki speed", ARCHITECT, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -658,7 +658,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logentry("Null victim sent to ki purify", ANGEL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to ki purify", ARCHITECT, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
   if (!arg)
@@ -721,7 +721,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   if (!victim)
   {
-    logentry("Serious problem in ki disrupt!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious problem in ki disrupt!", ARCHITECT, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -778,7 +778,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
@@ -1154,7 +1154,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   int learned, chance, percent;
   struct affected_type af;
 
-  if (IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+  if (IS_MOB(ch) || GET_LEVEL(ch) >= ARCHITECT)
     learned = 75;
   else if (!(learned = has_skill(ch, KI_AGILITY + KI_OFFSET)))
   {

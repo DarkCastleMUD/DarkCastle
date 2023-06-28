@@ -43,6 +43,7 @@
 #include "guild.h"
 #include "const.h"
 #include "newedit.h"
+#include "LegacyFile.h"
 
 using namespace std;
 
@@ -166,7 +167,7 @@ int do_check(Character *ch, char *arg, int cmd)
   sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10lld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
-  if (GET_LEVEL(ch) >= SERAPH)
+  if (GET_LEVEL(ch) >= ARCHITECT)
   {
     sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
             world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
@@ -182,7 +183,7 @@ int do_check(Character *ch, char *arg, int cmd)
           GET_KI(vict), GET_MAX_KI(vict));
   send_to_char(buf, ch);
 
-  if (GET_LEVEL(ch) >= OVERSEER && !IS_MOB(vict) && GET_LEVEL(ch) >= GET_LEVEL(vict))
+  if (GET_LEVEL(ch) >= OVERSEER && IS_PC(vict) && GET_LEVEL(ch) >= GET_LEVEL(vict))
   {
     sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
     send_to_char(buf, ch);
@@ -265,7 +266,7 @@ int do_find(Character *ch, char *arg, int cmd)
   {
   default:
     send_to_char("Problem...fuck up in do_find.\r\n", ch);
-    logentry("Default in do_find...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Default in do_find...should NOT happen.", ARCHITECT, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name, CMD_DEFAULT);
@@ -337,7 +338,7 @@ int do_stat(Character *ch, char *arg, int cmd)
   {
   default:
     send_to_char("Problem...fuck up in do_stat.\r\n", ch);
-    logentry("Default in do_stat...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Default in do_stat...should NOT happen.", ARCHITECT, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     if ((vict = get_mob_vis(ch, name)))
@@ -348,7 +349,7 @@ int do_stat(Character *ch, char *arg, int cmd)
     send_to_char("No such mobile.\r\n", ch);
     return eFAILURE;
   case 1: // object
-    if (!(obj = get_obj_vis(ch, name)))
+    if (!(obj = get_obj_vis(ch, QString(name))))
     {
       send_to_char("No such object.\r\n", ch);
       return eFAILURE;
@@ -449,7 +450,7 @@ int do_mpstat(Character *ch, char *arg, int cmd)
       send_to_char("No such mobile.\r\n", ch);
       return eFAILURE;
     }
-    x = vict->mobdata->nr;
+    x = vict->mobile->getNumber();
   }
   /*
     if(!has_range)
@@ -785,15 +786,15 @@ int do_zedit(Character *ch, char *argument, int cmd)
       auto &character_list = DC::getInstance()->character_list;
       for (auto &tmp_vict : character_list)
       {
-        if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone.cmd[j])
+        if (IS_MOB(tmp_vict) && tmp_vict->mobile && tmp_vict->mobile->reset == &zone.cmd[j])
         {
           if (zone.cmd[j + 1].command != 'S')
           {
-            tmp_vict->mobdata->reset = &zone.cmd[j + 1];
+            tmp_vict->mobile->reset = &zone.cmd[j + 1];
           }
           else
           {
-            tmp_vict->mobdata->reset = nullptr;
+            tmp_vict->mobile->reset = nullptr;
           }
         }
       }
@@ -2034,7 +2035,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] keywords <new_keywords>\n\r", ch);
       return eFAILURE;
     }
-    ((Object *)obj_index[rnum].item)->name = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->setName(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2062,7 +2063,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] shortdesc <new_desc>\n\r", ch);
       return eFAILURE;
     }
-    ((Object *)obj_index[rnum].item)->short_description = str_hsh(buf4);
+    ((Object *)obj_index[rnum].item)->setShortDescription(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -2437,7 +2438,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
           if (obj == nullptr)
             continue;
 
-          if (obj->item_number == rnum)
+          if (obj->getNumber() == rnum)
           {
 
             void item_remove(Object * obj, struct vault_data * vault);
@@ -2454,7 +2455,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     for (Object *k = object_list; k; k = next_k)
     {
       next_k = k->next;
-      if (k->item_number == rnum)
+      if (k->getNumber() == rnum)
         extract_obj(k);
     }
 
@@ -2491,12 +2492,12 @@ int do_oedit(Character *ch, char *argument, int cmd)
   case 22:
     extra_descr_data *curr;
     for (curr = ((Object *)obj_index[rnum].item)->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, ((Object *)obj_index[rnum].item)->name))
+      if (!str_cmp(curr->keyword, ((Object *)obj_index[rnum].item)->getName().toStdString().c_str()))
         break;
     if (!curr)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(((Object *)obj_index[rnum].item)->name);
+      curr->keyword = str_dup(((Object *)obj_index[rnum].item)->getName().toStdString().c_str());
       curr->description = str_dup("");
       curr->next = ((Object *)obj_index[rnum].item)->ex_description;
       ((Object *)obj_index[rnum].item)->ex_description = curr;
@@ -3140,17 +3141,17 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     if (is_abbrev(buf4, "male"))
     {
-      ((Character *)mob_index[mob_num].item)->sex = SEX_MALE;
+      ((Character *)mob_index[mob_num].item)->setMale();
       send_to_char("Mob sex set to male.\r\n", ch);
     }
     else if (is_abbrev(buf4, "female"))
     {
-      ((Character *)mob_index[mob_num].item)->sex = SEX_FEMALE;
+      ((Character *)mob_index[mob_num].item)->setFemale();
       send_to_char("Mob sex set to female.\r\n", ch);
     }
     else if (is_abbrev(buf4, "neutral"))
     {
-      ((Character *)mob_index[mob_num].item)->sex = SEX_NEUTRAL;
+      ((Character *)mob_index[mob_num].item)->setNeutral();
       send_to_char("Mob sex set to neutral.\r\n", ch);
     }
     else
@@ -3352,7 +3353,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Current$R: ",
           ch);
       sprintf(buf, "%s\n",
-              position_types[((Character *)mob_index[mob_num].item)->mobdata->default_pos]);
+              position_types[((Character *)mob_index[mob_num].item)->mobile->default_pos]);
       send_to_char(buf, ch);
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
@@ -3382,7 +3383,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       intval = POSITION_SLEEPING;
       break;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->default_pos = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->default_pos = intval;
     sprintf(buf, "Mob default position set to %s.\r\n",
             position_types[intval]);
     send_to_char(buf, ch);
@@ -3399,7 +3400,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Current$R: ",
           ch);
       sprintbit(
-          ((Character *)mob_index[mob_num].item)->mobdata->actflags,
+          ((Character *)mob_index[mob_num].item)->mobile->actflags,
           action_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3411,7 +3412,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(action_bits, buf4, ch,
-                              ((Character *)mob_index[mob_num].item)->mobdata->actflags);
+                              ((Character *)mob_index[mob_num].item)->mobile->actflags);
   }
   break;
 
@@ -3450,7 +3451,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
-              ((Character *)mob_index[mob_num].item)->mobdata->damnodice);
+              ((Character *)mob_index[mob_num].item)->mobile->damnodice);
       send_to_char(buf, ch);
       send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
       return eFAILURE;
@@ -3460,7 +3461,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->damnodice = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->damnodice = intval;
     sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3475,7 +3476,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
-              ((Character *)mob_index[mob_num].item)->mobdata->damsizedice);
+              ((Character *)mob_index[mob_num].item)->mobile->damsizedice);
       send_to_char(buf, ch);
       send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
       return eFAILURE;
@@ -3485,7 +3486,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->damsizedice = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->damsizedice = intval;
     sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3891,7 +3892,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     auto &character_list = DC::getInstance()->character_list;
     for (auto &v : character_list)
     {
-      if (IS_NPC(v) && v->mobdata->nr == mob_num)
+      if (IS_NPC(v) && v->mobile->getNumber() == mob_num)
         extract_char(v, true);
     }
     delete_mob_from_index(mob_num);
@@ -3906,7 +3907,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%s\n",
-              mob_types[((Character *)mob_index[mob_num].item)->mobdata->mob_flags.type]);
+              mob_types[((Character *)mob_index[mob_num].item)->mobile->mob_flags.type]);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
       for (i = 0; *mob_types[i] != '\n'; i++)
@@ -3923,7 +3924,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.type =
+    ((Character *)mob_index[mob_num].item)->mobile->mob_flags.type =
         (mob_type_t)intval;
     sprintf(buf, "Mob type set to %d.\r\n", intval);
     send_to_char(buf, ch);
@@ -3942,7 +3943,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Please specify a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[0] = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->mob_flags.value[0] = intval;
     sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3961,7 +3962,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Please specify a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[1] = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->mob_flags.value[1] = intval;
     sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3980,7 +3981,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Please specify a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[2] = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->mob_flags.value[2] = intval;
     sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3999,7 +4000,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Please specify a valid number.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[3] = intval;
+    ((Character *)mob_index[mob_num].item)->mobile->mob_flags.value[3] = intval;
     sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -4304,7 +4305,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     send_to_char("Ok.\r\n", ch);
 
-    if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_ONEWAY))
+    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4840,18 +4841,17 @@ int do_rsave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1.")) == nullptr)
+  LegacyFile world_file("world/%1", curr->filename, "Couldn't open room save file %1.");
+  if (world_file.getStream() == nullptr)
   {
     return eFAILURE;
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
+  {
     write_one_room(f, x);
+  }
 
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   send_to_char("Saved.\r\n", ch);
   set_zone_saved_world(ch->in_room);
   return eSUCCESS;
@@ -4898,18 +4898,17 @@ int do_msave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.")) == nullptr)
+  LegacyFile mobile_file("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.");
+  if (mobile_file.getStream() == nullptr)
   {
     return eFAILURE;
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
+  {
     write_mobile((Character *)mob_index[x].item, f);
+  }
 
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   send_to_char("Saved.\r\n", ch);
   set_zone_saved_mob(curr->firstnum);
   return eSUCCESS;
@@ -4917,7 +4916,6 @@ int do_msave(Character *ch, char *arg, int cmd)
 
 int do_osave(Character *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
   char buf2[180];
@@ -4943,29 +4941,28 @@ int do_osave(Character *ch, char *arg, int cmd)
 
   if (!curr)
   {
-    send_to_char("That range doesn't seem to exist...tell an imp.\r\n", ch);
+    ch->send(QString("I can't find a range that contains rnum %1 derived from vnum %2.\r\n").arg(r).arg(v));
     return eFAILURE;
   }
 
   if (!IS_SET(curr->flags, WORLD_FILE_MODIFIED))
   {
-    send_to_char("This range has not been modified.\r\n", ch);
+    ch->send(QString("Range %1-%2 has not been modified.\r\n").arg(curr->firstnum).arg(curr->lastnum));
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open legacy obj save file %1.")) == nullptr)
+  LegacyFile object_file("objects/", curr->filename, "Couldn't open legacy obj save file %1.");
+  if (object_file.getStream() == nullptr)
   {
     return eFAILURE;
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_object((Object *)obj_index[x].item, f);
+  {
+    write_object((Object *)obj_index[x].item, object_file.getStream());
+  }
 
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
-  send_to_char("Saved.\r\n", ch);
+  ch->send(QString("Saved range %1-%2 with filename '%3'.\r\n").arg(curr->firstnum).arg(curr->lastnum).arg(curr->filename));
   set_zone_saved_obj(curr->firstnum);
   return eSUCCESS;
 }
@@ -5089,16 +5086,16 @@ int do_instazone(Character *ch, char *arg, int cmd)
         for (obj_list = object_list; obj_list; obj_list =
                                                    obj_list->next)
         {
-          if (obj_list->item_number == obj->item_number)
+          if (obj_list->getNumber() == obj->getNumber())
             count++;
         }
 
         if (!obj->in_obj)
         {
           fprintf(fl, "O 0 %d %d %d",
-                  obj_index[obj->item_number].virt, count,
+                  obj_index[obj->getNumber()].virt, count,
                   world[room].number);
-          sprintf(buf, "           %s\n", obj->short_description);
+          sprintf(buf, "           %s\n", obj->getShortDescriptionC());
           string_to_file(fl, buf);
 
           if (obj->contains)
@@ -5111,16 +5108,16 @@ int do_instazone(Character *ch, char *arg, int cmd)
               for (obj_list = object_list; obj_list; obj_list =
                                                          obj_list->next)
               {
-                if (obj_list->item_number == tmp_obj->item_number)
+                if (obj_list->getNumber() == tmp_obj->getNumber())
                   count++;
               }
 
               fprintf(fl, "P 1 %d %d %d",
-                      obj_index[tmp_obj->item_number].virt, count,
-                      obj_index[obj->item_number].virt);
+                      obj_index[tmp_obj->getNumber()].virt, count,
+                      obj_index[obj->getNumber()].virt);
               sprintf(buf, "     %s placed inside %s\n",
-                      tmp_obj->short_description,
-                      obj->short_description);
+                      tmp_obj->getShortDescriptionC(),
+                      obj->getShortDescriptionC());
               string_to_file(fl, buf);
             } /*  for loop */
           }   /* end of the object's contents... */
@@ -5154,11 +5151,11 @@ int do_instazone(Character *ch, char *arg, int cmd)
         for (mob_list = character_list; mob_list;
              mob_list = mob_list->next)
         {
-          if (IS_MOB(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
+          if (IS_MOB(mob_list) && mob_list->mobile->getNumber() == mob->mobile->getNumber())
             count++;
         }
 
-        fprintf(fl, "M 0 %d %d %d", mob_index[mob->mobdata->nr].virt,
+        fprintf(fl, "M 0 %d %d %d", mob_index[mob->mobile->getNumber()].virt,
                 count, world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
@@ -5174,17 +5171,17 @@ int do_instazone(Character *ch, char *arg, int cmd)
             for (obj_list = object_list; obj_list; obj_list =
                                                        obj_list->next)
             {
-              if (obj_list->item_number == obj->item_number)
+              if (obj_list->getNumber() == obj->getNumber())
                 count++;
             }
 
             if (!obj->in_obj)
             {
               fprintf(fl, "E 1 %d %d %d",
-                      obj_index[obj->item_number].virt, count,
+                      obj_index[obj->getNumber()].virt, count,
                       pos);
               sprintf(buf, "      Equip %s with %s\n",
-                      mob->short_desc, obj->short_description);
+                      mob->short_desc, obj->getShortDescriptionC());
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5197,17 +5194,17 @@ int do_instazone(Character *ch, char *arg, int cmd)
                   for (obj_list = object_list; obj_list;
                        obj_list = obj_list->next)
                   {
-                    if (obj_list->item_number == tmp_obj->item_number)
+                    if (obj_list->getNumber() == tmp_obj->getNumber())
                       count++;
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          obj_index[tmp_obj->item_number].virt,
+                          obj_index[tmp_obj->getNumber()].virt,
                           count,
-                          obj_index[obj->item_number].virt);
+                          obj_index[obj->getNumber()].virt);
                   sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          obj->short_description);
+                          tmp_obj->getShortDescriptionC(),
+                          obj->getShortDescriptionC());
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5225,16 +5222,16 @@ int do_instazone(Character *ch, char *arg, int cmd)
             for (obj_list = object_list; obj_list; obj_list =
                                                        obj_list->next)
             {
-              if (obj_list->item_number == obj->item_number)
+              if (obj_list->getNumber() == obj->getNumber())
                 count++;
             }
 
             if (!obj->in_obj)
             {
               fprintf(fl, "G 1 %d %d",
-                      obj_index[obj->item_number].virt, count);
+                      obj_index[obj->getNumber()].virt, count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc,
-                      obj->short_description);
+                      obj->getShortDescriptionC());
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5247,17 +5244,17 @@ int do_instazone(Character *ch, char *arg, int cmd)
                   for (obj_list = object_list; obj_list;
                        obj_list = obj_list->next)
                   {
-                    if (obj_list->item_number == tmp_obj->item_number)
+                    if (obj_list->getNumber() == tmp_obj->getNumber())
                       count++;
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          obj_index[tmp_obj->item_number].virt,
+                          obj_index[tmp_obj->getNumber()].virt,
                           count,
-                          obj_index[obj->item_number].virt);
+                          obj_index[obj->getNumber()].virt);
                   sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          obj->short_description);
+                          tmp_obj->getShortDescriptionC(),
+                          obj->getShortDescriptionC());
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5306,11 +5303,11 @@ int do_rstat(Character *ch, char *argument, int cmd)
     }
     rm = &world[loc];
   }
-  if (IS_SET(rm->room_flags, CLAN_ROOM) && GET_LEVEL(ch) < PATRON)
+  if (IS_SET(rm->room_flags, CLAN_ROOM) && GET_LEVEL(ch) < DEITY)
   {
     send_to_char("And you are rstating a clan room because?\r\n", ch);
     sprintf(buf, "%s just rstat'd clan room %d.", GET_NAME(ch), rm->number);
-    logentry(buf, PATRON, LogChannels::LOG_GOD);
+    logentry(buf, DEITY, LogChannels::LOG_GOD);
     return eFAILURE;
   }
   sprintf(buf,
@@ -5371,7 +5368,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\n\r" : (!IS_MOB(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
+             (IS_PC(k) ? "(PC)\n\r" : (IS_PC(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
     }
   }
   strcat(buf, "\n\r");
@@ -5382,7 +5379,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   {
     if (CAN_SEE_OBJ(ch, j))
     {
-      buffer += j->name;
+      buffer += j->getName().toStdString();
       buffer += "\n\r";
     }
   }
@@ -5510,8 +5507,8 @@ int do_return(Character *ch, char *argument, int cmd)
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;
-    if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 90 &&
-        mob_index[ch->mobdata->nr].virt < 100 &&
+    if (IS_NPC(ch) && mob_index[ch->mobile->getNumber()].virt > 90 &&
+        mob_index[ch->mobile->getNumber()].virt < 100 &&
         cmd != 12)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);

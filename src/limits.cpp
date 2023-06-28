@@ -588,7 +588,7 @@ void advance_level(Character *ch, int is_conversion)
 	ch->raw_ki += add_ki;
 	ch->max_ki += add_ki;
 	redo_ki(ch); // Ki gets level bonuses now
-	if (!IS_MOB(ch) && !is_conversion)
+	if (IS_PC(ch) && !is_conversion)
 		ch->player->practices += add_practices;
 
 	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
@@ -667,7 +667,7 @@ void gain_exp(Character *ch, int64_t gain)
 	if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->player->golem, gain);
 
-	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
+	if (IS_NPC(ch) && mob_index[ch->mobile->getNumber()].virt == 8) // it's a golem
 		golem_gain_exp(ch);
 
 	if (IS_NPC(ch))
@@ -758,9 +758,6 @@ void gain_condition(Character *ch, int condition, int value)
 void food_update(void)
 {
 	class Object *bring_type_to_front(Character * ch, int item_type);
-	int do_eat(Character * ch, char *argument, int cmd);
-	int do_drink(Character * ch, char *argument, int cmd);
-	int FOUNTAINisPresent(Character * ch);
 
 	class Object *food = nullptr;
 
@@ -770,19 +767,19 @@ void food_update(void)
 		if (affected_by_spell(i, SPELL_PARALYZE))
 			continue;
 		int amt = -1;
-		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
+		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->getNumber()].virt == 536)
 			amt = -3;
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (IS_PC(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && IS_PC(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
-				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-					do_eat(i, food->name, CMD_DEFAULT);
+					i->do_drink(QStringList("fountain"), CMD_DEFAULT);
+				else if ((food = bring_type_to_front(i, ITEM_FOOD)) != nullptr)
+					i->do_eat(QStringList(food->getName()), CMD_DEFAULT);
 				else
 					send_to_char("You are out of food.\r\n", i);
 			}
@@ -791,14 +788,14 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (IS_PC(i) && IS_SET(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && IS_PC(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
+					i->do_drink(QStringList("fountain"), CMD_DEFAULT);
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-					do_drink(i, food->name, CMD_DEFAULT);
+					i->do_drink(QStringList(food->getName()), CMD_DEFAULT);
 				else
 					send_to_char("You are out of drink.\r\n", i);
 			}
@@ -857,7 +854,7 @@ void point_update(void)
 			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i, 0), move_limit(i));
 			GET_KI(i) = MIN(GET_KI(i) + ki_gain(i), ki_limit(i));
 		}
-		else if (!IS_MOB(i) && GET_LEVEL(i) < 1 && !i->desc)
+		else if (IS_PC(i) && GET_LEVEL(i) < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", 666);

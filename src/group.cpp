@@ -197,7 +197,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
         (f->follower->in_room == in_room) &&
-        !IS_MOB(f->follower))
+        IS_PC(f->follower))
       no_members++;
   }
 
@@ -234,7 +234,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
         f->follower->in_room == in_room &&
         f->follower != this &&
-        !IS_MOB(f->follower))
+        IS_PC(f->follower))
     {
       f->follower->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;

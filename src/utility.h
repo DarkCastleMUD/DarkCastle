@@ -202,16 +202,16 @@ bool IS_DARK(int room);
 
 #define IS_ARENA(room) (IS_SET(world[room].room_flags, ARENA))
 
-#define HSHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "his" : "her") : "its")
-#define HSSH(ch) ((ch)->sex ? (((ch)->sex == 1) ? "he" : "she") : "it")
-#define HMHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "him" : "her") : "it")
-// #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
-// #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
+#define HSHR(ch) ((ch)->getSex() ? (((ch)->isMale()) ? "his" : "her") : "its")
+#define HSSH(ch) ((ch)->getSex() ? (((ch)->isMale()) ? "he" : "she") : "it")
+#define HMHR(ch) ((ch)->getSex() ? (((ch)->isMale()) ? "him" : "her") : "it")
+// #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->getName().toStdString().c_str()) ? "An" : "A")
+// #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->getName().toStdString().c_str()) ? "an" : "a")
 
 #define IS_PC(ch) (!IS_NPC(ch) && ch->player != nullptr)
-#define IS_NPC(ch) (IS_SET((ch)->misc, MISC_IS_MOB))
+#define IS_NPC(ch) (IS_SET((ch)->getMisc(), MISC_IS_MOB))
 #define IS_MOB(ch) (IS_NPC(ch))
-#define IS_OBJ(ch) (IS_SET((ch)->misc, MISC_IS_OBJ))
+#define IS_OBJ(ch) (IS_SET((ch)->getMisc(), MISC_IS_OBJ))
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
@@ -250,10 +250,10 @@ bool IS_DARK(int room);
 
 #define GET_ZONE(ch) (world[(ch)->in_room].zone)
 
-#define GET_OBJ_SHORT(obj) ((obj)->short_description)
-#define GET_OBJ_NAME(obj) ((obj)->name)
+#define GET_OBJ_SHORT(obj) ((obj)->getShortDescriptionC())
+#define GET_OBJ_NAME(obj) ((obj)->getName().toStdString().c_str())
 
-#define GET_OBJ_RNUM(obj) ((obj)->item_number)
+#define GET_OBJ_RNUM(obj) ((obj)->getNumber())
 #define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_VROOM(obj) ((obj)->vroom)
 #define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
@@ -319,7 +319,7 @@ bool IS_DARK(int room);
 #define GET_EXP(ch) ((ch)->exp)
 #define GET_HEIGHT(ch) ((ch)->height)
 #define GET_WEIGHT(ch) ((ch)->weight)
-#define GET_SEX(ch) ((ch)->sex)
+#define GET_SEX(ch) ((ch)->getSex())
 #define GET_HITROLL(ch) ((ch)->hitroll)
 #define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
 #define GET_DAMROLL(ch) ((ch)->damroll)
@@ -349,7 +349,7 @@ inline const short IS_ANONYMOUS(Character *ch)
 /* Object And Carry related macros */
 
 #define GET_ITEM_TYPE(obj) ((obj)->obj_flags.type_flag)
-#define GET_MOB_TYPE(mob) ((mob)->mobdata->mob_flags.type)
+#define GET_MOB_TYPE(mob) ((mob)->mobile->mob_flags.type)
 #define GET_OBJ_WEIGHT(obj) ((obj)->obj_flags.weight)
 
 #define CAN_WEAR(obj, part) (IS_SET((obj)->obj_flags.wear_flags, part))
@@ -388,11 +388,11 @@ inline const short IS_ANONYMOUS(Character *ch)
 /* char name/short_desc(for mobs) or someone?  */
 
 #define PERS(ch, vict) ( \
-    GET_LEVEL(ch) > MIN_GOD ? (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "an immortal presence") : (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "someone"))
+    GET_LEVEL(ch) > IMMORTAL ? (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "an immortal presence") : (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "someone"))
 
-#define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? (obj)->short_description : "something")
+#define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? (obj)->getShortDescriptionC() : "something")
 
-#define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->name) : "something")
+#define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->getName().toStdString().c_str()) : "something")
 
 #define IS_EXIT(room, door) (world[(room)].dir_option[(door)])
 #define EXIT_TO(room, door) (world[(room)].dir_option[(door)]->to_room)
@@ -514,7 +514,6 @@ int char_from_room(Character *ch);
 void do_start(Character *ch);
 
 void update_pos(Character *victim);
-void clear_object(class Object *obj);
 void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);

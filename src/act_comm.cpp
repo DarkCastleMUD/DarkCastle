@@ -217,7 +217,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
   {
     if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
-    if (!(IS_SET(i->character->misc, type)))
+    if (!(IS_SET(i->character->getMisc(), type)))
       continue;
     if (is_busy(i->character))
       continue;
@@ -287,7 +287,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     {
       for (x = 7; x <= 14; x++)
       {
-        if (IS_SET(ch->misc, (1 << x)))
+        if (IS_SET(ch->getMisc(), (1 << x)))
           y = 1;
         else
           y = 0;
@@ -300,7 +300,7 @@ int do_channel(Character *ch, char *arg, int cmd)
       int o = GET_LEVEL(ch) == 110 ? 21 : 19;
       for (x = 0; x <= o; x++)
       {
-        if (IS_SET(ch->misc, (1 << x)))
+        if (IS_SET(ch->getMisc(), (1 << x)))
           y = 1;
         else
           y = 0;
@@ -309,14 +309,14 @@ int do_channel(Character *ch, char *arg, int cmd)
       }
     }
 
-    if (IS_SET(ch->misc, 1 << 22))
+    if (IS_SET(ch->getMisc(), 1 << 22))
       y = 1;
     else
       y = 0;
     sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
-    if (IS_SET(ch->misc, 1 << 23))
+    if (IS_SET(ch->getMisc(), 1 << 23))
       y = 1;
     else
       y = 0;
@@ -326,7 +326,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     int o = GET_LEVEL(ch) == 110 ? 26 : 0;
     for (x = 24; x <= o; x++)
     {
-      if (IS_SET(ch->misc, (1 << x)))
+      if (IS_SET(ch->getMisc(), (1 << x)))
         y = 1;
       else
         y = 0;
@@ -359,17 +359,17 @@ int do_channel(Character *ch, char *arg, int cmd)
     send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(ch->misc, (1 << x)))
+  if (IS_SET(ch->getMisc(), (1 << x)))
   {
     sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
     send_to_char(buf, ch);
-    REMOVE_BIT(ch->misc, (1 << x));
+    REMOVE_BIT(ch->getMiscReference(), (1 << x));
   }
   else
   {
     sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
     send_to_char(buf, ch);
-    SET_BIT(ch->misc, (1 << x));
+    SET_BIT(ch->getMiscReference(), (1 << x));
   }
   return eSUCCESS;
 }
@@ -561,7 +561,7 @@ int do_write(Character *ch, char *argument, int cmd)
     act("You can't write on $p.", ch, paper, 0, TO_CHAR, 0);
   }
   else if (paper->action_description)
-    /*    else if (paper->item_number != real_object(1205) )  */
+    /*    else if (paper->getNumber() != real_object(1205) )  */
     send_to_char("There's something written on it already.\r\n", ch);
   else
   {
@@ -601,13 +601,13 @@ int do_insult(Character *ch, char *argument, int cmd)
         switch (number(0, 3))
         {
         case 0:
-          if (GET_SEX(victim) == SEX_MALE)
+          if (GET_SEX(victim) == sex_t::MALE)
             act("$n accuses you of fighting like a woman!", ch, 0, victim, TO_VICT, 0);
           else
             act("$n says that women can't fight.", ch, 0, victim, TO_VICT, 0);
           break;
         case 1:
-          if (GET_SEX(victim) == SEX_MALE)
+          if (GET_SEX(victim) == sex_t::MALE)
             act("$n accuses you of having the smallest.... (brain?)", ch, 0, victim, TO_VICT, 0);
           else
             act("$n tells you that you'd loose a beauty contest against a troll.", ch, 0, victim, TO_VICT, 0);
@@ -638,7 +638,7 @@ int do_emote(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
+  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You can't show your emotions!!\n\r", ch);
     return eSUCCESS;
@@ -760,7 +760,7 @@ void DC::send_hint(void)
       continue;
     }
 
-    if (IS_SET(i->character->misc, LogChannels::CHANNEL_HINTS))
+    if (IS_SET(i->character->getMisc(), LogChannels::CHANNEL_HINTS))
     {
       i->character->send(hint);
     }

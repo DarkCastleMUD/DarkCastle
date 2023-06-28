@@ -175,7 +175,7 @@ class Object *get_object_in_equip_vis(Character *ch,
    for ((*j) = 0, k = 1; ((*j) < MAX_WEAR) && (k <= num); (*j)++)
       if (equipment[(*j)])
          if (CAN_SEE_OBJ(ch, equipment[(*j)], blindfighting))
-            if (isname(tmp, equipment[(*j)]->name))
+            if (isname(tmp, equipment[(*j)]->getName()))
             {
                if (k == num)
                   return (equipment[(*j)]);
@@ -231,9 +231,9 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
    buffer[0] = '\0';
    if ((mode == 0) && object->description)
       strcpy(buffer, object->description);
-   else if (object->short_description && ((mode == 1) ||
+   else if (object->getShortDescriptionC() && ((mode == 1) ||
                                           (mode == 2) || (mode == 3) || (mode == 4)))
-      strcpy(buffer, object->short_description);
+      strcpy(buffer, object->getShortDescriptionC());
    else if (mode == 5)
    {
       if (object->obj_flags.type_flag == ITEM_NOTE)
@@ -404,7 +404,7 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
    for (i = list; i; i = i->next_content)
    {
       if ((can_see = CAN_SEE_OBJ(ch, i)) && i->next_content &&
-          i->next_content->item_number == i->item_number && i->item_number != -1 && !IS_SET(i->obj_flags.more_flags, ITEM_NONOTICE))
+          i->next_content->getNumber() == i->getNumber() && i->getNumber() != -1 && !IS_SET(i->obj_flags.more_flags, ITEM_NONOTICE))
       {
          number++;
          continue;
@@ -517,7 +517,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       }
       send_to_char("$B$3", ch);
 
-      if (!(i->long_desc) || (IS_MOB(i) && (GET_POS(i) != i->mobdata->default_pos)))
+      if (!(i->long_desc) || (IS_MOB(i) && (GET_POS(i) != i->mobile->default_pos)))
       {
          /* A char without long descr, or not in default pos. */
          if (IS_PC(i))
@@ -546,7 +546,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
+               if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -883,7 +883,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
    {
       if (ch == i)
          continue;
-      if (!IS_MOB(i) && (i->player->wizinvis > GET_LEVEL(ch)))
+      if (IS_PC(i) && (i->player->wizinvis > GET_LEVEL(ch)))
          if (!i->player->incognito || !(ch->in_room == i->in_room))
             continue;
       if (IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
@@ -902,7 +902,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
             }
 
             gettimeofday(&tv, nullptr);
-            ch->player->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
+            ch->player->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobile->getNumber(), pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(ch->in_room))
@@ -942,7 +942,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    }
 
    char buf[200];
-   sprintf(buf, "You attempt to peek into the %s.\r\n", cont->short_description);
+   sprintf(buf, "You attempt to peek into the %s.\r\n", cont->getShortDescriptionC());
    send_to_char(buf, ch);
 
    if (IS_SET(cont->obj_flags.value[1], CONT_CLOSED))
@@ -1034,16 +1034,16 @@ bool identify(Character *ch, Object *obj)
       return false;
    }
 
-   if (obj->short_description)
+   if (obj->getShortDescriptionC())
    {
-      csendf(ch, "$3Short description: $R%s\r\n", obj->short_description);
+      csendf(ch, "$3Short description: $R%s\r\n", obj->getShortDescriptionC());
    }
    else
    {
       csendf(ch, "$3Short description: $R\r\n");
    }
 
-   csendf(ch, "$3Keywords: '$R%s$3'$R\r\n", obj->name);
+   csendf(ch, "$3Keywords: '$R%s$3'$R\r\n", obj->getName().toStdString().c_str());
 
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    csendf(ch, "$3Item type: $R%s\r\n", buf2);
@@ -1065,9 +1065,9 @@ bool identify(Character *ch, Object *obj)
    csendf(ch, "$3Value: $R%d\r\n", obj->obj_flags.cost);
 
    const Object *vobj = nullptr;
-   if (obj->item_number >= 0)
+   if (obj->getNumber() >= 0)
    {
-      const int vnum = obj_index[obj->item_number].virt;
+      const int vnum = obj_index[obj->getNumber()].virt;
       if (vnum >= 0)
       {
          const int rn_of_vnum = real_object(vnum);
@@ -1333,7 +1333,7 @@ int do_look(Character *ch, char *argument, int cmd)
       ansi_color(GREY, ch);
       return eSUCCESS;
    }
-   else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
+   else if (IS_DARK(ch->in_room) && (IS_PC(ch) && !ch->player->holyLite))
    {
       send_to_char("It is pitch black...\r\n", ch);
       list_char_to_char(world[ch->in_room].people, ch, 0);
@@ -1435,7 +1435,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      {
                         logf(IMMORTAL, LogChannels::LOG_WORLD,
                              "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                             obj_index[tmp_object->item_number].virt,
+                             obj_index[tmp_object->getNumber()].virt,
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
@@ -1454,7 +1454,7 @@ int do_look(Character *ch, char *argument, int cmd)
                   if (!IS_SET(tmp_object->obj_flags.value[1],
                               CONT_CLOSED))
                   {
-                     send_to_char(fname(tmp_object->name), ch);
+                     send_to_char(fname(tmp_object->getName().toStdString().c_str()), ch);
                      switch (bits)
                      {
                      case FIND_OBJ_INV:
@@ -1472,7 +1472,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      {
 
                         int weight_in(class Object * obj);
-                        if (obj_index[tmp_object->item_number].virt == 536)
+                        if (obj_index[tmp_object->getNumber()].virt == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
                            temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1491,7 +1491,7 @@ int do_look(Character *ch, char *argument, int cmd)
                         temp = 3;
                         logf(IMMORTAL, LogChannels::LOG_WORLD,
                              "Bug in object %d. Weight: %d v1: %d",
-                             obj_index[tmp_object->item_number].virt,
+                             obj_index[tmp_object->getNumber()].virt,
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
                      }
@@ -1548,7 +1548,7 @@ int do_look(Character *ch, char *argument, int cmd)
                   show_char_to_char(tmp_char, ch, 1);
                if (ch != tmp_char)
                {
-                  if (!IS_MOB(ch) && (GET_LEVEL(tmp_char) < ch->player->wizinvis))
+                  if (IS_PC(ch) && (GET_LEVEL(tmp_char) < ch->player->wizinvis))
                   {
                      return eSUCCESS;
                   }
@@ -1708,7 +1708,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      {
                         sprintf(tmpbuf,
                                 "You look through %s but it seems to be opaque.\r\n",
-                                tmp_object->short_description);
+                                tmp_object->getShortDescriptionC());
                         send_to_char(tmpbuf, ch);
                         return eFAILURE;
                      }
@@ -1748,7 +1748,7 @@ int do_look(Character *ch, char *argument, int cmd)
          ansi_color(GREY, ch);
 
          // PUT SECTOR AND ROOMFLAG STUFF HERE
-         if (!IS_MOB(ch) && ch->player->holyLite)
+         if (IS_PC(ch) && ch->player->holyLite)
          {
             sprinttype(world[ch->in_room].sector_type, sector_types,
                        sector_buf);
@@ -1766,7 +1766,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          send_to_char("\n\r", ch);
 
-         if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
+         if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
             send_to_char(world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
@@ -1901,7 +1901,7 @@ int do_exits(Character *ch, char *argument, int cmd)
       if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
          continue;
 
-      if (!IS_MOB(ch) && ch->player->holyLite)
+      if (IS_PC(ch) && ch->player->holyLite)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  world[EXIT(ch, door)->to_room].name,
                  world[EXIT(ch, door)->to_room].number);
@@ -2609,10 +2609,10 @@ int do_olocate(Character *ch, char *name, int cmd)
       // allow search by vnum
       if (vnum)
       {
-         if (k->item_number != searchnum)
+         if (k->getNumber() != searchnum)
             continue;
       }
-      else if (!(isname(name, k->name)))
+      else if (!(isname(name, k->getName())))
          continue;
 
       if (!CAN_SEE_OBJ(ch, k))
@@ -2657,15 +2657,15 @@ int do_olocate(Character *ch, char *name, int cmd)
       count++;
 
       if (in_room != DC::NOWHERE)
-         sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
+         sprintf(buf, "[%2d] %-26s %d", count, k->getShortDescriptionC(), in_room);
       else
-         sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
+         sprintf(buf, "[%2d] %-26s %s", count, k->getShortDescriptionC(),
                  "(Item at DC::NOWHERE.)");
 
       if (k->in_obj)
       {
          strcat(buf, " in ");
-         strcat(buf, k->in_obj->short_description);
+         strcat(buf, k->in_obj->getShortDescriptionC());
          if (k->in_obj->carried_by)
          {
             strcat(buf, " carried by ");
@@ -2733,15 +2733,15 @@ int do_mlocate(Character *ch, char *name, int cmd)
       // allow find by vnum
       if (vnum)
       {
-         if (searchnum != i->mobdata->nr)
+         if (searchnum != i->mobile->getNumber())
             continue;
       }
-      else if (!(isname(name, i->name)))
+      else if (!(isname(name, i->getName())))
          continue;
 
       if (i->in_room < 0)
       {
-         logf(ANGEL, LogChannels::LOG_BUG, "do_mlocate: %s is in_room %d, averting crash. IS_NPC(i)==%s, IS_PC(i)==%s, IS_MOB(i)==%s",
+         logf(ARCHITECT, LogChannels::LOG_BUG, "do_mlocate: %s is in_room %d, averting crash. IS_NPC(i)==%s, IS_PC(i)==%s, IS_MOB(i)==%s",
               GET_NAME(i), i->in_room, IS_NPC(i) ? "true" : "false", IS_PC(i) ? "true" : "false", IS_MOB(i) ? "true" : "false");
          produce_coredump(i);
          continue;
@@ -2999,8 +2999,8 @@ int do_consider(Character *ch, char *argument, int cmd)
          {
             if (IS_NPC(victim))
             {
-               x = victim->mobdata->damnodice;
-               y = victim->mobdata->damsizedice;
+               x = victim->mobile->damnodice;
+               y = victim->mobile->damsizedice;
                x = (((x * y - x) / 2) + x);
             }
             else
@@ -3614,7 +3614,7 @@ bool Search::operator==(const Object *obj)
    switch (type_)
    {
    case O_NAME:
-      if (o_name_ == obj->name || isname(o_name_, obj->name))
+      if (o_name_ == obj->getName() || isname(o_name_, obj->getName()))
       {
          return true;
       }
@@ -4469,14 +4469,14 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       {
          break;
       }
-      if (QString(obj->name).size() > max_keyword_size)
+      if (QString(obj->getName().toStdString().c_str()).size() > max_keyword_size)
       {
-         max_keyword_size = QString(obj->name).size();
+         max_keyword_size = QString(obj->getName().toStdString().c_str()).size();
       }
 
-      if (nocolor_strlen(obj->short_description) > max_short_description_size)
+      if (nocolor_strlen(obj->getShortDescriptionC()) > max_short_description_size)
       {
-         max_short_description_size = nocolor_strlen(obj->short_description);
+         max_short_description_size = nocolor_strlen(obj->getShortDescriptionC());
          max_short_description_size = MAX(20, max_short_description_size);
       }
    }
@@ -4530,7 +4530,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       if (count_if(sl.begin(), sl.end(), [](Search search_item)
                    { return (search_item.getType() == Search::types::O_NAME); }))
       {
-         custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
+         custom_columns += QString(" [%1]").arg(obj->getName().toStdString().c_str(), -max_keyword_size);
       }
 
       if (search_world)
@@ -4561,14 +4561,14 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                    { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
       {
          // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-         custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+         custom_columns += QString(" [%1]").arg(obj->getShortDescriptionC(), -(strlen(obj->getShortDescriptionC()) - nocolor_strlen(obj->getShortDescriptionC()) + max_short_description_size));
       }
 
       // Needed to show details or affects below
       const Object *vobj = nullptr;
-      if (obj->item_number >= 0)
+      if (obj->getNumber() >= 0)
       {
-         const int vnum = obj_index[obj->item_number].virt;
+         const int vnum = obj_index[obj->getNumber()].virt;
          if (vnum >= 0)
          {
             const int rn_of_vnum = real_object(vnum);

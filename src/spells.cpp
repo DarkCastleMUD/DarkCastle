@@ -896,7 +896,7 @@ const char *spells[] =
 bool canPerform(Character *const &ch, const int_fast32_t &skillType,
                 string failMessage)
 {
-  if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL)
+  if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHITECT)
   {
     send_to_char(
         failMessage.c_str(),
@@ -1139,7 +1139,7 @@ void stop_follower(Character *ch, int cmd)
 
   if (ch->master == nullptr)
   {
-    logentry("Stop_follower: null ch_master!", ARCHANGEL, LogChannels::LOG_BUG);
+    logentry("Stop_follower: null ch_master!", ARCHITECT, LogChannels::LOG_BUG);
     return;
   }
   /*
@@ -1719,7 +1719,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   int i = 0, learned = 0;
 
   // if (IS_PC(ch)) debug_point();
-  if (!IS_MOB(ch))
+  if (IS_PC(ch))
   {
     i = learned = has_skill(ch, skillnum);
     if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE)
@@ -1842,7 +1842,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (obj_index[tmp_obj->getNumber()].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from casting!\n\r", ch);
       return eFAILURE;
@@ -1854,7 +1854,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (GET_LEVEL(ch) < ARCHITECT && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
@@ -1961,7 +1961,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (!IS_MOB(ch))
+      if (IS_PC(ch))
       {
         if (!(learned = has_skill(ch, spl)))
         {
@@ -2065,8 +2065,8 @@ int do_cast(Character *ch, char *argument, int cmd)
             return eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
-              mob_index[tar_char->mobdata->nr].virt <= 2399)
+          if (IS_NPC(tar_char) && mob_index[tar_char->mobile->getNumber()].virt >= 2300 &&
+              mob_index[tar_char->mobile->getNumber()].virt <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2243,14 +2243,14 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
+            if ((tar_obj = get_obj_vis(ch, QString(name), true)) != nullptr)
               /* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
           {
             for (i = 0; i < MAX_WEAR && !target_ok; i++)
-              if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
+              if (ch->equipment[i] != nullptr && QString(name) == ch->equipment[i]->getName())
               {
                 tar_obj = ch->equipment[i];
                 target_ok = true;
@@ -2258,7 +2258,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
-            if (str_cmp(GET_NAME(ch), name) == 0)
+            if (ch->getName().compare(name, Qt::CaseInsensitive) == 0)
             {
               tar_char = ch;
               target_ok = true;
@@ -2352,7 +2352,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch))
+      if (GET_LEVEL(ch) < ARCHITECT && IS_PC(ch))
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -3092,7 +3092,7 @@ int do_spells(Character *ch, char *arg, int cmd)
 
 int spl_lvl(int lev)
 {
-  if (lev >= MIN_GOD)
+  if (lev >= IMMORTAL)
     return 0;
   return lev;
 }

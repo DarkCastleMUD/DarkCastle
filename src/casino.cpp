@@ -1,15 +1,9 @@
-
-/*
-
- Real bloody blackjack. Who does two cards then nothing else? Wankers, that's who
-
-
-*/
-extern "C"
-{
 #include <ctype.h>
 #include <string.h>
-}
+
+#include <algorithm>
+#include <fmt/format.h>
+
 #include "structs.h"
 #include "room.h"
 #include "character.h"
@@ -31,8 +25,7 @@ extern "C"
 #include "returnvals.h"
 #include "timeinfo.h"
 #include "DC.h"
-#include <algorithm>
-#include <fmt/format.h>
+#include "LegacyFile.h"
 
 using namespace std;
 
@@ -2097,18 +2090,16 @@ void save_slot_machines()
       return;
    }
 
-   if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.")) == nullptr)
+   LegacyFile objects_file("objects/", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+   if (objects_file.getStream() == nullptr)
    {
       return;
    }
 
    for (int x = curr->firstnum; x <= curr->lastnum; x++)
-      write_object((Object *)obj_index[x].item, f);
-
-   // end file
-   fprintf(f, "$~\n");
-
-   fclose(f);
+   {
+      write_object((Object *)obj_index[x].item, objects_file.getStream());
+   }
 }
 
 void create_slot(Object *obj)
@@ -2174,7 +2165,7 @@ void update_linked_slots(struct machine_data *machine)
          // Update instances of the original slot obj
          for (Object *j = object_list; j; j = j->next)
          {
-            if (j->item_number == real_object(i))
+            if (j->getNumber() == real_object(i))
             {
                // if(!ishashed(j->description)) dc_free(j->description);
                j->description = str_dup(ldesc);
@@ -2263,13 +2254,13 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          }
          else
          {
-            ((Object *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)obj_index[machine->obj->getNumber()].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            if (!ishashed(((Object *)obj_index[machine->obj->item_number].item)->description))
-               dc_free(((Object *)obj_index[machine->obj->item_number].item)->description);
-            ((Object *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            if (!ishashed(((Object *)obj_index[machine->obj->getNumber()].item)->description))
+               dc_free(((Object *)obj_index[machine->obj->getNumber()].item)->description);
+            ((Object *)obj_index[machine->obj->getNumber()].item)->description = str_dup(buf);
          }
       }
 
@@ -2293,13 +2284,13 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          }
          else
          {
-            ((Object *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)obj_index[machine->obj->getNumber()].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            // if(!ishashed(((Object *)obj_index[machine->obj->item_number].item)->description))
-            //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->description);
-            ((Object *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            // if(!ishashed(((Object *)obj_index[machine->obj->getNumber()].item)->description))
+            //    dc_free(((Object*)obj_index[machine->obj->getNumber()].item)->description);
+            ((Object *)obj_index[machine->obj->getNumber()].item)->description = str_dup(buf);
          }
       }
       else if (payout)

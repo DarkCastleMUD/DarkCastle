@@ -128,7 +128,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!has_skill(ch, SKILL_BACKSTAB) && !IS_MOB(ch))
+  if (!has_skill(ch, SKILL_BACKSTAB) && IS_PC(ch))
   {
     send_to_char("You don't know how to backstab people!\r\n", ch);
     return eFAILURE;
@@ -146,19 +146,19 @@ int do_backstab(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE))
   {
     send_to_char("You cannot backstab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM))
   {
     send_to_char("You cannot target just one to backstab!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY))
   {
     send_to_char("You cannot target someone that tiny to backstab!\r\n", ch);
     return eFAILURE;
@@ -201,7 +201,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
 
   // Check the killer/victim
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((GET_LEVEL(ch) < DEITY) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -230,7 +230,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHANGEL) || (IS_NPC(ch) && GET_LEVEL(ch) > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
+  if ((((IS_PC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHITECT) || (IS_NPC(ch) && GET_LEVEL(ch) > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
   {
     if (skill_success(ch, victim, SKILL_DUAL_BACKSTAB) || IS_NPC(ch))
     {
@@ -366,21 +366,21 @@ int do_circle(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_HUGE) &&
       has_skill(ch, SKILL_CIRCLE) <= 80)
   {
     send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM) &&
       has_skill(ch, SKILL_CIRCLE) <= 80)
   {
     send_to_char("You cannot pick just one to circle behind!\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY) &&
       has_skill(ch, SKILL_CIRCLE) <= 80)
   {
     send_to_char("You cannot target something that tiny to circle behind!\n\r", ch);
@@ -408,7 +408,7 @@ int do_circle(Character *ch, char *argument, int cmd)
   }
 
   // Check the killer/victim
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((GET_LEVEL(ch) < DEITY) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -466,7 +466,7 @@ int do_circle(Character *ch, char *argument, int cmd)
       return retval;
 
     // Now go for dual backstab
-    if (ch->equipment[SECOND_WIELD] && (has_skill(ch, SKILL_DUAL_BACKSTAB) || (GET_LEVEL(ch) >= ARCHANGEL)))
+    if (ch->equipment[SECOND_WIELD] && (has_skill(ch, SKILL_DUAL_BACKSTAB) || (GET_LEVEL(ch) >= ARCHITECT)))
     {
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (AWAKE(victim) && !skill_success(ch, victim, SKILL_DUAL_BACKSTAB))
@@ -914,12 +914,12 @@ int do_steal(Character *ch, char *argument, int cmd)
       send_to_char("That piece of equipment is protected by the powerful magics of the MUD-school elders.\r\n", ch);
       return eFAILURE;
     }
-    if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (obj_index[obj->getNumber()].virt == CHAMPION_ITEM)
     {
       send_to_char("You must earn that flag, no stealing allowed!", ch);
       return eFAILURE;
     }
-    if (IS_NPC(victim) && isname("prize", obj->name))
+    if (IS_NPC(victim) && isname("prize", obj->getName().toStdString().c_str()))
     {
       send_to_char("You have to HUNT the targets...its not a Treasture Steal!\r\n", ch);
       return eFAILURE;
@@ -956,7 +956,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         {
           move_obj(obj, ch);
 
-          if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+          if (IS_PC(victim) || (ISSET(victim->mobile->actflags, ACT_NICE_THIEF)))
             _exp = GET_OBJ_WEIGHT(obj) * 1000;
           else
             _exp = (GET_OBJ_WEIGHT(obj) * 1000);
@@ -1010,25 +1010,25 @@ int do_steal(Character *ch, char *argument, int cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%d] from %s",
-                    GET_NAME(ch), obj->short_description,
-                    obj_index[obj->item_number].virt, GET_NAME(victim));
-            logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+                    GET_NAME(ch), obj->getShortDescriptionC(),
+                    obj_index[obj->getNumber()].virt, GET_NAME(victim));
+            logentry(log_buf, ARCHITECT, LogChannels::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
-                   obj->short_description,
-                   loop_obj->short_description,
-                   obj_index[loop_obj->item_number].virt);
+              logf(ARCHITECT, LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
+                   obj->getShortDescriptionC(),
+                   loop_obj->getShortDescriptionC(),
+                   obj_index[loop_obj->getNumber()].virt);
           }
-          if (obj_index[obj->item_number].virt != 76)
+          if (obj_index[obj->getNumber()].virt != 76)
           {
             obj_from_char(obj);
-            has_item = search_char_for_item(ch, obj->item_number, false);
+            has_item = search_char_for_item(ch, obj->getNumber(), false);
             obj_to_char(obj, ch);
           }
           if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
               (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
-            csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->short_description);
+            csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->getShortDescriptionC());
             extract_obj(obj);
           }
           // check for no_trade inside containers
@@ -1043,7 +1043,7 @@ int do_steal(Character *ch, char *argument, int cmd)
                   (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
               {
                 csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
-                       loop_obj->short_description, obj->short_description);
+                       loop_obj->getShortDescriptionC(), obj->getShortDescriptionC());
                 extract_obj(loop_obj);
               }
             }
@@ -1060,7 +1060,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     for (eq_pos = 0; (eq_pos < MAX_WEAR); eq_pos++)
     {
       if (victim->equipment[eq_pos] &&
-          (isname(obj_name, victim->equipment[eq_pos]->name)) &&
+          (isname(obj_name, victim->equipment[eq_pos]->getName())) &&
           CAN_SEE_OBJ(ch, victim->equipment[eq_pos]))
       {
         obj = victim->equipment[eq_pos];
@@ -1172,7 +1172,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
         act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), ch);
-        if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
+        if (IS_PC(victim) || (ISSET(victim->mobile->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
@@ -1182,9 +1182,9 @@ int do_steal(Character *ch, char *argument, int cmd)
         sprintf(buf, "You receive %d exps.\r\n", _exp);
         send_to_char(buf, ch);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
-                GET_NAME(ch), obj->short_description, GET_NAME(victim));
-        logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
-        if (!IS_MOB(victim))
+                GET_NAME(ch), obj->getShortDescriptionC(), GET_NAME(victim));
+        logentry(buf, ARCHITECT, LogChannels::LOG_MORTAL);
+        if (IS_PC(victim))
         {
           victim->save(666);
           ch->save(666);
@@ -1218,7 +1218,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           }
         } // !is_npc
         obj_from_char(obj);
-        has_item = search_char_for_item(ch, obj->item_number, false);
+        has_item = search_char_for_item(ch, obj->getNumber(), false);
         obj_to_char(obj, ch);
 
         if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1238,7 +1238,7 @@ int do_steal(Character *ch, char *argument, int cmd)
                 (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
             {
               csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n",
-                     loop_obj->short_description, obj->short_description);
+                     loop_obj->getShortDescriptionC(), obj->getShortDescriptionC());
               extract_obj(loop_obj);
             }
           }
@@ -1251,9 +1251,9 @@ int do_steal(Character *ch, char *argument, int cmd)
     }
   } // of else, not in inventory
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ANGEL)
+  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ARCHITECT)
   {
-    if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
+    if (ISSET(victim->mobile->actflags, ACT_NICE_THIEF))
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
       do_shout(victim, buf, 0);
@@ -1397,7 +1397,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
       _exp = gold / 100 * GET_LEVEL(victim) / 5;
       if (IS_PC(victim))
         _exp = 0;
-      if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
+      if (IS_NPC(victim) && ISSET(victim->mobile->actflags, ACT_NICE_THIEF))
         _exp = 1;
       if (GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
@@ -1435,9 +1435,9 @@ int do_pocket(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ANGEL)
+  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ARCHITECT)
   {
-    if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
+    if (ISSET(victim->mobile->actflags, ACT_NICE_THIEF))
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
       do_shout(victim, buf, 0);
@@ -1474,7 +1474,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   //      has_lockpicks = true;
 
   for (j = 0; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || obj_index[ch->equipment[j]->item_number].virt == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || obj_index[ch->equipment[j]->getNumber()].virt == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1603,7 +1603,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   extern int weight_in(Object *);
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (IS_PC(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
     send_to_char("Your criminal acts prohibit this action.\r\n", ch);
     return eFAILURE;
@@ -1617,7 +1617,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
     {
       send_to_char("Your criminal acts prohibit this action.\r\n", ch);
       return eFAILURE;
@@ -1723,7 +1723,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       // the mob from turning into an interest bearing savings account. :)
       if (IS_NPC(vict))
       {
-        SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
+        SETBIT(vict->mobile->actflags, ACT_NO_GOLD_BONUS);
       }
 
       ch->save();
@@ -1793,7 +1793,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (obj_index[container->item_number].virt != 536 ||
+        (obj_index[container->getNumber()].virt != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       send_to_char("It won't fit...cheater.\r\n", ch);
@@ -1808,7 +1808,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (obj_index[container->item_number].virt != 536)
+    if (obj_index[container->getNumber()].virt != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
@@ -1820,7 +1820,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(vict) && mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (IS_NPC(vict) && mob_index[vict->mobile->getNumber()].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;
@@ -1854,7 +1854,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(vict, obj->item_number, false))
+    if (search_char_for_item(vict, obj->getNumber(), false))
     {
       send_to_char("The item's uniqueness prevents it!\r\n", ch);
       return eFAILURE;
@@ -1865,7 +1865,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (obj_index[obj->item_number].virt == 393)
+    if (obj_index[obj->getNumber()].virt == 393)
     {
       send_to_char("Whoa, you almost dropped your hot potato!\n\r", ch);
       return eFAILURE;
@@ -1874,7 +1874,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     if (GET_LEVEL(ch) >= IMMORTAL && GET_LEVEL(ch) <= DEITY)
     {
       sprintf(buf, "%s slips %s to %s and fumbles it.", GET_NAME(ch),
-              obj->short_description, GET_NAME(vict));
+              obj->getShortDescriptionC(), GET_NAME(vict));
       special_log(buf);
     }
 
@@ -1895,11 +1895,11 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     /*      if (GET_LEVEL(ch) >= IMMORTAL  && GET_LEVEL(ch) <= DEITY ) {
              sprintf(buf, "%s slips %s to %s.", GET_NAME(ch),
-                     obj->short_description, GET_NAME(vict));
+                     obj->getShortDescriptionC(), GET_NAME(vict));
              special_log(buf);
              }
       */
-    sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
+    sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->getName().toStdString().c_str(),
             GET_NAME(vict));
     logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
@@ -2101,25 +2101,25 @@ int do_jab(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
+  if (IS_MOB(victim) && (ISSET(victim->mobile->actflags, ACT_HUGE) && learned < 81))
   {
     send_to_char("You cannot jab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_SWARM) && learned < 81)
   {
     send_to_char("You cannot target just one to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
+  if (IS_MOB(victim) && ISSET(victim->mobile->actflags, ACT_TINY) && learned < 81)
   {
     send_to_char("You cannot target someone that tiny to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((GET_LEVEL(ch) < DEITY) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -2363,19 +2363,19 @@ int do_cripple(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
+  if (IS_MOB(vict) && ISSET(vict->mobile->actflags, ACT_HUGE) && skill < 81)
   {
     send_to_char("You cannot cripple someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
+  if (IS_MOB(vict) && ISSET(vict->mobile->actflags, ACT_SWARM) && skill < 81)
   {
     send_to_char("You cannot pick just one to cripple!\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
+  if (IS_MOB(vict) && ISSET(vict->mobile->actflags, ACT_TINY) && skill < 81)
   {
     send_to_char("You cannot target someone that tiny to cripple!\r\n", ch);
     return eFAILURE;

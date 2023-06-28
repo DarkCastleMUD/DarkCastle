@@ -206,7 +206,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   if ((IS_SET(victim->immune, ISR_CHARM)) ||
-      !ISSET(victim->mobdata->actflags, ACT_CHARM))
+      !ISSET(victim->mobile->actflags, ACT_CHARM))
   {
     act("$N is wilder than you thought.", ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -290,7 +290,7 @@ int do_track(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL)
+  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ARCHITECT)
   {
     send_to_char("Only a ranger could track someone by name.\r\n", ch);
     return eFAILURE;
@@ -308,7 +308,7 @@ int do_track(Character *ch, char *argument, int cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_STUPID))
+  if (IS_MOB(ch) && ISSET(ch->mobile->actflags, ACT_STUPID))
   {
     send_to_char("Being stupid, you cannot find any..\r\n", ch);
     return eFAILURE;
@@ -370,7 +370,7 @@ int do_track(Character *ch, char *argument, int cmd)
           // temp disable tracking mobs into town
           if (DC::getInstance()->zones.value(world[EXIT(ch, y)->to_room].zone).isTown() == false && !IS_SET(world[EXIT(ch, y)->to_room].room_flags, NO_TRACK))
           {
-            ch->mobdata->last_direction = y;
+            ch->mobile->last_direction = y;
             retval = do_move(ch, "", (y + 1));
             if (IS_SET(retval, eCH_DIED))
               return retval;
@@ -923,43 +923,43 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   case 1:
     if (dir < 0)
     {
-      sprintf(buf, "%s wizzes by.\r\n", found->short_description);
+      sprintf(buf, "%s wizzes by.\r\n", found->getShortDescriptionC());
       send_to_char(buf, victim);
-      sprintf(buf, "%s wizzes by.", found->short_description);
+      sprintf(buf, "%s wizzes by.", found->getShortDescriptionC());
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
-      sprintf(buf, "%s wizzes by from the %s.\r\n", found->short_description, dirs[rev_dir[dir]]);
+      sprintf(buf, "%s wizzes by from the %s.\r\n", found->getShortDescriptionC(), dirs[rev_dir[dir]]);
       send_to_char(buf, victim);
       sprintf(buf, "%s wizzes by from the %s.",
-              found->short_description, dirs[rev_dir[dir]]);
+              found->getShortDescriptionC(), dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
   case 2:
     sprintf(buf, "A quiet whistle sounds as %s flies over your head.",
-            found->short_description);
+            found->getShortDescriptionC());
     act(buf, victim, 0, 0, TO_CHAR, 0);
     sprintf(buf, "A quiet whistle sounds as %s flies over your head.",
-            found->short_description);
+            found->getShortDescriptionC());
     act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
     break;
   case 3:
     if (dir < 0)
     {
-      sprintf(buf, "%s narrowly misses your head.\r\n", found->short_description);
+      sprintf(buf, "%s narrowly misses your head.\r\n", found->getShortDescriptionC());
       send_to_char(buf, victim);
-      sprintf(buf, "%s narrowly misses $n.", found->short_description);
+      sprintf(buf, "%s narrowly misses $n.", found->getShortDescriptionC());
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
       sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
-              found->short_description, dirs[rev_dir[dir]]);
+              found->getShortDescriptionC(), dirs[rev_dir[dir]]);
       send_to_char(buf, victim);
       sprintf(buf, "%s from the %s narrowly misses $n.",
-              found->short_description, dirs[rev_dir[dir]]);
+              found->getShortDescriptionC(), dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
@@ -977,7 +977,7 @@ int mob_arrow_response(Character *ch, Character *victim,
      the waterwheel around shire though.
   */
 
-  if (ISSET(victim->mobdata->actflags, ACT_STUPID))
+  if (ISSET(victim->mobile->actflags, ACT_STUPID))
   {
     if (!number(0, 20))
       do_shout(victim, "Duh George, someone keeps shooting me!", CMD_DEFAULT);
@@ -1008,7 +1008,7 @@ int mob_arrow_response(Character *ch, Character *victim,
       if (CAN_GO(victim, dir2))
         if (EXIT(victim, dir2))
         {
-          if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+          if (!(ISSET(victim->mobile->actflags, ACT_STAY_NO_TOWN) &&
                 DC::getInstance()->zones.value(world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
               !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
             /* send 1-6 since attempt move --cmd's it */
@@ -1030,7 +1030,7 @@ int mob_arrow_response(Character *ch, Character *victim,
     if (EXIT(victim, dir2))
     {
       if (CAN_GO(ch, dir2))
-        if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+        if (!(ISSET(victim->mobile->actflags, ACT_STAY_NO_TOWN) &&
               DC::getInstance()->zones.value(world[EXIT(victim, dir2)->to_room].zone).isTown()))
           if (!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
@@ -1080,22 +1080,22 @@ int do_arrow_damage(Character *ch, Character *victim,
     sprintf(buf, "Your shot impales %s through the heart!\r\n", GET_SHORT(victim));
     send_to_char(buf, ch);
     sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
-       found->short_description, dirs[rev_dir[dir]]);
+       found->getShortDescriptionC(), dirs[rev_dir[dir]]);
     send_to_char(buf, victim);
     sprintf(buf, "%s from the %s impales $n through the chest!",
-       found->short_description, dirs[rev_dir[dir]]);
+       found->getShortDescriptionC(), dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
 
     case 2:
     sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n",
-       found->short_description, GET_SHORT(victim));
+       found->getShortDescriptionC(), GET_SHORT(victim));
     send_to_char(buf, ch);
     sprintf(buf, "%s drives right through your left eye!\r\nThe last thing through your mind is.........an arrowhead.\r\n",
-       found->short_description);
+       found->getShortDescriptionC());
     send_to_char(buf, victim);
     sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.",
-       found->short_description, dirs[rev_dir[dir]]);
+       found->getShortDescriptionC(), dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
    } // of switch
@@ -1103,13 +1103,13 @@ int do_arrow_damage(Character *ch, Character *victim,
   else  // they have enough to survive the arrow..lucky bastard
   {
     sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-       found->short_description);
+       found->getShortDescriptionC());
     send_to_char(buf, ch);
     sprintf(buf, "You get shot with %s from the %s.  Ouch.",
-          found->short_description, dirs[rev_dir[dir]]);
+          found->getShortDescriptionC(), dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_CHAR, 0);
     sprintf(buf, "%s from the %s hits $n!",
-          found->short_description, dirs[rev_dir[dir]]);
+          found->getShortDescriptionC(), dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_ROOM, 0);
 
     switch(artype)
@@ -1300,7 +1300,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     }
   }
 
-  if ((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
+  if ((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ARCHITECT))
   {
     send_to_char("You don't have enough mana for that arrow.\r\n", ch);
     return eFAILURE;
@@ -1453,7 +1453,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   for (; where < MAX_WEAR; where++)
   {
     if (ch->equipment[where])
-      if (IS_CONTAINER(ch->equipment[where]) && isname("quiver", ch->equipment[where]->name))
+      if (IS_CONTAINER(ch->equipment[where]) && isname("quiver", ch->equipment[where]->getName()))
       {
         found = find_arrow(ch->equipment[where]);
         if (found)
@@ -1470,7 +1470,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300 && mob_index[victim->mobdata->nr].virt <= 2399)
+  if (IS_NPC(victim) && mob_index[victim->mobile->getNumber()].virt >= 2300 && mob_index[victim->mobile->getNumber()].virt <= 2399)
   {
     send_to_char(
         "Your arrow is disintegrated by the fortress' enchantments.\r\n",
@@ -1537,7 +1537,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         if (dir < 0)
         {
           sprintf(buf, "The %s impales %s through the heart!\r\n",
-                  found->short_description, victname);
+                  found->getShortDescriptionC(), victname);
           send_to_room(buf, victroom);
         }
         else
@@ -1547,7 +1547,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           send_to_char(buf, ch);
           sprintf(buf,
                   "%s from the %s impales %s through the chest!\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
+                  found->getShortDescriptionC(), dirs[rev_dir[dir]],
                   victname);
           send_to_room(buf, victroom);
         }
@@ -1557,18 +1557,18 @@ int do_fire(Character *ch, char *arg, int cmd)
         {
           sprintf(buf,
                   "%s drives through the eye of %s, ending %s life.\r\n",
-                  found->short_description, victname, victhshr);
+                  found->getShortDescriptionC(), victname, victhshr);
           send_to_room(buf, victroom);
         }
         else
         {
           sprintf(buf,
                   "Your %s drives through the eye of %s ending %s life.\r\n",
-                  found->short_description, victname, victhshr);
+                  found->getShortDescriptionC(), victname, victhshr);
           send_to_char(buf, ch);
           sprintf(buf,
                   "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
+                  found->getShortDescriptionC(), dirs[rev_dir[dir]],
                   victname, victhshr);
           send_to_room(buf, victroom);
         }
@@ -1578,7 +1578,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         {
           sprintf(buf,
                   "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n",
-                  found->short_description, victname, HSSH(victim));
+                  found->getShortDescriptionC(), victname, HSSH(victim));
           send_to_room(buf, victroom);
         }
         else
@@ -1589,7 +1589,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           send_to_char(buf, ch);
           sprintf(buf,
                   "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n",
-                  found->short_description, dirs[rev_dir[dir]],
+                  found->getShortDescriptionC(), dirs[rev_dir[dir]],
                   victname, HSSH(victim));
           send_to_room(buf, victroom);
         }
@@ -1601,24 +1601,24 @@ int do_fire(Character *ch, char *arg, int cmd)
       if (dir < 0)
       {
         sprintf(buf, "You get shot with %s.  Ouch.",
-                found->short_description);
+                found->getShortDescriptionC());
         act(buf, victim, 0, 0, TO_CHAR, 0);
-        sprintf(buf, "%s hits $n!", found->short_description);
+        sprintf(buf, "%s hits $n!", found->getShortDescriptionC());
         act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
         sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-                found->short_description);
+                found->getShortDescriptionC());
         send_to_char(buf, ch);
       }
       else
       {
         sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
-                found->short_description);
+                found->getShortDescriptionC());
         send_to_char(buf, ch);
         sprintf(buf, "You get shot with %s from the %s.  Ouch.",
-                found->short_description, dirs[rev_dir[dir]]);
+                found->getShortDescriptionC(), dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_CHAR, 0);
         sprintf(buf, "%s from the %s hits $n!",
-                found->short_description, dirs[rev_dir[dir]]);
+                found->getShortDescriptionC(), dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_ROOM, 0);
       }
       GET_POS(victim) = POSITION_STANDING;
@@ -1800,7 +1800,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   /*
     TODO - make this into a skill and put it in
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHITECT)
        learned = 75;
     else if(!(learned = has_skill(ch, SKILL_MIND_DELVE))) {
        send_to_char("You try to think like a chipmunk and go nuts.\r\n", ch);
@@ -1819,7 +1819,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(target))
+  if (IS_PC(target))
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
     send_to_char(buf, ch);
@@ -1828,7 +1828,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
   sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
-          ch->mobdata->hatred ? ch->mobdata->hatred : "Noone!");
+          ch->mobile->hatred ? ch->mobile->hatred : "Noone!");
   send_to_char(buf, ch);
   if (ch->master)
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),

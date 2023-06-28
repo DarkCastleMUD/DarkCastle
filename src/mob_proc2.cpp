@@ -48,7 +48,7 @@ void repair_shop_fix_eq(Character *ch, Character *owner, int price, Object *obj)
 
 	ch->removeGold(price);
 	eq_remove_damage(obj);
-	sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
+	sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->getShortDescriptionC());
 	do_say(owner, buf, CMD_DEFAULT);
 	act("You watch $N fix $p...", ch, obj, owner, TO_CHAR, 0);
 	act("You watch $N fix $p...", ch, obj, owner, TO_ROOM, 0);
@@ -62,7 +62,7 @@ void repair_shop_complain_no_cash(Character *ch, Character *owner, int price, Ob
 	char buf[256];
 
 	do_say(owner, "Trying to sucker me for a free repair job?", CMD_DEFAULT);
-	sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, obj->short_description);
+	sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, obj->getShortDescriptionC());
 	do_say(owner, buf, CMD_DEFAULT);
 	act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
@@ -72,7 +72,7 @@ void repair_shop_price_check(Character *ch, Character *owner, int price, Object 
 {
 	char buf[256];
 
-	sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
+	sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->getShortDescriptionC());
 	do_say(owner, buf, CMD_DEFAULT);
 	act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
@@ -87,7 +87,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+	if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
 		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
@@ -165,7 +165,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+	if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
 		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
@@ -266,7 +266,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+	if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
 		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
@@ -429,7 +429,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 				continue;
 
-			if (!isname("pc", obj->name) || (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)))
+			if (!isname("pc", obj->getName().toStdString().c_str()) || (!isname(GET_NAME(ch), obj->getName().toStdString().c_str()) && !isname(buf, obj->getName().toStdString().c_str())))
 				continue;
 
 			if (obj->in_room == ch->in_room)
@@ -440,7 +440,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 			cost = corpse_cost(obj);
 			cost /= 20000;
 			cost = MAX(cost, 30);
-			sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
+			sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->getShortDescriptionC(), cost);
 			send_to_char(buf, ch);
 		}
 		send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
@@ -477,7 +477,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 			continue;
 
-		if (!isname("pc", obj->name) || (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)) || ++x < which)
+		if (!isname("pc", obj->getName().toStdString().c_str()) || (!isname(GET_NAME(ch), obj->getName().toStdString().c_str()) && !isname(buf, obj->getName().toStdString().c_str())) || ++x < which)
 			continue;
 
 		if (!obj->contains) // skip empty corpses
@@ -516,11 +516,11 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (platinum)
 	{
-		buf = fmt::format("$B$7{:-2}$R) {} ", number + 1, obj->short_description);
+		buf = fmt::format("$B$7{:-2}$R) {} ", number + 1, obj->getShortDescriptionC());
 	}
 	else
 	{
-		buf = fmt::format("$B$7{:-2}$R) $3$B{}$R ", number + 1, obj->short_description);
+		buf = fmt::format("$B$7{:-2}$R) $3$B{}$R ", number + 1, obj->getShortDescriptionC());
 	}
 
 	if (obj->obj_flags.type_flag == ITEM_WEAPON)
@@ -668,7 +668,7 @@ const struct platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538
 int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
 	extern struct index_data *mob_index;
-	int mobvnum = mob_index[owner->mobdata->nr].virt;
+	int mobvnum = mob_index[owner->mobile->getNumber()].virt;
 	int o;
 	char buf[MAX_STRING_LENGTH];
 	//  return eFAILURE; //disabled for now
@@ -734,7 +734,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		class Object *obj;
 		obj = clone_object(real_object(platsmith_list[o].sales[k]));
 
-		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
+		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->getNumber(), false))
 		{
 			sprintf(buf, "%s That item is not available to you.", GET_NAME(ch));
 			do_tell(owner, buf, 0);
@@ -749,10 +749,10 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 			return eSUCCESS;
 		}
 		GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
-		sprintf(buf, "%s %s", obj->name, GET_NAME(ch));
-		obj->name = str_hsh(buf);
+		sprintf(buf, "%s %s", obj->getName().toStdString().c_str(), GET_NAME(ch));
+		obj->setName(buf);
 		obj_to_char(obj, ch);
-		sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
+		sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->getShortDescriptionC());
 		do_tell(owner, buf, 0);
 		return eSUCCESS;
 	}
@@ -809,7 +809,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+	if (IS_PC(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
 		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
