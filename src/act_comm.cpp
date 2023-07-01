@@ -90,15 +90,13 @@ int do_report(Character *ch, char *argument, int cmd)
         }
       }
 
-      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
-               GET_EXP(ch),
-               (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)),
-               levels_to_gain);
+      int64_t xp_to_level = (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch));
+      QString qreport = QString("XP: %1, XP till level: %2, Levels to gain: %3").arg(GET_EXP(ch)).arg(xp_to_level).arg(levels_to_gain);
 
-      sprintf(buf, "$n reports '%s'", report);
+      sprintf(buf, "$n reports '%s'", qreport.toStdString().c_str());
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
-      csendf(ch, "You report: %s\n\r", report);
+      csendf(ch, "You report: %s\n\r", qreport.toStdString().c_str());
       return eSUCCESS;
     }
   }
