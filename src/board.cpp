@@ -94,6 +94,7 @@ struct BOARD_INFO
 void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 char *fread_string(FILE *fl, int hasher);
+char *fread_string(QTextStream &, int hasher);
 int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
@@ -893,7 +894,7 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board)
     return;
   }
 
-  fprintf(the_file, " %d ", board->second.msgs.size());
+  fprintf(the_file, " %lu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
