@@ -236,8 +236,6 @@ sex_t &Character::getSexReference(void)
 
 bool Character::load_charmie_equipment(QString player_name, bool previous)
 {
-    int golemtype = 0;
-
     if (player_name.isEmpty())
     {
         return false;
