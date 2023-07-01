@@ -24,6 +24,7 @@ using namespace std;
 
 class Character;
 class Connection;
+#include "typedefs.h"
 #include "utility.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
@@ -193,7 +194,7 @@ struct class_skill_defines
 {
     char *skillname;        // name of skill
     int16_t skillnum;       // ID # of skill
-    int16_t levelavailable; // what level class can get it
+    level_t levelavailable; // what level class can get it
     int16_t maximum;        // maximum value PC can train it to (1-100)
     uint8_t group;          // which class tree group it is assigned
     int16_t attrs;          // What attributes the skill is based on
@@ -490,7 +491,7 @@ public:
 
     uint32_t plat = {}; /* Platinum                                */
     int64_t exp = {};   /* The experience of the player            */
-    int32_t in_room = {};
+    room_t in_room = {};
 
     uint32_t immune = {};                  // Bitvector of damage types I'm immune to
     uint32_t resist = {};                  // Bitvector of damage types I'm resistant to
