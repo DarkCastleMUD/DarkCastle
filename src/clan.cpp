@@ -2564,7 +2564,6 @@ void clan_data::log(QString log_entry)
 
   QTextStream out(&file);
   out << log_entry;
-  file.close();
 }
 
 void show_clan_log(Character *ch)
