@@ -96,7 +96,7 @@ void _write_one_node(FILE *fp, struct ban_list_element *node)
   {
     _write_one_node(fp, node->next);
     fprintf(fp, "%s %s %ld %s\n", ban_types[node->type],
-            node->site, (int32_t)node->date, node->name);
+            node->site, node->date, node->name);
   }
 }
 
