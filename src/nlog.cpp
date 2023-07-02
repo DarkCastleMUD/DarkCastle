@@ -62,10 +62,10 @@ bool ishashed(char *arg)
 
 char *str_hsh(const char *arg)
 {
-  int scratch;
+  int scratch = {};
   struct hash_info *current = &tree;
-  struct hash_info *next;
-  struct hash_info *temp;
+  struct hash_info *next = nullptr;
+  struct hash_info *temp = nullptr;
 
   // Second spot for "" args so we don't leak them all over the place
   // if(*arg == '\0')
