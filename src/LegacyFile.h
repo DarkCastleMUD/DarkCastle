@@ -8,7 +8,7 @@ class LegacyFile
 {
 public:
     explicit LegacyFile(QString directory_name, QString filename, QString error_message, FILE *stream = nullptr)
-        : stream_(stream), directory_name_(directory_name), filename_(filename), error_message_(error_message)
+        : directory_name_(directory_name), filename_(filename), error_message_(error_message), stream_(stream)
     {
         full_filename_ = QString(directory_name + "/%1").arg(filename);
         full_new_filename_ = QString(directory_name + "/%1.new").arg(filename);
