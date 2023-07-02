@@ -150,12 +150,12 @@ void Zone::setBottom(int room_key)
     bottom = room_key;
 }
 
-int Zone::getTop(void)
+room_t Zone::getTop(void)
 {
     return top;
 }
 
-void Zone::setTop(int room_key)
+void Zone::setTop(room_t room_key)
 {
     top = room_key;
 }
@@ -165,17 +165,17 @@ room_t Zone::getRealBottom(void)
     return bottom_rnum;
 }
 
-void Zone::setRealBottom(int room_key)
+void Zone::setRealBottom(room_t room_key)
 {
     bottom_rnum = room_key;
 }
 
-int Zone::getRealTop(void)
+room_t Zone::getRealTop(void)
 {
     return top_rnum;
 }
 
-void Zone::setRealTop(int room_key)
+void Zone::setRealTop(room_t room_key)
 {
     top_rnum = room_key;
 }
