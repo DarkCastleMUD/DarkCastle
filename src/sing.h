@@ -12,7 +12,7 @@
 
 #define BARD_MAX_RATING 3
 
-typedef int	SING_FUN		( uint8_t level, Character *ch, char *arg, Character *victim, int skill);
+typedef int	SING_FUN		( level_t level, Character *ch, char *arg, Character *victim, int skill);
 
 struct song_info_type
 {
