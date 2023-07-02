@@ -216,7 +216,7 @@ void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
 	}
 }
 
-bool DC::authenticate(QString username, QString password, uint64_t level)
+bool DC::authenticate(QString username, QString password, level_t level)
 {
 	username = username.toLower();
 	username[0] = username[0].toUpper();
@@ -248,7 +248,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
 	return false;
 }
 
-bool DC::authenticate(const QHttpServerRequest &request, uint64_t level)
+bool DC::authenticate(const QHttpServerRequest &request, level_t level)
 {
 	const auto query = request.query();
 	if (!query.hasQueryItem("username") || !query.hasQueryItem("password"))
