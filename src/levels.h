@@ -22,13 +22,13 @@
 // #define MAX_MORTAL 50
 // #define IMMORTAL IMMORTAL
 
-constexpr uint64_t GIFTED_COMMAND = 101; // noone should ever "be" this level
-constexpr uint64_t IMMORTAL = 102;
-constexpr uint64_t ARCHITECT = 103;
-constexpr uint64_t DEITY = 104;
-constexpr uint64_t OVERSEER = 105;
-constexpr uint64_t COORDINATOR = 108;
-constexpr uint64_t IMPLEMENTER = 110;
+constexpr level_t GIFTED_COMMAND = 101; // noone should ever "be" this level
+constexpr level_t IMMORTAL = 102;
+constexpr level_t ARCHITECT = 103;
+constexpr level_t DEITY = 104;
+constexpr level_t OVERSEER = 105;
+constexpr level_t COORDINATOR = 108;
+constexpr level_t IMPLEMENTER = 110;
 
 struct bestowable_god_commands_type
 {
