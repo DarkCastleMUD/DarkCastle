@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "typedefs.h"
 #include "structs.h" // uint8_t
 #include "character.h"
 #include "Entity.h"
@@ -190,8 +191,6 @@ struct machine_data;
 struct wheel_data;
 class Object;
 class Character;
-typedef uint64_t vnum_t;
-typedef uint64_t room_t;
 
 struct active_object
 {
