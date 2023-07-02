@@ -59,8 +59,6 @@ int load_debug = 0;
 #include "const.h"
 #include "wizard.h"
 
-using namespace std;
-
 int load_new_help(FILE *fl, int reload, Character *ch);
 void load_vaults();
 void load_auction_tickets();
@@ -164,7 +162,7 @@ struct weather_data weather_info; /* the infomation about the weather */
 struct vault_data *vault_table = 0;
 
 /* local procedures */
-void setup_dir(FILE *fl, int room, int dir);
+void setup_dir(QTextStream &fl, room_t room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
@@ -172,9 +170,11 @@ void half_chop(const char *string, char *arg1, char *arg2);
 world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
 world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
-QString read_next_worldfile_name(FILE *flWorldIndex);
+QString read_next_worldfile_name(QTextStream &flWorldIndex);
 int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
 int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
+template <typename T>
+T fread_bitvector(QTextStream &fl, T minval, T maxval);
 char fread_char(FILE *fl);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
@@ -989,7 +989,6 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 	int i = 0;
 	char buf[82];
 	char log_buf[256];
-	FILE *flMobIndex;
 	FILE *fl;
 	QString temp;
 	char endfile[180];
@@ -997,23 +996,22 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 	//  extern short code_testing_mode;
 
 	logentry("Opening mobile file index.", 0, LogChannels::LOG_MISC);
+	QFile mob_index_file;
 	if (DC::getInstance()->cf.test_mobs)
 	{
-		if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
-		{
-			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
-			abort();
-		}
+		mob_index_file.setFileName(MOB_INDEX_FILE_TINY);
 	}
 	else
 	{
-		if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
-		{
-			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
-			abort();
-		}
+		mob_index_file.setFileName(MOB_INDEX_FILE);
 	}
 
+	if (!mob_index_file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
+		abort();
+	}
+	QTextStream flMobIndex(&mob_index_file);
 	logentry("Opening object files.", 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
@@ -1085,7 +1083,6 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 		fclose(fl);
 	}
 	*top = i - 1;
-	fclose(flMobIndex);
 	/*
 	 Here the index gets processed, and mob classes gets
 	 assigned. (Not done in read_mobile 'cause of
@@ -1303,18 +1300,19 @@ struct index_data *generate_obj_indices(int *top,
 	char buf[82];
 	char log_buf[256];
 	FILE *fl;
-	FILE *flObjIndex;
+	QFile obj_index_file(OBJECT_INDEX_FILE);
 	QString temp;
 	QString endfile;
 	struct world_file_list_item *pItem = nullptr;
 
 	//  if (!bport) {
 
-	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
+	if (!obj_index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
 	{
 		logentry("Cannot open object file index.", 0, LogChannels::LOG_MISC);
 		abort();
 	}
+	QTextStream flObjIndex(&obj_index_file);
 	/*
 	 } else {
 	 if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
@@ -1427,7 +1425,6 @@ struct index_data *generate_obj_indices(int *top,
 	} // for next_in_file
 
 	*top = i - 1;
-	fclose(flObjIndex);
 	return (index);
 }
 
@@ -1503,7 +1500,7 @@ void write_one_room(FILE *f, int a)
 	fprintf(f, "S\n");
 }
 
-int DC::read_one_room(FILE *fl, int &room_nr)
+bool DC::read_one_room(QTextStream &fl, room_t &room_nr)
 {
 	char *temp = nullptr;
 	char ch = 0;
@@ -1515,7 +1512,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 	if (ch != '$')
 	{
-		room_nr = fread_int(fl, 0, 1000000);
+		room_nr = fread_int<room_t>(fl, 0, 1000000);
 
 		if (load_debug)
 		{
@@ -1601,7 +1598,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			world[room_nr].zone = zone_nr;
 		}
 
-		world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
+		world[room_nr].room_flags = fread_bitvector<uint32_t>(fl, 0, 2147483467);
 		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
 			REMOVE_BIT(world[room_nr].room_flags, NO_ASTRAL);
 
@@ -1642,7 +1639,10 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			{
 				// strip off the \n after the E
 				if (fread_char(fl) != '\n')
-					fseek(fl, -1, SEEK_CUR);
+				{
+					// fseek(fl, -1, SEEK_CUR);
+					fl.seek(-1);
+				}
 #ifdef LEAK_CHECK
 				new_new_descr = (struct extra_descr_data *)
 					calloc(1, sizeof(struct extra_descr_data));
@@ -1683,7 +1683,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 	return false;
 }
 
-QString read_next_worldfile_name(FILE *flWorldIndex)
+QString read_next_worldfile_name(QTextStream &flWorldIndex)
 {
 	QString filename = fread_string(flWorldIndex, 0);
 
@@ -1991,11 +1991,10 @@ world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr)
 /* load the rooms */
 void DC::boot_world(void)
 {
-	FILE *fl;
-	FILE *flWorldIndex;
-	int room_nr = 0;
+	QFile world_index_file;
+	room_t room_nr = 0;
 	QString temp;
-	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
+	QString endfile;
 	struct world_file_list_item *pItem = nullptr;
 
 	object_list = 0;
@@ -2004,32 +2003,29 @@ void DC::boot_world(void)
 
 	if (cf.test_world)
 	{
-		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE_TINY, "r")))
-		{
-			perror("fopen");
-			logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
-			abort();
-		}
+		world_index_file.setFileName(WORLD_INDEX_FILE_TINY);
 	}
 	else
 	{
-		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE, "r")))
-		{
-			perror("fopen");
-			logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
-			abort();
-		}
+		world_index_file.setFileName(WORLD_INDEX_FILE);
+	}
+
+	if (!world_index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
+	{
+		perror("fopen");
+		logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
+		abort();
 	}
 
 	logentry("Booting individual world files", 0, LogChannels::LOG_MISC);
 
+	QTextStream flWorldIndex(&world_index_file);
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
 		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flWorldIndex))
 	{
-		strcpy(endfile, "world/");
-		strcat(endfile, temp.toStdString().c_str());
+		endfile = "world/" + temp;
 
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
@@ -2037,17 +2033,19 @@ void DC::boot_world(void)
 			logentry(temp, 0, LogChannels::LOG_MISC);
 		}
 
-		if (!(fl = fopen(endfile, "r")))
+		QFile world_file(endfile);
+		if (!world_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
 		{
 			perror("fopen");
 			logentry("boot_world: could not open world file.", 0, LogChannels::LOG_BUG);
 			logentry(temp, 0, LogChannels::LOG_BUG);
 			abort();
 		}
+		QTextStream flWorld(&world_file);
 
 		pItem = new_world_file_item(temp, room_nr);
 
-		while (read_one_room(fl, room_nr))
+		while (read_one_room(flWorld, room_nr))
 			;
 
 		// push the first num forward until it hits a room, that way it's
@@ -2059,11 +2057,8 @@ void DC::boot_world(void)
 		pItem->lastnum = room_nr / 100 * 100 + 99;
 
 		room_nr++;
-
-		fclose(fl);
 	}
 	logentry("World Boot done.", 0, LogChannels::LOG_MISC);
-	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
 }
@@ -2099,6 +2094,51 @@ void setup_dir(FILE *fl, int room, int dir)
 	world[room].dir_option[dir]->keyword = fread_string(fl, 0);
 
 	tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
+	world[room].dir_option[dir]->exit_info = tmp;
+	world[room].dir_option[dir]->bracee = nullptr;
+
+	world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
+	try
+	{
+		world[room].dir_option[dir]->to_room = fread_int(fl, 0, 62000);
+	}
+	catch (...)
+	{
+		world[room].dir_option[dir]->to_room = DC::NOWHERE;
+	}
+}
+
+/* read direction data */
+void setup_dir(QTextStream &fl, room_t room, int dir)
+{
+	int tmp;
+
+	if (world[room].dir_option[dir])
+	{
+		char buf[200];
+		sprintf(buf, "Room %d attemped to created two exits in the same direction.", world[room].number);
+		logentry(buf, 0, LogChannels::LOG_WORLD);
+		if (world[room].dir_option[dir]->general_description)
+			dc_free(world[room].dir_option[dir]->general_description);
+		if (world[room].dir_option[dir]->keyword)
+			dc_free(world[room].dir_option[dir]->keyword);
+		dc_free(world[room].dir_option[dir]);
+	}
+
+#ifdef LEAK_CHECK
+	world[room].dir_option[dir] = (struct room_direction_data *)
+		calloc(1, sizeof(struct room_direction_data));
+#else
+	world[room].dir_option[dir] = (struct room_direction_data *)
+		dc_alloc(1, sizeof(struct room_direction_data));
+#endif
+
+	world[room].dir_option[dir]->general_description =
+		fread_string(fl, 0);
+
+	world[room].dir_option[dir]->keyword = fread_string(fl, 0);
+
+	tmp = fread_bitvector<int>(fl, -1, 300); /* tjs hack - not the right range */
 	world[room].dir_option[dir]->exit_info = tmp;
 	world[room].dir_option[dir]->bracee = nullptr;
 
@@ -2218,7 +2258,7 @@ void renum_zone_table(void)
 				break;
 			case 'O':
 				if (real_object(zone.cmd[comm].arg1) >= 0 && real_room(zone.cmd[comm].arg3) >= 0)
-					zone.cmd[comm].arg1 = real_object(zone.cmd[comm].arg1);
+					zone.cmd[comm].arg1 = (int)real_object((vnum_t)zone.cmd[comm].arg1);
 				else
 					zone.cmd[comm].active = 0;
 
@@ -2586,7 +2626,7 @@ zone_t DC::read_one_zone(FILE *fl)
 void DC::boot_zones(void)
 {
 	FILE *fl;
-	FILE *flZoneIndex;
+
 	QString temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
@@ -2595,23 +2635,26 @@ void DC::boot_zones(void)
 
 	// DC::config &cf = DC::getInstance()->cf;
 
+	QFile index_file;
 	if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 	{
-		if (!(flZoneIndex = fopen(ZONE_INDEX_FILE, "r")))
-		{
-			int errnum = errno;
-			char buf[80] = {};
-			char *errorstring = strerror_r(errnum, buf, sizeof(buf));
-			logentry(QString("boot_world: Opening '%1/%2': %3").arg(QDir::currentPath()).arg(ZONE_INDEX_FILE).arg(errorstring), 0, LogChannels::LOG_BUG);
-			abort();
-		}
+		index_file.setFileName(ZONE_INDEX_FILE);
 	}
-	else if (!(flZoneIndex = fopen(ZONE_INDEX_FILE_TINY, "r")))
+	else
 	{
-		perror("fopen");
-		logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
+		index_file.setFileName(ZONE_INDEX_FILE_TINY);
+	}
+
+	if (!index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
+	{
+		int errnum = errno;
+		char buf[80] = {};
+		char *errorstring = strerror_r(errnum, buf, sizeof(buf));
+		logentry(QString("boot_world: Opening '%1/%2': %3").arg(QDir::currentPath()).arg(ZONE_INDEX_FILE).arg(errorstring), 0, LogChannels::LOG_BUG);
 		abort();
 	}
+
+	QTextStream flZoneIndex(&index_file);
 	logentry("Booting individual zone files", 0, LogChannels::LOG_MISC);
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
@@ -2642,8 +2685,6 @@ void DC::boot_zones(void)
 	}
 
 	logentry("Zone Boot done.", 0, LogChannels::LOG_MISC);
-
-	fclose(flZoneIndex);
 
 	//  fclose(fl);
 }
@@ -3860,7 +3901,7 @@ class Object *read_object(int nr, FILE *fl, bool zz)
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
 	obj->setName(fread_string(fl, 1));
-	char *tmpptr;
+	char *tmpptr = nullptr;
 
 	tmpptr = fread_string(fl, 1);
 
@@ -3869,12 +3910,6 @@ class Object *read_object(int nr, FILE *fl, bool zz)
 		tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = 0;
 
 		obj->setShortDescription(tmpptr);
-		if (obj->getNumber() == 781)
-		{
-			QString s = obj->getShortDescription();
-			QRegularExpression pattern("[\\r]+");
-			s.remove(pattern);
-		}
 		free(tmpptr);
 
 		logf(IMMORTAL, LogChannels::LOG_BUG, "read_object: vnum %d short_description too long.", obj_index[nr].virt);
@@ -3882,12 +3917,6 @@ class Object *read_object(int nr, FILE *fl, bool zz)
 	else
 	{
 		obj->setShortDescription(tmpptr);
-		if (obj->getNumber() == 781)
-		{
-			QString s = obj->getShortDescription();
-			QRegularExpression pattern("[\\r]+");
-			s.remove(pattern);
-		}
 	}
 
 	obj->description = fread_string(fl, 1);
@@ -4030,12 +4059,6 @@ ifstream &operator>>(ifstream &in, Object *obj)
 		tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = 0;
 
 		obj->setShortDescription(tmpptr);
-		if (obj->getNumber() == 781)
-		{
-			QString s = obj->getShortDescription();
-			QRegularExpression pattern("[\\r]+");
-			s.remove(pattern);
-		}
 		free(tmpptr);
 
 		logf(IMMORTAL, LogChannels::LOG_BUG, "read_object: vnum unknown short_description too long.");
@@ -4043,12 +4066,6 @@ ifstream &operator>>(ifstream &in, Object *obj)
 	else
 	{
 		obj->setShortDescription(tmpptr);
-		if (obj->getNumber() == 781)
-		{
-			QString s = obj->getShortDescription();
-			QRegularExpression pattern("[\\r]+");
-			s.remove(pattern);
-		}
 	}
 	obj->description = fread_string(in, 1);
 	obj->action_description = fread_string(in, 1);
@@ -4152,12 +4169,6 @@ void write_object(Object *obj, FILE *fl)
 
 	fprintf(fl, "#%d\n", x.virt);
 	string_to_file(fl, obj->getName());
-
-	// TODO remove
-	QString s = obj->getShortDescription();
-	QRegularExpression pattern("[\\r]+");
-	s.remove(pattern);
-	//
 
 	string_to_file(fl, obj->getShortDescription());
 	string_to_file(fl, obj->description);
@@ -5128,7 +5139,6 @@ char *fread_string(ifstream &in, int hasher)
 	return retval;
 }
 
-/* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE *fl, int hasher)
 {
 	char buf[MAX_STRING_LENGTH] = {};
@@ -5202,6 +5212,39 @@ char *fread_string(FILE *fl, int hasher)
 	return (nullptr);
 }
 
+/* read and allocate space for a '~'-terminated string from a given file */
+char *fread_string(QTextStream &file, int hasher)
+{
+	QString line = {};
+	QString buffer = {};
+
+	while (file.readLineInto(&line))
+	{
+		if (line.endsWith('~'))
+		{
+			line.removeLast();
+			buffer += line;
+			break;
+		}
+		else
+		{
+			buffer += line + "\n";
+		}
+	}
+
+	char *c_str = nullptr;
+	if (hasher)
+	{
+		c_str = str_hsh(buffer.toStdString().c_str());
+	}
+	else
+	{
+		c_str = str_dup(buffer.toStdString().c_str());
+	}
+
+	return c_str;
+}
+
 /* read and allocate space for a whitespace-terminated string from a given file */
 char *fread_word(FILE *fl, int hasher)
 {
@@ -5269,6 +5312,14 @@ char *fread_word(FILE *fl, int hasher)
 	perror("fread_word: string too long");
 	abort();
 	return (nullptr);
+}
+
+template <typename T>
+T fread_bitvector(QTextStream &fl, T minval, T maxval)
+{
+	T i;
+	fl >> i;
+	return i;
 }
 
 // This is here to allow us to read a bitvector in as either a number
@@ -5612,6 +5663,63 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 	return (0);
 }
 
+template <typename T>
+T fread_int(QTextStream &fl, T beg_range, T end_range)
+{
+	QString buf;
+	T i;
+
+	if (fl.atEnd())
+	{
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_int: premature EOF");
+		abort();
+	}
+
+	fl.skipWhiteSpace();
+	if (fl.atEnd())
+	{
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_int: premature EOF");
+		abort();
+	}
+
+	fl >> i;
+
+	if (i < 0 && beg_range >= 0)
+	{
+		cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
+		cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
+		throw error_negative_int();
+	}
+
+	if (i >= beg_range && i <= end_range)
+	{
+		return i;
+	}
+	else
+	{
+		printf("Buffer: '%s'\n", buf);
+		printf("Reading %s: %s, %d\n", curr_type, curr_name,
+			   curr_virtno);
+		printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+			   beg_range, end_range, i);
+		perror("fread_int: Value range error");
+		if (i < beg_range)
+		{
+			throw error_range_under();
+		}
+		else if (i > end_range)
+		{
+			throw error_range_over();
+		}
+	}
+
+	perror("fread_int: something went wrong");
+	abort();
+	return 0;
+}
+
 char fread_char(FILE *fl)
 {
 	int ch;
@@ -5628,6 +5736,30 @@ char fread_char(FILE *fl)
 		if (ch != ' ' && ch != '\n') /* eat the white space */
 			break;
 	}
+
+	return ch;
+}
+
+char fread_char(QTextStream &fl)
+{
+	if (fl.atEnd())
+	{
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_char: premature EOF");
+		abort();
+	}
+
+	fl.skipWhiteSpace();
+	if (fl.atEnd())
+	{
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_char: premature EOF");
+		abort();
+	}
+
+	int ch;
+
+	fl >> ch;
 
 	return ch;
 }
@@ -6050,9 +6182,9 @@ room_t real_room(room_t virt)
 }
 
 /* returns the real number of the monster with given virt number */
-int real_mobile(int virt)
+vnum_t real_mobile(vnum_t virt)
 {
-	int bot, top, mid;
+	vnum_t bot = {}, top = {}, mid = {};
 
 	bot = 0;
 	top = top_of_mobt;
@@ -6076,9 +6208,9 @@ int real_mobile(int virt)
 }
 
 /* returns the real number of the object with given virt number */
-int real_object(int virt)
+vnum_t real_object(vnum_t virt)
 {
-	int bot, top, mid;
+	vnum_t bot, top, mid;
 
 	bot = 0;
 	top = top_of_objt;
@@ -6383,15 +6515,11 @@ void find_unordered_mobiles(void)
 
 void string_to_file(FILE *f, QString str)
 {
-	QRegularExpression pattern("[\\r]+");
-	str.remove(pattern);
 	fprintf(f, "%s~\n", str.toStdString().c_str());
 }
 
 void string_to_file(ofstream &f, QString str)
 {
-	str.remove(QRegularExpression("[\\r]+"));
-
 	f << str.toStdString() << "~" << endl;
 }
 
