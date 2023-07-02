@@ -20,12 +20,10 @@
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
 
-typedef uint64_t vnum_t;
-typedef QMap<QString, bool> joining_t;
-
-typedef QList<QString> hints_t;
-#include "character.h"
+#include "typedefs.h"
 #include "obj.h"
+#include "character.h"
+
 #include "character.h"
 #include "fileinfo.h"
 #include "connect.h"
@@ -37,26 +35,6 @@ typedef QList<QString> hints_t;
 #include "Shops.h"
 
 using namespace std;
-
-using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
-
-typedef set<Character *> character_list_t;
-typedef set<class Object *> obj_list_t;
-typedef set<int> client_descriptor_list_t;
-typedef set<int> server_descriptor_list_t;
-typedef vector<in_port_t> port_list_t;
-typedef set<Character *>::iterator character_list_i;
-typedef set<int>::iterator client_descriptor_list_i;
-typedef set<int>::iterator server_descriptor_list_i;
-typedef vector<in_port_t>::iterator port_list_i;
-typedef unordered_map<Character *, Trace> death_list_t;
-typedef unordered_map<Character *, Trace> free_list_t;
-typedef uint64_t zone_t;
-typedef uint64_t room_t;
-typedef uint64_t gold_t;
-typedef map<vnum_t, special_function> special_function_list_t;
-// class Zone;
-typedef QMap<zone_t, Zone> zones_t;
 
 class DC : public QCoreApplication
 {
@@ -139,13 +117,13 @@ public:
   void boot_world(void);
   void write_one_zone(FILE *fl, zone_t zone_key);
   zone_t read_one_zone(FILE *fl);
-  int read_one_room(FILE *fl, int &room_nr);
+  bool read_one_room(QTextStream &, room_t &room_nr);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
   void assign_mobiles(void);
-  bool authenticate(QString username, QString password, uint64_t level = 0);
-  bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
+  bool authenticate(QString username, QString password, level_t level = 0);
+  bool authenticate(const QHttpServerRequest &request, level_t level = 0);
   void sendAll(QString message);
 
 private:
