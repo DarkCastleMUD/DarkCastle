@@ -48,7 +48,7 @@ void test_handle_ansi(string test)
   // string str1 = "$b$B$1test$R $ $$ $$$ $$$";
   string str1 = test;
   char *str2 = new char[1024];
-  memset(str2, 1024, 0);
+  memset(str2, 0, 1024);
   strncpy(str2, str1.c_str(), 1024);
   string result1 = handle_ansi(str1, ch);
   string result2 = string(handle_ansi_(str2, ch));
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
   do_look(ch, "", CMD_LOOK);
   process_output(d);
 
-  if (argc > 1 && QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard")
+  if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {
     Object *obj = nullptr;
     string savepath = dclib + "../save/";
