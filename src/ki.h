@@ -10,7 +10,7 @@
 
 #include "structs.h" // uint8_t, uint8_t, etc..
 
-typedef int	KI_FUN		( uint8_t level, Character *ch, char *arg, Character *vict);
+typedef int KI_FUN(level_t level, Character *ch, char *arg, Character *vict);
 
 /************************************************************************
 | These are pretty worthless, since I never did anything with them
@@ -18,23 +18,23 @@ typedef int	KI_FUN		( uint8_t level, Character *ch, char *arg, Character *vict);
 |   at some point.  Morc XXX
 */
 /* The following defs refer to player ki and its effects */
-#define MAXIMUM_KI   100
-#define MINIMUM_KI   0
-#define MIN_REACT_KI   20
-#define NO_EFFECT   0
-#define DIVINE   1
-#define MIRACLE   2
-#define MAJOR_EFFECT   3
-#define MINOR_EFFECT   4
+#define MAXIMUM_KI 100
+#define MINIMUM_KI 0
+#define MIN_REACT_KI 20
+#define NO_EFFECT 0
+#define DIVINE 1
+#define MIRACLE 2
+#define MAJOR_EFFECT 3
+#define MINOR_EFFECT 4
 
 struct ki_info_type
 {
-	uint32_t beats;	/* Waiting time after ki */
+	uint32_t beats;			  /* Waiting time after ki */
 	uint8_t minimum_position; /* min position for use */
-	uint8_t min_useski;	/* minimum ki used */
-	int16_t targets;		/* Legal targets */
-	KI_FUN *ki_pointer;	/* function to call */
-        int difficulty;
+	uint8_t min_useski;		  /* minimum ki used */
+	int16_t targets;		  /* Legal targets */
+	KI_FUN *ki_pointer;		  /* function to call */
+	int difficulty;
 };
 
 /************************************************************************
@@ -44,7 +44,7 @@ struct ki_info_type
 int ki_gain(Character *ch);
 int ki_check(Character *ch);
 void reduce_ki(Character *ch, int type);
-char * skip_spaces(char *string);
+char *skip_spaces(char *string);
 
 KI_FUN ki_blast;
 KI_FUN ki_punch;
