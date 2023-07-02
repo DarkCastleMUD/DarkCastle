@@ -15,158 +15,188 @@
 using namespace std;
 using namespace XmlRpc;
 
-class common {
+class common
+{
 protected:
-  int authenticated(XmlRpcValue &params) {
-    std::string& login = params[0];
-    std::string& password = params[1];
+  int authenticated(XmlRpcValue &params)
+  {
+    std::string &login = params[0];
+    std::string &password = params[1];
     char buffer[MAX_STRING_LENGTH];
-    
+
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
-    Character * ch = get_all_pc(buffer);
+    Character *ch = get_all_pc(buffer);
 
     if (ch && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->player->pwd &&
-	!strncmp(crypt(password.c_str(), ch->player->pwd),
-		 ch->player->pwd, (PASSWORD_LEN))) {
+        !strncmp(crypt(password.c_str(), ch->player->pwd),
+                 ch->player->pwd, (PASSWORD_LEN)))
+    {
       return 1;
     }
-    
+
     return 0;
   }
 };
 
-class login : public XmlRpcServerMethod, public common {
+class login : public XmlRpcServerMethod, public common
+{
 public:
-  login(XmlRpcServer* s) : XmlRpcServerMethod("login", s) {}
+  login(XmlRpcServer *s) : XmlRpcServerMethod("login", s) {}
 
-  void execute(XmlRpcValue& params, XmlRpcValue& result)
+  void execute(XmlRpcValue &params, XmlRpcValue &result)
   {
-    if (!authenticated(params)) {
+    if (!authenticated(params))
+    {
       result = "unauthorized";
-    } else {
-      result = "authorized";      
+    }
+    else
+    {
+      result = "authorized";
     }
 
     return;
   }
 };
 
-class editor : public XmlRpcServerMethod, public common {
+class editor : public XmlRpcServerMethod, public common
+{
 public:
-  editor(XmlRpcServer* s) : XmlRpcServerMethod("editor", s) {}
+  editor(XmlRpcServer *s) : XmlRpcServerMethod("editor", s) {}
 
-  void execute(XmlRpcValue& params, XmlRpcValue& result)
+  void execute(XmlRpcValue &params, XmlRpcValue &result)
   {
-    if (!authenticated(params)) {
+    if (!authenticated(params))
+    {
       result = "unauthorized";
       return;
     }
 
-    std::string& login = params[0];
+    std::string &login = params[0];
     char buffer[MAX_STRING_LENGTH];
-    
+
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
     Character *ch = get_all_pc(buffer);
-    if (ch == 0) {
+    if (ch == 0)
+    {
       result = "player not found in game";
       return;
     }
 
-    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB)) {
+    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB))
+    {
       result = "plr_editor_dc";
       return;
     }
 
-    std::string& contents = params[2];
+    std::string &contents = params[2];
 
     // Remove \r characters from web input
     unsigned int index = 0;
-    while((index = contents.find('\r', index)) != string::npos) {
-	contents.erase(index, 1);
+    while ((index = contents.find('\r', index)) != string::npos)
+    {
+      contents.erase(index, 1);
     }
 
-    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew) {
-      switch(ch->desc->web_connected) {
+    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew)
+    {
+      switch (ch->desc->web_connected)
+      {
       case Connection::states::EDIT_MPROG:
-	if (!contents.empty()) {
-	  if (!(*ch->desc->strnew)) {
-	    if ((int)contents.size() > ch->desc->max_str) {
-	      SEND_TO_Q("String too long - Truncated.\r\n", ch->desc);
-	      contents[ch->desc->max_str] = '\0';
-	    }
-	    CREATE(*ch->desc->strnew, char, contents.size() + 5);
-	    strcpy(*ch->desc->strnew, contents.c_str());
-	  } else {
-	    if (!(*ch->desc->strnew = (char *) dc_realloc(*ch->desc->strnew,
-							  strlen(*ch->desc->strnew) + contents.size() + 5))) {
-	      perror("string_add");
-	      abort();
-	    }
-	    strcpy(*ch->desc->strnew, contents.c_str());
-	  }
-	  ch->desc->web_connected = Connection::states::PLAYING;
-	  result = *(ch->desc->strnew);
-	  ch->desc->strnew = 0;
-	  send_to_char("Entry submitted.\r\n", ch);
-	} else {
-	  string str_result = *(ch->desc->strnew);
+        if (!contents.empty())
+        {
+          if (!(*ch->desc->strnew))
+          {
+            if ((int)contents.size() > ch->desc->max_str)
+            {
+              SEND_TO_Q("String too long - Truncated.\r\n", ch->desc);
+              contents[ch->desc->max_str] = '\0';
+            }
+            CREATE(*ch->desc->strnew, char, contents.size() + 5);
+            strcpy(*ch->desc->strnew, contents.c_str());
+          }
+          else
+          {
+            if (!(*ch->desc->strnew = (char *)dc_realloc(*ch->desc->strnew,
+                                                         strlen(*ch->desc->strnew) + contents.size() + 5)))
+            {
+              perror("string_add");
+              abort();
+            }
+            strcpy(*ch->desc->strnew, contents.c_str());
+          }
+          ch->desc->web_connected = Connection::states::PLAYING;
+          result = *(ch->desc->strnew);
+          ch->desc->strnew = 0;
+          send_to_char("Entry submitted.\r\n", ch);
+        }
+        else
+        {
+          string str_result = *(ch->desc->strnew);
 
-	  // Remove \r characters before sending this to the web form
-	  index = 0;
-	  while((index = str_result.find('\r', index)) != string::npos) {
-	      str_result.erase(index, 1);
-	  }
-	  result = str_result.c_str();
-	}
-	break;
+          // Remove \r characters before sending this to the web form
+          index = 0;
+          while ((index = str_result.find('\r', index)) != string::npos)
+          {
+            str_result.erase(index, 1);
+          }
+          result = str_result.c_str();
+        }
+        break;
       default:
-	break;
+        break;
       }
-    } else {
+    }
+    else
+    {
       ch->desc->web_connected = Connection::states::PLAYING;
     }
   }
 };
 
-class get_editor_type : public XmlRpcServerMethod, public common {
+class get_editor_type : public XmlRpcServerMethod, public common
+{
 public:
-  get_editor_type(XmlRpcServer* s) : XmlRpcServerMethod("get_editor_type", s) {}
+  get_editor_type(XmlRpcServer *s) : XmlRpcServerMethod("get_editor_type", s) {}
 
-  void execute(XmlRpcValue& params, XmlRpcValue& result)
+  void execute(XmlRpcValue &params, XmlRpcValue &result)
   {
-    if (!authenticated(params)) {
+    if (!authenticated(params))
+    {
       result = "unauthorized";
       return;
     }
 
-    std::string& login = params[0];
+    std::string &login = params[0];
     char buffer[MAX_STRING_LENGTH];
-    
+
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
     Character *ch = get_all_pc(buffer);
-    if (ch == 0) {
+    if (ch == 0)
+    {
       result = "player not found in game";
       return;
     }
-    
-    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB)) {
+
+    if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_EDITOR_WEB))
+    {
       result = "plr_editor_dc";
       return;
     }
 
-    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) {
-      switch(ch->desc->web_connected) {
+    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+    {
+      switch (ch->desc->web_connected)
+      {
       case Connection::states::EDIT_MPROG:
-	result = "Obj or Mob program";
-	break;
+        result = "Obj or Mob program";
+        break;
       default:
-	result = "unknown";
-	break;
+        result = "unknown";
+        break;
       }
     }
   }
 };
-
 
 XmlRpcServer *xmlrpc_init(int xmlrpc_port)
 {
@@ -175,11 +205,11 @@ XmlRpcServer *xmlrpc_init(int xmlrpc_port)
   new editor(s);
   new get_editor_type(s);
 
-  while (!s->bindAndListen(xmlrpc_port)) {
+  while (!s->bindAndListen(xmlrpc_port))
+  {
     xmlrpc_port++;
     cout << "Trying port " << xmlrpc_port << endl;
   }
 
   return s;
 }
-
