@@ -5757,11 +5757,11 @@ char fread_char(QTextStream &fl)
 		abort();
 	}
 
-	int ch;
+	char c;
 
-	fl >> ch;
+	fl >> c;
 
-	return ch;
+	return c;
 }
 
 /* release memory allocated for a Character class */
