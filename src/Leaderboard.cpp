@@ -603,8 +603,7 @@ void Leaderboard::check(void)
 
 void Leaderboard::check_offline(void)
 {
-	Character *ch;
-	int i, j, k;
+	int i = {}, j = {}, k = {};
 	extern char *curr_type;
 	extern char *curr_name;
 	extern int curr_virtno;
