@@ -2016,9 +2016,10 @@ void Leaderboard::rename(char *oldname, char *newname)
 	FILE *fl;
 	// lines is the number of lines rewritten back to leaderboard file
 	// after a rename.. must sync up with # of outputs
-	int lines = 35 * (CLASS_MAX - 1);
-	int value[lines], i;
-	char *name[lines];
+	constexpr int lines = 35 * (CLASS_MAX - 1);
+	int value[lines] = {};
+	int i = {};
+	char *name[lines] = {};
 
 	if (DC::getInstance()->cf.bport)
 	{
