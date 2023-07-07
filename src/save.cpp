@@ -1308,11 +1308,9 @@ bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
 // write one object to file
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos)
 {
-  obj_file_elem object;
-  Object *standard_obj = 0;
-  uint16_t length = 0; // do not change this type
-
-  memset(&object, 0, sizeof(object));
+  obj_file_elem object = {};
+  Object *standard_obj = {};
+  uint16_t length = {}; // do not change this type
 
   if (GET_ITEM_TYPE(obj) == ITEM_NOTE)
     return true;
