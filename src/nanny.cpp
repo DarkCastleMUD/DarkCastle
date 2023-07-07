@@ -3176,7 +3176,7 @@ bool check_race_attributes(Character *ch, int race)
 }
 
 stat_data::stat_data(void)
-    : min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0), race(0), clss(0)
+    : min_str(0), min_int(0), min_wis(0), min_dex(0), min_con(0), points(0), selection(0), race(0), clss(0)
 {
    memset(str, 0, sizeof(str));
    memset(dex, 0, sizeof(dex));
