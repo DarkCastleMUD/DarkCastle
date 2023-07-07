@@ -6,7 +6,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_FLAGS "-O0 -ggdb -Wno-write-strings -fdiagnostics-color=always")
-set(CMAKE_CXX_FLAGS "-O0 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
+set(CMAKE_CXX_FLAGS "-O0 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always -std=gnu++23 -Wpedantic -Wcomma-subscript -Wctad-maybe-unsupported -Wctor-dtor-privacy -Wdangling-reference -Wdelete-non-virtual-dtor -Wdeprecated-copy -Winvalid-constexpr -Winvalid-imported-macros -Wclass-memaccess -Wregister -Wreorder"  )
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 
