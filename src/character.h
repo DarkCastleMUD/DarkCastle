@@ -337,6 +337,13 @@ class Mobile : public Entity
 public:
     explicit Mobile(void) {}
     explicit Mobile(const Mobile &mobile) { duplicate(mobile); }
+    explicit Mobile(const Mobile *const mobile)
+    {
+        if (mobile != nullptr)
+        {
+            duplicate(*mobile);
+        }
+    }
     void duplicate(const Mobile &mobile) {}
 
     int8_t default_pos = {};                     // Default position for NPC
