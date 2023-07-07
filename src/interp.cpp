@@ -718,8 +718,8 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
     return eFAILURE;
   }
 
-  int look_at;
-  int retval;
+  int look_at = {};
+  int retval = {};
   struct command_info *found = 0;
   QString buf;
 
@@ -1022,7 +1022,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
     return eSUCCESS;
   }
   // Check social table
-  if ((retval = check_social(ch, pcomm, look_at)))
+  if ((retval = check_social(ch, pcomm.c_str(), look_at)))
   {
     if (SOCIAL_true_WITH_NOISE == retval)
       return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
