@@ -40,7 +40,7 @@ struct pulse_info
 {
 	pulse_type pulse;
 	uint64_t duration;
-	char name[];
+	QString name;
 };
 
 #define BAN_NOT 0
