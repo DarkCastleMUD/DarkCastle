@@ -32,6 +32,11 @@ extern CWorld world;
 
 extern bool MOBtrigger;
 
+act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+{
+  return act(str.toStdString().c_str(), ch, obj, vict_obj, destination, flags);
+}
+
 act_return act(const string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
