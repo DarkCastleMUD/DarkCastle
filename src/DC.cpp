@@ -12,7 +12,7 @@
 #include "db.h"
 #include "version.h"
 
-string DC::version = VERSION;
+std::string DC::version = VERSION;
 
 DC::DC(int &argc, char **argv)
 	: QCoreApplication(argc, argv), ssh(this), shops_(this)
