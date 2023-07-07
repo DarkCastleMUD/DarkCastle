@@ -722,6 +722,6 @@ char *handle_ansi_(char *s, Character *ch);
 void blackjack_prompt(Character *ch, string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
 void special_log(char *arg);
-int check_social(Character *ch, string pcomm, int length);
+int check_social(Character *ch, QString pcomm, int length);
 
 #endif /* UTILITY_H_ */
