@@ -3422,9 +3422,7 @@ Character *clone_mobile(int nr)
 		mob->duplicate(*old);
 	}
 
-	mob->mobile = new Mobile;
-
-	memcpy(mob->mobile, old->mobile, sizeof(Mobile));
+	mob->mobile = new Mobile(old->mobile);
 
 	for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
 		mob->equipment[i] = 0;
