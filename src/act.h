@@ -21,6 +21,8 @@ struct act_return
   int retval;
 };
 
+act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+
 act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
