@@ -1639,7 +1639,7 @@ void CVoteData::DisplayResults(Character *ch)
     if (GET_LEVEL(ch) < IMMORTAL)
     {
       percent = (answer_it->votes * 100) / total_votes;
-      csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());
+      ch->send(QString("%1%%: %2\n\r").arg(percent, 3).arg(answer_it->answer.c_str()));
     }
     else
       csendf(ch, "%3d: %s\n\r", answer_it->votes, answer_it->answer.c_str());
