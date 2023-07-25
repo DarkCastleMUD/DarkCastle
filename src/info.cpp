@@ -1054,6 +1054,11 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
 
+   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) || IS_SET(obj->obj_flags.more_flags, ITEM_NPC_CORPSE) || IS_SET(obj->obj_flags.more_flags, ITEM_PC_CORPSE) || IS_SET(obj->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED))
+   {
+      csendf(ch, "$3Owner: $R%s\r\n", obj->getOwner().toStdString().c_str());
+   }
+
    sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
    csendf(ch, "$3Worn on: $R%s\r\n", buf);
 
