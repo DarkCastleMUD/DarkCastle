@@ -695,13 +695,14 @@ int max_res(int zone)
 
 int do_zedit(Character *ch, char *argument, int cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char text[MAX_INPUT_LENGTH];
-  int16_t skill;
-  int i = 0, j = 0;
-  int last_cmd;
-  int robj, rmob;
+  QString buf, text, arg;
+  int16_t skill = {};
+  uint64_t i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
+  unsigned int k = 0;
+  vnum_t robj = {}, rmob = {};
+  bool ok = false;
+  struct reset_com tmp = {}, temp_com = {};
+  char *str = {};
 
   const char *zedit_values[] = {
       "remove", "add", "edit", "list", "name",
@@ -709,9 +710,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
       "swap", "copy", "continent", "info",
       "\n"};
 
-  argument = one_argumentnolow(argument, select);
+  QStringList arguments = QString(argument).trimmed().split(' ');
+  qDebug() << argument << arguments << arguments.size();
 
-  if (!(*select))
+  if (arguments.isEmpty() || arguments.at(0).isEmpty())
   {
     send_to_char("$3Usage$R: zedit <field> <correct arguments>\r\n"
                  "You must be _in_ the zone you wish to edit.\r\n"
@@ -719,6 +721,19 @@ int do_zedit(Character *ch, char *argument, int cmd)
                  ch);
     display_string_list(zedit_values, ch);
     return eFAILURE;
+  }
+
+  QString select = arguments.at(0);
+  ok = false;
+  zone_t zone_key = select.toULongLong(&ok);
+  if (!ok)
+  {
+    zone_key = world[ch->in_room].zone;
+  }
+  else
+  {
+    arguments.pop_front();
+    select = arguments.at(0);
   }
 
   for (skill = 0;; skill++)
@@ -737,9 +752,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
     send_to_char("You are unable to modify a zone other than the one your room-range is in.\r\n", ch);
     return eFAILURE;
   }
-  int from, to;
+  uint64_t from = {}, to = {};
+
   // set the zone we're in
-  auto zone_key = world[ch->in_room].zone;
+
   if (DC::getInstance()->zones.contains(zone_key) == false)
   {
     ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
@@ -751,18 +767,17 @@ int do_zedit(Character *ch, char *argument, int cmd)
   // set the index of the S command in that zone
   // have to go from bottom instead of top-counting down since we could have more than
   // one 'S' at the end from deletes
-  for (i = 0;
-       zone.cmd[i].command != 'S' && i < (zone.reset_total - 1);
-       i++)
+  for (i = 0; zone.cmd[i].command != 'S' && i < (zone.reset_total - 1); i++)
+  {
     ;
+  }
   last_cmd = i;
 
   switch (skill)
   {
   case 0: /* remove */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!(*text))
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit remove <zonecmdnumber>\r\n"
                    "This will remove the command from the zonefile.\r\n",
@@ -770,11 +785,13 @@ int do_zedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    i = atoi(text);
+    text = arguments.at(1);
+    ok = false;
+
+    i = text.toInt(&ok);
     if (!i || i > last_cmd)
     {
-      sprintf(buf, "Invalid number '%s'.  <zonecmdnumber> must be between 1 and %d.\r\n",
-              text, last_cmd - 1);
+      buf = QString("Invalid number '%1'.  <zonecmdnumber> must be between 1 and %2.\r\n").arg(text).arg(last_cmd - 1);
       send_to_char(buf, ch);
       return eFAILURE;
     }
@@ -800,15 +817,13 @@ int do_zedit(Character *ch, char *argument, int cmd)
       zone.cmd[j] = zone.cmd[j + 1];
     }
 
-    sprintf(buf, "Command %d removed.  Table reformatted.\r\n", i);
+    buf = QString("Command %1 removed.  Table reformatted.\r\n").arg(i);
     send_to_char(buf, ch);
     break;
-  }
 
   case 1: /* add */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!(*text))
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit add <zonecmdnumber|new>\r\n"
                    "This will add a new command to the zonefile.\r\n"
@@ -819,13 +834,16 @@ int do_zedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if ((
-            !(i = atoi(text)) || i > last_cmd) &&
-        !isname(text, "new"))
+    text = arguments.at(1);
+    ok = false;
+    i = text.toULongLong(&ok);
+
+    if (!ok || i > last_cmd || !isname(text, "new"))
     {
-      sprintf(buf, "You must state either 'new' or the insertion point which must be between 0 and %d.\r\n"
-                   "'%s' is not valid.\r\n",
-              zone.reset_total, text);
+      buf = QString("You must state either 'new' or the insertion point which must be between 0 and %1.\r\n"
+                    "'%2' is not valid.\r\n")
+                .arg(zone.reset_total)
+                .arg(text);
       send_to_char(buf, ch);
       return eFAILURE;
     }
@@ -851,7 +869,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
       zone.cmd[i - 1].arg2 = 0;
       zone.cmd[i - 1].arg3 = 0;
       zone.cmd[i - 1].comment = nullptr;
-      sprintf(buf, "New command 'J' added at %d.\r\n", i);
+      buf = QString("New command 'J' added at %1.\r\n").arg(i);
     }
     else // tack it on the end
     {
@@ -865,39 +883,58 @@ int do_zedit(Character *ch, char *argument, int cmd)
       zone.cmd[last_cmd].arg2 = 0;
       zone.cmd[last_cmd].arg3 = 0;
       zone.cmd[last_cmd].comment = nullptr;
-      sprintf(buf, "New command 'J' added at %d.\r\n", last_cmd + 1);
+      buf = QString("New command 'J' added at %1.\r\n").arg(last_cmd + 1);
     }
     send_to_char(buf, ch);
     break;
-  }
+
   case 2: /* edit */
-  {
+
     do_zone_single_edit(ch, argument, zone_key);
     break;
-  }
+
   case 3: /* list */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!*text)
+
+    if (arguments.size() < 2)
     {
       show_zone_commands(ch, zone_key);
     }
     else
     {
-      if ((i = atoi(text)) < 1)
+      text = arguments.at(1);
+      ok = false;
+      i = text.toULongLong(&ok);
+      if (!ok)
       {
-        send_to_char("Use zedit list <number>.\r\n", ch);
+        send_to_char("Use zedit list <number> [# of commands to show].\r\n", ch);
         return eFAILURE;
       }
-      show_zone_commands(ch, zone_key, i - 1);
-    }
-    send_to_char("To see commands higher than 20, use zedit list <cmdnumber>.\r\n", ch);
 
-    return eSUCCESS; // so we don't set_zone_modified_zone
-  }
+      if (arguments.size() >= 3)
+      {
+        ok = false;
+        num_to_show = arguments.at(2).toULongLong(&ok);
+        if (ok && num_to_show > 0)
+
+        {
+          show_zone_commands(ch, zone_key, i - 1, num_to_show);
+        }
+
+        else
+        {
+          show_zone_commands(ch, zone_key, i - 1);
+        }
+      }
+      if (num_to_show != 1)
+      {
+        send_to_char("To see commands higher than 20, use zedit list <cmdnumber> [# of commands to show].\r\n", ch);
+      }
+
+      return eSUCCESS; // so we don't set_zone_modified_zone
+    }
   case 4: /* name */
-  {
-    if (!*argument)
+
+    if (arguments.size() < 3)
     {
       send_to_char("$3Usage$R: zedit name <newname>\r\n"
                    "This changes the name of the zone.\r\n",
@@ -906,16 +943,16 @@ int do_zedit(Character *ch, char *argument, int cmd)
     }
 
     dc_free(zone.name);
-    zone.name = str_dup(argument);
+    arguments.pop_front();
+    zone.name = str_dup(arguments.at(0).toStdString().c_str());
 
-    sprintf(buf, "Zone %d's name changed to '%s'.\r\n", zone, argument);
+    buf = QString("Zone %1's name changed to '%2'.\r\n").arg(zone.key).arg(arguments.at(0));
     send_to_char(buf, ch);
     break;
-  }
+
   case 5: /* lifetime */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!*text)
+
+    if (arguments.size() < 3)
     {
       send_to_char("$3Usage$R: zedit lifetime <tickamount>\r\n"
                    "The lifetime is the number of ticks the zone takes\r\n"
@@ -923,8 +960,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
                    ch);
       return eFAILURE;
     }
+    text = arguments.at(2);
+    ok = false;
+    ticks = text.toULongLong(&ok);
 
-    if (!(i = atoi(text)) || i > 32000)
+    if (!ok || ticks > 32000)
     {
       send_to_char("You much choose between 1 and 32000.\r\n", ch);
       return eFAILURE;
@@ -932,30 +972,33 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     zone.lifespan = i;
 
-    sprintf(buf, "Zone %d's lifetime changed to %d.\r\n", zone, i);
+    buf = QString("Zone %1's lifetime changed to %2.\r\n").arg(zone.key).arg(zone.lifespan);
     send_to_char(buf, ch);
     break;
-  }
+
   case 6: /* mode */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!*text)
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit mode <modetype>\r\n"
                    "You much choose the rule the zone follows when it\r\n"
                    "attempts to repop itself.  Available modes are:\r\n",
                    ch);
-      string buffer;
+      QString buffer;
       for (j = 0; *zone_modes[j] != '\n'; j++)
       {
-        buffer += fmt::format("{}  $C{}$R: {}\r\n", buf, j + 1, zone_modes[j]);
+        buffer += fmt::format("{}  $C{}$R: {}\r\n", buf.toStdString(), j + 1, zone_modes[j]).c_str();
       }
 
-      send_to_char(buffer.c_str(), ch);
+      send_to_char(buffer, ch);
       return eFAILURE;
     }
 
-    if (!(i = atoi(text)) || i > 3)
+    text = arguments.at(1);
+    ok = false;
+    k = text.toUInt(&ok);
+
+    if (!ok || i > 3)
     {
       send_to_char("You must choose between 1 and 3.\r\n", ch);
       return eFAILURE;
@@ -963,20 +1006,20 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     zone.reset_mode = i - 1;
 
-    sprintf(buf, "Zone %d's reset mode changed to %s(%d).\r\n", zone, zone_modes[i - 1], i);
+    buf = QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.key).arg(zone_modes[i - 1]).arg(i);
     send_to_char(buf, ch);
     break;
-  }
+
   case 7: /* flags */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!*text)
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>\r\n", ch);
       return eFAILURE;
     }
+    text = arguments.at(1);
 
-    if (!str_cmp(text, "noclaim"))
+    if (text == "noclaim")
     {
       zone.setNoClaim();
       if (zone.isNoClaim())
@@ -989,7 +1032,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
       }
     }
 
-    else if (!strcmp(text, "noteleport"))
+    else if (text == "noteleport")
     {
       zone.setNoTeleport();
       if (zone.isNoTeleport())
@@ -1001,7 +1044,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
         send_to_char("Noteleport turned off.\r\n", ch);
       }
     }
-    else if (!strcmp(text, "nohunt"))
+    else if (text == "nohunt")
     {
       zone.setNoHunt();
       if (zone.isNoHunt())
@@ -1015,7 +1058,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     }
     else
     {
-      sprintf(buf, "'%s' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n", text);
+      buf = QString("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text);
       send_to_char(buf, ch);
       return eFAILURE;
     }
@@ -1023,9 +1066,8 @@ int do_zedit(Character *ch, char *argument, int cmd)
     // sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone, zone.isNoTeleport() ? "true" : "false");
     // send_to_char(buf, ch);
     break;
-  }
   case 8: /* help */
-  {
+
     send_to_char("\r\n"
                  "Most commands will give you help on their own, just type them\r\n"
                  "without any arguments.\r\n\r\n"
@@ -1041,11 +1083,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
                  "\r\n",
                  ch);
     return eSUCCESS; // so we don't set modified
-  }
+    break;
   case 9: /* search */
-  {
-    argument = one_argumentnolow(argument, text);
-    if (!*text)
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit search <number>\r\n"
                    "This searches your current zonefile for any commands\r\n"
@@ -1056,7 +1097,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!check_valid_and_convert(j, text))
+    text = arguments.at(1);
+    ok = false;
+    j = text.toULongLong(&ok);
+
+    if (!ok)
     {
       send_to_char("Please specifiy a valid number.\r\n", ch);
       return eFAILURE;
@@ -1069,72 +1114,94 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     // If that obj/mob doesn't exist, put a junk value that should never (hopefully) match
     if (robj == -1)
+    {
       robj = -93294;
+    }
+    else
+    {
+      ch->send(QString("Searching for Object rnum %1 with vnum %2\r\n").arg(robj).arg(j));
+    }
     if (rmob == -1)
+    {
       rmob = -93294;
+    }
+    else
+    {
+      ch->send(QString("Searching for Mobile rnum %1 with vnum %2\r\n").arg(rmob).arg(j));
+    }
 
     for (auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
     {
-      if (!has_skill(ch, COMMAND_RANGE) && z_key != zone_key)
-        continue;
-
       for (i = 0; i < zone.reset_total; i++)
         switch (zone.cmd[i].command)
         {
         case 'M':
           if (rmob == zone.cmd[i].arg1)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
+          {
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            do_zedit(ch, str, 1);
+            free(str);
+          }
           break;
         case 'G': // G, E, and O have obj # in arg1
         case 'E':
         case 'O':
           if (robj == zone.cmd[i].arg1)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
+          {
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            do_zedit(ch, str, 1);
+            free(str);
+          }
           break;
         case 'P': // P has obj # in arg1 and arg3
           if (robj == zone.cmd[i].arg1 ||
               robj == zone.cmd[i].arg3)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
+          {
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            do_zedit(ch, str, 1);
+            free(str);
+          }
           break;
-        case 'J': // J could be any
-          if (robj == zone.cmd[i].arg1 ||
-              rmob == zone.cmd[i].arg1 ||
-              robj == zone.cmd[i].arg2 ||
-              rmob == zone.cmd[i].arg2 ||
-              robj == zone.cmd[i].arg3 ||
-              rmob == zone.cmd[i].arg3)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
         default:
           break;
         }
     }
     return eSUCCESS;
-  }
+    break;
 
   case 10: // swap
-  {
-    half_chop(argument, select, text);
-    if (!*text || !*select)
+
+    if (arguments.size() < 3)
     {
       send_to_char("$3Usage$R: zedit swap <cmd1> <cmd2>\r\n"
                    "This swaps the positions of two zone commands.\r\n",
                    ch);
       return eFAILURE;
     }
+    select = arguments.at(0);
+    text = arguments.at(1);
 
-    if (!check_range_valid_and_convert(i, select, 1, last_cmd))
+    ok = false;
+    i = select.toULongLong(&ok);
+    if (!ok)
     {
       send_to_char("Invalid command num for cmd1.\r\n", ch);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert(j, text, 1, last_cmd))
+
+    ok = false;
+    j = text.toULongLong(&ok);
+    if (!ok)
     {
       send_to_char("Invalid command num for cmd2.\r\n", ch);
       return eFAILURE;
     }
 
     // swap i and j
-    struct reset_com temp_com;
+    temp_com = {};
 
     temp_com = zone.cmd[i - 1];
     zone.cmd[i - 1] = zone.cmd[j - 1];
@@ -1142,27 +1209,32 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     csendf(ch, "Commands %d and %d swapped.\r\n", i, j);
     break;
-  }
+
   case 11: // copy
-  {
-    argument = one_argumentnolow(argument, text);
-    char arg[MAX_INPUT_LENGTH];
-    argument = one_argumentnolow(argument, arg);
-    if (!text[0] || !is_number(text))
+
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit copy <source line> <destination line>\r\nDestination line is optional. If no such line exists, it tacks it on at the end.", ch);
       return eFAILURE;
     }
-    from = atoi(text) - 1;
+    text = arguments.at(0);
+    arg = arguments.at(1);
+
+    ok = false;
+    from = text.toLongLong(&ok) - 1;
     to = 0;
-    if (arg[0])
-      to = atoi(arg);
+    if (!arg.isEmpty())
+    {
+      ok = false;
+      to = arg.toLongLong(&ok);
+    }
 
     if (from > last_cmd || from < 0)
     {
-      sprintf(buf, "Source line must be between 0 and %d.\r\n"
-                   "'%s' is not valid.\r\n",
-              zone.reset_total, text);
+      buf = QString("Source line must be between 0 and %1.\r\n"
+                    "'%2' is not valid.\r\n")
+                .arg(zone.reset_total)
+                .arg(text);
       send_to_char(buf, ch);
       return eFAILURE;
     }
@@ -1175,13 +1247,13 @@ int do_zedit(Character *ch, char *argument, int cmd)
       zone.reset_total += 10;
     }
 
-    struct reset_com tmp = zone.cmd[from];
+    tmp = zone.cmd[from];
     if (to)
     {
       // bump everything up a slot
       for (j = last_cmd; j != (to - 2); j--)
         zone.cmd[j + 1] = zone.cmd[j];
-      sprintf(buf, "Command copied to %d.\r\n", to);
+      buf = QString("Command copied to %1.\r\n").arg(to);
       to--;
     }
     else // tack it on the end
@@ -1189,7 +1261,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
       // bump the 'S' up
       zone.cmd[last_cmd + 1] = zone.cmd[last_cmd];
       to = last_cmd;
-      sprintf(buf, "Command copied.\r\n");
+      buf = "Command copied.\r\n";
     }
     zone.cmd[to].active = tmp.active;
     zone.cmd[to].command = tmp.command;
@@ -1200,12 +1272,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
     zone.cmd[to].comment = tmp.comment;
     send_to_char(buf, ch);
     break;
-  }
+
   case 12:
 
-    argument = one_argumentnolow(argument, text);
-    unsigned int cont;
-    if (!*text)
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
       for (cont = NO_CONTINENT; cont != continent_names.size(); cont++)
@@ -1215,8 +1285,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-
-    if (!(cont = atoi(text)) || cont > continent_names.size() - 1)
+    text = arguments.at(1);
+    ok = false;
+    cont = text.toLongLong(&ok);
+    if (!ok || !cont || cont > continent_names.size() - 1)
     {
       csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size() - 1);
       return eFAILURE;

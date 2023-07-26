@@ -746,10 +746,16 @@ int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment);
 
 		send_to_char(buf, ch);
-		csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
+		if (num_to_show != 1)
+		{
+			csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
+		}
 	} // for
 
-	send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);
+	if (num_to_show != 1)
+	{
+		send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);
+	}
 	return eSUCCESS;
 }
 
