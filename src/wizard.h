@@ -60,7 +60,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random = false);
 void do_mload(Character *ch, int rnum, int cnt);
 void colorCharSend(char *s, Character *ch);
 obj_list_t oload(Character *ch, int rnum, int cnt, bool random);
-int show_zone_commands(Character *ch, int i, int start = 0);
+int show_zone_commands(Character *ch, int i, int start = 0, int num_to_show = 0);
 
 /* Our own constants */
 const int MAX_MESSAGE_LENGTH = 4096;

@@ -483,11 +483,10 @@ int Zone::show_info(Character *ch)
 	return eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, int zone_key, int start)
+int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 {
 	char buf[MAX_STRING_LENGTH];
 	int k = 0;
-	int num_to_show;
 
 	if (start < 0)
 		start = 0;
@@ -516,10 +515,17 @@ int show_zone_commands(Character *ch, int zone_key, int start)
 		return eFAILURE;
 	}
 
-	if (IS_SET(ch->player->toggles, PLR_PAGER))
-		num_to_show = 50;
-	else
-		num_to_show = 20;
+	if (!num_to_show)
+	{
+		if (IS_SET(ch->player->toggles, PLR_PAGER))
+		{
+			num_to_show = 50;
+		}
+		else
+		{
+			num_to_show = 20;
+		}
+	}
 
 	// show zone cmds
 	for (int j = start; (j < start + num_to_show) && (zone.cmd[j].command != 'S'); j++)
@@ -740,7 +746,7 @@ int show_zone_commands(Character *ch, int zone_key, int start)
 			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment);
 
 		send_to_char(buf, ch);
-		csendf(ch, "[%3d] Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", j + 1, lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
+		csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
 	} // for
 
 	send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);
