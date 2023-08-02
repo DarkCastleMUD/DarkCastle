@@ -1511,7 +1511,7 @@ int do_show(Character *ch, char *argument, int cmd)
 						SET_BIT(extra, 1 << i);
 					goto endy;
 				}
-			for (i = 0; i < Object::more_obj_bits.size();; i++)
+			for (i = 0; i < Object::more_obj_bits.size(); i++)
 				if (!str_nosp_cmp(Object::more_obj_bits[i], arg1))
 				{
 					SET_BIT(more, 1 << i);
