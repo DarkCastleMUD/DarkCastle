@@ -1585,7 +1585,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		int o = 0, z;
 		if (!fo)
 		{
-			for (z = 0; i < Object::wear_bits.size(); z++)
+			for (z = 0; z < Object::wear_bits.size(); z++)
 			{
 				o++;
 				send_to_char_nosp(Object::wear_bits[z], ch);
