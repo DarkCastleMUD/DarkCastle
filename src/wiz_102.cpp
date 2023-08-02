@@ -2310,7 +2310,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                 Object::more_obj_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
-      for (i = 0; Object::more_obj_bits[i] != '\n'; i++)
+      for (i = 0; i < Object::more_obj_bits.size(); i++)
       {
         sprintf(buf, "  %s\n\r", Object::more_obj_bits[i]);
         send_to_char(buf, ch);

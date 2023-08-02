@@ -1511,7 +1511,7 @@ int do_show(Character *ch, char *argument, int cmd)
 						SET_BIT(extra, 1 << i);
 					goto endy;
 				}
-			for (i = 0; Object::more_obj_bits[i] != '\n'; i++)
+			for (i = 0; i < Object::more_obj_bits.size();; i++)
 				if (!str_nosp_cmp(Object::more_obj_bits[i], arg1))
 				{
 					SET_BIT(more, 1 << i);
@@ -1613,7 +1613,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					send_to_char(" ", ch);
 			}
 
-			for (z = 0; Object::more_obj_bits[z] != '\n'; z++)
+			for (z = 0; z < Object::more_obj_bits.size(); z++)
 			{
 				o++;
 				send_to_char_nosp(Object::more_obj_bits[z], ch);
