@@ -44,8 +44,6 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
 
-
-
 extern Character *initiate_oproc(Character *ch, Object *obj);
 
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -1324,7 +1322,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
   int j;
 
   class Object *get_object_in_equip_vis(Character * ch,
-                                           char *arg, class Object *equipment[], int *j, bool blindfighting);
+                                        char *arg, class Object *equipment[], int *j, bool blindfighting);
 
   if (!cmd && obj) // This is where we recharge
     if (obj->obj_flags.value[3])
@@ -2634,8 +2632,13 @@ int moving_portals(Character *ch, class Object *obj, int cmd,
           continue;
       class Object *o;
       for (o = world[real_room(room)].contents; o; o = o->next_content)
-        if (o->obj_flags.type_flag == ITEM_PORTAL)
+      {
+        if (o->isPortal())
+        {
           portal = true;
+        }
+      }
+
       if (!portal)
         break;
     } // Find a room

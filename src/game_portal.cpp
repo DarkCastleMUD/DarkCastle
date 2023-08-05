@@ -239,7 +239,8 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   from_portal->in_room = DC::NOWHERE;
 
   /* The room that it goes to */
-  from_portal->obj_flags.value[0] = to_room;
+  from_portal->setPortalDestinationRoom(to_room);
+
   /* Make it game_portal flagged for do_enter and limits.C */
   from_portal->obj_flags.value[1] = 2;
   /* Make it non-zone wide for do_leave */

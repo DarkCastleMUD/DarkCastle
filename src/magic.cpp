@@ -6602,15 +6602,15 @@ void make_portal(Character *ch, Character *vict)
         good_destination = true;
       }
     }
-    ch_portal->obj_flags.value[0] = world[destination].number;
+    ch_portal->setPortalDestinationRoom(destination);
   }
   else
   {
     destination = vict->in_room;
-    ch_portal->obj_flags.value[0] = world[destination].number;
+    ch_portal->setPortalDestinationRoom(destination);
   }
 
-  vict_portal->obj_flags.value[0] = world[ch->in_room].number;
+  vict_portal->setPortalDestinationRoom(ch->in_room);
 
   ch_portal->next = vict_portal;
   vict_portal->next = object_list;
@@ -6688,22 +6688,27 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
 
   for (portal = world[ch->in_room].contents; portal;
        portal = portal->next_content)
-    if (portal->obj_flags.type_flag == ITEM_PORTAL)
+    if (portal->isPortal())
       break;
 
   if (!portal)
     for (portal = world[victim->in_room].contents; portal;
          portal = portal->next_content)
-      if (portal->obj_flags.type_flag == ITEM_PORTAL)
+      if (portal->isPortal())
         break;
 
   Character *tmpch;
 
+  bool found_hunt_or_quest_item = false;
   for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+  {
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
-      portal = (Object *)1; // Makes the below produce an error. And yeah, I'm lazy. Go away.
+    {
+      found_hunt_or_quest_item = true;
+    }
+  }
 
-  if (portal || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
+  if (found_hunt_or_quest_item || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
   {
     send_to_char("A portal shimmers into view, then fades away again.\r\n", ch);
     act("A portal shimmers into view, then fades away again.",

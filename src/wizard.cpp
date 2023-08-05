@@ -1233,22 +1233,22 @@ void obj_stat(Character *ch, class Object *j)
   case ITEM_PORTAL:
     sprintf(buf, "$3ToRoom (v1)$R : %d\r\n"
                  "$3Type   (v2)$R : ",
-            j->obj_flags.value[0]);
-    switch (j->obj_flags.value[1])
+            j->getPortalDestinationRoom());
+    switch (j->getPortalType())
     {
-    case 0:
+    case Object::portal_types_t::Player:
       strcat(buf, "0-Player-Portal");
       break;
-    case 1:
+    case Object::portal_types_t::Permanent:
       strcat(buf, "1-Permanent-Game-Portal");
       break;
-    case 2:
+    case Object::portal_types_t::Temp:
       strcat(buf, "2-Temp-Game-portal");
       break;
-    case 3:
+    case Object::portal_types_t::LookOnly:
       strcat(buf, "3-Look-only-portal");
       break;
-    case 4:
+    case Object::portal_types_t::PermanentNoLook:
       strcat(buf, "4-Perm-No-Look-portal");
       break;
     default:

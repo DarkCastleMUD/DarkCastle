@@ -107,28 +107,20 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (portal->obj_flags.type_flag == ITEM_PORTAL && !IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER) && (portal->obj_flags.value[1] == 1 || portal->obj_flags.value[1] == 2))
+      if (portal->isPortal() && !portal->hasPortalFlagNoEnter() && (portal->isPortalTypePermanent() || portal->isPortalTypeTemp()))
       {
-        if (real_room(portal->obj_flags.value[0]) < 0)
+        if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
         {
-          sprintf(buf, "Room %5d - enter to Room %5d (ERROR)\r\n",
-                  i, real_room(portal->obj_flags.value[0]));
+          sprintf(buf, "Room %5d - enter to Room %5d (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
 
           output += buf;
         }
-        else if (!world_array[real_room(portal->obj_flags.value[0])])
-        {
-          sprintf(buf, "Room %5d - enter to Room %5d (DOES NOT EXIST)\r\n",
-                  i, real_room(portal->obj_flags.value[0]));
-
-          output += buf;
-        }
-        else if (world[real_room(portal->obj_flags.value[0])].zone != curZone)
+        else if (world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
           sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
-                  i, real_room(portal->obj_flags.value[0]),
-                  world[real_room(portal->obj_flags.value[0])].zone,
-                  DC::getInstance()->zones.value(world[real_room(portal->obj_flags.value[0])].zone).name);
+                  i, real_room(portal->getPortalDestinationRoom()),
+                  world[real_room(portal->getPortalDestinationRoom())].zone,
+                  DC::getInstance()->zones.value(world[real_room(portal->getPortalDestinationRoom())].zone).name);
 
           output += buf;
         }
@@ -137,7 +129,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
     for (portal = object_list; portal; portal = portal->next)
     {
-      if ((portal->obj_flags.type_flag == ITEM_PORTAL) && (portal->obj_flags.value[1] == 1 || (portal->obj_flags.value[1] == 2)) && (portal->in_room > -1) && !IS_SET(portal->obj_flags.value[3], PORTAL_NO_LEAVE))
+      if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != DC::NOWHERE) && !portal->hasPortalFlagNoLeave())
       {
         if ((portal->obj_flags.value[0] == world[i].number) || (portal->obj_flags.value[2] == world[i].zone))
         {

@@ -34,7 +34,6 @@
 #include "weather.h"
 #include "memory.h"
 #include "player.h"
-#include "obj.h"
 #include "character.h"
 #include "Trace.h"
 

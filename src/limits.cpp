@@ -884,7 +884,7 @@ void update_corpses_and_portals(void)
 		 |  Type 4 is a no look permanent game portal
 		 */
 
-		if ((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0 || j->obj_flags.value[1] == 2))
+		if ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp()))
 		{
 			if (j->obj_flags.timer > 0)
 				(j->obj_flags.timer)--;

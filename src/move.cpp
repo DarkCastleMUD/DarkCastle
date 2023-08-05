@@ -127,7 +127,7 @@ void record_track_data(Character *ch, int cmd)
 	newScent->race = (int)ch->race;
 	newScent->sex = (int)ch->sex;
 	newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
-	newScent->next = nullptr;	   // just in case
+	newScent->next = nullptr;	  // just in case
 	newScent->previous = nullptr; // just in case
 
 	if (IS_NPC(ch))
@@ -1037,13 +1037,13 @@ int do_leave(Character *ch, char *arguement, int cmd)
 
 	for (k = object_list; k; k = k->next)
 	{
-		if (k->obj_flags.type_flag == ITEM_PORTAL)
+		if (k->isPortal())
 		{
-			if (k->obj_flags.value[1] == 1 || k->obj_flags.value[1] == 2)
+			if (k->getPortalType() == Object::portal_types_t::Permanent || k->getPortalType() == Object::portal_types_t::Temp)
 			{
-				if (k->in_room > 0 && !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE))
+				if (k->in_room != DC::NOWHERE && !k->hasPortalFlagNoLeave())
 				{
-					if (k->obj_flags.value[0] == world[ch->in_room].number || k->obj_flags.value[2] == world[ch->in_room].zone)
+					if (k->getPortalDestinationRoom() == world[ch->in_room].number || k->obj_flags.value[2] == world[ch->in_room].zone)
 					{
 						send_to_char("You exit the area.\r\n", ch);
 						act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -1094,13 +1094,13 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (portal->obj_flags.type_flag != ITEM_PORTAL)
+	if (!portal->isPortal())
 	{
 		send_to_char("You can't enter that.\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (real_room(portal->obj_flags.value[0]) < 0)
+	if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
 	{
 		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
 		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
@@ -1108,13 +1108,13 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+	if (world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
 		send_to_char("You bravely attempt to plunge through the portal - let's hope you have gills!\r\n", ch);
 		return eSUCCESS;
 	}
 
-	if (GET_LEVEL(ch) > IMMORTAL && GET_LEVEL(ch) < DEITY && IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+	if (GET_LEVEL(ch) > IMMORTAL && GET_LEVEL(ch) < DEITY && IS_SET(world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
 	{
 		send_to_char("You may not enter a clanhall at your level.\r\n", ch);
 		return eFAILURE;
@@ -1141,7 +1141,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	}
 
 	// should probably just combine this with 'if' below it, but i'm lazy
-	if (IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER))
+	if (IS_SET(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
 	{
 		send_to_char("The portal's destination rebels against you.\r\n", ch);
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
@@ -1149,7 +1149,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	}
 
 	// Thieves arent allowed through cleric portals
-	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->obj_flags.value[1] == 0)
+	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->isPortalTypePlayer())
 	{
 		send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n", ch);
 		return eFAILURE;

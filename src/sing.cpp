@@ -1991,7 +1991,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	}
 
 	// make sure the obj is a player portal
-	if (obj->obj_flags.type_flag != ITEM_PORTAL)
+	if (!obj->isPortal())
 	{
 		send_to_char("You can't shatter that!\r\n", ch);
 		return eFAILURE;

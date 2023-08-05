@@ -1685,7 +1685,7 @@ int do_look(Character *ch, char *argument, int cmd)
          for (tmp_object = object_list; tmp_object;
               tmp_object = tmp_object->next)
          {
-            if (((tmp_object->obj_flags.type_flag == ITEM_PORTAL) && (tmp_object->obj_flags.value[2] == world[ch->in_room].zone) && (tmp_object->in_room) && (tmp_object->obj_flags.value[1] == 1)) || ((tmp_object->obj_flags.type_flag == ITEM_PORTAL) && (tmp_object->obj_flags.value[0] == world[ch->in_room].number) && (tmp_object->in_room > -1) && (tmp_object->obj_flags.value[1] == 1)))
+            if (tmp_object->isPortal() && tmp_object->getPortalDestinationRoom() == ch->in_room && tmp_object->in_room != DC::NOWHERE && tmp_object->isPortalTypePermanent())
             {
                ch->in_room = tmp_object->in_room;
                found = true;
@@ -1707,9 +1707,9 @@ int do_look(Character *ch, char *argument, int cmd)
                if ((tmp_object = get_obj_in_list_vis(ch, arg2,
                                                      world[ch->in_room].contents)))
                {
-                  if (tmp_object->obj_flags.type_flag == ITEM_PORTAL)
+                  if (tmp_object->isPortal())
                   {
-                     if (tmp_object->obj_flags.value[1] == 0 || tmp_object->obj_flags.value[1] == 4)
+                     if (tmp_object->isPortalTypePlayer() || tmp_object->isPortalTypePermanentNoLook())
                      {
                         sprintf(tmpbuf,
                                 "You look through %s but it seems to be opaque.\r\n",
@@ -1717,8 +1717,7 @@ int do_look(Character *ch, char *argument, int cmd)
                         send_to_char(tmpbuf, ch);
                         return eFAILURE;
                      }
-                     if (-1 == (ch->in_room = real_room(
-                                    tmp_object->obj_flags.value[0])))
+                     if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == DC::NOWHERE)
                         ch->in_room = original_loc;
                      else
                         found = true;

@@ -21,6 +21,8 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 
+#define IS_SET(flag, bit) ((flag) & (bit))
+
 using namespace std;
 
 /* The following defs are for Object  */
@@ -242,6 +244,21 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
+    enum class portal_types_t
+    {
+        Player = 0,
+        Permanent = 1,
+        Temp = 2,
+        LookOnly = 3,
+        PermanentNoLook = 4
+    };
+
+    enum portal_flags_t
+    {
+        No_Leave = 1 << 0,
+        No_Enter = 1 << 1
+    };
+
     int32_t item_number = {};     /* Where in data-base               */
     room_t in_room = {};          /* In what room -1 when conta/carr  */
     int vroom = {};               /* for corpse saving */
@@ -270,6 +287,81 @@ public:
     time_t no_sell_expiration = {};
 
     bool isDark(void);
+    bool isPortal(void)
+    {
+        return obj_flags.type_flag == ITEM_PORTAL;
+    }
+    room_t getPortalDestinationRoom(void)
+    {
+        if (!isPortal())
+        {
+            return 0;
+        }
+        return obj_flags.value[0];
+    }
+    void setPortalDestinationRoom(room_t room)
+    {
+        if (!isPortal())
+        {
+            return;
+        }
+        obj_flags.value[0] = room;
+    }
+
+    portal_types_t getPortalType(void)
+    {
+        if (!isPortal())
+        {
+            return portal_types_t::Player;
+        }
+        return static_cast<portal_types_t>(obj_flags.value[1]);
+    }
+    bool isPortalTypePlayer(void)
+    {
+        return getPortalType() == portal_types_t::Player;
+    }
+    bool isPortalTypePermanent(void)
+    {
+        return getPortalType() == portal_types_t::Permanent;
+    }
+    bool isPortalTypeTemp(void)
+    {
+        return getPortalType() == portal_types_t::Temp;
+    }
+    bool isPortalTypeLookOnly(void)
+    {
+        return getPortalType() == portal_types_t::LookOnly;
+    }
+    bool isPortalTypePermanentNoLook(void)
+    {
+        return getPortalType() == portal_types_t::PermanentNoLook;
+    }
+
+    int32_t getPortalLeaveZone(void)
+    {
+        if (!isPortal())
+        {
+            return -1;
+        }
+        return obj_flags.value[2];
+    }
+    int32_t getPortalFlags(void)
+    {
+        if (!isPortal())
+        {
+            return 0;
+        }
+        return obj_flags.value[3];
+    }
+    bool hasPortalFlagNoLeave(void)
+    {
+        return IS_SET(getPortalFlags(), Object::portal_flags_t::No_Leave);
+    }
+    bool hasPortalFlagNoEnter(void)
+    {
+        return IS_SET(getPortalFlags(), Object::portal_flags_t::No_Enter);
+    }
+
     uint64_t getLevel(void);
 
     int keywordfind(void);
