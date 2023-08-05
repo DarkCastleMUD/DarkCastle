@@ -3318,8 +3318,10 @@ int obj_to_room(class Object *object, int room)
 		return 0;
 	}
 
-	if (object->obj_flags.type_flag == ITEM_PORTAL)
+	if (object->isPortal())
+	{
 		world[room].light++;
+	}
 
 	// combine any cash amounts
 	if (GET_ITEM_TYPE(object) == ITEM_MONEY)
@@ -3398,8 +3400,10 @@ int obj_from_room(class Object *object)
 		return 0;
 	}
 
-	if (object->obj_flags.type_flag == ITEM_PORTAL)
+	if (object->isPortal())
+	{
 		world[object->in_room].light--;
+	}
 
 	// head of list
 	if (object == world[object->in_room].contents)
