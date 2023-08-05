@@ -224,7 +224,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   {
     from_portal = clone_object(real_object(duplicate));
 
-    if (from_portal->obj_flags.type_flag != ITEM_PORTAL)
+    if (!from_portal->isPortal())
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       dc_free(from_portal);
@@ -272,13 +272,15 @@ void find_and_remove_player_portal(Character *ch)
   for (k = object_list; k; k = next_k)
   {
     next_k = k->next;
-    if (GET_ITEM_TYPE(k) != ITEM_PORTAL ||
-        !strstr(k->name, searchstr))
+    if (!k->isPortal() || !strstr(k->name, searchstr))
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if (k->in_room < top_of_world && k->in_room > -1 && world_array[k->in_room])
+    if (k->in_room < top_of_world && k->in_room > DC::NOWHERE && world_array[k->in_room])
+    {
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
+    }
+
     obj_from_room(k);
     extract_obj(k);
   }
