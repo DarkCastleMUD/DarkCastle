@@ -3602,6 +3602,28 @@ private:
    bool show_range_ = false;
 };
 
+class Result
+{
+   Search::locations location_ = {};
+   Object *object_ = {};
+   QString name_;
+
+public:
+   Result(Search::locations location, Object *object)
+       : location_(location), object_(object)
+   {
+   }
+
+   Result(Search::locations location, Object *object, QString name)
+       : location_(location), object_(object), name_(name)
+   {
+   }
+
+   Search::locations getLocation() { return location_; }
+   Object *getObject() { return object_; }
+   QString getName() { return name_; }
+};
+
 bool Search::operator==(const Object *obj)
 {
    if (obj == nullptr)
@@ -4125,7 +4147,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    bool header_shown = false;
    size_t objects_found = 0;
 
-   QList<QPair<Search::locations, Object *>> obj_results;
+   QList<Result> obj_results;
    uint64_t limit_output = 0;
 
    if (search_world)
@@ -4159,7 +4181,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("Searching your inventory.......%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      send(QString("%1 matches found in inventory.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
       // Search equipment
@@ -4191,7 +4213,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("Searching your equipment.......%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      send(QString("%1 matches found among worn equipment.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
       // search room
@@ -4220,57 +4242,69 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("Searching this room............%1 matches found.\r\n").arg(obj_results.size() - old_count));
+      send(QString("%1 matches found in room.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
-      auto vault = has_vault(name);
-      // search vault if able
-      if (vault)
+      // Search all vaults player has access to
+      uint64_t vaults_searched = 0;
+      for (auto vault = vault_table; vault; vault = vault->next)
       {
-         struct vault_items_data *items;
-         struct sorted_vault sv;
-         sort_vault(*vault, sv);
-         if (!sv.vault_contents.empty())
+         if (vault && vault->owner && has_vault_access(GET_NAME(this), vault))
          {
-            for (auto &o_short_description : sv.vault_contents)
+            vaults_searched++;
+            struct vault_items_data *items;
+            struct sorted_vault sv;
+            sort_vault(*vault, sv);
+            if (!sv.vault_contents.empty())
             {
-               auto &o = sv.vault_content_qty[o_short_description];
-               auto &obj = o.first;
-               auto &count = o.second;
-
-               bool matches = false;
-
-               for (auto i = 0; i < sl.size(); ++i)
+               for (auto &o_short_description : sv.vault_contents)
                {
-                  if (sl[i].getType() == Search::types::LIMIT)
+                  auto &o = sv.vault_content_qty[o_short_description];
+                  auto &obj = o.first;
+                  auto &count = o.second;
+
+                  bool matches = false;
+
+                  for (auto i = 0; i < sl.size(); ++i)
                   {
-                     limit_output = sl[i].getLimitOutput();
-                     continue;
+                     if (sl[i].getType() == Search::types::LIMIT)
+                     {
+                        limit_output = sl[i].getLimitOutput();
+                        continue;
+                     }
+
+                     if (sl[i] == obj)
+                     {
+                        matches = true;
+                     }
+                     else
+                     {
+                        matches = false;
+                        break;
+                     }
                   }
 
-                  if (sl[i] == obj)
+                  if (matches)
                   {
-                     matches = true;
-                  }
-                  else
-                  {
-                     matches = false;
-                     break;
-                  }
-               }
-
-               if (matches)
-               {
-                  for (auto counter = 0; counter < count; counter++)
-                  {
-                     obj_results.push_back({Search::locations::in_vault, obj});
+                     for (auto counter = 0; counter < count; counter++)
+                     {
+                        obj_results.push_back({Search::locations::in_vault, obj, vault->owner});
+                     }
                   }
                }
             }
          }
-         send(QString("Searching your vault........   %1 matches found.\r\n").arg(obj_results.size() - old_count));
-         old_count = obj_results.size();
       }
+
+      if (vaults_searched == 1)
+      {
+         send(QString("%1 matches found within 1 vault.\r\n").arg(obj_results.size() - old_count));
+      }
+      else
+      {
+         send(QString("%1 matches found within %2 vaults.\r\n").arg(obj_results.size() - old_count).arg(vaults_searched));
+      }
+      old_count = obj_results.size();
 
       if (clan)
       {
@@ -4317,13 +4351,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                   {
                      for (auto counter = 0; counter < count; counter++)
                      {
-                        obj_results.push_back({Search::locations::in_clan_vault, obj});
+                        obj_results.push_back({Search::locations::in_clan_vault, obj, vault_name});
                      }
                   }
                }
             }
-            send(QString("Searching your clan vault......%1 matches found.\r\n").arg(obj_results.size() - old_count));
-            old_count = obj_results.size();
          }
       }
 
@@ -4338,7 +4370,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                uint64_t min_level = 100, max_level = 0;
                for (auto &result : obj_results)
                {
-                  auto obj = result.second;
+                  auto obj = result.getObject();
                   if (obj->getLevel() > max_level)
                   {
                      max_level = obj->getLevel();
@@ -4425,7 +4457,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                uint64_t min_level = 100, max_level = 0;
                for (auto &result : obj_results)
                {
-                  auto obj = result.second;
+                  auto obj = result.getObject();
                   if (obj->getLevel() > max_level)
                   {
                      max_level = obj->getLevel();
@@ -4467,7 +4499,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    uint64_t result_nr = {};
    for (auto &result : obj_results)
    {
-      auto obj = result.second;
+      auto obj = result.getObject();
       if (limit_output > 0 && ++result_nr > limit_output)
       {
          break;
@@ -4492,7 +4524,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
    if (search_world)
    {
-      header += QString(" [%1]").arg("Location", 9);
+      header += QString(" [%1]").arg("Location", 19);
    }
 
    if (true || count_if(sl.begin(), sl.end(), [](Search search_item)
@@ -4523,7 +4555,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    result_nr = 0;
    for (auto &result : obj_results)
    {
-      auto obj = result.second;
+      auto obj = result.getObject();
       if (limit_output > 0 && ++result_nr > limit_output)
       {
          break;
@@ -4538,22 +4570,20 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       if (search_world)
       {
-         switch (result.first)
+         switch (result.getLocation())
          {
          case Search::locations::in_inventory:
-            custom_columns += QString(" [%1]").arg("inventory", 9);
+            custom_columns += QString(" [%1]").arg("inventory", 19);
             break;
          case Search::locations::in_equipment:
-            custom_columns += QString(" [%1]").arg("equipped", 9);
+            custom_columns += QString(" [%1]").arg("equipped", 19);
             break;
          case Search::locations::in_room:
-            custom_columns += QString(" [%1]").arg("in room", 9);
+            custom_columns += QString(" [%1]").arg("in room", 19);
             break;
          case Search::locations::in_vault:
-            custom_columns += QString(" [%1]").arg("in vault", 9);
-            break;
          case Search::locations::in_clan_vault:
-            custom_columns += QString(" [%1]").arg("in cvault", 9);
+            custom_columns += QString(" [%1 vault]").arg(result.getName(), 13);
             break;
          }
       }
