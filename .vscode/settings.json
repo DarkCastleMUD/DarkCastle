@@ -70,5 +70,6 @@
         "qsharedpointer": "cpp",
         "qtconcurrent": "cpp",
         "qhttpserverrequest": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
