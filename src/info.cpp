@@ -1758,8 +1758,7 @@ int do_look(Character *ch, char *argument, int cmd)
                        sector_buf);
             sprintbit((int32_t)world[ch->in_room].room_flags, room_bits,
                       rflag_buf);
-            csendf(ch, " Light[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room),
-                   sector_buf, rflag_buf);
+            csendf(ch, "\r\nLight[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
             if (world[ch->in_room].temp_room_flags)
             {
                sprintbit((int32_t)world[ch->in_room].temp_room_flags, temp_room_bits,
