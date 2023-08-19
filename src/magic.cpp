@@ -3123,7 +3123,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       }
       else if (i->equipped_by != nullptr)
       {
-        sprintf(buf, "%s is in use in an unknown location.\r\n",
+        sprintf(buf, "%s is equipped by someone.\r\n",
                 i->short_description);
       }
 
