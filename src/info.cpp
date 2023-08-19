@@ -2625,7 +2625,7 @@ int do_olocate(Character *ch, char *name, int cmd)
 
       if (k->in_obj)
       {
-         if (k->in_obj->in_room > -1)
+         if (k->in_obj->in_room > DC::NOWHERE)
             in_room = world[k->in_obj->in_room].number;
          else if (k->in_obj->carried_by)
          {
@@ -2652,7 +2652,7 @@ int do_olocate(Character *ch, char *name, int cmd)
             continue;
          in_room = world[k->equipped_by->in_room].number;
       }
-      else if (k->in_room > -1)
+      else if (k->in_room > 0)
          in_room = world[k->in_room].number;
       else
          in_room = 0;

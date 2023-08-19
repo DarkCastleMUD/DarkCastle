@@ -2550,7 +2550,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 	if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
 		ch->glow_factor++;
-		if (ch->in_room > -1)
+		if (ch->in_room > DC::NOWHERE)
 			world[ch->in_room].light++;
 		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
@@ -2562,7 +2562,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
 		ch->glow_factor++;
-		if (ch->in_room > -1)
+		if (ch->in_room > DC::NOWHERE)
 			world[ch->in_room].light++;
 	}
 
@@ -2654,7 +2654,7 @@ b: // ew
 	if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
 		ch->glow_factor--;
-		if (ch->in_room > -1)
+		if (ch->in_room > DC::NOWHERE)
 			world[ch->in_room].light--;
 		// this is just annoying cause it tells you every time you save
 		// TODO - make it not be annoying
@@ -2664,7 +2664,7 @@ b: // ew
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
 		ch->glow_factor--;
-		if (ch->in_room > -1)
+		if (ch->in_room > DC::NOWHERE)
 			world[ch->in_room].light--;
 	}
 
@@ -3644,7 +3644,7 @@ void update_char_objects(Character *ch)
 				{
 					send_to_char("Your light flickers out and dies.\r\n", ch);
 					ch->glow_factor--;
-					if (ch->in_room > -1)
+					if (ch->in_room > DC::NOWHERE)
 						world[ch->in_room].light--;
 				}
 			}

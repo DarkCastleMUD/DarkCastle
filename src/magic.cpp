@@ -4621,7 +4621,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
   if (obj)
   {
-    if (obj->in_room > -1)
+    if (obj->in_room > DC::NOWHERE)
     {
       // it's an obj in a room.  If it's not a corpse, don't id it
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1)
