@@ -3094,15 +3094,6 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       continue;
     }
 
-    if (room == DC::NOWHERE)
-    {
-      if (isname(tmp, i->name))
-      {
-        skipped_nowhere++;
-      }
-      continue;
-    }
-
     buf[0] = 0;
     if (isname(tmp, i->name))
     {
@@ -3125,6 +3116,11 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       {
         sprintf(buf, "%s is equipped by someone.\r\n",
                 i->short_description);
+      }
+      else
+      {
+        skipped_nowhere++;
+        continue;
       }
 
       if (buf[0] != 0)
