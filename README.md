@@ -30,8 +30,16 @@ Install dependencies for compilation.
 openSUSE Tumbleweed
 ```
 sudo zypper ref
-sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel
+sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel qt6-httpserver-devel libssh-devel
 ```
+
+openSUSE Leap 15.5
+```
+sudo zypper ref
+sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel qt6-httpserver-devel libstdc++6-devel-gcc12 gcc12-c++ libssh-devel
+```
+
+
 
 Ubuntu 22.04
 ```
@@ -43,18 +51,21 @@ sudo apt install unzip zlib1g-dev
 sudo apt install libfmt-dev cmake qt6-base-dev
 ```
 
-Now build the DarkCastle project. Change -j # option below to match the number of threads your CPU(s) can run in parallel.
+Now build the DarkCastle project. Change -j64 option below to match the number of threads your CPU(s) can run in parallel.
 
 ```
 git clone https://github.com/DarkCastleMUD/DarkCastle.git
 cd DarkCastle
-cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+# The c++ compiler should be g++-12 or newer
+cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=g++-12
 or 
-cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug
+cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++-12
+
+
 make -C build clean
-make -C build -j
+make -C build -j64
 or
-make -C build -j VERBOSE=1
+make -C build -j64 VERBOSE=1
 ```
 
 Run DarkCastle server
