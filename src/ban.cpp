@@ -70,22 +70,23 @@ void free_ban_list_from_memory()
   }
 }
 
-int isbanned(char *hostname)
+int isbanned(QString hostname)
 {
-  int i;
-  struct ban_list_element *banned_node;
-  char *nextchar;
+  if (hostname.isEmpty())
+  {
+    return 0;
+  }
 
-  if (!hostname || !*hostname)
-    return (0);
+  hostname = hostname.trimmed().toLower();
 
-  i = 0;
-  for (nextchar = hostname; *nextchar; nextchar++)
-    *nextchar = LOWER(*nextchar);
-
-  for (banned_node = ban_list; banned_node; banned_node = banned_node->next)
-    if (strstr(hostname, banned_node->site)) /* if hostname is a substring */
+  int i = 0;
+  for (struct ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
+  {
+    if (hostname == banned_node->site) /* if hostname is a substring */
+    {
       i = MAX(i, banned_node->type);
+    }
+  }
 
   return i;
 }
