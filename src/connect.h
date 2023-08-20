@@ -164,11 +164,14 @@ public:
     {
       if (proxy.getSourceAddress().isNull())
       {
+        qDebug() << "proxy.getSourceAddress().isNull() is true";
         return "";
       }
-
+      qDebug() << "proxy.getSourceAddress().toString().toStdString().c_str()" << proxy.getSourceAddress().toString().toStdString().c_str();
       return proxy.getSourceAddress().toString().toStdString().c_str();
     }
+
+    qDebug() << "host_.toStdString().c_str()" << host_.toStdString().c_str();
     return host_.toStdString().c_str();
   }
   QString getHost(void)

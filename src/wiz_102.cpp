@@ -5635,7 +5635,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     bool duplicate = false;
     for (Connection *ad = DC::getInstance()->descriptor_list; ad != nullptr; ad = ad->next)
     {
-      if (ad != d && !str_cmp(d->getHostC(), ad->getHostC()))
+      if (ad != d && d->getHost() == ad->getHost())
       {
         if (!ad->character || GET_LEVEL(ad->character) <= GET_LEVEL(this))
         {
@@ -5655,7 +5655,8 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     {
       connection_character_name = "NONE";
     }
-    buf += QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->getHostC(), -15).arg(connection_character_name, -16);
+
+    buf += QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->getHost(), -15).arg(connection_character_name, -16);
 
     if (const char *pStr = constindex(d->connected, connected_states))
     {
