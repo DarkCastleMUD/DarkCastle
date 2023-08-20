@@ -9,6 +9,8 @@
 #include "structs.h" // MAX_INPUT_LENGTH
 #include "comm.h"
 
+int isbanned(QString host);
+
 #define STATE(d) ((d)->connected)
 
 // if you change, make sure you update char *connected_states[] in const.C
@@ -32,12 +34,44 @@ public:
   bool decrease(uint64_t points = 1);
 };
 
+class Proxy
+{
+public:
+  Proxy(QString);
+  Proxy(void) {}
+
+  enum class inet_protocol_family_t
+  {
+    UNKNOWN,
+    TCP4,
+    TCP6,
+    UNRECOGNIZED
+  };
+  inet_protocol_family_t getInet_Protocol_Fanily(void) { return inet_protocol_family; }
+  QString getHeader(void) { return header; }
+  bool isActive(void) { return active; }
+  QHostAddress getSourceAddress(void) { return source_address; }
+  QHostAddress getDestinationAddress(void) { return destination_address; }
+  quint16 getSourcePort(void) { return source_port; }
+  quint16 getDestinationPort(void) { return destination_port; }
+
+private:
+  inet_protocol_family_t inet_protocol_family;
+  QString header;
+  bool active = false;
+  QHostAddress source_address;
+  QHostAddress destination_address;
+  quint16 source_port;
+  quint16 destination_port;
+};
+
 class Connection
 {
 public:
   enum states
   {
     PLAYING,
+    GET_PROXY,
     GET_NAME,
     GET_OLD_PASSWORD,
     CONFIRM_NEW_NAME,
@@ -83,10 +117,11 @@ public:
     GET_STATS
   };
 
+  Proxy proxy;
+
   int descriptor = {}; /* file descriptor for socket	*/
   int desc_num = {};
   char *name = {};       /* Copy of the player name	*/
-  char host[80] = {};    /* hostname			*/
   states connected = {}; /* mode of 'connectedness'	*/
   int web_connected = {};
   int wait = {};           /* wait for how many loops	*/
@@ -123,6 +158,36 @@ public:
   bool server_size_echo = false;
   bool allowColor = 1;
   void send(QString txt);
+  const char *getHostC(void)
+  {
+    if (proxy.isActive())
+    {
+      if (proxy.getSourceAddress().isNull())
+      {
+        return "";
+      }
+
+      return proxy.getSourceAddress().toString().toStdString().c_str();
+    }
+    return host_.toStdString().c_str();
+  }
+  QString getHost(void)
+  {
+    if (proxy.isActive())
+    {
+      if (proxy.getSourceAddress().isNull())
+      {
+        return "";
+      }
+
+      return proxy.getSourceAddress().toString();
+    }
+    return host_;
+  }
+  void setHost(QString host) { host_ = host; }
+
+private:
+  QString host_ = {};
 };
 
 #endif

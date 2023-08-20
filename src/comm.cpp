@@ -68,7 +68,7 @@ using namespace std;
 
 struct multiplayer
 {
-  char *host;
+  QString host;
   char *name1;
   char *name2;
 };
@@ -171,7 +171,6 @@ void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
-int isbanned(char *hostname);
 void time_update();
 void weather_update();
 void send_hint();
@@ -233,34 +232,34 @@ int write_hotboot_file(char **new_argv)
       STATE(d) = Connection::states::PLAYING; // if editors.
       if (d->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->host);
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getHostC());
         if (d->original->player)
         {
           if (d->original->player->last_site)
             dc_free(d->original->player->last_site);
 #ifdef LEAK_CHECK
-          d->original->player->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+          d->original->player->last_site = (char *)calloc(strlen(d->getHostC()) + 1, sizeof(char));
 #else
-          d->original->player->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+          d->original->player->last_site = (char *)dc_alloc(strlen(d->getHostC()) + 1, sizeof(char));
 #endif
-          strcpy(d->original->player->last_site, d->original->desc->host);
+          strcpy(d->original->player->last_site, d->original->desc->getHostC());
           d->original->player->time.logon = time(0);
         }
         save_char_obj(d->original);
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->host);
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getHostC());
         if (d->character->player)
         {
           if (d->character->player->last_site)
             dc_free(d->character->player->last_site);
 #ifdef LEAK_CHECK
-          d->character->player->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+          d->character->player->last_site = (char *)calloc(strlen(d->getHostC()) + 1, sizeof(char));
 #else
-          d->character->player->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+          d->character->player->last_site = (char *)dc_alloc(strlen(d->getHostC()) + 1, sizeof(char));
 #endif
-          strcpy(d->character->player->last_site, d->character->desc->host);
+          strcpy(d->character->player->last_site, d->character->desc->getHostC());
           d->character->player->time.logon = time(0);
         }
         save_char_obj(d->character);
@@ -386,7 +385,7 @@ int load_hotboot_descs()
         continue;
       }
 
-      strcpy(d->host, host);
+      d->setHost(host);
       d->descriptor = desc;
 
       // we need a second to be sure
@@ -777,9 +776,9 @@ void DC::game_loop(void)
     {
       if (process_input(d) < 0)
       {
-        if (strcmp(d->host, "127.0.0.1"))
+        if (strcmp(d->getHostC(), "127.0.0.1"))
         {
-          sprintf(buf, "Connection attempt bailed from %s", d->host);
+          sprintf(buf, "Connection attempt bailed from %s", d->getHostC());
           printf(buf);
           logentry(buf, 111, LogChannels::LOG_SOCKET);
         }
@@ -2089,10 +2088,10 @@ int new_descriptor(int s)
 
   /* create a new descriptor */
   newd = new Connection;
-  strcpy(newd->host, inet_ntoa(peer.sin_addr));
+  newd->setHost(inet_ntoa(peer.sin_addr));
 
   /* determine if the site is banned */
-  if (isbanned(newd->host) == BAN_ALL)
+  if (isbanned(newd->getHost()) == BAN_ALL)
   {
     write_to_descriptor(desc,
                         "Your site has been banned from Dark Castle. If you have any\n\r"
@@ -2100,9 +2099,9 @@ int new_descriptor(int s)
                         "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
-    sprintf(buf, "Connection attempt denied from [%s]", newd->host);
+    sprintf(buf, "Connection attempt denied from [%s]", newd->getHostC());
     logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
-    // dc_free(newd->host);
+    // dc_free(newd->getHostC());
     dc_free(newd);
     return 0;
   }
@@ -2470,11 +2469,11 @@ int process_input(class Connection *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->host).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->getHost()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->host), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->getHost()), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
 
       return -1;
@@ -3388,7 +3387,7 @@ bool is_multi(Character *ch)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->host, ch->desc->host))
+        !strcmp(d->getHostC(), ch->desc->getHostC()))
     {
       return true;
     }
@@ -3408,10 +3407,10 @@ void warn_if_duplicate_ip(Character *ch)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->host, ch->desc->host))
+        !strcmp(d->getHostC(), ch->desc->getHostC()))
     {
       multiplayer m;
-      m.host = d->host;
+      m.host = d->getHost();
       m.name1 = GET_NAME(ch);
       m.name2 = GET_NAME(d->character);
 
@@ -3477,4 +3476,73 @@ int do_editor(Character *ch, char *argument, int cmd)
   send_to_char("game   - use in game line editor\n\r", ch);
 
   return eSUCCESS;
+}
+
+Proxy::Proxy(QString h)
+    : header(h)
+{
+  QStringList elements = h.split(' ');
+
+  if (elements.size() >= 2 && elements.at(0).indexOf("PROXY") == 0)
+  {
+    QString arg2 = elements.at(1);
+    if (arg2 == "TCP4")
+    {
+      inet_protocol_family = inet_protocol_family_t::TCP4;
+    }
+    else if (arg2 == "TCP6")
+    {
+      inet_protocol_family = inet_protocol_family_t::TCP6;
+    }
+    else if (arg2 == "UNKNOWN")
+    {
+      inet_protocol_family = inet_protocol_family_t::UNKNOWN;
+    }
+    else
+    {
+      inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
+      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
+      qDebug() << arg2;
+    }
+  }
+
+  if (elements.size() >= 3)
+  {
+    source_address = QHostAddress(elements.at(2));
+  }
+
+  if (elements.size() >= 4)
+  {
+    destination_address = QHostAddress(elements.at(3));
+  }
+
+  if (elements.size() >= 5)
+  {
+    QString arg5 = elements.at(4);
+
+    bool ok = false;
+    source_port = arg5.toUInt(&ok);
+    if (!ok)
+    {
+      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg5).toStdString().c_str());
+      qDebug() << arg5 << arg5.toUInt(&ok);
+      return;
+    }
+  }
+
+  if (elements.size() >= 6)
+  {
+    QString arg6 = elements.at(4);
+
+    bool ok = false;
+    destination_port = arg6.toUInt(&ok);
+    if (!ok)
+    {
+      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg6).toStdString().c_str());
+      qDebug() << arg6 << arg6.toUInt(&ok);
+      return;
+    }
+
+    active = true;
+  }
 }

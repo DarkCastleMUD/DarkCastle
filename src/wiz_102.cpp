@@ -200,7 +200,7 @@ int do_check(Character *ch, char *arg, int cmd)
     {
       if (GET_LEVEL(ch) >= OVERSEER && GET_LEVEL(ch) >= GET_LEVEL(vict))
       {
-        sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->host);
+        sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getHostC());
         send_to_char(buf, ch);
       }
       else
@@ -5626,7 +5626,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
 
     if (name.isEmpty() == false)
     {
-      if (QString(d->host).contains(name) == false && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
+      if (QString(d->getHostC()).contains(name) == false && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
       {
         continue;
       }
@@ -5635,7 +5635,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     bool duplicate = false;
     for (Connection *ad = DC::getInstance()->descriptor_list; ad != nullptr; ad = ad->next)
     {
-      if (ad != d && !str_cmp(d->host, ad->host))
+      if (ad != d && !str_cmp(d->getHostC(), ad->getHostC()))
       {
         if (!ad->character || GET_LEVEL(ad->character) <= GET_LEVEL(this))
         {
@@ -5655,7 +5655,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     {
       connection_character_name = "NONE";
     }
-    buf += QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->host, -15).arg(connection_character_name, -16);
+    buf += QString("%1%2 : %3 | %4$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->getHostC(), -15).arg(connection_character_name, -16);
 
     if (const char *pStr = constindex(d->connected, connected_states))
     {

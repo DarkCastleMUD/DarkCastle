@@ -2500,7 +2500,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
         {
           /*
-          if (!strcmp(tar_char->desc->host, ch->desc->host))
+          if (!strcmp(tar_char->desc->getHostC(), ch->desc->getHostC()))
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
