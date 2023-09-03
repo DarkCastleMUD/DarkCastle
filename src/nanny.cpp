@@ -772,9 +772,9 @@ int count_IP_connections(class Connection *new_conn)
    int count = 0;
    for (class Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
    {
-      if (!d->getHostC())
+      if (d->getPeerOriginalAddress().isNull())
          continue;
-      if (!strcmp(new_conn->getHostC(), d->getHostC()))
+      if (new_conn->getPeerOriginalAddress() == d->getPeerOriginalAddress())
          count++;
    }
 
@@ -790,20 +790,6 @@ int count_IP_connections(class Connection *new_conn)
    }
 
    return 0;
-}
-
-const char *host_list[] =
-    {
-        "127.0.0.1", // localhost (duh)
-};
-
-bool allowed_host(QString host)
-{ /* Wizlock uses hosts for wipe. */
-   int i;
-   for (i = 0; i < (int)((sizeof(host_list) / sizeof(char *))); i++)
-      if (host == host_list[i])
-         return true;
-   return false;
 }
 
 void check_hw(Character *ch)
@@ -995,12 +981,12 @@ void nanny(class Connection *d, string arg)
       // doing it to fix it.  (No time to verify this now, so i'll do it later)
       GET_NAME(ch) = str_dup(tmp_name);
 
-      // if (allowed_host(d->getHostC()))
+      // if (isAllowedHost(d->getPeerOriginalAddressC()))
       // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
       if (check_reconnect(d, tmp_name, false))
          fOld = true;
-      else if ((wizlock) && !allowed_host(d->getHost()))
+      else if ((wizlock) && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
       {
          SEND_TO_Q("The game is wizlocked.\r\n", d);
          close_socket(d);
@@ -1038,11 +1024,11 @@ void nanny(class Connection *d, string arg)
       password = ch->player->pwd;
 
       // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
-      if (DC::getInstance()->cf.allow_imp_password && allowed_host(d->getHost()))
+      if (DC::getInstance()->cf.allow_imp_password && DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
       {
          for (Connection *ad = DC::getInstance()->descriptor_list; ad && ad != (Connection *)0x95959595; ad = ad->next)
          {
-            if (ad != d && d->getHost() == ad->getHost())
+            if (ad != d && d->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
             {
                if (ad->character && GET_LEVEL(ad->character) == IMPLEMENTER && IS_PC(ad->character))
                {
@@ -1057,7 +1043,7 @@ void nanny(class Connection *d, string arg)
       if (string(crypt(arg.c_str(), password)) != password)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
-         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getHostC());
+         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddressC());
          logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
@@ -1088,7 +1074,7 @@ void nanny(class Connection *d, string arg)
       if (check_reconnect(d, GET_NAME(ch), true))
          return;
 
-      sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->getHostC());
+      sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->getPeerOriginalAddressC());
       if (GET_LEVEL(ch) < ANGEL)
          logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       else
@@ -1137,10 +1123,10 @@ void nanny(class Connection *d, string arg)
       case 'y':
       case 'Y':
 
-         if (isbanned(d->getHost()) >= BAN_NEW)
+         if (isbanned(d->getPeerOriginalAddress()) >= BAN_NEW)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
-                    GET_NAME(d->character), d->getHostC());
+                    GET_NAME(d->character), d->getPeerOriginalAddressC());
             logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
@@ -1270,7 +1256,7 @@ void nanny(class Connection *d, string arg)
       }
 
       /*
-            if (!allowed_host(d->getHostC()) && DC::getInstance()->cf.allow_newstatsys == false)
+            if (!isAllowedHost(d->getPeerOriginalAddressC()) && DC::getInstance()->cf.allow_newstatsys == false)
             {
                STATE(d) = Connection::states::OLD_STAT_METHOD;
                break;
@@ -1732,7 +1718,7 @@ void nanny(class Connection *d, string arg)
 
       init_char(ch);
 
-      sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getHostC());
+      sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddressC());
       logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
@@ -2059,7 +2045,7 @@ bool check_deny(class Connection *d, char *name)
    fclose(fpdeny);
 
    char log_buf[MAX_STRING_LENGTH] = {};
-   sprintf(log_buf, "Denying access to player %s@%s.", name, d->getHostC());
+   sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddressC());
    logentry(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
@@ -2099,7 +2085,7 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
          send_to_char("Reconnecting.\r\n", tmp_ch);
          char log_buf[MAX_STRING_LENGTH] = {};
          sprintf(log_buf, "%s@%s has reconnected.",
-                 GET_NAME(tmp_ch), d->getHostC());
+                 GET_NAME(tmp_ch), d->getPeerOriginalAddressC());
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0,
              0, TO_ROOM, INVIS_NULL);
 

@@ -147,6 +147,7 @@ public:
   bool authenticate(QString username, QString password, uint64_t level = 0);
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
   void sendAll(QString message);
+  bool isAllowedHost(QHostAddress host);
 
 private:
   DC(const DC &) = delete; // non-copyable
@@ -164,6 +165,7 @@ private:
   void game_loop(void);
   int init_socket(in_port_t port);
   Shops shops_;
+  QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
 };
 
 extern vector<string> continent_names;

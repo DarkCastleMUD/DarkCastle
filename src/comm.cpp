@@ -68,7 +68,7 @@ using namespace std;
 
 struct multiplayer
 {
-  QString host;
+  QHostAddress host;
   char *name1;
   char *name2;
 };
@@ -232,34 +232,34 @@ int write_hotboot_file(char **new_argv)
       STATE(d) = Connection::states::PLAYING; // if editors.
       if (d->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getHostC());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getPeerOriginalAddressC());
         if (d->original->player)
         {
           if (d->original->player->last_site)
             dc_free(d->original->player->last_site);
 #ifdef LEAK_CHECK
-          d->original->player->last_site = (char *)calloc(strlen(d->getHostC()) + 1, sizeof(char));
+          d->original->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
 #else
-          d->original->player->last_site = (char *)dc_alloc(strlen(d->getHostC()) + 1, sizeof(char));
+          d->original->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
 #endif
-          strcpy(d->original->player->last_site, d->original->desc->getHostC());
+          strcpy(d->original->player->last_site, d->original->desc->getPeerOriginalAddressC());
           d->original->player->time.logon = time(0);
         }
         save_char_obj(d->original);
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getHostC());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getPeerOriginalAddressC());
         if (d->character->player)
         {
           if (d->character->player->last_site)
             dc_free(d->character->player->last_site);
 #ifdef LEAK_CHECK
-          d->character->player->last_site = (char *)calloc(strlen(d->getHostC()) + 1, sizeof(char));
+          d->character->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
 #else
-          d->character->player->last_site = (char *)dc_alloc(strlen(d->getHostC()) + 1, sizeof(char));
+          d->character->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
 #endif
-          strcpy(d->character->player->last_site, d->character->desc->getHostC());
+          strcpy(d->character->player->last_site, d->character->desc->getPeerOriginalAddressC());
           d->character->player->time.logon = time(0);
         }
         save_char_obj(d->character);
@@ -385,7 +385,7 @@ int load_hotboot_descs()
         continue;
       }
 
-      d->setHost(host);
+      d->setPeerAddress(QHostAddress(host));
       d->descriptor = desc;
 
       // we need a second to be sure
@@ -776,9 +776,9 @@ void DC::game_loop(void)
     {
       if (process_input(d) < 0)
       {
-        if (strcmp(d->getHostC(), "127.0.0.1"))
+        if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
         {
-          sprintf(buf, "Connection attempt bailed from %s", d->getHostC());
+          sprintf(buf, "Connection attempt bailed from %s", d->getPeerOriginalAddressC());
           printf(buf);
           logentry(buf, 111, LogChannels::LOG_SOCKET);
         }
@@ -2088,10 +2088,10 @@ int new_descriptor(int s)
 
   /* create a new descriptor */
   newd = new Connection;
-  newd->setHost(inet_ntoa(peer.sin_addr));
+  newd->setPeerAddress(QHostAddress(inet_ntoa(peer.sin_addr)));
 
   /* determine if the site is banned */
-  if (isbanned(newd->getHost()) == BAN_ALL)
+  if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
   {
     write_to_descriptor(desc,
                         "Your site has been banned from Dark Castle. If you have any\n\r"
@@ -2099,9 +2099,8 @@ int new_descriptor(int s)
                         "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
-    sprintf(buf, "Connection attempt denied from [%s]", newd->getHostC());
+    sprintf(buf, "Connection attempt denied from [%s]", newd->getPeerOriginalAddressC());
     logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
-    // dc_free(newd->getHostC());
     dc_free(newd);
     return 0;
   }
@@ -2469,11 +2468,11 @@ int process_input(class Connection *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->getHost()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->getHost()), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
 
       return -1;
@@ -3385,9 +3384,7 @@ bool is_multi(Character *ch)
 {
   for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    if (d->character &&
-        strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->getHostC(), ch->desc->getHostC()))
+    if (d->character != nullptr && strcmp(GET_NAME(ch), GET_NAME(d->character)) && d->getPeerOriginalAddress() == ch->desc->getPeerOriginalAddress())
     {
       return true;
     }
@@ -3407,10 +3404,10 @@ void warn_if_duplicate_ip(Character *ch)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->getHostC(), ch->desc->getHostC()))
+        !strcmp(d->getPeerOriginalAddressC(), ch->desc->getPeerOriginalAddressC()))
     {
       multiplayer m;
-      m.host = d->getHost();
+      m.host = d->getPeerAddress();
       m.name1 = GET_NAME(ch);
       m.name2 = GET_NAME(d->character);
 

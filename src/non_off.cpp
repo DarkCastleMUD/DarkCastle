@@ -1582,7 +1582,7 @@ void CVoteData::AddAnswer(Character *ch, std::string answer)
 
 bool CVoteData::HasVoted(Character *ch)
 {
-  return (ip_voted[ch->desc->getHostC()] || char_voted[GET_NAME(ch)]);
+  return (ip_voted[ch->desc->getPeerOriginalAddressC()] || char_voted[GET_NAME(ch)]);
 }
 
 bool CVoteData::Vote(Character *ch, unsigned int vote)
@@ -1605,7 +1605,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
     return false;
   }
 
-  ip_voted[ch->desc->getHostC()] = true;
+  ip_voted[ch->desc->getPeerOriginalAddressC()] = true;
   char_voted[GET_NAME(ch)] = true;
   total_votes++;
   answers.at(vote - 1).votes++;
@@ -1617,7 +1617,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
 
 void CVoteData::DisplayResults(Character *ch)
 {
-  if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->getHostC()] && GET_LEVEL(ch) < IMMORTAL)
+  if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->getPeerOriginalAddressC()] && GET_LEVEL(ch) < IMMORTAL)
   {
     send_to_char("Sorry, but you have to cast a vote before you can see the results.\r\n", ch);
     return;

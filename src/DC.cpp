@@ -261,3 +261,15 @@ bool DC::authenticate(const QHttpServerRequest &request, uint64_t level)
 
 	return authenticate(username, password, level);
 }
+
+bool DC::isAllowedHost(QHostAddress address)
+{
+	for (const auto &host : host_list_)
+	{
+		if (host == address)
+		{
+			return true;
+		}
+	}
+	return false;
+}

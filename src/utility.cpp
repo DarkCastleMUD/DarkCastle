@@ -1791,16 +1791,16 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   update_wizlist(ch);
 
-  if (!IS_MOB(ch) && ch->desc && !ch->desc->getHost().isEmpty())
+  if (!IS_MOB(ch) && ch->desc && !ch->desc->getPeerOriginalAddress().isNull())
   {
     if (ch->player->last_site)
       dc_free(ch->player->last_site);
 #ifdef LEAK_CHECK
-    ch->player->last_site = (char *)calloc(strlen(ch->desc->getHostC()) + 1, sizeof(char));
+    ch->player->last_site = (char *)calloc(strlen(ch->desc->getPeerOriginalAddressC()) + 1, sizeof(char));
 #else
-    ch->player->last_site = (char *)dc_alloc(strlen(ch->desc->getHostC()) + 1, sizeof(char));
+    ch->player->last_site = (char *)dc_alloc(strlen(ch->desc->getPeerOriginalAddressC()) + 1, sizeof(char));
 #endif
-    strcpy(ch->player->last_site, ch->desc->getHostC());
+    strcpy(ch->player->last_site, ch->desc->getPeerOriginalAddressC());
     ch->player->time.logon = time(0);
   }
 

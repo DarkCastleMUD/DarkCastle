@@ -70,8 +70,10 @@ void free_ban_list_from_memory()
   }
 }
 
-int isbanned(QString hostname)
+int isbanned(QHostAddress address)
 {
+  QString hostname = address.toString();
+
   if (hostname.isEmpty())
   {
     return 0;

@@ -9,7 +9,7 @@
 #include "structs.h" // MAX_INPUT_LENGTH
 #include "comm.h"
 
-int isbanned(QString host);
+int isbanned(QHostAddress address);
 
 #define STATE(d) ((d)->connected)
 
@@ -158,39 +158,40 @@ public:
   bool server_size_echo = false;
   bool allowColor = 1;
   void send(QString txt);
-  const char *getHostC(void)
+
+  const char *getPeerOriginalAddressC(void)
+  {
+    return getPeerOriginalAddress().toString().toStdString().c_str();
+  }
+
+  QHostAddress getPeerAddress(void)
+  {
+    return peer_address_;
+  }
+  QHostAddress getPeerOriginalAddress(void)
   {
     if (proxy.isActive())
     {
-      if (proxy.getSourceAddress().isNull())
-      {
-        qDebug() << "proxy.getSourceAddress().isNull() is true";
-        return "";
-      }
-      qDebug() << "proxy.getSourceAddress().toString().toStdString().c_str()" << proxy.getSourceAddress().toString().toStdString().c_str();
-      return proxy.getSourceAddress().toString().toStdString().c_str();
+      return proxy.getSourceAddress();
     }
-
-    qDebug() << "host_.toStdString().c_str()" << host_.toStdString().c_str();
-    return host_.toStdString().c_str();
+    return getPeerAddress();
   }
-  QString getHost(void)
+
+  void setPeerAddress(QHostAddress address)
   {
-    if (proxy.isActive())
-    {
-      if (proxy.getSourceAddress().isNull())
-      {
-        return "";
-      }
-
-      return proxy.getSourceAddress().toString();
-    }
-    return host_;
+    peer_address_ = address;
+    qDebug() << "setPeerAddress(" << address << ")";
   }
-  void setHost(QString host) { host_ = host; }
+
+  void setPeerPort(uint16_t port)
+  {
+    peer_port_ = port;
+    qDebug() << "setPeerPort(" << port << ")";
+  }
 
 private:
-  QString host_ = {};
+  QHostAddress peer_address_ = {};
+  uint16_t peer_port_ = {};
 };
 
 #endif
