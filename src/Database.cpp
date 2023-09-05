@@ -62,7 +62,7 @@ int Database::lookupPlayerID(const char *name)
   PGresult *res = PQexecParams(conn, "SELECT player_id FROM player_lookup WHERE name=$1", 1, nullptr, paramValues, nullptr, nullptr, 0);
   if (PQresultStatus(res) != PGRES_TUPLES_OK)
   {
-    cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
+    // cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
     PQclear(res);
     return 0;
   }
@@ -76,7 +76,7 @@ int Database::lookupPlayerID(const char *name)
   char *buffer = PQgetvalue(res, 0, 0);
   if (buffer == 0 || PQgetlength(res, 0, 0) < 1)
   {
-    cerr << "Error occured getting player_id from player_lookup table." << endl;
+    // cerr << "Error occured getting player_id from player_lookup table." << endl;
     PQclear(res);
     return 0;
   }
@@ -100,7 +100,7 @@ int Database::createPlayerID(char *name)
   PGresult *res = PQexec(conn, "SELECT lastval()");
   if (PQresultStatus(res) != PGRES_TUPLES_OK)
   {
-    cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
+    // cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
     PQclear(res);
     return 0;
   }
@@ -114,7 +114,7 @@ int Database::createPlayerID(char *name)
   char *buffer = PQgetvalue(res, 0, 0);
   if (buffer == 0 || PQgetlength(res, 0, 0) < 1)
   {
-    cerr << "Error occured getting player_id from player_lookup table." << endl;
+    // cerr << "Error occured getting player_id from player_lookup table." << endl;
     PQclear(res);
     return 0;
   }
@@ -139,7 +139,7 @@ void Database::save(Character *ch, char_file_u4 *st)
 
       if (ch->player_id == 0)
       {
-        cerr << "Error creating player_id. Aborting DB save." << endl;
+        // cerr << "Error creating player_id. Aborting DB save." << endl;
         return;
       }
     }
@@ -367,7 +367,7 @@ void Prepare::exec(void)
     res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, nullptr);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-      cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
+      // cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
       PQclear(res);
       return;
     }
@@ -395,7 +395,7 @@ void Prepare::exec(void)
   int status = PQsendQueryPrepared(this->conn, prepareID.c_str(), nParams, paramValues, nullptr, nullptr, 0);
   if (status == 0)
   {
-    cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
+    // cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
   }
 
   delete paramValues;

@@ -472,11 +472,11 @@ void logentry(QString str, int god_level, LogChannels type, Character *vict)
   {
     if (cf.stderr_timestamp == true)
     {
-      cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << endl;
+      // cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << endl;
     }
     else
     {
-      cerr << QString("%1:%2").arg(type).arg(str).toStdString() << endl;
+      // cerr << QString("%1:%2").arg(type).arg(str).toStdString() << endl;
     }
   }
 
@@ -2027,7 +2027,7 @@ string double_dollars(string source)
     }
   }
 
-  cerr << source << " becomes " << destination << endl;
+  // cerr << source << " becomes " << destination << endl;
   return destination;
 }
 

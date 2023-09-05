@@ -497,7 +497,6 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 
   QString cmdnum = arguments.at(0);
   uint64_t cmd = 0;
-  qDebug() << max_res(zone) << cmdnum << check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone));
 
   if (max_res(zone) == 0)
   {
@@ -788,7 +787,6 @@ int do_zedit(Character *ch, char *argument, int cmd)
       "\n"};
 
   QStringList arguments = QString(argument).trimmed().split(' ');
-  qDebug() << argument << arguments << arguments.size();
 
   if (arguments.isEmpty() || arguments.at(0).isEmpty())
   {
@@ -4909,7 +4907,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
+    // cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
     return eFAILURE;
   }
 

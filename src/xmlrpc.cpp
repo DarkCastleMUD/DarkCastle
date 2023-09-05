@@ -177,7 +177,7 @@ XmlRpcServer *xmlrpc_init(int xmlrpc_port)
 
   while (!s->bindAndListen(xmlrpc_port)) {
     xmlrpc_port++;
-    cout << "Trying port " << xmlrpc_port << endl;
+    // cerr <<  "Trying port " << xmlrpc_port << endl;
   }
 
   return s;

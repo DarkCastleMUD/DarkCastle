@@ -821,7 +821,7 @@ void DC::game_loop(void)
 
       comm = get_from_q(d->input);
 #ifdef DEBUG_INPUT
-      cerr << "Got command [" << comm << "] from the d->input queue" << endl;
+      // cerr << "Got command [" << comm << "] from the d->input queue" << endl;
 #endif
       /* reset the idle timer & pull char back from void if necessary */
       d->wait = 1;
@@ -1949,7 +1949,7 @@ string generate_prompt(Character *ch)
 void write_to_q(const string txt, queue<string> &input_queue)
 {
 #ifdef DEBUG_INPUT
-  cerr << "Writing to queue '" << txt << "'" << endl;
+  // cerr << "Writing to queue '" << txt << "'" << endl;
 #endif
   input_queue.push(txt);
 }
@@ -2254,7 +2254,7 @@ void process_iac(Connection *t)
           break;
 
         default:
-          cerr << "Unrecognized telnet option " << hex << static_cast<int>(c) << endl;
+          // cerr << "Unrecognized telnet option " << hex << static_cast<int>(c) << endl;
           prev = 0;
           break;
         }
@@ -2263,22 +2263,22 @@ void process_iac(Connection *t)
       {
         if (c == '\x1')
         {
-          cerr << "Telnet client requests to turn on server-side echo" << endl;
+          // cerr << "Telnet client requests to turn on server-side echo" << endl;
           t->server_size_echo = true;
         }
         else if (c == '\x3')
         {
-          cerr << "Telnet client requests server to suppress sending go-ahead" << endl;
+          // cerr << "Telnet client requests server to suppress sending go-ahead" << endl;
         }
         else
         {
-          cerr << "Unrecognized do option " << hex << static_cast<int>(c) << endl;
+          // cerr << "Unrecognized do option " << hex << static_cast<int>(c) << endl;
         }
         prev = 0;
       }
       else
       {
-        cerr << "Unrecognized telnet code " << hex << static_cast<int>(c) << endl;
+        // cerr << "Unrecognized telnet code " << hex << static_cast<int>(c) << endl;
         prev = 0;
       }
     }
@@ -2495,15 +2495,15 @@ int process_input(class Connection *t)
         {
           if (t->inbuf.size() == 1)
           {
-            // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             t->inbuf.erase(t->inbuf.end() - 1, t->inbuf.end());
-            // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
           }
           if (t->inbuf.size() >= 2)
           {
-            // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             t->inbuf.erase(t->inbuf.end() - 2, t->inbuf.end());
-            // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
             new_buffer += "\b \b";
           }
         }
@@ -2545,16 +2545,16 @@ int process_input(class Connection *t)
     }
 
 #ifdef DEBUG_INPUT
-    cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
-         << "(" << t->inbuf.length() << ")" << endl;
+    // cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
+    << "(" << t->inbuf.length() << ")" << endl;
 #endif
     string buffer = t->inbuf.substr(0, eoc_pos);
     t->inbuf.erase(0, eoc_pos + erase);
 #ifdef DEBUG_INPUT
-    cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
-         << "(" << t->inbuf.length() << ")" << endl;
-    cerr << "buffer [" << makePrintable(buffer) << "]"
-         << "(" << buffer.length() << ")" << endl;
+    // cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
+    << "(" << t->inbuf.length() << ")" << endl;
+    // cerr << "buffer [" << makePrintable(buffer) << "]"
+    << "(" << buffer.length() << ")" << endl;
 #endif
 
     if (t->character == nullptr || GET_LEVEL(t->character) < IMMORTAL)
@@ -3499,7 +3499,6 @@ Proxy::Proxy(QString h)
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
       logf(IMMORTAL, LogChannels::LOG_BUG, QString("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
-      qDebug() << arg2;
     }
   }
 
@@ -3522,7 +3521,6 @@ Proxy::Proxy(QString h)
     if (!ok)
     {
       logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg5).toStdString().c_str());
-      qDebug() << arg5 << arg5.toUInt(&ok);
       return;
     }
   }
@@ -3536,7 +3534,6 @@ Proxy::Proxy(QString h)
     if (!ok)
     {
       logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg6).toStdString().c_str());
-      qDebug() << arg6 << arg6.toUInt(&ok);
       return;
     }
 

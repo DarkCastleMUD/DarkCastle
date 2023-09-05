@@ -39,7 +39,7 @@ bool verbose_mode = false;
 
 void test_handle_ansi(string test)
 {
-  cout << "Testing '" << test << "'" << endl;
+  // cerr <<  "Testing '" << test << "'" << endl;
   Character *ch = new Character;
   ch->player = new Player;
   SET_BIT(ch->player->toggles, PLR_ANSI);
@@ -52,8 +52,8 @@ void test_handle_ansi(string test)
   strncpy(str2, str1.c_str(), 1024);
   string result1 = handle_ansi(str1, ch);
   string result2 = string(handle_ansi_(str2, ch));
-  cout << "Result1: [" << result1 << "]" << endl;
-  cout << "Result2: [" << result2 << "]" << endl;
+  // cerr <<  "Result1: [" << result1 << "]" << endl;
+  // cerr <<  "Result2: [" << result2 << "]" << endl;
   assert(handle_ansi(str1, ch) == string(handle_ansi_(str2, ch)));
   delete[] str2;
 }
@@ -89,9 +89,9 @@ bool test_rolls(uint8_t total)
       unsigned total = stats.str[x] + stats.dex[x] + stats.con[x] + stats.tel[x] + stats.wis[x];
       if (total >= 88)
       {
-        cout << "Total = " << total << endl;
-        cout << "Took " << attempts << " attempts." << endl;
-        cout << (float)attempts / 4 / 60.0 / 60.0 << " hours" << endl;
+        // cerr <<  "Total = " << total << endl;
+        // cerr <<  "Took " << attempts << " attempts." << endl;
+        // cerr <<  (float)attempts / 4 / 60.0 / 60.0 << " hours" << endl;
         return 0;
       }
     }
@@ -111,7 +111,7 @@ void test_random_stats(void)
   // printf("%d\n", result);
   for (auto &cur : results)
   {
-    cout << cur.first << "=" << cur.second << endl;
+    // cerr <<  cur.first << "=" << cur.second << endl;
   }
 }
 
@@ -121,7 +121,7 @@ void showObjectAffects(Object *obj)
   {
     if (i > 0)
     {
-      cout << ", ";
+      // cerr <<  ", ";
     }
 
     char buf2[255];
@@ -139,52 +139,52 @@ void showObjectAffects(Object *obj)
     }
     buf2[254] = 0;
 
-    cout << buf2 << " by " << obj->affected[i].modifier;
+    // cerr <<  buf2 << " by " << obj->affected[i].modifier;
   }
 }
 
 void showObjectVault(const char *owner, Object *obj)
 {
-  cout << obj_index[obj->item_number].virt << ":";
+  // cerr <<  obj_index[obj->item_number].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.size,Object::size_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   showObjectAffects(obj);
 
-  cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
+  // cerr <<  " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
 void showObject(Character *ch, Object *obj)
 {
-  cout << obj_index[obj->item_number].virt << ":";
+  // cerr <<  obj_index[obj->item_number].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.size,Object::size_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
-  cout << buf << ":";
+  // cerr <<  buf << ":";
 
   showObjectAffects(obj);
 
-  cout << " " << obj->short_description << " in " << GET_NAME(ch) << endl;
+  // cerr <<  " " << obj->short_description << " in " << GET_NAME(ch) << endl;
 }
 
 int main(int argc, char **argv)
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
     do
     {
       tie(arg1, remainder) = half_chop(remainder);
-      cerr << "[" << arg1 << "]"
+      // cerr << "[" << arg1 << "]"
            << "[" << remainder << "]" << endl;
     } while (arg1.empty() == false);
 
@@ -214,12 +214,12 @@ int main(int argc, char **argv)
     do
     {
       half_chop(c_input, c_arg1, c_arg2);
-      cerr << "[" << c_arg1 << "]"
+      // cerr << "[" << c_arg1 << "]"
            << "[" << c_arg2 << "]" << endl;
       strncpy(c_input, c_arg2, sizeof(c_input) - 1);
     } while (c_arg1[0] != '\0');
 
-    cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
+    // cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
 
     exit(0);
   }
@@ -271,7 +271,7 @@ int main(int argc, char **argv)
 
   chdir(orig_cwd.c_str());
 
-  cerr << real_mobile(0) << " " << real_mobile(1) << endl;
+  // cerr << real_mobile(0) << " " << real_mobile(1) << endl;
 
   int vnum = 0;
   if (argc >= 3)
@@ -314,7 +314,7 @@ int main(int argc, char **argv)
             path.erase(0, path.find_last_of('/') + 1);
             if (path.empty() == false && path[0] != '.')
             {
-              cerr << pfile.path().c_str() << endl;
+              // cerr << pfile.path().c_str() << endl;
               do_linkload(ch, path.data(), CMD_DEFAULT);
               process_output(d);
               do_fsave(ch, path, CMD_DEFAULT);
@@ -390,7 +390,7 @@ int main(int argc, char **argv)
         queue<pair<int32_t,string>> top_hp_leaders;
         for (auto& l : hp_leaders)
         {
-          //cout << l.first << " " << l.second << endl;
+          //// cerr <<  l.first << " " << l.second << endl;
           top_hp_leaders.push(l);
           if (top_hp_leaders.size() > 5)
           {
@@ -401,14 +401,14 @@ int main(int argc, char **argv)
         unsigned int placement = 0;
         while (top_hp_leaders.size() > 0)
         {
-          cout << top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
+          // cerr <<  top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
           leaderboard.setHP(placement++, top_hp_leaders.front().second, top_hp_leaders.front().first);
           top_hp_leaders.pop();
         }
     */
 
     // leaderboard.check_offline();
-    // cout << DC::getInstance()->character_list.size() << endl;
+    // // cerr <<  DC::getInstance()->character_list.size() << endl;
     // do_leaderboard(ch, "", CMD_DEFAULT);
     // process_output(d);
 
@@ -437,7 +437,7 @@ int main(int argc, char **argv)
       Object *obj;
       if (load_char_obj(d, argv[1]) == false)
       {
-        cerr << "Unable to load " << argv[1] << endl;
+        // cerr << "Unable to load " << argv[1] << endl;
         exit(1);
       }
       else
@@ -478,5 +478,5 @@ int main(int argc, char **argv)
 
   return 0;
 }
-//      cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
-//      cout << "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
+//      // cerr <<  "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
+//      // cerr <<  "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;

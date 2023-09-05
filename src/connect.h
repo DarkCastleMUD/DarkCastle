@@ -180,13 +180,11 @@ public:
   void setPeerAddress(QHostAddress address)
   {
     peer_address_ = address;
-    qDebug() << "setPeerAddress(" << address << ")";
   }
 
   void setPeerPort(uint16_t port)
   {
     peer_port_ = port;
-    qDebug() << "setPeerPort(" << port << ")";
   }
 
 private:

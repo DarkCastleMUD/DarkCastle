@@ -101,7 +101,7 @@ void Timer::stop() {
 	stoptv.gettime();
 
 	if (stoptv < starttv) {
-		cerr << "Timer::stop() time went backwards." << endl;
+		// cerr << "Timer::stop() time went backwards." << endl;
 		stoptv = starttv;
 	}
 	diff_cur = stoptv-starttv;

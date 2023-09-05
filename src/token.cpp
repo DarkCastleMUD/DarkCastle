@@ -70,7 +70,7 @@ TokenList::TokenList(const char *str) : head(0), current(0)
     AddToken(cur_token);
 
 #ifdef DEBUG_TOKEN
-    cerr << "Added token: " << cur_token->GetBuf() << endl;
+    // cerr << "Added token: " << cur_token->GetBuf() << endl;
 #endif
   }
 
@@ -182,26 +182,26 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
 
 #ifdef DEBUG_TOKEN
     if (current->IsAnsi())
-      cerr << "ANSI token" << endl;
+      // cerr << "ANSI token" << endl;
     if (current->IsVt100())
-      cerr << "VT100 token" << endl;
+      // cerr << "VT100 token" << endl;
     if (current->IsCode())
-      cerr << "Code token" << endl;
+      // cerr << "Code token" << endl;
     if (current->IsText())
-      cerr << "Text token" << endl;
+      // cerr << "Text token" << endl;
 #endif
 
     if (current->IsText())
     {
 #ifdef DEBUG_TOKEN
-      cerr << "It's a text token" << endl;
+      // cerr << "It's a text token" << endl;
 #endif
       interp += current->GetBuf();
     }
     else if (current->IsAnsi() || current->IsVt100())
     {
 #ifdef DEBUG_TOKEN
-      cerr << "It's ansi or vt100 code" << endl;
+      // cerr << "It's ansi or vt100 code" << endl;
 #endif
       if (IS_MOB(send_to) ||
           (IS_SET(send_to->player->toggles, PLR_ANSI) && current->IsAnsi()) ||
@@ -259,7 +259,7 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
     else if (current->IsCode())
     {
 #ifdef DEBUG_TOKEN
-      cerr << "It's a special code" << endl;
+      // cerr << "It's a special code" << endl;
 #endif
       switch ((current->GetBuf())[1])
       {
@@ -507,15 +507,15 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
       logentry("TokenList::Interpret() sent bad Token!", OVERSEER, LogChannels::LOG_BUG);
     }
 #ifdef DEBUG_TOKEN
-    cerr << "Output after this loop: " << interp << endl;
+    // cerr << "Output after this loop: " << interp << endl;
 #endif
   } /* for loop */
 
   interp += "\r\n";
 
 #ifdef DEBUG_TOKEN
-  cerr << "Finished building interp; it is:" << endl;
-  cerr << interp << endl;
+  // cerr << "Finished building interp; it is:" << endl;
+  // cerr << interp << endl;
 #endif
 
   return interp;
@@ -558,7 +558,7 @@ void Token::SetBuf(char *rhs)
   {
     type = TEXT;
 #ifdef DEBUG_TOKEN
-    cerr << buf << ": TEXT" << endl;
+    // cerr << buf << ": TEXT" << endl;
 #endif
   }
   else
@@ -583,7 +583,7 @@ void Token::SetBuf(char *rhs)
     case '*':
       type = ANSI;
 #ifdef DEBUG_TOKEN
-      cerr << buf << ": ANSI" << endl;
+      // cerr << buf << ": ANSI" << endl;
 #endif
       break;
     case 'B':
@@ -592,20 +592,20 @@ void Token::SetBuf(char *rhs)
     case 'R':
       type = (VT100 | ANSI);
 #ifdef DEBUG_TOKEN
-      cerr << buf << ": ANSI|VT100" << endl;
+      // cerr << buf << ": ANSI|VT100" << endl;
 #endif
       break;
       // we allow $$ to go through now, since it's handled in handle_ansi -pir 2/14/01
     case '$':
       type = TEXT; // buf[1] = 0;
 #ifdef DEBUG_TOKEN
-      cerr << buf << ": TEXT" << endl;
+      // cerr << buf << ": TEXT" << endl;
 #endif
       break;
     default:
       type = CODE;
 #ifdef DEBUG_TOKEN
-      cerr << buf << ": CODE" << endl;
+      // cerr << buf << ": CODE" << endl;
 #endif
       break;
     } /* switch */

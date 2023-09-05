@@ -644,7 +644,7 @@ void DC::boot_db(void)
 	{
 		if (cf.verbose_mode)
 		{
-			cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << endl;
+			// cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << endl;
 		}
 
 		zone.reset(Zone::ResetType::full);
@@ -2539,7 +2539,7 @@ zone_t DC::read_one_zone(FILE *fl)
 		zone_key = zones.lastKey() + 1;
 	}
 	zone.key = zone_key;
-	// cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << endl;
+	// // cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << endl;
 	zones.insert(zone_key, zone);
 	return zone_key;
 }
@@ -2596,7 +2596,7 @@ void DC::boot_zones(void)
 		auto zone_key = read_one_zone(fl);
 		auto &zone = zones[zone_key];
 		zone.setFilename(temp);
-		// cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << endl;
+		// // cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << endl;
 
 		fclose(fl);
 	}
@@ -5362,8 +5362,8 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
-		cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
+		// cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
+		// cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
 		while (isdigit(getc(fl)))
 		{
 		}
@@ -5429,14 +5429,12 @@ int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range)
 
 	if (number < beg_range)
 	{
-		cerr << "fread_int: error " << number << " less than " << beg_range << ". "
-			 << "Setting to " << beg_range << endl;
+		// cerr << "fread_int: error " << number << " less than " << beg_range << ". " << "Setting to " << beg_range << endl;
 		number = beg_range;
 	}
 	else if (number > end_range)
 	{
-		cerr << "fread_int: error " << number << " greater than " << beg_range << ". "
-			 << "Setting to " << beg_range << endl;
+		// cerr << "fread_int: error " << number << " greater than " << beg_range << ". " << "Setting to " << beg_range << endl;
 		number = end_range;
 	}
 
@@ -5472,8 +5470,8 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
-		cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
+		// cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
+		// cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
 		while (isdigit(getc(fl)))
 		{
 		}
