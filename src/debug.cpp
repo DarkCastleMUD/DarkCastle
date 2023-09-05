@@ -151,13 +151,13 @@ void showObjectVault(const char *owner, Object *obj)
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.size,Object::size_bits, buf);
+  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
   // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
+  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
   // cerr <<  buf << ":";
 
   showObjectAffects(obj);
@@ -173,13 +173,13 @@ void showObject(Character *ch, Object *obj)
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.size,Object::size_bits, buf);
+  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
   // cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags,Object::more_obj_bits, buf);
+  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
   // cerr <<  buf << ":";
 
   showObjectAffects(obj);
@@ -206,16 +206,14 @@ int main(int argc, char **argv)
     do
     {
       tie(arg1, remainder) = half_chop(remainder);
-      // cerr << "[" << arg1 << "]"
-           << "[" << remainder << "]" << endl;
+      // cerr << "[" << arg1 << "]" << "[" << remainder << "]" << endl;
     } while (arg1.empty() == false);
 
     char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
     do
     {
       half_chop(c_input, c_arg1, c_arg2);
-      // cerr << "[" << c_arg1 << "]"
-           << "[" << c_arg2 << "]" << endl;
+      // cerr << "[" << c_arg1 << "]" << "[" << c_arg2 << "]" << endl;
       strncpy(c_input, c_arg2, sizeof(c_input) - 1);
     } while (c_arg1[0] != '\0');
 
