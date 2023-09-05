@@ -2281,24 +2281,24 @@ void Zone::write(FILE *fl)
 	for (int i = 0; cmd[i].command != 'S'; i++)
 	{
 		if (cmd[i].command == '*')
-			fprintf(fl, "* %s\n", cmd[i].comment ? cmd[i].comment : "");
+			fprintf(fl, "* %s\n", cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		else if (cmd[i].command == '%')
 			fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i].if_flag,
 					cmd[i].arg1,
 					cmd[i].arg2,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		else if (cmd[i].command == 'X')
 			fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i].if_flag,
 					cmd[i].arg1,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		else if (cmd[i].command == 'K')
 			fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i].if_flag,
 					cmd[i].arg1,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		else if (cmd[i].command == 'M')
 		{
 			int virt = cmd[i].active ? mob_index[cmd[i].arg1].virt : cmd[i].arg1;
@@ -2306,7 +2306,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		}
 		else if (cmd[i].command == 'P')
 		{
@@ -2316,7 +2316,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i].arg2,
 					virt2,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		}
 		else if (cmd[i].command == 'G')
 		{
@@ -2326,7 +2326,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		}
 		else if (cmd[i].command == 'O')
 		{
@@ -2335,7 +2335,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		}
 		else if (cmd[i].command == 'E')
 		{
@@ -2344,7 +2344,7 @@ void Zone::write(FILE *fl)
 					virt,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 		}
 		else
 			fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i].command,
@@ -2352,7 +2352,7 @@ void Zone::write(FILE *fl)
 					cmd[i].arg1,
 					cmd[i].arg2,
 					cmd[i].arg3,
-					cmd[i].comment ? cmd[i].comment : "");
+					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
 	}
 
 	fprintf(fl, "S\n$~\n");
@@ -2528,7 +2528,7 @@ zone_t DC::read_one_zone(FILE *fl)
 		zone.cmd[i].arg1 = reset_tab[i].arg1;
 		zone.cmd[i].arg2 = reset_tab[i].arg2;
 		zone.cmd[i].arg3 = reset_tab[i].arg3;
-		if (reset_tab[i].comment)
+		if (!reset_tab[i].comment.isEmpty())
 			zone.cmd[i].comment = reset_tab[i].comment;
 	}
 

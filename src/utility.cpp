@@ -2049,10 +2049,59 @@ void double_dollars(char *destination, char *source)
 // convert char string to int
 // return true if successful, false if error
 // also check to make sure it's in the valid range
-bool check_range_valid_and_convert(int &value, const char *buf, int begin, int end)
+bool check_range_valid_and_convert(uint64_t &value, QString buf, uint64_t begin, uint64_t end)
 {
-  value = atoi(buf);
-  if (value == 0 && strcmp(buf, "0"))
+  bool ok = false;
+  value = buf.toULongLong(&ok);
+  if (!ok)
+    return false;
+
+  if (value < begin)
+    return false;
+
+  if (value > end)
+    return false;
+
+  return true;
+}
+
+bool check_range_valid_and_convert(int64_t &value, QString buf, int64_t begin, int64_t end)
+{
+  bool ok = false;
+  value = buf.toLongLong(&ok);
+  if (!ok)
+    return false;
+
+  if (value < begin)
+    return false;
+
+  if (value > end)
+    return false;
+
+  return true;
+}
+
+bool check_range_valid_and_convert(uint32_t &value, QString buf, uint32_t begin, uint32_t end)
+{
+  bool ok = false;
+  value = buf.toUInt(&ok);
+  if (!ok)
+    return false;
+
+  if (value < begin)
+    return false;
+
+  if (value > end)
+    return false;
+
+  return true;
+}
+
+bool check_range_valid_and_convert(int32_t &value, QString buf, int32_t begin, int32_t end)
+{
+  bool ok = false;
+  value = buf.toInt(&ok);
+  if (!ok)
     return false;
 
   if (value < begin)

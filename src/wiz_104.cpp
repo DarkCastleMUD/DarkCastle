@@ -694,7 +694,7 @@ int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 			break;
 		case '*':
 			sprintf(buf, "%s %s\r\n", buf,
-					zone.cmd[j].comment ? zone.cmd[j].comment : "Empty Comment");
+					zone.cmd[j].comment.toStdString().c_str() ? zone.cmd[j].comment.toStdString().c_str() : "Empty Comment");
 			break;
 		case 'K':
 			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
@@ -742,8 +742,10 @@ int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 			break;
 		} // switch
 
-		if (zone.cmd[j].comment && zone.cmd[j].command != '*')
-			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment);
+		if (!zone.cmd[j].comment.isEmpty() && zone.cmd[j].command != '*')
+		{
+			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment.toStdString().c_str());
+		}
 
 		send_to_char(buf, ch);
 		if (num_to_show != 1)

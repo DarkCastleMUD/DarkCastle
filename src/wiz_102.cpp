@@ -46,6 +46,24 @@
 
 using namespace std;
 
+int max_res(const Zone &zone)
+{
+  int i = 0;
+  for (; zone.cmd[i].command != 'S' && i < zone.reset_total - 1; i++)
+    ;
+  return i;
+}
+
+int max_res(int zone_key)
+{
+  if (DC::getInstance()->zones.contains(zone_key))
+  {
+    return max_res(DC::getInstance()->zones[zone_key]);
+  }
+
+  return 0;
+}
+
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -464,31 +482,51 @@ int do_mpstat(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_zone_single_edit(Character *ch, char *argument, int zone)
+command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 {
-  char cmdnum[MAX_INPUT_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char last[MAX_INPUT_LENGTH];
-  int32_t i, j;
-  int cmd = 0;
-
-  argument = one_argument(argument, cmdnum);
-  half_chop(argument, select, last);
-  int max_res(int zone);
-  if (*cmdnum && !check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone)))
+  if (arguments.size() < 3 || arguments.at(0).isEmpty())
   {
-    send_to_char("That is not a valid command number.\r\n", ch);
+    send_to_char("$3Usage$R:  zedit edit <cmdnumber> <type|if|1|2|3|comment> <value>\r\n"
+                 "Valid types are:   'M', 'O', 'P', 'G', 'E', 'D', '*', 'X', 'K', and '%'.\r\n"
+                 "Valid ifs are:     0(always), 1(ontrue), 2(onfalse), 3(onboot).\r\n"
+                 "Valid args (123):  0-32000\r\n"
+                 "                   (for max-in-world, -1 represents 'always')\r\n",
+                 ch);
     return eFAILURE;
   }
-  cmd--; // since we show user list starting at 1
 
-  if (*select && *last && cmd > -1)
+  QString cmdnum = arguments.at(0);
+  uint64_t cmd = 0;
+  qDebug() << max_res(zone) << cmdnum << check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone));
+
+  if (max_res(zone) == 0)
+  {
+    ch->send("There are no commands in this zone yet. Use 'zedit add' to add one.\r\n");
+  }
+
+  if (cmdnum.isEmpty())
+  {
+    ch->send("You did not specify a command number.\r\n");
+    return eFAILURE;
+  }
+
+  if (!check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone)))
+  {
+    ch->send(QString("'%1' is not a valid command number Valid command numbers are 1-%1.\r\n").arg(cmdnum).arg(max_res(zone)));
+    return eFAILURE;
+  }
+
+  QString select = arguments.at(1);
+  QString last = arguments.at(2);
+  uint64_t i = 0, j = 0;
+
+  if (!select.isEmpty() && !last.isEmpty() && cmd > 0)
   {
     if (isname(select, "type"))
     {
-      char result = toupper(*last);
+      char result = last.at(0).toUpper().toLatin1();
 
-      switch (toupper(result))
+      switch (result)
       {
       case 'M':
       case 'O':
@@ -499,15 +537,14 @@ int do_zone_single_edit(Character *ch, char *argument, int zone)
       case 'K':
       case 'X':
       case '*':
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg1 = 0;
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = 0;
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg3 = 0;
+        zone.cmd[cmd].arg1 = 0;
+        zone.cmd[cmd].arg2 = 0;
+        zone.cmd[cmd].arg3 = 0;
         /* no break */
       case '%':
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = 100;
-        DC::getInstance()->zones.value(zone).cmd[cmd].command = result;
-        sprintf(select, "Type for command %d changed to %c.\r\nArg1-3 reset.\r\n", cmd + 1, result);
-        send_to_char(select, ch);
+        zone.cmd[cmd].arg2 = 100;
+        zone.cmd[cmd].command = result;
+        ch->send(QString("Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n").arg(cmd + 1).arg(result));
         break;
       default:
         send_to_char("Type must be:  M, O, P, G, E, D, X, K, *, or %.\r\n", ch);
@@ -516,82 +553,77 @@ int do_zone_single_edit(Character *ch, char *argument, int zone)
     }
     else if (isname(select, "if"))
     {
-      switch (*last)
+      switch (last.at(0).toLatin1())
       {
       case '0':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 0;
-        sprintf(select, "If flag for command %d changed to 0 (always).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 0;
+        ch->send(QString("If flag for command %1 changed to 0 (always).\r\n").arg(cmd + 1));
         break;
       case '1':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 1;
-        sprintf(select, "If flag for command %d changed to 1 ($B$2ontrue$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 1;
+        ch->send(QString("If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n").arg(cmd + 1));
         break;
       case '2':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 2;
-        sprintf(select, "If flag for command %d changed to 2 ($B$4onfalse$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 2;
+        ch->send(QString("If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n").arg(cmd + 1));
         break;
       case '3':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 3;
-        sprintf(select, "If flag for command %d changed to 3 ($B$5onboot$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 3;
+        ch->send(QString("If flag for command %1 changed to 3 ($B$5onboot$R).\r\n").arg(cmd + 1));
         break;
       case '4':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 4;
-        sprintf(select, "If flag for command %d changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 4;
+        ch->send(QString("If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '5':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 5;
-        sprintf(select, "If flag for command %d changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 5;
+        ch->send(QString("If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '6':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 6;
-        sprintf(select, "If flag for command %d changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 6;
+        ch->send(QString("If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '7':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 7;
-        sprintf(select, "If flag for command %d changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 7;
+        ch->send(QString("If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '8':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 8;
-        sprintf(select, "If flag for command %d changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 8;
+        ch->send(QString("If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '9':
-        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 9;
-        sprintf(select, "If flag for command %d changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n", cmd + 1);
+        zone.cmd[cmd].if_flag = 9;
+        ch->send(QString("If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n").arg(cmd + 1));
         break;
       default:
-        send_to_char("Legal values are 0 (always), 1 (ontrue), 2 (onfalse), 3 (onboot),\r\n"
-                     "                 4 (if-last-mob-true),   5 (if-last-mob-false),\r\n"
-                     "                 6 (if-last-obj-true),   7 (if-last-obj-false),\r\n"
-                     "                 8 (if-last-%%-true),    9 (if-last-%%-false)\r\n",
-                     ch);
+        ch->send("Legal values are 0 (always), 1 (ontrue), 2 (onfalse), 3 (onboot),\r\n"
+                 "                 4 (if-last-mob-true),   5 (if-last-mob-false),\r\n"
+                 "                 6 (if-last-obj-true),   7 (if-last-obj-false),\r\n"
+                 "                 8 (if-last-%%-true),    9 (if-last-%%-false)\r\n");
         return eFAILURE;
       }
-      send_to_char(select, ch);
     }
     else if (isname(select, "comment"))
     {
       //      This is str_hsh'd, don't delete it
-      //      if(DC::getInstance()->zones.value(zone).cmd[cmd].comment)
-      //        dc_free(DC::getInstance()->zones.value(zone).cmd[cmd].comment);
-      if (!strcmp(last, "none"))
+      //      if(zone.cmd[cmd].comment)
+      //        dc_free(zone.cmd[cmd].comment);
+      if (last == "none")
       {
-        DC::getInstance()->zones.value(zone).cmd[cmd].comment = nullptr;
-        sprintf(select, "Comment for command %d removed.\r\n", cmd + 1);
-        send_to_char(select, ch);
+        zone.cmd[cmd].comment = {};
+        ch->send(QString("Comment for command %d removed.\r\n").arg(cmd + 1));
       }
       else
       {
-        DC::getInstance()->zones.value(zone).cmd[cmd].comment = str_hsh(last);
-        sprintf(select, "Comment for command %d change to '%s'.\r\n", cmd + 1,
-                DC::getInstance()->zones.value(zone).cmd[cmd].comment);
-        send_to_char(select, ch);
+        zone.cmd[cmd].comment = last;
+        ch->send(QString("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd].comment));
       }
     }
     else
     {
-      if (*last == '0')
-        i = 0;
-      else if (!(i = atoi(last)))
+      bool ok = false;
+      i = last.toULongLong(&ok);
+      if (!ok)
       {
         send_to_char("That was not a valid number for an argument.\r\n", ch);
         return eFAILURE;
@@ -600,7 +632,7 @@ int do_zone_single_edit(Character *ch, char *argument, int zone)
       int vnum = 0;
       if (isname(select, "1"))
       {
-        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
+        switch (zone.cmd[cmd].command)
         {
         case 'M':
           j = real_mobile(i);
@@ -621,28 +653,26 @@ int do_zone_single_edit(Character *ch, char *argument, int zone)
           j = i;
           break;
         }
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg1 = j;
-        sprintf(select, "Arg 1 set to %ld.\r\n", i);
-        send_to_char(select, ch);
+        zone.cmd[cmd].arg1 = j;
+        ch->send(QString("Arg 1 set to %1.\r\n").arg(i));
       }
       else if (isname(select, "2"))
       {
-        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
+        switch (zone.cmd[cmd].command)
         {
         case 'K':
         case 'X':
-          send_to_char("There is no arg2 for X commands.\r\n", ch);
+          ch->send("There is no arg2 for X commands.\r\n");
           return eFAILURE;
         default:
           break;
         }
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = i;
-        sprintf(select, "Arg 2 set to %ld.\r\n", i);
-        send_to_char(select, ch);
+        zone.cmd[cmd].arg2 = i;
+        ch->send(QString("Arg 2 set to %1.\r\n").arg(i));
       }
       else if (isname(select, "3"))
       {
-        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
+        switch (zone.cmd[cmd].command)
         {
         case 'M':
         case 'O':
@@ -667,36 +697,83 @@ int do_zone_single_edit(Character *ch, char *argument, int zone)
         default:
           break;
         }
-        DC::getInstance()->zones.value(zone).cmd[cmd].arg3 = i;
-        sprintf(select, "Arg 3 set to %ld.\r\n", i);
+        zone.cmd[cmd].arg3 = i;
+        ch->send(QString("Arg 3 set to %1.\r\n").arg(i));
         send_to_char(select, ch);
       }
     }
     return eFAILURE;
   }
 
-  send_to_char("$3Usage$R:  zedit edit <cmdnumber> <type|if|1|2|3|comment> <value>\r\n"
-               "Valid types are:   'M', 'O', 'P', 'G', 'E', 'D', '*', 'X', 'K', and '%'.\r\n"
-               "Valid ifs are:     0(always), 1(ontrue), 2(onfalse), 3(onboot).\r\n"
-               "Valid args (123):  0-32000\r\n"
-               "                   (for max-in-world, -1 represents 'always')\r\n",
-               ch);
   return eFAILURE;
 }
-int max_res(int zone)
+
+uint64_t getZoneLastCommandNumber(const Zone &zone)
 {
-  int i;
-  for (i = 0;
-       DC::getInstance()->zones.value(zone).cmd[i].command != 'S' && i < (DC::getInstance()->zones.value(zone).reset_total - 1);
-       i++)
+  // set the index of the S command in that zone
+  // have to go from bottom instead of top-counting down since we could have more than
+  // one 'S' at the end from deletes
+  uint64_t command_number;
+  for (command_number = 0; zone.cmd[command_number].command != 'S' && command_number < (zone.reset_total - 1); command_number++)
+  {
     ;
-  return i;
+  }
+  return command_number;
+}
+
+command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
+{
+
+  if (arguments.size() < 2)
+  {
+    send_to_char("$3Usage$R: zedit remove <zonecmdnumber>\r\n"
+                 "This will remove the command from the zonefile.\r\n",
+                 ch);
+    return eFAILURE;
+  }
+
+  QString text = arguments.at(1);
+  bool ok = false;
+
+  uint64_t zone_command_number = text.toULongLong(&ok);
+
+  uint64_t zone_last_command_number = getZoneLastCommandNumber(zone);
+
+  if (zone_command_number == 0 || zone_command_number > zone_last_command_number)
+  {
+    ch->send(QString("Invalid number '%1'.  <zonecmdnumber> must be between 1 and %2.\r\n").arg(text).arg(zone_last_command_number - 1));
+    return eFAILURE;
+  }
+
+  // j = zone_command_number-1 because the user sees arrays starting at 1
+  for (uint64_t j = zone_command_number - 1; zone.cmd[j].command != 'S'; j++)
+  {
+    auto &character_list = DC::getInstance()->character_list;
+    for (auto &tmp_vict : character_list)
+    {
+      if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone.cmd[j])
+      {
+        if (zone.cmd[j + 1].command != 'S')
+        {
+          tmp_vict->mobdata->reset = &zone.cmd[j + 1];
+        }
+        else
+        {
+          tmp_vict->mobdata->reset = nullptr;
+        }
+      }
+    }
+    zone.cmd[j] = zone.cmd[j + 1];
+  }
+
+  ch->send(QString("Command %1 removed.  Table reformatted.\r\n").arg(zone_command_number));
+  return eSUCCESS;
 }
 
 int do_zedit(Character *ch, char *argument, int cmd)
 {
   QString buf, text, arg;
-  int16_t skill = {};
+  uint_fast8_t subcommand = {};
   uint64_t i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
@@ -704,7 +781,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   struct reset_com tmp = {}, temp_com = {};
   char *str = {};
 
-  const char *zedit_values[] = {
+  const char *zedit_subcommands[] = {
       "remove", "add", "edit", "list", "name",
       "lifetime", "mode", "flags", "help", "search",
       "swap", "copy", "continent", "info",
@@ -715,11 +792,12 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   if (arguments.isEmpty() || arguments.at(0).isEmpty())
   {
-    send_to_char("$3Usage$R: zedit <field> <correct arguments>\r\n"
-                 "You must be _in_ the zone you wish to edit.\r\n"
-                 "Fields are the following.\r\n",
+    send_to_char("$3Usage$R: zedit <subcommand> [arguments]\r\n"
+                 "       zedit <zone number> <subcommand> [arguments]\r\n"
+                 "If you don't specify the zone number then whatever zone you are in is used.\r\n"
+                 "Subcommands:\r\n",
                  ch);
-    display_string_list(zedit_values, ch);
+    display_string_list(zedit_subcommands, ch);
     return eFAILURE;
   }
 
@@ -736,14 +814,16 @@ int do_zedit(Character *ch, char *argument, int cmd)
     select = arguments.at(0);
   }
 
-  for (skill = 0;; skill++)
+  for (subcommand = 0;; subcommand++)
   {
-    if (zedit_values[skill][0] == '\n')
+    if (zedit_subcommands[subcommand][0] == '\n')
     {
-      send_to_char("Invalid field.\r\n", ch);
+      ch->send(QString("'%1' is an invalid subcommand.\r\n").arg(select));
+      ch->send("Valid subcommands are:\r\n");
+      display_string_list(zedit_subcommands, ch);
       return eFAILURE;
     }
-    if (is_abbrev(select, zedit_values[skill]))
+    if (is_abbrev(select, zedit_subcommands[subcommand]))
       break;
   }
 
@@ -773,52 +853,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
   }
   last_cmd = i;
 
-  switch (skill)
+  switch (subcommand)
   {
   case 0: /* remove */
-
-    if (arguments.size() < 2)
-    {
-      send_to_char("$3Usage$R: zedit remove <zonecmdnumber>\r\n"
-                   "This will remove the command from the zonefile.\r\n",
-                   ch);
-      return eFAILURE;
-    }
-
-    text = arguments.at(1);
-    ok = false;
-
-    i = text.toInt(&ok);
-    if (!i || i > last_cmd)
-    {
-      buf = QString("Invalid number '%1'.  <zonecmdnumber> must be between 1 and %2.\r\n").arg(text).arg(last_cmd - 1);
-      send_to_char(buf, ch);
-      return eFAILURE;
-    }
-
-    // j = i-1 because the user sees arrays starting at 1
-    for (j = i - 1; zone.cmd[j].command != 'S'; j++)
-    {
-      auto &character_list = DC::getInstance()->character_list;
-      for (auto &tmp_vict : character_list)
-      {
-        if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone.cmd[j])
-        {
-          if (zone.cmd[j + 1].command != 'S')
-          {
-            tmp_vict->mobdata->reset = &zone.cmd[j + 1];
-          }
-          else
-          {
-            tmp_vict->mobdata->reset = nullptr;
-          }
-        }
-      }
-      zone.cmd[j] = zone.cmd[j + 1];
-    }
-
-    buf = QString("Command %1 removed.  Table reformatted.\r\n").arg(i);
-    send_to_char(buf, ch);
+    zedit_remove(ch, arguments, zone);
     break;
 
   case 1: /* add */
@@ -890,7 +928,8 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   case 2: /* edit */
 
-    do_zone_single_edit(ch, argument, zone_key);
+    arguments.pop_front();
+    zedit_edit(ch, arguments, zone);
     break;
 
   case 3: /* list */

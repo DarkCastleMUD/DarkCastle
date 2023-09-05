@@ -179,9 +179,9 @@ struct reset_com
   int arg1;
   int arg2;
   int arg3;
-  char *comment; /* Any comments that went with the command */
-  int active;    // is it active? alot aren't on the builders' port
-  time_t last;   // when was it last reset
+  QString comment; /* Any comments that went with the command */
+  int active;      // is it active? alot aren't on the builders' port
+  time_t last;     // when was it last reset
   Character *lastPop;
   time_t lastSuccess;
   uint64_t attempts;
@@ -202,11 +202,11 @@ struct reset_com
 /* element in monster and object index-tables   */
 struct index_data
 {
-  int virt;                                                                               /* virt number of ths mob/obj           */
-  int number;                                                                             /* number of existing units of ths mob/obj */
+  int virt;                                                                            /* virt number of ths mob/obj           */
+  int number;                                                                          /* number of existing units of ths mob/obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
-  void *item;                                                                             /* the mobile/object itself                 */
+  void *item;                                                                          /* the mobile/object itself                 */
 
   mob_prog_data *mobprogs;
   mob_prog_data *mobspec;

@@ -570,7 +570,18 @@ int is_ignoring(const Character *const ch, const Character *const i);
 void colorCharSend(char *s, Character *ch);
 void send_to_char_regardless(string messg, Character *ch);
 int csendf(Character *ch, const char *arg, ...);
-bool check_range_valid_and_convert(int &value, const char *buf, int begin, int end);
+bool check_range_valid_and_convert(uint64_t &value, QString buf, uint64_t begin, uint64_t end);
+bool check_range_valid_and_convert(int64_t &value, QString buf, int64_t begin, int64_t end);
+bool check_range_valid_and_convert(uint32_t &value, QString buf, uint32_t begin, uint32_t end);
+bool check_range_valid_and_convert(int32_t &value, QString buf, int32_t begin, int32_t end);
+/*
+TODO
+bool check_range_valid_and_convert(uint16_t &value, QString buf, uint16_t begin, uint16_t end);
+bool check_range_valid_and_convert(int16_t &value, QString buf, int begin, int end);
+bool check_range_valid_and_convert(uint8_t &value, QString buf, int begin, int end);
+bool check_range_valid_and_convert(int8_t &value, QString buf, int begin, int end);
+*/
+
 bool check_valid_and_convert(int &value, char *buf);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t value[]);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t &value);
