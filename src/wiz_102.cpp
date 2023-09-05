@@ -514,12 +514,13 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
     ch->send(QString("'%1' is not a valid command number Valid command numbers are 1-%1.\r\n").arg(cmdnum).arg(max_res(zone)));
     return eFAILURE;
   }
+  cmd--;
 
   QString select = arguments.at(1);
   QString last = arguments.at(2);
   uint64_t i = 0, j = 0;
 
-  if (!select.isEmpty() && !last.isEmpty() && cmd > 0)
+  if (!select.isEmpty() && !last.isEmpty() && cmd >= 0)
   {
     if (isname(select, "type"))
     {
