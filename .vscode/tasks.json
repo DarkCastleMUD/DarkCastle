@@ -65,7 +65,7 @@
         {
             "label": "build debug src using 128 threads",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then rebootdc.sh; fi",
+            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug && make -C build -j 128 && if pidof dcastle; then rebootdc.sh; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
