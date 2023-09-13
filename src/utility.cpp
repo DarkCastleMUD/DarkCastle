@@ -1796,11 +1796,11 @@ int do_quit(Character *ch, char *argument, int cmd)
     if (ch->player->last_site)
       dc_free(ch->player->last_site);
 #ifdef LEAK_CHECK
-    ch->player->last_site = (char *)calloc(strlen(ch->desc->getPeerOriginalAddressC()) + 1, sizeof(char));
+    ch->player->last_site = (char *)calloc(strlen(ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #else
-    ch->player->last_site = (char *)dc_alloc(strlen(ch->desc->getPeerOriginalAddressC()) + 1, sizeof(char));
+    ch->player->last_site = (char *)dc_alloc(strlen(ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #endif
-    strcpy(ch->player->last_site, ch->desc->getPeerOriginalAddressC());
+    strcpy(ch->player->last_site, ch->desc->getPeerOriginalAddress().toString().toStdString().c_str());
     ch->player->time.logon = time(0);
   }
 

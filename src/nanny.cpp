@@ -841,6 +841,7 @@ void nanny(class Connection *d, string arg)
    unsigned selection = 0;
    auto &character_list = DC::getInstance()->character_list;
    char log_buf[MAX_STRING_LENGTH] = {};
+   QString buffer;
 
    ch = d->character;
    arg.erase(0, arg.find_first_not_of(' '));
@@ -981,7 +982,7 @@ void nanny(class Connection *d, string arg)
       // doing it to fix it.  (No time to verify this now, so i'll do it later)
       GET_NAME(ch) = str_dup(tmp_name);
 
-      // if (isAllowedHost(d->getPeerOriginalAddressC()))
+      // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
       // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
       if (check_reconnect(d, tmp_name, false))
@@ -1043,7 +1044,7 @@ void nanny(class Connection *d, string arg)
       if (string(crypt(arg.c_str(), password)) != password)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
-         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddressC());
+         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
          logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
@@ -1074,11 +1075,11 @@ void nanny(class Connection *d, string arg)
       if (check_reconnect(d, GET_NAME(ch), true))
          return;
 
-      sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->getPeerOriginalAddressC());
+      buffer = QString("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
       if (GET_LEVEL(ch) < ANGEL)
-         logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
+         logentry(buffer, OVERSEER, LogChannels::LOG_SOCKET);
       else
-         logentry(log_buf, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
+         logentry(buffer, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
@@ -1126,7 +1127,7 @@ void nanny(class Connection *d, string arg)
          if (isbanned(d->getPeerOriginalAddress()) >= BAN_NEW)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
-                    GET_NAME(d->character), d->getPeerOriginalAddressC());
+                    GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
             logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
@@ -1256,7 +1257,7 @@ void nanny(class Connection *d, string arg)
       }
 
       /*
-            if (!isAllowedHost(d->getPeerOriginalAddressC()) && DC::getInstance()->cf.allow_newstatsys == false)
+            if (!isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()) && DC::getInstance()->cf.allow_newstatsys == false)
             {
                STATE(d) = Connection::states::OLD_STAT_METHOD;
                break;
@@ -1718,7 +1719,7 @@ void nanny(class Connection *d, string arg)
 
       init_char(ch);
 
-      sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddressC());
+      sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
       logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
@@ -2045,7 +2046,7 @@ bool check_deny(class Connection *d, char *name)
    fclose(fpdeny);
 
    char log_buf[MAX_STRING_LENGTH] = {};
-   sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddressC());
+   sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddress().toString().toStdString().c_str());
    logentry(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
@@ -2085,7 +2086,7 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
          send_to_char("Reconnecting.\r\n", tmp_ch);
          char log_buf[MAX_STRING_LENGTH] = {};
          sprintf(log_buf, "%s@%s has reconnected.",
-                 GET_NAME(tmp_ch), d->getPeerOriginalAddressC());
+                 GET_NAME(tmp_ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0,
              0, TO_ROOM, INVIS_NULL);
 

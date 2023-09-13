@@ -232,34 +232,34 @@ int write_hotboot_file(char **new_argv)
       STATE(d) = Connection::states::PLAYING; // if editors.
       if (d->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getPeerOriginalAddressC());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getPeerOriginalAddress().toString().toStdString().c_str());
         if (d->original->player)
         {
           if (d->original->player->last_site)
             dc_free(d->original->player->last_site);
 #ifdef LEAK_CHECK
-          d->original->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
+          d->original->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #else
-          d->original->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
+          d->original->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #endif
-          strcpy(d->original->player->last_site, d->original->desc->getPeerOriginalAddressC());
+          strcpy(d->original->player->last_site, d->original->desc->getPeerOriginalAddress().toString().toStdString().c_str());
           d->original->player->time.logon = time(0);
         }
         save_char_obj(d->original);
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getPeerOriginalAddressC());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
         if (d->character->player)
         {
           if (d->character->player->last_site)
             dc_free(d->character->player->last_site);
 #ifdef LEAK_CHECK
-          d->character->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
+          d->character->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #else
-          d->character->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddressC()) + 1, sizeof(char));
+          d->character->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
 #endif
-          strcpy(d->character->player->last_site, d->character->desc->getPeerOriginalAddressC());
+          strcpy(d->character->player->last_site, d->character->desc->getPeerOriginalAddress().toString().toStdString().c_str());
           d->character->player->time.logon = time(0);
         }
         save_char_obj(d->character);
@@ -778,7 +778,7 @@ void DC::game_loop(void)
       {
         if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
         {
-          sprintf(buf, "Connection attempt bailed from %s", d->getPeerOriginalAddressC());
+          sprintf(buf, "Connection attempt bailed from %s", d->getPeerOriginalAddress().toString().toStdString().c_str());
           printf(buf);
           logentry(buf, 111, LogChannels::LOG_SOCKET);
         }
@@ -2050,16 +2050,12 @@ void write_to_output(string txt, class Connection *t)
 
 int new_descriptor(int s)
 {
-  socket_t desc;
-#ifndef WIN32
-  socklen_t i;
-#else
-  int i;
-#endif
+  socket_t desc = {};
+  socklen_t i = {};
   static int last_desc = 0; /* last descriptor number */
-  class Connection *newd;
-  struct sockaddr_in peer;
-  char buf[MAX_STRING_LENGTH];
+  class Connection *newd = {};
+  struct sockaddr_in peer = {};
+  char buf[MAX_STRING_LENGTH] = {};
 
   /* accept the new connection */
   i = sizeof(peer);
@@ -2099,7 +2095,7 @@ int new_descriptor(int s)
                         "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
-    sprintf(buf, "Connection attempt denied from [%s]", newd->getPeerOriginalAddressC());
+    sprintf(buf, "Connection attempt denied from [%s]", newd->getPeerOriginalAddress().toString().toStdString().c_str());
     logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
     dc_free(newd);
     return 0;
@@ -3404,7 +3400,7 @@ void warn_if_duplicate_ip(Character *ch)
   {
     if (d->character &&
         strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
-        !strcmp(d->getPeerOriginalAddressC(), ch->desc->getPeerOriginalAddressC()))
+        !strcmp(d->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))
     {
       multiplayer m;
       m.host = d->getPeerAddress();
@@ -3432,7 +3428,7 @@ void warn_if_duplicate_ip(Character *ch)
 
   for (list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    logf(108, LogChannels::LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host, (*i).name1, (*i).name2);
+    logf(108, LogChannels::LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1, (*i).name2);
   }
 }
 
@@ -3539,4 +3535,9 @@ Proxy::Proxy(QString h)
 
     active = true;
   }
+}
+
+const char *Connection::getPeerOriginalAddressC(void)
+{
+  return getPeerOriginalAddress().toString().toStdString().c_str();
 }
