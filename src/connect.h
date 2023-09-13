@@ -56,13 +56,13 @@ public:
   quint16 getDestinationPort(void) { return destination_port; }
 
 private:
-  inet_protocol_family_t inet_protocol_family;
-  QString header;
+  inet_protocol_family_t inet_protocol_family = {};
+  QString header = {};
   bool active = false;
-  QHostAddress source_address;
-  QHostAddress destination_address;
-  quint16 source_port;
-  quint16 destination_port;
+  QHostAddress source_address = {};
+  QHostAddress destination_address = {};
+  quint16 source_port = {};
+  quint16 destination_port = {};
 };
 
 class Connection
@@ -117,7 +117,7 @@ public:
     GET_STATS
   };
 
-  Proxy proxy;
+  Proxy proxy = {};
 
   int descriptor = {}; /* file descriptor for socket	*/
   int desc_num = {};
@@ -159,10 +159,7 @@ public:
   bool allowColor = 1;
   void send(QString txt);
 
-  const char *getPeerOriginalAddressC(void)
-  {
-    return getPeerOriginalAddress().toString().toStdString().c_str();
-  }
+  const char *getPeerOriginalAddressC(void);
 
   QHostAddress getPeerAddress(void)
   {
