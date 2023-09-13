@@ -235,7 +235,7 @@ uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input,
 
 bool isValidZoneCommandKey(Character *ch, const Zone &zone, const uint64_t zone_command_key)
 {
-    if (zone.cmd.isEmpty() || zone_command_key > zone.cmd.size())
+    if (zone.cmd.isEmpty() || zone_command_key >= zone.cmd.size())
     {
         if (ch)
         {
