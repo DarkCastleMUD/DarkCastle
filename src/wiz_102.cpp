@@ -697,7 +697,7 @@ command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
 
   zone.cmd.remove(zone_command_number);
 
-  ch->send(QString("Command %1 removed.\r\n").arg(zone_command_number));
+  ch->send(QString("Command %1 removed.\r\n").arg(zone_command_number + 1));
   return eSUCCESS;
 }
 
