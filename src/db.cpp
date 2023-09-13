@@ -2154,7 +2154,7 @@ void renum_zone_table(void)
 	for (auto [zone_key, zone] : zones.asKeyValueRange())
 	{
 		assert(zone_key != 0);
-		for (comm = 0; zone.cmd[comm].command != 'S'; comm++)
+		for (comm = 0; comm < zone.cmd.size(); comm++)
 		{
 			zone.cmd[comm].active = 1;
 			switch (zone.cmd[comm].command)
@@ -2269,7 +2269,7 @@ void Zone::write(FILE *fl)
 			zone_flags,
 			continent);
 
-	for (int i = 0; cmd[i].command != 'S'; i++)
+	for (int i = 0; i < cmd.size(); i++)
 	{
 		if (cmd[i].command == '*')
 			fprintf(fl, "* %s\n", cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
@@ -2421,7 +2421,6 @@ zone_t DC::read_one_zone(FILE *fl)
 		reset.arg3 = 0;
 		if (reset.command == 'S')
 		{
-			reset_tab.push_back(reset);
 			break;
 		}
 
@@ -3659,7 +3658,7 @@ void delete_mob_from_index(int nr)
 	// update zonefile commands - these store rnums
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		for (j = 0; zone.cmd[j].command != 'S'; j++)
+		for (j = 0; j < zone.cmd.size(); j++)
 		{
 			switch (zone.cmd[j].command)
 			{
@@ -3740,7 +3739,7 @@ void delete_item_from_index(int nr)
 	// update zonefile commands - these store rnums
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		for (j = 0; zone.cmd[j].command != 'S'; j++)
+		for (j = 0; j < zone.cmd.size(); j++)
 		{
 			switch (zone.cmd[j].command)
 			{
@@ -4540,7 +4539,6 @@ void Zone::reset(ResetType reset_type)
 	}
 
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
-	int last_no;
 	Character *mob = nullptr;
 	class Object *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
@@ -4561,11 +4559,8 @@ void Zone::reset(ResetType reset_type)
 	died_this_tick = 0;
 	num_mob_on_repop = 0;
 	// find last command in zone
-	last_no = 0;
-	while (cmd[last_no].command != 'S')
-		last_no++;
 
-	for (cmd_no = 0; cmd_no <= last_no; cmd_no++)
+	for (cmd_no = 0; cmd_no < cmd.size(); cmd_no++)
 	{
 		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
@@ -4575,8 +4570,6 @@ void Zone::reset(ResetType reset_type)
 			logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 			break;
 		}
-		if (cmd[cmd_no].command == 'S')
-			break;
 		if (cmd[cmd_no].active == 0)
 			continue;
 

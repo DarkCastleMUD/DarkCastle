@@ -773,7 +773,7 @@ int do_findfix(Character *ch, char *argument, int cmd)
   buf[0] = '\0';
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (j = 0; zone.cmd[j].command != 'S'; j++)
+    for (j = 0; j < zone.cmd.size(); j++)
     {
       bool first = true, found = false;
       if (zone.cmd[j].command != 'M')
@@ -783,7 +783,7 @@ int do_findfix(Character *ch, char *argument, int cmd)
           zone.cmd[j].arg2 == -1)
         continue; // Don't care about those..
       int amt = 0;
-      for (z = 0; zone.cmd[z].command != 'S'; z++)
+      for (z = 0; z < zone.cmd.size(); z++)
       {
         if (zone.cmd[z].command != 'M')
           continue;

@@ -491,14 +491,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	if (start < 0)
 		start = 0;
 
-	if (zone.cmd[0].command == 'S')
-	{
-		send_to_char("This zone has no zone commands.\r\n", ch);
-		return eFAILURE;
-	}
-
-	for (k = 0; zone.cmd[k].command != 'S'; k++)
-		;
+	k = zone.cmd.size();
 
 	if (k < start)
 	{
@@ -520,7 +513,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	}
 
 	// show zone cmds
-	for (int j = start; (j < start + num_to_show) && (zone.cmd[j].command != 'S'); j++)
+	for (int j = start; (j < start + num_to_show) && j < zone.cmd.size(); j++)
 	{
 		time_t last = zone.cmd[j].last;
 		string lastStr = "never";

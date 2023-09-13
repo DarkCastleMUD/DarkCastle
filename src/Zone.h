@@ -164,4 +164,6 @@ bool isValidZoneCommandKey(Character *ch, const Zone &zone, const uint64_t zone_
 qsizetype getZoneLastCommandNumber(const Zone &zone);
 zone_t getZoneKey(Character *ch, const QString input, bool *ok = nullptr);
 uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok = nullptr);
+
+zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone);
 #endif

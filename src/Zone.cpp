@@ -215,7 +215,7 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
             }
             else
             {
-                ch->send(QString("Valid values are 1-%1\r\n").arg(dc->zones.size()));
+                ch->send(QString("Valid values are 1-%1\r\n").arg(dc->zones.last().key));
             }
         }
         return false;
@@ -246,7 +246,7 @@ bool isValidZoneCommandKey(Character *ch, const Zone &zone, const uint64_t zone_
             }
             else
             {
-                ch->send(QString("Valid values are 1-%1\r\n").arg(zone.cmd.size() - 1));
+                ch->send(QString("Valid values are 1-%1\r\n").arg(zone.cmd.size()));
             }
         }
         return false;
