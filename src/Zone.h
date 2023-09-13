@@ -3,16 +3,48 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QList>
+#include "weather.h"
 
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 
-#define MAX_ZONE 200
+class ResetCommand
+{
+public:
+    ResetCommand(){};
+    ResetCommand(char comm) : command(comm), active(1){};
+    char command = {}; /* current command                      */
+    int if_flag = {};  // 0=always 1=if prev exe'd  2=if prev DIDN'T exe   3=ONLY on reboot
+    int arg1 = {};
+    int arg2 = {};
+    int arg3 = {};
+    QString comment = {}; /* Any comments that went with the command */
+    int active = {};      // is it active? alot aren't on the builders' port
+    time_t last = {};     // when was it last reset
+    class Character *lastPop = {};
+    time_t lastSuccess = {};
+    uint64_t attempts = {};
+    uint64_t successes = {};
+    /*
+     *  Commands:              *
+     *  'M': Read a mobile     *
+     *  'O': Read an object    *
+     *  'P': Put obj in obj    *
+     *  'G': Obj to char       *
+     *  'E': Obj to char equip *
+     *  'D': Set state of door *
+     *  '%': arg1 in arg2 chance of being true *
+     *       (this is used for putting a %chance on next command *
+     */
+};
+
+bool operator==(ResetCommand a, ResetCommand b);
+typedef QList<ResetCommand> zone_commands_t;
+
 #define MAX_INDEX 6000
-#define MAX_RESET 16383
 
 /* Zone Flag Bits */
-
 class Zone
 {
 
@@ -46,12 +78,8 @@ public:
 
     int reset_mode = {}; /* conditions for reset (see below)   */
 
-    struct reset_com *cmd = {}; /* command table for reset             */
-    int reset_total = {};       /* total number item in currently allocated
-                                 * reset_com array.  This is used in the
-                                 * do_zedit command so we don't have to realloc
-                                 * every time we add/delete a command
-                                 */
+    zone_commands_t cmd = {}; /* command table for reset             */
+
     /*
      *  Reset mode:                              *
      *  0: Don't reset, and don't update age.    *
@@ -131,4 +159,9 @@ private:
     room_t top_rnum = {};
 };
 
+bool isValidZoneKey(Character *ch, const zone_t zone_key);
+bool isValidZoneCommandKey(Character *ch, const Zone &zone, const uint64_t zone_command_key);
+qsizetype getZoneLastCommandNumber(const Zone &zone);
+zone_t getZoneKey(Character *ch, const QString input, bool *ok = nullptr);
+uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok = nullptr);
 #endif

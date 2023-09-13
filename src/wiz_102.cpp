@@ -46,24 +46,6 @@
 
 using namespace std;
 
-int max_res(const Zone &zone)
-{
-  int i = 0;
-  for (; zone.cmd[i].command != 'S' && i < zone.reset_total - 1; i++)
-    ;
-  return i;
-}
-
-int max_res(int zone_key)
-{
-  if (DC::getInstance()->zones.contains(zone_key))
-  {
-    return max_res(DC::getInstance()->zones[zone_key]);
-  }
-
-  return 0;
-}
-
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -72,11 +54,9 @@ int max_res(int zone_key)
 // Saving zones after this SHOULD not be required, as the old savefiles contain vnums, which should remain correct.
 void rebuild_rnum_references(int startAt, int type)
 {
-  int zone, comm;
-
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (comm = 0; zone.cmd && zone.cmd[comm].command != 'S'; comm++)
+    for (qsizetype comm = 0; !zone.cmd.isEmpty() && comm < zone.cmd.size(); comm++)
     {
       switch (zone.cmd[comm].command)
       {
@@ -218,7 +198,7 @@ int do_check(Character *ch, char *arg, int cmd)
     {
       if (GET_LEVEL(ch) >= OVERSEER && GET_LEVEL(ch) >= GET_LEVEL(vict))
       {
-        sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getPeerOriginalAddressC());
+        sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getPeerOriginalAddress().toString().toStdString().c_str());
         send_to_char(buf, ch);
       }
       else
@@ -495,26 +475,13 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
     return eFAILURE;
   }
 
-  QString cmdnum = arguments.at(0);
-  uint64_t cmd = 0;
-
-  if (max_res(zone) == 0)
+  QString text = arguments.at(0);
+  bool ok = false;
+  uint64_t cmd = getZoneCommandKey(ch, zone, text, &ok);
+  if (!ok)
   {
-    ch->send("There are no commands in this zone yet. Use 'zedit add' to add one.\r\n");
-  }
-
-  if (cmdnum.isEmpty())
-  {
-    ch->send("You did not specify a command number.\r\n");
     return eFAILURE;
   }
-
-  if (!check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone)))
-  {
-    ch->send(QString("'%1' is not a valid command number Valid command numbers are 1-%1.\r\n").arg(cmdnum).arg(max_res(zone)));
-    return eFAILURE;
-  }
-  cmd--;
 
   QString select = arguments.at(1);
   QString last = arguments.at(2);
@@ -708,23 +675,10 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
   return eFAILURE;
 }
 
-uint64_t getZoneLastCommandNumber(const Zone &zone)
-{
-  // set the index of the S command in that zone
-  // have to go from bottom instead of top-counting down since we could have more than
-  // one 'S' at the end from deletes
-  uint64_t command_number;
-  for (command_number = 0; zone.cmd[command_number].command != 'S' && command_number < (zone.reset_total - 1); command_number++)
-  {
-    ;
-  }
-  return command_number;
-}
-
 command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
 {
 
-  if (arguments.size() < 2)
+  if (arguments.size() < 1)
   {
     send_to_char("$3Usage$R: zedit remove <zonecmdnumber>\r\n"
                  "This will remove the command from the zonefile.\r\n",
@@ -732,42 +686,97 @@ command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
     return eFAILURE;
   }
 
-  QString text = arguments.at(1);
+  QString text = arguments.at(0);
   bool ok = false;
 
-  uint64_t zone_command_number = text.toULongLong(&ok);
-
-  uint64_t zone_last_command_number = getZoneLastCommandNumber(zone);
-
-  if (zone_command_number == 0 || zone_command_number > zone_last_command_number)
+  uint64_t zone_command_number = getZoneCommandKey(ch, zone, text, &ok);
+  if (!ok)
   {
-    ch->send(QString("Invalid number '%1'.  <zonecmdnumber> must be between 1 and %2.\r\n").arg(text).arg(zone_last_command_number - 1));
     return eFAILURE;
   }
 
-  // j = zone_command_number-1 because the user sees arrays starting at 1
-  for (uint64_t j = zone_command_number - 1; zone.cmd[j].command != 'S'; j++)
+  zone.cmd.remove(zone_command_number);
+
+  ch->send(QString("Command %1 removed.\r\n").arg(zone_command_number));
+  return eSUCCESS;
+}
+
+qsizetype zone_get_last_command(const Zone &zone)
+{
+  return zone.cmd.size();
+}
+
+zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
+{
+  if (arguments.size() < 1)
   {
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &tmp_vict : character_list)
-    {
-      if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone.cmd[j])
-      {
-        if (zone.cmd[j + 1].command != 'S')
-        {
-          tmp_vict->mobdata->reset = &zone.cmd[j + 1];
-        }
-        else
-        {
-          tmp_vict->mobdata->reset = nullptr;
-        }
-      }
-    }
-    zone.cmd[j] = zone.cmd[j + 1];
+    send_to_char("$3Usage$R: zedit add <new>\r\n"
+                 "       zedit add <command number>\r\n"
+                 "Adding 'new' will add a command to the end.\r\n"
+                 "Adding a number, will insert a new command at that place in\r\n"
+                 "the list, pushing the rest of the items back.\r\n",
+                 ch);
+    return eFAILURE;
   }
 
-  ch->send(QString("Command %1 removed.  Table reformatted.\r\n").arg(zone_command_number));
-  return eSUCCESS;
+  QString text = arguments.at(0);
+  if (isname(text, "new"))
+  {
+    zone.cmd.push_back(ResetCommand('J'));
+    ch->send(QString("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
+    return zone.cmd.size() - 1;
+  }
+
+  bool ok = false;
+  uint64_t i = getZoneCommandKey(ch, zone, text, &ok);
+  if (!ok)
+  {
+    return eFAILURE;
+  }
+
+  zone.cmd.insert(i, ResetCommand('J'));
+  ch->send(QString("New command 'J' added at %1.\r\n").arg(i + 1));
+  return i - 1;
+}
+
+command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone)
+{
+  if (arguments.isEmpty() || arguments.at(0) == "stats")
+  {
+    return show_zone_commands(ch, zone);
+  }
+
+  bool stats = false;
+  if (arguments.last() == "stats")
+  {
+    stats = true;
+    arguments.pop_back();
+  }
+
+  QString text = arguments.at(0);
+
+  // list 1
+  bool ok = false;
+  uint64_t command_number = getZoneCommandKey(ch, zone, text, &ok);
+  if (!ok)
+  {
+    return eFAILURE;
+  }
+
+  uint64_t num_to_show = 1;
+  if (arguments.size() > 1)
+  {
+    bool ok = false;
+    num_to_show = arguments.at(1).toULongLong(&ok);
+    if (!ok || num_to_show < 1)
+    {
+      num_to_show = 1;
+    }
+  }
+
+  show_zone_commands(ch, zone, command_number, num_to_show, stats);
+
+  return eSUCCESS; // so we don't set_zone_modified_zone
 }
 
 int do_zedit(Character *ch, char *argument, int cmd)
@@ -778,7 +787,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
   bool ok = false;
-  struct reset_com tmp = {}, temp_com = {};
+  ResetCommand tmp = {}, temp_com = {};
   char *str = {};
 
   const char *zedit_subcommands[] = {
@@ -835,143 +844,31 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   // set the zone we're in
 
-  if (DC::getInstance()->zones.contains(zone_key) == false)
+  if (!isValidZoneKey(ch, zone_key))
   {
-    ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
     return eFAILURE;
   }
 
   Zone &zone = DC::getInstance()->zones[zone_key];
 
-  // set the index of the S command in that zone
-  // have to go from bottom instead of top-counting down since we could have more than
-  // one 'S' at the end from deletes
-  for (i = 0; zone.cmd[i].command != 'S' && i < (zone.reset_total - 1); i++)
-  {
-    ;
-  }
-  last_cmd = i;
+  last_cmd = zone_get_last_command(zone);
 
+  arguments.pop_front();
   switch (subcommand)
   {
   case 0: /* remove */
     zedit_remove(ch, arguments, zone);
     break;
-
   case 1: /* add */
-
-    if (arguments.size() < 2)
-    {
-      send_to_char("$3Usage$R: zedit add <zonecmdnumber|new>\r\n"
-                   "This will add a new command to the zonefile.\r\n"
-                   "Adding 'new' will add a command to the end.\r\n"
-                   "Adding a number, will insert a new command at that place in\r\n"
-                   "the list, pushing the rest of the items back.\r\n",
-                   ch);
-      return eFAILURE;
-    }
-
-    text = arguments.at(1);
-    ok = false;
-    i = text.toULongLong(&ok);
-
-    if (!ok || i > last_cmd || !isname(text, "new"))
-    {
-      buf = QString("You must state either 'new' or the insertion point which must be between 0 and %1.\r\n"
-                    "'%2' is not valid.\r\n")
-                .arg(zone.reset_total)
-                .arg(text);
-      send_to_char(buf, ch);
-      return eFAILURE;
-    }
-
-    // if the zone memory is full, allocate another 10 commands worth
-    if (last_cmd >= (zone.reset_total - 2))
-    {
-      zone.cmd = (struct reset_com *)
-          realloc(zone.cmd, (zone.reset_total + 10) * sizeof(struct reset_com));
-      zone.reset_total += 10;
-    }
-
-    if (i)
-    {
-      // bump everything up a slot
-      for (j = last_cmd; j != (i - 2); j--)
-        zone.cmd[j + 1] = zone.cmd[j];
-      // set up the 'J'
-      zone.cmd[i - 1].active = 1;
-      zone.cmd[i - 1].command = 'J';
-      zone.cmd[i - 1].if_flag = 0;
-      zone.cmd[i - 1].arg1 = 0;
-      zone.cmd[i - 1].arg2 = 0;
-      zone.cmd[i - 1].arg3 = 0;
-      zone.cmd[i - 1].comment = nullptr;
-      buf = QString("New command 'J' added at %1.\r\n").arg(i);
-    }
-    else // tack it on the end
-    {
-      // bump the 'S' up
-      zone.cmd[last_cmd + 1] = zone.cmd[last_cmd];
-      // set up the 'J'
-      zone.cmd[last_cmd].active = 1;
-      zone.cmd[last_cmd].command = 'J';
-      zone.cmd[last_cmd].if_flag = 0;
-      zone.cmd[last_cmd].arg1 = 0;
-      zone.cmd[last_cmd].arg2 = 0;
-      zone.cmd[last_cmd].arg3 = 0;
-      zone.cmd[last_cmd].comment = nullptr;
-      buf = QString("New command 'J' added at %1.\r\n").arg(last_cmd + 1);
-    }
-    send_to_char(buf, ch);
+    zedit_add(ch, arguments, zone);
     break;
-
   case 2: /* edit */
-
-    arguments.pop_front();
     zedit_edit(ch, arguments, zone);
     break;
-
   case 3: /* list */
-
-    if (arguments.size() < 2)
-    {
-      show_zone_commands(ch, zone_key);
-    }
-    else
-    {
-      text = arguments.at(1);
-      ok = false;
-      i = text.toULongLong(&ok);
-      if (!ok)
-      {
-        send_to_char("Use zedit list <number> [# of commands to show].\r\n", ch);
-        return eFAILURE;
-      }
-
-      if (arguments.size() >= 3)
-      {
-        ok = false;
-        num_to_show = arguments.at(2).toULongLong(&ok);
-        if (ok && num_to_show > 0)
-
-        {
-          show_zone_commands(ch, zone_key, i - 1, num_to_show);
-        }
-
-        else
-        {
-          show_zone_commands(ch, zone_key, i - 1);
-        }
-      }
-      if (num_to_show != 1)
-      {
-        send_to_char("To see commands higher than 20, use zedit list <cmdnumber> [# of commands to show].\r\n", ch);
-      }
-
-      return eSUCCESS; // so we don't set_zone_modified_zone
-    }
+    zedit_list(ch, arguments, zone);
+    break;
   case 4: /* name */
-
     if (arguments.size() < 3)
     {
       send_to_char("$3Usage$R: zedit name <newname>\r\n"
@@ -1170,7 +1067,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     for (auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
     {
-      for (i = 0; i < zone.reset_total; i++)
+      for (i = 0; i < zone.cmd.size(); i++)
         switch (zone.cmd[i].command)
         {
         case 'M':
@@ -1271,18 +1168,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
     {
       buf = QString("Source line must be between 0 and %1.\r\n"
                     "'%2' is not valid.\r\n")
-                .arg(zone.reset_total)
+                .arg(zone.cmd.size())
                 .arg(text);
       send_to_char(buf, ch);
       return eFAILURE;
-    }
-
-    // if the zone memory is full, allocate another 10 commands worth
-    if (last_cmd >= (zone.reset_total - 2))
-    {
-      zone.cmd = (struct reset_com *)
-          realloc(zone.cmd, (zone.reset_total + 10) * sizeof(struct reset_com));
-      zone.reset_total += 10;
     }
 
     tmp = zone.cmd[from];
@@ -4908,7 +4797,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    // cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
+    cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
     return eFAILURE;
   }
 
@@ -5664,7 +5553,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
 
     if (name.isEmpty() == false)
     {
-      if (d->getPeerOriginalAddress().toString().contains(name) == false && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
+      if (!d->getPeerOriginalAddress().toString().contains(name) && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
       {
         continue;
       }

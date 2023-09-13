@@ -171,34 +171,6 @@ struct pulse_data
   pulse_data *next;
 };
 
-/* structure for the reset commands */
-struct reset_com
-{
-  char command; /* current command                      */
-  int if_flag;  // 0=always 1=if prev exe'd  2=if prev DIDN'T exe   3=ONLY on reboot
-  int arg1;
-  int arg2;
-  int arg3;
-  QString comment; /* Any comments that went with the command */
-  int active;      // is it active? alot aren't on the builders' port
-  time_t last;     // when was it last reset
-  Character *lastPop;
-  time_t lastSuccess;
-  uint64_t attempts;
-  uint64_t successes;
-  /*
-   *  Commands:              *
-   *  'M': Read a mobile     *
-   *  'O': Read an object    *
-   *  'P': Put obj in obj    *
-   *  'G': Obj to char       *
-   *  'E': Obj to char equip *
-   *  'D': Set state of door *
-   *  '%': arg1 in arg2 chance of being true *
-   *       (this is used for putting a %chance on next command *
-   */
-};
-
 /* element in monster and object index-tables   */
 struct index_data
 {

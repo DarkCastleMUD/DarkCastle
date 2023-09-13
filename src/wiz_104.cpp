@@ -483,21 +483,13 @@ int Zone::show_info(Character *ch)
 	return eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
+int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t num_to_show, bool stats)
 {
 	char buf[MAX_STRING_LENGTH];
 	int k = 0;
 
 	if (start < 0)
 		start = 0;
-
-	if (DC::getInstance()->zones.contains(zone_key) == false)
-	{
-		ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
-		return eFAILURE;
-	}
-
-	auto &zone = DC::getInstance()->zones[zone_key];
 
 	if (zone.cmd[0].command == 'S')
 	{
@@ -748,7 +740,7 @@ int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 		}
 
 		send_to_char(buf, ch);
-		if (num_to_show != 1)
+		if (stats)
 		{
 			csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
 		}
@@ -759,6 +751,17 @@ int show_zone_commands(Character *ch, int zone_key, int start, int num_to_show)
 		send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);
 	}
 	return eSUCCESS;
+}
+
+int show_zone_commands(Character *ch, zone_t zone_key, uint64_t start, uint64_t num_to_show, bool stats)
+{
+	if (!isValidZoneKey(ch, zone_key))
+	{
+		return eFAILURE;
+	}
+
+	auto &zone = DC::getInstance()->zones[zone_key];
+	return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
 int find_file(world_file_list_item *itm, int high)
@@ -1142,7 +1145,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 
-		if (!isdigit(*name)) /* show them all */
+		if (QString(name) == "all")
 		{
 			send_to_char(
 				"     Range        Usage\r\n"
@@ -1158,19 +1161,17 @@ int do_show(Character *ch, char *argument, int cmd)
 
 				ch->send(QString("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.name));
 			}
+			return eSUCCESS;
 		}
-		else /* was a digit */
-		{
-			i = atoi(name);
-			if ((!i && *name != '0') || i < 0 || DC::getInstance()->zones.contains(i) == false)
-			{
-				send_to_char("Which zone was that?\r\n", ch);
-				return eFAILURE;
-			}
-			DC::getInstance()->zones.value(i).show_info(ch);
 
-		} // else was a digit
-	}	  // zone
+		bool ok = false;
+		zone_t zone_key = getZoneKey(ch, name, &ok);
+		if (!ok)
+		{
+			return eFAILURE;
+		}
+		DC::getInstance()->zones.value(zone_key).show_info(ch);
+	} // zone
 	else if (is_abbrev(type, "rsearch") && has_range)
 	{
 		char arg1[MAX_INPUT_LENGTH];

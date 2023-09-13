@@ -2253,17 +2253,8 @@ void free_zones_from_memory()
 {
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		if (zone.name)
-			dc_free(zone.name);
-		if (zone.cmd)
-		{
-			//      We're str_hsh'ing this now, so we don't need to worry about it
-			//      for(int j = 0; zone.cmd[j].command != 'S'; j++)
-			//        if(zone.cmd[j].comment)
-			//          dc_free(zone.cmd[j].comment);
-			dc_free(zone.cmd);
-			// don't have to free DC::getInstance()->zones.value(i).cmd.comment cause it's str_hsh'd
-		}
+		zone.name = {};
+		zone.cmd.empty();
 	}
 }
 
@@ -2361,7 +2352,7 @@ void Zone::write(FILE *fl)
 zone_t DC::read_one_zone(FILE *fl)
 {
 	static room_t last_top_vnum = 0;
-	struct reset_com reset_tab[MAX_RESET];
+	zone_commands_t reset_tab;
 	char *check, buf[161], ch;
 	int reset_top, i, tmp;
 	char *skipper = nullptr;
@@ -2417,29 +2408,24 @@ zone_t DC::read_one_zone(FILE *fl)
 	}
 
 	/* read the command table */
-	reset_top = 0;
 
 	for (;;)
 	{
-		if (reset_top >= MAX_RESET)
+		ResetCommand reset = {};
+		reset.comment = nullptr; // needs to be initialized
+		reset.command = fread_char(fl);
+		reset.if_flag = 0;
+		reset.last = 0;
+		reset.arg1 = 0;
+		reset.arg2 = 0;
+		reset.arg3 = 0;
+		if (reset.command == 'S')
 		{
-			perror("Too many zone resets");
-			abort();
-		}
-		reset_tab[reset_top].comment = nullptr; // needs to be initialized
-		reset_tab[reset_top].command = fread_char(fl);
-		reset_tab[reset_top].if_flag = 0;
-		reset_tab[reset_top].last = 0;
-		reset_tab[reset_top].arg1 = 0;
-		reset_tab[reset_top].arg2 = 0;
-		reset_tab[reset_top].arg3 = 0;
-		if (reset_tab[reset_top].command == 'S')
-		{
-			reset_top++;
+			reset_tab.push_back(reset);
 			break;
 		}
 
-		if (reset_tab[reset_top].command == '*')
+		if (reset.command == '*')
 		{
 			fgets(buf, 160, fl); /* skip command */
 			// skip any space
@@ -2453,42 +2439,42 @@ zone_t DC::read_one_zone(FILE *fl)
 
 			// if any, keep anything left
 			if (*skipper)
-				reset_tab[reset_top].comment = str_hsh(skipper);
-			reset_top++;
+				reset.comment = str_hsh(skipper);
+			reset_tab.push_back(reset);
 			continue;
 		}
 
 		tmp = fread_int(fl, 0, CMD_DEFAULT);
-		reset_tab[reset_top].if_flag = tmp;
-		reset_tab[reset_top].last = time(nullptr) - number(0, 12 * 3600);
+		reset.if_flag = tmp;
+		reset.last = time(nullptr) - number(0, 12 * 3600);
 		// randomize last repop on boot
-		reset_tab[reset_top].arg1 = fread_int(fl, -64000, 2147483467);
-		reset_tab[reset_top].arg2 = fread_int(fl, -64000, 2147483467);
-		if (reset_tab[reset_top].arg1 > 64000)
-			reset_tab[reset_top].arg1 = 2;
+		reset.arg1 = fread_int(fl, -64000, 2147483467);
+		reset.arg2 = fread_int(fl, -64000, 2147483467);
+		if (reset.arg1 > 64000)
+			reset.arg1 = 2;
 
-		if (reset_tab[reset_top].arg2 > 64000)
-			reset_tab[reset_top].arg2 = 1;
+		if (reset.arg2 > 64000)
+			reset.arg2 = 1;
 
-		if (reset_tab[reset_top].command == 'M' ||
-			reset_tab[reset_top].command == 'O' ||
-			reset_tab[reset_top].command == 'E' ||
-			reset_tab[reset_top].command == 'P' ||
-			reset_tab[reset_top].command == 'G' ||
-			reset_tab[reset_top].command == 'D' ||
-			reset_tab[reset_top].command == 'X' ||
-			reset_tab[reset_top].command == 'K' ||
-			reset_tab[reset_top].command == 'J'
+		if (reset.command == 'M' ||
+			reset.command == 'O' ||
+			reset.command == 'E' ||
+			reset.command == 'P' ||
+			reset.command == 'G' ||
+			reset.command == 'D' ||
+			reset.command == 'X' ||
+			reset.command == 'K' ||
+			reset.command == 'J'
 			// % only has 2 args
 		)
-			reset_tab[reset_top].arg3 = fread_int(fl, -64000, 32768);
+			reset.arg3 = fread_int(fl, -64000, 32768);
 		else
-			reset_tab[reset_top].arg3 = 0;
+			reset.arg3 = 0;
 
-		reset_tab[reset_top].lastPop = 0;
+		reset.lastPop = 0;
 
-		if (reset_tab[reset_top].arg3 > 64000)
-			reset_tab[reset_top].arg1 = 1;
+		if (reset.arg3 > 64000)
+			reset.arg1 = 1;
 
 		/* tjs hack - ugly tmp bug fix */
 		// this just moves our cursor back 1 position
@@ -2506,31 +2492,14 @@ zone_t DC::read_one_zone(FILE *fl)
 
 		// if any, keep anything left
 		if (*skipper)
-			reset_tab[reset_top].comment = str_hsh(skipper);
+			reset.comment = str_hsh(skipper);
 
-		reset_top++;
+		reset_tab.push_back(reset);
 
 	} // for( ;; ) til end of zone commands
 
-#ifdef LEAK_CHECK
-	zone.cmd = ((struct reset_com *)calloc(reset_top, sizeof(struct reset_com)));
-#else
-	zone.cmd = ((struct reset_com *)dc_alloc(reset_top, sizeof(struct reset_com)));
-#endif
-
-	zone.reset_total = reset_top;
-
 	// copy the temp into the memory
-	for (i = 0; i < reset_top; i++)
-	{
-		zone.cmd[i].command = reset_tab[i].command;
-		zone.cmd[i].if_flag = reset_tab[i].if_flag;
-		zone.cmd[i].arg1 = reset_tab[i].arg1;
-		zone.cmd[i].arg2 = reset_tab[i].arg2;
-		zone.cmd[i].arg3 = reset_tab[i].arg3;
-		if (!reset_tab[i].comment.isEmpty())
-			zone.cmd[i].comment = reset_tab[i].comment;
-	}
+	zone.cmd = reset_tab;
 
 	auto &zones = DC::getInstance()->zones;
 	zone_t zone_key = 1;
@@ -2551,9 +2520,6 @@ void DC::boot_zones(void)
 	FILE *flZoneIndex;
 	QString temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
-
-	//  for (zon = 0;zon < MAX_ZONE;zon++)
-	//  DC::getInstance()->zones.value(zon) = nullptr; // Null list, top_of_z can't be used now
 
 	DC::config &cf = DC::getInstance()->cf;
 
@@ -2646,7 +2612,7 @@ Character *read_mobile(int nr, FILE *fl)
 #else
 	mob->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
 #endif
-	mob->mobdata->reset = nullptr;
+	mob->mobdata->reset = {};
 	/* *** Numeric data *** */
 	j = 0;
 	while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1)
@@ -3351,7 +3317,7 @@ Character *clone_mobile(int nr)
 
 	mob->mobdata->nr = nr;
 	mob->desc = 0;
-	mob->mobdata->reset = nullptr;
+	mob->mobdata->reset = {};
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.insert(mob);
@@ -3553,7 +3519,7 @@ int create_blank_mobile(int nr)
 		mob->mobdata->actflags[i] = 0;
 	for (i = 0; i < AFF_MAX / ASIZE + 1; i++)
 		mob->affected_by[i] = 0;
-	mob->mobdata->reset = nullptr;
+	mob->mobdata->reset = {};
 	mob->mobdata->damnodice = 1;
 	mob->mobdata->damsizedice = 1;
 	mob->mobdata->default_pos = POSITION_STANDING;
@@ -4601,7 +4567,7 @@ void Zone::reset(ResetType reset_type)
 
 	for (cmd_no = 0; cmd_no <= last_no; cmd_no++)
 	{
-		if ((cmd + cmd_no) == 0)
+		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
 			sprintf(buf,
 					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
@@ -4637,8 +4603,8 @@ void Zone::reset(ResetType reset_type)
 				if ((cmd[cmd_no].arg2 == -1 || cmd[cmd_no].lastPop == 0) && mob_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2 && (mob = clone_mobile(cmd[cmd_no].arg1)))
 				{
 					char_to_room(mob, cmd[cmd_no].arg3);
-					mob->mobdata->reset = &cmd[cmd_no];
 					cmd[cmd_no].lastPop = mob;
+					mob->mobdata->reset = cmd[cmd_no];
 					GET_HOME(mob) = world[cmd[cmd_no].arg3].number;
 					num_mob_on_repop++;
 					last_cmd = 1;

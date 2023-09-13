@@ -3700,8 +3700,8 @@ void extract_char(Character *ch, bool pull, Trace t)
 		return;
 	}
 
-	if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
-		ch->mobdata->reset->lastPop = nullptr;
+	if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset.lastPop)
+		ch->mobdata->reset.lastPop = nullptr;
 
 	remove_totem_stats(ch);
 	if (IS_PC(ch))

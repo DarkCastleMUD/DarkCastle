@@ -179,3 +179,82 @@ void Zone::setRealTop(int room_key)
 {
     top_rnum = room_key;
 }
+
+bool operator==(ResetCommand a, ResetCommand b)
+{
+    if (a.command == b.command && a.if_flag == b.if_flag && a.arg1 == b.arg1 && a.arg2 == b.arg2 && a.arg3 == b.arg3 && a.comment == b.comment)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+zone_t getZoneKey(Character *ch, const QString input, bool *ok)
+{
+    zone_t zone_key = input.toULongLong(ok);
+    if (!isValidZoneKey(ch, zone_key) && ok)
+    {
+        *ok = false;
+    }
+
+    return zone_key;
+}
+
+bool isValidZoneKey(Character *ch, const zone_t zone_key)
+{
+    const auto dc = DC::getInstance();
+    if (!dc->zones.contains(zone_key))
+    {
+        if (ch)
+        {
+            ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
+            if (dc->zones.isEmpty())
+            {
+                ch->send("There are no zones currently.\r\n");
+            }
+            else
+            {
+                ch->send(QString("Valid values are 1-%1\r\n").arg(dc->zones.size()));
+            }
+        }
+        return false;
+    }
+    return true;
+}
+
+uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok)
+{
+    uint64_t zone_command_key = input.toULongLong(ok);
+    if (!isValidZoneCommandKey(ch, zone, zone_command_key - 1) && ok)
+    {
+        *ok = false;
+    }
+    return zone_command_key - 1;
+}
+
+bool isValidZoneCommandKey(Character *ch, const Zone &zone, const uint64_t zone_command_key)
+{
+    if (zone.cmd.isEmpty() || zone_command_key > zone.cmd.size())
+    {
+        if (ch)
+        {
+            ch->send(QString("Zone command %1 not found.\r\n").arg(zone_command_key + 1));
+            if (zone.cmd.isEmpty())
+            {
+                ch->send("There are no zone commands.\r\n");
+            }
+            else
+            {
+                ch->send(QString("Valid values are 1-%1\r\n").arg(zone.cmd.size() - 1));
+            }
+        }
+        return false;
+    }
+    return true;
+}
+
+qsizetype getZoneLastCommandNumber(const Zone &zone)
+{
+    return zone.cmd.size();
+}

@@ -34,6 +34,7 @@ class Character;
 #include "quest.h"
 #include "interp.h"
 #include "utility.h"
+#include "Zone.h"
 
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);
@@ -348,7 +349,7 @@ public:
     int32_t last_room = {};        // Room rnum the mob was last in. Used
                                    // For !magic,!track changing flags.
     struct threat_struct *threat = {};
-    struct reset_com *reset = {};
+    ResetCommand reset = {};
     mob_flag_data mob_flags = {}; /* Mobile information               */
     bool paused = {};
 
