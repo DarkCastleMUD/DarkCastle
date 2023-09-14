@@ -1021,7 +1021,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     break;
   case 9: /* search */
 
-    if (arguments.size() < 2)
+    if (arguments.isEmpty())
     {
       send_to_char("$3Usage$R: zedit search <number>\r\n"
                    "This searches your current zonefile for any commands\r\n"
@@ -1032,7 +1032,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    text = arguments.at(1);
+    text = arguments.at(0);
     ok = false;
     j = text.toULongLong(&ok);
 
