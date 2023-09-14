@@ -4529,6 +4529,19 @@ void zone_update(void)
 	DC::getInstance()->removeDead();
 }
 
+uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
+{
+	uint64_t count = {};
+	for (auto ch = world_array[room_id]->people; ch != nullptr; ch = ch->next_in_room)
+	{
+		if (ch->mobdata && mob_index[ch->mobdata->nr].virt == vnum)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
 /* execute the reset command table of a given zone */
 void Zone::reset(ResetType reset_type)
 {
@@ -4597,7 +4610,7 @@ void Zone::reset(ResetType reset_type)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && mob_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && countMobsInRoom(mob_index[cmd[cmd_no]->arg1].virt, cmd[cmd_no]->arg3) < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
 				{
 					char_to_room(mob, cmd[cmd_no]->arg3);
 					cmd[cmd_no]->lastPop = mob;
