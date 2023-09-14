@@ -4532,7 +4532,7 @@ void zone_update(void)
 uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
 {
 	uint64_t count = {};
-	for (auto ch = world_array[room_id]->people; ch != nullptr; ch = ch->next_in_room)
+	for (auto ch = world[room_id].people; ch != nullptr; ch = ch->next_in_room)
 	{
 		if (ch->mobdata && mob_index[ch->mobdata->nr].virt == vnum)
 		{
