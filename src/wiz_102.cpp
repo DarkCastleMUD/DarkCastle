@@ -46,6 +46,8 @@
 
 using namespace std;
 
+command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone, bool stats = false);
+
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -739,18 +741,11 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   return i - 1;
 }
 
-command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone)
+command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone, bool stats)
 {
-  if (arguments.isEmpty() || arguments.at(0) == "stats")
+  if (arguments.isEmpty())
   {
-    return show_zone_commands(ch, zone);
-  }
-
-  bool stats = false;
-  if (arguments.last() == "stats")
-  {
-    stats = true;
-    arguments.pop_back();
+    return show_zone_commands(ch, zone, 0, 0, stats);
   }
 
   QString text = arguments.at(0);
@@ -807,6 +802,13 @@ int do_zedit(Character *ch, char *argument, int cmd)
                  ch);
     display_string_list(zedit_subcommands, ch);
     return eFAILURE;
+  }
+
+  bool stats = false;
+  if (arguments.last() == "stats")
+  {
+    stats = true;
+    arguments.pop_back();
   }
 
   QString select = arguments.at(0);
@@ -866,7 +868,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     zedit_edit(ch, arguments, zone);
     break;
   case 3: /* list */
-    zedit_list(ch, arguments, zone);
+    zedit_list(ch, arguments, zone, stats);
     break;
   case 4: /* name */
     if (arguments.size() < 3)
@@ -1075,7 +1077,14 @@ int do_zedit(Character *ch, char *argument, int cmd)
           if (rmob == zone.cmd[i].arg1)
           {
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
-            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            if (stats)
+            {
+              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
+            else
+            {
+              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
             do_zedit(ch, str, 1);
             free(str);
           }
@@ -1086,7 +1095,15 @@ int do_zedit(Character *ch, char *argument, int cmd)
           if (robj == zone.cmd[i].arg1)
           {
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
-            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            if (stats)
+            {
+              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
+            else
+            {
+              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
+
             do_zedit(ch, str, 1);
             free(str);
           }
@@ -1096,7 +1113,15 @@ int do_zedit(Character *ch, char *argument, int cmd)
               robj == zone.cmd[i].arg3)
           {
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
-            str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            if (stats)
+            {
+              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
+            else
+            {
+              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+            }
+            
             do_zedit(ch, str, 1);
             free(str);
           }
