@@ -40,7 +40,7 @@ public:
 };
 
 bool operator==(ResetCommand a, ResetCommand b);
-typedef QList<ResetCommand> zone_commands_t;
+typedef QList<QSharedPointer<ResetCommand> > zone_commands_t;
 
 #define MAX_INDEX 6000
 

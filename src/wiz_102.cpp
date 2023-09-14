@@ -60,29 +60,29 @@ void rebuild_rnum_references(int startAt, int type)
   {
     for (qsizetype comm = 0; !zone.cmd.isEmpty() && comm < zone.cmd.size(); comm++)
     {
-      switch (zone.cmd[comm].command)
+      switch (zone.cmd[comm]->command)
       {
       case 'M':
-        if (type == 1 && zone.cmd[comm].arg1 >= startAt)
-          zone.cmd[comm].arg1++;
+        if (type == 1 && zone.cmd[comm]->arg1 >= startAt)
+          zone.cmd[comm]->arg1++;
         break;
       case 'O':
-        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
-          zone.cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
+          zone.cmd[comm]->arg1++;
         break;
       case 'G':
-        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
-          zone.cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
+          zone.cmd[comm]->arg1++;
         break;
       case 'E':
-        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
-          zone.cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
+          zone.cmd[comm]->arg1++;
         break;
       case 'P':
-        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
-          zone.cmd[comm].arg1++;
-        if (type == 2 && zone.cmd[comm].arg3 >= startAt)
-          zone.cmd[comm].arg3++;
+        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
+          zone.cmd[comm]->arg1++;
+        if (type == 2 && zone.cmd[comm]->arg3 >= startAt)
+          zone.cmd[comm]->arg3++;
         break;
       case '%':
       case 'K':
@@ -506,13 +506,13 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       case 'K':
       case 'X':
       case '*':
-        zone.cmd[cmd].arg1 = 0;
-        zone.cmd[cmd].arg2 = 0;
-        zone.cmd[cmd].arg3 = 0;
+        zone.cmd[cmd]->arg1 = 0;
+        zone.cmd[cmd]->arg2 = 0;
+        zone.cmd[cmd]->arg3 = 0;
         /* no break */
       case '%':
-        zone.cmd[cmd].arg2 = 100;
-        zone.cmd[cmd].command = result;
+        zone.cmd[cmd]->arg2 = 100;
+        zone.cmd[cmd]->command = result;
         ch->send(QString("Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n").arg(cmd + 1).arg(result));
         break;
       default:
@@ -525,43 +525,43 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       switch (last.at(0).toLatin1())
       {
       case '0':
-        zone.cmd[cmd].if_flag = 0;
+        zone.cmd[cmd]->if_flag = 0;
         ch->send(QString("If flag for command %1 changed to 0 (always).\r\n").arg(cmd + 1));
         break;
       case '1':
-        zone.cmd[cmd].if_flag = 1;
+        zone.cmd[cmd]->if_flag = 1;
         ch->send(QString("If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n").arg(cmd + 1));
         break;
       case '2':
-        zone.cmd[cmd].if_flag = 2;
+        zone.cmd[cmd]->if_flag = 2;
         ch->send(QString("If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n").arg(cmd + 1));
         break;
       case '3':
-        zone.cmd[cmd].if_flag = 3;
+        zone.cmd[cmd]->if_flag = 3;
         ch->send(QString("If flag for command %1 changed to 3 ($B$5onboot$R).\r\n").arg(cmd + 1));
         break;
       case '4':
-        zone.cmd[cmd].if_flag = 4;
+        zone.cmd[cmd]->if_flag = 4;
         ch->send(QString("If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '5':
-        zone.cmd[cmd].if_flag = 5;
+        zone.cmd[cmd]->if_flag = 5;
         ch->send(QString("If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '6':
-        zone.cmd[cmd].if_flag = 6;
+        zone.cmd[cmd]->if_flag = 6;
         ch->send(QString("If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '7':
-        zone.cmd[cmd].if_flag = 7;
+        zone.cmd[cmd]->if_flag = 7;
         ch->send(QString("If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '8':
-        zone.cmd[cmd].if_flag = 8;
+        zone.cmd[cmd]->if_flag = 8;
         ch->send(QString("If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '9':
-        zone.cmd[cmd].if_flag = 9;
+        zone.cmd[cmd]->if_flag = 9;
         ch->send(QString("If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n").arg(cmd + 1));
         break;
       default:
@@ -575,17 +575,17 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
     else if (isname(select, "comment"))
     {
       //      This is str_hsh'd, don't delete it
-      //      if(zone.cmd[cmd].comment)
-      //        dc_free(zone.cmd[cmd].comment);
+      //      if(zone.cmd[cmd]->comment)
+      //        dc_free(zone.cmd[cmd]->comment);
       if (last == "none")
       {
-        zone.cmd[cmd].comment = {};
+        zone.cmd[cmd]->comment = {};
         ch->send(QString("Comment for command %d removed.\r\n").arg(cmd + 1));
       }
       else
       {
-        zone.cmd[cmd].comment = last;
-        ch->send(QString("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd].comment));
+        zone.cmd[cmd]->comment = last;
+        ch->send(QString("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd]->comment));
       }
     }
     else
@@ -601,7 +601,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       int vnum = 0;
       if (isname(select, "1"))
       {
-        switch (zone.cmd[cmd].command)
+        switch (zone.cmd[cmd]->command)
         {
         case 'M':
           j = real_mobile(i);
@@ -622,12 +622,12 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
           j = i;
           break;
         }
-        zone.cmd[cmd].arg1 = j;
+        zone.cmd[cmd]->arg1 = j;
         ch->send(QString("Arg 1 set to %1.\r\n").arg(i));
       }
       else if (isname(select, "2"))
       {
-        switch (zone.cmd[cmd].command)
+        switch (zone.cmd[cmd]->command)
         {
         case 'K':
         case 'X':
@@ -636,12 +636,12 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         default:
           break;
         }
-        zone.cmd[cmd].arg2 = i;
+        zone.cmd[cmd]->arg2 = i;
         ch->send(QString("Arg 2 set to %1.\r\n").arg(i));
       }
       else if (isname(select, "3"))
       {
-        switch (zone.cmd[cmd].command)
+        switch (zone.cmd[cmd]->command)
         {
         case 'M':
         case 'O':
@@ -666,7 +666,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         default:
           break;
         }
-        zone.cmd[cmd].arg3 = i;
+        zone.cmd[cmd]->arg3 = i;
         ch->send(QString("Arg 3 set to %1.\r\n").arg(i));
         send_to_char(select, ch);
       }
@@ -724,7 +724,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   QString text = arguments.at(0);
   if (isname(text, "new"))
   {
-    zone.cmd.push_back(ResetCommand('J'));
+    zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
     ch->send(QString("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
     return zone.cmd.size() - 1;
   }
@@ -736,7 +736,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
     return eFAILURE;
   }
 
-  zone.cmd.insert(i, ResetCommand('J'));
+  zone.cmd.insert(i, QSharedPointer<ResetCommand>::create('J'));
   ch->send(QString("New command 'J' added at %1.\r\n").arg(i + 1));
   return i - 1;
 }
@@ -782,7 +782,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
   bool ok = false;
-  ResetCommand tmp = {}, temp_com = {};
+  QSharedPointer<ResetCommand> tmp = {}, temp_com = {};
   char *str = {};
 
   const char *zedit_subcommands[] = {
@@ -1071,12 +1071,12 @@ int do_zedit(Character *ch, char *argument, int cmd)
     {
       for (i = 0; i < zone.cmd.size(); i++)
       {
-        switch (zone.cmd[i].command)
+        switch (zone.cmd[i]->command)
         {
         case 'M':
-          if (rmob == zone.cmd[i].arg1)
+          if (rmob == zone.cmd[i]->arg1)
           {
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
               str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
@@ -1092,9 +1092,9 @@ int do_zedit(Character *ch, char *argument, int cmd)
         case 'G': // G, E, and O have obj # in arg1
         case 'E':
         case 'O':
-          if (robj == zone.cmd[i].arg1)
+          if (robj == zone.cmd[i]->arg1)
           {
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
               str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
@@ -1109,10 +1109,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
           }
           break;
         case 'P': // P has obj # in arg1 and arg3
-          if (robj == zone.cmd[i].arg1 ||
-              robj == zone.cmd[i].arg3)
+          if (robj == zone.cmd[i]->arg1 ||
+              robj == zone.cmd[i]->arg3)
           {
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i].command);
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
               str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
@@ -1121,7 +1121,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
             {
               str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
-            
+
             do_zedit(ch, str, 1);
             free(str);
           }
@@ -1217,13 +1217,13 @@ int do_zedit(Character *ch, char *argument, int cmd)
       to = last_cmd;
       buf = "Command copied.\r\n";
     }
-    zone.cmd[to].active = tmp.active;
-    zone.cmd[to].command = tmp.command;
-    zone.cmd[to].if_flag = tmp.if_flag;
-    zone.cmd[to].arg1 = tmp.arg1;
-    zone.cmd[to].arg2 = tmp.arg2;
-    zone.cmd[to].arg3 = tmp.arg3;
-    zone.cmd[to].comment = tmp.comment;
+    zone.cmd[to]->active = tmp->active;
+    zone.cmd[to]->command = tmp->command;
+    zone.cmd[to]->if_flag = tmp->if_flag;
+    zone.cmd[to]->arg1 = tmp->arg1;
+    zone.cmd[to]->arg2 = tmp->arg2;
+    zone.cmd[to]->arg3 = tmp->arg3;
+    zone.cmd[to]->comment = tmp->comment;
     send_to_char(buf, ch);
     break;
 

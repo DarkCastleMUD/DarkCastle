@@ -508,22 +508,22 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	// show zone cmds
 	for (int j = start; (j < start + num_to_show) && j < zone.cmd.size(); j++)
 	{
-		time_t last = zone.cmd[j].last;
+		time_t last = zone.cmd[j]->last;
 		string lastStr = "never";
 		if (last)
 		{
 			lastStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(last));
 		}
 
-		time_t lastSuccess = zone.cmd[j].lastSuccess;
+		time_t lastSuccess = zone.cmd[j]->lastSuccess;
 		string lastSuccessStr = "never";
 		if (lastSuccess)
 		{
 			lastSuccessStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(lastSuccess));
 		}
 
-		uint64_t attempts = zone.cmd[j].attempts;
-		uint64_t successes = zone.cmd[j].successes;
+		uint64_t attempts = zone.cmd[j]->attempts;
+		uint64_t successes = zone.cmd[j]->successes;
 		double successRate = 0.0;
 		if (attempts > 0)
 		{
@@ -533,12 +533,12 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 		// show command # and if_flag
 		// note that we show the command as cmd+1.  This is so we don't have a
 		// command 0 from the user's perspective.
-		if (zone.cmd[j].command == '*')
+		if (zone.cmd[j]->command == '*')
 		{
 			sprintf(buf, "[%3d] Comment: ", j + 1);
 		}
 		else
-			switch (zone.cmd[j].if_flag)
+			switch (zone.cmd[j]->if_flag)
 			{
 			case 0:
 				sprintf(buf, "[%3d] Always ", j + 1);
@@ -571,78 +571,78 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				sprintf(buf, "[%3d] $B$4Ls$R%%%%$B$4Fl$R ", j + 1);
 				break;
 			default:
-				sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, zone.cmd[j].if_flag);
+				sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, zone.cmd[j]->if_flag);
 				break;
 			}
 		int virt;
 #define ZCMD zone.cmd[j]
-		switch (zone.cmd[j].command)
+		switch (zone.cmd[j]->command)
 		{
 		case 'M':
-			virt = ZCMD.active ? mob_index[ZCMD.arg1].virt : ZCMD.arg1;
+			virt = ZCMD->active ? mob_index[ZCMD->arg1].virt : ZCMD->arg1;
 			sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
-			if (zone.cmd[j].arg2 == -1)
+			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in room ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j].arg2);
-			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j].arg3);
-			if (ch && !str_cmp(ch->name, "Urizen"))
+				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
+			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
+			if (ch && !str_cmp(ch->name, "Julian"))
 			{
-				sprintf(buf, "%s [%d] [%d] %s", buf,
-						zone.cmd[j].lastPop ? 1 : 0, charExists(zone.cmd[j].lastPop),
-						charExists(zone.cmd[j].lastPop) ? GET_SHORT(zone.cmd[j].lastPop) : "Unknown");
+				sprintf(buf, "%s ([%d] [%d] [%s])", buf,
+						zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
+						charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
 			}
 			sprintf(buf, "%s\r\n", buf);
 			break;
 		case 'O':
-			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
+			virt = ZCMD->active ? obj_index[ZCMD->arg1].virt : ZCMD->arg1;
 			sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
-			if (zone.cmd[j].arg2 == -1)
+			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in room ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j].arg2);
+				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
 			//      sprintf(buf, "%s[%5d].$R\r\n", buf,
-			// world[zone.cmd[j].arg3].number);
-			sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j].arg3);
+			// world[zone.cmd[j]->arg3].number);
+			sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
 			break;
 		case 'P':
-			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
+			virt = ZCMD->active ? obj_index[ZCMD->arg1].virt : ZCMD->arg1;
 			sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
-			if (zone.cmd[j].arg2 == -1)
+			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in objt ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j].arg2);
-			virt = ZCMD.active ? obj_index[ZCMD.arg3].virt : ZCMD.arg3;
+				sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
+			virt = ZCMD->active ? obj_index[ZCMD->arg3].virt : ZCMD->arg3;
 			sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
 			break;
 		case 'G':
-			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
+			virt = ZCMD->active ? obj_index[ZCMD->arg1].virt : ZCMD->arg1;
 			sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
-			if (zone.cmd[j].arg2 == -1)
+			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) on last mob loaded.$R\r\n");
 			else
-				sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j].arg2);
+				sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
 			break;
 		case 'E':
-			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
+			virt = ZCMD->active ? obj_index[ZCMD->arg1].virt : ZCMD->arg1;
 			sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
-			if (zone.cmd[j].arg2 == -1)
+			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) on last mob on ");
 			else
-				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j].arg2);
-			if (zone.cmd[j].arg3 > MAX_WEAR - 1 ||
-				zone.cmd[j].arg3 < 0)
-				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j].arg3);
+				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
+			if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
+				zone.cmd[j]->arg3 < 0)
+				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
 			else
-				sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j].arg3,
-						equipment_types[zone.cmd[j].arg3]);
+				sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
+						equipment_types[zone.cmd[j]->arg3]);
 			break;
 		case 'D':
 			sprintf(buf, "%s $3Room [%5d] Dir: [%s]", buf,
-					zone.cmd[j].arg1,
-					dirNumToChar(zone.cmd[j].arg2));
+					zone.cmd[j]->arg1,
+					dirNumToChar(zone.cmd[j]->arg2));
 
-			switch (zone.cmd[j].arg3)
+			switch (zone.cmd[j]->arg3)
 			{
 			case 0:
 				strcat(buf, "Unlock/Open$R\r\n");
@@ -660,23 +660,23 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			break;
 		case '%':
 			sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
-					zone.cmd[j].arg1,
-					zone.cmd[j].arg2);
+					zone.cmd[j]->arg1,
+					zone.cmd[j]->arg2);
 
 			break;
 		case 'J':
 			sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
-					zone.cmd[j].arg1,
-					zone.cmd[j].arg2,
-					zone.cmd[j].arg3);
+					zone.cmd[j]->arg1,
+					zone.cmd[j]->arg2,
+					zone.cmd[j]->arg3);
 			break;
 		case '*':
 			sprintf(buf, "%s %s\r\n", buf,
-					zone.cmd[j].comment.toStdString().c_str() ? zone.cmd[j].comment.toStdString().c_str() : "Empty Comment");
+					zone.cmd[j]->comment.toStdString().c_str() ? zone.cmd[j]->comment.toStdString().c_str() : "Empty Comment");
 			break;
 		case 'K':
 			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
-					zone.cmd[j].arg1);
+					zone.cmd[j]->arg1);
 			break;
 		case 'X':
 		{
@@ -687,7 +687,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			char xstrerror[] = "Illegal value in arg1.";
 			char *xresultstr;
 
-			switch (zone.cmd[j].arg1)
+			switch (zone.cmd[j]->arg1)
 			{
 			case 0:
 				xresultstr = xstrone;
@@ -707,22 +707,22 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			}
 
 			sprintf(buf, "%s [%d] %s\r\n", buf,
-					zone.cmd[j].arg1, xresultstr);
+					zone.cmd[j]->arg1, xresultstr);
 		}
 		break;
 		default:
 			sprintf(buf, "Illegal Command: %c %d %d %d %d\r\n",
-					zone.cmd[j].command,
-					zone.cmd[j].if_flag,
-					zone.cmd[j].arg1,
-					zone.cmd[j].arg2,
-					zone.cmd[j].arg3);
+					zone.cmd[j]->command,
+					zone.cmd[j]->if_flag,
+					zone.cmd[j]->arg1,
+					zone.cmd[j]->arg2,
+					zone.cmd[j]->arg3);
 			break;
 		} // switch
 
-		if (!zone.cmd[j].comment.isEmpty() && zone.cmd[j].command != '*')
+		if (!zone.cmd[j]->comment.isEmpty() && zone.cmd[j]->command != '*')
 		{
-			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment.toStdString().c_str());
+			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j]->comment.toStdString().c_str());
 		}
 
 		send_to_char(buf, ch);

@@ -2156,77 +2156,77 @@ void renum_zone_table(void)
 		assert(zone_key != 0);
 		for (comm = 0; comm < zone.cmd.size(); comm++)
 		{
-			zone.cmd[comm].active = 1;
-			switch (zone.cmd[comm].command)
+			zone.cmd[comm]->active = 1;
+			switch (zone.cmd[comm]->command)
 			{
 			case 'M':
-				/*if(real_room(zone.cmd[comm].arg3) < 0) {
+				/*if(real_room(zone.cmd[comm]->arg3) < 0) {
 
 				 fprintf(stderr, "Problem in zonefile: no room number %d for mob "
-				 "%d - setting to J command\n", zone.cmd[comm].arg3,
-				 zone.cmd[comm].arg1);
-				 zone.cmd[comm].command = 'J';
+				 "%d - setting to J command\n", zone.cmd[comm]->arg3,
+				 zone.cmd[comm]->arg1);
+				 zone.cmd[comm]->command = 'J';
 				 }*/
-				if (real_mobile(zone.cmd[comm].arg1) >= 0 && real_room(zone.cmd[comm].arg3) >= 0)
-					zone.cmd[comm].arg1 =
-						real_mobile(zone.cmd[comm].arg1);
+				if (real_mobile(zone.cmd[comm]->arg1) >= 0 && real_room(zone.cmd[comm]->arg3) >= 0)
+					zone.cmd[comm]->arg1 =
+						real_mobile(zone.cmd[comm]->arg1);
 				else
 				{
-					zone.cmd[comm].active = 0;
+					zone.cmd[comm]->active = 0;
 				}
-				//          zone.cmd[comm].arg3;// =
-				//                real_room(zone.cmd[comm].arg3);
+				//          zone.cmd[comm]->arg3;// =
+				//                real_room(zone.cmd[comm]->arg3);
 
 				break;
 			case 'O':
-				if (real_object(zone.cmd[comm].arg1) >= 0 && real_room(zone.cmd[comm].arg3) >= 0)
-					zone.cmd[comm].arg1 = real_object(zone.cmd[comm].arg1);
+				if (real_object(zone.cmd[comm]->arg1) >= 0 && real_room(zone.cmd[comm]->arg3) >= 0)
+					zone.cmd[comm]->arg1 = real_object(zone.cmd[comm]->arg1);
 				else
-					zone.cmd[comm].active = 0;
+					zone.cmd[comm]->active = 0;
 
-				//            if (zone.cmd[comm].arg3 != DC::NOWHERE)
-				//          zone.cmd[comm].arg3 =
-				//        real_room(zone.cmd[comm].arg3);
+				//            if (zone.cmd[comm]->arg3 != DC::NOWHERE)
+				//          zone.cmd[comm]->arg3 =
+				//        real_room(zone.cmd[comm]->arg3);
 				break;
 			case 'G':
-				if (real_object(zone.cmd[comm].arg1) >= 0)
-					zone.cmd[comm].arg1 =
-						real_object(zone.cmd[comm].arg1);
+				if (real_object(zone.cmd[comm]->arg1) >= 0)
+					zone.cmd[comm]->arg1 =
+						real_object(zone.cmd[comm]->arg1);
 				else
-					zone.cmd[comm].active = 0;
+					zone.cmd[comm]->active = 0;
 
 				break;
 			case 'E':
-				if (real_object(zone.cmd[comm].arg1) >= 0)
-					zone.cmd[comm].arg1 =
-						real_object(zone.cmd[comm].arg1);
+				if (real_object(zone.cmd[comm]->arg1) >= 0)
+					zone.cmd[comm]->arg1 =
+						real_object(zone.cmd[comm]->arg1);
 				else
-					zone.cmd[comm].active = 0;
+					zone.cmd[comm]->active = 0;
 
 				break;
 			case 'P':
-				if (real_object(zone.cmd[comm].arg1) >= 0 && real_object(zone.cmd[comm].arg3) >= 0)
+				if (real_object(zone.cmd[comm]->arg1) >= 0 && real_object(zone.cmd[comm]->arg3) >= 0)
 				{
-					zone.cmd[comm].arg1 =
-						real_object(zone.cmd[comm].arg1);
-					zone.cmd[comm].arg3 =
-						real_object(zone.cmd[comm].arg3);
+					zone.cmd[comm]->arg1 =
+						real_object(zone.cmd[comm]->arg1);
+					zone.cmd[comm]->arg3 =
+						real_object(zone.cmd[comm]->arg3);
 				}
 				else
-					zone.cmd[comm].active = 0;
+					zone.cmd[comm]->active = 0;
 				break;
 			case 'D':
-				if (real_room(zone.cmd[comm].arg1) < 0)
-					zone.cmd[comm].active = 0;
+				if (real_room(zone.cmd[comm]->arg1) < 0)
+					zone.cmd[comm]->active = 0;
 				else
 				{
-					zone.cmd[comm].arg1 =
-						real_room(zone.cmd[comm].arg1);
-					if (zone.cmd[comm].arg1 == -1)
+					zone.cmd[comm]->arg1 =
+						real_room(zone.cmd[comm]->arg1);
+					if (zone.cmd[comm]->arg1 == -1)
 					{
 						fprintf(stderr, "Problem in zonefile: no room number for door"
 										" - setting to J command\n");
-						zone.cmd[comm].command = 'J';
+						zone.cmd[comm]->command = 'J';
 					}
 				}
 				break;
@@ -2271,79 +2271,79 @@ void Zone::write(FILE *fl)
 
 	for (int i = 0; i < cmd.size(); i++)
 	{
-		if (cmd[i].command == '*')
-			fprintf(fl, "* %s\n", cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
-		else if (cmd[i].command == '%')
-			fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i].if_flag,
-					cmd[i].arg1,
-					cmd[i].arg2,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
-		else if (cmd[i].command == 'X')
-			fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i].if_flag,
-					cmd[i].arg1,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
-		else if (cmd[i].command == 'K')
-			fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i].if_flag,
-					cmd[i].arg1,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
-		else if (cmd[i].command == 'M')
+		if (cmd[i]->command == '*')
+			fprintf(fl, "* %s\n", cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+		else if (cmd[i]->command == '%')
+			fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i]->if_flag,
+					cmd[i]->arg1,
+					cmd[i]->arg2,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+		else if (cmd[i]->command == 'X')
+			fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag,
+					cmd[i]->arg1,
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+		else if (cmd[i]->command == 'K')
+			fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag,
+					cmd[i]->arg1,
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
+		else if (cmd[i]->command == 'M')
 		{
-			int virt = cmd[i].active ? mob_index[cmd[i].arg1].virt : cmd[i].arg1;
-			fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i].if_flag,
+			int virt = cmd[i]->active ? mob_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		}
-		else if (cmd[i].command == 'P')
+		else if (cmd[i]->command == 'P')
 		{
-			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
-			int virt2 = cmd[i].active ? obj_index[cmd[i].arg3].virt : cmd[i].arg3;
-			fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i].if_flag,
+			int virt = cmd[i]->active ? obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt2 = cmd[i]->active ? obj_index[cmd[i]->arg3].virt : cmd[i]->arg3;
+			fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
-					cmd[i].arg2,
+					cmd[i]->arg2,
 					virt2,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		}
-		else if (cmd[i].command == 'G')
+		else if (cmd[i]->command == 'G')
 		{
-			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
+			int virt = cmd[i]->active ? obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
 
-			fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i].if_flag,
+			fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		}
-		else if (cmd[i].command == 'O')
+		else if (cmd[i]->command == 'O')
 		{
-			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
-			fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i].if_flag,
+			int virt = cmd[i]->active ? obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		}
-		else if (cmd[i].command == 'E')
+		else if (cmd[i]->command == 'E')
 		{
-			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
-			fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i].if_flag,
+			int virt = cmd[i]->active ? obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		}
 		else
-			fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i].command,
-					cmd[i].if_flag,
-					cmd[i].arg1,
-					cmd[i].arg2,
-					cmd[i].arg3,
-					cmd[i].comment.toStdString().c_str() ? cmd[i].comment.toStdString().c_str() : "");
+			fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
+					cmd[i]->if_flag,
+					cmd[i]->arg1,
+					cmd[i]->arg2,
+					cmd[i]->arg3,
+					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 	}
 
 	fprintf(fl, "S\n$~\n");
@@ -2419,20 +2419,20 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	for (;;)
 	{
-		ResetCommand reset = {};
-		reset.comment = nullptr; // needs to be initialized
-		reset.command = fread_char(fl);
-		reset.if_flag = 0;
-		reset.last = 0;
-		reset.arg1 = 0;
-		reset.arg2 = 0;
-		reset.arg3 = 0;
-		if (reset.command == 'S')
+		QSharedPointer<ResetCommand> reset = QSharedPointer<ResetCommand>::create();
+		reset->comment = nullptr; // needs to be initialized
+		reset->command = fread_char(fl);
+		reset->if_flag = 0;
+		reset->last = 0;
+		reset->arg1 = 0;
+		reset->arg2 = 0;
+		reset->arg3 = 0;
+		if (reset->command == 'S')
 		{
 			break;
 		}
 
-		if (reset.command == '*')
+		if (reset->command == '*')
 		{
 			fgets(buf, 160, fl); /* skip command */
 			// skip any space
@@ -2446,42 +2446,42 @@ zone_t DC::read_one_zone(FILE *fl)
 
 			// if any, keep anything left
 			if (*skipper)
-				reset.comment = str_hsh(skipper);
+				reset->comment = str_hsh(skipper);
 			reset_tab.push_back(reset);
 			continue;
 		}
 
 		tmp = fread_int(fl, 0, CMD_DEFAULT);
-		reset.if_flag = tmp;
-		reset.last = time(nullptr) - number(0, 12 * 3600);
+		reset->if_flag = tmp;
+		reset->last = time(nullptr) - number(0, 12 * 3600);
 		// randomize last repop on boot
-		reset.arg1 = fread_int(fl, -64000, 2147483467);
-		reset.arg2 = fread_int(fl, -64000, 2147483467);
-		if (reset.arg1 > 64000)
-			reset.arg1 = 2;
+		reset->arg1 = fread_int(fl, -64000, 2147483467);
+		reset->arg2 = fread_int(fl, -64000, 2147483467);
+		if (reset->arg1 > 64000)
+			reset->arg1 = 2;
 
-		if (reset.arg2 > 64000)
-			reset.arg2 = 1;
+		if (reset->arg2 > 64000)
+			reset->arg2 = 1;
 
-		if (reset.command == 'M' ||
-			reset.command == 'O' ||
-			reset.command == 'E' ||
-			reset.command == 'P' ||
-			reset.command == 'G' ||
-			reset.command == 'D' ||
-			reset.command == 'X' ||
-			reset.command == 'K' ||
-			reset.command == 'J'
+		if (reset->command == 'M' ||
+			reset->command == 'O' ||
+			reset->command == 'E' ||
+			reset->command == 'P' ||
+			reset->command == 'G' ||
+			reset->command == 'D' ||
+			reset->command == 'X' ||
+			reset->command == 'K' ||
+			reset->command == 'J'
 			// % only has 2 args
 		)
-			reset.arg3 = fread_int(fl, -64000, 32768);
+			reset->arg3 = fread_int(fl, -64000, 32768);
 		else
-			reset.arg3 = 0;
+			reset->arg3 = 0;
 
-		reset.lastPop = 0;
+		reset->lastPop = 0;
 
-		if (reset.arg3 > 64000)
-			reset.arg1 = 1;
+		if (reset->arg3 > 64000)
+			reset->arg1 = 1;
 
 		/* tjs hack - ugly tmp bug fix */
 		// this just moves our cursor back 1 position
@@ -2499,7 +2499,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
 		// if any, keep anything left
 		if (*skipper)
-			reset.comment = str_hsh(skipper);
+			reset->comment = str_hsh(skipper);
 
 		reset_tab.push_back(reset);
 
@@ -3660,12 +3660,11 @@ void delete_mob_from_index(int nr)
 	{
 		for (j = 0; j < zone.cmd.size(); j++)
 		{
-			switch (zone.cmd[j].command)
+			switch (zone.cmd[j]->command)
 			{
 			case 'M': // just #1
-				if (zone.cmd[j].arg1 >= nr)
-					zone.cmd[j]
-						.arg1--;
+				if (zone.cmd[j]->arg1 >= nr)
+					zone.cmd[j]->arg1--;
 				break;
 			default:
 				break;
@@ -3741,17 +3740,17 @@ void delete_item_from_index(int nr)
 	{
 		for (j = 0; j < zone.cmd.size(); j++)
 		{
-			switch (zone.cmd[j].command)
+			switch (zone.cmd[j]->command)
 			{
 			case 'P': // 1 and 3
-				if (zone.cmd[j].arg3 >= nr)
-					zone.cmd[j].arg3--;
+				if (zone.cmd[j]->arg3 >= nr)
+					zone.cmd[j]->arg3--;
 				// no break here on purpose so it falls through and does the '1'
 			case 'O':
 			case 'G':
 			case 'E': // 1 only
-				if (zone.cmd[j].arg1 >= nr)
-					zone.cmd[j].arg1--;
+				if (zone.cmd[j]->arg1 >= nr)
+					zone.cmd[j]->arg1--;
 				break;
 			default:
 				break;
@@ -4560,17 +4559,13 @@ void Zone::reset(ResetType reset_type)
 	num_mob_on_repop = 0;
 	// find last command in zone
 
-	if (id_ == 116)
-	{
-		qDebug() << cmd[65].lastSuccess;
-	}
-	else
-	{
-		qDebug() << id_;
-	}
-
 	for (cmd_no = 0; cmd_no < cmd.size(); cmd_no++)
 	{
+		if (id_ == 116 && cmd_no == 1)
+		{
+			qDebug("test");
+		}
+
 		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
 			sprintf(buf,
@@ -4579,35 +4574,35 @@ void Zone::reset(ResetType reset_type)
 			logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 			break;
 		}
-		if (cmd[cmd_no].active == 0)
+		if (cmd[cmd_no]->active == 0)
 			continue;
 
-		cmd[cmd_no].last = time(nullptr);
-		cmd[cmd_no].attempts++;
-		if (cmd[cmd_no].if_flag == 0 ||									   // always
-			(last_cmd == 1 && cmd[cmd_no].if_flag == 1) ||				   // if last command true
-			(last_cmd == 0 && cmd[cmd_no].if_flag == 2) ||				   // if last command false
-			(reset_type == ResetType::full && cmd[cmd_no].if_flag == 3) || // full reset (onboot)
-			(last_mob == 1 && cmd[cmd_no].if_flag == 4) ||				   // if-last-mob-true
-			(last_mob == 0 && cmd[cmd_no].if_flag == 5) ||				   // if-last-mob-false
-			(last_obj == 1 && cmd[cmd_no].if_flag == 6) ||				   // if-last-obj-true
-			(last_obj == 0 && cmd[cmd_no].if_flag == 7) ||				   // if-last-obj-false
-			(last_percent == 1 && cmd[cmd_no].if_flag == 8) ||			   // if-last-percent-true
-			(last_percent == 0 && cmd[cmd_no].if_flag == 9)				   // if-last-percent-false
+		cmd[cmd_no]->last = time(nullptr);
+		cmd[cmd_no]->attempts++;
+		if (cmd[cmd_no]->if_flag == 0 ||									// always
+			(last_cmd == 1 && cmd[cmd_no]->if_flag == 1) ||					// if last command true
+			(last_cmd == 0 && cmd[cmd_no]->if_flag == 2) ||					// if last command false
+			(reset_type == ResetType::full && cmd[cmd_no]->if_flag == 3) || // full reset (onboot)
+			(last_mob == 1 && cmd[cmd_no]->if_flag == 4) ||					// if-last-mob-true
+			(last_mob == 0 && cmd[cmd_no]->if_flag == 5) ||					// if-last-mob-false
+			(last_obj == 1 && cmd[cmd_no]->if_flag == 6) ||					// if-last-obj-true
+			(last_obj == 0 && cmd[cmd_no]->if_flag == 7) ||					// if-last-obj-false
+			(last_percent == 1 && cmd[cmd_no]->if_flag == 8) ||				// if-last-percent-true
+			(last_percent == 0 && cmd[cmd_no]->if_flag == 9)				// if-last-percent-false
 		)
 		{
-			cmd[cmd_no].lastSuccess = cmd[cmd_no].last;
-			cmd[cmd_no].successes++;
-			switch (cmd[cmd_no].command)
+			cmd[cmd_no]->lastSuccess = cmd[cmd_no]->last;
+			cmd[cmd_no]->successes++;
+			switch (cmd[cmd_no]->command)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[cmd_no].arg2 == -1 || cmd[cmd_no].lastPop == 0) && mob_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2 && (mob = clone_mobile(cmd[cmd_no].arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && mob_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
 				{
-					char_to_room(mob, cmd[cmd_no].arg3);
-					cmd[cmd_no].lastPop = mob;
+					char_to_room(mob, cmd[cmd_no]->arg3);
+					cmd[cmd_no]->lastPop = mob;
 					mob->mobdata->reset = cmd[cmd_no];
-					GET_HOME(mob) = world[cmd[cmd_no].arg3].number;
+					GET_HOME(mob) = world[cmd[cmd_no]->arg3].number;
 					num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
@@ -4628,16 +4623,16 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'O': /* read an object */
-				if (cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2)
+				if (cmd[cmd_no]->arg2 == -1 || obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
 				{
-					if (cmd[cmd_no].arg3 >= 0)
+					if (cmd[cmd_no]->arg3 >= 0)
 					{
-						if (!get_obj_in_list_num(cmd[cmd_no].arg1,
-												 world[cmd[cmd_no].arg3].contents) &&
+						if (!get_obj_in_list_num(cmd[cmd_no]->arg1,
+												 world[cmd[cmd_no]->arg3].contents) &&
 							(obj =
-								 clone_object(cmd[cmd_no].arg1)))
+								 clone_object(cmd[cmd_no]->arg1)))
 						{
-							obj_to_room(obj, cmd[cmd_no].arg3);
+							obj_to_room(obj, cmd[cmd_no]->arg3);
 							last_cmd = 1;
 							last_obj = 1;
 						}
@@ -4655,7 +4650,7 @@ void Zone::reset(ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-									obj_index[cmd[cmd_no].arg1].virt, id_, cmd_no);
+									obj_index[cmd[cmd_no]->arg1].virt, id_, cmd_no);
 							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
 						last_cmd = 0;
@@ -4671,12 +4666,12 @@ void Zone::reset(ResetType reset_type)
 
 			case 'P': /* object to object */
 
-				if (cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2)
+				if (cmd[cmd_no]->arg2 == -1 || obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
 				{
 					obj_to = 0;
 					obj = 0;
-					if ((obj_to = get_obj_num(cmd[cmd_no].arg3)) && (obj =
-																		 clone_object(cmd[cmd_no].arg1)))
+					if ((obj_to = get_obj_num(cmd[cmd_no]->arg3)) && (obj =
+																		  clone_object(cmd[cmd_no]->arg1)))
 						obj_to_obj(obj, obj_to);
 					else
 						logf(
@@ -4705,7 +4700,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no].arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4720,17 +4715,17 @@ void Zone::reset(ResetType reset_type)
 
 			case '%': /* percent chance of next command happening */
 				// We can't send a number less than one to number() otherwise a debug coredump occurs
-				if (cmd[cmd_no].arg2 < 1)
+				if (cmd[cmd_no]->arg2 < 1)
 				{
-					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, cmd_no, cmd[cmd_no].arg1, cmd[cmd_no].arg2);
+					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, cmd_no, cmd[cmd_no]->arg1, cmd[cmd_no]->arg2);
 					last_cmd = 0;
 					last_percent = 0;
 				}
 				else
 				{
-					if (number(1, cmd[cmd_no].arg2) <= cmd[cmd_no].arg1)
+					if (number(1, cmd[cmd_no]->arg2) <= cmd[cmd_no]->arg1)
 					{
-						cmd[cmd_no].last = time(nullptr);
+						cmd[cmd_no]->last = time(nullptr);
 						last_percent = 1;
 						last_cmd = 1;
 					}
@@ -4752,7 +4747,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((obj = clone_object(cmd[cmd_no].arg1)))
+				if ((obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					randomize_object(obj);
 
@@ -4764,13 +4759,13 @@ void Zone::reset(ResetType reset_type)
 					{
 						logentry("nullptr mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
 					}
-					else if (cmd[cmd_no].arg3 < 0 || cmd[cmd_no].arg3 >= MAX_WEAR)
+					else if (cmd[cmd_no]->arg3 < 0 || cmd[cmd_no]->arg3 >= MAX_WEAR)
 					{
 						logentry("Invalid eq position in Zone::reset()!", ANGEL, LogChannels::LOG_BUG);
 					}
-					else if (mob->equipment[cmd[cmd_no].arg3] == 0)
+					else if (mob->equipment[cmd[cmd_no]->arg3] == 0)
 					{
-						if (!equip_char(mob, obj, cmd[cmd_no].arg3))
+						if (!equip_char(mob, obj, cmd[cmd_no]->arg3))
 						{
 							sprintf(buf, "Bad equip_char zone %d cmd %d", id_,
 									cmd_no);
@@ -4799,68 +4794,68 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'D': /* set state of door */
-				if (cmd[cmd_no].arg1 < 0 || cmd[cmd_no].arg1 > top_of_world)
+				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > top_of_world)
 				{
 					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_,
 							cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (cmd[cmd_no].arg2 < 0 || cmd[cmd_no].arg2 >= 6)
+				if (cmd[cmd_no]->arg2 < 0 || cmd[cmd_no]->arg2 >= 6)
 				{
 					sprintf(log_buf,
 							"Illegal direction %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no].arg2, id_, cmd_no);
+							cmd[cmd_no]->arg2, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (!world_array[cmd[cmd_no].arg1])
+				if (!world_array[cmd[cmd_no]->arg1])
 				{
 					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no].arg1, id_, cmd_no);
+							cmd[cmd_no]->arg1, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
 
-				if (world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2] == 0)
+				if (world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2] == 0)
 				{
 					sprintf(
 						log_buf,
 						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
-						cmd[cmd_no].arg2, world[cmd[cmd_no].arg1].number, id_, cmd_no);
+						cmd[cmd_no]->arg2, world[cmd[cmd_no]->arg1].number, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				switch (cmd[cmd_no].arg3)
+				switch (cmd[cmd_no]->arg3)
 				{
 				case 0:
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_LOCKED);
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_CLOSED);
 					break;
 				case 1:
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_CLOSED);
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_LOCKED);
 					break;
 				case 2:
 					REMOVE_BIT(
-						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_LOCKED);
-					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_CLOSED);
 					break;
 				}
@@ -4868,7 +4863,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'X':
-				switch (cmd[cmd_no].arg1)
+				switch (cmd[cmd_no]->arg1)
 				{
 				case 0:
 					last_cmd = -1;
@@ -4899,7 +4894,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'K': // skip
-				cmd_no += cmd[cmd_no].arg1;
+				cmd_no += cmd[cmd_no]->arg1;
 				break;
 
 			case '*': // ignore *
@@ -4910,7 +4905,7 @@ void Zone::reset(ResetType reset_type)
 				sprintf(
 					log_buf,
 					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .",
-					id_, cmd_no, cmd[cmd_no].command);
+					id_, cmd_no, cmd[cmd_no]->command);
 				logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 				age = 0;
 				return;
@@ -4919,7 +4914,7 @@ void Zone::reset(ResetType reset_type)
 		}
 		else
 		{
-			switch (cmd[cmd_no].command)
+			switch (cmd[cmd_no]->command)
 			{
 
 			case 'M':
