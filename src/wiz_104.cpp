@@ -502,14 +502,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 
 	if (!num_to_show)
 	{
-		if (IS_SET(ch->player->toggles, PLR_PAGER))
-		{
-			num_to_show = 50;
-		}
-		else
-		{
-			num_to_show = 20;
-		}
+		num_to_show = 20;
 	}
 
 	// show zone cmds
