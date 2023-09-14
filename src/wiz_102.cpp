@@ -1065,9 +1065,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
       ch->send(QString("Searching for Mobile rnum %1 with vnum %2\r\n").arg(rmob).arg(j));
     }
 
-    for (auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+    for (const auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
     {
       for (i = 0; i < zone.cmd.size(); i++)
+      {
         switch (zone.cmd[i].command)
         {
         case 'M':
@@ -1103,13 +1104,14 @@ int do_zedit(Character *ch, char *argument, int cmd)
         default:
           break;
         }
+      }
     }
     return eSUCCESS;
     break;
 
   case 10: // swap
 
-    if (arguments.size() < 3)
+    if (arguments.size() < 2)
     {
       send_to_char("$3Usage$R: zedit swap <cmd1> <cmd2>\r\n"
                    "This swaps the positions of two zone commands.\r\n",
@@ -1147,7 +1149,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   case 11: // copy
 
-    if (arguments.size() < 2)
+    if (arguments.size() < 1)
     {
       send_to_char("$3Usage$R: zedit copy <source line> <destination line>\r\nDestination line is optional. If no such line exists, it tacks it on at the end.", ch);
       return eFAILURE;
@@ -1166,7 +1168,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     if (from > last_cmd || from < 0)
     {
-      buf = QString("Source line must be between 0 and %1.\r\n"
+      buf = QString("Source line must be between 1 and %1.\r\n"
                     "'%2' is not valid.\r\n")
                 .arg(zone.cmd.size())
                 .arg(text);
@@ -1200,9 +1202,9 @@ int do_zedit(Character *ch, char *argument, int cmd)
     send_to_char(buf, ch);
     break;
 
-  case 12:
+  case 12: // continent
 
-    if (arguments.size() < 2)
+    if (arguments.size() < 1)
     {
       send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
       for (cont = NO_CONTINENT; cont != continent_names.size(); cont++)
@@ -1212,12 +1214,12 @@ int do_zedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    text = arguments.at(1);
+    text = arguments.at(0);
     ok = false;
     cont = text.toLongLong(&ok);
     if (!ok || !cont || cont > continent_names.size() - 1)
     {
-      csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size() - 1);
+      csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size());
       return eFAILURE;
     }
     csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(cont).c_str());
