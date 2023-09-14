@@ -881,7 +881,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     arguments.pop_front();
     zone.name = str_dup(arguments.at(0).toStdString().c_str());
 
-    buf = QString("Zone %1's name changed to '%2'.\r\n").arg(zone.key).arg(arguments.at(0));
+    buf = QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(arguments.at(0));
     send_to_char(buf, ch);
     break;
 
@@ -907,7 +907,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     zone.lifespan = i;
 
-    buf = QString("Zone %1's lifetime changed to %2.\r\n").arg(zone.key).arg(zone.lifespan);
+    buf = QString("Zone %1's lifetime changed to %2.\r\n").arg(zone.getID()).arg(zone.lifespan);
     send_to_char(buf, ch);
     break;
 
@@ -941,7 +941,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     zone.reset_mode = i - 1;
 
-    buf = QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.key).arg(zone_modes[i - 1]).arg(i);
+    buf = QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[i - 1]).arg(i);
     send_to_char(buf, ch);
     break;
 

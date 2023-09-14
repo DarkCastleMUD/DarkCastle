@@ -2261,7 +2261,7 @@ void free_zones_from_memory()
 void Zone::write(FILE *fl)
 {
 	fprintf(fl, "V2\n");
-	fprintf(fl, "#%d\n", (id ? (bottom / 100) : 0));
+	fprintf(fl, "#%d\n", (id_ ? (bottom / 100) : 0));
 	fprintf(fl, "%s~\n", name);
 	fprintf(fl, "%d %d %d %ld %d\n", top,
 			lifespan,
@@ -2372,7 +2372,15 @@ zone_t DC::read_one_zone(FILE *fl)
 	// a = fread_int(fl, 0, 64000);
 	/* alloc a new_new zone */
 	//*num = zon = a / 100;
-	Zone zone;
+
+	auto &zones = DC::getInstance()->zones;
+	zone_t new_zone_key = 1;
+	if (!zones.isEmpty())
+	{
+		new_zone_key = zones.lastKey() + 1;
+	}
+
+	Zone zone(new_zone_key);
 
 	// logentry("Reading zone", 0, LogChannels::LOG_BUG);
 
@@ -2499,17 +2507,9 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	// copy the temp into the memory
 	zone.cmd = reset_tab;
-
-	auto &zones = DC::getInstance()->zones;
-	zone_t zone_key = 1;
-	if (zones.isEmpty() == false)
-	{
-		zone_key = zones.lastKey() + 1;
-	}
-	zone.key = zone_key;
 	// // cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << endl;
-	zones.insert(zone_key, zone);
-	return zone_key;
+	zones.insert(new_zone_key, zone);
+	return new_zone_key;
 }
 
 /* load the zone table and command tables */
@@ -4560,13 +4560,22 @@ void Zone::reset(ResetType reset_type)
 	num_mob_on_repop = 0;
 	// find last command in zone
 
+	if (id_ == 116)
+	{
+		qDebug() << cmd[65].lastSuccess;
+	}
+	else
+	{
+		qDebug() << id_;
+	}
+
 	for (cmd_no = 0; cmd_no < cmd.size(); cmd_no++)
 	{
 		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
 			sprintf(buf,
 					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
-					id, cmd_no);
+					id_, cmd_no);
 			logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 			break;
 		}
@@ -4646,7 +4655,7 @@ void Zone::reset(ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-									obj_index[cmd[cmd_no].arg1].virt, id, cmd_no);
+									obj_index[cmd[cmd_no].arg1].virt, id_, cmd_no);
 							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
 						last_cmd = 0;
@@ -4674,7 +4683,7 @@ void Zone::reset(ResetType reset_type)
 							IMMORTAL,
 							LogChannels::LOG_WORLD,
 							"Null container obj in P command Zone: %d, Cmd: %d",
-							id, cmd_no);
+							id_, cmd_no);
 
 					last_cmd = 1;
 					last_obj = 1;
@@ -4689,7 +4698,7 @@ void Zone::reset(ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id,
+					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_,
 							cmd_no + 1);
 					logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 					last_cmd = 0;
@@ -4713,7 +4722,7 @@ void Zone::reset(ResetType reset_type)
 				// We can't send a number less than one to number() otherwise a debug coredump occurs
 				if (cmd[cmd_no].arg2 < 1)
 				{
-					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id, cmd_no, cmd[cmd_no].arg1, cmd[cmd_no].arg2);
+					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, cmd_no, cmd[cmd_no].arg1, cmd[cmd_no].arg2);
 					last_cmd = 0;
 					last_percent = 0;
 				}
@@ -4736,7 +4745,7 @@ void Zone::reset(ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id,
+					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_,
 							cmd_no);
 					logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 					last_cmd = 0;
@@ -4763,7 +4772,7 @@ void Zone::reset(ResetType reset_type)
 					{
 						if (!equip_char(mob, obj, cmd[cmd_no].arg3))
 						{
-							sprintf(buf, "Bad equip_char zone %d cmd %d", id,
+							sprintf(buf, "Bad equip_char zone %d cmd %d", id_,
 									cmd_no);
 							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
@@ -4792,7 +4801,7 @@ void Zone::reset(ResetType reset_type)
 			case 'D': /* set state of door */
 				if (cmd[cmd_no].arg1 < 0 || cmd[cmd_no].arg1 > top_of_world)
 				{
-					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id,
+					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_,
 							cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
@@ -4801,14 +4810,14 @@ void Zone::reset(ResetType reset_type)
 				{
 					sprintf(log_buf,
 							"Illegal direction %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no].arg2, id, cmd_no);
+							cmd[cmd_no].arg2, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
 				if (!world_array[cmd[cmd_no].arg1])
 				{
 					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no].arg1, id, cmd_no);
+							cmd[cmd_no].arg1, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
@@ -4818,7 +4827,7 @@ void Zone::reset(ResetType reset_type)
 					sprintf(
 						log_buf,
 						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
-						cmd[cmd_no].arg2, world[cmd[cmd_no].arg1].number, id, cmd_no);
+						cmd[cmd_no].arg2, world[cmd[cmd_no].arg1].number, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
@@ -4901,7 +4910,7 @@ void Zone::reset(ResetType reset_type)
 				sprintf(
 					log_buf,
 					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .",
-					id, cmd_no, cmd[cmd_no].command);
+					id_, cmd_no, cmd[cmd_no].command);
 				logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 				age = 0;
 				return;
@@ -4955,7 +4964,7 @@ void Zone::reset(ResetType reset_type)
 			{
 				continue;
 			}
-			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id)
+			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id_)
 			{
 				tmp_victim->multiplyGold(1.10);
 				tmp_victim->exp *= 1.10;
@@ -4969,7 +4978,7 @@ bool Zone::isEmpty(void)
 	class Connection *i;
 
 	for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-		if (STATE(i) == Connection::states::PLAYING && i->character && world[i->character->in_room].zone == id)
+		if (STATE(i) == Connection::states::PLAYING && i->character && world[i->character->in_room].zone == id_)
 			return false;
 
 	return true;

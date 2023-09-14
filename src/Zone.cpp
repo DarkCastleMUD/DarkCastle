@@ -1,7 +1,7 @@
 #include "DC.h"
 
 Zone::Zone(zone_t zone_key)
-    : id(zone_key)
+    : id_(zone_key)
 {
 }
 
@@ -215,7 +215,7 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
             }
             else
             {
-                ch->send(QString("Valid values are 1-%1\r\n").arg(dc->zones.last().key));
+                ch->send(QString("Valid values are 1-%1\r\n").arg(dc->zones.last().getID()));
             }
         }
         return false;
