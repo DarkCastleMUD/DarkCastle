@@ -4356,7 +4356,10 @@ void make_corpse(Character *ch)
 
   corpse = new Object;
   clear_object(corpse);
-  corpse->setOwner(GET_NAME(ch));
+  if (IS_PC(ch))
+  {
+    corpse->setOwner(GET_NAME(ch));
+  }
 
   corpse->item_number = -1;
   corpse->in_room = DC::NOWHERE;
