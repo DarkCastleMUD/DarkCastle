@@ -153,7 +153,7 @@ public:
     int (*funct)(Character *, int, char *) = {}; // special procedure
 
     class Object *contents = {}; // List of items in room
-    Character *people = {};      // List of NPC / PC in room
+    Character *people = nullptr; // List of NPC / PC in room
 
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents

@@ -349,7 +349,7 @@ public:
     int32_t last_room = {};        // Room rnum the mob was last in. Used
                                    // For !magic,!track changing flags.
     struct threat_struct *threat = {};
-    ResetCommand reset = {};
+    QSharedPointer<ResetCommand> reset = {};
     mob_flag_data mob_flags = {}; /* Mobile information               */
     bool paused = {};
 

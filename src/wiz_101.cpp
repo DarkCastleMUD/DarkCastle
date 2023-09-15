@@ -776,18 +776,18 @@ int do_findfix(Character *ch, char *argument, int cmd)
     for (j = 0; j < zone.cmd.size(); j++)
     {
       bool first = true, found = false;
-      if (zone.cmd[j].command != 'M')
+      if (zone.cmd[j]->command != 'M')
         continue;
-      int vnum = zone.cmd[j].arg1, max = zone.cmd[j].arg2;
-      if (zone.cmd[j].arg2 == 1 ||
-          zone.cmd[j].arg2 == -1)
+      int vnum = zone.cmd[j]->arg1, max = zone.cmd[j]->arg2;
+      if (zone.cmd[j]->arg2 == 1 ||
+          zone.cmd[j]->arg2 == -1)
         continue; // Don't care about those..
       int amt = 0;
       for (z = 0; z < zone.cmd.size(); z++)
       {
-        if (zone.cmd[z].command != 'M')
+        if (zone.cmd[z]->command != 'M')
           continue;
-        if (zone.cmd[z].arg1 != vnum)
+        if (zone.cmd[z]->arg1 != vnum)
           continue;
         if (z == j && found)
         {
@@ -795,8 +795,8 @@ int do_findfix(Character *ch, char *argument, int cmd)
           break;
         }
         found = true;
-        if (zone.cmd[z].arg2 > max)
-          max = zone.cmd[z].arg2;
+        if (zone.cmd[z]->arg2 > max)
+          max = zone.cmd[z]->arg2;
         amt++;
       }
       if (!first)

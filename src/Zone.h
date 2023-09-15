@@ -40,7 +40,7 @@ public:
 };
 
 bool operator==(ResetCommand a, ResetCommand b);
-typedef QList<ResetCommand> zone_commands_t;
+typedef QList<QSharedPointer<ResetCommand> > zone_commands_t;
 
 #define MAX_INDEX 6000
 
@@ -68,7 +68,6 @@ public:
     };
 
     Zone(uint64_t zone_key = 0);
-    zone_t key = {};
     char *name = {};   /* name of this zone                  */
     int lifespan = {}; /* how long between resets (minutes)  */
     QDateTime last_full_reset = {};
@@ -148,8 +147,13 @@ public:
     void write(FILE *fl);
     int show_info(Character *ch);
 
+    zone_t getID(void) const
+    {
+        return id_;
+    }
+
 private:
-    zone_t id = {};
+    zone_t id_ = {};
     uint64_t died_this_tick = {}; // number of mobs that have died in this zone this pop
     uint64_t zone_flags = {};     /* flags for the entire zone eg: !teleport */
     QString filename = {};        /* name of the file this zone is kept in */
