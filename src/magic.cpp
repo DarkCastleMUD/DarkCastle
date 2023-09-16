@@ -6634,8 +6634,6 @@ void make_portal(Character *ch, Character *vict)
 
 int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  class Object *portal = 0;
-
   if (IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
       IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
       IS_SET(world[victim->in_room].room_flags, NO_PORTAL))
@@ -6682,16 +6680,27 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
     }
   }
 
-  for (portal = world[ch->in_room].contents; portal;
-       portal = portal->next_content)
+  bool portal_found = false;
+  for (auto portal = world[ch->in_room].contents; portal; portal = portal->next_content)
+  {
     if (portal->isPortal())
+    {
+      portal_found = true;
       break;
+    }
+  }
 
-  if (!portal)
-    for (portal = world[victim->in_room].contents; portal;
-         portal = portal->next_content)
+  if (!portal_found)
+  {
+    for (auto portal = world[victim->in_room].contents; portal; portal = portal->next_content)
+    {
       if (portal->isPortal())
+      {
+        portal_found = true;
         break;
+      }
+    }
+  }
 
   Character *tmpch;
 
@@ -6704,7 +6713,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
     }
   }
 
-  if (found_hunt_or_quest_item || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
+  if (portal_found || found_hunt_or_quest_item || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
   {
     send_to_char("A portal shimmers into view, then fades away again.\r\n", ch);
     act("A portal shimmers into view, then fades away again.",
