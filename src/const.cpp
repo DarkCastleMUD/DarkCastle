@@ -926,8 +926,7 @@ const QStringList Object::extra_bits =
         "NO_REPAIR",
         "NEWBIE_ITEM",
         "PC_CORPSE",
-        "QUEST_ITEM",
-        "\n"};
+        "QUEST_ITEM"};
 
 // more_flags obj flags
 

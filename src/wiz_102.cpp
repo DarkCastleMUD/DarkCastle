@@ -2198,19 +2198,16 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.extra_flags,
-                Object::extra_bits, buf);
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
       for (i = 0; i < Object::extra_bits.size(); i++)
       {
-        sprintf(buf, "  %s\n\r", Object::extra_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(QString("  %1\r\n").arg(Object::extra_bits[i]));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, buf4, ch,
-                              ((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch,((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
   }
   break;
 
@@ -2260,18 +2257,16 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.more_flags,
-                Object::more_obj_bits, buf);
+      sprintbit(((Object *)obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
       for (i = 0; i < Object::more_obj_bits.size(); i++)
       {
-        sprintf(buf, "  %s\n\r", Object::more_obj_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(QString("  %1\r\n").arg(Object::more_obj_bits[i]));
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::more_obj_bits, buf4, ch, ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, ((Object *)obj_index[rnum].item)->obj_flags.more_flags);
   }
   break;
 
