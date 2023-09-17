@@ -1964,7 +1964,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         }
 
         if (isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
+            obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3128)
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
           return eSUCCESS;
