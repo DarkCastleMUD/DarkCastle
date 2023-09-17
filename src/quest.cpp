@@ -755,8 +755,8 @@ void quest_update()
    Object *obj;
    struct quest_info *quest;
 
-   auto &character_list = DC::getInstance()->character_list;
-   for (auto &i : character_list)
+   const auto &character_list = DC::getInstance()->character_list;
+   for (const auto &i : character_list)
    {
       if (!i->desc || IS_NPC(i))
          continue;

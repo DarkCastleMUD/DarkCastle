@@ -152,7 +152,7 @@ int isname2(const char *str, const char *namel)
 
 int isname(QString arg, QStringList namelist)
 {
-	for (auto &name : namelist)
+	for (const auto &name : namelist)
 	{
 		if (arg.compare(name, Qt::CaseInsensitive) == 0)
 		{
@@ -2869,7 +2869,7 @@ Character *get_char(string name)
 	if ((number = get_number(tmp)) < 0)
 		return (0);
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](Character *const &i)
 						  {
 		if (number == 0 && IS_NPC(i)) return false;
@@ -2910,7 +2910,7 @@ Character *get_char(string name)
 /* search all over the world for a mob, and return a pointer if found */
 Character *get_mob(char *name)
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
 		if(!IS_MOB(i)) {
@@ -2932,7 +2932,7 @@ Character *get_mob(char *name)
 /* search all over the world for a char num, and return a pointer if found */
 Character *get_char_num(int nr)
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
 						  {
 		if (IS_MOB(i) && i->mobdata->nr == nr) {
@@ -4139,7 +4139,7 @@ Character *get_mob_vis(Character *ch, char *name)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](Character *const &i)
 						  {
 		if (number == 1)
@@ -4191,7 +4191,7 @@ Character *get_random_mob_vnum(int vnum)
 	int total = mob_index[num].number;
 	int which = number(1, total);
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
 						  {
@@ -4216,7 +4216,7 @@ Character *get_random_mob_vnum(int vnum)
 Character *get_mob_vnum(int vnum)
 {
 	int number = real_mobile(vnum);
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 
 	auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
 						  {
@@ -4255,7 +4255,7 @@ Character *get_char_vis(Character *ch, const char *name)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](Character *const &i)
 						  {
 		if (i->in_room == DC::NOWHERE)
@@ -4305,7 +4305,7 @@ Character *get_char_vis(Character *ch, const char *name)
 Character *
 get_pc(char *name)
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
 		if(IS_PC(i) && isname(name, GET_NAME(i)))
@@ -4397,7 +4397,7 @@ Character *get_pc_vis(Character *ch, const char *name)
 {
 	Character *partial_match = 0;
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
 						  {
 		if(IS_PC(i) && CAN_SEE(ch, i))
@@ -4427,7 +4427,7 @@ Character *get_pc_vis(Character *ch, const char *name)
 
 Character *get_pc_vis_exact(Character *ch, const char *name)
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](Character *const &i)
 						  {
 		if(IS_PC(i) && CAN_SEE(ch, i))
@@ -4937,7 +4937,7 @@ void remove_memory(Character *ch, char type, Character *vict)
 
 void room_mobs_only_hate(Character *ch)
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 
 	for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
 			 {

@@ -623,7 +623,7 @@ void do_on_login_stuff(Character *ch)
    if (IS_MORTAL(ch))
    {
       queue<skill_t> skills_to_delete = {};
-      for (auto &curr : ch->skills)
+      for (const auto &curr : ch->skills)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
@@ -2057,8 +2057,8 @@ bool check_deny(class Connection *d, char *name)
 // Look for link-dead player to reconnect.
 bool check_reconnect(class Connection *d, char *name, bool fReconnect)
 {
-   auto &character_list = DC::getInstance()->character_list;
-   for (auto &tmp_ch : character_list)
+   const auto &character_list = DC::getInstance()->character_list;
+   for (const auto &tmp_ch : character_list)
    {
       if (IS_NPC(tmp_ch) || tmp_ch->desc != nullptr)
          continue;
@@ -2198,8 +2198,8 @@ void update_characters()
    char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
    struct affected_type af;
 
-   auto &character_list = DC::getInstance()->character_list;
-   for (auto &i : character_list)
+   const auto &character_list = DC::getInstance()->character_list;
+   for (const auto &i : character_list)
    {
 
       if (i->brace_at) // if character is bracing

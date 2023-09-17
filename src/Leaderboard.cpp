@@ -613,7 +613,7 @@ void Leaderboard::check_offline(void)
 	curr_name = "NA";
 	curr_virtno = 0;
 
-	for (auto &ch : DC::getInstance()->character_list)
+	for (const auto &ch : DC::getInstance()->character_list)
 	{
 		if (GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch))
 			continue;

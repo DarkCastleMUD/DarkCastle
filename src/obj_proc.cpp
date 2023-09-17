@@ -2432,8 +2432,8 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     if (first && real_room(30000) != DC::NOWHERE)
     {
       int zone = world[real_room(30000)].zone;
-      auto &character_list = DC::getInstance()->character_list;
-      for (auto &tmp_victim : character_list)
+      const auto &character_list = DC::getInstance()->character_list;
+      for (const auto &tmp_victim : character_list)
       {
         // This should never happen but it has before so we must investigate without crashing the whole MUD
         if (tmp_victim == 0)
@@ -2540,8 +2540,8 @@ int szrildor_pass_checks(Character *ch, class Object *obj, int cmd, const char *
     return eFAILURE;
 
   int count = 0;
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &i : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &i : character_list)
   {
     if (IS_NPC(i))
       continue;

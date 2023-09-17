@@ -5510,8 +5510,8 @@ void raw_kill(Character *ch, Character *victim)
 
   save_char_obj(victim);
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &i : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &i : character_list)
   {
 
     remove_memory(i, 'h', victim);
@@ -6461,8 +6461,8 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
 
   if (type == KILL_POISON && affected_by_spell(victim, SPELL_POISON)->modifier > 0)
   {
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &findchar : character_list)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &findchar : character_list)
     {
       if (findchar == affected_by_spell(victim, SPELL_POISON)->origin)
         ch = findchar;
@@ -6868,8 +6868,8 @@ void arena_kill(Character *ch, Character *victim, int type)
   // if it's a chaos, see if the clan was eliminated
   if (victim && arena.type == CHAOS && victim_clan)
   {
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &tmp : character_list)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &tmp : character_list)
     {
 
       if (IS_SET(world[tmp->in_room].room_flags, ARENA))

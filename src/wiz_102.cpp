@@ -1344,7 +1344,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     if (results.size() > 1)
     {
       ch->send(fmt::format("Skill '{}' is too ambiguous. Please specify one of the following:\r\n", text));
-      for (auto &result : results)
+      for (const auto &result : results)
       {
         ch->send(fmt::format("{}\r\n", result.first));
       }
@@ -1439,7 +1439,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
                          "  {:<18}  {:<4}  Learned\r\n"
                          "$3-------------------------------------$R\r\n",
                          GET_NAME(vict), "Skill", "#"));
-    for (auto &skill : vict->skills)
+    for (const auto &skill : vict->skills)
     {
       const char *skillname = get_skill_name(skill.first);
 
@@ -3909,8 +3909,8 @@ int do_medit(Character *ch, char *argument, int cmd)
           ch);
       return eFAILURE;
     }
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &v : character_list)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &v : character_list)
     {
       if (IS_NPC(v) && v->mobdata->nr == mob_num)
         extract_char(v, true);

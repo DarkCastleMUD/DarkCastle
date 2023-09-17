@@ -1442,8 +1442,8 @@ int do_clear(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     // This should never happen but it has before so we must investigate without crashing the whole MUD
     if (tmp_victim == 0)
@@ -1483,8 +1483,8 @@ int do_linkdead(Character *ch, char *arg, int cmd)
   int x = 0;
   char buf[100];
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &i : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &i : character_list)
   {
 
     if (IS_NPC(i) || i->desc || !CAN_SEE(ch, i))

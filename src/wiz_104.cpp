@@ -2544,8 +2544,8 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	Character *old_mob = (Character *)mob_index[dst].item;
 	if (old_mob && old_mob->mobdata)
 	{
-		auto &character_list = DC::getInstance()->character_list;
-		for (auto &tmpch : character_list)
+		const auto &character_list = DC::getInstance()->character_list;
+		for (const auto &tmpch : character_list)
 		{
 			if (!tmpch->mobdata)
 				continue;

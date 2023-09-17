@@ -193,7 +193,7 @@ void send_to_table(const string msg, struct table_data *tbl, struct player_data 
 
 bool charExists(Character *ch)
 {
-   auto &character_list = DC::getInstance()->character_list;
+   const auto &character_list = DC::getInstance()->character_list;
 
    if (character_list.find(ch) != character_list.end())
    {
@@ -210,7 +210,7 @@ bool verify(struct player_data *plr)
    // make sure player didn't quit, die, or whatever
    // Character *ch;
 
-   auto &character_list = DC::getInstance()->character_list;
+   const auto &character_list = DC::getInstance()->character_list;
 
    auto result = find_if(character_list.begin(), character_list.end(), [&plr](Character *const &ch)
                          {

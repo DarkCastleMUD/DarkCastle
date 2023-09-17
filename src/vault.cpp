@@ -1925,11 +1925,11 @@ void vault_list(Character *ch, char *owner)
 
   // We are showing the last item in vault first because items were inserted at the
   // front of the sv.vault_contents container
-  for (auto &o_short_description : sv.vault_contents)
+  for (const auto &o_short_description : sv.vault_contents)
   {
-    auto &o = sv.vault_content_qty[o_short_description];
-    auto &obj = o.first;
-    auto &count = o.second;
+    const auto &o = sv.vault_content_qty[o_short_description];
+    const auto &obj = o.first;
+    const auto &count = o.second;
 
     if (count > 1)
     {
@@ -2437,10 +2437,10 @@ int vault_search(Character *ch, const char *args)
       sorted_vault sv;
       sort_vault(*vault, sv);
 
-      for (auto &o_short_description : sv.vault_contents)
+      for (const auto &o_short_description : sv.vault_contents)
       {
-        auto &o = sv.vault_content_qty[o_short_description];
-        auto &obj = o.first;
+        const auto &o = sv.vault_content_qty[o_short_description];
+        const auto &obj = o.first;
 
         nomatch = false;
         // look through each search parameter to see if any of them don't match the current object
@@ -2495,7 +2495,7 @@ int vault_search(Character *ch, const char *args)
           csendf(ch, "\n\r%s:\n\r", vault->owner);
         }
 
-        auto &count = o.second;
+        const auto &count = o.second;
         objects_found += count;
         if (count > 1)
         {

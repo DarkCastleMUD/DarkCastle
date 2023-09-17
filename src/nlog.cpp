@@ -275,7 +275,7 @@ string handle_ansi(string haystack, Character *ch)
   try
   {
     bool code = false;
-    for (auto &c : haystack)
+    for (const auto &c : haystack)
     {
       if (code == true)
       {

@@ -397,7 +397,7 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
 
     // convert ignoring map into "char1 char2 char3" format
     string ignoreString = {};
-    for (auto &ignore : ch->player->ignoring)
+    for (const auto &ignore : ch->player->ignoring)
     {
       if (ignore.second.ignore)
       {

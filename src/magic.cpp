@@ -953,8 +953,8 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
     break;
   }
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (IS_SET(retval, eCH_DIED))
     {
@@ -1285,8 +1285,8 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
     chance = 1;
   }
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -1318,8 +1318,8 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
 
 int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
 
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
@@ -1353,8 +1353,8 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
     GET_COND(ch, THIRST) = result;
   }
   send_to_char("You partake in a magnificent feast!\n\r", ch);
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -1380,8 +1380,8 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
 int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -1406,8 +1406,8 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
 int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -1470,8 +1470,8 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
     }
   }
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -4939,8 +4939,8 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
 
   act("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -4980,8 +4980,8 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
   act("You CHOKE on the gas fumes!",
       ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
@@ -11276,8 +11276,8 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
 
   act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     try
     {
@@ -13435,8 +13435,8 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   send_to_char("$B$3Ice$R erupts from the earth!\r\n", ch);
   act("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp_victim : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {

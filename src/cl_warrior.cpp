@@ -425,7 +425,7 @@ int do_hitall(Character *ch, char *argument, int cmd)
     SET_BIT(ch->combat, COMBAT_HITALL);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
-    auto &character_list = DC::getInstance()->character_list;
+    const auto &character_list = DC::getInstance()->character_list;
     for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
              {
 			if (vict && vict != (Character *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {

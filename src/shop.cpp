@@ -2021,7 +2021,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
 
       obj = r.orig_obj;
       obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
-      for (auto &o : obj_list)
+      for (const auto &o : obj_list)
       {
         if (r.choice1_obj == nullptr)
         {

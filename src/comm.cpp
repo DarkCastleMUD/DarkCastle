@@ -980,7 +980,7 @@ void DC::game_loop_init(void)
                  logentry(buf, ANGEL, LogChannels::LOG_GOD);
                  logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
 
-                 for (auto &ch : dc->character_list)
+                 for (const auto &ch : dc->character_list)
                  {
                    if (ch->player && IS_PC(ch))
                    {
@@ -2222,7 +2222,7 @@ void process_iac(Connection *t)
   {
     size_t processed = 0;
     auto iac_str = t->inbuf.substr(iac_pos);
-    for (auto &c : iac_str)
+    for (const auto &c : iac_str)
     {
       // count every processed character so we know how many to delete from t->inbuf
       processed++;
@@ -2481,7 +2481,7 @@ int process_input(class Connection *t)
     if (t->server_size_echo)
     {
       string new_buffer;
-      for (auto &c : buffer)
+      for (const auto &c : buffer)
       {
         if ((c >= ' ' && c <= '~'))
         {

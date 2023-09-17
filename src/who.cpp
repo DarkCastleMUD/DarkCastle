@@ -669,8 +669,8 @@ int do_whoarena(Character *ch, char *argument, int cmd)
 
   if (GET_LEVEL(ch) <= MORTAL)
   {
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &tmp : character_list)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &tmp : character_list)
     {
       if (CAN_SEE(ch, tmp))
       {
@@ -692,8 +692,8 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   }
 
   // If they're here that means they're a god
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &tmp : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &tmp : character_list)
   {
     if (CAN_SEE(ch, tmp))
     {

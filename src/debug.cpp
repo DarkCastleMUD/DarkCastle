@@ -109,7 +109,7 @@ void test_random_stats(void)
     results[result]++;
   }
   // printf("%d\n", result);
-  for (auto &cur : results)
+  for (const auto &cur : results)
   {
     // cerr <<  cur.first << "=" << cur.second << endl;
   }

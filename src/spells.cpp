@@ -964,8 +964,8 @@ void affect_update(int32_t duration_type)
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
     return;
 
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &i : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &i : character_list)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
     // That way we don't have to traverse the entire list all over again
@@ -3126,7 +3126,7 @@ int has_skill(Character *ch, skill_t skill)
 
   if (ch->skills.contains(skill))
   {
-    auto &curr = ch->skills[skill];
+    const auto &curr = ch->skills[skill];
 
     for (o = ch->player->skillchange; o; o = o->next_skill)
     {

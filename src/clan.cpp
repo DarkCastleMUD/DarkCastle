@@ -44,7 +44,6 @@ uint64_t i = UINT64_MAX;
 
 using namespace std;
 
-
 extern index_data *obj_index;
 extern CWorld world;
 
@@ -2980,7 +2979,7 @@ int do_cbalance(Character *ch, char *arg, int cmd)
 
 void remove_totem(Object *altar, Object *totem)
 {
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
@@ -3000,7 +2999,7 @@ void remove_totem(Object *altar, Object *totem)
 
 void add_totem(Object *altar, Object *totem)
 {
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](Character *const &t)
@@ -3078,7 +3077,7 @@ struct takeover_pulse_data *pulse_list = nullptr;
 
 int count_plrs(int zone, int clan)
 {
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   int i = count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
                    {
@@ -3223,7 +3222,7 @@ void recycle_pulse_data(struct takeover_pulse_data *pl)
 
 int online_clan_members(int clan)
 {
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   int i = count_if(character_list.begin(), character_list.end(),
                    [&clan](Character *const &Tmpch)
@@ -3332,7 +3331,7 @@ void pk_check(Character *ch, Character *victim)
 
 bool can_lose(struct takeover_pulse_data *take)
 {
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   auto result = find_if(character_list.begin(), character_list.end(), [&take](Character *const &ch)
                         {

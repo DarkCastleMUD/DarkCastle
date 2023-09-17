@@ -965,7 +965,7 @@ void write_array_csv(const char *const *array, ofstream &fout)
 
 void write_array_csv(QStringList names, ofstream &fout)
 {
-  for (auto &entry : names)
+  for (const auto &entry : names)
   {
     fout << entry.toStdString() << ",";
   }

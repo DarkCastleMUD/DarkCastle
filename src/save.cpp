@@ -376,7 +376,7 @@ void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
   }
   if (i->ignoring.empty() == false)
   {
-    for (auto &name : i->ignoring)
+    for (const auto &name : i->ignoring)
     {
       if (name.second.ignore)
       {
@@ -635,7 +635,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   if (!has_skill(this, NEW_SAVE)) // New save.
     learn_skill(this, NEW_SAVE, 1, 100);
 
-  for (auto &skill : this->skills)
+  for (const auto &skill : this->skills)
   {
     fwrite("SKL", sizeof(char), 3, fpsave);
     fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);

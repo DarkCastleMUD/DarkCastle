@@ -1274,7 +1274,7 @@ void add_mobspec(int i)
 
 void remove_all_mobs_from_world()
 {
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 
 	for_each(character_list.begin(), character_list.end(),
 			 [](Character *const &curr)
@@ -3559,7 +3559,7 @@ int create_blank_mobile(int nr)
 	mob_index[cur_index].progtypes = 0;
 
 	// update index of all mobiles in game
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
 			 [&cur_index](Character *const &curr)
 			 {
@@ -3627,7 +3627,7 @@ void delete_mob_from_index(int nr)
 	top_of_mobt--;
 
 	// update index of all mobiles in game - these store rnums
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
 			 [&nr](Character *const &curr)
 			 {
@@ -4965,8 +4965,8 @@ void Zone::reset(ResetType reset_type)
 	{
 		repops_with_bonus++;
 
-		auto &character_list = DC::getInstance()->character_list;
-		for (auto &tmp_victim : character_list)
+		const auto &character_list = DC::getInstance()->character_list;
+		for (const auto &tmp_victim : character_list)
 		{
 			if (tmp_victim->in_room == DC::NOWHERE)
 			{
@@ -5556,7 +5556,7 @@ void free_char(Character *ch, Trace trace)
 			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in character_list", ch);
 		}
 
-		auto &shooting_list = DC::getInstance()->shooting_list;
+		const auto &shooting_list = DC::getInstance()->shooting_list;
 		if (shooting_list.contains(ch))
 		{
 			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in shooting_list", ch);

@@ -133,8 +133,8 @@ int do_showbits(Character *ch, char *argument, int cmd)
   if (!*person)
   {
     char buf[MAX_STRING_LENGTH];
-    auto &character_list = DC::getInstance()->character_list;
-    for (auto &victim : character_list)
+    const auto &character_list = DC::getInstance()->character_list;
+    for (const auto &victim : character_list)
     {
       if (IS_NPC(victim))
         continue;
@@ -242,7 +242,7 @@ int do_debug(Character *ch, char *args, int cmd)
     tie(arg2, remainder) = half_chop(remainder);
     if (arg2 == "list")
     {
-      for (auto &pt : PerfTimers)
+      for (const auto &pt : PerfTimers)
       {
         csendf(ch, "%s\n\r", pt.first.c_str());
       }
@@ -252,7 +252,7 @@ int do_debug(Character *ch, char *args, int cmd)
       tie(arg3, remainder) = half_chop(remainder);
       if (arg3 == "all")
       {
-        for (auto &pt : PerfTimers)
+        for (const auto &pt : PerfTimers)
         {
           string key = pt.first;
           Timer t = pt.second;

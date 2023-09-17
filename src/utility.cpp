@@ -2015,7 +2015,7 @@ string double_dollars(string source)
 {
   string destination = {};
 
-  for (auto &ch : source)
+  for (const auto &ch : source)
   {
     if (ch == '$')
     {
@@ -2808,7 +2808,7 @@ void update_make_camp_and_leadership(void)
 {
   struct affected_type af;
   int bonus = 0;
-  auto &character_list = DC::getInstance()->character_list;
+  const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&af, &bonus](Character *i)

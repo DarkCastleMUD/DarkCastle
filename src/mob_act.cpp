@@ -73,8 +73,8 @@ void mobile_activity(void)
   extern int mprog_cur_result;
 
   /* Examine all mobs. */
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &ch : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &ch : character_list)
   {
     if (isDead(ch) || isNowhere(ch))
     {
@@ -960,8 +960,8 @@ void clear_hunt(void *arg1, void *arg2, void *arg3)
 
 void clear_hunt(char *arg1, Character *arg2, void *arg3)
 {
-  auto &character_list = DC::getInstance()->character_list;
-  for (auto &curr : character_list)
+  const auto &character_list = DC::getInstance()->character_list;
+  for (const auto &curr : character_list)
   {
     if (curr == arg2)
     {

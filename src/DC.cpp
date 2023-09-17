@@ -46,7 +46,7 @@ void DC::handleShooting(void)
 {
 	unordered_set<Character *> remove_list;
 
-	for (auto &ch : shooting_list)
+	for (const auto &ch : shooting_list)
 	{
 		// ignore the dead
 		if (ch->in_room == DC::NOWHERE)
@@ -64,7 +64,7 @@ void DC::handleShooting(void)
 		}
 	}
 
-	for (auto &ch : remove_list)
+	for (const auto &ch : remove_list)
 	{
 		shooting_list.erase(ch);
 	}

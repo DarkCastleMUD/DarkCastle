@@ -347,7 +347,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	{
 		left += 6;
 
-		auto &character_list = DC::getInstance()->character_list;
+		const auto &character_list = DC::getInstance()->character_list;
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left](Character *const &tmp)
 				{
@@ -366,7 +366,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	{
 		left += 5;
 
-		auto &character_list = DC::getInstance()->character_list;
+		const auto &character_list = DC::getInstance()->character_list;
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left, &mob](Character *const &tmp)
 				{
@@ -1762,7 +1762,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int target = atoi(arg);
 		int count = 0;
 
-		auto &character_list = DC::getInstance()->character_list;
+		const auto &character_list = DC::getInstance()->character_list;
 		count = count_if(character_list.begin(), character_list.end(),
 						 [&target](Character *vch)
 						 {

@@ -2725,8 +2725,8 @@ int do_mlocate(Character *ch, char *name, int cmd)
    *buf2 = '\0';
    send_to_char(" #   Short description          Room Number\n\n\r", ch);
 
-   auto &character_list = DC::getInstance()->character_list;
-   for (auto &i : character_list)
+   const auto &character_list = DC::getInstance()->character_list;
+   for (const auto &i : character_list)
    {
 
       if ((IS_PC(i) &&
@@ -3380,8 +3380,8 @@ void check_champion_and_website_who_list()
    int addminute = 0;
    string name;
 
-   auto &character_list = DC::getInstance()->character_list;
-   for (auto &ch : character_list)
+   const auto &character_list = DC::getInstance()->character_list;
+   for (const auto &ch : character_list)
    {
 
       if (IS_PC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
@@ -3510,7 +3510,7 @@ public:
    };
    bool operator==(const Object *obj);
    void setType(types type) { type_ = type; }
-   types getType(void) { return type_; }
+   types getType(void) const { return type_; }
 
    // name=
    void setObjectName(QString name) { o_name_ = name; }
@@ -3565,10 +3565,10 @@ public:
 
    // limit=
    void setLimitOutput(uint64_t limit_output) { limit_output_ = limit_output; }
-   uint64_t getLimitOutput(void) { return limit_output_; }
+   uint64_t getLimitOutput(void) const { return limit_output_; }
 
    void enableShowRange(void) { show_range_ = true; }
-   bool isShowRange(void) { return show_range_; }
+   bool isShowRange(void) const { return show_range_; }
 
 private:
    types type_ = {};
@@ -3619,9 +3619,9 @@ public:
    {
    }
 
-   Search::locations getLocation() { return location_; }
-   Object *getObject() { return object_; }
-   QString getName() { return name_; }
+   Search::locations getLocation() const { return location_; }
+   Object *getObject() const { return object_; }
+   QString getName() const { return name_; }
 };
 
 bool Search::operator==(const Object *obj)
@@ -4016,7 +4016,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             send("What type are you searching for?\r\n");
             send("Here are some valid types:\r\n");
-            for (auto &i : item_types)
+            for (const auto &i : item_types)
             {
                send(i + "\r\n");
             }
@@ -4042,7 +4042,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             send("What type are you searching for?\r\n");
             send("Here are some valid wear locations:\r\n");
-            for (auto &w : Object::wear_bits)
+            for (const auto &w : Object::wear_bits)
             {
                send(w + "\r\n");
             }
@@ -4068,7 +4068,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             send("What size are you searching for?\r\n");
             send("Here are some valid sizes:\r\n");
-            for (auto &s : Object::size_bits)
+            for (const auto &s : Object::size_bits)
             {
                send(s + "\r\n");
             }
@@ -4094,7 +4094,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             send("What more flag are you searching for?\r\n");
             send("Here are some valid more flags:\r\n");
-            for (auto &s : Object::more_obj_bits)
+            for (const auto &s : Object::more_obj_bits)
             {
                send(s + "\r\n");
             }
@@ -4120,7 +4120,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             send("What extra flag are you searching for?\r\n");
             send("Here are some valid extra flags:\r\n");
-            for (auto &s : Object::extra_bits)
+            for (const auto &s : Object::extra_bits)
             {
                send(s + "\r\n");
             }
@@ -4257,11 +4257,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             sort_vault(*vault, sv);
             if (!sv.vault_contents.empty())
             {
-               for (auto &o_short_description : sv.vault_contents)
+               for (const auto &o_short_description : sv.vault_contents)
                {
-                  auto &o = sv.vault_content_qty[o_short_description];
-                  auto &obj = o.first;
-                  auto &count = o.second;
+                  const auto &o = sv.vault_content_qty[o_short_description];
+                  const auto &obj = o.first;
+                  const auto &count = o.second;
 
                   bool matches = false;
 
@@ -4320,11 +4320,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             sort_vault(*vault, sv);
             if (!sv.vault_contents.empty())
             {
-               for (auto &o_short_description : sv.vault_contents)
+               for (const auto &o_short_description : sv.vault_contents)
                {
-                  auto &o = sv.vault_content_qty[o_short_description];
-                  auto &obj = o.first;
-                  auto &count = o.second;
+                  const auto &o = sv.vault_content_qty[o_short_description];
+                  const auto &obj = o.first;
+                  const auto &count = o.second;
 
                   bool matches = false;
 
@@ -4361,14 +4361,14 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       bool showed_ranges = false;
 
-      for (auto &s : sl)
+      for (const auto &s : sl)
       {
          if (s.isShowRange())
          {
             if (s.getType() == Search::types::O_EQ_LEVEL)
             {
                uint64_t min_level = 100, max_level = 0;
-               for (auto &result : obj_results)
+               for (const auto &result : obj_results)
                {
                   auto obj = result.getObject();
                   if (obj->getLevel() > max_level)
@@ -4448,14 +4448,14 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       bool showed_ranges = false;
 
-      for (auto &s : sl)
+      for (const auto &s : sl)
       {
          if (s.isShowRange())
          {
             if (s.getType() == Search::types::O_EQ_LEVEL)
             {
                uint64_t min_level = 100, max_level = 0;
-               for (auto &result : obj_results)
+               for (const auto &result : obj_results)
                {
                   auto obj = result.getObject();
                   if (obj->getLevel() > max_level)
@@ -4497,7 +4497,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    qsizetype max_keyword_size = 0, max_short_description_size = 0;
 
    uint64_t result_nr = {};
-   for (auto &result : obj_results)
+   for (const auto &result : obj_results)
    {
       auto obj = result.getObject();
       if (limit_output > 0 && ++result_nr > limit_output)
@@ -4553,7 +4553,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
 
    result_nr = 0;
-   for (auto &result : obj_results)
+   for (const auto &result : obj_results)
    {
       auto obj = result.getObject();
       if (limit_output > 0 && ++result_nr > limit_output)

@@ -465,12 +465,12 @@ int do_shutdown(Character *ch, char *argument, int cmd)
   }
   else if (!strcmp(arg1, "hot"))
   {
-    for (auto &ch : DC::getInstance()->character_list)
+    for (const auto &ch : DC::getInstance()->character_list)
     {
       if (IS_PC(ch))
       {
         vector<Character *> followers = ch->getFollowers();
-        for (auto &follower : followers)
+        for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
@@ -537,12 +537,12 @@ int do_shutdown(Character *ch, char *argument, int cmd)
   }
   else if (!strcmp(arg1, "check"))
   {
-    for (auto &ch : DC::getInstance()->character_list)
+    for (const auto &ch : DC::getInstance()->character_list)
     {
       if (IS_PC(ch))
       {
         vector<Character *> followers = ch->getFollowers();
-        for (auto &follower : followers)
+        for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
@@ -745,7 +745,7 @@ int do_skilledit(Character *ch, char *argument, int cmd)
     }
 
     ch->send(fmt::format("Skills for {}:\r\n", GET_NAME(victim)));
-    for (auto &curr : ch->skills)
+    for (const auto &curr : ch->skills)
     {
       ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
     }

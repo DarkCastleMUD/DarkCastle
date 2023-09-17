@@ -764,7 +764,7 @@ command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
   }
 
   auto parts = arguments.toLower().split(' ');
-  for (auto &i : parts)
+  for (const auto &i : parts)
   {
     ch->player->toggleJoining(i);
   }

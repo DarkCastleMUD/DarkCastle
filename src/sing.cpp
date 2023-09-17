@@ -717,7 +717,7 @@ void update_bard_singing()
 {
 	vector<songInfo>::iterator j;
 
-	auto &character_list = DC::getInstance()->character_list;
+	const auto &character_list = DC::getInstance()->character_list;
 	find_if(character_list.begin(), character_list.end(), [&j](Character *const &i)
 			{
 		if (IS_PC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < IMMORTAL)
