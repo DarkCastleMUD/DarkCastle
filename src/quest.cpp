@@ -1489,7 +1489,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       send_to_char("$BQuest Equipment:$R\r\n", ch);
 
       int n = 0;
-      for (int qvnum = 27975; qvnum < 28000; qvnum++)
+      for (int qvnum = 27975; qvnum < 27997; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0)
@@ -1509,7 +1509,17 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
             dc_free(buffer);
          }
       }
-      for (int qvnum = 3124; qvnum <= 3127; qvnum++)
+      for (int qvnum = 3124; qvnum <= 3128; qvnum++)
+      {
+         rnum = real_object(qvnum);
+         if (rnum >= 0)
+         {
+            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
+            send_to_char(buffer, ch);
+            dc_free(buffer);
+         }
+      }
+      for (int qvnum = 3151; qvnum <= 3158; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0)
@@ -1535,7 +1545,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       bool FOUND = false;
       int want_num = atoi(arg2) - 1;
       int n = 0;
-      for (int qvnum = 27975; qvnum <= 27999; qvnum++)
+      for (int qvnum = 27975; qvnum <= 27996; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0 && n++ == want_num)
@@ -1558,7 +1568,19 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       }
       if (!FOUND)
       {
-         for (int qvnum = 3124; qvnum <= 3127; qvnum++)
+         for (int qvnum = 3124; qvnum <= 3128; qvnum++)
+         {
+            rnum = real_object(qvnum);
+            if (rnum >= 0 && n++ == want_num)
+            {
+               FOUND = true;
+               break;
+            }
+         }
+      }
+      if (!FOUND)
+      {
+         for (int qvnum = 3151; qvnum <= 3158; qvnum++)
          {
             rnum = real_object(qvnum);
             if (rnum >= 0 && n++ == want_num)
@@ -1635,7 +1657,12 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
           obj_index[obj->item_number].virt != 3124 &&
           obj_index[obj->item_number].virt != 3125 &&
           obj_index[obj->item_number].virt != 3126 &&
-          obj_index[obj->item_number].virt != 3127)
+          obj_index[obj->item_number].virt != 3127 &&
+          obj_index[obj->item_number].virt != 3128 &&
+          obj_index[obj->item_number].virt != 27997 &&
+          obj_index[obj->item_number].virt != 27998 &&
+          obj_index[obj->item_number].virt != 27999
+          )
       {
          sprintf(buf, "%s I only buy quest equipment.", GET_NAME(ch));
          do_tell(owner, buf, 0);
