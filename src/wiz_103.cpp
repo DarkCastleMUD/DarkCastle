@@ -372,7 +372,7 @@ int lookupRoom(Character *ch, char *str)
 
   int room = atoi(str);
 
-  if (room < 0 || room > top_of_world || world_array[room] == 0 || (room == 0 && str[0] != '0'))
+  if (room < 0 || room > top_of_world || DC::getInstance()->world_array[room] == 0 || (room == 0 && str[0] != '0'))
   {
     if (ch)
     {
@@ -423,7 +423,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       bool found = false;
       for (c_class = 1; c_class < CLASS_MAX; c_class++)
       {
-        if (world_array[room]->allow_class[c_class] == true)
+        if (DC::getInstance()->world_array[room]->allow_class[c_class] == true)
         {
           found = true;
           csendf(ch, "%s ", pc_clss_types[c_class]);
@@ -456,7 +456,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       int cols = 0;
       for (int r = 0; r < top_of_world; r++)
       {
-        if (world_array[r] && world_array[r]->allow_class[c_class] == true)
+        if (DC::getInstance()->world_array[r] && DC::getInstance()->world_array[r]->allow_class[c_class] == true)
         {
           csendf(ch, "%5d ", r);
 
@@ -502,15 +502,15 @@ int do_guild(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (world_array[room]->allow_class[c_class] == true)
+  if (DC::getInstance()->world_array[room]->allow_class[c_class] == true)
   {
     csendf(ch, "Removed %s class from room #%d's allow list.\r\n", pc_clss_types[c_class], room);
-    world_array[room]->allow_class[c_class] = false;
+    DC::getInstance()->world_array[room]->allow_class[c_class] = false;
   }
   else
   {
     csendf(ch, "Added %s class to room #%d's allow list.\r\n", pc_clss_types[c_class], room);
-    world_array[room]->allow_class[c_class] = true;
+    DC::getInstance()->world_array[room]->allow_class[c_class] = true;
   }
 
   set_zone_modified_world(room);

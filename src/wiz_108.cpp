@@ -42,7 +42,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(world[curRoom].zone).name));
   for (low = curRoom; low > 0; low--)
   {
-    if (!world_array[low - 1])
+    if (!DC::getInstance()->world_array[low - 1])
       continue;
     last_good = low;
     if (world[low - 1].zone != curZone)
@@ -52,7 +52,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   last_good = curRoom;
   for (high = curRoom; high < top_of_world; high++)
   {
-    if (!world_array[high + 1])
+    if (!DC::getInstance()->world_array[high + 1])
       continue;
     last_good = high;
     if (world[high + 1].zone != curZone)
@@ -62,7 +62,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
   for (i = low; i < high; i++)
   {
-    if (!world_array[i])
+    if (!DC::getInstance()->world_array[i])
       continue;
     for (dir = 0; dir < 6; dir++)
     {
@@ -89,7 +89,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
           output += buf;
         }
-        else if (!world_array[portal->obj_flags.value[0]])
+        else if (!DC::getInstance()->world_array[portal->obj_flags.value[0]])
         {
           sprintf(buf, "Room %5d - climb to Room %5d (DOES NOT EXIST)\r\n",
                   i, real_room(portal->obj_flags.value[0]));

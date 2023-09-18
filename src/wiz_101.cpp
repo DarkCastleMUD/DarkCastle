@@ -30,7 +30,7 @@ queue<string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
-extern class Room **world_array;
+
 
 int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 {
@@ -194,7 +194,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-    if (world_array[loc_nr])
+    if (DC::getInstance()->world_array[loc_nr])
     {
       location = loc_nr;
     }
@@ -257,7 +257,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         return eFAILURE;
       }
 
-      if (world_array[loc_nr])
+      if (DC::getInstance()->world_array[loc_nr])
         location = loc_nr;
       else
       {

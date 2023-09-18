@@ -1727,7 +1727,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     do
     {
       to_room = number(0, top_of_world);
-    } while (!world_array[to_room] ||
+    } while (!DC::getInstance()->world_array[to_room] ||
              IS_SET(world[to_room].room_flags, PRIVATE) ||
              IS_SET(world[to_room].room_flags, IMP_ONLY) ||
              IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
@@ -6582,7 +6582,7 @@ void make_portal(Character *ch, Character *vict)
     while (!good_destination)
     {
       destination = number(0, top_of_world);
-      if (!world_array[destination] ||
+      if (!DC::getInstance()->world_array[destination] ||
           IS_SET(world[destination].room_flags, ARENA) ||
           IS_SET(world[destination].room_flags, IMP_ONLY) ||
           IS_SET(world[destination].room_flags, PRIVATE) ||

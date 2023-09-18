@@ -115,6 +115,7 @@ public:
   fd_set exc_set = {};
   fd_set null_set = {};
   zones_t zones = {};
+  class Room **world_array = nullptr;
 
   static string getVersion();
   static string getBuildTime();
@@ -169,7 +170,7 @@ private:
 
 extern vector<string> continent_names;
 extern class CVoteData *DCVote;
-extern class Room **world_array;
+
 extern class Object *object_list;
 extern struct spell_info_type spell_info[];
 void renum_world(void);

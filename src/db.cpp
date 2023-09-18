@@ -87,9 +87,8 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-class Room **world_array = 0; // array of rooms
-int top_of_world = 0;		  // index of last room in world
-int top_of_world_alloc = 0;	  // index of last alloc'd memory in world
+int top_of_world = 0;		// index of last room in world
+int top_of_world_alloc = 0; // index of last alloc'd memory in world
 
 class Object *object_list = 0; /* the global linked list of obj's */
 
@@ -99,13 +98,13 @@ Room &CWorld::operator[](int rnum)
 {
 	static Room generic_room = {};
 
-	if (rnum > top_of_world || rnum < 0 || world_array[rnum] == nullptr)
+	if (rnum > top_of_world || rnum < 0 || DC::getInstance()->world_array[rnum] == nullptr)
 	{
 		generic_room = {};
 		return generic_room;
 	}
 
-	return *world_array[rnum];
+	return *DC::getInstance()->world_array[rnum];
 }
 
 CWorld world;
@@ -571,11 +570,11 @@ void DC::boot_db(void)
 
 	logentry("Loading the world.", 0, LogChannels::LOG_MISC);
 	// start world off with 2000 rooms of alloc'd space
-	world_array = (Room **)realloc(world_array, 2000 * sizeof(Room *));
+	DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, 2000 * sizeof(Room *));
 	top_of_world_alloc = 2000;
 	// clear it (realloc = malloc, not calloc)
 	for (int counter = 0; counter < top_of_world_alloc; counter++)
-		world_array[counter] = 0;
+		DC::getInstance()->world_array[counter] = 0;
 
 	funny_boot_message();
 
@@ -1397,7 +1396,7 @@ void write_one_room(FILE *f, int a)
 {
 	struct extra_descr_data *extra;
 
-	if (!world_array[a])
+	if (!DC::getInstance()->world_array[a])
 		return;
 
 	fprintf(f, "#%d\n", world[a].number);
@@ -1495,12 +1494,12 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		if (room_nr >= top_of_world_alloc)
 		{
-			world_array = (Room **)realloc(world_array, (room_nr + 200) * sizeof(Room *));
+			DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, (room_nr + 200) * sizeof(Room *));
 			for (int counter = top_of_world_alloc; counter < room_nr + 200; counter++)
-				world_array[counter] = 0;
+				DC::getInstance()->world_array[counter] = 0;
 			top_of_world_alloc = room_nr + 200;
 
-			if (!world_array)
+			if (!DC::getInstance()->world_array)
 			{
 				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_WORLD);
 				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_BUG);
@@ -1511,7 +1510,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 		if (top_of_world < room_nr)
 			top_of_world = room_nr;
 
-		world_array[room_nr] = (Room *)calloc(1, sizeof(Room));
+		DC::getInstance()->world_array[room_nr] = (Room *)calloc(1, sizeof(Room));
 
 		world[room_nr].paths = 0;
 		world[room_nr].number = room_nr;
@@ -1830,7 +1829,7 @@ void free_world_from_memory()
 
 	for (int i = 0; i <= top_of_world; i++)
 	{
-		if (world_array[i] == 0)
+		if (DC::getInstance()->world_array[i] == 0)
 			continue;
 
 		if (world[i].name)
@@ -1859,7 +1858,7 @@ void free_world_from_memory()
 			}
 
 		world[i].FreeTracks();
-		dc_free(world_array[i]);
+		dc_free(DC::getInstance()->world_array[i]);
 	}
 
 	curr_wfli = world_file_list;
@@ -2014,8 +2013,8 @@ void DC::boot_world(void)
 
 		// push the first num forward until it hits a room, that way it's
 		// accurate.
-		// "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to world_array
-		for (; pItem->firstnum < top_of_world_alloc && !world_array[pItem->firstnum]; pItem->firstnum++)
+		// "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to DC::getInstance()->world_array
+		for (; pItem->firstnum < top_of_world_alloc && !DC::getInstance()->world_array[pItem->firstnum]; pItem->firstnum++)
 			;
 
 		pItem->lastnum = room_nr / 100 * 100 + 99;
@@ -2083,7 +2082,7 @@ int create_one_room(Character *ch, int vnum)
 
 	char buf[256];
 
-	if (world_array[vnum])
+	if (DC::getInstance()->world_array[vnum])
 		return 0;
 
 	if (vnum > WORLD_MAX_ROOM)
@@ -2095,19 +2094,19 @@ int create_one_room(Character *ch, int vnum)
 	if (top_of_world + 1 >= top_of_world_alloc)
 	{
 
-		world_array = (Room **)realloc(world_array, (top_of_world + 200) * sizeof(Room *));
+		DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, (top_of_world + 200) * sizeof(Room *));
 		for (int counter = top_of_world_alloc; counter < top_of_world + 200; counter++)
-			world_array[counter] = 0;
+			DC::getInstance()->world_array[counter] = 0;
 		top_of_world_alloc = top_of_world + 200;
 
-		if (!world_array)
+		if (!DC::getInstance()->world_array)
 		{
 			logentry("Out of memory in create_one_room.", IMMORTAL, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
 
-	world_array[vnum] = (Room *)calloc(1, sizeof(Room));
+	DC::getInstance()->world_array[vnum] = (Room *)calloc(1, sizeof(Room));
 
 	rp = &world[vnum];
 
@@ -2139,7 +2138,7 @@ void renum_world(void)
 
 	for (room = 0; room <= top_of_world; room++)
 		for (door = 0; door <= 5; door++)
-			if (world_array[room])
+			if (DC::getInstance()->world_array[room])
 				if (world[room].dir_option[door])
 					if (world[room].dir_option[door]->to_room != DC::NOWHERE)
 						world[room].dir_option[door]->to_room =
@@ -4822,7 +4821,7 @@ void Zone::reset(ResetType reset_type)
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (!world_array[cmd[cmd_no]->arg1])
+				if (!DC::getInstance()->world_array[cmd[cmd_no]->arg1])
 				{
 					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
 							cmd[cmd_no]->arg1, id_, cmd_no);
@@ -6001,7 +6000,7 @@ room_t real_room(room_t virt)
 		return DC::NOWHERE;
 	}
 
-	if (world_array[virt])
+	if (DC::getInstance()->world_array[virt])
 	{
 		return virt;
 	}

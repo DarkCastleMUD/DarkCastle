@@ -100,7 +100,7 @@ extern CWorld world; /* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
-extern class Room **world_array;
+
 extern string last_char_name;
 extern string last_processed_cmd;
 extern struct index_data *obj_index;
@@ -1792,7 +1792,7 @@ string generate_prompt(Character *ch)
       }
       break;
     case 's':
-      if (world_array[ch->in_room])
+      if (DC::getInstance()->world_array[ch->in_room])
         sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
       else
         sprintf(pro, " ");
@@ -3301,7 +3301,7 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
   if (room == DC::NOWHERE)
     return;
 
-  if (!world_array[room] || !world[room].people)
+  if (!DC::getInstance()->world_array[room] || !world[room].people)
   {
     return;
   }

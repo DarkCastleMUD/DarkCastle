@@ -75,7 +75,6 @@ extern Object *activeObj;
 extern void *activeVo;
 
 extern int top_of_world;
-extern Room **world_array;
 extern struct index_data *obj_index;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
@@ -777,9 +776,8 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   }
   if (location == ch->in_room)
     return eFAILURE; // zz
-  extern Room **world_array;
   extern int top_of_world;
-  if (location > top_of_world || !world_array[location])
+  if (location > top_of_world || !DC::getInstance()->world_array[location])
     location = 0;
 
   if (ch->fighting != nullptr)
@@ -830,9 +828,8 @@ int do_mpat(Character *ch, char *argument, int cmd)
     prog_error(ch, "Mpat - No such location.");
     return eFAILURE | eINTERNAL_ERROR;
   }
-  extern Room **world_array;
   extern int top_of_world;
-  if (location > top_of_world || !world_array[location])
+  if (location > top_of_world || !DC::getInstance()->world_array[location])
     location = 0;
   original = ch->in_room;
   char_from_room(ch, false); // Don't stop all fighting
@@ -1921,7 +1918,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     {
       to_room = number(0, top_of_world);
     }
-  } while (!world_array[to_room] ||
+  } while (!DC::getInstance()->world_array[to_room] ||
            IS_SET(world[to_room].room_flags, PRIVATE) ||
            IS_SET(world[to_room].room_flags, IMP_ONLY) ||
            IS_SET(world[to_room].room_flags, NO_TELEPORT) ||

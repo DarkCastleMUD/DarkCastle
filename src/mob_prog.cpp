@@ -68,7 +68,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;
 extern class Object *object_list;
-extern class Room **world_array;
+
 int activeProgs = 0; // loop protection
 
 Character *activeActor = nullptr;
@@ -754,7 +754,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			}
 			else if (rtarget >= 0)
 			{
-				if (world_array[rtarget])
+				if (DC::getInstance()->world_array[rtarget])
 					stringval = &world[rtarget].description;
 				else
 					tError = true;
@@ -1051,7 +1051,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (rtarget >= 0)
 			{
-				if (world_array[rtarget])
+				if (DC::getInstance()->world_array[rtarget])
 					stringval = &world[rtarget].name;
 				else
 					tError = true;
