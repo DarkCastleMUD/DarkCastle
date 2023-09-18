@@ -94,6 +94,7 @@ public:
   static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
+  const QString HINTS_FILE_NAME = "playerhints.txt";
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
@@ -130,6 +131,12 @@ public:
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
 
   explicit DC(int &argc, char **argv);
+  DC(const DC &) = delete; // non-copyable
+  DC(DC &&) = delete;      // and non-movable
+  // as there is only one object, assignment would always be assign to self
+  DC &operator=(const DC &) = delete;
+  DC &operator=(DC &&) = delete;
+
   void main_loop2(void);
   void removeDead(void);
   void handleShooting(void);
@@ -150,17 +157,9 @@ public:
   bool isAllowedHost(QHostAddress host);
 
 private:
-  DC(const DC &) = delete; // non-copyable
-  DC(DC &&) = delete;      // and non-movable
   static string version;
   struct timeval last_time = {}, delay_time = {}, now_time = {};
   hints_t hints;
-  const QString HINTS_FILE_NAME = "playerhints.txt";
-
-  // as there is only one object, assignment would always be assign to self
-  DC &operator=(const DC &) = delete;
-  DC &operator=(DC &&) = delete;
-
   void game_loop_init(void);
   void game_loop(void);
   int init_socket(in_port_t port);
