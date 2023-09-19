@@ -61,7 +61,7 @@ typedef QMap<zone_t, Zone> zones_t;
 class World
 {
 public:
-  class Room &operator[](int rnum);
+  class Room &operator[](room_t room_key);
 };
 
 class DC : public QCoreApplication

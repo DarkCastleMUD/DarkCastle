@@ -94,17 +94,17 @@ class Object *object_list = 0; /* the global linked list of obj's */
 
 pulse_data *bard_list = 0; /* global l-list of bards          */
 
-Room &World::operator[](int rnum)
+Room &World::operator[](room_t room_key)
 {
 	static Room generic_room = {};
 
-	if (rnum > top_of_world || rnum < 0 || DC::getInstance()->world_array[rnum] == nullptr)
+	if (room_key > top_of_world || room_key < 1 || DC::getInstance()->world_array[room_key] == nullptr)
 	{
 		generic_room = {};
 		return generic_room;
 	}
 
-	return *DC::getInstance()->world_array[rnum];
+	return *DC::getInstance()->world_array[room_key];
 }
 
 #ifndef SEEK_CUR
