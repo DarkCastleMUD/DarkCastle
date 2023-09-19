@@ -586,12 +586,9 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			else
 				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
 			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
-			if (ch && !str_cmp(ch->name, "Julian"))
-			{
-				sprintf(buf, "%s ([%d] [%d] [%s])", buf,
-						zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
-						charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
-			}
+			sprintf(buf, "%s ([%d] [%d] [%s])", buf,
+					zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
+					charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
 			sprintf(buf, "%s\r\n", buf);
 			break;
 		case 'O':
