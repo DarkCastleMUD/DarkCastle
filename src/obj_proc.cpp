@@ -1839,7 +1839,7 @@ int stupid_message(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (!obj || obj->in_room < 0)
+  if (!obj || obj->in_room == DC::NOWHERE)
     return eFAILURE;
 
   if (!DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players)
@@ -2664,7 +2664,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
   if (cmd)
     return eFAILURE;
 
-  if (obj->in_room < 0)
+  if (obj->in_room == DC::NOWHERE)
     return eFAILURE;
 
   Character *vict = DC::getInstance()->world[obj->in_room].people;
@@ -2726,7 +2726,7 @@ int boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   if (cmd && cmd != CMD_ENTER)
     return eFAILURE;
 
-  if (obj->in_room < 0)
+  if (obj->in_room == DC::NOWHERE)
     return eFAILURE; // someone loaded me
 
   // figure out which boat I am
@@ -2799,7 +2799,7 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
   if (cmd != CMD_LEAVE) // leave
     return eFAILURE;
 
-  if (obj->in_room < 0)
+  if (obj->in_room == DC::NOWHERE)
     return eFAILURE; // someone loaded me
 
   // switch off depending on what item we are
@@ -2865,7 +2865,7 @@ int mob_summoner(Character *ch, class Object *obj, int cmd, const char *arg, Cha
   if (cmd)
     return eFAILURE;
 
-  if (obj->in_room < 0)
+  if (obj->in_room == DC::NOWHERE)
     return eFAILURE; // someone loaded me
 
   // see if we have any players in room
@@ -2947,7 +2947,7 @@ int globe_of_darkness_proc(Character *ch, class Object *obj, int cmd, const char
   if (cmd)
     return eFAILURE;
 
-  if (obj->in_room < 0)
+  if (obj->in_room == DC::NOWHERE)
     return eFAILURE; // someone loaded me
 
   if (obj->obj_flags.value[0] < 1)
@@ -3163,7 +3163,7 @@ int TOHS_locator(Character *ch, class Object *obj, int cmd, const char *arg,
     if (victim->item_number == searchnum)
       break;
 
-  if (!victim || victim->in_room < 0) // couldn't find it?!
+  if (!victim || victim->in_room == DC::NOWHERE) // couldn't find it?!
   {
     send_to_char("The tower seems to not be there!?!!\r\n", ch);
     return eSUCCESS;

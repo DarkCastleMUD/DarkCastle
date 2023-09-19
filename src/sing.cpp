@@ -34,7 +34,6 @@ extern "C"
 #include "inventory.h"
 #include "handler.h"
 
-
 extern index_data *mob_index;
 Character *origsing = nullptr;
 
@@ -1201,7 +1200,7 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
 int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
 	Character *i;
-	class Room *room;
+	Room *room;
 	char buf[MAX_STRING_LENGTH];
 	char *direction[] = {
 		"to the North",

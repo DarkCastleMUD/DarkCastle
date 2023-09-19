@@ -26,8 +26,8 @@
 #include <algorithm>
 #include <QRegularExpression>
 
+#include "DC.h"
 #include "structs.h"
-#include "room.h"
 #include "character.h"
 #include "obj.h"
 #include "utility.h"
@@ -56,8 +56,6 @@
 using namespace std;
 
 /* extern variables */
-
-
 
 extern class Object *object_list;
 extern struct index_data *mob_index;
@@ -2742,7 +2740,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
       else if (!(isname(name, i->name)))
          continue;
 
-      if (i->in_room < 0)
+      if (i->in_room == DC::NOWHERE)
       {
          logf(ANGEL, LogChannels::LOG_BUG, "do_mlocate: %s is in_room %d, averting crash. IS_NPC(i)==%s, IS_PC(i)==%s, IS_MOB(i)==%s",
               GET_NAME(i), i->in_room, IS_NPC(i) ? "true" : "false", IS_PC(i) ? "true" : "false", IS_MOB(i) ? "true" : "false");
@@ -3164,7 +3162,7 @@ int do_scan(Character *ch, char *argument, int cmd)
 {
    int i;
    Character *vict;
-   class Room *room;
+   Room *room;
    int32_t was_in;
 
    char *possibilities[] =

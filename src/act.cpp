@@ -138,7 +138,7 @@ act_return act(
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!i->character || i->character == ch)
         continue;
-      if (i->character->in_room < 0 || ch->in_room < 0)
+      if (i->character->in_room == DC::NOWHERE || ch->in_room == DC::NOWHERE)
         continue;
       if ((destination == TO_ZONE) && DC::getInstance()->world[i->character->in_room].zone != DC::getInstance()->world[ch->in_room].zone)
         continue;

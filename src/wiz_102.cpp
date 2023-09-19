@@ -2207,7 +2207,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch,((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, ((Object *)obj_index[rnum].item)->obj_flags.extra_flags);
   }
   break;
 
@@ -5076,7 +5076,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
       if (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
       {
         if ((IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info,
-                                                                                    EX_LOCKED)))
+                                                                                                       EX_LOCKED)))
           value = 2;
         else if (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info,
                         EX_CLOSED))
@@ -5300,7 +5300,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH * 2];
   char buf2[MAX_STRING_LENGTH];
-  class Room *rm = 0;
+  Room *rm = 0;
   Character *k = 0;
   class Object *j = 0;
   struct extra_descr_data *desc;

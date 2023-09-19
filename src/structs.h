@@ -19,8 +19,6 @@ extern "C"
 
 const size_t MAX_STRING_LENGTH = 8192;
 
-#include "character.h"
-
 using namespace std;
 
 // FILE * fopen(const char *filename, const char *type);
@@ -50,8 +48,8 @@ typedef struct txt_q
 
 struct snoop_data
 {
-  Character *snooping;
-  Character *snoop_by;
+  class Character *snooping;
+  class Character *snoop_by;
 };
 
 struct msg_type
@@ -88,17 +86,17 @@ struct SVoteData
 class CVoteData
 {
 public:
-  void SetQuestion(Character *ch, std::string question);
-  void AddAnswer(Character *ch, std::string answer);
-  void RemoveAnswer(Character *ch, unsigned int answer);
-  void StartVote(Character *ch);
-  void EndVote(Character *ch);
-  void Reset(Character *ch);
+  void SetQuestion(class Character *ch, std::string question);
+  void AddAnswer(class Character *ch, std::string answer);
+  void RemoveAnswer(class Character *ch, unsigned int answer);
+  void StartVote(class Character *ch);
+  void EndVote(class Character *ch);
+  void Reset(class Character *ch);
   void OutToFile();
-  bool HasVoted(Character *ch);
-  bool Vote(Character *ch, unsigned int vote);
-  void DisplayVote(Character *ch);
-  void DisplayResults(Character *ch);
+  bool HasVoted(class Character *ch);
+  bool Vote(class Character *ch, unsigned int vote);
+  void DisplayVote(class Character *ch);
+  void DisplayResults(class Character *ch);
   bool IsActive() { return active; }
   CVoteData();
   ~CVoteData();
@@ -110,6 +108,13 @@ private:
   int total_votes;
   std::map<std::string, bool> ip_voted;
   std::map<std::string, bool> char_voted;
+};
+
+struct extra_descr_data
+{
+  char *keyword = {};                 /* Keyword in look/examine          */
+  char *description = {};             /* What to see                      */
+  struct extra_descr_data *next = {}; /* Next in list                     */
 };
 
 /*

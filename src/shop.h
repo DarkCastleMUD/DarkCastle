@@ -1,10 +1,9 @@
 #ifndef SHOP_H_
 #define SHOP_H_
 
-
 #include "structs.h" // uint8_t, uint8_t, etc..
 
-
+typedef uint64_t vnum_t;
 
 struct player_shop_item
 {

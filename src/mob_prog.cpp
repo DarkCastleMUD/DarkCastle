@@ -63,7 +63,6 @@ using namespace std;
 
 // Extern variables
 
-
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;
@@ -754,7 +753,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			}
 			else if (rtarget >= 0)
 			{
-				if (DC::getInstance()->world_array[rtarget])
+				if (DC::getInstance()->rooms.contains(rtarget))
 					stringval = &DC::getInstance()->world[rtarget].description;
 				else
 					tError = true;
@@ -1051,7 +1050,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (rtarget >= 0)
 			{
-				if (DC::getInstance()->world_array[rtarget])
+				if (DC::getInstance()->rooms.contains(rtarget))
 					stringval = &DC::getInstance()->world[rtarget].name;
 				else
 					tError = true;
@@ -4875,11 +4874,11 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (ch->in_room < 0)
+	if (ch->in_room == DC::NOWHERE)
 		return mprog_cur_result;
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
-													   item->next_content)
+																		  item->next_content)
 		if (obj_index[item->item_number].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
@@ -4930,7 +4929,7 @@ int oprog_greet_trigger(Character *ch)
 	mprog_cur_result = eSUCCESS;
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
-													   item->next_content)
+																		  item->next_content)
 		if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
@@ -4989,8 +4988,7 @@ int oprog_load_trigger(Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
-													   item->next_content)
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
 		if (obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);

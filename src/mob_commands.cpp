@@ -64,7 +64,6 @@ using namespace std;
 
 extern struct index_data *mob_index;
 
-
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
 
@@ -777,7 +776,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   if (location == ch->in_room)
     return eFAILURE; // zz
   extern int top_of_world;
-  if (location > top_of_world || !DC::getInstance()->world_array[location])
+  if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
     location = 0;
 
   if (ch->fighting != nullptr)
@@ -825,12 +824,23 @@ int do_mpat(Character *ch, char *argument, int cmd)
 
   if (location < 0)
   {
-    prog_error(ch, "Mpat - No such location.");
+    prog_error(ch, "do_mpat - No such location.");
     return eFAILURE | eINTERNAL_ERROR;
   }
   extern int top_of_world;
-  if (location > top_of_world || !DC::getInstance()->world_array[location])
-    location = 0;
+  if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
+  {
+    if (!DC::getInstance()->rooms.contains(1))
+    {
+      ch->send(QString("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      return eFAILURE | eINTERNAL_ERROR;
+    }
+    else
+    {
+      location = 1;
+    }
+  }
+
   original = ch->in_room;
   char_from_room(ch, false); // Don't stop all fighting
   char_to_room(ch, location);
@@ -959,7 +969,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (victim->in_room < 0)
+  if (victim->in_room == DC::NOWHERE)
   {
     prog_error(ch, "Mptransfer - Victim in Limbo.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -1918,7 +1928,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     {
       to_room = number(0, top_of_world);
     }
-  } while (!DC::getInstance()->world_array[to_room] ||
+  } while (!DC::getInstance()->rooms.contains(to_room) ||
            IS_SET(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
            IS_SET(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
            IS_SET(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||

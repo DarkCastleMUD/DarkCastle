@@ -98,13 +98,13 @@ Room &World::operator[](room_t room_key)
 {
 	static Room generic_room = {};
 
-	if (room_key > top_of_world || room_key < 1 || DC::getInstance()->world_array[room_key] == nullptr)
+	if (room_key > top_of_world || room_key == DC::NOWHERE || !DC::getInstance()->rooms.contains(room_key))
 	{
 		generic_room = {};
 		return generic_room;
 	}
 
-	return *DC::getInstance()->world_array[room_key];
+	return DC::getInstance()->rooms[room_key];
 }
 
 #ifndef SEEK_CUR
@@ -567,12 +567,7 @@ void DC::boot_db(void)
 	boot_zones();
 
 	logentry("Loading the world.", 0, LogChannels::LOG_MISC);
-	// start world off with 2000 rooms of alloc'd space
-	DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, 2000 * sizeof(Room *));
 	top_of_world_alloc = 2000;
-	// clear it (realloc = malloc, not calloc)
-	for (int counter = 0; counter < top_of_world_alloc; counter++)
-		DC::getInstance()->world_array[counter] = 0;
 
 	funny_boot_message();
 
@@ -1394,7 +1389,7 @@ void write_one_room(FILE *f, int a)
 {
 	struct extra_descr_data *extra;
 
-	if (!DC::getInstance()->world_array[a])
+	if (!DC::getInstance()->rooms.contains(a))
 		return;
 
 	fprintf(f, "#%d\n", DC::getInstance()->world[a].number);
@@ -1467,7 +1462,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 	char *temp = nullptr;
 	char ch = 0;
 	int dir = 0;
-	struct extra_descr_data *new_new_descr;
+	struct extra_descr_data *new_new_descr{};
 	zone_t zone_nr = {};
 
 	ch = fread_char(fl);
@@ -1484,107 +1479,116 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		temp = fread_string(fl, 0);
 
-		curr_virtno = room_nr;
-		curr_type = "Room";
-		curr_name = temp;
-
-		/* a new_new record to be read */
-
-		if (room_nr >= top_of_world_alloc)
+		if (room_nr)
 		{
-			DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, (room_nr + 200) * sizeof(Room *));
-			for (int counter = top_of_world_alloc; counter < room_nr + 200; counter++)
-				DC::getInstance()->world_array[counter] = 0;
-			top_of_world_alloc = room_nr + 200;
+			curr_virtno = room_nr;
+			curr_type = "Room";
+			curr_name = temp;
 
-			if (!DC::getInstance()->world_array)
+			/* a new_new record to be read */
+
+			if (room_nr >= top_of_world_alloc)
 			{
-				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_WORLD);
-				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_BUG);
-				abort();
+				top_of_world_alloc = room_nr + 200;
 			}
+
+			if (top_of_world < room_nr)
+				top_of_world = room_nr;
+
+			DC::getInstance()->rooms[room_nr] = {};
+
+			DC::getInstance()->world[room_nr].paths = 0;
+			DC::getInstance()->world[room_nr].number = room_nr;
+			DC::getInstance()->world[room_nr].name = temp;
 		}
-
-		if (top_of_world < room_nr)
-			top_of_world = room_nr;
-
-		DC::getInstance()->world_array[room_nr] = (Room *)calloc(1, sizeof(Room));
-
-		DC::getInstance()->world[room_nr].paths = 0;
-		DC::getInstance()->world[room_nr].number = room_nr;
-		DC::getInstance()->world[room_nr].name = temp;
-		DC::getInstance()->world[room_nr].description = fread_string(fl, 0);
-		DC::getInstance()->world[room_nr].nTracks = 0;
-		DC::getInstance()->world[room_nr].tracks = 0;
-		DC::getInstance()->world[room_nr].last_track = 0;
-		DC::getInstance()->world[room_nr].denied = 0;
-		total_rooms++;
-
+		char *description = fread_string(fl, 0);
+		if (room_nr)
+		{
+			DC::getInstance()->world[room_nr].description = description;
+			DC::getInstance()->world[room_nr].nTracks = 0;
+			DC::getInstance()->world[room_nr].tracks = 0;
+			DC::getInstance()->world[room_nr].last_track = 0;
+			DC::getInstance()->world[room_nr].denied = 0;
+			total_rooms++;
+		}
 		// Ignore recorded zone number since it may not longer be valid
 		fread_int(fl, -1, 64000); // zone nr
 
-		// Go through the zone table until DC::getInstance()->world[room_nr].number is
-		// in the current zone.
+		if (room_nr)
+		{
+			// Go through the zone table until DC::getInstance()->world[room_nr].number is
+			// in the current zone.
 
-		bool found = false;
-		zone_t zone_nr = {};
-		for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-		{
-			if (zone.getBottom() <= DC::getInstance()->world[room_nr].number && zone.getTop() >= DC::getInstance()->world[room_nr].number)
+			bool found = false;
+			zone_t zone_nr = {};
+			for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 			{
-				found = true;
-				zone_nr = zone_key;
-				break;
-			}
-		}
-		if (!found)
-		{
-			QString error = QString("Room %1 is outside of any zone.").arg(room_nr);
-			logentry(error);
-			logentry("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
-		}
-		else
-		{
-			auto &zone = DC::getInstance()->zones[zone_nr];
-			if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
-			{
-				if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+				if (zone.getBottom() <= DC::getInstance()->world[room_nr].number && zone.getTop() >= DC::getInstance()->world[room_nr].number)
 				{
-					zone.setRealBottom(room_nr);
-				}
-				if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
-				{
-					zone.setRealTop(room_nr);
+					found = true;
+					zone_nr = zone_key;
+					break;
 				}
 			}
-			DC::getInstance()->world[room_nr].zone = zone_nr;
+			if (!found)
+			{
+				QString error = QString("Room %1 is outside of any zone.").arg(room_nr);
+				logentry(error);
+				logentry("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
+			}
+			else
+			{
+				auto &zone = DC::getInstance()->zones[zone_nr];
+				if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
+				{
+					if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+					{
+						zone.setRealBottom(room_nr);
+					}
+					if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+					{
+						zone.setRealTop(room_nr);
+					}
+				}
+				DC::getInstance()->world[room_nr].zone = zone_nr;
+			}
 		}
 
-		DC::getInstance()->world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
-		if (IS_SET(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
-			REMOVE_BIT(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL);
+		uint32_t room_flags = fread_bitvector(fl, -1, 2147483467);
 
-		// This bitvector is for runtime and not stored in the files, so just initialize it to 0
-		DC::getInstance()->world[room_nr].temp_room_flags = 0;
-
-		DC::getInstance()->world[room_nr].sector_type = fread_int(fl, -1, 64000);
-
-		if (load_debug)
+		if (room_nr)
 		{
-			printf("Flags are %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
-				   DC::getInstance()->world[room_nr].sector_type);
-			fflush(stdout);
+			DC::getInstance()->world[room_nr].room_flags = room_flags;
+			if (IS_SET(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
+				REMOVE_BIT(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL);
+
+			// This bitvector is for runtime and not stored in the files, so just initialize it to 0
+			DC::getInstance()->world[room_nr].temp_room_flags = 0;
 		}
 
-		DC::getInstance()->world[room_nr].funct = 0;
-		DC::getInstance()->world[room_nr].contents = 0;
-		DC::getInstance()->world[room_nr].people = 0;
-		DC::getInstance()->world[room_nr].light = 0; /* Zero light sources */
+		int sector_type = fread_int(fl, -1, 64000);
 
-		for (size_t tmp = 0; tmp <= 5; tmp++)
-			DC::getInstance()->world[room_nr].dir_option[tmp] = 0;
+		if (room_nr)
+		{
+			DC::getInstance()->world[room_nr].sector_type = sector_type;
 
-		DC::getInstance()->world[room_nr].ex_description = 0;
+			if (load_debug)
+			{
+				printf("Flags are %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
+					   DC::getInstance()->world[room_nr].sector_type);
+				fflush(stdout);
+			}
+
+			DC::getInstance()->world[room_nr].funct = 0;
+			DC::getInstance()->world[room_nr].contents = 0;
+			DC::getInstance()->world[room_nr].people = 0;
+			DC::getInstance()->world[room_nr].light = 0; /* Zero light sources */
+
+			for (size_t tmp = 0; tmp <= 5; tmp++)
+				DC::getInstance()->world[room_nr].dir_option[tmp] = 0;
+
+			DC::getInstance()->world[room_nr].ex_description = 0;
+		}
 
 		for (;;)
 		{
@@ -1611,8 +1615,16 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 #endif
 				new_new_descr->keyword = fread_string(fl, 0);
 				new_new_descr->description = fread_string(fl, 0);
-				new_new_descr->next = DC::getInstance()->world[room_nr].ex_description;
-				DC::getInstance()->world[room_nr].ex_description = new_new_descr;
+
+				if (room_nr)
+				{
+					new_new_descr->next = DC::getInstance()->world[room_nr].ex_description;
+					DC::getInstance()->world[room_nr].ex_description = new_new_descr;
+				}
+				else
+				{
+					dc_free(new_new_descr);
+				}
 			}
 			else if (ch == 'B')
 			{
@@ -1623,15 +1635,26 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 				deni = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 #endif
 				deni->vnum = fread_int(fl, -1, 2147483467);
-				deni->next = DC::getInstance()->world[room_nr].denied;
-				DC::getInstance()->world[room_nr].denied = deni;
+
+				if (room_nr)
+				{
+					deni->next = DC::getInstance()->world[room_nr].denied;
+					DC::getInstance()->world[room_nr].denied = deni;
+				}
+				else
+				{
+					dc_free(deni);
+				}
 			}
 			else if (ch == 'S') /* end of current room */
 				break;
 			else if (ch == 'C')
 			{
 				int c_class = fread_int(fl, 0, CLASS_MAX);
-				DC::getInstance()->world[room_nr].allow_class[c_class] = true;
+				if (room_nr)
+				{
+					DC::getInstance()->world[room_nr].allow_class[c_class] = true;
+				}
 			}
 		} // of for (;;) (get directions and extra descs)
 
@@ -1827,7 +1850,7 @@ void free_world_from_memory()
 
 	for (int i = 0; i <= top_of_world; i++)
 	{
-		if (DC::getInstance()->world_array[i] == 0)
+		if (!DC::getInstance()->rooms.contains(i))
 			continue;
 
 		if (DC::getInstance()->world[i].name)
@@ -1856,8 +1879,8 @@ void free_world_from_memory()
 			}
 
 		DC::getInstance()->world[i].FreeTracks();
-		dc_free(DC::getInstance()->world_array[i]);
 	}
+	DC::getInstance()->rooms.clear();
 
 	curr_wfli = world_file_list;
 
@@ -2011,8 +2034,8 @@ void DC::boot_world(void)
 
 		// push the first num forward until it hits a room, that way it's
 		// accurate.
-		// "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to DC::getInstance()->world_array
-		for (; pItem->firstnum < top_of_world_alloc && !DC::getInstance()->world_array[pItem->firstnum]; pItem->firstnum++)
+		// "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to DC::getInstance()->rooms
+		for (; pItem->firstnum < top_of_world_alloc && !DC::getInstance()->rooms.contains(pItem->firstnum); pItem->firstnum++)
 			;
 
 		pItem->lastnum = room_nr / 100 * 100 + 99;
@@ -2032,7 +2055,7 @@ void setup_dir(FILE *fl, int room, int dir)
 {
 	int tmp;
 
-	if (DC::getInstance()->world[room].dir_option[dir])
+	if (room && DC::getInstance()->world[room].dir_option[dir])
 	{
 		char buf[200];
 		sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
@@ -2041,46 +2064,65 @@ void setup_dir(FILE *fl, int room, int dir)
 			dc_free(DC::getInstance()->world[room].dir_option[dir]->general_description);
 		if (DC::getInstance()->world[room].dir_option[dir]->keyword)
 			dc_free(DC::getInstance()->world[room].dir_option[dir]->keyword);
+
 		dc_free(DC::getInstance()->world[room].dir_option[dir]);
 	}
 
+	if (room)
+	{
 #ifdef LEAK_CHECK
-	DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-		calloc(1, sizeof(struct room_direction_data));
+		DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
+			calloc(1, sizeof(struct room_direction_data));
 #else
-	DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
-		dc_alloc(1, sizeof(struct room_direction_data));
+		DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
+			dc_alloc(1, sizeof(struct room_direction_data));
 #endif
+	}
+	char *general_description = fread_string(fl, 0);
 
-	DC::getInstance()->world[room].dir_option[dir]->general_description =
-		fread_string(fl, 0);
+	if (room)
+		DC::getInstance()->world[room].dir_option[dir]->general_description = general_description;
 
-	DC::getInstance()->world[room].dir_option[dir]->keyword = fread_string(fl, 0);
+	char *keyword = fread_string(fl, 0);
+	if (room)
+		DC::getInstance()->world[room].dir_option[dir]->keyword = keyword;
 
 	tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
-	DC::getInstance()->world[room].dir_option[dir]->exit_info = tmp;
-	DC::getInstance()->world[room].dir_option[dir]->bracee = nullptr;
 
-	DC::getInstance()->world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
+	if (room)
+	{
+		DC::getInstance()->world[room].dir_option[dir]->exit_info = tmp;
+		DC::getInstance()->world[room].dir_option[dir]->bracee = nullptr;
+	}
+
+	int16_t key = fread_int(fl, -62000, 62000);
+	if (room)
+	{
+		DC::getInstance()->world[room].dir_option[dir]->key = key;
+	}
+
+	int16_t to_room = DC::NOWHERE;
 	try
 	{
-		DC::getInstance()->world[room].dir_option[dir]->to_room = fread_int(fl, 0, 62000);
+		to_room = fread_int(fl, 0, 62000);
 	}
 	catch (...)
 	{
-		DC::getInstance()->world[room].dir_option[dir]->to_room = DC::NOWHERE;
 	}
+
+	if (room)
+		DC::getInstance()->world[room].dir_option[dir]->to_room = to_room;
 }
 
 // return true for success
 int create_one_room(Character *ch, int vnum)
 {
-	class Room *rp;
-	int x;
+	Room *rp{};
+	int x{};
 
-	char buf[256];
+	char buf[256]{};
 
-	if (DC::getInstance()->world_array[vnum])
+	if (DC::getInstance()->rooms.contains(vnum))
 		return 0;
 
 	if (vnum > WORLD_MAX_ROOM)
@@ -2091,20 +2133,10 @@ int create_one_room(Character *ch, int vnum)
 
 	if (top_of_world + 1 >= top_of_world_alloc)
 	{
-
-		DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, (top_of_world + 200) * sizeof(Room *));
-		for (int counter = top_of_world_alloc; counter < top_of_world + 200; counter++)
-			DC::getInstance()->world_array[counter] = 0;
 		top_of_world_alloc = top_of_world + 200;
-
-		if (!DC::getInstance()->world_array)
-		{
-			logentry("Out of memory in create_one_room.", IMMORTAL, LogChannels::LOG_BUG);
-			abort();
-		}
 	}
 
-	DC::getInstance()->world_array[vnum] = (Room *)calloc(1, sizeof(Room));
+	DC::getInstance()->rooms[vnum] = {};
 
 	rp = &DC::getInstance()->world[vnum];
 
@@ -2136,7 +2168,7 @@ void renum_world(void)
 
 	for (room = 0; room <= top_of_world; room++)
 		for (door = 0; door <= 5; door++)
-			if (DC::getInstance()->world_array[room])
+			if (DC::getInstance()->rooms.contains(room))
 				if (DC::getInstance()->world[room].dir_option[door])
 					if (DC::getInstance()->world[room].dir_option[door]->to_room != DC::NOWHERE)
 						DC::getInstance()->world[room].dir_option[door]->to_room =
@@ -4814,7 +4846,7 @@ void Zone::reset(ResetType reset_type)
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (!DC::getInstance()->world_array[cmd[cmd_no]->arg1])
+				if (!DC::getInstance()->rooms.contains(cmd[cmd_no]->arg1))
 				{
 					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
 							cmd[cmd_no]->arg1, id_, cmd_no);
@@ -5993,7 +6025,7 @@ room_t real_room(room_t virt)
 		return DC::NOWHERE;
 	}
 
-	if (DC::getInstance()->world_array[virt])
+	if (DC::getInstance()->rooms.contains(virt))
 	{
 		return virt;
 	}

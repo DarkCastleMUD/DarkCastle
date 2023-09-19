@@ -1553,7 +1553,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
          return eFAILURE;
       }
       i = atoi(text);
-      if(i < 1 || i > top_of_world || !DC::getInstance()->world_array[i]) {
+      if(i < 1 || i > top_of_world || !DC::getInstance()->rooms[i]) {
          send_to_char("You must choose a valid room number.\r\n", ch);
          return eFAILURE;
       }

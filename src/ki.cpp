@@ -603,7 +603,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
       if (!IS_EXIT(room, dir) || !IS_OPEN(room, dir))
         break;
       room = EXIT_TO(room, dir);
-      if (room < 0)
+      if (room == DC::NOWHERE)
         break;
       for (tmp_victim = DC::getInstance()->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
         send_to_char("A crackle of energy echoes past you.\r\n", tmp_victim);

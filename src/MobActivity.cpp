@@ -114,7 +114,7 @@ bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
   {
     if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
     if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
       continue;
@@ -145,7 +145,7 @@ int Path::leastSteps(int from, int to, int val, int *bestval)
   {
     if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
     if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
       continue;
@@ -492,7 +492,7 @@ int find_closest_path(int from, int steps, char *buf, map<int, int> z)
   {
     if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room == DC::NOWHERE)
       continue;
     if (z[DC::getInstance()->world[from].dir_option[i]->to_room] <= steps && z[DC::getInstance()->world[from].dir_option[i]->to_room] != 0)
       continue;

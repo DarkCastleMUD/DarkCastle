@@ -6,12 +6,17 @@
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
-#include "structs.h"     // uint8_t
-#include "obj.h"         // uint8_t
-#include "MobActivity.h" // struct path_data
-#include "player.h"      // CLASS_MAX
+
+#include <QSharedPointer>
+
+#include "structs.h" // uint8_t
+#include "class.h"
+#include "Zone.h"
 
 /* Bitvector For 'room_flags' */
+
+typedef uint64_t zone_t;
+typedef uint64_t room_t;
 
 const auto DARK = 1;
 const auto NOHOME = 1 << 1;
@@ -144,7 +149,7 @@ public:
     struct deny_data *denied = {};
     char *name = {};                                // Rooms name 'You are ...'
     char *description = {};                         // Shown when entered
-    extra_descr_data *ex_description = {};          // for examine/look
+    struct extra_descr_data *ex_description = {};   // for examine/look
     room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
     uint32_t room_flags = {};                       // DEATH, DARK ... etc
     uint32_t temp_room_flags = {};                  // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.

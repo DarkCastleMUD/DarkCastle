@@ -40,7 +40,7 @@ int count_rooms(int start, int end)
 	int count = 0;
 	for (int i = start; i < top_of_world && i <= end; i++)
 	{
-		if (!DC::getInstance()->world_array[i])
+		if (!DC::getInstance()->rooms.contains(i))
 			continue;
 		count++;
 	}
@@ -1092,7 +1092,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 			if (end == -1)
 			{
-				if (DC::getInstance()->world_array[begin])
+				if (DC::getInstance()->rooms.contains(begin))
 				{
 					sprintf(buf, "[  1] [%5d] %s\n\r", begin,
 							DC::getInstance()->world[begin].name);
@@ -1103,7 +1103,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			{
 				for (i = begin; i < top_of_world && i <= end; i++)
 				{
-					if (!DC::getInstance()->world_array[i])
+					if (!DC::getInstance()->rooms.contains(i))
 						continue;
 					count++;
 					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, DC::getInstance()->world[i].name);
@@ -1217,7 +1217,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		for (i = DC::getInstance()->zones.value(zon).getRealBottom(); i < DC::getInstance()->zones.value(zon).getRealTop();
 			 i++)
 		{
-			if (!DC::getInstance()->world_array[i])
+			if (!DC::getInstance()->rooms.contains(i))
 				continue;
 			if (bits)
 				if (!IS_SET(DC::getInstance()->world[i].room_flags, bits))
@@ -1787,16 +1787,16 @@ int do_show(Character *ch, char *argument, int cmd)
 		csendf(ch, "$3Doors in game that use key %d$R:\r\n\r\n", count);
 		for (i = 0; i < top_of_world; i++)
 			for (nr = 0; nr < MAX_DIRS; nr++)
-				if (DC::getInstance()->world_array[i] && DC::getInstance()->world_array[i]->dir_option[nr])
+				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
 				{
-					if (IS_SET(DC::getInstance()->world_array[i]->dir_option[nr]->exit_info,
+					if (IS_SET(DC::getInstance()->rooms[i].dir_option[nr]->exit_info,
 							   EX_ISDOOR) &&
-						DC::getInstance()->world_array[i]->dir_option[nr]->key == count)
+						DC::getInstance()->rooms[i].dir_option[nr]->key == count)
 					{
 						csendf(ch,
 							   " $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n",
-							   DC::getInstance()->world_array[i]->number, dirs[nr],
-							   DC::getInstance()->world_array[i]->dir_option[nr]->key);
+							   DC::getInstance()->rooms[i].number, dirs[nr],
+							   DC::getInstance()->rooms[i].dir_option[nr]->key);
 					}
 				}
 	}
@@ -1910,7 +1910,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 	if (isdigit(*room))
 	{
 		target = atoi(&room[0]);
-		if ((*room != '0' && target == 0) || !DC::getInstance()->world_array[target])
+		if ((*room != '0' && target == 0) || !DC::getInstance()->rooms.contains(target))
 		{
 			send_to_char("No room exists with that number.\r\n", ch);
 			return eFAILURE;

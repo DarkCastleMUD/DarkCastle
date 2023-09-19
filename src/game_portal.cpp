@@ -276,7 +276,7 @@ void find_and_remove_player_portal(Character *ch)
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if (k->in_room < top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->world_array[k->in_room])
+    if (k->in_room < top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->rooms.contains(k->in_room))
     {
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
     }

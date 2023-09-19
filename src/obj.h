@@ -202,13 +202,6 @@ struct active_object
     struct active_object *next = {};
 };
 
-struct extra_descr_data
-{
-    char *keyword = {};                 /* Keyword in look/examine          */
-    char *description = {};             /* What to see                      */
-    struct extra_descr_data *next = {}; /* Next in list                     */
-};
-
 #define OBJ_NOTIMER -7000000
 
 typedef uint8_t object_type_t;
@@ -266,13 +259,13 @@ public:
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    char *name = {};                       /* Title of object :get etc.        */
-    char *description = {};                /* When in room                     */
-    char *short_description = {};          /* when worn/carry/in cont.         */
-    char *action_description = {};         /* What to write when used          */
-    extra_descr_data *ex_description = {}; /* extra descriptions     */
-    Character *carried_by = {};            /* Carried by :NULL in room/conta   */
-    Character *equipped_by = {};           /* so I can access the player :)    */
+    char *name = {};                              /* Title of object :get etc.        */
+    char *description = {};                       /* When in room                     */
+    char *short_description = {};                 /* when worn/carry/in cont.         */
+    char *action_description = {};                /* What to write when used          */
+    struct extra_descr_data *ex_description = {}; /* extra descriptions     */
+    Character *carried_by = {};                   /* Carried by :NULL in room/conta   */
+    Character *equipped_by = {};                  /* so I can access the player :)    */
 
     Object *in_obj = {};   /* In what object NULL when none    */
     Object *contains = {}; /* Contains objects                 */

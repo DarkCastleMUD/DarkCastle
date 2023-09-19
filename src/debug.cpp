@@ -239,12 +239,9 @@ int main(int argc, char **argv)
   DC::getInstance()->boot_zones();
 
   logentry("Loading the world.", 0, LogChannels::LOG_MISC);
-  DC::getInstance()->world_array = (Room **)realloc(DC::getInstance()->world_array, 2000 * sizeof(Room *));
   extern int top_of_world_alloc;
   top_of_world_alloc = 2000;
   // clear it (realloc = malloc, not calloc)
-  for (int counter = 0; counter < top_of_world_alloc; counter++)
-    DC::getInstance()->world_array[counter] = 0;
 
   DC::getInstance()->boot_world();
 

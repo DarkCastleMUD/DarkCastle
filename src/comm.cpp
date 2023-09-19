@@ -96,7 +96,7 @@ extern int restrict;
 // extern int mini_mud;
 // extern int no_rent_check;
 
- /* In db.c */
+/* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
@@ -1792,7 +1792,7 @@ string generate_prompt(Character *ch)
       }
       break;
     case 's':
-      if (DC::getInstance()->world_array[ch->in_room])
+      if (DC::getInstance()->rooms.contains(ch->in_room))
         sprintf(pro, "%s", sector_types[DC::getInstance()->world[ch->in_room].sector_type]);
       else
         sprintf(pro, " ");
@@ -3301,7 +3301,7 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
   if (room == DC::NOWHERE)
     return;
 
-  if (!DC::getInstance()->world_array[room] || !DC::getInstance()->world[room].people)
+  if (!DC::getInstance()->rooms.contains(room) || !DC::getInstance()->world[room].people)
   {
     return;
   }

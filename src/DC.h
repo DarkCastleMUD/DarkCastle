@@ -35,6 +35,7 @@ typedef QList<QString> hints_t;
 #include "weather.h"
 #include "Zone.h"
 #include "Shops.h"
+#include "room.h"
 
 using namespace std;
 
@@ -61,7 +62,7 @@ typedef QMap<zone_t, Zone> zones_t;
 class World
 {
 public:
-  class Room &operator[](room_t room_key);
+  Room &operator[](room_t room_key);
 };
 
 class DC : public QCoreApplication
@@ -121,7 +122,7 @@ public:
   fd_set exc_set = {};
   fd_set null_set = {};
   zones_t zones = {};
-  class Room **world_array = nullptr;
+  QMap<room_t, Room> rooms;
   class World world;
 
   static string getVersion();

@@ -6941,8 +6941,8 @@ int can_be_attacked(Character *ch, Character *vict)
   if (!ch || !vict)
     return false;
 
-  if (vict->in_room < 0 || vict->in_room >= top_of_world ||
-      ch->in_room < 0 || ch->in_room >= top_of_world)
+  if (vict->in_room == DC::NOWHERE || vict->in_room >= top_of_world ||
+      ch->in_room == DC::NOWHERE || ch->in_room >= top_of_world)
     return false;
 
   // Ch should not be able to attack a wizinvis immortal player

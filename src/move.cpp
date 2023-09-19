@@ -543,7 +543,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		return eFAILURE;
 	}
 
-	class Room *rm = &(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room]);
+	Room *rm = &(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room]);
 
 	if (rm->sector_type != DC::getInstance()->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->level <= MAX_MORTAL)
 	{

@@ -9,6 +9,7 @@
 
 #include "shop.h" // legacy shop
 #include "Shops.h"
+#include "utility.h"
 
 Shops::Shops(QObject *parent) : Database(parent)
 {

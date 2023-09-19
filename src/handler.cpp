@@ -3393,7 +3393,7 @@ int obj_from_room(class Object *object)
 {
 	class Object *i;
 
-	if (object->in_room < 0)
+	if (object->in_room == DC::NOWHERE)
 	{
 		logentry("obj_from_room called on an object that isn't in a room!", OVERSEER,
 				 LogChannels::LOG_BUG);
