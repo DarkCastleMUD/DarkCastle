@@ -26,7 +26,7 @@ extern "C"
 #include "handler.h"
 #include "interp.h"
 
-extern World world;
+
 
 /*************************************************************************
  * Figures out if a fountain is present in the room                       *
@@ -37,7 +37,7 @@ int FOUNTAINisPresent(Character *ch)
   class Object *tmp;
   bool found = false;
 
-  for (tmp = world[ch->in_room].contents;
+  for (tmp = DC::getInstance()->world[ch->in_room].contents;
        tmp != nullptr && !found;
        tmp = tmp->next_content)
   {

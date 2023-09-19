@@ -31,7 +31,7 @@
 
 using namespace std;
 
-extern World world;
+
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
@@ -859,7 +859,7 @@ int do_rescue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  for (tmp_ch = world[ch->in_room].people; tmp_ch &&
+  for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch &&
                                            (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
@@ -974,7 +974,7 @@ int handle_any_guard(Character *ch)
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
   {
-    for (Character *vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (Character *vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
         curr = nullptr;
@@ -1145,7 +1145,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1174,7 +1174,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1212,17 +1212,17 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, UNSTABLE) ||
-      IS_SET(world[ch->in_room].room_flags, FALL_NORTH) || IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) ||
-      IS_SET(world[ch->in_room].room_flags, FALL_EAST) || IS_SET(world[ch->in_room].room_flags, FALL_WEST) ||
-      IS_SET(world[ch->in_room].room_flags, FALL_UP) || IS_SET(world[ch->in_room].room_flags, FALL_DOWN) ||
-      world[ch->in_room].sector_type == SECT_CITY || world[ch->in_room].sector_type == SECT_PAVED_ROAD)
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) ||
+      DC::getInstance()->world[ch->in_room].sector_type == SECT_CITY || DC::getInstance()->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
     send_to_char("Something about this area inherently prohibits a rugged camp.\r\n", ch);
     return eFAILURE;
   }
 
-  for (i = world[ch->in_room].people; i; i = next_i)
+  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1245,7 +1245,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  for (i = world[ch->in_room].people; i; i = next_i)
+  for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1285,7 +1285,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
 
     affect_to_char(ch, &af);
 
-    for (i = world[ch->in_room].people; i; i = next_i)
+    for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)
     {
       next_i = i->next_in_room;
 
@@ -1507,7 +1507,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("Stop trying to show off.\r\n", ch);
     return eFAILURE;

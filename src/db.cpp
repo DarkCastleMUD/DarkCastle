@@ -107,8 +107,6 @@ Room &World::operator[](int rnum)
 	return *DC::getInstance()->world_array[rnum];
 }
 
-World world;
-
 #ifndef SEEK_CUR
 #define SEEK_CUR 1
 #endif
@@ -1399,41 +1397,41 @@ void write_one_room(FILE *f, int a)
 	if (!DC::getInstance()->world_array[a])
 		return;
 
-	fprintf(f, "#%d\n", world[a].number);
-	string_to_file(f, world[a].name);
-	string_to_file(f, world[a].description);
+	fprintf(f, "#%d\n", DC::getInstance()->world[a].number);
+	string_to_file(f, DC::getInstance()->world[a].name);
+	string_to_file(f, DC::getInstance()->world[a].description);
 
-	if (world[a].iFlags)
-		REMOVE_BIT(world[a].room_flags, world[a].iFlags);
+	if (DC::getInstance()->world[a].iFlags)
+		REMOVE_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
 	fprintf(f, "%d %d %d\n",
-			world[a].zone,
-			world[a].room_flags,
-			world[a].sector_type);
-	if (world[a].iFlags)
-		SET_BIT(world[a].room_flags, world[a].iFlags);
+			DC::getInstance()->world[a].zone,
+			DC::getInstance()->world[a].room_flags,
+			DC::getInstance()->world[a].sector_type);
+	if (DC::getInstance()->world[a].iFlags)
+		SET_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
 
 	/* exits */
 	for (int b = 0; b <= 5; b++)
 	{
-		if (!(world[a].dir_option[b]))
+		if (!(DC::getInstance()->world[a].dir_option[b]))
 			continue;
 		fprintf(f, "D%d\n", b);
-		if (world[a].dir_option[b]->general_description)
-			string_to_file(f, world[a].dir_option[b]->general_description);
+		if (DC::getInstance()->world[a].dir_option[b]->general_description)
+			string_to_file(f, DC::getInstance()->world[a].dir_option[b]->general_description);
 		else
 			fprintf(f, "~\n"); // print blank
-		if (world[a].dir_option[b]->keyword)
-			string_to_file(f, world[a].dir_option[b]->keyword);
+		if (DC::getInstance()->world[a].dir_option[b]->keyword)
+			string_to_file(f, DC::getInstance()->world[a].dir_option[b]->keyword);
 		else
 			fprintf(f, "~\n"); // print blank
 		fprintf(f, "%d %d %d\n",
-				world[a].dir_option[b]->exit_info,
-				world[a].dir_option[b]->key,
-				world[a].dir_option[b]->to_room);
+				DC::getInstance()->world[a].dir_option[b]->exit_info,
+				DC::getInstance()->world[a].dir_option[b]->key,
+				DC::getInstance()->world[a].dir_option[b]->to_room);
 	} /* exits */
 
 	/* extra descriptions */
-	for (extra = world[a].ex_description; extra; extra = extra->next)
+	for (extra = DC::getInstance()->world[a].ex_description; extra; extra = extra->next)
 	{
 		if (!extra)
 			break;
@@ -1449,13 +1447,13 @@ void write_one_room(FILE *f, int a)
 	}						   /* extra descriptions */
 
 	struct deny_data *deni;
-	for (deni = world[a].denied; deni; deni = deni->next)
+	for (deni = DC::getInstance()->world[a].denied; deni; deni = deni->next)
 		fprintf(f, "B\n%d\n", deni->vnum);
 
 	// Write out allowed classes if any
 	for (int i = 0; i < CLASS_MAX; i++)
 	{
-		if (world[a].allow_class[i] == true)
+		if (DC::getInstance()->world[a].allow_class[i] == true)
 		{
 			fprintf(f, "C%d\n", i);
 		}
@@ -1512,27 +1510,27 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		DC::getInstance()->world_array[room_nr] = (Room *)calloc(1, sizeof(Room));
 
-		world[room_nr].paths = 0;
-		world[room_nr].number = room_nr;
-		world[room_nr].name = temp;
-		world[room_nr].description = fread_string(fl, 0);
-		world[room_nr].nTracks = 0;
-		world[room_nr].tracks = 0;
-		world[room_nr].last_track = 0;
-		world[room_nr].denied = 0;
+		DC::getInstance()->world[room_nr].paths = 0;
+		DC::getInstance()->world[room_nr].number = room_nr;
+		DC::getInstance()->world[room_nr].name = temp;
+		DC::getInstance()->world[room_nr].description = fread_string(fl, 0);
+		DC::getInstance()->world[room_nr].nTracks = 0;
+		DC::getInstance()->world[room_nr].tracks = 0;
+		DC::getInstance()->world[room_nr].last_track = 0;
+		DC::getInstance()->world[room_nr].denied = 0;
 		total_rooms++;
 
 		// Ignore recorded zone number since it may not longer be valid
 		fread_int(fl, -1, 64000); // zone nr
 
-		// Go through the zone table until world[room_nr].number is
+		// Go through the zone table until DC::getInstance()->world[room_nr].number is
 		// in the current zone.
 
 		bool found = false;
 		zone_t zone_nr = {};
 		for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 		{
-			if (zone.getBottom() <= world[room_nr].number && zone.getTop() >= world[room_nr].number)
+			if (zone.getBottom() <= DC::getInstance()->world[room_nr].number && zone.getTop() >= DC::getInstance()->world[room_nr].number)
 			{
 				found = true;
 				zone_nr = zone_key;
@@ -1559,34 +1557,34 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 					zone.setRealTop(room_nr);
 				}
 			}
-			world[room_nr].zone = zone_nr;
+			DC::getInstance()->world[room_nr].zone = zone_nr;
 		}
 
-		world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
-		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
-			REMOVE_BIT(world[room_nr].room_flags, NO_ASTRAL);
+		DC::getInstance()->world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
+		if (IS_SET(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
+			REMOVE_BIT(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL);
 
 		// This bitvector is for runtime and not stored in the files, so just initialize it to 0
-		world[room_nr].temp_room_flags = 0;
+		DC::getInstance()->world[room_nr].temp_room_flags = 0;
 
-		world[room_nr].sector_type = fread_int(fl, -1, 64000);
+		DC::getInstance()->world[room_nr].sector_type = fread_int(fl, -1, 64000);
 
 		if (load_debug)
 		{
-			printf("Flags are %d %d\n", zone_nr, world[room_nr].room_flags,
-				   world[room_nr].sector_type);
+			printf("Flags are %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
+				   DC::getInstance()->world[room_nr].sector_type);
 			fflush(stdout);
 		}
 
-		world[room_nr].funct = 0;
-		world[room_nr].contents = 0;
-		world[room_nr].people = 0;
-		world[room_nr].light = 0; /* Zero light sources */
+		DC::getInstance()->world[room_nr].funct = 0;
+		DC::getInstance()->world[room_nr].contents = 0;
+		DC::getInstance()->world[room_nr].people = 0;
+		DC::getInstance()->world[room_nr].light = 0; /* Zero light sources */
 
 		for (size_t tmp = 0; tmp <= 5; tmp++)
-			world[room_nr].dir_option[tmp] = 0;
+			DC::getInstance()->world[room_nr].dir_option[tmp] = 0;
 
-		world[room_nr].ex_description = 0;
+		DC::getInstance()->world[room_nr].ex_description = 0;
 
 		for (;;)
 		{
@@ -1613,8 +1611,8 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 #endif
 				new_new_descr->keyword = fread_string(fl, 0);
 				new_new_descr->description = fread_string(fl, 0);
-				new_new_descr->next = world[room_nr].ex_description;
-				world[room_nr].ex_description = new_new_descr;
+				new_new_descr->next = DC::getInstance()->world[room_nr].ex_description;
+				DC::getInstance()->world[room_nr].ex_description = new_new_descr;
 			}
 			else if (ch == 'B')
 			{
@@ -1625,15 +1623,15 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 				deni = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 #endif
 				deni->vnum = fread_int(fl, -1, 2147483467);
-				deni->next = world[room_nr].denied;
-				world[room_nr].denied = deni;
+				deni->next = DC::getInstance()->world[room_nr].denied;
+				DC::getInstance()->world[room_nr].denied = deni;
 			}
 			else if (ch == 'S') /* end of current room */
 				break;
 			else if (ch == 'C')
 			{
 				int c_class = fread_int(fl, 0, CLASS_MAX);
-				world[room_nr].allow_class[c_class] = true;
+				DC::getInstance()->world[room_nr].allow_class[c_class] = true;
 			}
 		} // of for (;;) (get directions and extra descs)
 
@@ -1731,12 +1729,12 @@ bool can_modify_object(Character *ch, int32_t obj)
 
 void set_zone_saved_zone(int32_t room)
 {
-	DC::setZoneNotModified(world[room].zone);
+	DC::setZoneNotModified(DC::getInstance()->world[room].zone);
 }
 
 void set_zone_modified_zone(int32_t room)
 {
-	DC::setZoneModified(world[room].zone);
+	DC::setZoneModified(DC::getInstance()->world[room].zone);
 }
 
 void set_zone_modified(int32_t modnum, world_file_list_item *list)
@@ -1832,32 +1830,32 @@ void free_world_from_memory()
 		if (DC::getInstance()->world_array[i] == 0)
 			continue;
 
-		if (world[i].name)
-			dc_free(world[i].name);
+		if (DC::getInstance()->world[i].name)
+			dc_free(DC::getInstance()->world[i].name);
 
-		if (world[i].description)
-			dc_free(world[i].description);
+		if (DC::getInstance()->world[i].description)
+			dc_free(DC::getInstance()->world[i].description);
 
-		while (world[i].ex_description)
+		while (DC::getInstance()->world[i].ex_description)
 		{
-			curr_extra = world[i].ex_description->next;
-			if (world[i].ex_description->keyword)
-				dc_free(world[i].ex_description->keyword);
-			if (world[i].ex_description->description)
-				dc_free(world[i].ex_description->description);
-			dc_free(world[i].ex_description);
-			world[i].ex_description = curr_extra;
+			curr_extra = DC::getInstance()->world[i].ex_description->next;
+			if (DC::getInstance()->world[i].ex_description->keyword)
+				dc_free(DC::getInstance()->world[i].ex_description->keyword);
+			if (DC::getInstance()->world[i].ex_description->description)
+				dc_free(DC::getInstance()->world[i].ex_description->description);
+			dc_free(DC::getInstance()->world[i].ex_description);
+			DC::getInstance()->world[i].ex_description = curr_extra;
 		}
 
 		for (int j = 0; j < 6; j++)
-			if (world[i].dir_option[j])
+			if (DC::getInstance()->world[i].dir_option[j])
 			{
-				dc_free(world[i].dir_option[j]->general_description);
-				dc_free(world[i].dir_option[j]->keyword);
-				dc_free(world[i].dir_option[j]);
+				dc_free(DC::getInstance()->world[i].dir_option[j]->general_description);
+				dc_free(DC::getInstance()->world[i].dir_option[j]->keyword);
+				dc_free(DC::getInstance()->world[i].dir_option[j]);
 			}
 
-		world[i].FreeTracks();
+		DC::getInstance()->world[i].FreeTracks();
 		dc_free(DC::getInstance()->world_array[i]);
 	}
 
@@ -2034,43 +2032,43 @@ void setup_dir(FILE *fl, int room, int dir)
 {
 	int tmp;
 
-	if (world[room].dir_option[dir])
+	if (DC::getInstance()->world[room].dir_option[dir])
 	{
 		char buf[200];
-		sprintf(buf, "Room %d attemped to created two exits in the same direction.", world[room].number);
+		sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
 		logentry(buf, 0, LogChannels::LOG_WORLD);
-		if (world[room].dir_option[dir]->general_description)
-			dc_free(world[room].dir_option[dir]->general_description);
-		if (world[room].dir_option[dir]->keyword)
-			dc_free(world[room].dir_option[dir]->keyword);
-		dc_free(world[room].dir_option[dir]);
+		if (DC::getInstance()->world[room].dir_option[dir]->general_description)
+			dc_free(DC::getInstance()->world[room].dir_option[dir]->general_description);
+		if (DC::getInstance()->world[room].dir_option[dir]->keyword)
+			dc_free(DC::getInstance()->world[room].dir_option[dir]->keyword);
+		dc_free(DC::getInstance()->world[room].dir_option[dir]);
 	}
 
 #ifdef LEAK_CHECK
-	world[room].dir_option[dir] = (struct room_direction_data *)
+	DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
 		calloc(1, sizeof(struct room_direction_data));
 #else
-	world[room].dir_option[dir] = (struct room_direction_data *)
+	DC::getInstance()->world[room].dir_option[dir] = (struct room_direction_data *)
 		dc_alloc(1, sizeof(struct room_direction_data));
 #endif
 
-	world[room].dir_option[dir]->general_description =
+	DC::getInstance()->world[room].dir_option[dir]->general_description =
 		fread_string(fl, 0);
 
-	world[room].dir_option[dir]->keyword = fread_string(fl, 0);
+	DC::getInstance()->world[room].dir_option[dir]->keyword = fread_string(fl, 0);
 
 	tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
-	world[room].dir_option[dir]->exit_info = tmp;
-	world[room].dir_option[dir]->bracee = nullptr;
+	DC::getInstance()->world[room].dir_option[dir]->exit_info = tmp;
+	DC::getInstance()->world[room].dir_option[dir]->bracee = nullptr;
 
-	world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
+	DC::getInstance()->world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
 	try
 	{
-		world[room].dir_option[dir]->to_room = fread_int(fl, 0, 62000);
+		DC::getInstance()->world[room].dir_option[dir]->to_room = fread_int(fl, 0, 62000);
 	}
 	catch (...)
 	{
-		world[room].dir_option[dir]->to_room = DC::NOWHERE;
+		DC::getInstance()->world[room].dir_option[dir]->to_room = DC::NOWHERE;
 	}
 }
 
@@ -2108,7 +2106,7 @@ int create_one_room(Character *ch, int vnum)
 
 	DC::getInstance()->world_array[vnum] = (Room *)calloc(1, sizeof(Room));
 
-	rp = &world[vnum];
+	rp = &DC::getInstance()->world[vnum];
 
 	rp->number = vnum;
 
@@ -2139,10 +2137,10 @@ void renum_world(void)
 	for (room = 0; room <= top_of_world; room++)
 		for (door = 0; door <= 5; door++)
 			if (DC::getInstance()->world_array[room])
-				if (world[room].dir_option[door])
-					if (world[room].dir_option[door]->to_room != DC::NOWHERE)
-						world[room].dir_option[door]->to_room =
-							real_room(world[room].dir_option[door]->to_room);
+				if (DC::getInstance()->world[room].dir_option[door])
+					if (DC::getInstance()->world[room].dir_option[door]->to_room != DC::NOWHERE)
+						DC::getInstance()->world[room].dir_option[door]->to_room =
+							real_room(DC::getInstance()->world[room].dir_option[door]->to_room);
 }
 
 void renum_zone_table(void)
@@ -4531,7 +4529,7 @@ void zone_update(void)
 uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
 {
 	uint64_t count = {};
-	for (auto ch = world[room_id].people; ch != nullptr; ch = ch->next_in_room)
+	for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
 	{
 		if (ch->mobdata && mob_index[ch->mobdata->nr].virt == vnum)
 		{
@@ -4614,7 +4612,7 @@ void Zone::reset(ResetType reset_type)
 					char_to_room(mob, cmd[cmd_no]->arg3);
 					cmd[cmd_no]->lastPop = mob;
 					mob->mobdata->reset = cmd[cmd_no];
-					GET_HOME(mob) = world[cmd[cmd_no]->arg3].number;
+					GET_HOME(mob) = DC::getInstance()->world[cmd[cmd_no]->arg3].number;
 					num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
@@ -4640,7 +4638,7 @@ void Zone::reset(ResetType reset_type)
 					if (cmd[cmd_no]->arg3 >= 0)
 					{
 						if (!get_obj_in_list_num(cmd[cmd_no]->arg1,
-												 world[cmd[cmd_no]->arg3].contents) &&
+												 DC::getInstance()->world[cmd[cmd_no]->arg3].contents) &&
 							(obj =
 								 clone_object(cmd[cmd_no]->arg1)))
 						{
@@ -4829,12 +4827,12 @@ void Zone::reset(ResetType reset_type)
 					break;
 				}
 
-				if (world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2] == 0)
+				if (DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2] == 0)
 				{
 					sprintf(
 						log_buf,
 						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
-						cmd[cmd_no]->arg2, world[cmd[cmd_no]->arg1].number, id_, cmd_no);
+						cmd[cmd_no]->arg2, DC::getInstance()->world[cmd[cmd_no]->arg1].number, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
@@ -4842,32 +4840,32 @@ void Zone::reset(ResetType reset_type)
 				{
 				case 0:
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_LOCKED);
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_CLOSED);
 					break;
 				case 1:
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_CLOSED);
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_LOCKED);
 					break;
 				case 2:
 					REMOVE_BIT(
-						world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_LOCKED);
-					SET_BIT(world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
 							EX_CLOSED);
 					break;
 				}
@@ -4971,7 +4969,7 @@ void Zone::reset(ResetType reset_type)
 			{
 				continue;
 			}
-			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id_)
+			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && DC::getInstance()->world[tmp_victim->in_room].zone == id_)
 			{
 				tmp_victim->multiplyGold(1.10);
 				tmp_victim->exp *= 1.10;
@@ -4985,7 +4983,7 @@ bool Zone::isEmpty(void)
 	class Connection *i;
 
 	for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-		if (STATE(i) == Connection::states::PLAYING && i->character && world[i->character->in_room].zone == id_)
+		if (STATE(i) == Connection::states::PLAYING && i->character && DC::getInstance()->world[i->character->in_room].zone == id_)
 			return false;
 
 	return true;

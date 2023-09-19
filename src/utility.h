@@ -199,7 +199,7 @@ int DARK_AMOUNT(int room);
 bool IS_DARK(int room);
 #define IS_LIGHT(room) (!IS_DARK(room))
 
-#define IS_ARENA(room) (IS_SET(world[room].room_flags, ARENA))
+#define IS_ARENA(room) (IS_SET(DC::getInstance()->world[room].room_flags, ARENA))
 
 #define HSHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "his" : "her") : "its")
 #define HSSH(ch) ((ch)->sex ? (((ch)->sex == 1) ? "he" : "she") : "it")
@@ -247,7 +247,7 @@ bool IS_DARK(int room);
 #define GET_TITLE(ch) ((ch)->title)
 #define GET_LEVEL(ch) ((ch)->level)
 
-#define GET_ZONE(ch) (world[(ch)->in_room].zone)
+#define GET_ZONE(ch) (DC::getInstance()->world[(ch)->in_room].zone)
 
 #define GET_OBJ_SHORT(obj) ((obj)->short_description)
 #define GET_OBJ_NAME(obj) ((obj)->name)
@@ -264,7 +264,7 @@ bool IS_DARK(int room);
 #define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? obj_index[GET_OBJ_RNUM(obj)].virt : -1)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= top_of_world)
 #define GET_ROOM_VNUM(rnum) \
-   ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : DC::NOWHERE))
+   ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
 
 #define GET_PROMPT(ch) ((ch)->player->prompt)
 #define GET_LAST_PROMPT(ch) ((ch)->player->last_prompt)
@@ -393,12 +393,12 @@ inline const short IS_ANONYMOUS(Character *ch)
 
 #define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->name) : "something")
 
-#define IS_EXIT(room, door) (world[(room)].dir_option[(door)])
-#define EXIT_TO(room, door) (world[(room)].dir_option[(door)]->to_room)
-#define IS_OPEN(room, door) (!IS_SET(world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
+#define IS_EXIT(room, door) (DC::getInstance()->world[(room)].dir_option[(door)])
+#define EXIT_TO(room, door) (DC::getInstance()->world[(room)].dir_option[(door)]->to_room)
+#define IS_OPEN(room, door) (!IS_SET(DC::getInstance()->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
 
-#define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags, INDOORS))
-#define EXIT(ch, door) (world[(ch)->in_room].dir_option[door])
+#define OUTSIDE(ch) (!IS_SET(DC::getInstance()->world[(ch)->in_room].room_flags, INDOORS))
+#define EXIT(ch, door) (DC::getInstance()->world[(ch)->in_room].dir_option[door])
 #define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)

@@ -20,7 +20,7 @@
 #include "room.h"
 #include "db.h"
 
-extern World world;
+
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 
@@ -158,8 +158,8 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(ch->in_room && (IS_SET(world[ch->in_room].room_flags, NO_MAGIC) 
-                     || IS_SET(world[ch->in_room].room_flags, SAFE))) 
+  if(ch->in_room && (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) 
+                     || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))) 
   {
     send_to_char("Something about this room prohibits your magical imbuement.\r\n", ch);
     return eFAILURE;
@@ -288,12 +288,12 @@ int check_ethereal_focus(Character *ch, int trigger_type)
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
   // we can.  We do this by checking if the room has a flag or not
   // NOTICE:  This is a TEMP_room_flag
-  if(!IS_SET(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
+  if(!IS_SET(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
     return eSUCCESS;
 
   // loop through the room to find the caster. It should only be possible for a single
   // caster in a room to have this running (as long as no imms are being stupid)
-  for(i = world[ch->in_room].people; i; i = next_i) 
+  for(i = DC::getInstance()->world[ch->in_room].people; i; i = next_i) 
   {
     next_i = i->next_in_room;
   
@@ -307,7 +307,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
 
     // Okay, something is going down no matter what, so let's remove the flags first to avoid any cascading effects
     // NOTICE:  This is a TEMP_room_flag
-    REMOVE_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+    REMOVE_BIT(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
     affect_from_char(i, SPELL_ETHEREAL_FOCUS);
 
     if(IS_PC(i) && !i->desc) // don't work if I'm linkdead
@@ -318,7 +318,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     if(  GET_POS(i) <= POSITION_RESTING || 
          GET_POS(i) == POSITION_FIGHTING || i->fighting ||
          IS_AFFECTED(i, AFF_PARALYSIS) ||
-         ( IS_SET(world[i->in_room].room_flags, SAFE) && !IS_AFFECTED(ch, AFF_CANTQUIT) )
+         ( IS_SET(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !IS_AFFECTED(ch, AFF_CANTQUIT) )
       )
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
@@ -345,7 +345,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
     // Loop through allies and attack
-    for(ally = world[ch->in_room].people; ally; ally = next_ally) 
+    for(ally = DC::getInstance()->world[ch->in_room].people; ally; ally = next_ally) 
     {
       next_ally = ally->next_in_room;
 

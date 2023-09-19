@@ -67,7 +67,7 @@ vault_search_parameter::~vault_search_parameter()
   }
 }
 
-extern World world;
+
 int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 
@@ -372,7 +372,7 @@ int do_vault(Character *ch, char *argument, int cmd)
     }
     // putting this here so that anything below it requires you to be in a safe room.
   }
-  else if (!IS_SET(world[ch->in_room].room_flags, SAFE))
+  else if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You don't feel safe enough to manage your valuables.\r\n", ch);
     return eSUCCESS;

@@ -84,7 +84,7 @@ extern char imotd[MAX_STRING_LENGTH];
 
 extern Object *object_list;
 extern struct index_data *obj_index;
-extern World world;
+
 extern CVoteData *DCVote;
 
 int _parse_email(char *arg);
@@ -345,7 +345,7 @@ Object *clan_altar(Character *ch)
             {
                if (real_room(room->room_number) == DC::NOWHERE)
                   continue;
-               Object *t = world[real_room(room->room_number)].contents;
+               Object *t = DC::getInstance()->world[real_room(room->room_number)].contents;
                for (; t; t = t->next_content)
                {
                   if (t->obj_flags.type_flag == ITEM_ALTAR)
@@ -2244,10 +2244,10 @@ void update_characters()
       }
 
       // handle drowning
-      if (IS_PC(i) && GET_LEVEL(i) < IMMORTAL && world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
+      if (IS_PC(i) && GET_LEVEL(i) < IMMORTAL && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
       {
          tmp = GET_MAX_HIT(i) / 5;
-         sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
+         sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
          retval = noncombat_damage(i, tmp, "You gasp your last breath and everything goes dark...", "$n stops struggling as $e runs out of oxygen.", log_msg,
                                    KILL_DROWN);
          if (SOMEONE_DIED(retval))
@@ -2339,20 +2339,20 @@ void checkConsecrate(int pulseType)
                      if (spl == SPELL_CONSECRATE)
                      {
                         if (ch->in_room != obj->in_room)
-                           csendf(ch, "You sense your consecration of %s has ended.\r\n", world[obj->in_room].name);
+                           csendf(ch, "You sense your consecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
                         else
                            send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.\r\n", ch);
                      }
                      else
                      {
                         if (ch->in_room != obj->in_room)
-                           csendf(ch, "You sense your desecration of %s has ended.\r\n", world[obj->in_room].name);
+                           csendf(ch, "You sense your desecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
                         else
                            send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.\r\n", ch);
                      }
                   }
                }
-               for (tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
+               for (tmp_ch = DC::getInstance()->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
                {
                   next_ch = tmp_ch->next_in_room;
                   if (tmp_ch == ch)
@@ -2397,7 +2397,7 @@ void checkConsecrate(int pulseType)
             {
                ch = obj->obj_flags.origin;
             }
-            for (tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
+            for (tmp_ch = DC::getInstance()->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
                next_ch = tmp_ch->next_in_room;
                if (IS_PC(tmp_ch) && GET_LEVEL(tmp_ch) >= IMMORTAL)

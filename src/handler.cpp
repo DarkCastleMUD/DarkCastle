@@ -54,7 +54,7 @@
 #include "corpse.h"
 #include "shop.h"
 
-extern World world;
+
 
 extern class Object *object_list;
 extern struct index_data *mob_index;
@@ -1729,7 +1729,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		break;
 	case SPELL_FLY:
 		/* Fly wears off...you fall :) */
-		if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
+		if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
 		{
 			if (do_fall(ch, dir) & eCH_DIED)
 				char_died = true;
@@ -1912,7 +1912,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		if (!(flags & SUPPRESS_CONSEQUENCES))
 		{
 			send_to_char("Your musical ability to breathe water ends.\r\n", ch);
-			if (world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
+			if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
 			{
 				act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
 				send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n", ch);
@@ -1920,7 +1920,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		}
 		break;
 	case SPELL_WATER_BREATHING:
-		if (!(flags & SUPPRESS_CONSEQUENCES) && world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
+		if (!(flags & SUPPRESS_CONSEQUENCES) && DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
 		{
 #if 0
 			// you just drowned!
@@ -2259,21 +2259,21 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 		}
 	}
 
-	world[ch->in_room].light -= ch->glow_factor;
+	DC::getInstance()->world[ch->in_room].light -= ch->glow_factor;
 
-	if (ch == world[ch->in_room].people) /* head of list */
-		world[ch->in_room].people = ch->next_in_room;
+	if (ch == DC::getInstance()->world[ch->in_room].people) /* head of list */
+		DC::getInstance()->world[ch->in_room].people = ch->next_in_room;
 
 	/* locate the previous element */
 	else
-		for (i = world[ch->in_room].people; i; i = i->next_in_room)
+		for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 		{
 			if (i->next_in_room == ch)
 				i->next_in_room = ch->next_in_room;
 		}
 	//  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
 	//	debugpoint();
-	for (i = world[ch->in_room].people; i; i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 	{
 		if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
 			Other = true;
@@ -2283,25 +2283,25 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 			kimore = true;
 	}
 	if (IS_PC(ch)) // player
-		DC::getInstance()->zones.value(world[ch->in_room].zone).decrementPlayers();
+		DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).decrementPlayers();
 	if (IS_NPC(ch))
 		ch->mobdata->last_room = ch->in_room;
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK))
 		{
-			REMOVE_BIT(world[ch->in_room].iFlags, NO_TRACK);
-			REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
+			REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK);
+			REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_TRACK);
 		}
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_KI))
+		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_KI))
 		{
-			REMOVE_BIT(world[ch->in_room].iFlags, NO_KI);
-			REMOVE_BIT(world[ch->in_room].room_flags, NO_KI);
+			REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_KI);
+			REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_KI);
 		}
-	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC))
 	{
-		REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
-		REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
+		REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC);
+		REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC);
 	}
 
 	ch->in_room = DC::NOWHERE;
@@ -2336,17 +2336,17 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 	if (room == DC::NOWHERE)
 		return (0);
 
-	if (world[room].people == ch)
+	if (DC::getInstance()->world[room].people == ch)
 	{
-		logentry("Error: world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
+		logentry("Error: DC::getInstance()->world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
-	ch->next_in_room = world[room].people;
-	world[room].people = ch;
+	ch->next_in_room = DC::getInstance()->world[room].people;
+	DC::getInstance()->world[room].people = ch;
 	ch->in_room = room;
 
-	world[room].light += ch->glow_factor;
+	DC::getInstance()->world[room].light += ch->glow_factor;
 	int a, i;
 	if (IS_PC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
 	{
@@ -2390,27 +2390,27 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 			}
 	}
 	if (IS_PC(ch)) // player
-		DC::getInstance()->zones.value(world[room].zone).incrementPlayers();
+		DC::getInstance()->zones.value(DC::getInstance()->world[room].zone).incrementPlayers();
 	if (IS_NPC(ch))
 	{
-		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
+		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_MAGIC))
 		{
-			SET_BIT(world[room].iFlags, NO_MAGIC);
-			SET_BIT(world[room].room_flags, NO_MAGIC);
+			SET_BIT(DC::getInstance()->world[room].iFlags, NO_MAGIC);
+			SET_BIT(DC::getInstance()->world[room].room_flags, NO_MAGIC);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
+		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_KI))
 		{
-			SET_BIT(world[room].iFlags, NO_KI);
-			SET_BIT(world[room].room_flags, NO_KI);
+			SET_BIT(DC::getInstance()->world[room].iFlags, NO_KI);
+			SET_BIT(DC::getInstance()->world[room].room_flags, NO_KI);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
+		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_TRACK))
 		{
-			SET_BIT(world[room].iFlags, NO_TRACK);
-			SET_BIT(world[room].room_flags, NO_TRACK);
+			SET_BIT(DC::getInstance()->world[room].iFlags, NO_TRACK);
+			SET_BIT(DC::getInstance()->world[room].room_flags, NO_TRACK);
 		}
 	}
 
-	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && IS_SET(world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
+	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
 	{
 		do_sing(ch, "stop", CMD_DEFAULT);
 	}
@@ -2551,7 +2551,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 	{
 		ch->glow_factor++;
 		if (ch->in_room > DC::NOWHERE)
-			world[ch->in_room].light++;
+			DC::getInstance()->world[ch->in_room].light++;
 		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
 		//  it tells you every time you save
@@ -2563,7 +2563,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 	{
 		ch->glow_factor++;
 		if (ch->in_room > DC::NOWHERE)
-			world[ch->in_room].light++;
+			DC::getInstance()->world[ch->in_room].light++;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
@@ -2655,7 +2655,7 @@ b: // ew
 	{
 		ch->glow_factor--;
 		if (ch->in_room > DC::NOWHERE)
-			world[ch->in_room].light--;
+			DC::getInstance()->world[ch->in_room].light--;
 		// this is just annoying cause it tells you every time you save
 		// TODO - make it not be annoying
 		//      act("The soft glow around $n from $p fades.", ch, obj, 0, TO_ROOM, 0);
@@ -2665,7 +2665,7 @@ b: // ew
 	{
 		ch->glow_factor--;
 		if (ch->in_room > DC::NOWHERE)
-			world[ch->in_room].light--;
+			DC::getInstance()->world[ch->in_room].light--;
 	}
 
 	for (j = 0; j < obj->num_affects; j++)
@@ -2824,7 +2824,7 @@ Character *get_char_room(char *name, int room, bool careful)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	for (i = world[room].people, j = 0; i && (j <= number); i = i->next_in_room)
+	for (i = DC::getInstance()->world[room].people, j = 0; i && (j <= number); i = i->next_in_room)
 	{
 		if (number == 0 && IS_NPC(i))
 			continue;
@@ -2973,7 +2973,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3025,7 +3025,7 @@ int move_obj(Object *obj, int dest)
 			abort();
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to destination: %d", obj->name, world[dest].number);
+		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
 		return 0;
 	}
 
@@ -3058,7 +3058,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3145,7 +3145,7 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, world[obj_in_room].number);
+			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3311,22 +3311,22 @@ int obj_to_room(class Object *object, int room)
 	if (!object)
 		return 0;
 
-	if (&world[room] == nullptr)
+	if (&DC::getInstance()->world[room] == nullptr)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "obj_to_room: world[%d] == nullptr", room);
+		logf(IMMORTAL, LogChannels::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}
 
 	if (object->isPortal())
 	{
-		world[room].light++;
+		DC::getInstance()->world[room].light++;
 	}
 
 	// combine any cash amounts
 	if (GET_ITEM_TYPE(object) == ITEM_MONEY)
 	{
-		for (obj = world[room].contents; obj; obj = obj->next_content)
+		for (obj = DC::getInstance()->world[room].contents; obj; obj = obj->next_content)
 			if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
 			{
 				object->obj_flags.value[0] += obj->obj_flags.value[0];
@@ -3337,7 +3337,7 @@ int obj_to_room(class Object *object, int room)
 	}
 
 	// search through for the last object, or another object just like this one
-	for (obj = world[room].contents; obj && obj->next_content; obj = obj->next_content)
+	for (obj = DC::getInstance()->world[room].contents; obj && obj->next_content; obj = obj->next_content)
 	{
 		if (obj->item_number == object->item_number)
 			break;
@@ -3347,7 +3347,7 @@ int obj_to_room(class Object *object, int room)
 	if (!obj)
 	{
 		object->next_content = nullptr;
-		world[room].contents = object;
+		DC::getInstance()->world[room].contents = object;
 	}
 	else
 	{
@@ -3360,11 +3360,11 @@ int obj_to_room(class Object *object, int room)
 		object->equipped_by = 0;
 
 	/*
-	 if(!(obj = world[room].contents) ||
+	 if(!(obj = DC::getInstance()->world[room].contents) ||
 	 (!obj->next_content && obj->item_number > object->item_number))
 	 {
-	 object->next_content = world[room].contents;
-	 world[room].contents = object;
+	 object->next_content = DC::getInstance()->world[room].contents;
+	 DC::getInstance()->world[room].contents = object;
 	 object->in_room      = room;
 	 object->carried_by   = 0;
 
@@ -3402,17 +3402,17 @@ int obj_from_room(class Object *object)
 
 	if (object->isPortal())
 	{
-		world[object->in_room].light--;
+		DC::getInstance()->world[object->in_room].light--;
 	}
 
 	// head of list
-	if (object == world[object->in_room].contents)
-		world[object->in_room].contents = object->next_content;
+	if (object == DC::getInstance()->world[object->in_room].contents)
+		DC::getInstance()->world[object->in_room].contents = object->next_content;
 
 	// locate previous element in list
 	else
 	{
-		for (i = world[object->in_room].contents; i && (i->next_content != object); i = i->next_content)
+		for (i = DC::getInstance()->world[object->in_room].contents; i && (i->next_content != object); i = i->next_content)
 			;
 
 		if (i != nullptr)
@@ -3645,7 +3645,7 @@ void update_char_objects(Character *ch)
 					send_to_char("Your light flickers out and dies.\r\n", ch);
 					ch->glow_factor--;
 					if (ch->in_room > DC::NOWHERE)
-						world[ch->in_room].light--;
+						DC::getInstance()->world[ch->in_room].light--;
 				}
 			}
 
@@ -3756,11 +3756,11 @@ void extract_char(Character *ch, bool pull, Trace t)
 	char_from_room(ch);
 	if (!pull && !isGolem)
 	{
-		if (world[was_in].number == START_ROOM)
+		if (DC::getInstance()->world[was_in].number == START_ROOM)
 			char_to_room(ch, real_room(SECOND_START_ROOM));
-		else if (DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == FAR_REACH || DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == UNDERDARK)
+		else if (DC::getInstance()->zones.value(DC::getInstance()->world[GET_HOME(ch)].zone).continent == FAR_REACH || DC::getInstance()->zones.value(DC::getInstance()->world[GET_HOME(ch)].zone).continent == UNDERDARK)
 			char_to_room(ch, real_room(FARREACH_START_ROOM));
-		else if (DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == DIAMOND_ISLE || DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == FORBIDDEN_ISLAND)
+		else if (DC::getInstance()->zones.value(DC::getInstance()->world[GET_HOME(ch)].zone).continent == DIAMOND_ISLE || DC::getInstance()->zones.value(DC::getInstance()->world[GET_HOME(ch)].zone).continent == FORBIDDEN_ISLAND)
 			char_to_room(ch, real_room(THALOS_START_ROOM));
 		else
 			char_to_room(ch, real_room(START_ROOM));
@@ -3909,7 +3909,7 @@ Character *get_rand_other_char_room_vis(Character *ch)
 	int count = 0;
 
 	// Count the number of players in room
-	for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+	for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
 		if (CAN_SEE(ch, vict) && ch != vict)
 			count++;
 
@@ -3920,7 +3920,7 @@ Character *get_rand_other_char_room_vis(Character *ch)
 	count = number(1, count);
 
 	// Find the "count" player and return them
-	for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+	for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
 	{
 		if (CAN_SEE(ch, vict) && ch != vict)
 		{
@@ -4021,7 +4021,7 @@ Character *get_char_room_vis(Character *ch, const char *name)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	for (i = world[ch->in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
 	{
 		if (number == 0 && IS_NPC(i))
 			continue;
@@ -4075,7 +4075,7 @@ Character *get_mob_room_vis(Character *ch, char *name)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	for (i = world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
 	{
 		if (!IS_MOB(i))
 			continue;
@@ -4112,7 +4112,7 @@ Character *get_pc_room_vis_exact(Character *ch, const char *name)
 {
 	Character *i;
 
-	for (i = world[ch->in_room].people; i; i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 	{
 		if (isname(name, GET_NAME(i)) && CAN_SEE(ch, i) && IS_PC(i))
 			return (i);
@@ -4539,7 +4539,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		return (i);
 
 	/* scan room */
-	if ((i = get_obj_in_list_vis(ch, name, world[ch->in_room].contents)) != nullptr)
+	if ((i = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents)) != nullptr)
 		return (i);
 
 	strcpy(tmpname, name);
@@ -4768,7 +4768,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 
 	if (IS_SET(bitvector, FIND_OBJ_ROOM))
 	{
-		*tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+		*tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
 		if (*tar_obj)
 		{
 			if (verbose)
@@ -4942,7 +4942,7 @@ void room_mobs_only_hate(Character *ch)
 	for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
 			 {
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
-				(vict != ch) && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
+				(vict != ch) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) {
 			remove_memory(vict, 'h');
 			add_memory(vict, GET_NAME(ch), 'h');
 		} });

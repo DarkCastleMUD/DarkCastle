@@ -27,7 +27,7 @@ extern "C"
 #include "MobActivity.h"
 #include "const.h"
 // Externs
-extern World world;
+
 
 // Locals
 class Path *mPathList = nullptr;
@@ -51,8 +51,8 @@ bool Path::isRoomConnected(int room)
   int i;
 
   for (i = 0; i < MAX_DIRS; i++)
-    if (world[room].dir_option[i] && world[room].dir_option[i]->to_room >= 0)
-      for (p = world[world[room].dir_option[i]->to_room].paths; p; p = p->next)
+    if (DC::getInstance()->world[room].dir_option[i] && DC::getInstance()->world[room].dir_option[i]->to_room >= 0)
+      for (p = DC::getInstance()->world[DC::getInstance()->world[room].dir_option[i]->to_room].paths; p; p = p->next)
         if (p->p == this)
           return true;
 
@@ -63,7 +63,7 @@ bool Path::isRoomPathed(int room)
 {
   struct path_data *p;
 
-  for (p = world[room].paths; p; p = p->next)
+  for (p = DC::getInstance()->world[room].paths; p; p = p->next)
     if (p->p == this)
       return true;
 
@@ -112,21 +112,21 @@ bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 
   for (int i = 0; i < MAX_DIRS; i++)
   {
-    if (!world[from].dir_option[i])
+    if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
       continue;
-    if (!isRoomPathed(world[from].dir_option[i]->to_room))
+    if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
       continue;
 
-    if (world[from].dir_option[i]->to_room == to)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room == to)
     {
       *buf = dirs[i][0];
       *(buf + 1) = '\0';
       return true;
     }
 
-    if (findRoom(world[from].dir_option[i]->to_room, to, steps + 1, leastSteps, buf + 1))
+    if (findRoom(DC::getInstance()->world[from].dir_option[i]->to_room, to, steps + 1, leastSteps, buf + 1))
     {
       *buf = dirs[i][0];
       return true;
@@ -143,21 +143,21 @@ int Path::leastSteps(int from, int to, int val, int *bestval)
 
   for (int i = 0; i < MAX_DIRS; i++)
   {
-    if (!world[from].dir_option[i])
+    if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
       continue;
-    if (!isRoomPathed(world[from].dir_option[i]->to_room))
+    if (!isRoomPathed(DC::getInstance()->world[from].dir_option[i]->to_room))
       continue;
 
-    if (world[from].dir_option[i]->to_room == to)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room == to)
     {
       if (val < *bestval)
         *bestval = val;
       return val;
     }
     else
-      leastSteps(world[from].dir_option[i]->to_room, to, val + 1, bestval);
+      leastSteps(DC::getInstance()->world[from].dir_option[i]->to_room, to, val + 1, bestval);
   }
   return *bestval;
 }
@@ -194,10 +194,10 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
   }
   struct path_data *pa;
 
-  if (world[room].paths)
+  if (DC::getInstance()->world[room].paths)
   {
     struct path_data *t;
-    for (pa = world[room].paths; pa; pa = pa->next)
+    for (pa = DC::getInstance()->world[room].paths; pa; pa = pa->next)
     {
       if (isPathConnected(pa->p))
       {
@@ -235,8 +235,8 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
 
   pa = newPath();
   pa->p = this;
-  pa->next = world[room].paths;
-  world[room].paths = pa;
+  pa->next = DC::getInstance()->world[room].paths;
+  DC::getInstance()->world[room].paths = pa;
   (*this)[room] = 0;
   if (ch)
     send_to_char("Room successfully added to path.\r\n", ch);
@@ -271,7 +271,7 @@ int do_newPath(Character *ch, char *argument, int cmd)
 int do_listPathsByZone(Character *ch, char *argument, int cmd)
 {
   auto &zones = DC::getInstance()->zones;
-  int i = world[ch->in_room].zone;
+  int i = DC::getInstance()->world[ch->in_room].zone;
   if (zones.contains(i) == false)
   {
     return eFAILURE;
@@ -490,20 +490,20 @@ int find_closest_path(int from, int steps, char *buf, map<int, int> z)
 
   for (int i = 0; i < MAX_DIRS; i++)
   {
-    if (!world[from].dir_option[i])
+    if (!DC::getInstance()->world[from].dir_option[i])
       continue;
-    if (world[from].dir_option[i]->to_room < 0)
+    if (DC::getInstance()->world[from].dir_option[i]->to_room < 0)
       continue;
-    if (z[world[from].dir_option[i]->to_room] <= steps && z[world[from].dir_option[i]->to_room] != 0)
+    if (z[DC::getInstance()->world[from].dir_option[i]->to_room] <= steps && z[DC::getInstance()->world[from].dir_option[i]->to_room] != 0)
       continue;
 
-    if (world[world[from].dir_option[i]->to_room].paths)
+    if (DC::getInstance()->world[DC::getInstance()->world[from].dir_option[i]->to_room].paths)
     {
       *buf = *dirs[i];
       *(buf + 1) = '\0';
-      return world[from].dir_option[i]->to_room;
+      return DC::getInstance()->world[from].dir_option[i]->to_room;
     }
-    if ((zenew = find_closest_path(world[from].dir_option[i]->to_room, steps + 1, buf + 1, z)) != 0)
+    if ((zenew = find_closest_path(DC::getInstance()->world[from].dir_option[i]->to_room, steps + 1, buf + 1, z)) != 0)
     {
       *buf = *dirs[i];
       return zenew;
@@ -517,7 +517,7 @@ int Path::connectRoom(class Path *z)
   struct path_data *pa;
 
   for (map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
-    for (pa = world[(*iter).first].paths; pa; pa = pa->next)
+    for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;
 
@@ -530,31 +530,31 @@ char *findPath(int from, int to, Character *ch = nullptr)
   static char endbuf[MAX_STRING_LENGTH];
   endbuf[0] = buf[0] = '\0';
   class Path *start, *stop;
-  if (world[from].paths)
+  if (DC::getInstance()->world[from].paths)
   {
-    csendf(ch, "Starting from path %s.\r\n", world[from].paths->p->name);
+    csendf(ch, "Starting from path %s.\r\n", DC::getInstance()->world[from].paths->p->name);
   }
   else
   {
     map<int, int> z;
     from = find_closest_path(from, 1, &buf[0], z);
-    if (from && world[from].paths)
-      csendf(ch, "Starting from path %s.\r\n", world[from].paths->p->name);
+    if (from && DC::getInstance()->world[from].paths)
+      csendf(ch, "Starting from path %s.\r\n", DC::getInstance()->world[from].paths->p->name);
   }
   strcat(endbuf, buf);
-  start = world[from].paths->p;
-  if (world[to].paths)
+  start = DC::getInstance()->world[from].paths->p;
+  if (DC::getInstance()->world[to].paths)
   {
-    csendf(ch, "Ending in path %s.\r\n", world[to].paths->p->name);
+    csendf(ch, "Ending in path %s.\r\n", DC::getInstance()->world[to].paths->p->name);
   }
   else
   {
     map<int, int> z;
     to = find_closest_path(to, 1, &buf[0], z);
-    if (to && world[to].paths)
-      csendf(ch, "Ending in path %s.\r\n", world[to].paths->p->name);
+    if (to && DC::getInstance()->world[to].paths)
+      csendf(ch, "Ending in path %s.\r\n", DC::getInstance()->world[to].paths->p->name);
   }
-  stop = world[to].paths->p;
+  stop = DC::getInstance()->world[to].paths->p;
   if (!start || !stop)
     return "Invalid path";
 

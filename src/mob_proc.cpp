@@ -41,7 +41,7 @@
 
 /*   external vars  */
 
-extern World world;
+
 
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
@@ -69,7 +69,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
     return false;
 
   // Any friends in the room?  Call for help!   int friends = 0;
-  for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!IS_MOB(ally))
       continue;
@@ -114,7 +114,7 @@ int protect(Character *ch, int iFriendId)
     return eFAILURE;
 
   // Any one I need to protect in the room?
-  for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!IS_MOB(ally))
       continue;
@@ -166,7 +166,7 @@ Character *find_random_player_in_room(Character *ch)
   int count = 0;
 
   // Count the number of players in room
-  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
     if (IS_PC(vict))
       count++;
 
@@ -177,7 +177,7 @@ Character *find_random_player_in_room(Character *ch)
   count = number(1, count);
 
   // Find the "count" player and return them
-  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
     if (IS_PC(vict))
     {
       if (count > 1)
@@ -199,7 +199,7 @@ void damage_all_players_in_room(Character *ch, int damage)
   Character *next_vict = nullptr;
   void inform_victim(Character * ch, Character * vict, int dam);
 
-  for (vict = world[ch->in_room].people; vict; vict = next_vict)
+  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_vict)
   {
     // we need this here in case fight_kill moves our victim
     next_vict = vict->next_in_room;
@@ -254,7 +254,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
     return nullptr;
 
   // Is my friend in the room?
-  for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
     if (!IS_MOB(ally))
       continue;
@@ -649,7 +649,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
     return eSUCCESS;
   }
 
-  for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
     if (IS_PC(tch))
@@ -836,7 +836,7 @@ int francis_guard(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   if (cmd != 1)
     return eFAILURE;
-  if (world[ch->in_room].number == 7077)
+  if (DC::getInstance()->world[ch->in_room].number == 7077)
   {
     do_say(owner, "Oh no you don't!", CMD_DEFAULT);
     attack(owner, ch, 0);
@@ -860,7 +860,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   // 3 = south, 2 = east, 5 = up
   // 1 = north, 4  = west, 6 = down
 
-  switch (world[ch->in_room].number)
+  switch (DC::getInstance()->world[ch->in_room].number)
   {
   case 1978:
     dir = 4;
@@ -1938,7 +1938,7 @@ int fido(Character *ch, class Object *obj, int cmd, const char *arg,
   if (IS_AFFECTED(ch, AFF_CHARM))
     return eFAILURE;
 
-  for (i = world[ch->in_room].contents; i; i = i->next_content)
+  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
   {
     if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->obj_flags.value[3])
     {
@@ -1979,7 +1979,7 @@ int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
   if (IS_AFFECTED(ch, AFF_CHARM))
     return eFAILURE;
 
-  for (i = world[ch->in_room].contents; i; i = i->next_content)
+  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
   {
     if (IS_SET(i->obj_flags.wear_flags, ITEM_TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
@@ -2015,7 +2015,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
     return eFAILURE;
 
   // TODO - make this Crydragon proc into something better
-  for (tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = temp)
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
@@ -2054,7 +2054,7 @@ int adept(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd || !AWAKE(ch))
     return eFAILURE;
 
-  for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
     if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2099,7 +2099,7 @@ int mud_school_adept(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!AWAKE(ch))
     return eFAILURE;
 
-  for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
     if (IS_PC(tch) && number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2232,7 +2232,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
   if (cmd == 59)
   { /* List */
     send_to_char("Available pets are:\n\r", ch);
-    for (pet = world[pet_room].people; pet; pet = pet->next_in_room)
+    for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
       sprintf(buf, "%8lld - %s\n\r",
               3 * GET_EXP(pet), pet->short_desc);
@@ -2410,7 +2410,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = DC::getInstance()->world[ch->in_room].people; tch; tch = tch->next_in_room)
   {
 
     if (IS_PC(tch))
@@ -3191,7 +3191,7 @@ int hiryushi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
 
   case 3:
     act("$n leaps back and readies a wand...", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    for (victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
     {
       if (IS_NPC(victim))
         continue;
@@ -3280,7 +3280,7 @@ int arena_only(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd || ch->fighting)
     return eFAILURE;
 
-  if (!IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     do_gossip(ch, "My life has no meaning outside of glorious arena combat!", 0);
     act("$n goes out in a blaze of glory!", ch, 0, 0, TO_ROOM, NOTVICT);
@@ -3483,17 +3483,17 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
     for (dir = 0; *dirs[dir] != '\n'; dir++)
       if (!str_cmp(dirs[dir], arg2))
         break;
-    if (*dirs[dir] == '\n' || !world[ch->in_room].dir_option[dir])
+    if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
     {
       send_to_char("In what direction did you say?\r\n", ch);
       return eSUCCESS;
     }
     int to_room = 0;
     bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
-    if (!str_cmp(arg1, "far") && world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
-      to_room = world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
+    if (!str_cmp(arg1, "far") && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
+      to_room = DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
     if (!to_room)
-      to_room = world[ch->in_room].dir_option[dir]->to_room;
+      to_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
     if (!check_components(ch, 1, 44, 0, 0, 0, true))
     {
       send_to_char("The owl requires a feeding to do this for you.\r\n", ch);

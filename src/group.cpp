@@ -26,7 +26,7 @@ extern "C"
 #include "spells.h"
 #include "terminal.h"
 
-extern World world;
+
 char *calc_color(int hit, int max_hit);
 
 int do_abandon(Character *ch, char *argument, int cmd)
@@ -34,7 +34,7 @@ int do_abandon(Character *ch, char *argument, int cmd)
   Character *k;
   char buf[MAX_INPUT_LENGTH + 1];
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -86,7 +86,7 @@ int do_found(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -357,7 +357,7 @@ int do_group(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -543,7 +543,7 @@ int do_disband(Character *ch, char *argument, int cmd)
   Character *adios, *k;
   struct follow_type *f, *next_f;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
@@ -649,7 +649,7 @@ int do_follow(Character *ch, char *argument, int cmd)
   void stop_follower(Character * ch, int cmd);
   void add_follower(Character * ch, Character * leader, int cmd);
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;

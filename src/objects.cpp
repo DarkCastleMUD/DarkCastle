@@ -32,7 +32,7 @@ extern "C"
 extern const char *drinks[];
 extern const char *dirs[];
 extern int drink_aff[][3];
-extern World world;
+
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
@@ -187,7 +187,7 @@ void object_activity(uint64_t pulse_type)
 
       if (obj->in_room != DC::NOWHERE)
       {
-        if (DC::getInstance()->zones.value(world[obj->in_room].zone).players > 0)
+        if (DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players > 0)
           retval = oprog_rand_trigger(obj);
       }
       else
@@ -220,7 +220,7 @@ int do_switch(Character *ch, char *arg, int cmd)
 {
   class Object *between;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -318,7 +318,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!ch->fighting && IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (!ch->fighting && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -366,7 +366,7 @@ int do_recite(Character *ch, char *argument, int cmd)
   int is_mob = IS_MOB(ch);
   int lvl;
 
-  if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("Your magic is muffled by greater beings.\r\n", ch);
     return eFAILURE;
@@ -393,7 +393,7 @@ int do_recite(Character *ch, char *argument, int cmd)
       }
     }
   }
-  if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     act("Your magic is muffled by greater beings.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -557,12 +557,12 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
     return false;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("In the rear with the gear huh?  Maybe use this somewhere in the field.\r\n", ch);
     return false;
   }
-  if (CAN_GO(ch, dir) && IS_SET(world[world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
+  if (CAN_GO(ch, dir) && IS_SET(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
   {
     send_to_char("Firing it into a safe room seems wasteful.\r\n", ch);
     return false;
@@ -590,9 +590,9 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
     sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
     send_to_room(buf, ch->in_room);
     sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
-    send_to_room(buf, world[ch->in_room].dir_option[dir]->to_room);
+    send_to_room(buf, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
     // set it up in the target room
-    obj_to_room(trap_obj, world[ch->in_room].dir_option[dir]->to_room);
+    obj_to_room(trap_obj, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
   }
 
   return true;
@@ -609,7 +609,7 @@ void set_catstink(Character *ch, class Object *obj)
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make sure it's useable in the place we're at
-  if (world[ch->in_room].sector_type != obj->obj_flags.value[1])
+  if (DC::getInstance()->world[ch->in_room].sector_type != obj->obj_flags.value[1])
   {
     if (SECT_MAX_SECT < obj->obj_flags.value[1] ||
         0 > obj->obj_flags.value[1])
@@ -628,7 +628,7 @@ void set_catstink(Character *ch, class Object *obj)
   }
 
   SETBIT(ch->affected_by, AFF_UTILITY);
-  world[ch->in_room].FreeTracks();
+  DC::getInstance()->world[ch->in_room].FreeTracks();
 }
 
 void set_utility_item(Character *ch, class Object *obj, char *argument)
@@ -712,13 +712,13 @@ int do_use(Character *ch, char *argument, int cmd)
   int lvl;
   int bits;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("Your magic is muffled by greater beings.\r\n", ch);
     return eFAILURE;
@@ -907,7 +907,7 @@ int do_drink(Character *ch, char *argument, int cmd)
   struct affected_type af;
   int amount;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -928,7 +928,7 @@ int do_drink(Character *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
 
-  if ((temp = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(ch, temp))
+  if ((temp = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(ch, temp))
   {
     act("You drink from $p.", ch, temp, 0, TO_CHAR, 0);
     act("$n drinks from $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
@@ -1058,7 +1058,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   class Object *temp;
   struct affected_type af;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1126,7 +1126,7 @@ int do_pour(Character *ch, char *argument, int cmd)
   class Object *to_obj;
   int amount;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1241,7 +1241,7 @@ int do_sip(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   class Object *temp;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1303,7 +1303,7 @@ int do_taste(Character *ch, char *argument, int cmd)
   char arg[MAX_STRING_LENGTH];
   class Object *temp;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -2269,7 +2269,7 @@ int do_wear(Character *ch, char *argument, int cmd)
       "primary",
       "\n"};
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -2345,7 +2345,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   bool blindlag = false;
   int keyword = 12;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -2394,7 +2394,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   class Object *obj_object;
   bool blindlag = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -2487,7 +2487,7 @@ int do_remove(Character *ch, char *argument, int cmd)
   bool blindlag = false;
   int j;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;

@@ -47,7 +47,6 @@
 /* External Structures / Variables */
 extern class Object *object_list;
 class Object *obj_proto;
-extern struct World world;
 extern struct index_data *obj_index; /* index table for object file   */
 int16_t frozen_start_room = 1;
 
@@ -502,7 +501,7 @@ void load_corpses(void)
 				if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE))
 				{
 					/* scan our temp room for objects */
-					for (obj = world[real_room(frozen_start_room)].contents; obj; obj = next_obj)
+					for (obj = DC::getInstance()->world[real_room(frozen_start_room)].contents; obj; obj = next_obj)
 					{
 						next_obj = obj->next_content;
 						if (obj)

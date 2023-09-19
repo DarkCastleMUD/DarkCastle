@@ -63,7 +63,7 @@ using namespace std;
 // external vars
 
 extern struct index_data *mob_index;
-extern World world;
+
 
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -204,7 +204,7 @@ int do_mpasound(Character *ch, char *argument, int cmd)
   {
     if (CAN_GO(ch, door))
     {
-      ch->in_room = world[was_in_room].dir_option[door]->to_room;
+      ch->in_room = DC::getInstance()->world[was_in_room].dir_option[door]->to_room;
       if (ch->in_room == was_in_room)
         continue;
       MOBtrigger = false;
@@ -555,7 +555,7 @@ int do_mpmload(Character *ch, char *argument, int cmd)
   }
 
   victim = clone_mobile(realnum);
-  victim->hometown = world[ch->in_room].number;
+  victim->hometown = DC::getInstance()->world[ch->in_room].number;
   char_to_room(victim, ch->in_room);
   mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
 
@@ -592,7 +592,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (obj_index[obj->item_number].virt == 393 && IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+  if (obj_index[obj->item_number].virt == 393 && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
   {
     return eFAILURE;
   }
@@ -639,7 +639,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
     Character *vnext;
     Object *obj_next;
 
-    for (victim = world[ch->in_room].people; victim != nullptr; victim = vnext)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
       if (IS_NPC(victim) && victim != ch)
@@ -648,7 +648,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
       }
     }
 
-    for (obj = world[ch->in_room].contents; obj != nullptr; obj = obj_next)
+    for (obj = DC::getInstance()->world[ch->in_room].contents; obj != nullptr; obj = obj_next)
     {
       obj_next = obj->next_content;
       extract_obj(obj);
@@ -659,7 +659,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
 
   if (!(victim = get_char_room(arg, ch->in_room)))
   {
-    if ((obj = get_obj_in_list(arg, world[ch->in_room].contents)) ||
+    if ((obj = get_obj_in_list(arg, DC::getInstance()->world[ch->in_room].contents)) ||
         (obj = get_obj_in_list(arg, ch->carrying)))
     {
       extract_obj(obj);
@@ -946,7 +946,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
       return eFAILURE | eINTERNAL_ERROR;
     }
 
-    if (IS_SET(world[location].room_flags, PRIVATE))
+    if (IS_SET(DC::getInstance()->world[location].room_flags, PRIVATE))
     {
       prog_error(ch, "Mptransfer - Private room.");
       return eFAILURE | eINTERNAL_ERROR;
@@ -1003,7 +1003,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
     Character *vch;
     Character *vch_next;
 
-    for (vch = world[ch->in_room].people; vch != nullptr; vch = vch_next)
+    for (vch = DC::getInstance()->world[ch->in_room].people; vch != nullptr; vch = vch_next)
     {
       vch_next = vch->next_in_room;
 
@@ -1265,7 +1265,7 @@ int do_mpsettemp(Character *ch, char *argument, int cmd)
   if (!victim && type == 0)
     return eFAILURE;
   if (!victim)
-    victim = world[ch->in_room].people;
+    victim = DC::getInstance()->world[ch->in_room].people;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1531,7 +1531,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
     }
 
     Character *next_vict;
-    for (victim = world[ch->in_room].people; victim; victim = next_vict)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       if ((IS_PC(victim) && GET_LEVEL(victim) > MORTAL) || victim == ch)
@@ -1709,7 +1709,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
     owner = (Character *)ch->beacon;
 
   if (!victim)
-    victim = world[ch->in_room].people;
+    victim = DC::getInstance()->world[ch->in_room].people;
   int z = 0;
   for (; victim;)
   {
@@ -1884,7 +1884,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     send_to_char("You find yourself unable to.\r\n", ch);
@@ -1896,7 +1896,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  int i = world[ch->in_room].zone,
+  int i = DC::getInstance()->world[ch->in_room].zone,
       low = DC::getInstance()->zones.value(i).getRealBottom(),
       high = DC::getInstance()->zones.value(i).getRealTop(),
       attempts = 0;
@@ -1919,14 +1919,14 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
       to_room = number(0, top_of_world);
     }
   } while (!DC::getInstance()->world_array[to_room] ||
-           IS_SET(world[to_room].room_flags, PRIVATE) ||
-           IS_SET(world[to_room].room_flags, IMP_ONLY) ||
-           IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
-           IS_SET(world[to_room].room_flags, ARENA) ||
-           (world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
-           DC::getInstance()->zones.value(world[to_room].zone).isNoTeleport() ||
-           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(world[to_room].zone).isTown()) : false) ||
-           (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
+           IS_SET(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
+           IS_SET(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
+           IS_SET(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
+           IS_SET(DC::getInstance()->world[to_room].room_flags, ARENA) ||
+           (DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
+           DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
+           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
+           (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
@@ -1963,7 +1963,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
       stop_fighting(vict);
     return eSUCCESS;
   }
-  for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
     if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
       remove_memory(rch, 'h');

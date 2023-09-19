@@ -44,7 +44,7 @@ extern struct index_data *mob_index;
 
 struct player_shop *g_playershops;
 
-extern World world;
+
 extern struct index_data *obj_index;
 
 extern struct time_info_data time_info;
@@ -705,7 +705,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   /*
    * Find a shop keeper in the room.
    */
-  //    for ( keeper = world[ch->in_room].people;
+  //    for ( keeper = DC::getInstance()->world[ch->in_room].people;
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
@@ -906,7 +906,7 @@ void fix_shopkeepers_inventory()
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
-    for (keeper = world[shop_index[shop_nr].in_room].people; keeper != nullptr;
+    for (keeper = DC::getInstance()->world[shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
       if (IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
@@ -1395,9 +1395,9 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       send_to_char("That room name is too long (60 chars max).\r\n", ch);
       return;
     }
-    dc_free(world[shop->room_num].name);
-    world[shop->room_num].name = str_dup(text);
-    csendf(ch, "Room name set to '%s'.\r\n", world[shop->room_num].name);
+    dc_free(DC::getInstance()->world[shop->room_num].name);
+    DC::getInstance()->world[shop->room_num].name = str_dup(text);
+    csendf(ch, "Room name set to '%s'.\r\n", DC::getInstance()->world[shop->room_num].name);
     save_player_shop_world_range();
     break;
 

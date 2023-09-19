@@ -63,7 +63,7 @@ using namespace std;
 
 // Extern variables
 
-extern World world;
+
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;
@@ -287,7 +287,7 @@ bool istank(Character *ch)
 	Character *t;
 	if (!ch->in_room)
 		return false;
-	for (t = world[ch->in_room].people; t; t = t->next_in_room)
+	for (t = DC::getInstance()->world[ch->in_room].people; t; t = t->next_in_room)
 		if (t->fighting == ch && t != ch)
 			return true;
 	return false;
@@ -370,7 +370,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left, &mob](Character *const &tmp)
 				{
-					if (tmp->in_room != DC::NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
+					if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
 					{
 						target = tmp;
 						return true;
@@ -385,7 +385,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	{
 		left += 6;
 		Character *tmp;
-		for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
+		for (tmp = DC::getInstance()->world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
 		{
 			if (isname(left, GET_NAME(tmp)))
 			{
@@ -411,11 +411,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	{
 		left += 6;
 		Object *otmp;
-		int z = world[mob->in_room].zone;
+		int z = DC::getInstance()->world[mob->in_room].zone;
 		for (otmp = object_list; otmp; otmp = otmp->next)
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
-			if ((cmp->in_room != DC::NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
+			if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
 				if (isname(left, otmp->name))
 				{
 					otarget = otmp;
@@ -427,11 +427,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	else if (!str_prefix("oroom_", left))
 	{
 		left += 6;
-		otarget = get_obj_in_list(left, world[mob->in_room].contents);
+		otarget = get_obj_in_list(left, DC::getInstance()->world[mob->in_room].contents);
 	}
 	else if (!str_prefix("zone_", left))
 	{
-		ztarget = world[mob->in_room].zone;
+		ztarget = DC::getInstance()->world[mob->in_room].zone;
 		left += 5;
 	}
 	else if (*left == '$')
@@ -755,7 +755,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			else if (rtarget >= 0)
 			{
 				if (DC::getInstance()->world_array[rtarget])
-					stringval = &world[rtarget].description;
+					stringval = &DC::getInstance()->world[rtarget].description;
 				else
 					tError = true;
 			}
@@ -823,7 +823,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!rtarget)
 				tError = true;
 			else
-				uintval = &world[rtarget].room_flags;
+				uintval = &DC::getInstance()->world[rtarget].room_flags;
 		}
 		break;
 	case 'g':
@@ -1052,7 +1052,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			else if (rtarget >= 0)
 			{
 				if (DC::getInstance()->world_array[rtarget])
-					stringval = &world[rtarget].name;
+					stringval = &DC::getInstance()->world[rtarget].name;
 				else
 					tError = true;
 			}
@@ -1648,7 +1648,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	{
 		Character *te;
 		int vnum = atoi(arg);
-		for (te = world[mob->in_room].people; te; te = te->next)
+		for (te = DC::getInstance()->world[mob->in_room].people; te; te = te->next)
 		{
 			if (IS_PC(te))
 				continue;
@@ -1750,7 +1750,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	{
 		Character *p;
 		int count = 0;
-		for (p = world[mob->in_room].people; p; p = p->next_in_room)
+		for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
 			if (IS_PC(p))
 				count++;
 		return mprog_veval(count, opr, atoi(val));
@@ -1802,7 +1802,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int target = atoi(arg);
 		Character *p;
 		int count = 0;
-		for (p = world[mob->in_room].people; p; p = p->next_in_room)
+		for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
 			if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
 				count++;
 
@@ -2848,7 +2848,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	{
 		int target = atoi(arg);
 
-		for (Character *vch = world[mob->in_room].people;
+		for (Character *vch = DC::getInstance()->world[mob->in_room].people;
 			 vch;
 			 vch = vch->next_in_room)
 		{
@@ -2866,7 +2866,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	{
 		int target = atoi(arg);
 
-		for (Object *obj = world[mob->in_room].contents;
+		for (Object *obj = DC::getInstance()->world[mob->in_room].contents;
 			 obj;
 			 obj = obj->next_content)
 		{
@@ -3904,7 +3904,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 	// count valid random victs in room
 	if (mob->in_room > 0)
 	{
-		for (vch = world[mob->in_room].people; vch; vch = vch->next_in_room)
+		for (vch = DC::getInstance()->world[mob->in_room].people; vch; vch = vch->next_in_room)
 			if (CAN_SEE(mob, vch, true) && IS_PC(vch))
 				count++;
 
@@ -3913,7 +3913,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 
 		if (!rndm && count)
 		{
-			for (vch = world[mob->in_room].people; vch && count;)
+			for (vch = DC::getInstance()->world[mob->in_room].people; vch && count;)
 			{
 				if (CAN_SEE(mob, vch, true) && IS_PC(vch))
 					count--;
@@ -4368,7 +4368,7 @@ int mprog_greet_trigger(Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (vmob = world[ch->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+	for (vmob = DC::getInstance()->world[ch->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
 		{
 			if (ch != vmob && CAN_SEE(vmob, ch) && (mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
@@ -4487,7 +4487,7 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (vmob = world[mob->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+	for (vmob = DC::getInstance()->world[mob->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
 		{
 			if (mprog_wordlist_check(txt, vmob, mob, nullptr, nullptr, SPEECH_PROG))
@@ -4770,7 +4770,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = world[ch->in_room].contents; item; item = item->next_content)
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
 		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
@@ -4878,7 +4878,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 	if (ch->in_room < 0)
 		return mprog_cur_result;
 
-	for (item = world[ch->in_room].contents; item; item =
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
 													   item->next_content)
 		if (obj_index[item->item_number].progtypes & ACT_PROG)
 		{
@@ -4929,7 +4929,7 @@ int oprog_greet_trigger(Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = world[ch->in_room].contents; item; item =
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
 													   item->next_content)
 		if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
 		{
@@ -4989,7 +4989,7 @@ int oprog_load_trigger(Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = world[ch->in_room].contents; item; item =
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
 													   item->next_content)
 		if (obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
@@ -5076,7 +5076,7 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 	char buf[MAX_STRING_LENGTH] = {0};
 	if (ch->in_room >= 0)
 	{
-		for (item = world[ch->in_room].contents; item; item = item->next_content)
+		for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
 		{
 			if (obj_index[item->item_number].progtypes & COMMAND_PROG)
 			{

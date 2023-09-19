@@ -39,13 +39,13 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(world[curRoom].zone).name));
+  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).name));
   for (low = curRoom; low > 0; low--)
   {
     if (!DC::getInstance()->world_array[low - 1])
       continue;
     last_good = low;
-    if (world[low - 1].zone != curZone)
+    if (DC::getInstance()->world[low - 1].zone != curZone)
       break;
   }
   low = last_good;
@@ -55,7 +55,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
     if (!DC::getInstance()->world_array[high + 1])
       continue;
     last_good = high;
-    if (world[high + 1].zone != curZone)
+    if (DC::getInstance()->world[high + 1].zone != curZone)
       break;
   }
   high = last_good;
@@ -66,19 +66,19 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
       continue;
     for (dir = 0; dir < 6; dir++)
     {
-      if ((curExits = world[i].dir_option[dir]) != 0)
+      if ((curExits = DC::getInstance()->world[i].dir_option[dir]) != 0)
       {
-        if (curExits->to_room > 0 && world[curExits->to_room].zone != curZone)
+        if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
           sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n",
-                  i, dirs[dir], curExits->to_room, world[curExits->to_room].zone,
-                  DC::getInstance()->zones.value(world[curExits->to_room].zone).name);
+                  i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone,
+                  DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).name);
 
           output += buf;
         }
       }
     }
-    for (portal = world[i].contents; portal; portal = portal->next_content)
+    for (portal = DC::getInstance()->world[i].contents; portal; portal = portal->next_content)
     {
       if (portal->obj_flags.type_flag == ITEM_CLIMBABLE)
       {
@@ -96,12 +96,12 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
           output += buf;
         }
-        else if (world[real_room(portal->obj_flags.value[0])].zone != curZone)
+        else if (DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone != curZone)
         {
           sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->obj_flags.value[0]),
-                  world[real_room(portal->obj_flags.value[0])].zone,
-                  DC::getInstance()->zones.value(world[real_room(portal->obj_flags.value[0])].zone).name);
+                  DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone,
+                  DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).name);
 
           output += buf;
         }
@@ -115,12 +115,12 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
           output += buf;
         }
-        else if (world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
+        else if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
           sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->getPortalDestinationRoom()),
-                  world[real_room(portal->getPortalDestinationRoom())].zone,
-                  DC::getInstance()->zones.value(world[real_room(portal->getPortalDestinationRoom())].zone).name);
+                  DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone,
+                  DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).name);
 
           output += buf;
         }
@@ -131,14 +131,14 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
     {
       if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != DC::NOWHERE) && !portal->hasPortalFlagNoLeave())
       {
-        if ((portal->obj_flags.value[0] == world[i].number) || (portal->obj_flags.value[2] == world[i].zone))
+        if ((portal->obj_flags.value[0] == DC::getInstance()->world[i].number) || (portal->obj_flags.value[2] == DC::getInstance()->world[i].zone))
         {
-          if (world[real_room(portal->in_room)].zone != curZone)
+          if (DC::getInstance()->world[real_room(portal->in_room)].zone != curZone)
           {
             sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n",
                     i, real_room(portal->in_room),
-                    world[real_room(portal->in_room)].zone,
-                    DC::getInstance()->zones.value(world[real_room(portal->in_room)].zone).name);
+                    DC::getInstance()->world[real_room(portal->in_room)].zone,
+                    DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).name);
 
             output += buf;
           }

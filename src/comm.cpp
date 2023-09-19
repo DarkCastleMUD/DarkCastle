@@ -96,7 +96,7 @@ extern int restrict;
 // extern int mini_mud;
 // extern int no_rent_check;
 
-extern World world; /* In db.c */
+ /* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
@@ -1510,7 +1510,7 @@ string generate_prompt(Character *ch)
   Room *rm = nullptr;
   try
   {
-    rm = &world[ch->in_room];
+    rm = &DC::getInstance()->world[ch->in_room];
   }
   catch (...)
   {
@@ -1793,7 +1793,7 @@ string generate_prompt(Character *ch)
       break;
     case 's':
       if (DC::getInstance()->world_array[ch->in_room])
-        sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
+        sprintf(pro, "%s", sector_types[DC::getInstance()->world[ch->in_room].sector_type]);
       else
         sprintf(pro, " ");
       break;
@@ -2781,7 +2781,7 @@ int close_socket(class Connection *d)
 
       act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
       sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
-              world[d->character->in_room].number);
+              DC::getInstance()->world[d->character->in_room].number);
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
         sprintf(buf, "%s with CQ.", buf);
       logentry(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
@@ -3285,7 +3285,7 @@ void send_to_zone(char *messg, int zone)
   {
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && world[i->character->in_room].zone == zone)
+      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && DC::getInstance()->world[i->character->in_room].zone == zone)
       {
         SEND_TO_Q(messg, i);
       }
@@ -3301,12 +3301,12 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
   if (room == DC::NOWHERE)
     return;
 
-  if (!DC::getInstance()->world_array[room] || !world[room].people)
+  if (!DC::getInstance()->world_array[room] || !DC::getInstance()->world[room].people)
   {
     return;
   }
   if (!messg.empty())
-    for (i = world[room].people; i; i = i->next_in_room)
+    for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
         if (!awakeonly || GET_POS(i) > POSITION_SLEEPING)
           SEND_TO_Q(messg, i->desc);

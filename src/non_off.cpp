@@ -36,7 +36,7 @@ extern "C"
 #include <map>
 #include <set>
 
-extern World world;
+
 extern struct index_data *obj_index;
 extern CVoteData *DCVote;
 
@@ -70,7 +70,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -90,7 +90,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   /* Ok, lets see if it's a corpse on the ground then */
   if (obj == nullptr)
   {
-    obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+    obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
     if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
@@ -185,7 +185,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   int room = 3099;
   int origin;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -222,7 +222,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   // Handle yielding the champion flag
   if (GET_OBJ_VNUM(obj) == 45)
   {
-    if (IS_SET(world[ch->in_room].room_flags, SAFE))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     {
       if (IS_AFFECTED(ch, AFF_CHAMPION))
       {
@@ -1190,7 +1190,7 @@ int do_stand(Character *ch, char *argument, int cmd)
 int do_sit(Character *ch, char *argument, int cmd)
 {
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1244,7 +1244,7 @@ int do_sit(Character *ch, char *argument, int cmd)
 int do_rest(Character *ch, char *argument, int cmd)
 {
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1296,7 +1296,7 @@ int do_rest(Character *ch, char *argument, int cmd)
 int do_sleep(Character *ch, char *argument, int cmd)
 {
   struct affected_type *paf;
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1306,7 +1306,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
     send_to_char("You are far too alert for that.\r\n", ch);
     return eFAILURE;
   }
-  if (!IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     if (!check_make_camp(ch->in_room))
     {
       send_to_char("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
@@ -1864,7 +1864,7 @@ int do_random(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int i = 0;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;

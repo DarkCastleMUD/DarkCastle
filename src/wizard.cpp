@@ -120,8 +120,8 @@ void do_mload(Character *ch, int rnum, int cnt)
                cnt,
                mob_index[rnum].virt,
                mob->short_desc,
-               world[ch->in_room].number,
-               world[ch->in_room].name);
+               DC::getInstance()->world[ch->in_room].number,
+               DC::getInstance()->world[ch->in_room].name);
     }
     else
     {
@@ -130,8 +130,8 @@ void do_mload(Character *ch, int rnum, int cnt)
                cnt,
                mob_index[rnum].virt,
                mob->short_desc,
-               world[ch->in_room].number,
-               world[ch->in_room].name);
+               DC::getInstance()->world[ch->in_room].number,
+               DC::getInstance()->world[ch->in_room].name);
     }
     logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
@@ -141,8 +141,8 @@ void do_mload(Character *ch, int rnum, int cnt)
              GET_NAME(ch),
              cnt,
              mob_index[rnum].virt,
-             world[ch->in_room].number,
-             world[ch->in_room].name);
+             DC::getInstance()->world[ch->in_room].number,
+             DC::getInstance()->world[ch->in_room].name);
     logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n", ch);
   }
@@ -191,8 +191,8 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
                     cnt > 1 ? "copies" : "copy",
                     GET_OBJ_VNUM(obj),
                     obj->short_description,
-                    world[ch->in_room].number,
-                    world[ch->in_room].name);
+                    DC::getInstance()->world[ch->in_room].number,
+                    DC::getInstance()->world[ch->in_room].name);
   logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   return obj_list;
@@ -241,8 +241,8 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
              obj->short_description,
-             world[ch->in_room].number,
-             world[ch->in_room].name);
+             DC::getInstance()->world[ch->in_room].number,
+             DC::getInstance()->world[ch->in_room].name);
   }
   else
   {
@@ -252,8 +252,8 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
              obj->short_description,
-             world[ch->in_room].number,
-             world[ch->in_room].name);
+             DC::getInstance()->world[ch->in_room].number,
+             DC::getInstance()->world[ch->in_room].name);
   }
   logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 }
@@ -287,7 +287,7 @@ void boro_mob_stat(Character *ch, Character *k)
           (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
           (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
-          (k->in_room == DC::NOWHERE ? 0 : world[k->in_room].number),
+          (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
           (k->short_desc ? k->short_desc : "None"),
@@ -591,7 +591,7 @@ void mob_stat(Character *ch, Character *k)
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
             (IS_NPC(k) ? k->mobdata->nr : 0),
-            k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
+            k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
     strcat(buf, buf2);
@@ -601,7 +601,7 @@ void mob_stat(Character *ch, Character *k)
   {
     sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
-            k->in_room == DC::NOWHERE ? -1 : world[k->in_room].number);
+            k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
   }
   send_to_char(buf, ch);
 
@@ -1035,7 +1035,7 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, "NOWHERE");
   else
   {
-    sprintf(buf2, "%d", world[j->in_room].number);
+    sprintf(buf2, "%d", DC::getInstance()->world[j->in_room].number);
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
@@ -1416,16 +1416,16 @@ command_return_t do_repop(Character *ch, string arguments, int cmd)
   if (arg1 == "full")
   {
     send_to_char("Performing full zone reset!\n\r", ch);
-    string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
+    string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
-    DC::resetZone(world[ch->in_room].zone, Zone::ResetType::full);
+    DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     send_to_char("Resetting this entire zone!\n\r", ch);
-    string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
+    string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
-    DC::resetZone(world[ch->in_room].zone);
+    DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
   return eSUCCESS;
@@ -1434,7 +1434,7 @@ command_return_t do_repop(Character *ch, string arguments, int cmd)
 int do_clear(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int zone = world[ch->in_room].zone;
+  int zone = DC::getInstance()->world[ch->in_room].zone;
 
   if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1455,7 +1455,7 @@ int do_clear(Character *ch, char *argument, int cmd)
     {
       continue;
     }
-    if (world[tmp_victim->in_room].zone == zone)
+    if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
     {
       if (IS_NPC(tmp_victim))
       {
@@ -1493,10 +1493,10 @@ int do_linkdead(Character *ch, char *arg, int cmd)
 
     if (i->player->possesing)
       sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
-              (int32_t)(world[i->in_room].number), (world[i->in_room].name));
+              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     else
       sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
-              (int32_t)(world[i->in_room].number), (world[i->in_room].name));
+              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
     send_to_char(buf, ch);
   }
 
@@ -1523,7 +1523,7 @@ int do_echo(Character *ch, char *argument, int cmd)
   else
   {
     sprintf(buf, "\n\r%s\n\r", argument + i);
-    for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       send_to_char(buf, vict);
   }
   return eSUCCESS;
@@ -1913,7 +1913,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
-      if (DC::getInstance()->zones.value(world[vict->in_room].zone).isNoHunt())
+      if (DC::getInstance()->zones.value(DC::getInstance()->world[vict->in_room].zone).isNoHunt())
         continue;
 
       if (strlen(vict->short_desc) > 34)
@@ -2044,14 +2044,14 @@ void pulse_hunts()
 
   try
   {
-    if (&world[6345] == nullptr)
+    if (&DC::getInstance()->world[6345] == nullptr)
     {
       logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
     class Object *obj, *onext;
-    for (obj = world[6345].contents; obj; obj = onext)
+    for (obj = DC::getInstance()->world[6345].contents; obj; obj = onext)
     {
       onext = obj->next_content;
       extract_obj(obj);

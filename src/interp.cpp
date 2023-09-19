@@ -57,7 +57,7 @@ int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern World world;
+
 
 // globals to store last command that was done.
 // this is used for debugging.  We output it in case of a crash
@@ -1601,9 +1601,9 @@ int special(Character *ch, int cmd, char *arg)
   int retval;
 
   /* special in room? */
-  if (world[ch->in_room].funct)
+  if (DC::getInstance()->world[ch->in_room].funct)
   {
-    if ((retval = (*world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
+    if ((retval = (*DC::getInstance()->world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
       return retval;
   }
 
@@ -1628,7 +1628,7 @@ int special(Character *ch, int cmd, char *arg)
       }
 
   /* special in mobile present? */
-  for (k = world[ch->in_room].people; k; k = k->next_in_room)
+  for (k = DC::getInstance()->world[ch->in_room].people; k; k = k->next_in_room)
   {
     if (IS_MOB(k))
     {
@@ -1649,7 +1649,7 @@ int special(Character *ch, int cmd, char *arg)
   }
 
   /* special in object present? */
-  for (i = world[ch->in_room].contents; i; i = i->next_content)
+  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
       if (obj_index[i->item_number].non_combat_func)
       {

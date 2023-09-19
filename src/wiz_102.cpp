@@ -161,7 +161,7 @@ int do_check(Character *ch, char *arg, int cmd)
   sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
           races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
-          (connected ? world[vict->in_room].number : -1));
+          (connected ? DC::getInstance()->world[vict->in_room].number : -1));
   send_to_char(buf, ch);
   sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10lld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
@@ -169,7 +169,7 @@ int do_check(Character *ch, char *arg, int cmd)
   if (GET_LEVEL(ch) >= SERAPH)
   {
     sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
-            world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
+            DC::getInstance()->world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
     send_to_char(buf, ch);
   }
   sprintf(buf, "$3Str$R: %-2d  $3Wis$R: %-2d  $3Int$R: %-2d  $3Dex$R: %-2d  $3Con$R: %d\n\r",
@@ -284,7 +284,7 @@ int do_find(Character *ch, char *arg, int cmd)
   }
 
   sprintf(type, "%30s -- %s [%d]\n\r", GET_SHORT(vict),
-          world[vict->in_room].name, world[vict->in_room].number);
+          DC::getInstance()->world[vict->in_room].name, DC::getInstance()->world[vict->in_room].number);
   send_to_char(type, ch);
   return eSUCCESS;
 }
@@ -816,7 +816,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   zone_t zone_key = select.toULongLong(&ok);
   if (!ok)
   {
-    zone_key = world[ch->in_room].zone;
+    zone_key = DC::getInstance()->world[ch->in_room].zone;
   }
   else
   {
@@ -4111,8 +4111,8 @@ int do_redit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: redit name <Room Name>\n\r", ch);
       return eFAILURE;
     }
-    dc_free(world[ch->in_room].name);
-    world[ch->in_room].name = str_dup(remainder_args.c_str());
+    dc_free(DC::getInstance()->world[ch->in_room].name);
+    DC::getInstance()->world[ch->in_room].name = str_dup(remainder_args.c_str());
     send_to_char("Ok.\r\n", ch);
   }
   break;
@@ -4123,14 +4123,14 @@ int do_redit(Character *ch, char *argument, int cmd)
     if (!remainder_args.empty())
     {
       string description = remainder_args + "\n\r";
-      dc_free(world[ch->in_room].description);
-      world[ch->in_room].description = str_dup(description.c_str());
+      dc_free(DC::getInstance()->world[ch->in_room].description);
+      DC::getInstance()->world[ch->in_room].description = str_dup(description.c_str());
       send_to_char("Ok.\r\n", ch);
       return eFAILURE;
     }
     send_to_char("        Write your room's description.  (/s saves /h for help)\r\n", ch);
     ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(world[ch->in_room].description);
+    ch->desc->strnew = &(DC::getInstance()->world[ch->in_room].description);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
   }
   break;
@@ -4170,28 +4170,28 @@ int do_redit(Character *ch, char *argument, int cmd)
       {
         if (is_abbrev(direction.c_str(), dirs[x]))
         {
-          if (world[ch->in_room].dir_option[x] == nullptr)
+          if (DC::getInstance()->world[ch->in_room].dir_option[x] == nullptr)
           {
             csendf(ch, "There is no %s exit.\r\n", dirs[x]);
             return eFAILURE;
           }
 
-          int16_t destination_room = world[ch->in_room].dir_option[x]->to_room;
+          int16_t destination_room = DC::getInstance()->world[ch->in_room].dir_option[x]->to_room;
           csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[x], ch->in_room, destination_room);
-          free(world[ch->in_room].dir_option[x]);
-          world[ch->in_room].dir_option[x] = nullptr;
+          free(DC::getInstance()->world[ch->in_room].dir_option[x]);
+          DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
           if (IS_PC(ch) && !IS_SET(ch->player->toggles, PLR_ONEWAY))
           {
             // if the destination room has a reverse exit
-            if (world[destination_room].dir_option[reverse_number[x]])
+            if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]])
             {
               // and that reverse exit points to us then we can delete it too
-              if (world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
+              if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
               {
                 csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[reverse_number[x]], destination_room, ch->in_room);
-                free(world[destination_room].dir_option[reverse_number[x]]);
-                world[destination_room].dir_option[reverse_number[x]] = nullptr;
+                free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
+                DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = nullptr;
                 return eSUCCESS;
               }
               else
@@ -4303,24 +4303,24 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (world[ch->in_room].dir_option[x])
+    if (DC::getInstance()->world[ch->in_room].dir_option[x])
       send_to_char("Modifying exit.\r\n", ch);
     else
     {
       send_to_char("Creating new exit.\r\n", ch);
-      CREATE(world[ch->in_room].dir_option[x], struct room_direction_data, 1);
-      world[ch->in_room].dir_option[x]->general_description = 0;
-      world[ch->in_room].dir_option[x]->keyword = 0;
+      CREATE(DC::getInstance()->world[ch->in_room].dir_option[x], struct room_direction_data, 1);
+      DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
+      DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = 0;
     }
 
-    world[ch->in_room].dir_option[x]->exit_info = a;
-    world[ch->in_room].dir_option[x]->key = b;
-    world[ch->in_room].dir_option[x]->to_room = c;
+    DC::getInstance()->world[ch->in_room].dir_option[x]->exit_info = a;
+    DC::getInstance()->world[ch->in_room].dir_option[x]->key = b;
+    DC::getInstance()->world[ch->in_room].dir_option[x]->to_room = c;
     if (!remainder_args.empty())
     {
-      if (world[ch->in_room].dir_option[x]->keyword)
-        dc_free(world[ch->in_room].dir_option[x]->keyword);
-      world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
+      if (DC::getInstance()->world[ch->in_room].dir_option[x]->keyword)
+        dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->keyword);
+      DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
     }
 
     send_to_char("Ok.\r\n", ch);
@@ -4330,14 +4330,14 @@ int do_redit(Character *ch, char *argument, int cmd)
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
                    ch);
-      if (world[c].dir_option[reverse_number[x]])
+      if (DC::getInstance()->world[c].dir_option[reverse_number[x]])
       {
         send_to_char("COULD NOT CREATE EXIT...One already exists.\r\n", ch);
       }
       else
       {
         buf = fmt::format("{} redit exit {} {} {} {} {}", d,
-                          return_directions[x], world[ch->in_room].number,
+                          return_directions[x], DC::getInstance()->world[ch->in_room].number,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->player->toggles, PLR_ONEWAY);
         char *tmp = strdup(buf.c_str());
@@ -4359,7 +4359,7 @@ int do_redit(Character *ch, char *argument, int cmd)
                  "redit extra <keywords ...>    - add or edit keywords.\r\n"
                  "redit extra delete <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n");
       bool found = false;
-      for (extra = world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
+      for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
       {
         if (extra->keyword != nullptr)
         {
@@ -4389,13 +4389,13 @@ int do_redit(Character *ch, char *argument, int cmd)
 
       bool deleted = false;
       extra_descr_data *prev = nullptr;
-      for (extra = world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
+      for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
       {
         if (arg3 == string(extra->keyword))
         {
           if (prev == nullptr)
           {
-            world[ch->in_room].ex_description = extra->next;
+            DC::getInstance()->world[ch->in_room].ex_description = extra->next;
           }
           else
           {
@@ -4416,7 +4416,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       break;
     }
 
-    for (extra = world[ch->in_room].ex_description;; extra = extra->next)
+    for (extra = DC::getInstance()->world[ch->in_room].ex_description;; extra = extra->next)
     {
       if (!extra)
       {
@@ -4425,16 +4425,16 @@ int do_redit(Character *ch, char *argument, int cmd)
         CREATE(extra, struct extra_descr_data, 1);
         extra->next = nullptr;
 
-        if (!(world[ch->in_room].ex_description))
+        if (!(DC::getInstance()->world[ch->in_room].ex_description))
         {
           // The room has no pre-existing extra descriptions so this will be its first
-          world[ch->in_room].ex_description = extra;
+          DC::getInstance()->world[ch->in_room].ex_description = extra;
         }
         else
         {
           // The room has pre-existing extra descriptions so we will find the end of
           // this linked list and append our new extra description to it
-          for (ext = world[ch->in_room].ex_description;; ext = ext->next)
+          for (ext = DC::getInstance()->world[ch->in_room].ex_description;; ext = ext->next)
           {
             if (ext->next == nullptr)
             {
@@ -4490,7 +4490,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         break;
     }
 
-    if (!(world[ch->in_room].dir_option[x]))
+    if (!(DC::getInstance()->world[ch->in_room].dir_option[x]))
     {
       send_to_char("That exit does not exist...create it first.\r\n", ch);
       return eFAILURE;
@@ -4499,12 +4499,12 @@ int do_redit(Character *ch, char *argument, int cmd)
     send_to_char("Enter the exit's description below. Terminate with "
                  "'~' on a new line.\n\r\n\r",
                  ch);
-    /*        if(world[ch->in_room].dir_option[x]->general_description) {
-          dc_free(world[ch->in_room].dir_option[x]->general_description);
-          world[ch->in_room].dir_option[x]->general_description = 0;
+    /*        if(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description) {
+          dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description);
+          DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
         }
    */
-    ch->desc->strnew = &world[ch->in_room].dir_option[x]->general_description;
+    ch->desc->strnew = &DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
   }
@@ -4536,7 +4536,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       send_to_char("\r\n\r\n", ch);
       return eFAILURE;
     }
-    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (world[ch->in_room].room_flags));
+    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (DC::getInstance()->world[ch->in_room].room_flags));
   }
   break;
 
@@ -4572,7 +4572,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       }
       else if (is_abbrev(remainder_args.c_str(), sector_types[x]))
       {
-        world[ch->in_room].sector_type = x;
+        DC::getInstance()->world[ch->in_room].sector_type = x;
         csendf(ch, "Sector type set to %s.\r\n", sector_types[x]);
         break;
       }
@@ -4596,14 +4596,14 @@ int do_redit(Character *ch, char *argument, int cmd)
       mob = 0;
     }
     struct deny_data *nd, *pd = nullptr;
-    for (nd = world[ch->in_room].denied; nd; nd = nd->next)
+    for (nd = DC::getInstance()->world[ch->in_room].denied; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
       {
         if (pd)
           pd->next = nd->next;
         else
-          world[ch->in_room].denied = nd->next;
+          DC::getInstance()->world[ch->in_room].denied = nd->next;
         dc_free(nd);
         csendf(ch, "Mobile %d ALLOWED entrance.\r\n", mob);
         done = true;
@@ -4618,7 +4618,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 #else
     nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 #endif
-    nd->next = world[ch->in_room].denied;
+    nd->next = DC::getInstance()->world[ch->in_room].denied;
     try
     {
       nd->vnum = stoi(remainder_args);
@@ -4628,7 +4628,7 @@ int do_redit(Character *ch, char *argument, int cmd)
       nd->vnum = 0;
     }
 
-    world[ch->in_room].denied = nd;
+    DC::getInstance()->world[ch->in_room].denied = nd;
     csendf(ch, "Mobile %d DENIED entrance.\r\n", mob);
     break;
   }
@@ -4671,13 +4671,13 @@ int do_rdelete(Character *ch, char *arg, int cmd)
         break;
     }
 
-    if (!(world[ch->in_room].dir_option[x]))
+    if (!(DC::getInstance()->world[ch->in_room].dir_option[x]))
     {
       send_to_char("There is nothing there to remove.\r\n", ch);
       return eFAILURE;
     }
-    dc_free(world[ch->in_room].dir_option[x]);
-    world[ch->in_room].dir_option[x] = 0;
+    dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]);
+    DC::getInstance()->world[ch->in_room].dir_option[x] = 0;
     csendf(ch, "You stretch forth your hands and remove "
                "the %s exit.\r\n",
            dirs[x]);
@@ -4685,7 +4685,7 @@ int do_rdelete(Character *ch, char *arg, int cmd)
 
   else if (is_abbrev(buf, "extra"))
   {
-    for (i = world[ch->in_room].ex_description;; i = i->next)
+    for (i = DC::getInstance()->world[ch->in_room].ex_description;; i = i->next)
     {
       if (i == nullptr)
       {
@@ -4696,15 +4696,15 @@ int do_rdelete(Character *ch, char *arg, int cmd)
         break;
     }
 
-    if (world[ch->in_room].ex_description == i)
+    if (DC::getInstance()->world[ch->in_room].ex_description == i)
     {
-      world[ch->in_room].ex_description = i->next;
+      DC::getInstance()->world[ch->in_room].ex_description = i->next;
       dc_free(i);
       send_to_char("You remove the extra description.\r\n", ch);
     }
     else
     {
-      for (extra = world[ch->in_room].ex_description;; extra = extra->next)
+      for (extra = DC::getInstance()->world[ch->in_room].ex_description;; extra = extra->next)
         if (extra->next == i)
         {
           extra->next = i->next;
@@ -4734,13 +4734,13 @@ int do_rdelete(Character *ch, char *arg, int cmd)
         break;
     }
 
-    if (!(world[ch->in_room].dir_option[x]))
+    if (!(DC::getInstance()->world[ch->in_room].dir_option[x]))
     {
       send_to_char("That exit does not exist...create it first.\r\n", ch);
       return eFAILURE;
     }
 
-    if (!(world[ch->in_room].dir_option[x]->general_description))
+    if (!(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description))
     {
       send_to_char("There's no description there to delete.\r\n", ch);
       return eFAILURE;
@@ -4748,8 +4748,8 @@ int do_rdelete(Character *ch, char *arg, int cmd)
 
     else
     {
-      dc_free(world[ch->in_room].dir_option[x]->general_description);
-      world[ch->in_room].dir_option[x]->general_description = 0;
+      dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description);
+      DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
       send_to_char("Ok.\r\n", ch);
     }
   }
@@ -4793,7 +4793,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  auto zone_key = world[in_room].zone;
+  auto zone_key = DC::getInstance()->world[in_room].zone;
   auto &zones = DC::getInstance()->zones;
   if (zones.contains(zone_key) == false)
   {
@@ -5054,7 +5054,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
     break;
   }
 
-  fprintf(fl, "#%d\n", world[room].zone);
+  fprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
   sprintf(buf, "%s's Area.", ch->name);
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
@@ -5070,22 +5070,22 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
     for (door = 0; door <= 5; door++)
     {
-      if (!(world[room].dir_option[door]))
+      if (!(DC::getInstance()->world[room].dir_option[door]))
         continue;
 
-      if (IS_SET(world[room].dir_option[door]->exit_info, EX_ISDOOR))
+      if (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
       {
-        if ((IS_SET(world[room].dir_option[door]->exit_info, EX_CLOSED)) && (IS_SET(world[room].dir_option[door]->exit_info,
+        if ((IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info,
                                                                                     EX_LOCKED)))
           value = 2;
-        else if (IS_SET(world[room].dir_option[door]->exit_info,
+        else if (IS_SET(DC::getInstance()->world[room].dir_option[door]->exit_info,
                         EX_CLOSED))
           value = 1;
         else
           value = 0;
 
-        fprintf(fl, "D 0 %d %d %d\n", world[room].number,
-                world[world[room].dir_option[door]->to_room].number,
+        fprintf(fl, "D 0 %d %d %d\n", DC::getInstance()->world[room].number,
+                DC::getInstance()->world[DC::getInstance()->world[room].dir_option[door]->to_room].number,
                 value);
       }
     }
@@ -5099,10 +5099,10 @@ int do_instazone(Character *ch, char *arg, int cmd)
     if (room == DC::NOWHERE)
       continue;
 
-    if (world[room].contents)
+    if (DC::getInstance()->world[room].contents)
     {
 
-      for (obj = world[room].contents; obj; obj = obj->next_content)
+      for (obj = DC::getInstance()->world[room].contents; obj; obj = obj->next_content)
       {
 
         count = 0;
@@ -5118,7 +5118,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
         {
           fprintf(fl, "O 0 %d %d %d",
                   obj_index[obj->item_number].virt, count,
-                  world[room].number);
+                  DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
 
@@ -5162,10 +5162,10 @@ int do_instazone(Character *ch, char *arg, int cmd)
     if (room == DC::NOWHERE)
       continue;
 
-    if (world[room].people)
+    if (DC::getInstance()->world[room].people)
     {
 
-      for (mob = world[room].people; mob; mob = mob->next_in_room)
+      for (mob = DC::getInstance()->world[room].people; mob; mob = mob->next_in_room)
       {
         if (IS_PC(mob))
           continue;
@@ -5180,7 +5180,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
         }
 
         fprintf(fl, "M 0 %d %d %d", mob_index[mob->mobdata->nr].virt,
-                count, world[room].number);
+                count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
 
@@ -5314,7 +5314,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   /* no argument */
   if (!*arg1)
   {
-    rm = &world[ch->in_room];
+    rm = &DC::getInstance()->world[ch->in_room];
   }
 
   else
@@ -5325,7 +5325,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
       send_to_char("No such room exists.\r\n", ch);
       return eFAILURE;
     }
-    rm = &world[loc];
+    rm = &DC::getInstance()->world[loc];
   }
   if (IS_SET(rm->room_flags, CLAN_ROOM) && GET_LEVEL(ch) < PATRON)
   {

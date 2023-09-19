@@ -284,7 +284,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* a location has been found. */
-  if (IS_SET(world[location].room_flags, IMP_ONLY) &&
+  if (IS_SET(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
       GET_LEVEL(this) < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
@@ -292,17 +292,17 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
+  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       GET_LEVEL(this) < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return eFAILURE;
   }
 
-  if ((IS_SET(world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
+  if ((IS_SET(DC::getInstance()->world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
   {
 
-    for (i = 0, pers = world[location].people; pers;
+    for (i = 0, pers = DC::getInstance()->world[location].people; pers;
          pers = pers->next_in_room, i++)
       ;
     if (i > 1)
@@ -315,7 +315,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   send("\r\n");
 
   if (!IS_MOB(this))
-    for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
@@ -337,7 +337,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   move_char(this, location);
 
   if (!IS_MOB(this))
-    for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
@@ -524,14 +524,14 @@ int do_at(Character *ch, char *argument, int cmd)
   }
 
   /* a location has been found. */
-  if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+  if (IS_SET(DC::getInstance()->world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     send_to_char("No.\r\n", ch);
     return eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
+  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       GET_LEVEL(ch) < DEITY)
   {
     send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
@@ -543,7 +543,7 @@ int do_at(Character *ch, char *argument, int cmd)
   int retval = command_interpreter(ch, command);
 
   /* check if the guy's still there */
-  for (target_mob = world[location].people; target_mob; target_mob =
+  for (target_mob = DC::getInstance()->world[location].people; target_mob; target_mob =
                                                             target_mob->next_in_room)
     if (ch == target_mob)
     {

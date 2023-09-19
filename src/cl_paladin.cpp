@@ -21,7 +21,7 @@
 #include "returnvals.h"
 #include "interp.h"
 
-extern World world;
+
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the

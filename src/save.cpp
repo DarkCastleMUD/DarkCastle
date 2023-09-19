@@ -50,7 +50,7 @@ extern Database db;
 using namespace std;
 
 extern struct index_data *obj_index;
-extern World world;
+
 
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
@@ -812,8 +812,8 @@ void save_char_obj_db(Character *ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (IS_SET(world[this->in_room].room_flags, SAFE))
-    uchar.load_room = world[this->in_room].number;
+  if (IS_SET(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+    uchar.load_room = DC::getInstance()->world[this->in_room].number;
   else
     uchar.load_room = real_room(GET_HOME(ch));
 
@@ -916,8 +916,8 @@ void save_char_obj(Character *ch)
   }
   else
   {
-    if (IS_SET(world[ch->in_room].room_flags, SAFE))
-      uchar.load_room = world[ch->in_room].number;
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+      uchar.load_room = DC::getInstance()->world[ch->in_room].number;
     else
       uchar.load_room = real_room(GET_HOME(ch));
   }
@@ -1697,7 +1697,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   st->hometown = ch->hometown;
 
   //  gets set outside
-  //  st->load_room = world[ch->in_room].number;
+  //  st->load_room = DC::getInstance()->world[ch->in_room].number;
 
   //  st->gold      = ch->getGold();
   st->gold = 0; // Moved

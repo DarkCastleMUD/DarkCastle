@@ -54,7 +54,7 @@ int do_report(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;

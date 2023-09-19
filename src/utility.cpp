@@ -950,17 +950,17 @@ bool ARE_CLANNED(Character *sub, Character *obj)
 
 int DARK_AMOUNT(int room)
 {
-  int glow = world[room].light;
+  int glow = DC::getInstance()->world[room].light;
 
   // indoors and cities are always lit
-  if (world[room].sector_type == SECT_INSIDE ||
-      world[room].sector_type == SECT_CITY)
+  if (DC::getInstance()->world[room].sector_type == SECT_INSIDE ||
+      DC::getInstance()->world[room].sector_type == SECT_CITY)
     glow += 3;
 
-  if (IS_SET(world[room].room_flags, DARK))
+  if (IS_SET(DC::getInstance()->world[room].room_flags, DARK))
     glow -= 2;
 
-  if (IS_SET(world[room].room_flags, LIGHT_ROOM))
+  if (IS_SET(DC::getInstance()->world[room].room_flags, LIGHT_ROOM))
     glow += 2;
 
   if (weather_info.sunlight == SUN_DARK)
@@ -1092,7 +1092,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   try
   {
-    if (world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
+    if (DC::getInstance()->world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
     {
       return false;
     }
@@ -1233,7 +1233,7 @@ int do_order(Character *ch, char *argument, int cmd)
 
   half_chop(argument, name, message);
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1328,7 +1328,7 @@ int do_idea(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   send_to_char("Ok.  Thanks.\r\n", ch);
@@ -1364,7 +1364,7 @@ int do_typo(Character *ch, char *argument, int cmd)
   }
 
   sprintf(str, "**%s[%d]: %s\n",
-          GET_NAME(ch), world[ch->in_room].number, argument);
+          GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   send_to_char("Ok.  Thanks.\r\n", ch);
@@ -1399,7 +1399,7 @@ int do_bug(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   send_to_char("Ok.\r\n", ch);
@@ -1424,13 +1424,13 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   if (IS_AFFECTED(this, AFF_CHARM))
     return eFAILURE;
 
-  if (IS_SET(world[this->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[this->in_room].room_flags, ARENA))
   {
     send_to_char("TYou can't recall while in the arena.\r\n", this);
     return eFAILURE;
   }
 
-  if (IS_SET(world[this->in_room].room_flags, NO_MAGIC))
+  if (IS_SET(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("You can't use magic here.\r\n", this);
     return eFAILURE;
@@ -1475,7 +1475,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     // Additional 5% chance of failure when recalling across continents
     location = GET_HOME(victim);
-    if (location > 0 && DC::getInstance()->zones.value(world[victim->in_room].zone).continent != DC::getInstance()->zones.value(world[location].zone).continent)
+    if (location > 0 && DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
     {
       percent += 5;
     }
@@ -1520,7 +1520,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-    if (IS_SET(world[location].room_flags, NOHOME))
+    if (IS_SET(DC::getInstance()->world[location].room_flags, NOHOME))
     {
       send_to_char("The gods reset your home.\r\n", victim);
       location = real_room(START_ROOM);
@@ -1529,7 +1529,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     // make sure they arne't recalling into someone's chall
 
-    if (IS_SET(world[location].room_flags, CLAN_ROOM))
+    if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -1559,7 +1559,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((IS_SET(world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if ((IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!.\r\n", victim);
     location = real_room(START_ROOM);
@@ -1577,7 +1577,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     cf = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
 
-    if (DC::getInstance()->zones.value(world[victim->in_room].zone).continent != DC::getInstance()->zones.value(world[location].zone).continent)
+    if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
     {
       // Cross-continent recalling costs twice as much
       cost *= 2;
@@ -1603,7 +1603,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  for (loop_ch = world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
+  for (loop_ch = DC::getInstance()->world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
     if (loop_ch == victim || loop_ch->fighting == victim)
       stop_fighting(loop_ch);
 
@@ -1649,7 +1649,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!IS_SET(world[ch->in_room].room_flags, SAFE) && cmd != 666 && GET_LEVEL(ch) < IMMORTAL)
+  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && GET_LEVEL(ch) < IMMORTAL)
   {
     send_to_char("This room doesn't feel...SAFE enough to do that.\r\n", ch);
     return eFAILURE;
@@ -1672,7 +1672,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       }
     }
 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
     {
       send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
       return eFAILURE;
@@ -1698,19 +1698,19 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (IS_SET(world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
     {
       send_to_char("Something about this room makes it seem like a bad place to quit.\r\n", ch);
       return eFAILURE;
     }
 
-    if (IS_SET(world[ch->in_room].room_flags, ARENA))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
     {
       send_to_char("Don't make me zap you.....\r\n", ch);
       return eFAILURE;
     }
 
-    if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1893,15 +1893,15 @@ int do_home(Character *ch, char *argument, int cmd)
   struct clan_room_data *room;
   int found = 0;
 
-  if (!IS_SET(world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     send_to_char("This place doesn't sit right with you...not enough "
                  "security.\r\n",
                  ch);
     return eFAILURE;
   }
-  if (IS_SET(world[ch->in_room].room_flags, NOHOME))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
   {
     send_to_char("Something prevents it.\r\n", ch);
     return eFAILURE;
@@ -1914,7 +1914,7 @@ int do_home(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
   {
     if (!ch->clan || !(clan = get_clan(ch)))
     {
@@ -1934,7 +1934,7 @@ int do_home(Character *ch, char *argument, int cmd)
   }
 
   send_to_char("You now consider this place to be your home.\r\n", ch);
-  GET_HOME(ch) = world[ch->in_room].number;
+  GET_HOME(ch) = DC::getInstance()->world[ch->in_room].number;
   return eSUCCESS;
 }
 
@@ -2743,7 +2743,7 @@ bool check_make_camp(int room)
   Character *i, *next_i;
   bool campok = false;
 
-  for (i = world[room].people; i; i = next_i)
+  for (i = DC::getInstance()->world[room].people; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -3026,14 +3026,14 @@ bool champion_can_go(int room)
     // Champions can't enter class restricted rooms
     for (int c_class = 1; c_class < CLASS_MAX; c_class++)
     {
-      if (world[room].allow_class[c_class] == true)
+      if (DC::getInstance()->world[room].allow_class[c_class] == true)
       {
         return false;
       }
     }
 
     // Champions can't enter clan rooms
-    if (IS_SET(world[room].room_flags, CLAN_ROOM))
+    if (IS_SET(DC::getInstance()->world[room].room_flags, CLAN_ROOM))
     {
       return false;
     }
@@ -3115,7 +3115,7 @@ bool class_can_go(int ch_class, int room)
     // Determine if any class restrictions are in place
     for (int c_class = 1; c_class < CLASS_MAX; c_class++)
     {
-      if (world[room].allow_class[c_class] == true)
+      if (DC::getInstance()->world[room].allow_class[c_class] == true)
       {
         classRestrictions = true;
       }
@@ -3123,7 +3123,7 @@ bool class_can_go(int ch_class, int room)
 
     if (classRestrictions)
     {
-      if (world[room].allow_class[ch_class] != true)
+      if (DC::getInstance()->world[room].allow_class[ch_class] != true)
       {
         return false;
       }

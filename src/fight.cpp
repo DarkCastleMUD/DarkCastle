@@ -63,7 +63,7 @@
 #define MAX_CHAMP_DEATH_MESSAGE 14
 
 extern int top_of_world;
-extern World world;
+
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 
@@ -114,7 +114,7 @@ bool someone_fighting(Character *ch)
   Character *vict;
   if (ch->fighting && ch->fighting->fighting == ch)
     return true;
-  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
   {
     if (vict->fighting == ch)
       return true;
@@ -130,11 +130,11 @@ int check_autojoiners(Character *ch, int skill = 0)
     return eFAILURE;
   if (ch->player && ch->player->unjoinable == true)
     return eFAILURE;
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
 
   Character *tmp;
-  for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
   {
     if (tmp == ch || tmp == ch->fighting)
       continue;
@@ -1729,7 +1729,7 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
 
     if (pos == WEAR_LIGHT)
     {
-      world[ch->in_room].light--;
+      DC::getInstance()->world[ch->in_room].light--;
       ch->glow_factor--;
     }
     else if ((pos == WIELD) && (ch->equipment[SECOND_WIELD]))
@@ -1778,7 +1778,7 @@ void eq_damage(Character *ch, Character *victim,
   class Object *obj;
   int pos;
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
     return;
   if (IS_PC(victim) && IS_PC(ch)) // Don't damage eq on pc->pc fights
     return;
@@ -2985,7 +2985,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
 
   if (to == TO_ROOM)
   {
-    for (tmpch = world[ch->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+    for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch; tmpch = tmpch->next_in_room)
     {
       if (tmpch == ch || tmpch == victim)
         continue;
@@ -4177,7 +4177,7 @@ void stop_fighting(Character *ch, int clearlag)
   if (IS_SET(ch->combat, COMBAT_BERSERK))
   {
     bool keepZerk = false;
-    for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+    for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
       if (tmp->fighting == ch)
         keepZerk = true;
     if (!keepZerk)
@@ -5035,7 +5035,7 @@ void death_cry(Character *ch)
   {
     if (CAN_GO(ch, door))
     {
-      ch->in_room = world[was_in].dir_option[door]->to_room;
+      ch->in_room = DC::getInstance()->world[was_in].dir_option[door]->to_room;
       if (ch->in_room == was_in)
         continue;
       act(message, ch, 0, 0, TO_ROOM, 0);
@@ -5372,7 +5372,7 @@ void raw_kill(Character *ch, Character *victim)
     return;
   }
 
-  if (IS_SET(world[victim->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
   {
     fight_kill(ch, victim, TYPE_ARENA_KILL, 0);
     return;
@@ -5390,7 +5390,7 @@ void raw_kill(Character *ch, Character *victim)
   }
 
   // register my death with this zone's counter
-  DC::incrementZoneDiedTick(world[victim->in_room].zone);
+  DC::incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
 
   GET_POS(victim) = POSITION_STANDING;
   int retval = mprog_death_trigger(victim, ch);
@@ -5546,7 +5546,7 @@ void raw_kill(Character *ch, Character *victim)
     // notify the clan members - clan_death checks for null ch/vict
     clan_death(victim, ch);
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s at %d", buf, world[death_room].number);
+    sprintf(log_buf, "%s at %d", buf, DC::getInstance()->world[death_room].number);
     logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
 
     // update stats
@@ -5878,7 +5878,7 @@ void group_gain(Character *ch, Character *victim)
     // this loops the followers (cut and pasted above)
     tmp_ch = loop_followers(&f);
   } while (tmp_ch);
-  getAreaData(world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, victim->getGold());
+  getAreaData(DC::getInstance()->world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, victim->getGold());
 }
 
 /* find the highest level present at the kill */
@@ -6746,7 +6746,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     }
     if (IS_NPC(ch) && ch->master)
     {
-      if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || IS_SET(world[ch->master->in_room].room_flags, CLAN_ROOM))
+      if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || IS_SET(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
         sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\n\r", GET_NAME(ch->master), GET_NAME(victim));
@@ -6872,7 +6872,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     for (const auto &tmp : character_list)
     {
 
-      if (IS_SET(world[tmp->in_room].room_flags, ARENA))
+      if (IS_SET(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
         if (victim->clan == tmp->clan && victim != tmp && GET_LEVEL(tmp) < IMMORTAL)
           eliminated = 0;
     }
@@ -6914,14 +6914,14 @@ int is_stunned(Character *ch)
 int can_attack(Character *ch)
 {
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
   {
     send_to_char("Wait until it closes!\n\r", ch);
     return false;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
     return false;
@@ -6957,7 +6957,7 @@ int can_be_attacked(Character *ch, Character *vict)
     }
 
   // Prize Arena
-  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict))
   {
 
     if (ch->fighting && ch->fighting != vict)
@@ -6977,7 +6977,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Clan Chaos Arena
-  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict))
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
@@ -7005,7 +7005,7 @@ int can_be_attacked(Character *ch, Character *vict)
         vict->master &&
         vict->fighting != ch &&
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
-        IS_SET(world[vict->in_room].room_flags, SAFE))
+        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
     {
       send_to_char("No fighting permitted in a safe room.\r\n", ch);
       return false;
@@ -7045,7 +7045,7 @@ int can_be_attacked(Character *ch, Character *vict)
     }
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     /* Allow the NPCs to continue fighting */
     if (IS_NPC(ch))
@@ -7492,7 +7492,7 @@ int do_flee(Character *ch, char *argument, int cmd)
 
     // keep mobs from fleeing into a no_track room
     if (CAN_GO(ch, attempt))
-      if (IS_PC(ch) || !IS_SET(world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
+      if (IS_PC(ch) || !IS_SET(DC::getInstance()->world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
         if (!escape)
         {

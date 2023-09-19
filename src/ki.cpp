@@ -33,7 +33,7 @@ extern "C"
 
 using namespace std;
 
-extern World world;
+
 
 extern int hit_gain(Character *, int);
 
@@ -126,7 +126,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
   /*
-   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
+   if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
    return eFAILURE;
@@ -152,7 +152,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                  "the universe.\r\n",
@@ -291,7 +291,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       }
 
     /* crasher right here */
-    if (IS_SET(world[ch->in_room].room_flags, NO_KI))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
     {
       send_to_char(
           "You find yourself unable to focus your energy here.\r\n",
@@ -318,7 +318,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     {
       if (!skill_success(ch, tar_char,
                          spl + KI_OFFSET) &&
-          !IS_SET(world[ch->in_room].room_flags, SAFE))
+          !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl) / 2;
@@ -344,7 +344,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Imps ignore safe flags  */
       if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_SET(world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+        if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
         {
           send_to_char(
               "There is no safe haven from an angry IMPLEMENTER!\n\r",
@@ -398,7 +398,7 @@ int ki_gain(Character *ch)
 
   gain += age(ch).year / 25;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
@@ -458,8 +458,8 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   }
 
   if (CAN_GO(vict, exit) &&
-      !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-      !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
+      !IS_SET(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
+      !IS_SET(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)) &&
       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
   {
@@ -478,13 +478,13 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
         remove_memory(vict, 'f');
       }
       Character *tmp;
-      for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+      for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
         if (tmp->fighting == vict)
           stop_fighting(tmp);
       stop_fighting(vict);
     }
 
-    move_char(vict, (world[(ch)->in_room].dir_option[exit])->to_room);
+    move_char(vict, (DC::getInstance()->world[(ch)->in_room].dir_option[exit])->to_room);
     GET_POS(vict) = POSITION_SITTING;
     SET_BIT(vict->combat, COMBAT_BASH2);
     return eSUCCESS;
@@ -581,7 +581,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
   //  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
   //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
   int32_t room = ch->in_room;
-  for (tmp_victim = world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
@@ -593,7 +593,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
         return retval;
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else
-    //		if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+    //		if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
     //	send_to_char("A crackle of energy echos past you.\r\n", tmp_victim);
   }
   int dir = number(0, 5), distance = number(1, 3), i;
@@ -605,7 +605,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
       room = EXIT_TO(room, dir);
       if (room < 0)
         break;
-      for (tmp_victim = world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
+      for (tmp_victim = DC::getInstance()->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
         send_to_char("A crackle of energy echoes past you.\r\n", tmp_victim);
     }
   if (number(1, 4) == 4 && !ch->fighting)
@@ -1184,7 +1184,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
     send_to_char("You instruct your party on more graceful movement.\r\n", ch);
     act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
 
-    for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;

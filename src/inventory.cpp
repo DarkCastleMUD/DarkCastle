@@ -33,7 +33,7 @@
 
 /* extern variables */
 
-extern World world;
+
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
@@ -217,20 +217,20 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
     bool tax = false;
 
-    if (DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                     DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner)
+    if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
+                                                                                     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      DC::getInstance()->zones.value(world[ch->in_room].zone).addGold(cgold);
+      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
-        DC::getInstance()->zones.value(world[ch->in_room].zone).addGold(cgold);
+        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       }
       else
-        csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner)->name, cgold,
+        csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
                obj_object->obj_flags.value[0]);
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
@@ -415,7 +415,7 @@ int do_get(Character *ch, char *argument, int cmd)
     sub_object = 0;
     found = false;
     fail = false;
-    for (obj_object = world[ch->in_room].contents;
+    for (obj_object = DC::getInstance()->world[ch->in_room].contents;
          obj_object;
          obj_object = next_obj)
     {
@@ -539,7 +539,7 @@ int do_get(Character *ch, char *argument, int cmd)
     found = false;
     fail = false;
     obj_object = get_obj_in_list_vis(ch, arg1,
-                                     world[ch->in_room].contents);
+                                     DC::getInstance()->world[ch->in_room].contents);
     if (obj_object)
     {
       if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
@@ -637,7 +637,7 @@ int do_get(Character *ch, char *argument, int cmd)
     found = false;
     fail = false;
     sub_object = get_obj_in_list_vis(ch, arg2,
-                                     world[ch->in_room].contents);
+                                     DC::getInstance()->world[ch->in_room].contents);
     if (!sub_object)
     {
       sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -813,7 +813,7 @@ int do_get(Character *ch, char *argument, int cmd)
     found = false;
     fail = false;
     sub_object = get_obj_in_list_vis(ch, arg2,
-                                     world[ch->in_room].contents);
+                                     DC::getInstance()->world[ch->in_room].contents);
     if (!sub_object)
     {
       if (cmd == CMD_LOOT)
@@ -836,7 +836,7 @@ int do_get(Character *ch, char *argument, int cmd)
 
         if ((cmd != CMD_LOOT && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name))) || isname(buffer, sub_object->name))
           has_consent = true;
-        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
           has_consent = true;
         if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
         {
@@ -1114,7 +1114,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   alldot[0] = '\0';
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1362,7 +1362,7 @@ int do_put(Character *ch, char *argument, int cmd)
   int bits;
   char allbuf[MAX_STRING_LENGTH];
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1374,7 +1374,7 @@ int do_put(Character *ch, char *argument, int cmd)
   {
     if (*arg2)
     {
-      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents)))
+      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, DC::getInstance()->world[ch->in_room].contents)))
       {
         sprintf(buffer, "You don't have a %s.\r\n", arg2);
         send_to_char(buffer, ch);
@@ -1611,7 +1611,7 @@ int do_give(Character *ch, char *argument, int cmd)
   Character *vict;
   class Object *obj;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
@@ -1873,7 +1873,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+          IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
           arena.type == POTATO)
       {
         ;
@@ -1896,7 +1896,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+          IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
           arena.type == POTATO)
       {
         ;
@@ -1941,7 +1941,7 @@ int do_give(Character *ch, char *argument, int cmd)
          obj_index[loop_obj->item_number].virt);
 
   if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL &&
-      IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
+      IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
   {
     send_to_char("Here, have some for some potato lag!!\r\n", vict);
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
@@ -2208,7 +2208,7 @@ bool is_bracing(Character *bracee, struct room_direction_data *exit)
     return false;
 
   for (int i = 0; i < 6; i++)
-    if (world[bracee->in_room].dir_option[i] == exit)
+    if (DC::getInstance()->world[bracee->in_room].dir_option[i] == exit)
       return true;
 
   if (bracee->in_room == exit->to_room)
@@ -2308,11 +2308,11 @@ int do_open(Character *ch, char *argument, int cmd)
 
       /* now for opening the OTHER side of the door! */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED);
-            if ((back->keyword) && !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+            if ((back->keyword) && !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s is opened from the other side.\r\n",
                       fname(back->keyword));
@@ -2323,17 +2323,17 @@ int do_open(Character *ch, char *argument, int cmd)
                            EXIT(ch, door)->to_room, true);
           }
 
-      if ((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
-          (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
-          (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
-          (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
-          (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
-          (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
+      if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
+          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
+          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
+          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
+          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
+          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
       {
         int success = 0;
 
         // opened the door that kept them from falling out
-        for (victim = world[ch->in_room].people; victim; victim = next_vict)
+        for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
         {
           next_vict = victim->next_in_room;
           if (IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))
@@ -2417,12 +2417,12 @@ int do_close(Character *ch, char *argument, int cmd)
       send_to_char("Ok.\r\n", ch);
       /* now for closing the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             SET_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) &&
-                !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s closes quietly.\r\n",
                       fname(back->keyword));
@@ -2555,7 +2555,7 @@ int do_lock(Character *ch, char *argument, int cmd)
       send_to_char("*Click*\r\n", ch);
       /* now for locking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             SET_BIT(back->exit_info, EX_LOCKED);
     }
@@ -2629,7 +2629,7 @@ int do_unlock(Character *ch, char *argument, int cmd)
       send_to_char("*click*\r\n", ch);
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             REMOVE_BIT(back->exit_info, EX_LOCKED);
     }
@@ -2772,14 +2772,14 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     sprintf(buffer, "There was %d coins.\r\n",
             obj_object->obj_flags.value[0]);
     send_to_char(buffer, ch);
-    if (DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                     DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner)
+    if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
+                                                                                     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(world[ch->in_room].zone).clanowner)->name, cgold,
+      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
              obj_object->obj_flags.value[0]);
-      DC::getInstance()->zones.value(world[ch->in_room].zone).addGold(cgold);
+      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
     }
 
     ch->addGold(obj_object->obj_flags.value[0]);

@@ -1265,12 +1265,12 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     return;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     return;
   }

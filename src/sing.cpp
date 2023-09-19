@@ -34,7 +34,7 @@ extern "C"
 #include "inventory.h"
 #include "handler.h"
 
-extern World world;
+
 extern index_data *mob_index;
 Character *origsing = nullptr;
 
@@ -379,7 +379,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-	if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
+	if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
 	{
 		send_to_char("This room feels too safe to sing an offensive song such as this.\r\n", ch);
 		return eFAILURE;
@@ -459,7 +459,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_ROOM))
 				{
-					tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+					tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
 					if (tar_obj != nullptr)
 						target_ok = true;
 				}
@@ -564,7 +564,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				return eFAILURE | eINTERNAL_ERROR;
 			}
 
-		if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && IS_SET(world[ch->in_room].room_flags, NO_KI))
+		if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
 		{
 			send_to_char("You find yourself unable to use energy based chants here.\r\n", ch);
 			return eFAILURE;
@@ -602,7 +602,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 			}
 
-			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !IS_SET(world[ch->in_room].room_flags, SAFE))
+			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
 			{
 
 				send_to_char("You forgot the words!\n\r", ch);
@@ -620,7 +620,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 			/* Imps ignore safe flags  */
 			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (IS_SET(world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+				if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
 				{
 					send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", tar_char);
 				}
@@ -755,7 +755,7 @@ void update_bard_singing()
 			send_to_char("Your singing ruins your hiding place.\r\n", i);
 		}
 		if (GET_LEVEL(i) < IMPLEMENTER
-				&& ((IS_SET(world[i->in_room].room_flags, NO_KI) || IS_SET(world[i->in_room].room_flags, SAFE))
+				&& ((IS_SET(DC::getInstance()->world[i->in_room].room_flags, NO_KI) || IS_SET(DC::getInstance()->world[i->in_room].room_flags, SAFE))
 						&& ((*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE
@@ -1131,7 +1131,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 	}
 	GET_KI(ch) -= 2;
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -1220,7 +1220,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 		if ((*k).song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE)
 			break;
 	}
-	for (i = world[ch->in_room].people; i; i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 	{
 		if (!ISSET(i->affected_by, AFF_HIDE) && !ISSET(i->affected_by, AFF_FOREST_MELD))
 			continue;
@@ -1245,8 +1245,8 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 		{
 			if (CAN_GO(ch, j))
 			{
-				room = &world[world[ch->in_room].dir_option[j]->to_room];
-				if (room == &world[ch->in_room] || IS_SET(room->room_flags, SAFE))
+				room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[j]->to_room];
+				if (room == &DC::getInstance()->world[ch->in_room] || IS_SET(room->room_flags, SAFE))
 					continue;
 				for (i = room->people; i; i = i->next_in_room)
 				{
@@ -1318,7 +1318,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 
 	obj = get_obj_in_list((*i).song_data, ch->carrying);
 	vict = get_char_room_vis(ch, (*i).song_data);
-	corpse = get_obj_in_list_vis(ch, (*i).song_data, world[ch->in_room].contents);
+	corpse = get_obj_in_list_vis(ch, (*i).song_data, DC::getInstance()->world[ch->in_room].contents);
 	if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
 		corpse = nullptr;
 
@@ -1475,7 +1475,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 	int combat, non_combat;
 	get_instrument_bonus(ch, combat, non_combat);
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -1571,7 +1571,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 	af.bitvector = -1;
 	af.caster = GET_NAME(ch);
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -1701,9 +1701,9 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	if (IS_SET(world[target->in_room].room_flags, PRIVATE) ||
-		IS_SET(world[target->in_room].room_flags, IMP_ONLY) ||
-		IS_SET(world[target->in_room].room_flags, NO_PORTAL))
+	if (IS_SET(DC::getInstance()->world[target->in_room].room_flags, PRIVATE) ||
+		IS_SET(DC::getInstance()->world[target->in_room].room_flags, IMP_ONLY) ||
+		IS_SET(DC::getInstance()->world[target->in_room].room_flags, NO_PORTAL))
 	{
 		send_to_char("Your astral travels fail to find your destination.\r\n", victim);
 		return;
@@ -1729,7 +1729,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	Character *tmpch;
 
-	for (tmpch = world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+	for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
 		{
 			send_to_char("Your astral travels fail to find your destination.\r\n", victim);
@@ -1774,9 +1774,9 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		send_to_char("Your target resists the song's draw.\r\n", ch);
 		status = eFAILURE;
 	}
-	else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
-			 DC::getInstance()->zones.value(world[victim->in_room].zone).isNoTeleport() ||
-			 IS_SET(world[victim->in_room].room_flags, ARENA))
+	else if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
+			 DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport() ||
+			 IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
 	{
 		send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
 		status = eFAILURE;
@@ -1786,7 +1786,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 
 		Character *tmpch;
 
-		for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+		for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 			if (search_char_for_item(tmpch, real_object(51), false))
 			{
 				send_to_char("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R\r\n", ch);
@@ -1797,7 +1797,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		if (status != eFAILURE)
 		{
 			// Additional costs for astral chanty across continents
-			if (DC::getInstance()->zones.value(world[ch->in_room].zone).continent != DC::getInstance()->zones.value(world[victim->in_room].zone).continent)
+			if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent)
 			{
 				if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
 				{
@@ -1821,7 +1821,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 			}
 
 			Character *next_char = 0;
-			for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_char)
+			for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_char)
 			{
 				next_char = tmp_char->next_in_room;
 				if (!ARE_GROUPED(ch, tmp_char))
@@ -1958,7 +1958,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 			break;
 	}
 
-	if (!(obj = get_obj_in_list((*i).song_data, world[ch->in_room].contents)))
+	if (!(obj = get_obj_in_list((*i).song_data, DC::getInstance()->world[ch->in_room].contents)))
 	{
 		send_to_char("You don't see that object here.\r\n", ch);
 		dc_free((*i).song_data);
@@ -2017,7 +2017,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	obj_from_room(obj);
 
 	// find it's match
-	if (!(tobj = get_obj_in_list("pcportal", world[real_room(obj->obj_flags.value[0])].contents)))
+	if (!(tobj = get_obj_in_list("pcportal", DC::getInstance()->world[real_room(obj->obj_flags.value[0])].contents)))
 	{
 		send_to_char("Could not find matching exit portal? Tell an Immortal.\r\n", ch);
 		return eFAILURE;
@@ -2059,7 +2059,7 @@ int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character
 	act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
 	send_to_char("Your singing drives everyone around you INSANE!!!\r\n", ch);
 
-	for (victim = world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
+	for (victim = DC::getInstance()->world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
 	{
 		// don't effect gods unless it was a higher level god singing
 		if (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
@@ -2110,7 +2110,7 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
 	af.caster = GET_NAME(ch);
 	af.bitvector = AFF_FLYING;
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -2177,7 +2177,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 		send_to_char("Your song fades away, its search unfinished.\r\n", ch);
 		return eFAILURE;
 	}
-	if (affected_by_spell(target, SKILL_INNATE_EVASION) || IS_SET(world[target->in_room].room_flags, NO_KI))
+	if (affected_by_spell(target, SKILL_INNATE_EVASION) || IS_SET(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
 	{
 		send_to_char("Something blocks your vision.\r\n", ch);
 		return eFAILURE;
@@ -2216,7 +2216,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 	if (affected_by_spell(target, SPELL_DETECT_MAGIC) && affected_by_spell(target, SPELL_DETECT_MAGIC)->modifier > 80)
 		send_to_char("You sense you are the target of scrying.\r\n", target);
 
-	sprintf(buf, "%s%s.\r\n", buf, world[target->in_room].name);
+	sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
 	send_to_char(buf, ch);
 	return eSUCCESS;
 }
@@ -2330,7 +2330,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 	af.caster = GET_NAME(ch);
 	af.bitvector = AFF_HASTE;
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -2402,7 +2402,7 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
 	af3.bitvector = AFF_NO_PARA;
 	af3.caster = GET_NAME(ch);
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -2461,7 +2461,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 	else
 		af.bitvector = -1;
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -2667,7 +2667,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
 	act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
 	send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
 
-	for (victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
+	for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
 	{
 		// don't effect gods unless it was a higher level god singing
 		if (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
@@ -2695,7 +2695,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
 	}
 
 	Object *item;
-	for (item = world[ch->in_room].contents; item; item = item->next_content)
+	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
 	{
 		if (GET_ITEM_TYPE(item) == ITEM_BEACON && IS_SET(item->obj_flags.extra_flags, ITEM_INVISIBLE))
 		{
@@ -3101,7 +3101,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 	af3.bitvector = AFF_NO_BEHEAD;
 	af3.caster = GET_NAME(ch);
 
-	for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+	for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
 	{
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
@@ -3229,7 +3229,7 @@ int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Cha
 	//   int specialization = skill / 100;
 	skill %= 100;
 
-	for (i = world[ch->in_room].people; i; i = i->next_in_room)
+	for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 	{
 		if (number(1, 100) < get_saves(i, SAVE_TYPE_MAGIC))
 		{

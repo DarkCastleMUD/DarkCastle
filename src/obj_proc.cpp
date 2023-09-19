@@ -39,7 +39,7 @@
 
 #define EMOTING_FILE "emoting-objects.txt"
 
-extern World world;
+
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
@@ -219,11 +219,11 @@ int emoting_object(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     return eFAILURE;
   }
-  if (!world[obj->in_room].people)
+  if (!DC::getInstance()->world[obj->in_room].people)
   {
     return eFAILURE;
   }
-  ch = world[obj->in_room].people;
+  ch = DC::getInstance()->world[obj->in_room].people;
   for (index_cursor = &obj_emote_head; index_cursor; index_cursor = index_cursor->next)
   {
     if (real_room(index_cursor->room_number) == obj->in_room)
@@ -403,7 +403,7 @@ int dawnsword(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     send_to_char("Dawn needs more time to recharge and is not ready to hear your prayer yet.", ch);
     return eSUCCESS;
   }
-  if (!ch->in_room || IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+  if (!ch->in_room || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("Something about this room blocks your command.\r\n", ch);
     return eSUCCESS;
@@ -413,7 +413,7 @@ int dawnsword(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   send_to_char("You whisper a prayer to Dawn and it responds in a brilliant flash of light!\r\n", ch);
   Character *v;
   struct affected_type af;
-  for (v = world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
     if (v == ch)
       continue;
@@ -446,7 +446,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     return eFAILURE;
   ch = obj->equipped_by;
   char buf[MAX_STRING_LENGTH];
-  if ((IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, NO_MAGIC) || IS_SET(world[ch->in_room].room_flags, QUIET)))
+  if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET)))
     return eFAILURE;
 
   obj->obj_flags.timer--;
@@ -455,7 +455,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   obj->obj_flags.timer = 5;
 
   int heal;
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -532,7 +532,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
     return eSUCCESS;
   }
 
-  if (!ch->in_room || IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (!ch->in_room || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("Something about this room blocks your command.\r\n", ch);
     return eSUCCESS;
@@ -1287,7 +1287,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eSUCCESS;
-  if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("That action is impossible to perform in these restrictive confinements.\r\n", ch);
     return eSUCCESS;
@@ -1511,7 +1511,7 @@ int dancevest(Character *ch, class Object *obj, int cmd, const char *arg,
       };
   Character *v;
   send_to_char("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!\r\n", ch);
-  for (v = world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
     if (GET_POS(v) != POSITION_STANDING)
     {
@@ -1562,7 +1562,7 @@ int durendal(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("Your soul is impure. Durendel ignores your contrition.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("Something about this room prohibits your prayer from being heard.\r\n", ch);
     return eSUCCESS;
@@ -1570,7 +1570,7 @@ int durendal(Character *ch, class Object *obj, int cmd, const char *arg,
   send_to_char("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!\r\n", ch);
   act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
   Character *v, *vn;
-  for (v = world[ch->in_room].people; v; v = vn)
+  for (v = DC::getInstance()->world[ch->in_room].people; v; v = vn)
   {
     vn = v->next_in_room;
     if (GET_ALIGNMENT(v) > -350 || ARE_GROUPED(ch, v))
@@ -1842,7 +1842,7 @@ int stupid_message(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!obj || obj->in_room < 0)
     return eFAILURE;
 
-  if (!DC::getInstance()->zones.value(world[obj->in_room].zone).players)
+  if (!DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players)
     return eFAILURE;
 
   if (number(1, 10) == 1)
@@ -1869,7 +1869,7 @@ int pagoda_balance(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
-    for (vict = world[real_room(i)].people; vict; vict = vict->next_in_room)
+    for (vict = DC::getInstance()->world[real_room(i)].people; vict; vict = vict->next_in_room)
       if (IS_NPC(vict))
         found = 0;
       else
@@ -1891,7 +1891,7 @@ int pagoda_balance(Character *ch, class Object *obj, int cmd, const char *arg,
                  "You hear the poping of a magical barrier dissapating.\r\n\r\n",
                  real_room(j));
 
-  REMOVE_BIT(world[real_room(8699)].room_flags, IMP_ONLY);
+  REMOVE_BIT(DC::getInstance()->world[real_room(8699)].room_flags, IMP_ONLY);
   return eFAILURE;
 }
 
@@ -1902,10 +1902,10 @@ int pagoda_shield_restorer(Character *ch, class Object *obj, int cmd, const char
   if (!cmd)
     return eFAILURE; // only restore if a player is in the room
 
-  if (!IS_SET(world[obj->in_room].room_flags, IMP_ONLY))
+  if (!IS_SET(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY))
   {
     send_to_room("You hear the 'pop' of a magical barrier springing up.\r\n\r\n", obj->in_room);
-    SET_BIT(world[obj->in_room].room_flags, IMP_ONLY);
+    SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY);
   }
 
   return eFAILURE;
@@ -1952,7 +1952,7 @@ int generic_push_proc(Character *ch, class Object *obj, int cmd, const char *arg
   {
   case 26723: // transporter in star-trek
     send_to_room("You hear a chiming electrical noise as the transporter hums to life.\r\n", obj->in_room);
-    for (victim = world[obj->in_room].people; victim; victim = next_vict)
+    for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       send_to_char("Your body is pulled apart and reassembled elsewhere!\r\n", victim);
@@ -2213,7 +2213,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("The box doesn't respond.\r\n", ch);
     return eSUCCESS;
@@ -2374,8 +2374,8 @@ int pull_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   {
   case 9529: // DK lever in captain's room
     // unlock the gate
-    REMOVE_BIT(world[9531].dir_option[1]->exit_info, EX_LOCKED);
-    REMOVE_BIT(world[9532].dir_option[3]->exit_info, EX_LOCKED);
+    REMOVE_BIT(DC::getInstance()->world[9531].dir_option[1]->exit_info, EX_LOCKED);
+    REMOVE_BIT(DC::getInstance()->world[9532].dir_option[3]->exit_info, EX_LOCKED);
     send_to_room("You hear a large clicking noise.\r\n", 9531, true);
     send_to_room("You hear a large clicking noise.\r\n", 9532, true);
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
@@ -2431,7 +2431,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     }
     if (first && real_room(30000) != DC::NOWHERE)
     {
-      int zone = world[real_room(30000)].zone;
+      int zone = DC::getInstance()->world[real_room(30000)].zone;
       const auto &character_list = DC::getInstance()->character_list;
       for (const auto &tmp_victim : character_list)
       {
@@ -2445,7 +2445,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
         {
           continue;
         }
-        if (world[tmp_victim->in_room].zone == zone)
+        if (DC::getInstance()->world[tmp_victim->in_room].zone == zone)
         {
           if (IS_NPC(tmp_victim))
           {
@@ -2465,7 +2465,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
         }
       }
 
-      DC::resetZone(world[real_room(30000)].zone);
+      DC::resetZone(DC::getInstance()->world[real_room(30000)].zone);
     }
   }
 
@@ -2495,7 +2495,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
           send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
           extract_obj(p); // extract handles all variations of obj_from_char etc
 
-          if (IS_PC(v) && v->in_room && real_room(30000) > 0 && world[v->in_room].zone == world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
+          if (IS_PC(v) && v->in_room && real_room(30000) > 0 && DC::getInstance()->world[v->in_room].zone == DC::getInstance()->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
           {
             if (GET_LEVEL(v) >= IMMORTAL)
             {
@@ -2547,7 +2547,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, int cmd, const char *
       continue;
     if (!i->in_room)
       continue;
-    if (real_room(30000) > 0 && world[i->in_room].zone != world[real_room(30000)].zone)
+    if (real_room(30000) > 0 && DC::getInstance()->world[i->in_room].zone != DC::getInstance()->world[real_room(30000)].zone)
       continue;
     if (GET_LEVEL(i) >= 100)
       continue;
@@ -2628,10 +2628,10 @@ int moving_portals(Character *ch, class Object *obj, int cmd,
       if (real_room(room) == DC::NOWHERE)
         continue;
       if (sector)
-        if (world[real_room(room)].sector_type != sector)
+        if (DC::getInstance()->world[real_room(room)].sector_type != sector)
           continue;
       class Object *o;
-      for (o = world[real_room(room)].contents; o; o = o->next_content)
+      for (o = DC::getInstance()->world[real_room(room)].contents; o; o = o->next_content)
       {
         if (o->isPortal())
         {
@@ -2667,7 +2667,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
   if (obj->in_room < 0)
     return eFAILURE;
 
-  Character *vict = world[obj->in_room].people;
+  Character *vict = DC::getInstance()->world[obj->in_room].people;
 
   for (; vict; vict = vict->next_in_room)
   {
@@ -2679,15 +2679,15 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
 
   if (vict)
   {
-    if (!IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
+    if (!IS_SET(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\r\n", obj->in_room);
-    SET_BIT(world[obj->in_room].room_flags, NO_MAGIC);
+    SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
   else
   {
-    if (IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
+    if (IS_SET(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
-    REMOVE_BIT(world[obj->in_room].room_flags, NO_MAGIC);
+    REMOVE_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
   return eSUCCESS;
 }
@@ -2869,7 +2869,7 @@ int mob_summoner(Character *ch, class Object *obj, int cmd, const char *arg, Cha
     return eFAILURE; // someone loaded me
 
   // see if we have any players in room
-  for (vict = world[obj->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = DC::getInstance()->world[obj->in_room].people; vict; vict = vict->next_in_room)
     if (IS_PC(vict))
       break;
 
@@ -2894,7 +2894,7 @@ int mob_summoner(Character *ch, class Object *obj, int cmd, const char *arg, Cha
       send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\r\n", BONEWRACK_ROOM, true);
       break;
     case 1:
-      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", world[obj->in_room].zone);
+      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", DC::getInstance()->world[obj->in_room].zone);
       break;
     case 2:
       send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM, true);
@@ -2953,7 +2953,7 @@ int globe_of_darkness_proc(Character *ch, class Object *obj, int cmd, const char
   if (obj->obj_flags.value[0] < 1)
   {
     // time to kill myself
-    world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
+    DC::getInstance()->world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
     send_to_room("The globe of darkness fades brightening the room some.\r\n", obj->in_room, true);
     extract_obj(obj);
   }
@@ -3674,14 +3674,14 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
         buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
         tmp.push_back(buf);
       }
-      if (IS_SET(world[vict->in_room].room_flags, SAFE))
+      if (IS_SET(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
       {
         buf = "Oh... I suppose we're just going to sit here and gossip for the next few hours, huh?";
         tmp.push_back(buf);
         buf = "While we're here, why don't we just talk about how badass we are on gossip....";
         tmp.push_back(buf);
       }
-      switch (world[vict->in_room].sector_type)
+      switch (DC::getInstance()->world[vict->in_room].sector_type)
       {
       case SECT_UNDERWATER:
         buf = "Aww man, I hate being under water. I'll rust!";
@@ -3773,7 +3773,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
     {
       send_to_char("Wait until the potato arena is open before you try blowing yourself up!\n\r", vict);
       return eSUCCESS;
@@ -3832,7 +3832,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL)
+        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL)
     {
       send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
       return eSUCCESS;
@@ -3902,7 +3902,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                  "You have been KILLED!\n\r",
                  vict);
     extract_obj(obj);
-    if (!IS_SET(world[vict->in_room].room_flags, ARENA))
+    if (!IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA))
       fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
     else if (arena.type == POTATO)
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
@@ -3938,10 +3938,10 @@ int exploding_mortar_shells(Character *ch, class Object *obj, int cmd, const cha
   send_to_room("The mortar shell explodes ripping the area to shreds!\r\n", obj->in_room);
 
   for (int i = 0; i < 6; i++)
-    if (world[obj->in_room].dir_option[i] && world[obj->in_room].dir_option[i]->to_room)
-      send_to_room("You hear a loud boom.\r\n", world[obj->in_room].dir_option[i]->to_room);
+    if (DC::getInstance()->world[obj->in_room].dir_option[i] && DC::getInstance()->world[obj->in_room].dir_option[i]->to_room)
+      send_to_room("You hear a loud boom.\r\n", DC::getInstance()->world[obj->in_room].dir_option[i]->to_room);
 
-  for (victim = world[obj->in_room].people; victim; victim = next_v)
+  for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_v)
   {
     next_v = victim->next_in_room;
     if (IS_NPC(victim)) // only hurts players
@@ -4114,7 +4114,7 @@ int godload_wailka(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (str_cmp(arg1, "suloaki"))
     return eFAILURE;
-  if (isTimer(ch, SPELL_PARALYZE) || IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (isTimer(ch, SPELL_PARALYZE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("The ring hums, but nothing happens.\r\n", ch);
     return eSUCCESS;
@@ -4340,15 +4340,15 @@ int angie_proc(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
   if (str_cmp(arg1, "door"))
     return eFAILURE;
-  if (!IS_SET(world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
+  if (!IS_SET(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
     return eFAILURE;
-  REMOVE_BIT(world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
-  REMOVE_BIT(world[29265].dir_option[2]->exit_info, EX_CLOSED);
+  REMOVE_BIT(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
+  REMOVE_BIT(DC::getInstance()->world[29265].dir_option[2]->exit_info, EX_CLOSED);
   act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_ROOM, 0);
   act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_CHAR, 0);
   Character *a, *b, *c;
   b = initiate_oproc(nullptr, obj);
-  for (a = world[ch->in_room].people; a; a = c)
+  for (a = DC::getInstance()->world[ch->in_room].people; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed
     if (a == b)

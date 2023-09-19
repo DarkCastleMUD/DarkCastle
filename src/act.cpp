@@ -28,7 +28,7 @@
 
 using namespace std;
 
-extern World world;
+
 
 extern bool MOBtrigger;
 
@@ -98,7 +98,7 @@ act_return act(
     Character *tmp_char, *next_tmp_char;
     if (ch->in_room >= 0)
     {
-      for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
+      for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
       {
         next_tmp_char = tmp_char->next_in_room;
         // If they're not really playing, and no force flag, don't send
@@ -140,7 +140,7 @@ act_return act(
         continue;
       if (i->character->in_room < 0 || ch->in_room < 0)
         continue;
-      if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
+      if ((destination == TO_ZONE) && DC::getInstance()->world[i->character->in_room].zone != DC::getInstance()->world[ch->in_room].zone)
         continue;
       st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character);
       retval |= st_return.retval;

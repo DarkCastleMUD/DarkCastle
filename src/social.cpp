@@ -22,7 +22,7 @@ extern "C"
 #include "interp.h" // len_cmp
 #include "returnvals.h"
 
-extern World world;
+
 
 // storage of socials
 struct social_messg *soc_mess_list; // head of social array
@@ -65,7 +65,7 @@ int check_social(Character *ch, string pcomm, int length)
     return SOCIAL_true;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return SOCIAL_true;

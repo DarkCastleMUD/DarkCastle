@@ -183,7 +183,7 @@ int mana_gain(Character *ch)
 	if (ch->mana_regen > 0)
 		gain += ch->mana_regen;
 	if (ch->in_room >= 0)
-		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+		if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
 			gain = (int)(gain * 1.25);
 
 	if (ch->mana_regen < 0)
@@ -277,7 +277,7 @@ int hit_gain(Character *ch, int position)
 		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
 
 	if (ch->in_room >= 0)
-		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+		if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
 			gain = (int)(gain * 1.5);
 	if (ch->hit_regen < 0)
 		gain += ch->hit_regen;
@@ -348,7 +348,7 @@ int move_gain(Character *ch, int extra)
 		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
 
 	if (ch->in_room >= 0)
-		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+		if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
 			gain = (int)(gain * 1.5);
 	if (ch->move_regen < 0)
 		gain += ch->move_regen;
@@ -828,7 +828,7 @@ void point_update(void)
 			for (o = 0; o < MAX_HIDE; o++)
 				i->player->hiding_from[o] = nullptr;
 			o = 0;
-			for (temp = world[i->in_room].people; temp; temp = temp->next_in_room)
+			for (temp = DC::getInstance()->world[i->in_room].people; temp; temp = temp->next_in_room)
 			{
 				if (i == temp)
 					continue;
@@ -890,10 +890,10 @@ void update_corpses_and_portals(void)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if ((j->in_room != DC::NOWHERE) && (world[j->in_room].people))
+				if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
 				{
-					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
-					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
+					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
+					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
 				}
 				extract_obj(j);
 				continue;
@@ -916,10 +916,10 @@ void update_corpses_and_portals(void)
 			{
 				if (j->carried_by)
 					act("$p decays in your hands.", j->carried_by, j, 0, TO_CHAR, 0);
-				else if ((j->in_room != DC::NOWHERE) && (world[j->in_room].people))
+				else if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
 				{
-					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
-					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_CHAR, 0);
+					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
+					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, 0);
 				}
 
 				for (jj = j->contains; jj; jj = next_thing2)

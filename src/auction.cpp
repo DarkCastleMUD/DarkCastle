@@ -55,7 +55,7 @@ struct AuctionTicket;
 Object *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
 extern struct index_data *obj_index;
-extern World world;
+
 
 enum ListOptions
 {
@@ -341,7 +341,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
          ticket, Item_it->second.item_name.c_str(), new_price);
 
   Character *tmp;
-  for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
       csendf(tmp, "%s has just modified the price of one of %s items.\r\n",
              GET_NAME(ch), (GET_SEX(ch) == SEX_MALE) ? "his" : "her");
@@ -1237,7 +1237,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   csendf(ch, "You have purchased %s for %u coins.\r\n", obj->short_description, Item_it->second.price);
 
   Character *tmp;
-  for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
       csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
 

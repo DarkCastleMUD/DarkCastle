@@ -28,12 +28,12 @@
 int do_suicide(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch)) return eFAILURE; // just in case 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
 	send_to_char("This place is too peaceful for that.\r\n",ch);
 	return eFAILURE;
   }
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
 	send_to_char("You can't do that in the arena.\r\n",ch);
 	return eFAILURE;
@@ -315,7 +315,7 @@ int do_join(Character *ch, char *argument, int cmd)
   int num;
 	if (IS_MOB(ch) && isdigit(*victim_name) && !(sscanf(victim_name, "%d.%s", &num, tmp) == 2)) {
     count = atoi(victim_name);
-    victim = world[ch->in_room].people;
+    victim = DC::getInstance()->world[ch->in_room].people;
     for(; victim; victim = victim->next_in_room)
       if(IS_MOB(victim) && mob_index[victim->mobdata->nr].virt == count)
         break;

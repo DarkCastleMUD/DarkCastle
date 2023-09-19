@@ -54,7 +54,7 @@ extern "C"
 
 // Global data
 
-extern World world;
+
 extern struct class_skill_defines w_skills[];
 extern struct class_skill_defines t_skills[];
 extern struct class_skill_defines d_skills[];
@@ -1032,7 +1032,7 @@ void affect_update(int32_t duration_type)
         if (af->type == SPELL_ETHEREAL_FOCUS)
         {
           // NOTICE:  this is a TEMP room flag
-          REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+          REMOVE_BIT(DC::getInstance()->world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
           act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, nullptr, nullptr, TO_ROOM, NOTVICT);
         }
         affect_remove(i, af, 0);
@@ -1390,11 +1390,11 @@ int say_spell(Character *ch, int si, int room)
   Character *people;
   if (room > 0)
   {
-    people = world[room].people;
+    people = DC::getInstance()->world[room].people;
   }
   else
   {
-    people = world[ch->in_room].people;
+    people = DC::getInstance()->world[ch->in_room].people;
   }
 
   for (temp_char = people;
@@ -1841,7 +1841,7 @@ int do_cast(Character *ch, char *argument, int cmd)
   }
 
   Object *tmp_obj;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from casting!\n\r", ch);
@@ -1891,7 +1891,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       send_to_char("Stick to singing bucko.", ch);
       return eFAILURE;
     }
-    if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
     {
       send_to_char("You find yourself unable to weave magic here.\r\n", ch);
       return eFAILURE;
@@ -2018,7 +2018,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             send_to_char("Fire a lightning bolt where?\r\n", ch);
             return eFAILURE;
           }
-          if (!world[ch->in_room].dir_option[dir])
+          if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
           {
             send_to_char("The wall blocks your attempt.\r\n", ch);
             return eFAILURE;
@@ -2033,8 +2033,8 @@ int do_cast(Character *ch, char *argument, int cmd)
             send_to_char("You cannot concentrate enough to fire a bolt of lightning into another room!\n\r", ch);
             return eFAILURE;
           }
-          int new_room = world[ch->in_room].dir_option[dir]->to_room;
-          if (IS_SET(world[new_room].room_flags, SAFE) || IS_SET(world[new_room].room_flags, NO_MAGIC))
+          int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
+          if (IS_SET(DC::getInstance()->world[new_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
           {
             send_to_char("That room is protected from this harmful magic.\r\n", ch);
             return eFAILURE;
@@ -2237,7 +2237,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
           {
-            tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+            tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
             if (tar_obj != nullptr)
               target_ok = true;
           }
@@ -2433,7 +2433,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
           chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier / 10;
 
-        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !IS_SET(world[ch->in_room].room_flags, SAFE))
+        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);
@@ -2509,7 +2509,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Prize Arena
-          if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
+          if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
           {
             if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
@@ -2537,7 +2537,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Clan Chaos
-          if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
+          if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
           {
             if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {

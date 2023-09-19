@@ -27,7 +27,7 @@
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
-extern World world;
+
 
 int do_batter(Character *ch, char *argument, int cmd)
 {
@@ -149,7 +149,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       SET_BIT(exit->exit_info, EX_BROKEN);
 
       if ((other_room = exit->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED); // break other side of door
@@ -199,10 +199,10 @@ int do_batter(Character *ch, char *argument, int cmd)
       else
       {
         if (CAN_GO(ch, door) &&
-            !IS_SET(world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+            !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
             (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
             class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
-            !others_clan_room(ch, &world[EXIT(ch, door)->to_room]))
+            !others_clan_room(ch, &DC::getInstance()->world[EXIT(ch, door)->to_room]))
         {
           send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n\r\n", ch);
           act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
@@ -329,7 +329,7 @@ int do_brace(Character *ch, char *argument, int cmd)
       exit->bracee = ch;
       ch->brace_at = exit;
       if ((other_room = exit->to_room) != DC::NOWHERE)
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
             ch->brace_exit = back;
@@ -1012,7 +1012,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1041,7 +1041,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
     af.modifier = 0;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1240,8 +1240,8 @@ int do_knockback(Character *ch, char *argument, int cmd)
   }
   else if (CAN_GO(victim, dir) &&
            !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
-           !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
-           !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
+           !IS_SET(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
+           !IS_SET(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
            (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
            class_can_go(GET_CLASS(victim), EXIT(victim, dir)->to_room))
   {
@@ -1284,12 +1284,12 @@ int do_knockback(Character *ch, char *argument, int cmd)
         }
 
         Character *tmp;
-        for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+        for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
         stop_fighting(victim);
       }
-      move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
+      move_char(victim, (DC::getInstance()->world[(ch)->in_room].dir_option[dir])->to_room);
     }
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eSUCCESS;

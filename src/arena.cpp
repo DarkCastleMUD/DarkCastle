@@ -25,7 +25,7 @@
 #include "returnvals.h"
 #include "levels.h"
 
-extern World world;
+
 struct _arena arena;
 
 int do_arena(Character *ch, char *argument, int cmd)
@@ -171,7 +171,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     send_to_char("Only clan members may join this arena.\r\n", ch);
     return eFAILURE;
   }
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     send_to_char("You are already there!\n\r", ch);
     return eFAILURE;

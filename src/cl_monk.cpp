@@ -103,7 +103,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
 
 int do_quivering_palm(Character *ch, char *argument, int cmd)
 {
-  extern World world;
+  
   struct affected_type af;
   Character *victim;
   char name[256];
@@ -151,7 +151,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
         return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI)) {
     send_to_char("You find yourself unable to focus your energy here.\r\n", ch);
     return eFAILURE;
   }

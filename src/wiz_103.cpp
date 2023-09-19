@@ -261,7 +261,7 @@ int do_fighting(Character *ch, char *argument, int cmd)
   {
     // Don't show mobs fighting or people not in the arena when arena
     // keyword was specified.
-    if (IS_NPC(i) || (arenaONLY && !IS_SET(world[i->in_room].room_flags, ARENA)))
+    if (IS_NPC(i) || (arenaONLY && !IS_SET(DC::getInstance()->world[i->in_room].room_flags, ARENA)))
     {
       continue;
     }
@@ -281,7 +281,7 @@ int do_fighting(Character *ch, char *argument, int cmd)
     snprintf(buf, 80, "%s %s fighting %s %s (%d)\n\r",
              GET_NAME(i), ch_clan_name,
              GET_NAME(i->fighting), victim_clan_name,
-             world[i->in_room].number);
+             DC::getInstance()->world[i->in_room].number);
     send_to_char(buf, ch);
   }
 
@@ -299,7 +299,7 @@ int do_peace(Character *ch, char *argument, int cmd)
 {
   Character *rch;
 
-  for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
     if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
       remove_memory(rch, 'h');

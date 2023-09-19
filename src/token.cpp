@@ -31,7 +31,7 @@ extern "C"
 
 #undef DEBUG_TOKEN
 
-extern World world;
+
 
 /************************************************************************
 | TokenList::TokenList(char *str)
@@ -167,7 +167,7 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
   }
   if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FORCE))
     return "";
-  if (IS_SET(world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
+  if (IS_SET(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";

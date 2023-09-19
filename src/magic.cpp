@@ -377,12 +377,12 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   int weap_spell = obj ? WIELD : 0;
 
   /* Does not work in Desert or Underwater */
-  if (world[ch->in_room].sector_type == SECT_DESERT)
+  if (DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
   {
     send_to_char("You're trying to drown someone in the desert?  Get a clue!\r\n", ch);
     return eFAILURE;
   }
-  if (world[ch->in_room].sector_type == SECT_UNDERWATER)
+  if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
   {
     send_to_char("Hello!  You're underwater!  *knock knock*  Anyone home?\r\n", ch);
     return eFAILURE;
@@ -421,7 +421,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Ob
 {
   int mult = GET_EXP(victim) / 20;
   mult = MIN(10000, mult);
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
 
   set_cantquit(ch, victim);
@@ -443,7 +443,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
   int mana;
   set_cantquit(ch, victim);
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot do this in a safe room!\r\n", ch);
     return eFAILURE;
@@ -626,7 +626,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
   if (IS_SET(retval, eEXTRA_VALUE))
     return retval;
 
-  for (tmp_char = world[ch->in_room].people; tmp_char;
+  for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char;
        tmp_char = tmp_char->next_in_room)
   {
 
@@ -927,7 +927,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
   int dam = 0, retval = eSUCCESS, weap_spell = obj ? WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
   Object *tmp_obj = 0, *obj_next = 0;
 
-  switch (world[ch->in_room].sector_type)
+  switch (DC::getInstance()->world[ch->in_room].sector_type)
   {
   case SECT_AIR:
     send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\r\n", ch);
@@ -968,8 +968,8 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
 
     try
     {
-      ch_zone = world[ch->in_room].zone;
-      tmp_vict_zone = world[tmp_victim->in_room].zone;
+      ch_zone = DC::getInstance()->world[ch->in_room].zone;
+      tmp_vict_zone = DC::getInstance()->world[tmp_victim->in_room].zone;
     }
     catch (...)
     {
@@ -1048,10 +1048,10 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
   int weap_spell = obj ? WIELD : 0;
   Character *tmp_victim, *temp;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
   /*  double o = 0.0, m = 0.0, avglevel = 0.0;
-   for (tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+   for (tmp_victim = DC::getInstance()->world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
    { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
    else m++;
@@ -1063,7 +1063,7 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
    int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
    max += number(-10,10);
    */
-  for (tmp_victim = world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) && (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
@@ -1163,7 +1163,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
 
   // we also now use .people instead of the character_list -pir 12/26
 
-  for (tmp_victim = world[orig_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
+  for (tmp_victim = DC::getInstance()->world[orig_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
@@ -1187,7 +1187,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
   {
     if (CAN_GO(ch, i))
     {
-      for (tmp_victim = world[world[orig_room].dir_option[i]->to_room].people;
+      for (tmp_victim = DC::getInstance()->world[DC::getInstance()->world[orig_room].dir_option[i]->to_room].people;
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
@@ -1435,7 +1435,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
   send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
   act("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, TO_ROOM, 0);
 
-  for (Character *victim = world[ch->in_room].people; victim && victim != reinterpret_cast<Character *>(0x95959595); victim = next_victim)
+  for (Character *victim = DC::getInstance()->world[ch->in_room].people; victim && victim != reinterpret_cast<Character *>(0x95959595); victim = next_victim)
   {
     next_victim = victim->next_in_room;
 
@@ -1488,7 +1488,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
 
     try
     {
-      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+      if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
       {
         send_to_char("You feel a HOT blast of air.\r\n", tmp_victim);
       }
@@ -1519,7 +1519,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
         victim = pal;
       }
       else
-        csendf(pal, "You sense your desecration of %s has been destroyed!", world[obj->in_room].name);
+        csendf(pal, "You sense your desecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!\r\n", ch);
     act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1568,7 +1568,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
         victim = pal;
       }
       else
-        csendf(pal, "You sense your consecration of %s has been destroyed!", world[obj->in_room].name);
+        csendf(pal, "You sense your consecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
     }
     send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!\r\n", ch);
     act("Runes upon the ground glow brightly, then fade to nothing.\n\r$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1679,7 +1679,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't teleport in potato arenas!\n\r", ch);
     return eFAILURE;
@@ -1690,7 +1690,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if (IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     send_to_char("You find yourself unable to.\r\n", ch);
@@ -1702,7 +1702,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     // If the ch is in a general arena and self-teleporting, there's a 25% chance they will teleport to the deathtrap.
     if (ch == victim && ch->in_room >= ARENA_LOW && ch->in_room <= ARENA_HIGH && number(1, 4) == 1)
@@ -1712,7 +1712,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     else
     {
       // Find a valid room in whatever arena area the ch is in
-      int cur_zone = world[ch->in_room].zone;
+      int cur_zone = DC::getInstance()->world[ch->in_room].zone;
       int cur_zone_bottom = DC::getInstance()->zones.value(cur_zone).getRealBottom();
       int cur_zone_top = DC::getInstance()->zones.value(cur_zone).getRealTop();
 
@@ -1728,18 +1728,18 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     {
       to_room = number(0, top_of_world);
     } while (!DC::getInstance()->world_array[to_room] ||
-             IS_SET(world[to_room].room_flags, PRIVATE) ||
-             IS_SET(world[to_room].room_flags, IMP_ONLY) ||
-             IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
-             IS_SET(world[to_room].room_flags, ARENA) ||
-             world[to_room].sector_type == SECT_UNDERWATER ||
-             DC::getInstance()->zones.value(world[to_room].zone).isNoTeleport() ||
-             ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(world[to_room].zone).isTown()) : false) ||
-             (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
+             IS_SET(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
+             IS_SET(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
+             IS_SET(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
+             IS_SET(DC::getInstance()->world[to_room].room_flags, ARENA) ||
+             DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER ||
+             DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
+             ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
+             (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
              (IS_NPC(victim) &&
-              DC::getInstance()->zones.value(world[victim->in_room].zone).continent != DC::getInstance()->zones.value(world[to_room].zone).continent));
+              DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).continent));
   }
 
   if ((IS_MOB(victim)) && (!IS_MOB(ch)))
@@ -2287,7 +2287,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       return eFAILURE;
 
     // Curse in a prize arena follows rules of offensive spells
-    if (IS_SET(world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -2374,7 +2374,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     }
 
     // Curse in a prize arena follows rules of offensive spells
-    if (IS_SET(world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -3110,7 +3110,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       else if (i->in_room != DC::NOWHERE)
       {
         sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                world[i->in_room].name);
+                DC::getInstance()->world[i->in_room].name);
       }
       else if (i->equipped_by != nullptr)
       {
@@ -3559,7 +3559,7 @@ int cast_camouflague(uint8_t level, Character *ch, char *arg, int type,
     return spell_camouflague(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_camouflague(level, ch, tar_ch, 0, skill);
     return eSUCCESS;
@@ -3597,7 +3597,7 @@ int cast_farsight(uint8_t level, Character *ch, char *arg, int type,
     return spell_farsight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_farsight(level, ch, tar_ch, 0, skill);
     return eSUCCESS;
@@ -3635,7 +3635,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
     return spell_freefloat(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       ;
     spell_freefloat(level, ch, tar_ch, 0, skill);
@@ -3673,7 +3673,7 @@ int cast_insomnia(uint8_t level, Character *ch, char *arg, int type,
     return spell_insomnia(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_insomnia(level, ch, tar_ch, 0, skill);
     return eSUCCESS;
@@ -3711,7 +3711,7 @@ int cast_shadowslip(uint8_t level, Character *ch, char *arg, int type,
     return spell_shadowslip(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_shadowslip(level, ch, tar_ch, 0, skill);
     return eSUCCESS;
@@ -3797,7 +3797,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
     return spell_sanctuary(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_sanctuary(level, ch, tar_ch, 0, skill);
     return eSUCCESS;
@@ -4156,7 +4156,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
   assert(victim);
-  if (IS_SET(world[victim->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
   {
     send_to_char("To the DEATH you wimp!\n\r", ch);
     return eFAILURE;
@@ -4203,7 +4203,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
       location = real_room(GET_HOME(victim));
 
     // make sure they aren't recalling into someone's chall
-    if (IS_SET(world[location].room_flags, CLAN_ROOM))
+    if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -4233,7 +4233,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  if (IS_SET(world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!\n\r", victim);
     location = real_room(START_ROOM);
@@ -4244,7 +4244,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     location = real_room(START_ROOM);
   }
 
-  if (DC::getInstance()->zones.value(world[victim->in_room].zone).continent != DC::getInstance()->zones.value(world[location].zone).continent)
+  if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[location].zone).continent)
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
@@ -4296,7 +4296,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   int original_loc;
   assert(ch && victim);
 
-  if (IS_SET(world[victim->in_room].room_flags, NO_MAGIC) ||
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
       (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
   {
     send_to_char("Your vision is too clouded to make out anything.\r\n", ch);
@@ -4392,7 +4392,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   int retval;
   assert(ch && victim);
 
-  if (IS_SET(world[victim->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, SAFE))
   {
     send_to_char("That person is in a safe area!\n\r", ch);
     return eFAILURE;
@@ -4415,8 +4415,8 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
 
   if ((IS_NPC(victim) && GET_LEVEL(ch) < IMPLEMENTER) ||
-      IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
-      IS_SET(world[victim->in_room].room_flags, NO_SUMMON))
+      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
+      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_SUMMON))
   {
     send_to_char("You have failed to summon your target!\n\r", ch);
     return eFAILURE;
@@ -4442,13 +4442,13 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
+  if (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
   {
     send_to_char("You cannot summon a Champion here.\r\n", ch);
     return eFAILURE;
   }
 
-  if (DC::getInstance()->zones.value(world[ch->in_room].zone).continent != DC::getInstance()->zones.value(world[victim->in_room].zone).continent)
+  if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -4966,7 +4966,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
       if (SOMEONE_DIED(retval))
         return retval;
     }
-    else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+    else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
       send_to_char("You feel a HOT blast of air.\r\n", tmp_victim);
   }
   return eSUCCESS;
@@ -5001,7 +5001,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
       if (IS_SET(retval, eCH_DIED))
         return retval;
     }
-    else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+    else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
       send_to_char("You wanna choke on the smell in the air.\r\n", tmp_victim);
   }
   return eSUCCESS;
@@ -6484,7 +6484,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
     return eFAILURE;
   }
 
-  for (tmp_victim = world[ch->in_room].people; tmp_victim;
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
     if ((ch->in_room == tmp_victim->in_room))
@@ -6583,13 +6583,13 @@ void make_portal(Character *ch, Character *vict)
     {
       destination = number(0, top_of_world);
       if (!DC::getInstance()->world_array[destination] ||
-          IS_SET(world[destination].room_flags, ARENA) ||
-          IS_SET(world[destination].room_flags, IMP_ONLY) ||
-          IS_SET(world[destination].room_flags, PRIVATE) ||
-          IS_SET(world[destination].room_flags, CLAN_ROOM) ||
-          IS_SET(world[destination].room_flags, NO_PORTAL) ||
-          IS_SET(world[destination].room_flags, NO_TELEPORT) ||
-          DC::getInstance()->zones.value(world[destination].zone).isNoTeleport())
+          IS_SET(DC::getInstance()->world[destination].room_flags, ARENA) ||
+          IS_SET(DC::getInstance()->world[destination].room_flags, IMP_ONLY) ||
+          IS_SET(DC::getInstance()->world[destination].room_flags, PRIVATE) ||
+          IS_SET(DC::getInstance()->world[destination].room_flags, CLAN_ROOM) ||
+          IS_SET(DC::getInstance()->world[destination].room_flags, NO_PORTAL) ||
+          IS_SET(DC::getInstance()->world[destination].room_flags, NO_TELEPORT) ||
+          DC::getInstance()->zones.value(DC::getInstance()->world[destination].zone).isNoTeleport())
       {
         good_destination = false;
       }
@@ -6634,9 +6634,9 @@ void make_portal(Character *ch, Character *vict)
 
 int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  if (IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
-      IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
-      IS_SET(world[victim->in_room].room_flags, NO_PORTAL))
+  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
+      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, IMP_ONLY) ||
+      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL))
   {
     send_to_char("You can't seem to find a path.\r\n", ch);
     return eFAILURE;
@@ -6652,14 +6652,14 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
     send_to_char("You can't seem to find a definite path.\r\n", ch);
     return eFAILURE;
   }
-  if (DC::getInstance()->zones.value(world[victim->in_room].zone).isNoTeleport())
+  if (DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport())
   {
     send_to_char("A portal shimmers into view but is unstable and immediately fades to nothing.\r\n", ch);
     act("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
 
-  if (DC::getInstance()->zones.value(world[ch->in_room].zone).continent != DC::getInstance()->zones.value(world[victim->in_room].zone).continent)
+  if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent)
   {
     if (number(1, 100) < 6)
     {
@@ -6681,7 +6681,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
   }
 
   bool portal_found = false;
-  for (auto portal = world[ch->in_room].contents; portal; portal = portal->next_content)
+  for (auto portal = DC::getInstance()->world[ch->in_room].contents; portal; portal = portal->next_content)
   {
     if (portal->isPortal())
     {
@@ -6692,7 +6692,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
 
   if (!portal_found)
   {
-    for (auto portal = world[victim->in_room].contents; portal; portal = portal->next_content)
+    for (auto portal = DC::getInstance()->world[victim->in_room].contents; portal; portal = portal->next_content)
     {
       if (portal->isPortal())
       {
@@ -6705,7 +6705,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
   Character *tmpch;
 
   bool found_hunt_or_quest_item = false;
-  for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+  for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
   {
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
     {
@@ -6798,7 +6798,7 @@ int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
     {
-      for (victim = world[ch->in_room].people; victim; victim = next_v)
+      for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -7130,7 +7130,7 @@ int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
       return spell_energy_drain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = world[ch->in_room].people; victim; victim = next_v)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7177,7 +7177,7 @@ int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
       return spell_souldrain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = world[ch->in_room].people; victim; victim = next_v)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7355,7 +7355,7 @@ int cast_harm(uint8_t level, Character *ch, char *arg, int type,
       return spell_harm(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = world[ch->in_room].people; victim; victim = next_v)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7403,7 +7403,7 @@ int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
       return spell_power_harm(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = world[ch->in_room].people; victim; victim = next_v)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7440,7 +7440,7 @@ int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
     return spell_divine_fury(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = world[ch->in_room].people; victim; victim = next_v)
+    for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7671,7 +7671,7 @@ int cast_teleport(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       // must do it this way to insure staff continues in THIS room
       next_v = tar_ch->next_in_room;
@@ -7826,7 +7826,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
 {
   int retval;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not paralyze anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -7865,7 +7865,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
     return spell_paralyze(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (IS_NPC(tar_ch))
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
@@ -7891,7 +7891,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not blind anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -7931,7 +7931,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
     return spell_blindness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8085,7 +8085,7 @@ int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
     return spell_remove_paralysis(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
     {
       retval = spell_remove_paralysis(level, ch, tar_ch, 0, skill);
       if (IS_SET(retval, eCH_DIED))
@@ -8120,7 +8120,7 @@ int cast_remove_blind(uint8_t level, Character *ch, char *arg, int type,
     return spell_remove_blind(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_blind(level, ch, tar_ch, 0, skill);
@@ -8193,7 +8193,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
     return spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
@@ -8267,7 +8267,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
     return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
@@ -8283,7 +8283,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
 {
   int retval;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) && tar_ch)
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && tar_ch)
   {
     send_to_char("You cannot curse someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -8322,7 +8322,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
       return spell_curse(level, ch, tar_ch, 0, skill);
     }
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (IS_NPC(tar_ch))
       {
@@ -8357,7 +8357,7 @@ int cast_detect_evil(uint8_t level, Character *ch, char *arg, int type,
     return spell_detect_evil(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_evil(level, ch, tar_ch, 0, skill);
@@ -8392,7 +8392,7 @@ int cast_true_sight(uint8_t level, Character *ch, char *arg, int type,
     return spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
@@ -8422,7 +8422,7 @@ int cast_detect_good(uint8_t level, Character *ch, char *arg, int type,
     return spell_detect_good(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_good(level, ch, tar_ch, 0, skill);
@@ -8496,7 +8496,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
     return spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -8566,7 +8566,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
     return spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -8603,7 +8603,7 @@ int cast_haste(uint8_t level, Character *ch, char *arg, int type,
     return spell_haste(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       if (!(IS_AFFECTED(tar_ch, SPELL_HASTE)))
@@ -8710,7 +8710,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
     return spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8721,7 +8721,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
           return retval;
       }
     }
-    for (tar_obj = world[ch->in_room].contents; tar_obj; tar_obj = next_o)
+    for (tar_obj = DC::getInstance()->world[ch->in_room].contents; tar_obj; tar_obj = next_o)
     {
       next_o = tar_obj->next;
 
@@ -8767,7 +8767,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
     return spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8778,7 +8778,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
           return retval;
       }
     }
-    for (tar_obj = world[ch->in_room].contents; tar_obj; tar_obj = next_o)
+    for (tar_obj = DC::getInstance()->world[ch->in_room].contents; tar_obj; tar_obj = next_o)
     {
       next_o = tar_obj->next;
 
@@ -8856,7 +8856,7 @@ int cast_mana(uint8_t level, Character *ch, char *arg, int type,
     return spell_mana(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_mana(level, ch, tar_ch, 0, skill);
     break;
@@ -8891,7 +8891,7 @@ int cast_heal(uint8_t level, Character *ch, char *arg, int type,
     return spell_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8926,7 +8926,7 @@ int cast_power_heal(uint8_t level, Character *ch, char *arg, int type,
     return spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8954,7 +8954,7 @@ int cast_full_heal(uint8_t level, Character *ch, char *arg, int type,
     return spell_full_heal(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_full_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -9012,7 +9012,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -9056,7 +9056,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
     return spell_poison(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_SPELL:
-    if (IS_SET(world[ch->in_room].room_flags, SAFE))
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     {
       send_to_char("You can not poison someone in a safe area!\n\r", ch);
       return eFAILURE;
@@ -9067,7 +9067,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
     return spell_poison(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9167,7 +9167,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
     return spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9255,7 +9255,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
     return spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9295,7 +9295,7 @@ int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
     return spell_remove_curse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_curse(level, ch, tar_ch, 0, skill);
@@ -9316,7 +9316,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
     if (!strcmp(arg, "communegroupspell") && has_skill(ch, SKILL_COMMUNE))
     {
       int retval = eFAILURE;
-      for (Character *tmp_char = world[ch->in_room].people; tmp_char;
+      for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char;
            tmp_char = tmp_char->next_in_room)
       {
         if (!ARE_GROUPED(ch, tmp_char))
@@ -9354,7 +9354,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_poison(level, ch, tar_ch, 0, skill);
@@ -9387,7 +9387,7 @@ int cast_fireshield(uint8_t level, Character *ch, char *arg, int type,
     return spell_fireshield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fireshield(level, ch, tar_ch, 0, skill);
@@ -9405,7 +9405,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not sleep someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -9431,7 +9431,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
     return spell_sleep(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9471,7 +9471,7 @@ int cast_strength(uint8_t level, Character *ch, char *arg, int type,
     return spell_strength(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_strength(level, ch, tar_ch, 0, skill);
@@ -9513,7 +9513,7 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
 
   sprintf(buf3, "Someone says, '%s'\n\r", arg);
 
-  for (tmp_ch = world[ch->in_room].people; tmp_ch;
+  for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch;
        tmp_ch = tmp_ch->next_in_room)
   {
 
@@ -9569,7 +9569,7 @@ int cast_word_of_recall(uint8_t level, Character *ch, char *arg, int type,
     return targetted_word_of_recall(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch_next)
     {
       tar_ch_next = tar_ch->next_in_room;
@@ -9647,7 +9647,7 @@ int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
     return spell_charm_person(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9686,7 +9686,7 @@ int cast_sense_life(uint8_t level, Character *ch, char *arg, int type,
     return spell_sense_life(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_sense_life(level, ch, tar_ch, 0, skill);
@@ -9799,7 +9799,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not fear someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -9823,7 +9823,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
     return spell_fear(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9908,7 +9908,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
     return spell_refresh(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_refresh(level, ch, tar_ch, 0, skill);
@@ -9985,7 +9985,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
     return spell_fly(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fly(level, ch, tar_ch, 0, skill);
@@ -10041,7 +10041,7 @@ int cast_know_alignment(uint8_t level, Character *ch, char *arg, int type,
     return spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
@@ -10101,7 +10101,7 @@ int cast_dispel_magic(uint8_t level, Character *ch, char *arg, int type,
     return spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -10160,7 +10160,7 @@ int cast_dispel_minor(uint8_t level, Character *ch, char *arg, int type,
     return spell_dispel_minor(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_minor(level, ch, tar_ch, 0, skill);
     break;
@@ -10442,7 +10442,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
     return spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
@@ -10482,7 +10482,7 @@ int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10533,7 +10533,7 @@ int cast_cause_critical(uint8_t level, Character *ch, char *arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10583,7 +10583,7 @@ int cast_cause_serious(uint8_t level, Character *ch, char *arg,
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10633,7 +10633,7 @@ int cast_flamestrike(uint8_t level, Character *ch, char *arg,
     return spell_flamestrike(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10880,7 +10880,7 @@ int cast_shield(uint8_t level, Character *ch, char *arg,
     return spell_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_shield(level, ch, tar_ch, 0, skill);
     break;
@@ -10898,7 +10898,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
   Character *next_v;
   int retval;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not weaken anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -10931,7 +10931,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
     return spell_weaken(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11010,7 +11010,7 @@ int cast_acid_blast(uint8_t level, Character *ch, char *arg,
     return spell_acid_blast(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11059,7 +11059,7 @@ int cast_hellstream(uint8_t level, Character *ch, char *arg,
     return spell_hellstream(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11136,7 +11136,7 @@ int cast_infravision(uint8_t level, Character *ch, char *arg,
     return spell_infravision(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people;
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_infravision(level, ch, tar_ch, 0, skill);
@@ -11279,40 +11279,25 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    try
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
-      if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
-      {
-        continue;
-      }
-
-      if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-          (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
-      {
-
-        set_cantquit(ch, tmp_victim);
-
-        retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
-        if (IS_SET(retval, eCH_DIED))
-          return retval;
-      }
-      else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-      {
-        send_to_char("You hear the buzzing of hundreds of bees.\r\n",
-                     tmp_victim);
-      }
+      continue;
     }
-    catch (World::underrun &)
+
+    if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
+        (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
     {
-      logentry("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LogChannels::LOG_BUG);
-      produce_coredump();
-      return eFAILURE;
+
+      set_cantquit(ch, tmp_victim);
+
+      retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
+      if (IS_SET(retval, eCH_DIED))
+        return retval;
     }
-    catch (World::overrun &)
+    else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
     {
-      logentry("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LogChannels::LOG_BUG);
-      produce_coredump();
-      return eFAILURE;
+      send_to_char("You hear the buzzing of hundreds of bees.\r\n",
+                   tmp_victim);
     }
   }
   return eSUCCESS;
@@ -11330,31 +11315,31 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
   set_cantquit(ch, victim);
   dam = 300;
 
-  if (world[ch->in_room].sector_type == SECT_SWAMP)
+  if (DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP)
     dam += 200;
-  else if (world[ch->in_room].sector_type == SECT_FOREST)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FOREST)
     dam += 185;
-  else if (world[ch->in_room].sector_type == SECT_FIELD)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FIELD)
     dam += 170;
-  else if (world[ch->in_room].sector_type == SECT_BEACH)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_BEACH)
     dam += 150;
-  else if (world[ch->in_room].sector_type == SECT_HILLS)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_HILLS)
     dam += 130;
-  else if (world[ch->in_room].sector_type == SECT_DESERT)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
     dam += 110;
-  else if (world[ch->in_room].sector_type == SECT_MOUNTAIN)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_MOUNTAIN)
     dam += 90;
-  else if (world[ch->in_room].sector_type == SECT_PAVED_ROAD)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
     dam += 90;
-  else if (world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
     dam -= 25;
-  else if (world[ch->in_room].sector_type == SECT_AIR)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_AIR)
     dam += 25;
-  else if (world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
     dam -= 30;
-  else if (world[ch->in_room].sector_type == SECT_UNDERWATER)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
     dam -= 100;
-  else if (world[ch->in_room].sector_type == SECT_ARCTIC)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_ARCTIC)
     dam -= 60;
 
   if (!OUTSIDE(ch))
@@ -11725,7 +11710,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
 
 int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
-  if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
   {
     send_to_char("I don't think your fellow clan members would appreciate the wildlife.\r\n", ch);
     GET_MANA(ch) += 75;
@@ -12032,7 +12017,7 @@ int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *v
 
 int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
-  if (!(world[ch->in_room].sector_type == SECT_FOREST || world[ch->in_room].sector_type == SECT_SWAMP))
+  if (!(DC::getInstance()->world[ch->in_room].sector_type == SECT_FOREST || DC::getInstance()->world[ch->in_room].sector_type == SECT_SWAMP))
   {
     send_to_char("You are not in a forest!!\n\r", ch);
     return eFAILURE;
@@ -12501,10 +12486,10 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     return eFAILURE;
   }
 
-  if ((!IS_SET(world[ch->in_room].room_flags, ARENA) &&
-       IS_SET(world[ch->beacon->in_room].room_flags, ARENA)) ||
-      (IS_SET(world[ch->in_room].room_flags, ARENA) &&
-       !IS_SET(world[ch->beacon->in_room].room_flags, ARENA)))
+  if ((!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
+       IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)) ||
+      (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
+       !IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)))
   {
     send_to_char("Your beacon cannot take you into or out of the arena!\r\n", ch);
     return eFAILURE;
@@ -12518,14 +12503,14 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
       return eFAILURE;
     }
 
-    if (IS_SET(world[ch->beacon->in_room].room_flags, CLAN_ROOM))
+    if (IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, CLAN_ROOM))
     {
       send_to_char("You cannot beacon into a clan hall whilst Champion.\r\n", ch);
       return eFAILURE;
     }
   }
 
-  if (DC::getInstance()->zones.value(world[ch->in_room].zone).continent != DC::getInstance()->zones.value(world[ch->beacon->in_room].zone).continent)
+  if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[ch->beacon->in_room].zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -12540,7 +12525,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     }
   }
 
-  if (others_clan_room(ch, &world[ch->beacon->in_room]) == true)
+  if (others_clan_room(ch, &DC::getInstance()->world[ch->beacon->in_room]) == true)
   {
     send_to_char("You cannot beacon into another clan's hall.\r\n", ch);
     ch->beacon->equipped_by = nullptr;
@@ -12590,19 +12575,19 @@ int do_beacon(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     send_to_char("You may not place your beacon in an area protected by the gods.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CHAMPION) && IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
+  if (IS_AFFECTED(ch, AFF_CHAMPION) && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
   {
     send_to_char("You cannot set a beacon in a clan hall whilst Champion.\r\n", ch);
     return eFAILURE;
   }
 
-  if (others_clan_room(ch, &world[ch->in_room]) == true)
+  if (others_clan_room(ch, &DC::getInstance()->world[ch->in_room]) == true)
   {
     send_to_char("You cannot set a beacon in another clan's hall.\r\n", ch);
     return eFAILURE;
@@ -12627,7 +12612,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
   obj_to_room(new_obj, ch->in_room);
   ch->beacon = new_obj;
 
-  //   ch->beacon = world[ch->in_room].number;
+  //   ch->beacon = DC::getInstance()->world[ch->in_room].number;
   return eSUCCESS;
 }
 
@@ -12836,7 +12821,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
   struct room_track_data *ptrack;
   char buf[180];
 
-  ptrack = world[ch->in_room].tracks;
+  ptrack = DC::getInstance()->world[ch->in_room].tracks;
 
   if (!ptrack)
   {
@@ -13009,7 +12994,7 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
     {
-      for (victim = world[ch->in_room].people; victim; victim = next_v)
+      for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -13225,7 +13210,7 @@ int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Characte
     return spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13279,7 +13264,7 @@ int cast_water_breathing(uint8_t level, Character *ch, char *arg, int type, Char
     return spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13347,7 +13332,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, cla
   send_to_char("Your summoned $B$0darkness$R turns the area pitch black.\r\n", ch);
 
   obj_to_room(globe, ch->in_room);
-  world[ch->in_room].light -= globe->obj_flags.value[1];
+  DC::getInstance()->world[ch->in_room].light -= globe->obj_flags.value[1];
 
   return eSUCCESS;
 }
@@ -13372,7 +13357,7 @@ int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Ch
     return spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13423,13 +13408,13 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   int learned = has_skill(ch, SPELL_ICESTORM);
   dam = 25 + learned * 4.25;
 
-  if (world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
+  if (DC::getInstance()->world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
     dam = dam * 5 / 4;
-  else if (world[ch->in_room].sector_type == SECT_ARCTIC)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_ARCTIC)
     dam = dam * 3 / 2;
-  else if (world[ch->in_room].sector_type == SECT_UNDERWATER)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
     dam = dam * 3 / 4;
-  else if (world[ch->in_room].sector_type == SECT_DESERT)
+  else if (DC::getInstance()->world[ch->in_room].sector_type == SECT_DESERT)
     dam = dam * 1 / 2;
 
   send_to_char("$B$3Ice$R erupts from the earth!\r\n", ch);
@@ -13472,7 +13457,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
     }
     else
     {
-      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+      if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
         send_to_char("You feel a BLAST of $B$3cold$R air.\r\n", tmp_victim);
     }
   }
@@ -13503,7 +13488,7 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
     return spell_icestorm(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13568,7 +13553,7 @@ int cast_lightning_shield(uint8_t level, Character *ch, char *arg, int type, Cha
     return spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13589,7 +13574,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Objec
   if (ch_level < 5)
     ch_level = 5;
   set_cantquit(ch, victim);
-  switch (world[ch->in_room].sector_type)
+  switch (DC::getInstance()->world[ch->in_room].sector_type)
   {
 
   case SECT_SWAMP:
@@ -13655,7 +13640,7 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
     return spell_blue_bird(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13782,7 +13767,7 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
     return spell_debility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13904,7 +13889,7 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
     return spell_attrition(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13979,7 +13964,7 @@ int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Charac
     return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_vampiric_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14132,7 +14117,7 @@ int cast_dismiss_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
     return spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14189,7 +14174,7 @@ int cast_dismiss_corpse(uint8_t level, Character *ch, char *arg, int type, Chara
     return spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14264,7 +14249,7 @@ int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Ch
     return spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14286,7 +14271,7 @@ int spell_visage_of_hate(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14337,7 +14322,7 @@ int spell_blessed_halo(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14398,7 +14383,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
     do_snoop(ch->desc->snoop_by->character, ch->desc->snoop_by->character->name, 0);
   }
   int vnum;
-  switch (world[ch->in_room].sector_type)
+  switch (DC::getInstance()->world[ch->in_room].sector_type)
   {
   case SECT_INSIDE:
   case SECT_CITY:
@@ -14447,7 +14432,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
 
   Character *mob;
   mob = clone_mobile(mobile);
-  mob->hometown = world[ch->in_room].number;
+  mob->hometown = DC::getInstance()->world[ch->in_room].number;
   char_to_room(mob, ch->in_room);
 
   send_to_char("You call upon the spirits of this area, shifting into a trance-state.\r\n", ch);
@@ -14666,13 +14651,13 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
   char buf[MAX_STRING_LENGTH];
   Character *next_vict;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot cast this here.\r\n", ch);
     return eFAILURE;
   }
 
-  for (victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
+  for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
     castcost += 75;
 
   castcost -= 75; // the initial 75 to cast the spell
@@ -14688,7 +14673,7 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
   send_to_char("You call forth the fury of the gods to consume the area in a holy tempest!\n\r", ch);
   act("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, TO_ROOM, 0);
 
-  for (victim = world[ch->in_room].people; victim && victim != (Character *)0x95959595; victim = next_vict)
+  for (victim = DC::getInstance()->world[ch->in_room].people; victim && victim != (Character *)0x95959595; victim = next_vict)
   {
     next_vict = victim->next_in_room;
 
@@ -14781,7 +14766,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
 {
   Object *silence_obj = nullptr;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot silence this room.\r\n", ch);
     return eFAILURE;
@@ -15072,7 +15057,7 @@ int cast_solidity(uint8_t level, Character *ch, char *arg,
     return spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -15606,10 +15591,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (IS_SET(world[ch->in_room].room_flags,
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags,
              CLAN_ROOM) ||
-      IS_SET(world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(world[ch->in_room].room_flags, NOLEARN))
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {
@@ -15626,7 +15611,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
   Object *cItem = nullptr;
 
-  if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+  if ((cItem = get_obj_in_list("consecrateitem", DC::getInstance()->world[ch->in_room].contents)))
   {
     if (ch == ((Character *)(cItem->obj_flags.origin)) && spl == SPELL_CONSECRATE)
     {
@@ -15774,10 +15759,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (IS_SET(world[ch->in_room].room_flags,
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags,
              CLAN_ROOM) ||
-      IS_SET(world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(world[ch->in_room].room_flags, NOLEARN))
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {
@@ -15799,7 +15784,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   }
 
   Object *cItem = nullptr;
-  if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+  if ((cItem = get_obj_in_list("consecrateitem", DC::getInstance()->world[ch->in_room].contents)))
   {
     if (ch == ((Character *)(cItem->obj_flags.origin)))
     {
@@ -15939,7 +15924,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   send_to_char("You focus the minds of your allies to react to the slightest movement...\r\n", ch);
   act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
   // loop through group members in room
-  for (ally = world[ch->in_room].people; ally; ally = next_ally)
+  for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = next_ally)
   {
     next_ally = ally->next_in_room;
 
@@ -15956,7 +15941,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   // We do this last because this is the trigger for the spell.  If we did this before the act() call we would trigger it
   // on ourself immediately which would probably make the spell not very useful.
   // NOTICE:  This is a TEMP_room_flag
-  SET_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+  SET_BIT(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
 
   return eSUCCESS;
 }

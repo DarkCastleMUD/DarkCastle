@@ -58,6 +58,12 @@ typedef map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
 
+class World
+{
+public:
+  class Room &operator[](int rnum);
+};
+
 class DC : public QCoreApplication
 {
   Q_OBJECT
@@ -116,6 +122,7 @@ public:
   fd_set null_set = {};
   zones_t zones = {};
   class Room **world_array = nullptr;
+  class World world;
 
   static string getVersion();
   static string getBuildTime();

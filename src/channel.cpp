@@ -108,7 +108,7 @@ queue<string> auction_history;
 queue<string> newbie_history;
 queue<string> trivia_history;
 
-extern World world;
+
 
 extern struct index_data *obj_index;
 
@@ -125,7 +125,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
@@ -133,7 +133,7 @@ command_return_t do_say(Character *ch, string argument, int cmd)
   }
 
   Object *tmp_obj;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -196,14 +196,14 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
   }
 
   Object *tmp_obj = nullptr;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -315,13 +315,13 @@ int do_gossip(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -399,7 +399,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     {
       if (i->character != ch && !i->connected && (IS_SET(i->character->misc, LogChannels::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
       {
-        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         {
           if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
           {
@@ -426,14 +426,14 @@ int do_auction(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -502,7 +502,7 @@ int do_auction(Character *ch, char *argument, int cmd)
           (IS_SET(i->character->misc, LogChannels::CHANNEL_AUCTION)) &&
           !is_ignoring(i->character, ch))
       {
-        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
           {
             silence = true;
@@ -523,14 +523,14 @@ int do_shout(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -576,11 +576,11 @@ int do_shout(Character *ch, char *argument, int cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
-          (world[i->character->in_room].zone == world[ch->in_room].zone) &&
+          (DC::getInstance()->world[i->character->in_room].zone == DC::getInstance()->world[ch->in_room].zone) &&
           (IS_NPC(i->character) || IS_SET(i->character->misc, LogChannels::CHANNEL_SHOUT)) &&
           !is_ignoring(i->character, ch))
       {
-        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
           {
             silence = true;
@@ -601,13 +601,13 @@ int do_trivia(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -688,7 +688,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
         (IS_SET(i->character->misc, LogChannels::CHANNEL_TRIVIA)) &&
         !is_ignoring(i->character, ch))
     {
-      for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
         {
           silence = true;
@@ -823,7 +823,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -909,11 +909,11 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
   }
   if (ch == vict)
     send_to_char("You try to tell yourself something.\r\n", ch);
-  else if ((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL)
+  else if ((GET_POS(vict) == POSITION_SLEEPING || IS_SET(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL)
     act("Sorry, $E cannot hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
   else
   {
-    for (tmp_obj = world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    for (tmp_obj = DC::getInstance()->world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
         act("$E cannot hear you right now.", ch, 0, vict, TO_CHAR, STAYHIDE);
@@ -1033,7 +1033,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
   }
 
   Object *tmp_obj;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -1069,7 +1069,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
       buf[MAX_STRING_LENGTH];
 
   Object *tmp_obj;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -1114,7 +1114,7 @@ int do_ask(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
   Object *tmp_obj;
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -1185,7 +1185,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -1230,7 +1230,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) && (f->follower != ch))
     {
-      for (tmp_obj = world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      for (tmp_obj = DC::getInstance()->world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       {
         if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
         {
@@ -1259,14 +1259,14 @@ int do_newbie(Character *ch, char *argument, int cmd)
   Object *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
     return eSUCCESS;
   }
 
-  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -1329,7 +1329,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
           !is_ignoring(i->character, ch) &&
           (IS_SET(i->character->misc, LogChannels::CHANNEL_NEWBIE)))
       {
-        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
           {
             silence = true;

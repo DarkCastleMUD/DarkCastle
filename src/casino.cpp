@@ -37,7 +37,7 @@ extern "C"
 using namespace std;
 
 extern Object *object_list;
-extern World world;
+
 extern struct index_data *obj_index;
 
 void pulse_table_bj(struct table_data *tbl, int recall = 0);
@@ -1056,7 +1056,7 @@ void blackjack_prompt(Character *ch, string &prompt, bool ascii)
       if (ch->in_room != 44)
          return;
    class Object *obj;
-   for (obj = world[ch->in_room].contents; obj; obj = obj->next_content)
+   for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = obj->next_content)
    {
       if (obj->table)
          break;
@@ -1296,7 +1296,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       {
          Character *tmpch;
          int i = 0;
-         for (tmpch = world[ch->in_room].people; tmpch;
+         for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
             if (IS_PC(tmpch))
                i++;
@@ -1310,7 +1310,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       {
          Character *tmpch;
          int i = 0;
-         for (tmpch = world[ch->in_room].people; tmpch;
+         for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
             if (IS_PC(tmpch))
                i++;

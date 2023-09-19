@@ -57,7 +57,7 @@ using namespace std;
 
 /* extern variables */
 
-extern World world;
+
 
 extern class Object *object_list;
 extern struct index_data *mob_index;
@@ -1341,7 +1341,7 @@ int do_look(Character *ch, char *argument, int cmd)
    else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
    {
       send_to_char("It is pitch black...\r\n", ch);
-      list_char_to_char(world[ch->in_room].people, ch, 0);
+      list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
       send_to_char("$R", ch);
       // TODO - if have blindfighting, list some of the room exits sometimes
    }
@@ -1374,7 +1374,7 @@ int do_look(Character *ch, char *argument, int cmd)
       {
          /* Check if there is an extra-desc with "up"(or whatever) and use that instead */
          tmp_desc = find_ex_description(arg1,
-                                        world[ch->in_room].ex_description);
+                                        DC::getInstance()->world[ch->in_room].ex_description);
          if (tmp_desc)
          {
             page_string(ch->desc, tmp_desc, 0);
@@ -1581,7 +1581,7 @@ int do_look(Character *ch, char *argument, int cmd)
             if (!found)
             {
                tmp_desc = find_ex_description(arg2,
-                                              world[ch->in_room].ex_description);
+                                              DC::getInstance()->world[ch->in_room].ex_description);
                if (tmp_desc)
                {
                   page_string(ch->desc, tmp_desc, 0);
@@ -1640,7 +1640,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
             if (!found)
             {
-               for (tmp_object = world[ch->in_room].contents;
+               for (tmp_object = DC::getInstance()->world[ch->in_room].contents;
                     tmp_object && !found;
                     tmp_object = tmp_object->next_content)
                {
@@ -1705,7 +1705,7 @@ int do_look(Character *ch, char *argument, int cmd)
             if (*arg2)
             {
                if ((tmp_object = get_obj_in_list_vis(ch, arg2,
-                                                     world[ch->in_room].contents)))
+                                                     DC::getInstance()->world[ch->in_room].contents)))
                {
                   if (tmp_object->isPortal())
                   {
@@ -1747,21 +1747,21 @@ int do_look(Character *ch, char *argument, int cmd)
 
          ansi_color(GREY, ch);
          ansi_color(BOLD, ch);
-         send_to_char(world[ch->in_room].name, ch);
+         send_to_char(DC::getInstance()->world[ch->in_room].name, ch);
          ansi_color(NTEXT, ch);
          ansi_color(GREY, ch);
 
          // PUT SECTOR AND ROOMFLAG STUFF HERE
          if (!IS_MOB(ch) && ch->player->holyLite)
          {
-            sprinttype(world[ch->in_room].sector_type, sector_types,
+            sprinttype(DC::getInstance()->world[ch->in_room].sector_type, sector_types,
                        sector_buf);
-            sprintbit((int32_t)world[ch->in_room].room_flags, room_bits,
+            sprintbit((int32_t)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
                       rflag_buf);
             csendf(ch, "\r\nLight[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
-            if (world[ch->in_room].temp_room_flags)
+            if (DC::getInstance()->world[ch->in_room].temp_room_flags)
             {
-               sprintbit((int32_t)world[ch->in_room].temp_room_flags, temp_room_bits,
+               sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
                          tempflag_buf);
                csendf(ch, " [ %s]", tempflag_buf);
             }
@@ -1770,13 +1770,13 @@ int do_look(Character *ch, char *argument, int cmd)
          send_to_char("\n\r", ch);
 
          if (!IS_MOB(ch) && !IS_SET(ch->player->toggles, PLR_BRIEF))
-            send_to_char(world[ch->in_room].description, ch);
+            send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
          ansi_color(BOLD, ch);
-         list_obj_to_char(world[ch->in_room].contents, ch, 0, false);
+         list_obj_to_char(DC::getInstance()->world[ch->in_room].contents, ch, 0, false);
 
-         list_char_to_char(world[ch->in_room].people, ch, 0);
+         list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
 
          strcpy(buffer, "");
          *buffer = '\0';
@@ -1906,8 +1906,8 @@ int do_exits(Character *ch, char *argument, int cmd)
 
       if (!IS_MOB(ch) && ch->player->holyLite)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
-                 world[EXIT(ch, door)->to_room].name,
-                 world[EXIT(ch, door)->to_room].number);
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].name,
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].number);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
       {
          if (IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN))
@@ -1919,7 +1919,7 @@ int do_exits(Character *ch, char *argument, int cmd)
          sprintf(buf + strlen(buf), "%s - Too dark to tell\n\r", exits[door]);
       else
          sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
-                 world[EXIT(ch, door)->to_room].name);
+                 DC::getInstance()->world[EXIT(ch, door)->to_room].name);
    }
 
    send_to_char("You scan around the exits to see where they lead.\r\n", ch);
@@ -2626,34 +2626,34 @@ int do_olocate(Character *ch, char *name, int cmd)
       if (k->in_obj)
       {
          if (k->in_obj->in_room > DC::NOWHERE)
-            in_room = world[k->in_obj->in_room].number;
+            in_room = DC::getInstance()->world[k->in_obj->in_room].number;
          else if (k->in_obj->carried_by)
          {
             if (!CAN_SEE(ch, k->in_obj->carried_by))
                continue;
-            in_room = world[k->in_obj->carried_by->in_room].number;
+            in_room = DC::getInstance()->world[k->in_obj->carried_by->in_room].number;
          }
          else if (k->in_obj->equipped_by)
          {
             if (!CAN_SEE(ch, k->in_obj->equipped_by))
                continue;
-            in_room = world[k->in_obj->equipped_by->in_room].number;
+            in_room = DC::getInstance()->world[k->in_obj->equipped_by->in_room].number;
          }
       }
       else if (k->carried_by)
       {
          if (!CAN_SEE(ch, k->carried_by))
             continue;
-         in_room = world[k->carried_by->in_room].number;
+         in_room = DC::getInstance()->world[k->carried_by->in_room].number;
       }
       else if (k->equipped_by)
       {
          if (!CAN_SEE(ch, k->equipped_by))
             continue;
-         in_room = world[k->equipped_by->in_room].number;
+         in_room = DC::getInstance()->world[k->equipped_by->in_room].number;
       }
       else if (k->in_room > 0)
-         in_room = world[k->in_room].number;
+         in_room = DC::getInstance()->world[k->in_room].number;
       else
          in_room = 0;
 
@@ -2755,7 +2755,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
       sprintf(buf, "[%2d] %-26s %d\n\r",
               count,
               i->short_desc,
-              world[i->in_room].number);
+              DC::getInstance()->world[i->in_room].number);
       if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
       {
          send_to_char("LIST TRUNCATED...TOO LONG\n\r", ch);
@@ -3188,7 +3188,7 @@ int do_scan(Character *ch, char *argument, int cmd)
        INVIS_NULL | STAYHIDE);
    send_to_char("You carefully search the surroundings...\n\r\n\r", ch);
 
-   for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
    {
       if (CAN_SEE(ch, vict) && ch != vict)
       {
@@ -3200,8 +3200,8 @@ int do_scan(Character *ch, char *argument, int cmd)
    {
       if (CAN_GO(ch, i))
       {
-         room = &world[world[ch->in_room].dir_option[i]->to_room];
-         if (room == &world[ch->in_room])
+         room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
+         if (room == &DC::getInstance()->world[ch->in_room])
             continue;
          if (IS_SET(room->room_flags, NO_SCAN))
          {
@@ -3214,9 +3214,9 @@ int do_scan(Character *ch, char *argument, int cmd)
                if (CAN_SEE(ch, vict))
                {
                   if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                      world[vict->in_room].sector_type != SECT_INSIDE &&
-                      world[vict->in_room].sector_type != SECT_CITY &&
-                      world[vict->in_room].sector_type != SECT_AIR)
+                      DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
+                      DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
+                      DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
                      continue;
 
                   if (skill_success(ch, nullptr, SKILL_SCAN))
@@ -3230,11 +3230,11 @@ int do_scan(Character *ch, char *argument, int cmd)
          // Now we go one room further (reach out and touch someone)
 
          was_in = ch->in_room;
-         ch->in_room = world[ch->in_room].dir_option[i]->to_room;
+         ch->in_room = DC::getInstance()->world[ch->in_room].dir_option[i]->to_room;
 
          if (CAN_GO(ch, i))
          {
-            room = &world[world[ch->in_room].dir_option[i]->to_room];
+            room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
             if (IS_SET(room->room_flags, NO_SCAN))
             {
                csendf(ch, "%35s -- a ways off %s\n\r", "It's too hard to see!",
@@ -3246,9 +3246,9 @@ int do_scan(Character *ch, char *argument, int cmd)
                   if (CAN_SEE(ch, vict))
                   {
                      if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                         world[vict->in_room].sector_type != SECT_INSIDE &&
-                         world[vict->in_room].sector_type != SECT_CITY &&
-                         world[vict->in_room].sector_type != SECT_AIR)
+                         DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
+                         DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
+                         DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
                         continue;
 
                      if (skill_success(ch, nullptr, SKILL_SCAN, -10))
@@ -3262,10 +3262,10 @@ int do_scan(Character *ch, char *argument, int cmd)
             // Now if we have the farsight spell we go another room out
             if (IS_AFFECTED(ch, AFF_FARSIGHT))
             {
-               ch->in_room = world[ch->in_room].dir_option[i]->to_room;
+               ch->in_room = DC::getInstance()->world[ch->in_room].dir_option[i]->to_room;
                if (CAN_GO(ch, i))
                {
-                  room = &world[world[ch->in_room].dir_option[i]->to_room];
+                  room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
                   if (IS_SET(room->room_flags, NO_SCAN))
                   {
                      csendf(ch, "%35s -- extremely far off %s\n\r", "It's too hard to see!",
@@ -3277,9 +3277,9 @@ int do_scan(Character *ch, char *argument, int cmd)
                         if (CAN_SEE(ch, vict))
                         {
                            if (IS_AFFECTED(vict, AFF_CAMOUFLAGUE) &&
-                               world[vict->in_room].sector_type != SECT_INSIDE &&
-                               world[vict->in_room].sector_type != SECT_CITY &&
-                               world[vict->in_room].sector_type != SECT_AIR)
+                               DC::getInstance()->world[vict->in_room].sector_type != SECT_INSIDE &&
+                               DC::getInstance()->world[vict->in_room].sector_type != SECT_CITY &&
+                               DC::getInstance()->world[vict->in_room].sector_type != SECT_AIR)
                               continue;
 
                            if (skill_success(ch, nullptr, SKILL_SCAN, -20))
@@ -3305,7 +3305,7 @@ int do_tick(Character *ch, char *argument, int cmd)
    int ntick;
    char buf[256];
 
-   if (IS_SET(world[ch->in_room].room_flags, QUIET))
+   if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
    {
       send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
       return 1;
@@ -3445,7 +3445,7 @@ int do_sector(Character *ch, char *arg, int cmd)
 
    if (ch->desc && ch->in_room)
    {
-      int sector = world[ch->in_room].sector_type;
+      int sector = DC::getInstance()->world[ch->in_room].sector_type;
       switch (sector)
       {
       case SECT_INSIDE:
@@ -4217,7 +4217,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       old_count = obj_results.size();
 
       // search room
-      for (auto obj = world[in_room].contents; obj; obj = obj->next_content)
+      for (auto obj = DC::getInstance()->world[in_room].contents; obj; obj = obj->next_content)
       {
          if (CAN_SEE_OBJ(this, obj))
          {

@@ -25,7 +25,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 // external vars
-extern World world;
+
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ char * innate_skills[] =
 int do_innate(Character *ch, char *arg, int cmd)
 {
   if(ch && ch->in_room > 0 &&
-     IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
+     IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
     send_to_char("Cannot use innate skills within a potato arena.\r\n", ch);
     return eFAILURE;
   }

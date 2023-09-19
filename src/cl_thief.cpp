@@ -27,7 +27,7 @@
 #include "inventory.h"
 
 extern int rev_dir[];
-extern World world;
+
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -619,7 +619,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   affected_type af;
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't do that in a potato arena ya sneaky bastard!\r\n", ch);
     return eFAILURE;
@@ -731,13 +731,13 @@ int do_hide(Character *ch, char *argument, int cmd)
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
     return eFAILURE;
   }
 
-  for (Character *curr = world[ch->in_room].people;
+  for (Character *curr = DC::getInstance()->world[ch->in_room].people;
        curr;
        curr = curr->next_in_room)
   {
@@ -764,7 +764,7 @@ int do_hide(Character *ch, char *argument, int cmd)
     for (i = 0; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = nullptr;
     i = 0;
-    for (temp = world[ch->in_room].people; temp; temp = temp->next_in_room)
+    for (temp = DC::getInstance()->world[ch->in_room].people; temp; temp = temp->next_in_room)
     {
       if (ch == temp)
         continue;
@@ -857,7 +857,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("No stealing permitted in safe areas!\n\r", ch);
     return eFAILURE;
@@ -869,7 +869,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     send_to_char("Do what!? This is an Arena, go kill someone!\n\r", ch);
     return eFAILURE;
@@ -1317,7 +1317,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("No stealing permitted in safe areas!\n\r", ch);
     return eFAILURE;
@@ -1329,7 +1329,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     send_to_char("Do what!? This is an Arena, go kill someone!\n\r", ch);
     return eFAILURE;
@@ -1575,7 +1575,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
       {
-        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+        if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
         {
           if (back->to_room == ch->in_room)
           {
@@ -1994,7 +1994,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -2023,7 +2023,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;

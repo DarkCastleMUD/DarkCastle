@@ -366,7 +366,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 			extract_char(vict, true);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, name,
-											world[ch->in_room].contents)) != nullptr)
+											DC::getInstance()->world[ch->in_room].contents)) != nullptr)
 		{
 			act("$n purges $p.", ch, obj, 0, TO_ROOM, 0);
 			act("You purge $p.", ch, obj, 0, TO_CHAR, 0);
@@ -392,14 +392,14 @@ int do_purge(Character *ch, char *argument, int cmd)
 					 "flames!\n\r",
 					 ch);
 
-		for (vict = world[ch->in_room].people; vict; vict = next_v)
+		for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_v)
 		{
 			next_v = vict->next_in_room;
 			if (IS_NPC(vict))
 				extract_char(vict, true);
 		}
 
-		for (obj = world[ch->in_room].contents; obj; obj = next_o)
+		for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = next_o)
 		{
 			next_o = obj->next_content;
 			extract_obj(obj);
@@ -602,7 +602,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			else
 				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
 			//      sprintf(buf, "%s[%5d].$R\r\n", buf,
-			// world[zone.cmd[j]->arg3].number);
+			// DC::getInstance()->world[zone.cmd[j]->arg3].number);
 			sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
 			break;
 		case 'P':
@@ -1095,7 +1095,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (DC::getInstance()->world_array[begin])
 				{
 					sprintf(buf, "[  1] [%5d] %s\n\r", begin,
-							world[begin].name);
+							DC::getInstance()->world[begin].name);
 					send_to_char(buf, ch);
 				}
 			}
@@ -1106,7 +1106,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					if (!DC::getInstance()->world_array[i])
 						continue;
 					count++;
-					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, world[i].name);
+					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, DC::getInstance()->world[i].name);
 					send_to_char(buf, ch);
 
 					if (count > 200)
@@ -1220,12 +1220,12 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (!DC::getInstance()->world_array[i])
 				continue;
 			if (bits)
-				if (!IS_SET(world[i].room_flags, bits))
+				if (!IS_SET(DC::getInstance()->world[i].room_flags, bits))
 					continue;
 			if (sector)
-				if (world[i].sector_type != sector)
+				if (DC::getInstance()->world[i].sector_type != sector)
 					continue;
-			sprintf(buf, "[%3d] %s\r\n", i, world[i].name);
+			sprintf(buf, "[%3d] %s\r\n", i, DC::getInstance()->world[i].name);
 			send_to_char(buf, ch);
 		}
 	}
@@ -1840,7 +1840,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 			if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
 			{
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-				ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+				ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1860,14 +1860,14 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 	}
 	source_room = victim->in_room;
 
-	if (world[destination_room].number == IMM_PIRAHNA_ROOM && !isname(GET_NAME(ch), "Pirahna"))
+	if (DC::getInstance()->world[destination_room].number == IMM_PIRAHNA_ROOM && !isname(GET_NAME(ch), "Pirahna"))
 	{
 		send_to_char("Damn! That is rude! This ain't your place. :P\r\n", ch);
 		return eFAILURE;
 	}
 
 	act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-	ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+	ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 	move_char(victim, destination_room);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1916,7 +1916,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 		//      for (loop = 0; loop <= top_of_world; loop++) {
-		//         if (world[loop].number == target) {
+		//         if (DC::getInstance()->world[loop].number == target) {
 		//            target = (int16_t)loop;
 		//            break;
 		//      } else if (loop == top_of_world) {
@@ -1935,9 +1935,9 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	} /* if */
 
-	if (IS_SET(world[target].room_flags, PRIVATE))
+	if (IS_SET(DC::getInstance()->world[target].room_flags, PRIVATE))
 	{
-		for (loop = 0, pers = world[target].people; pers;
+		for (loop = 0, pers = DC::getInstance()->world[target].people; pers;
 			 pers = pers->next_in_room, loop++)
 			;
 		if (loop > 1)
@@ -1949,13 +1949,13 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		} /* if */
 	}	  /* if */
 
-	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+	if (IS_SET(DC::getInstance()->world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (IS_SET(world[target].room_flags, CLAN_ROOM) &&
+	if (IS_SET(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
 		GET_LEVEL(ch) < DEITY)
 	{
 		send_to_char("No.\r\n", ch);
@@ -1964,7 +1964,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 
 	act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
-		   world[victim->in_room].number, world[target].number);
+		   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 	move_char(victim, target);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has teleported you!", ch, 0, (char *)victim, TO_VICT, 0);
@@ -2003,7 +2003,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 			victim, 0, 0, TO_ROOM, 0);
 		target = ch->in_room;
 		csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
-			   world[victim->in_room].number, world[target].number);
+			   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 		move_char(victim, target);
 		act("$n arrives from a puff of smoke.",
 			victim, 0, 0, TO_ROOM, 0);
@@ -2020,7 +2020,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 						victim, 0, 0, TO_ROOM, 0);
 					target = ch->in_room;
 					csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(k->follower),
-						   world[k->follower->in_room].number, world[target].number);
+						   DC::getInstance()->world[k->follower->in_room].number, DC::getInstance()->world[target].number);
 					move_char(k->follower, target);
 					act("$n arrives from a puff of smoke.",
 						k->follower, 0, 0, TO_ROOM, 0);

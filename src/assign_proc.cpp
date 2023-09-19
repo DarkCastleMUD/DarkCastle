@@ -22,7 +22,7 @@ typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument,
                      Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, char *arg);
 
-extern World world;
+
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 void boot_the_shops();
@@ -673,5 +673,5 @@ void assign_rooms(void)
 {
   ROOM_PROC pet_shops;
   if (real_room(3031) >= 0)
-    world[real_room(3031)].funct = pet_shops;
+    DC::getInstance()->world[real_room(3031)].funct = pet_shops;
 }
