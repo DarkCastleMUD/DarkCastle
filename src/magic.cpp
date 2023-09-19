@@ -11302,13 +11302,13 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
                      tmp_victim);
       }
     }
-    catch (CWorld::underrun &)
+    catch (World::underrun &)
     {
       logentry("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LogChannels::LOG_BUG);
       produce_coredump();
       return eFAILURE;
     }
-    catch (CWorld::overrun &)
+    catch (World::overrun &)
     {
       logentry("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LogChannels::LOG_BUG);
       produce_coredump();

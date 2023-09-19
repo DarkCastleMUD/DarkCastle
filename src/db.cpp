@@ -94,7 +94,7 @@ class Object *object_list = 0; /* the global linked list of obj's */
 
 pulse_data *bard_list = 0; /* global l-list of bards          */
 
-Room &CWorld::operator[](int rnum)
+Room &World::operator[](int rnum)
 {
 	static Room generic_room = {};
 
@@ -107,7 +107,7 @@ Room &CWorld::operator[](int rnum)
 	return *DC::getInstance()->world_array[rnum];
 }
 
-CWorld world;
+World world;
 
 #ifndef SEEK_CUR
 #define SEEK_CUR 1

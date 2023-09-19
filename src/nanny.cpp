@@ -84,7 +84,7 @@ extern char imotd[MAX_STRING_LENGTH];
 
 extern Object *object_list;
 extern struct index_data *obj_index;
-extern CWorld world;
+extern World world;
 extern CVoteData *DCVote;
 
 int _parse_email(char *arg);

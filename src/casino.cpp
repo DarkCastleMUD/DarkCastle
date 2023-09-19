@@ -37,7 +37,7 @@ extern "C"
 using namespace std;
 
 extern Object *object_list;
-extern CWorld world;
+extern World world;
 extern struct index_data *obj_index;
 
 void pulse_table_bj(struct table_data *tbl, int recall = 0);

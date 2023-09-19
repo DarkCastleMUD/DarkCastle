@@ -28,7 +28,7 @@
 
 using namespace std;
 
-extern CWorld world;
+extern World world;
 
 extern bool MOBtrigger;
 

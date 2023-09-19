@@ -35,7 +35,7 @@ extern const char *pc_clss_types3[];
 extern const char *pc_clss_abbrev[];
 
 /* External variables */
-extern CWorld world;
+extern World world;
 extern int max_who;
 extern int top_of_world;
 

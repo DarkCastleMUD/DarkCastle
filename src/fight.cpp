@@ -63,7 +63,7 @@
 #define MAX_CHAMP_DEATH_MESSAGE 14
 
 extern int top_of_world;
-extern CWorld world;
+extern World world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 

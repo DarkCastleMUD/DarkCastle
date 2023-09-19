@@ -207,9 +207,9 @@ struct world_file_list_item
   world_file_list_item *next;
 };
 
-// The CWorld class, to control the world a bit better.
+// The World class, to control the world a bit better.
 
-class CWorld : public ErrorHandler
+class World : public ErrorHandler
 {
 public:
   Room &operator[](int rnum);

@@ -96,7 +96,7 @@ extern int restrict;
 // extern int mini_mud;
 // extern int no_rent_check;
 
-extern CWorld world; /* In db.c */
+extern World world; /* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];

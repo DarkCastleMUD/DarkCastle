@@ -34,7 +34,7 @@ extern "C"
 #include "inventory.h"
 #include "handler.h"
 
-extern CWorld world;
+extern World world;
 extern index_data *mob_index;
 Character *origsing = nullptr;
 

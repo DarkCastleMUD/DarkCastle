@@ -25,7 +25,7 @@
 #include "returnvals.h"
 #include "levels.h"
 
-extern CWorld world;
+extern World world;
 struct _arena arena;
 
 int do_arena(Character *ch, char *argument, int cmd)

@@ -31,7 +31,7 @@ extern "C"
 
 #undef DEBUG_TOKEN
 
-extern CWorld world;
+extern World world;
 
 /************************************************************************
 | TokenList::TokenList(char *str)

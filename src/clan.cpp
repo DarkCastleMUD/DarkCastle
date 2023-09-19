@@ -45,7 +45,7 @@ uint64_t i = UINT64_MAX;
 using namespace std;
 
 extern index_data *obj_index;
-extern CWorld world;
+extern World world;
 
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);

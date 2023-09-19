@@ -26,7 +26,7 @@ extern "C"
 #include "handler.h"
 #include "interp.h"
 
-extern CWorld world;
+extern World world;
 
 /*************************************************************************
  * Figures out if a fountain is present in the room                       *

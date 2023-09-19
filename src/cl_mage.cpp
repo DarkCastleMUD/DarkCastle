@@ -20,7 +20,7 @@
 #include "room.h"
 #include "db.h"
 
-extern CWorld world;
+extern World world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 

@@ -22,7 +22,7 @@ typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument,
                      Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, char *arg);
 
-extern CWorld world;
+extern World world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 void boot_the_shops();

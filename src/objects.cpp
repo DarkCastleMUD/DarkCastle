@@ -32,7 +32,7 @@ extern "C"
 extern const char *drinks[];
 extern const char *dirs[];
 extern int drink_aff[][3];
-extern CWorld world;
+extern World world;
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;

@@ -47,7 +47,7 @@
 /* External Structures / Variables */
 extern class Object *object_list;
 class Object *obj_proto;
-extern struct CWorld world;
+extern struct World world;
 extern struct index_data *obj_index; /* index table for object file   */
 int16_t frozen_start_room = 1;
 

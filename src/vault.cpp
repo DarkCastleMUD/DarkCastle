@@ -67,7 +67,7 @@ vault_search_parameter::~vault_search_parameter()
   }
 }
 
-extern CWorld world;
+extern World world;
 int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 

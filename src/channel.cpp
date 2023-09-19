@@ -108,7 +108,7 @@ queue<string> auction_history;
 queue<string> newbie_history;
 queue<string> trivia_history;
 
-extern CWorld world;
+extern World world;
 
 extern struct index_data *obj_index;
 

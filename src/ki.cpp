@@ -33,7 +33,7 @@ extern "C"
 
 using namespace std;
 
-extern CWorld world;
+extern World world;
 
 extern int hit_gain(Character *, int);
 

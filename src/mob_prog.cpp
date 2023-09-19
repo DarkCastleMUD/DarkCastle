@@ -63,7 +63,7 @@ using namespace std;
 
 // Extern variables
 
-extern CWorld world;
+extern World world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;

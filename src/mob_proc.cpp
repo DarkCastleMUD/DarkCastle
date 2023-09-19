@@ -41,7 +41,7 @@
 
 /*   external vars  */
 
-extern CWorld world;
+extern World world;
 
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;

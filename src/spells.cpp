@@ -54,7 +54,7 @@ extern "C"
 
 // Global data
 
-extern CWorld world;
+extern World world;
 extern struct class_skill_defines w_skills[];
 extern struct class_skill_defines t_skills[];
 extern struct class_skill_defines d_skills[];

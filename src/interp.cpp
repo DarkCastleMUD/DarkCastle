@@ -57,7 +57,7 @@ int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern CWorld world;
+extern World world;
 
 // globals to store last command that was done.
 // this is used for debugging.  We output it in case of a crash

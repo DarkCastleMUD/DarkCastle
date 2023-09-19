@@ -55,7 +55,7 @@ struct AuctionTicket;
 Object *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
 extern struct index_data *obj_index;
-extern CWorld world;
+extern World world;
 
 enum ListOptions
 {

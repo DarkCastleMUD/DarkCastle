@@ -54,7 +54,7 @@
 #include "corpse.h"
 #include "shop.h"
 
-extern CWorld world;
+extern World world;
 
 extern class Object *object_list;
 extern struct index_data *mob_index;

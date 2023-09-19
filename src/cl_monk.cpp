@@ -103,7 +103,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
 
 int do_quivering_palm(Character *ch, char *argument, int cmd)
 {
-  extern CWorld world;
+  extern World world;
   struct affected_type af;
   Character *victim;
   char name[256];

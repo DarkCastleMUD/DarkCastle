@@ -27,7 +27,7 @@
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
-extern CWorld world;
+extern World world;
 
 int do_batter(Character *ch, char *argument, int cmd)
 {

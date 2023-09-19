@@ -50,7 +50,7 @@ extern Database db;
 using namespace std;
 
 extern struct index_data *obj_index;
-extern CWorld world;
+extern World world;
 
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);

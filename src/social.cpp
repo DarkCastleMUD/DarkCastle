@@ -22,7 +22,7 @@ extern "C"
 #include "interp.h" // len_cmp
 #include "returnvals.h"
 
-extern CWorld world;
+extern World world;
 
 // storage of socials
 struct social_messg *soc_mess_list; // head of social array

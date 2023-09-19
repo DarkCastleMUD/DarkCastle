@@ -27,7 +27,7 @@ extern "C"
 #include "MobActivity.h"
 #include "const.h"
 // Externs
-extern CWorld world;
+extern World world;
 
 // Locals
 class Path *mPathList = nullptr;

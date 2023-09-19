@@ -63,7 +63,7 @@ using namespace std;
 // external vars
 
 extern struct index_data *mob_index;
-extern CWorld world;
+extern World world;
 
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;

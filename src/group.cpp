@@ -26,7 +26,7 @@ extern "C"
 #include "spells.h"
 #include "terminal.h"
 
-extern CWorld world;
+extern World world;
 char *calc_color(int hit, int max_hit);
 
 int do_abandon(Character *ch, char *argument, int cmd)

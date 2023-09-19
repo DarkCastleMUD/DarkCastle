@@ -27,7 +27,7 @@ using namespace std;
 typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
-extern CWorld world;
+extern World world;
 
 char *valid_fields[] = {
     "name",

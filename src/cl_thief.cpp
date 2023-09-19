@@ -27,7 +27,7 @@
 #include "inventory.h"
 
 extern int rev_dir[];
-extern CWorld world;
+extern World world;
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;

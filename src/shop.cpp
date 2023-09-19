@@ -44,7 +44,7 @@ extern struct index_data *mob_index;
 
 struct player_shop *g_playershops;
 
-extern CWorld world;
+extern World world;
 extern struct index_data *obj_index;
 
 extern struct time_info_data time_info;

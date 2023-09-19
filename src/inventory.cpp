@@ -33,7 +33,7 @@
 
 /* extern variables */
 
-extern CWorld world;
+extern World world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
