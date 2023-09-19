@@ -4571,11 +4571,6 @@ void Zone::reset(ResetType reset_type)
 
 	for (cmd_no = 0; cmd_no < cmd.size(); cmd_no++)
 	{
-		if (id_ == 116 && cmd_no == 1)
-		{
-			qDebug("test");
-		}
-
 		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
 			sprintf(buf,
