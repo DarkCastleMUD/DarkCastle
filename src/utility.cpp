@@ -1893,43 +1893,47 @@ int do_home(Character *ch, char *argument, int cmd)
   struct clan_room_data *room;
   int found = 0;
 
-  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->isMortal())
   {
-    send_to_char("This place doesn't sit right with you...not enough "
-                 "security.\r\n",
-                 ch);
-    return eFAILURE;
-  }
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
-  {
-    send_to_char("Something prevents it.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if (GET_LEVEL(ch) < 11)
-  {
-    send_to_char("You must grow a bit before you can leave the nursery.\r\n", ch);
-    GET_HOME(ch) = START_ROOM;
-    return eFAILURE;
-  }
-
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
-  {
-    if (!ch->clan || !(clan = get_clan(ch)))
+    if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+        IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
     {
-      send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+      send_to_char("This place doesn't sit right with you...not enough "
+                   "security.\r\n",
+                   ch);
       return eFAILURE;
     }
 
-    for (room = clan->rooms; room; room = room->next)
-      if (ch->in_room == real_room(room->room_number))
-        found = 1;
-
-    if (!found)
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
     {
-      send_to_char("Chode! You can't set home in another clan's hall!\r\n", ch);
+      send_to_char("Something prevents it.\r\n", ch);
       return eFAILURE;
+    }
+
+    if (GET_LEVEL(ch) < 11)
+    {
+      send_to_char("You must grow a bit before you can leave the nursery.\r\n", ch);
+      GET_HOME(ch) = START_ROOM;
+      return eFAILURE;
+    }
+
+    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
+    {
+      if (!ch->clan || !(clan = get_clan(ch)))
+      {
+        send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+        return eFAILURE;
+      }
+
+      for (room = clan->rooms; room; room = room->next)
+        if (ch->in_room == real_room(room->room_number))
+          found = 1;
+
+      if (!found)
+      {
+        send_to_char("Chode! You can't set home in another clan's hall!\r\n", ch);
+        return eFAILURE;
+      }
     }
   }
 
