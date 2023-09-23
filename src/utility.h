@@ -465,11 +465,9 @@ QString sprinttype(uint64_t type, QStringList names);
 std::string sprinttype(int type, vector<const char *>);
 
 int consttype(char *search_str, const char *names[]);
-const char *constindex(int index, const char *names[]);
-struct time_info_data
-mud_time_passed(time_t t2, time_t t1);
-struct time_info_data
-age(Character *ch);
+QString constindex(const qsizetype index, const QStringList names);
+struct time_info_data mud_time_passed(time_t t2, time_t t1);
+struct time_info_data age(Character *ch);
 bool circle_follow(Character *ch, Character *victim);
 bool ARE_GROUPED(Character *sub, Character *obj);
 bool ARE_CLANNED(Character *sub, Character *obj);

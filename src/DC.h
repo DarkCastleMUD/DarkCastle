@@ -102,6 +102,7 @@ public:
   static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
   const QString HINTS_FILE_NAME = "playerhints.txt";
+  static const QStringList connected_states;
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;

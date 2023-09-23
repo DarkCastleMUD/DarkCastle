@@ -2277,54 +2277,6 @@ const char *connected_types[] =
         "Get stats",
         "\n"};
 
-const char *connected_states[] =
-    {
-        "PLAYING", // 0
-        "GET_NAME",
-        "GET_OLD_PASSWORD",
-        "CONFIRM_NEW_NAME",
-        "GET_NEW_PASSWORD",
-        "CONFIRM_NEW_PASSWORD", // 5
-        "GET_NEW_SEX",
-        "OLD_GET_CLASS",
-        "READ_MOTD",
-        "SELECT_MENU",
-        "RESET_PASSWORD", // 10
-        "CONFIRM_RESET_PASSWORD",
-        "EXDSCR",
-        "OLD_GET_RACE",
-        "WRITE_BOARD",
-        "EDITING", // 15
-        "SEND_MAIL",
-        "DELETE_CHAR",
-        "OLD_CHOOSE_STATS",
-        "PFILE_WIPE",
-        "ARCHIVE_CHAR", // 20
-        "CLOSE",
-        "CONFIRM_PASSWORD_CHANGE",
-        "EDIT_MPROG",
-        "DISPLAY_ENTRANCE",
-        "PRE_DISPLAY_ENTRANCE", // 25
-        "SELECT_RECOVERY_MENU",
-        "GET_NEW_RECOVERY_QUESTION",
-        "GET_NEW_RECOVERY_ANSWER",
-        "GET_NEW_RECOVERY_EMAIL",
-        "QUESTION_ANSI", // 30
-        "GET_ANSI",
-        "QUESTION_SEX",
-        "QUESTION_STAT_METHOD",
-        "GET_STAT_METHOD",
-        "OLD_STAT_METHOD", // 35
-        "NEW_STAT_METHOD",
-        "NEW_PLAYER",
-        "QUESTION_RACE",
-        "GET_RACE",
-        "QUESTION_CLASS", // 40
-        "GET_CLASS",
-        "QUESTION_STATS",
-        "GET_STATS",
-        "\n"};
-
 // Constitution Attribute Modifiers
 const struct con_app_type con_app[] = {
     /*STAT#  { HP_REGEN/TICK, MOVE_REGEN/TICK, HP_GAIN/LEVEL, POSION_RES	},*/
@@ -3773,3 +3725,50 @@ const QList<int> Character::wear_to_item_wear =
         ITEM_WEAR_FACE, // 20
         ITEM_WEAR_EAR,
         ITEM_WEAR_EAR};
+
+const QStringList DC::connected_states =
+    {
+        "PLAYING", // 0
+        "GET_NAME",
+        "GET_OLD_PASSWORD",
+        "CONFIRM_NEW_NAME",
+        "GET_NEW_PASSWORD",
+        "CONFIRM_NEW_PASSWORD", // 5
+        "GET_NEW_SEX",
+        "OLD_GET_CLASS",
+        "READ_MOTD",
+        "SELECT_MENU",
+        "RESET_PASSWORD", // 10
+        "CONFIRM_RESET_PASSWORD",
+        "EXDSCR",
+        "OLD_GET_RACE",
+        "WRITE_BOARD",
+        "EDITING", // 15
+        "SEND_MAIL",
+        "DELETE_CHAR",
+        "OLD_CHOOSE_STATS",
+        "PFILE_WIPE",
+        "ARCHIVE_CHAR", // 20
+        "CLOSE",
+        "CONFIRM_PASSWORD_CHANGE",
+        "EDIT_MPROG",
+        "DISPLAY_ENTRANCE",
+        "PRE_DISPLAY_ENTRANCE", // 25
+        "SELECT_RECOVERY_MENU",
+        "GET_NEW_RECOVERY_QUESTION",
+        "GET_NEW_RECOVERY_ANSWER",
+        "GET_NEW_RECOVERY_EMAIL",
+        "QUESTION_ANSI", // 30
+        "GET_ANSI",
+        "QUESTION_SEX",
+        "QUESTION_STAT_METHOD",
+        "GET_STAT_METHOD",
+        "OLD_STAT_METHOD", // 35
+        "NEW_STAT_METHOD",
+        "NEW_PLAYER",
+        "QUESTION_RACE",
+        "GET_RACE",
+        "QUESTION_CLASS", // 40
+        "GET_CLASS",
+        "QUESTION_STATS",
+        "GET_STATS"};

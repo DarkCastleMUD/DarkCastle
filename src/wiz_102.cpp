@@ -19,6 +19,7 @@
 #include <limits>
 #include <type_traits>
 #include <tuple>
+#include <algorithm>
 
 #include <fmt/format.h>
 
@@ -5545,88 +5546,36 @@ int do_return(Character *ch, char *argument, int cmd)
 
 command_return_t Character::do_sockets(QStringList arguments, int cmd)
 {
-  QString name;
-  if (arguments.isEmpty() == false)
+  QString searchkey;
+  if (!arguments.isEmpty())
   {
-    name = arguments.at(0);
+    searchkey = arguments.at(0);
   }
 
-  uint64_t num_can_see = 0;
-  QString buf;
-  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  const Sockets sockets{this, searchkey};
+  const QMap<QString, uint64_t> IPs = sockets.getIPs();
+  const QList<Connection *> connections = sockets.getConnections();
+  const uint64_t longest_IP_size = std::max(2UL, sockets.getLongestIPSize());
+  const uint64_t longest_name_size = std::max(4UL, sockets.getLongestNameSize());
+  const uint64_t longest_connection_state_size = std::max(5UL, sockets.getLongestConnectionStateSize());
+  const uint64_t longest_idle_size = std::max(4UL, sockets.getLongestIdleSize() + 1);
+
+  send(QString("%1: %2 | %3 | %4 | %5$R\r\n").arg("Des").arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
+  for (const auto &d : connections)
   {
-    if (GET_LEVEL(this) < OVERSEER)
-    {
-      if (d->character == nullptr)
-        continue;
-      if (d->character->name == nullptr)
-        continue;
-    }
-    if (d->character)
-    {
-      if (!CAN_SEE(this, d->character))
-        continue;
-      if (GET_LEVEL(this) < GET_LEVEL(d->character))
-        continue;
-      if ((d->connected != Connection::states::PLAYING) &&
-          (GET_LEVEL(this) < GET_LEVEL(d->character)))
-        continue;
-    }
+    const QString connection_character_name = d->getName();
+    const QString IPstr = d->getPeerFullAddressString();
+    const auto descriptor = d->descriptor;
+    const bool duplicate_IP = IPs[d->getPeerOriginalAddress().toString()] > 1;
+    const QString connected_state = constindex(d->connected, DC::connected_states);
+    const QString idle_seconds = QString("%1s").arg(d->idle_time / DC::PASSES_PER_SEC);
 
-    if (name.isEmpty() == false)
-    {
-      if (!d->getPeerOriginalAddress().toString().contains(name) && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(name, Qt::CaseInsensitive) == false)
-      {
-        continue;
-      }
-    }
+    send(QString("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
+  }
 
-    bool duplicate = false;
-    for (Connection *ad = DC::getInstance()->descriptor_list; ad != nullptr; ad = ad->next)
-    {
-      if (ad != d && d->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
-      {
-        if (!ad->character || GET_LEVEL(ad->character) <= GET_LEVEL(this))
-        {
-          duplicate = true;
-          break;
-        }
-      }
-    }
-    num_can_see++;
+  const uint64_t num_can_see = connections.size();
+  send(QString("\r\nThere are %1 connections.\r\n").arg(num_can_see));
 
-    QString connection_character_name;
-    if (d && d->character && d->character->name)
-    {
-      connection_character_name = d->character->name;
-    }
-    else
-    {
-      connection_character_name = "NONE";
-    }
-
-    QString source_host_buffer;
-    if (d->proxy.isActive())
-    {
-      source_host_buffer = QString(" via %1").arg(d->proxy.getSourceAddress().toString());
-    }
-
-    buf += QString("%1%2: %3%4 | %5$R |").arg(duplicate ? "$B$4" : "").arg(d->descriptor, 3).arg(d->getPeerAddress().toString()).arg(source_host_buffer).arg(connection_character_name, -16);
-
-    if (const char *pStr = constindex(d->connected, connected_states))
-    {
-      buf += QString("%1 |").arg(pStr, -20);
-    }
-    else
-    {
-      buf += "***UNKNOWN*** | ";
-    }
-    buf += QString("%1s\r\n").arg(d->idle_time / DC::PASSES_PER_SEC);
-
-  } // for
-
-  buf += QString("\n\r\n\rThere are %1 connections.\r\n").arg(num_can_see);
-  page_string(desc, buf.toStdString().c_str(), 1);
   return eSUCCESS;
 }
 

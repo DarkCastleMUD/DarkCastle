@@ -752,15 +752,14 @@ int consttype(char *search_str, const char *names[])
   return -1;
 }
 
-const char *constindex(int index, const char *names[])
+QString constindex(const qsizetype index, const QStringList names)
 {
-  int nr;
+  if (names.size() > index)
+  {
+    return names.at(index);
+  }
 
-  for (nr = 0; *names[nr] != '\n'; nr++)
-    if (nr == index)
-      return names[nr];
-
-  return (char *)0;
+  return "";
 }
 
 // Calculate the MUD time passed over the last t2-t1 centuries (secs)

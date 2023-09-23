@@ -340,6 +340,15 @@ void Connection::send(QString txt)
     output += txt.toStdString();
 }
 
+QString Connection::getName(void)
+{
+    if (character)
+    {
+        return character->getName();
+    }
+    return "";
+}
+
 const QStringList Object::apply_types =
     {
         "NONE", // 0
@@ -452,3 +461,61 @@ const QStringList Object::apply_types =
         "WATERBREATHING",
         "DETECT MAGIC",
         "WILD MAGIC"};
+
+Sockets::Sockets(Character *ch, QString searchkey)
+{
+    for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+    {
+        if (GET_LEVEL(ch) < OVERSEER)
+        {
+            if (d->character == nullptr)
+                continue;
+            if (d->character->name == nullptr)
+                continue;
+        }
+        if (d->character)
+        {
+            if (!CAN_SEE(ch, d->character))
+                continue;
+            if (GET_LEVEL(ch) < GET_LEVEL(d->character))
+                continue;
+            if ((d->connected != Connection::states::PLAYING) && (GET_LEVEL(ch) < GET_LEVEL(d->character)))
+                continue;
+        }
+
+        if (!searchkey.isEmpty())
+        {
+            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
+            {
+                continue;
+            }
+        }
+
+        const QString name = d->getName();
+        if (name.size() > longest_name_size_)
+        {
+            longest_name_size_ = name.size();
+        }
+
+        const QString IPstr = d->getPeerFullAddressString();
+        if (IPstr.size() > longest_IP_size_)
+        {
+            longest_IP_size_ = IPstr.size();
+        }
+
+        const QString state = constindex(d->connected, DC::connected_states);
+        if (state.size() > longest_connection_state_size_)
+        {
+            longest_connection_state_size_ = state.size();
+        }
+
+        const QString idle = QString::number(d->idle_time / DC::PASSES_PER_SEC);
+        if (idle.size() > longest_idle_size_)
+        {
+            longest_idle_size_ = idle.size();
+        }
+
+        IPs_[d->getPeerAddress().toString()]++;
+        connections_.push_back(d);
+    }
+}

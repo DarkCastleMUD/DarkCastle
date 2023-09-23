@@ -174,6 +174,18 @@ public:
     return getPeerAddress();
   }
 
+  QString getPeerFullAddressString(void)
+  {
+    if (proxy.isActive())
+    {
+      return QString("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
+    }
+    else
+    {
+      return getPeerOriginalAddress().toString();
+    }
+  }
+
   void setPeerAddress(QHostAddress address)
   {
     peer_address_ = address;
@@ -184,9 +196,31 @@ public:
     peer_port_ = port;
   }
 
+  QString getName(void);
+
 private:
   QHostAddress peer_address_ = {};
   uint16_t peer_port_ = {};
+};
+
+class Sockets
+{
+public:
+  Sockets(Character *ch = nullptr, QString searchkey = "");
+  QMap<QString, uint64_t> getIPs(void) const { return IPs_; }
+  QList<Connection *> getConnections(void) const { return connections_; }
+  uint64_t getLongestNameSize(void) const { return longest_name_size_; }
+  uint64_t getLongestIPSize(void) const { return longest_IP_size_; }
+  uint64_t getLongestConnectionStateSize(void) const { return longest_connection_state_size_; }
+  uint64_t getLongestIdleSize(void) const { return longest_idle_size_; }
+
+private:
+  QMap<QString, uint64_t> IPs_{};
+  QList<Connection *> connections_{};
+  uint64_t longest_name_size_{};
+  uint64_t longest_IP_size_{};
+  uint64_t longest_connection_state_size_{};
+  uint64_t longest_idle_size_{};
 };
 
 #endif
