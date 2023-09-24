@@ -764,24 +764,22 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
 
 int do_findfix(Character *ch, char *argument, int cmd)
 {
-  int i, j, z;
-
-  // Lazy code. Nested fors > thinking.
-  char buf[MAX_STRING_LENGTH];
-  buf[0] = '\0';
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (j = 0; j < zone.cmd.size(); j++)
+    for (qsizetype j = 0; j < zone.cmd.size(); j++)
     {
-      bool first = true, found = false;
+      bool first = true;
+      bool found = false;
       if (zone.cmd[j]->command != 'M')
         continue;
-      int vnum = zone.cmd[j]->arg1, max = zone.cmd[j]->arg2;
-      if (zone.cmd[j]->arg2 == 1 ||
-          zone.cmd[j]->arg2 == -1)
+
+      int vnum = zone.cmd[j]->arg1;
+      int max = zone.cmd[j]->arg2;
+      if (max == 1 || max == -1)
         continue; // Don't care about those..
+
       int amt = 0;
-      for (z = 0; z < zone.cmd.size(); z++)
+      for (qsizetype z = 0; z < zone.cmd.size(); z++)
       {
         if (zone.cmd[z]->command != 'M')
           continue;
@@ -797,26 +795,27 @@ int do_findfix(Character *ch, char *argument, int cmd)
           max = zone.cmd[z]->arg2;
         amt++;
       }
+
       if (!first)
         continue;
       if (amt == max)
         continue;
-      if (strlen(buf) > MAX_STRING_LENGTH - 200)
-      {
-        i = 10000; // Hack to make it end immediatly.
-        break;
-      }
       if (amt > max)
       {
-        sprintf(buf, "%sReset %d in zone %d has MORE resets than max in world.\r\n", buf, j, i);
+        ch->send(QString("Reset %1 in zone %2 has %3 vs a max of %4 in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        char *buffer = strdup(QString("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        do_zedit(ch, buffer, CMD_DEFAULT);
+        free(buffer);
       }
       else
       {
-        sprintf(buf, "%sReset %d in zone %d has LESS resets than max in world.\r\n", buf, j, i);
+        ch->send(QString("Reset %1 in zone %2 has %3 vs a max of %4 in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        char *buffer = strdup(QString("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        do_zedit(ch, buffer, CMD_DEFAULT);
+        free(buffer);
       }
     }
   }
-  send_to_char(buf, ch);
   return eSUCCESS;
 }
 
