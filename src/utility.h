@@ -188,7 +188,6 @@ bool is_hiding(Character *ch, Character *vict);
 #define ISSET(var, bit) ((var)[(bit) / ASIZE] & (1 << (((bit) - (((bit) / ASIZE) * ASIZE)) - 1)))
 // using an AND
 
-#define IS_SET(flag, bit) ((flag) & (bit))
 #define SET_BIT(var, bit) ((var) = (var) | (bit))
 #define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
 #define TOGGLE_BIT(var, bit) ((var) = (var) ^ (bit))
@@ -199,7 +198,7 @@ int DARK_AMOUNT(int room);
 bool IS_DARK(int room);
 #define IS_LIGHT(room) (!IS_DARK(room))
 
-#define IS_ARENA(room) (IS_SET(DC::getInstance()->world[room].room_flags, ARENA))
+#define IS_ARENA(room) (DC::isSet(DC::getInstance()->world[room].room_flags, ARENA))
 
 #define HSHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "his" : "her") : "its")
 #define HSSH(ch) ((ch)->sex ? (((ch)->sex == 1) ? "he" : "she") : "it")
@@ -208,9 +207,9 @@ bool IS_DARK(int room);
 // #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
 #define IS_PC(ch) (!IS_NPC(ch) && ch->player != nullptr)
-#define IS_NPC(ch) (IS_SET((ch)->misc, MISC_IS_MOB))
+#define IS_NPC(ch) (DC::isSet((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch) (IS_NPC(ch))
-#define IS_OBJ(ch) (IS_SET((ch)->misc, MISC_IS_OBJ))
+#define IS_OBJ(ch) (DC::isSet((ch)->misc, MISC_IS_OBJ))
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
@@ -332,7 +331,7 @@ bool IS_DARK(int room);
 
 #define AWAKE(ch) (GET_POS(ch) != POSITION_SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->player->toggles, PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : DC::isSet((ch)->player->toggles, PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
@@ -342,7 +341,7 @@ inline const short IS_ANONYMOUS(Character *ch)
   else if (GET_LEVEL(ch) >= 101)
      return 0;
   else
-     return (IS_SET(ch->player->toggles, PLR_ANONYMOUS) != 0);
+     return (DC::isSet(ch->player->toggles, PLR_ANONYMOUS) != 0);
 }
 */
 /* Object And Carry related macros */
@@ -351,7 +350,7 @@ inline const short IS_ANONYMOUS(Character *ch)
 #define GET_MOB_TYPE(mob) ((mob)->mobdata->mob_flags.type)
 #define GET_OBJ_WEIGHT(obj) ((obj)->obj_flags.weight)
 
-#define CAN_WEAR(obj, part) (IS_SET((obj)->obj_flags.wear_flags, part))
+#define CAN_WEAR(obj, part) (DC::isSet((obj)->obj_flags.wear_flags, part))
 
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + has_skill(ch, SKILL_VIGOR))
 #define CAN_CARRY_N(ch) (5 + GET_DEX(ch))
@@ -365,7 +364,7 @@ inline const short IS_ANONYMOUS(Character *ch)
    (CAN_WEAR((obj), ITEM_TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
     CAN_SEE_OBJ((ch), (obj)))
 
-#define IS_OBJ_STAT(obj, stat) (IS_SET((obj)->obj_flags.extra_flags, stat))
+#define IS_OBJ_STAT(obj, stat) (DC::isSet((obj)->obj_flags.extra_flags, stat))
 #define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
 #define NOT_SPECIAL(obj) (!IS_SPECIAL(obj))
 
@@ -395,11 +394,11 @@ inline const short IS_ANONYMOUS(Character *ch)
 
 #define IS_EXIT(room, door) (DC::getInstance()->world[(room)].dir_option[(door)])
 #define EXIT_TO(room, door) (DC::getInstance()->world[(room)].dir_option[(door)]->to_room)
-#define IS_OPEN(room, door) (!IS_SET(DC::getInstance()->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
+#define IS_OPEN(room, door) (!DC::isSet(DC::getInstance()->world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
 
-#define OUTSIDE(ch) (!IS_SET(DC::getInstance()->world[(ch)->in_room].room_flags, INDOORS))
+#define OUTSIDE(ch) (!DC::isSet(DC::getInstance()->world[(ch)->in_room].room_flags, INDOORS))
 #define EXIT(ch, door) (DC::getInstance()->world[(ch)->in_room].dir_option[door])
-#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
 #define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)

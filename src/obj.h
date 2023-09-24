@@ -21,8 +21,6 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 
-#define IS_SET(flag, bit) ((flag) & (bit))
-
 using namespace std;
 
 /* The following defs are for Object  */
@@ -346,14 +344,8 @@ public:
         }
         return obj_flags.value[3];
     }
-    bool hasPortalFlagNoLeave(void)
-    {
-        return IS_SET(getPortalFlags(), Object::portal_flags_t::No_Leave);
-    }
-    bool hasPortalFlagNoEnter(void)
-    {
-        return IS_SET(getPortalFlags(), Object::portal_flags_t::No_Enter);
-    }
+    bool hasPortalFlagNoLeave(void);
+    bool hasPortalFlagNoEnter(void);
 
     uint64_t getLevel(void);
 

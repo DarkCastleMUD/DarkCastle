@@ -576,7 +576,7 @@ void format_text(char **ptr_string, int mode, class Connection *d, int maxlen)
    if (!flow)
       return;
 
-   if (IS_SET(mode, FORMAT_INDENT))
+   if (DC::isSet(mode, FORMAT_INDENT))
    {
       strcpy(formated, "   ");
       total_chars = 3;

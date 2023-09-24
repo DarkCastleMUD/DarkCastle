@@ -1461,11 +1461,11 @@ int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_typ
     save = get_saves(vict, SAVE_TYPE_MAGIC);
     // ISR Magic has to affect saving throws as well as damage so they don't get
     // para'd or slept or something
-    if (IS_SET(vict->immune, ISR_MAGIC))
+    if (DC::isSet(vict->immune, ISR_MAGIC))
       return (true);
-    if (IS_SET(vict->suscept, ISR_MAGIC))
+    if (DC::isSet(vict->suscept, ISR_MAGIC))
       save *= 0.7;
-    if (IS_SET(vict->resist, ISR_MAGIC))
+    if (DC::isSet(vict->resist, ISR_MAGIC))
       save *= 1.3;
     break;
   case SAVE_TYPE_POISON:
@@ -1552,7 +1552,7 @@ int do_release(Character *ch, char *argument, int cmd)
         continue;
       if (aff->type > MAX_SPL_LIST)
         continue;
-      if (!IS_SET(spell_info[aff->type].targets,
+      if (!DC::isSet(spell_info[aff->type].targets,
                   TAR_SELF_DEFAULT) &&
           aff->type != SPELL_HOLY_AURA)
         continue;
@@ -1891,7 +1891,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       send_to_char("Stick to singing bucko.", ch);
       return eFAILURE;
     }
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
     {
       send_to_char("You find yourself unable to weave magic here.\r\n", ch);
       return eFAILURE;
@@ -2034,7 +2034,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             return eFAILURE;
           }
           int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
-          if (IS_SET(DC::getInstance()->world[new_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
+          if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
           {
             send_to_char("That room is protected from this harmful magic.\r\n", ch);
             return eFAILURE;
@@ -2194,13 +2194,13 @@ int do_cast(Character *ch, char *argument, int cmd)
 
         } // end if filterable spell
       }   // end filter
-      if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE))
+      if (!target_ok && !DC::isSet(spell_info[spl].targets, TAR_IGNORE))
       {
         argument = one_argument(argument, name);
 
         if (*name)
         {
-          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (DC::isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
           {
             if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
               target_ok = true;
@@ -2221,7 +2221,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             }
           }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
           {
             bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
@@ -2231,23 +2231,23 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (!orig)
               REMBIT(ch->affected_by, AFF_true_SIGHT);
           }
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_OBJ_INV))
             if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
               target_ok = true;
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
           {
             tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
             if (tar_obj != nullptr)
               target_ok = true;
           }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
             if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
-              /* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
+              /* && !(DC::isSet(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
           {
             for (i = 0; i < MAX_WEAR && !target_ok; i++)
               if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
@@ -2257,7 +2257,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               }
           }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_SELF_ONLY))
             if (str_cmp(GET_NAME(ch), name) == 0)
             {
               tar_char = ch;
@@ -2267,14 +2267,14 @@ int do_cast(Character *ch, char *argument, int cmd)
         else
         { // !*name No argument was typed
 
-          if (IS_SET(spell_info[spl].targets, TAR_FIGHT_SELF))
+          if (DC::isSet(spell_info[spl].targets, TAR_FIGHT_SELF))
             if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
             {
               tar_char = ch;
               target_ok = true;
             }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             if (ch->fighting && (ch->in_room == ch->fighting->in_room))
             // added the in_room checks -pir2/23/01
             {
@@ -2282,14 +2282,14 @@ int do_cast(Character *ch, char *argument, int cmd)
               target_ok = true;
             }
 
-          if (!target_ok && (IS_SET(spell_info[spl].targets, TAR_SELF_ONLY) ||
-                             IS_SET(spell_info[spl].targets, TAR_SELF_DEFAULT)))
+          if (!target_ok && (DC::isSet(spell_info[spl].targets, TAR_SELF_ONLY) ||
+                             DC::isSet(spell_info[spl].targets, TAR_SELF_DEFAULT)))
           {
             tar_char = ch;
             target_ok = true;
           }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_NONE_OK))
+          if (!target_ok && DC::isSet(spell_info[spl].targets, TAR_NONE_OK))
           {
             target_ok = true;
           }
@@ -2304,19 +2304,19 @@ int do_cast(Character *ch, char *argument, int cmd)
       {
         if (*name)
         {
-          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (DC::isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
             send_to_char("Nobody here by that name.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
+          else if (DC::isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
             send_to_char("Nobody playing by that name.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
+          else if (DC::isSet(spell_info[spl].targets, TAR_OBJ_INV))
             send_to_char("You are not carrying anything like that.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
+          else if (DC::isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
             send_to_char("Nothing here by that name.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (DC::isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
             send_to_char("Nothing at all by that name.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          else if (DC::isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
             send_to_char("You are not wearing anything like that.\r\n", ch);
-          else if (IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (DC::isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
             send_to_char("Nothing at all by that name.\r\n", ch);
         }
         else
@@ -2330,7 +2330,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       }
       else
       { /* TARGET IS OK */
-        if ((tar_char == ch) && !ok_self && IS_SET(spell_info[spl].targets, TAR_SELF_NONO))
+        if ((tar_char == ch) && !ok_self && DC::isSet(spell_info[spl].targets, TAR_SELF_NONO))
         {
           if (oldroom)
           {
@@ -2340,7 +2340,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           send_to_char("You can not cast this spell upon yourself.\r\n", ch);
           return eFAILURE;
         }
-        else if ((tar_char != ch) && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
+        else if ((tar_char != ch) && DC::isSet(spell_info[spl].targets, TAR_SELF_ONLY))
         {
           send_to_char("You can only cast this spell upon yourself.\r\n", ch);
           return eFAILURE;
@@ -2365,7 +2365,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-      if (tar_char && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+      if (tar_char && DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
       {
         if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         {
@@ -2433,7 +2433,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
           chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier / 10;
 
-        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);
@@ -2509,9 +2509,9 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Prize Arena
-          if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
+          if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
           {
-            if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (tar_char && tar_char != ch && !DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               send_to_char("You can't cast that spell on someone in a prize arena.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
@@ -2537,9 +2537,9 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Clan Chaos
-          if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
+          if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
           {
-            if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
+            if (tar_char && tar_char != ch && !DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               send_to_char("You can't cast that spell on someone from another clan in a prize arena.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
@@ -2547,7 +2547,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               return eFAILURE;
             }
 
-            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               send_to_char("You can't cast that because you're in a fight with someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
@@ -2557,7 +2557,7 @@ int do_cast(Character *ch, char *argument, int cmd)
                    GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
-            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && DC::isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               send_to_char("You can't cast that because they are fighting someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
@@ -2663,7 +2663,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           free(argument_ptr);
         }
 
-        if (oldroom && !IS_SET(retval, eCH_DIED))
+        if (oldroom && !DC::isSet(retval, eCH_DIED))
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);

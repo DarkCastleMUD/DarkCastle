@@ -378,7 +378,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-	if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
+	if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
 	{
 		send_to_char("This room feels too safe to sing an offensive song such as this.\r\n", ch);
 		return eFAILURE;
@@ -440,30 +440,30 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		one_argument(argument, name);
 
-		if (!IS_SET(song_info[spl].targets, TAR_IGNORE))
+		if (!DC::isSet(song_info[spl].targets, TAR_IGNORE))
 		{
 			if (*name)
 			{
-				if (IS_SET(song_info[spl].targets, TAR_CHAR_ROOM))
+				if (DC::isSet(song_info[spl].targets, TAR_CHAR_ROOM))
 					if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_CHAR_WORLD))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_CHAR_WORLD))
 					if ((tar_char = get_char_vis(ch, name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_INV))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_OBJ_INV))
 					if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_ROOM))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_OBJ_ROOM))
 				{
 					tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
 					if (tar_obj != nullptr)
 						target_ok = true;
 				}
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_EQUIP))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_OBJ_EQUIP))
 				{
 					for (int i = 0; i < MAX_WEAR && !target_ok; i++)
 						if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
@@ -473,11 +473,11 @@ int do_sing(Character *ch, char *arg, int cmd)
 						}
 				}
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_OBJ_WORLD))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_OBJ_WORLD))
 					if ((tar_obj = get_obj_vis(ch, name)) != nullptr)
 						target_ok = true;
 
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_SELF_ONLY))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_SELF_ONLY))
 					if (str_cmp(GET_NAME(ch), name) == 0)
 					{
 						tar_char = ch;
@@ -488,14 +488,14 @@ int do_sing(Character *ch, char *arg, int cmd)
 			/* No argument was typed */
 			else if (!*name)
 			{
-				if (IS_SET(song_info[spl].targets, TAR_FIGHT_VICT))
+				if (DC::isSet(song_info[spl].targets, TAR_FIGHT_VICT))
 					if (ch->fighting)
 						if ((ch->fighting)->in_room == ch->in_room)
 						{
 							tar_char = ch->fighting;
 							target_ok = true;
 						}
-				if (!target_ok && IS_SET(song_info[spl].targets, TAR_SELF_ONLY))
+				if (!target_ok && DC::isSet(song_info[spl].targets, TAR_SELF_ONLY))
 				{
 					tar_char = ch;
 					target_ok = true;
@@ -506,26 +506,26 @@ int do_sing(Character *ch, char *arg, int cmd)
 				target_ok = false;
 		}
 
-		if (IS_SET(song_info[spl].targets, TAR_IGNORE))
+		if (DC::isSet(song_info[spl].targets, TAR_IGNORE))
 			target_ok = true;
 
 		if (target_ok != true)
 		{
 			if (*name)
 			{
-				if (IS_SET(song_info[spl].targets, TAR_CHAR_ROOM))
+				if (DC::isSet(song_info[spl].targets, TAR_CHAR_ROOM))
 					send_to_char("Nobody here by that name.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_CHAR_WORLD))
+				else if (DC::isSet(song_info[spl].targets, TAR_CHAR_WORLD))
 					send_to_char("Nobody playing by that name.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_OBJ_INV))
+				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_INV))
 					send_to_char("You are not carrying anything like that.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_OBJ_ROOM))
+				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_ROOM))
 					send_to_char("Nothing here by that name.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_OBJ_WORLD))
+				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_WORLD))
 					send_to_char("Nothing at all by that name.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_OBJ_EQUIP))
+				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_EQUIP))
 					send_to_char("You are not wearing anything like that.\r\n", ch);
-				else if (IS_SET(song_info[spl].targets, TAR_OBJ_WORLD))
+				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_WORLD))
 					send_to_char("Nothing at all by that name.\r\n", ch);
 			}
 			else
@@ -536,12 +536,12 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		else if (target_ok)
 		{
-			if ((tar_char == ch) && IS_SET(song_info[spl].targets, TAR_SELF_NONO))
+			if ((tar_char == ch) && DC::isSet(song_info[spl].targets, TAR_SELF_NONO))
 			{
 				send_to_char("You cannot sing this to yourself!\n\r", ch);
 				return eFAILURE;
 			}
-			else if ((tar_char != ch) && IS_SET(song_info[spl].targets, TAR_SELF_ONLY))
+			else if ((tar_char != ch) && DC::isSet(song_info[spl].targets, TAR_SELF_ONLY))
 			{
 				send_to_char("You can only sing this song to yourself.\r\n", ch);
 				return eFAILURE;
@@ -553,7 +553,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 		}
 
-		if (!IS_SET(song_info[spl].targets, TAR_IGNORE))
+		if (!DC::isSet(song_info[spl].targets, TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
 				logentry("Dammit, fix that null tar_char thing in do_song", IMPLEMENTER, LogChannels::LOG_BUG);
@@ -563,7 +563,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				return eFAILURE | eINTERNAL_ERROR;
 			}
 
-		if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
+		if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
 		{
 			send_to_char("You find yourself unable to use energy based chants here.\r\n", ch);
 			return eFAILURE;
@@ -601,7 +601,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 			}
 
-			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
 			{
 
 				send_to_char("You forgot the words!\n\r", ch);
@@ -610,7 +610,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 
 			/* Stop abusing your betters  */
-			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
+			if (!DC::isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
 				if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
 				{
 					send_to_char("That just might annoy them!\n\r", ch);
@@ -618,8 +618,8 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 
 			/* Imps ignore safe flags  */
-			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+			if (!DC::isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
+				if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
 				{
 					send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", tar_char);
 				}
@@ -754,7 +754,7 @@ void update_bard_singing()
 			send_to_char("Your singing ruins your hiding place.\r\n", i);
 		}
 		if (GET_LEVEL(i) < IMPLEMENTER
-				&& ((IS_SET(DC::getInstance()->world[i->in_room].room_flags, NO_KI) || IS_SET(DC::getInstance()->world[i->in_room].room_flags, SAFE))
+				&& ((DC::isSet(DC::getInstance()->world[i->in_room].room_flags, NO_KI) || DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE))
 						&& ((*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE
@@ -786,9 +786,9 @@ void update_bard_singing()
 			i->songs.erase(j);
 			--j;
 			return false;
-		} else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || IS_SET(i->combat, COMBAT_STUNNED)
-						|| IS_SET(i->combat, COMBAT_STUNNED2) || IS_SET(i->combat, COMBAT_SHOCKED) || IS_SET(i->combat, COMBAT_SHOCKED2)
-						|| (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2)))
+		} else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || DC::isSet(i->combat, COMBAT_STUNNED)
+						|| DC::isSet(i->combat, COMBAT_STUNNED2) || DC::isSet(i->combat, COMBAT_SHOCKED) || DC::isSet(i->combat, COMBAT_SHOCKED2)
+						|| (DC::isSet(i->combat, COMBAT_BASH1) || DC::isSet(i->combat, COMBAT_BASH2)))
 				&& ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE
 						|| (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE
 						|| (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE
@@ -1007,7 +1007,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 
 	if (learned > 90)
 	{
-		if (IS_SET(victim->combat, COMBAT_REPELANCE))
+		if (DC::isSet(victim->combat, COMBAT_REPELANCE))
 		{
 			act("Your limerick disrupts $S magical barrier!", ch, 0, victim, TO_CHAR, 0);
 			act("$n's limerick broke your concentration of your magical barrier!", ch, 0, victim, TO_VICT, 0);
@@ -1076,10 +1076,10 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 	strcpy(buf, victim->short_desc);
 
 	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP, 0);
-	if (IS_SET(retval, eCH_DIED))
+	if (DC::isSet(retval, eCH_DIED))
 		return retval;
 
-	if (IS_SET(retval, eVICT_DIED))
+	if (DC::isSet(retval, eVICT_DIED))
 	{
 		send_to_char("You dance a small jig on the corpse.\r\n", ch);
 		act("$n dances a little jig on the fallen corpse.", ch, 0, victim, TO_ROOM, 0);
@@ -1139,7 +1139,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && IS_SET(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 			{
@@ -1245,7 +1245,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 			if (CAN_GO(ch, j))
 			{
 				room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[j]->to_room];
-				if (room == &DC::getInstance()->world[ch->in_room] || IS_SET(room->room_flags, SAFE))
+				if (room == &DC::getInstance()->world[ch->in_room] || DC::isSet(room->room_flags, SAFE))
 					continue;
 				for (i = room->people; i; i = i->next_in_room)
 				{
@@ -1392,9 +1392,9 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 	char buf[MAX_STRING_LENGTH];
 	strcpy(buf, victim->short_desc);
 	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF, 0);
-	if (IS_SET(retval, eCH_DIED))
+	if (DC::isSet(retval, eCH_DIED))
 		return retval;
-	if (IS_SET(retval, eVICT_DIED))
+	if (DC::isSet(retval, eVICT_DIED))
 	{
 		send_to_char("You dance a small jig on the corpse.\r\n", ch);
 		act("$n dances a little jig on the fallen corpse.", ch, 0, victim, TO_ROOM, 0);
@@ -1483,7 +1483,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && IS_SET(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 				sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
@@ -1579,7 +1579,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && IS_SET(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 			{
@@ -1700,9 +1700,9 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	if (IS_SET(DC::getInstance()->world[target->in_room].room_flags, PRIVATE) ||
-		IS_SET(DC::getInstance()->world[target->in_room].room_flags, IMP_ONLY) ||
-		IS_SET(DC::getInstance()->world[target->in_room].room_flags, NO_PORTAL))
+	if (DC::isSet(DC::getInstance()->world[target->in_room].room_flags, PRIVATE) ||
+		DC::isSet(DC::getInstance()->world[target->in_room].room_flags, IMP_ONLY) ||
+		DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_PORTAL))
 	{
 		send_to_char("Your astral travels fail to find your destination.\r\n", victim);
 		return;
@@ -1737,7 +1737,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	retval = move_char(victim, target->in_room);
 
-	if (!IS_SET(retval, eSUCCESS))
+	if (!DC::isSet(retval, eSUCCESS))
 	{
 		send_to_char("Mystic winds shock you back into your old reality.\r\n", victim);
 		act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
@@ -1773,9 +1773,9 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		send_to_char("Your target resists the song's draw.\r\n", ch);
 		status = eFAILURE;
 	}
-	else if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
+	else if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
 			 DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport() ||
-			 IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+			 DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
 	{
 		send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
 		status = eFAILURE;
@@ -2176,7 +2176,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 		send_to_char("Your song fades away, its search unfinished.\r\n", ch);
 		return eFAILURE;
 	}
-	if (affected_by_spell(target, SKILL_INNATE_EVASION) || IS_SET(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
+	if (affected_by_spell(target, SKILL_INNATE_EVASION) || DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
 	{
 		send_to_char("Something blocks your vision.\r\n", ch);
 		return eFAILURE;
@@ -2696,7 +2696,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
 	Object *item;
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
 	{
-		if (GET_ITEM_TYPE(item) == ITEM_BEACON && IS_SET(item->obj_flags.extra_flags, ITEM_INVISIBLE))
+		if (GET_ITEM_TYPE(item) == ITEM_BEACON && DC::isSet(item->obj_flags.extra_flags, ITEM_INVISIBLE))
 		{
 			send_to_char("Your glitter reveals a beacon.\r\n", ch);
 			REMOVE_BIT(item->obj_flags.extra_flags, ITEM_INVISIBLE);
@@ -3301,7 +3301,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 															//   if ((int)(*i).song_data < 3) // Doesn't help beyond that.
 	(*i).song_data = (char *)((int64_t)(*i).song_data + 1); // Add one round.
 	// Bleh, C allows easier pointer manipulation
-	if (IS_SET(victim->immune, ISR_SONG))
+	if (DC::isSet(victim->immune, ISR_SONG))
 	{
 		act("$N laughs at your crushing crescendo!", ch, 0, victim, TO_CHAR, 0);
 		act("You laugh at $n's crushing crescendo.", ch, 0, victim, TO_VICT, 0);
@@ -3356,10 +3356,10 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 	strcpy(buf, victim->short_desc);
 
 	retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO, 0);
-	if (IS_SET(retval, eCH_DIED))
+	if (DC::isSet(retval, eCH_DIED))
 		return retval;
 
-	if (IS_SET(retval, eVICT_DIED))
+	if (DC::isSet(retval, eVICT_DIED))
 	{
 		char buf2[MAX_STRING_LENGTH];
 		sprintf(buf2, "$n's crushing crescendo has completely crushed %s and they are no more.", buf);

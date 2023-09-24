@@ -494,11 +494,11 @@ int do_who(Character *ch, char *argument, int cmd)
       {
         continue;
       }
-      if (lfgcheck && !IS_SET(i->player->toggles, PLR_LFG))
+      if (lfgcheck && !DC::isSet(i->player->toggles, PLR_LFG))
       {
         continue;
       }
-      if (guidecheck && !IS_SET(i->player->toggles, PLR_GUIDE_TOG))
+      if (guidecheck && !DC::isSet(i->player->toggles, PLR_GUIDE_TOG))
       {
         continue;
       }
@@ -594,7 +594,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *tailBuf = '\0'; // clear it
     }
 
-    if (IS_SET(i->player->toggles, PLR_GUIDE_TOG))
+    if (DC::isSet(i->player->toggles, PLR_GUIDE_TOG))
     {
       strcpy(preBuf, "$7$B(Guide)$R ");
     }
@@ -603,7 +603,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *preBuf = '\0';
     }
 
-    if (IS_SET(i->player->toggles, PLR_LFG))
+    if (DC::isSet(i->player->toggles, PLR_LFG))
     {
       strcat(tailBuf, "$3(LFG) ");
     }
@@ -674,7 +674,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
     {
       if (CAN_SEE(ch, tmp))
       {
-        if (IS_SET(DC::getInstance()->world[tmp->in_room].room_flags, ARENA) && !IS_SET(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
+        if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA) && !DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
             csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
@@ -697,7 +697,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   {
     if (CAN_SEE(ch, tmp))
     {
-      if (IS_SET(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
+      if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
       {
         if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
@@ -775,12 +775,12 @@ int do_where(Character *ch, char *argument, int cmd)
   { // normal, mortal where
     zonenumber = DC::getInstance()->world[ch->in_room].zone;
     send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
       return eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&
-          !IS_SET(DC::getInstance()->world[d->character->in_room].room_flags, NO_WHERE) &&
+          !DC::isSet(DC::getInstance()->world[d->character->in_room].room_flags, NO_WHERE) &&
           CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)

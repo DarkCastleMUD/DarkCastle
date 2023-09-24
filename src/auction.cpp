@@ -183,7 +183,7 @@ bool AuctionHouse::IsRace(int vnum, string israce)
   if (!obj)
     return false;
 
-  if (IS_SET(obj->obj_flags.size, SIZE_ANY))
+  if (DC::isSet(obj->obj_flags.size, SIZE_ANY))
     return true;
 
   for (unsigned int i = 0; i < israce.size(); i++)
@@ -193,28 +193,28 @@ bool AuctionHouse::IsRace(int vnum, string israce)
     return true;
 
   if (!strncmp(israce.c_str(), "ogre", israce.size()))
-    return IS_SET(obj->obj_flags.size, SIZE_LARGE);
+    return DC::isSet(obj->obj_flags.size, SIZE_LARGE);
 
   if (!strncmp(israce.c_str(), "troll", israce.size()))
-    return IS_SET(obj->obj_flags.size, SIZE_LARGE);
+    return DC::isSet(obj->obj_flags.size, SIZE_LARGE);
 
   if (!strncmp(israce.c_str(), "elf", israce.size()))
-    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_LARGE));
+    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_LARGE));
 
   if (!strncmp(israce.c_str(), "orc", israce.size()))
-    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_LARGE));
+    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_LARGE));
 
   if (!strncmp(israce.c_str(), "dwarf", israce.size()))
-    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_SMALL));
+    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_SMALL));
 
   if (!strncmp(israce.c_str(), "gnome", israce.size()))
-    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_SMALL));
+    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_SMALL));
 
   if (!strncmp(israce.c_str(), "pixie", israce.size()))
-    return IS_SET(obj->obj_flags.size, SIZE_SMALL);
+    return DC::isSet(obj->obj_flags.size, SIZE_SMALL);
 
   if (!strncmp(israce.c_str(), "hobbit", israce.size()))
-    return IS_SET(obj->obj_flags.size, SIZE_SMALL);
+    return DC::isSet(obj->obj_flags.size, SIZE_SMALL);
 
   return false;
 }
@@ -462,7 +462,7 @@ Is item type ok to sell?
 */
 bool AuctionHouse::IsOkToSell(Object *obj)
 {
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     return false;
   }
@@ -685,7 +685,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return IS_SET(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return DC::isSet(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -1186,13 +1186,13 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     return;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
   {
     send_to_char("Why would you want another one of those?\r\n", ch);
     return;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     Object *no_trade_obj;
     int nr = real_object(27909);
@@ -1418,7 +1418,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       return;
     }
 
-    if (IS_SET(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (DC::isSet(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
@@ -1662,13 +1662,13 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, strin
     return;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
     send_to_char("You can't sell that item!\n\r", ch);
     return;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     send_to_char("You can't sell godload.\r\n", ch);
     return;
@@ -1715,7 +1715,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, strin
     advertise = true;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
   {
     csendf(ch, "You're selling %s already and it's unique!\n\r", obj->short_description);
     return;

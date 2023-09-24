@@ -723,14 +723,14 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
   QString buf;
 
   // Handle logged players.
-  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_LOG))
+  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_LOG))
   {
     buf = QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str());
     logentry(buf, 110, LogChannels::LOG_PLAYER, ch);
   }
 
   // Implement freeze command.
-  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_FREEZE) && pcomm != "quit")
+  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_FREEZE) && pcomm != "quit")
   {
     send_to_char("You've been frozen by an immortal.\r\n", ch);
     return eSUCCESS;
@@ -742,7 +742,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
   }
 
   // Berserk checks
-  if (IS_SET(ch->combat, COMBAT_BERSERK))
+  if (DC::isSet(ch->combat, COMBAT_BERSERK))
   {
     if (ch->fighting)
     {
@@ -787,7 +787,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
   if (!pcomm.empty())
   {
     retval = oprog_command_trigger(pcomm.c_str(), ch, &pcomm[look_at]);
-    if (SOMEONE_DIED(retval) || IS_SET(retval, eEXTRA_VALUE))
+    if (SOMEONE_DIED(retval) || DC::isSet(retval, eEXTRA_VALUE))
       return retval;
   }
 
@@ -864,10 +864,10 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
 
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
-        if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
+        if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !DC::isSet(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-          ch->desc->original->level <= MAX_MORTAL && !IS_SET(found->flags, COM_CHARMIE_OK))
+          ch->desc->original->level <= MAX_MORTAL && !DC::isSet(found->flags, COM_CHARMIE_OK))
       {
         send_to_char("The spirit cannot perform that action.\r\n", ch);
         return eFAILURE;
@@ -903,7 +903,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->player->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(ch->player->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
         }
@@ -911,7 +911,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
 
       // We're going to execute, check for usable special proc.
       retval = special(ch, found->command_number, &pcomm[look_at]);
-      if (IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
         return retval;
 
       switch (found->type)
@@ -1617,7 +1617,7 @@ int special(Character *ch, int cmd, char *arg)
       if (obj_index[ch->equipment[j]->item_number].non_combat_func)
       {
         retval = ((*obj_index[ch->equipment[j]->item_number].non_combat_func)(ch, ch->equipment[j], cmd, arg, ch));
-        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
 
@@ -1627,7 +1627,7 @@ int special(Character *ch, int cmd, char *arg)
       if (obj_index[i->item_number].non_combat_func)
       {
         retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
-        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
 
@@ -1639,14 +1639,14 @@ int special(Character *ch, int cmd, char *arg)
       if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(ch, 0, cmd, arg, k);
-        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
       else if (mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
                                                                cmd, arg, k));
-        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
     }
@@ -1658,7 +1658,7 @@ int special(Character *ch, int cmd, char *arg)
       if (obj_index[i->item_number].non_combat_func)
       {
         retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
-        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
 

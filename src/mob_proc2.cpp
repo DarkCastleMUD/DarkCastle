@@ -114,7 +114,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 	act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
 	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
-	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
@@ -212,14 +212,14 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 	value0 = eq_max_damage(obj);
 	value2 = obj->obj_flags.value[2];
 
-	if ((obj->obj_flags.type_flag == ITEM_ARMOR || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_LIGHT) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if ((obj->obj_flags.type_flag == ITEM_ARMOR || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_LIGHT) && !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		percent = ((100 * eqdam) / value0); /* now we know what percent to repair ..  */
 		price = ((cost * percent) / 100);	/* now we know what to charge */
 		price *= 2;							/* he likes to charge more..  */
 											/*  for armor... cuz he can.. */
 	}
-	else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_INSTRUMENT || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_INSTRUMENT || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		percent = ((100 * eqdam) / (value0 + value2)); /* now we know what percent to repair ..  */
 		price = ((cost * percent) / 100);			   /* now we know what to charge */
@@ -313,7 +313,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 	value0 = eq_max_damage(obj);
 	value2 = obj->obj_flags.value[2];
 
-	if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT) && !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 
 		percent = ((100 * eqdam) / value0); /* now we know what percent to repair ..  */
@@ -321,7 +321,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 		price *= 4;							/* he likes to charge more..  */
 											/*  for armor... cuz he's a crook..  */
 	}
-	else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 
 	{
 
@@ -371,10 +371,10 @@ int corpse_cost(Character *ch)
 			continue;
 		for (curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
 		{
-			if (!IS_SET(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
+			if (!DC::isSet(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
 				cost += curr_cont->obj_flags.cost;
 		}
-		if (!IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
+		if (!DC::isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
 			cost += obj2->obj_flags.cost;
 	}
 	for (int x = 0; x < MAX_WEAR; x++)
@@ -382,10 +382,10 @@ int corpse_cost(Character *ch)
 		if (ch->equipment[x])
 		{
 			for (curr_cont = ch->equipment[x]->contains; curr_cont; curr_cont = curr_cont->next_content)
-				if (!IS_SET(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
+				if (!DC::isSet(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
 					cost += curr_cont->obj_flags.cost;
 
-			if (!IS_SET(ch->equipment[x]->obj_flags.extra_flags, ITEM_SPECIAL))
+			if (!DC::isSet(ch->equipment[x]->obj_flags.extra_flags, ITEM_SPECIAL))
 				cost += ch->equipment[x]->obj_flags.cost;
 		}
 	}
@@ -525,7 +525,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (obj->obj_flags.type_flag == ITEM_WEAPON)
 	{ // weapon
-		buf = fmt::format("{}{}d{}, {}, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2], IS_SET(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+		buf = fmt::format("{}{}d{}, {}, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2], DC::isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
 	}
 
 	for (uint i = 0; i < obj->num_affects; i++)
@@ -773,7 +773,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 			do_tell(owner, buf, 0);
 			return eSUCCESS;
 		}
-		if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+		if (!DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 		{
 			sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
 			do_tell(owner, buf, 0);
@@ -856,7 +856,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 	value0 = eq_max_damage(obj);
 	value2 = obj->obj_flags.value[2];
 
-	if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if (!DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		do_say(owner, "I don't repair this kind of junk.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);

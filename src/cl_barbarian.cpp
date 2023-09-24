@@ -64,19 +64,19 @@ int do_batter(Character *ch, char *argument, int cmd)
     exit = EXIT(ch, door);
 
     // check to make sure door is in right state
-    if (!IS_SET(exit->exit_info, EX_ISDOOR))
+    if (!DC::isSet(exit->exit_info, EX_ISDOOR))
     {
       send_to_char("You can't figure out how to break it down.\r\n", ch);
       return eFAILURE;
     }
 
-    if (!IS_SET(exit->exit_info, EX_CLOSED))
+    if (!DC::isSet(exit->exit_info, EX_CLOSED))
     {
       send_to_char("You can't break down an open door!\r\n", ch);
       return eFAILURE;
     }
 
-    if (IS_SET(exit->exit_info, EX_PICKPROOF))
+    if (DC::isSet(exit->exit_info, EX_PICKPROOF))
     {
       send_to_char("It seems far too sturdy for you to break down.\r\n", ch);
       return eFAILURE;
@@ -199,7 +199,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       else
       {
         if (CAN_GO(ch, door) &&
-            !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+            !DC::isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
             (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
             class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
             !others_clan_room(ch, &DC::getInstance()->world[EXIT(ch, door)->to_room]))
@@ -277,13 +277,13 @@ int do_brace(Character *ch, char *argument, int cmd)
 
     exit = EXIT(ch, door);
 
-    if (!IS_SET(exit->exit_info, EX_ISDOOR))
+    if (!DC::isSet(exit->exit_info, EX_ISDOOR))
     {
       send_to_char("You can't figure out how to hold it shut.\r\n", ch);
       return eFAILURE;
     }
 
-    if (!IS_SET(exit->exit_info, EX_CLOSED))
+    if (!DC::isSet(exit->exit_info, EX_CLOSED))
     {
       send_to_char("You have to close it first!\r\n", ch);
       return eFAILURE;
@@ -402,7 +402,7 @@ int do_rage(Character *ch, char *argument, int cmd)
         ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -418,7 +418,7 @@ int do_rage(Character *ch, char *argument, int cmd)
         ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n advances confidently towards you, and flies into a rage!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -481,9 +481,9 @@ int do_battlecry(Character *ch, char *argument, int cmd)
     for (; f; f = f->next)
     {
       if (!IS_AFFECTED(f->follower, AFF_GROUP) ||
-          (IS_SET(f->follower->combat, COMBAT_RAGE1)) ||
-          (IS_SET(f->follower->combat, COMBAT_RAGE2)) ||
-          (IS_SET(f->follower->combat, COMBAT_BERSERK)) ||
+          (DC::isSet(f->follower->combat, COMBAT_RAGE1)) ||
+          (DC::isSet(f->follower->combat, COMBAT_RAGE2)) ||
+          (DC::isSet(f->follower->combat, COMBAT_BERSERK)) ||
           (f->follower->in_room != ch->in_room) ||
           (!f->follower->fighting))
         continue;
@@ -572,7 +572,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
     act("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -596,7 +596,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
     act("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -604,7 +604,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
     bSuccess = 1;
   }
 
-  if (bSuccess && !IS_SET(ch->combat, COMBAT_RAGE1))
+  if (bSuccess && !DC::isSet(ch->combat, COMBAT_RAGE1))
     SET_BIT(ch->combat, COMBAT_RAGE1);
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
@@ -612,9 +612,9 @@ int do_berserk(Character *ch, char *argument, int cmd)
   if (!ch->fighting)
     retval = attack(ch, victim, TYPE_UNDEFINED);
 
-  if (!IS_SET(retval, eCH_DIED))
+  if (!DC::isSet(retval, eCH_DIED))
   {
-    if (!IS_SET(retval, eVICT_DIED) && IS_PC(ch) && IS_SET(ch->player->toggles, PLR_WIMPY))
+    if (!DC::isSet(retval, eVICT_DIED) && IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
@@ -690,7 +690,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     send_to_char("Headbutting a bladeshielded opponent would be asking for decapitation!\n\r", ch);
     return eFAILURE;
@@ -699,7 +699,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_HEADBUTT))
     return eSUCCESS;
 
-  if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
     act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
@@ -726,7 +726,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   int32_t weapon_bit;
   weapon_bit = get_weapon_bit(TYPE_CRUSH);
 
-  if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || IS_SET(victim->immune, weapon_bit) || do_frostshield(ch, victim))
+  if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || DC::isSet(victim->immune, weapon_bit) || do_frostshield(ch, victim))
   {
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
@@ -742,7 +742,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
       act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
       act_return ar = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
       retval = ar.retval;
-      if (IS_SET(retval, eVICT_DIED))
+      if (DC::isSet(retval, eVICT_DIED))
       {
         return retval;
       }
@@ -754,7 +754,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (IS_SET(victim->combat, COMBAT_BERSERK))
+      if (DC::isSet(victim->combat, COMBAT_BERSERK))
         REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
       set_fighting(victim, ch);
@@ -944,7 +944,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
   retval = special(ch, dir, "");
-  if (IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
+  if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
     return retval;
   SETBIT(ch->affected_by, AFF_RUSH_CD);
   extern void addtimer(struct timer_data * add);
@@ -1212,7 +1212,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -1229,7 +1229,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (IS_SET(retval, eVICT_DIED))
+    if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
@@ -1240,8 +1240,8 @@ int do_knockback(Character *ch, char *argument, int cmd)
   }
   else if (CAN_GO(victim, dir) &&
            !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
-           !IS_SET(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
-           !IS_SET(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
+           !DC::isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
+           !DC::isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
            (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
            class_can_go(GET_CLASS(victim), EXIT(victim, dir)->to_room))
   {

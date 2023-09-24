@@ -372,7 +372,7 @@ int do_vault(Character *ch, char *argument, int cmd)
     }
     // putting this here so that anything below it requires you to be in a safe room.
   }
-  else if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  else if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You don't feel safe enough to manage your valuables.\r\n", ch);
     return eSUCCESS;
@@ -562,7 +562,7 @@ void rename_vault_owner(char *oldname, char *newname)
 
   for (items = vault->items; items; items = items->next)
   {
-    if (items->obj && IS_SET(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (items->obj && DC::isSet(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
       sprintf(tmp, "%s", items->obj->name);
@@ -1312,13 +1312,13 @@ void vault_get(Character *ch, char *object, char *owner)
       return;
     }
 
-    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
     {
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
     }
 
-    if (!self && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) || IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL)
+    if (!self && (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL)
     {
       send_to_char("That item seems to be bound to the vault.\r\n", ch);
       return;
@@ -1628,31 +1628,31 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
   { // Uniques
     csendf(ch, "Why would you need another %s?\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self)
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self)
   { // GL
     csendf(ch, "%s is far too valuable to place in someone else's vault.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
-  if (!self && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+  if (!self && DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
   { // no_trade
     csendf(ch, "%s seems bound to you.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   { // cursed
     csendf(ch, "%s is stuck! Ack!.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE) || IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) || DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   { // nosave
     csendf(ch, "%s doesn't seem to be a permanent part of the world.\r\n", GET_OBJ_SHORT(obj));
     return 0;

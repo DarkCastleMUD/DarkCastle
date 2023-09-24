@@ -44,7 +44,7 @@ int check_social(Character *ch, string pcomm, int length)
     return SOCIAL_false;
   }
 
-  if (IS_PC(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
+  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You are anti-social!\n\r", ch);
     return SOCIAL_true;
@@ -65,7 +65,7 @@ int check_social(Character *ch, string pcomm, int length)
     return SOCIAL_true;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return SOCIAL_true;

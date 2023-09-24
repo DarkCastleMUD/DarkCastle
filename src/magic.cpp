@@ -262,9 +262,9 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Obj
 
   bool hasSpellcraft = spellcraft(ch, SPELL_CHILL_TOUCH);
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
 
   save = saves_spell(ch, victim, (level / 2), SAVE_TYPE_COLD);
@@ -349,9 +349,9 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
 
   /*  Dazzle Effect */
@@ -394,9 +394,9 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
   /* Drown BINGO Effect */
   if (skill > 80)
@@ -421,7 +421,7 @@ int spell_energy_drain(uint8_t level, Character *ch, Character *victim, class Ob
 {
   int mult = GET_EXP(victim) / 20;
   mult = MIN(10000, mult);
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
 
   set_cantquit(ch, victim);
@@ -443,7 +443,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
   int mana;
   set_cantquit(ch, victim);
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot do this in a safe room!\r\n", ch);
     return eFAILURE;
@@ -546,9 +546,9 @@ int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Ob
   /* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM) && !number(0, 9))
   {
-    if (IS_SET(retval, eEXTRA_VAL2))
+    if (DC::isSet(retval, eEXTRA_VAL2))
       victim = ch;
-    if (IS_SET(retval, eEXTRA_VALUE))
+    if (DC::isSet(retval, eEXTRA_VALUE))
       return retval;
     act("The force of the spell knocks $N over!", ch, 0, victim, TO_CHAR, 0);
     send_to_char("The force of the spell knocks you over!\r\n", victim);
@@ -576,9 +576,9 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
     return retval;
   // Above: Fleeing now saves you from the second blast.
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
 
   /* Fireball Recombining Effect */
@@ -621,9 +621,9 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
 
   for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char;
@@ -956,7 +956,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (IS_SET(retval, eCH_DIED))
+    if (DC::isSet(retval, eCH_DIED))
     {
       break;
     }
@@ -1018,11 +1018,11 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
         int retval2 = 0;
         retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
-        if (IS_SET(retval2, eVICT_DIED))
+        if (DC::isSet(retval2, eVICT_DIED))
         {
           SET_BIT(retval, eVICT_DIED);
         }
-        else if (IS_SET(retval2, eCH_DIED))
+        else if (DC::isSet(retval2, eCH_DIED))
         {
           SET_BIT(retval, eCH_DIED);
           break;
@@ -1048,7 +1048,7 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
   int weap_spell = obj ? WIELD : 0;
   Character *tmp_victim, *temp;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
   /*  double o = 0.0, m = 0.0, avglevel = 0.0;
    for (tmp_victim = DC::getInstance()->world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
@@ -1071,7 +1071,7 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
       //		dam = max / o;
       dam = 150;
       int adam = dam_percent(skill, dam);
-      if (IS_SET(tmp_victim->immune, ISR_POISON))
+      if (DC::isSet(tmp_victim->immune, ISR_POISON))
         adam = 0;
 
       if (GET_HIT(tmp_victim) < adam)
@@ -1172,11 +1172,11 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
 
       dam = 660;
       retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
-      if (IS_SET(retval, eEXTRA_VALUE))
+      if (DC::isSet(retval, eEXTRA_VALUE))
         return retval;
-      if (!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !IS_SET(retval, eEXTRA_VAL2))
+      if (!DC::isSet(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !DC::isSet(retval, eEXTRA_VAL2))
         do_solar_blind(ch, tmp_victim, skill);
     } // if are grouped, etc
   }   // for
@@ -1207,13 +1207,13 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
           act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
           retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
-          if (IS_SET(retval, eCH_DIED))
+          if (DC::isSet(retval, eCH_DIED))
             return retval;
 
-          if (IS_SET(retval, eVICT_DIED))
-            if (ch->desc && ch->player && !IS_SET(ch->player->toggles, PLR_WIMPY))
+          if (DC::isSet(retval, eVICT_DIED))
+            if (ch->desc && ch->player && !DC::isSet(ch->player->toggles, PLR_WIMPY))
               ch->desc->wait = 0;
-          if (!IS_SET(retval, eVICT_DIED))
+          if (!DC::isSet(retval, eVICT_DIED))
           {
             // don't blind surrounding rooms
             // do_solar_blind(ch, tmp_victim);
@@ -1459,11 +1459,11 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
       retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
     }
 
-    if (IS_SET(retval2, eVICT_DIED))
+    if (DC::isSet(retval2, eVICT_DIED))
     {
       SET_BIT(retval, eVICT_DIED);
     }
-    else if (IS_SET(retval2, eCH_DIED))
+    else if (DC::isSet(retval2, eCH_DIED))
     {
       SET_BIT(retval, eCH_DIED);
       break;
@@ -1679,7 +1679,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't teleport in potato arenas!\n\r", ch);
     return eFAILURE;
@@ -1690,7 +1690,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     send_to_char("You find yourself unable to.\r\n", ch);
@@ -1702,7 +1702,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     // If the ch is in a general arena and self-teleporting, there's a 25% chance they will teleport to the deathtrap.
     if (ch == victim && ch->in_room >= ARENA_LOW && ch->in_room <= ARENA_HIGH && number(1, 4) == 1)
@@ -1728,14 +1728,14 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     {
       to_room = number(0, top_of_world);
     } while (!DC::getInstance()->rooms.contains(to_room) ||
-             IS_SET(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
-             IS_SET(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
-             IS_SET(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
-             IS_SET(DC::getInstance()->world[to_room].room_flags, ARENA) ||
+             DC::isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
+             DC::isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
+             DC::isSet(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
+             DC::isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
              DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER ||
              DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
              ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
-             (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
+             (IS_AFFECTED(victim, AFF_CHAMPION) && (DC::isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
              (IS_NPC(victim) &&
@@ -1839,7 +1839,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     }
   }
 
-  if (IS_SET(victim->immune, ISR_PARA) || IS_AFFECTED(victim, AFF_NO_PARA))
+  if (DC::isSet(victim->immune, ISR_PARA) || IS_AFFECTED(victim, AFF_NO_PARA))
   {
     act("$N absorbs your puny spell and seems no different!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -2180,16 +2180,16 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s of the more critical wounds on $N.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s of the more critical wounds on $N.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of the more critical wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more critical wounds on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s more critical wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
@@ -2241,16 +2241,16 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s small cuts and scratches on $N.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s small cuts and scratches on $N.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of small cuts and scratches on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several small cuts and scratches on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s small cuts and scratches.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
@@ -2287,7 +2287,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       return eFAILURE;
 
     // Curse in a prize arena follows rules of offensive spells
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -2374,7 +2374,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     }
 
     // Curse in a prize arena follows rules of offensive spells
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -2656,7 +2656,7 @@ int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, class O
   return eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_ARMOR) &&
-      !IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      !DC::isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
   {
 
     SET_BIT(obj->obj_flags.extra_flags, ITEM_ENCHANTED);
@@ -2695,7 +2695,7 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class 
   return eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) &&
-      !IS_SET(obj->obj_flags.extra_flags, ITEM_MAGIC))
+      !DC::isSet(obj->obj_flags.extra_flags, ITEM_MAGIC))
   {
 
     if (obj->affected)
@@ -2814,16 +2814,16 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *ob
 
   if (ch != victim)
   {
-    sprintf(buf, "Your incantation heals $N%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "Your incantation heals $N%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth an incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "Your incantation heals you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "Your incantation heals you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth an incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
@@ -2873,16 +2873,16 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (ch != victim)
   {
-    sprintf(buf, "Your powerful incantation heals $N%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "Your powerful incantation heals $N%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth a powerful incantation that heals $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth a powerful incantation that heals $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
@@ -2934,16 +2934,16 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Objec
 
   if (ch != victim)
   {
-    sprintf(buf, "You call forth the magic of the gods to restore $N%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "You call forth the magic of the gods to restore $N%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth the magic of the gods to restore $N|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+    sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth the magic of the gods to restore $m|.");
     send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
@@ -2963,7 +2963,7 @@ int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Ob
   {
     if (CAN_WEAR(obj, ITEM_TAKE))
     {
-      if (!IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (!DC::isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
       {
         act("$p turns invisible.", ch, obj, 0, TO_CHAR, 0);
         act("$p turns invisible.", ch, obj, 0, TO_ROOM, INVIS_NULL);
@@ -3041,7 +3041,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       continue;
     }
 
-    if (IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE))
+    if (DC::isSet(i->obj_flags.more_flags, ITEM_NOLOCATE))
     {
       if (isname(tmp, i->name))
       {
@@ -3164,7 +3164,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
       act("$N's insides are already being eaten away by poison!", ch, nullptr, victim, TO_CHAR, 0);
       endy = true;
     }
-    else if (IS_SET(victim->immune, ISR_POISON) ||
+    else if (DC::isSet(victim->immune, ISR_POISON) ||
              malediction_res(ch, victim, SPELL_POISON) ||
              (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL))
     {
@@ -3299,7 +3299,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (obj)
   {
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
       act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
       REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
@@ -3345,7 +3345,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
 
   for (j = 0; j < MAX_WEAR; j++)
   {
-    if ((obj = victim->equipment[j]) && IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if ((obj = victim->equipment[j]) && DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
       if (skill > 70 && obj_index[obj->item_number].virt == 514)
       {
@@ -3367,7 +3367,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   for (obj = victim->carrying; obj; obj = obj->next_content)
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
       act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
       act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
@@ -4156,7 +4156,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
   assert(victim);
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
   {
     send_to_char("To the DEATH you wimp!\n\r", ch);
     return eFAILURE;
@@ -4203,7 +4203,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
       location = real_room(GET_HOME(victim));
 
     // make sure they aren't recalling into someone's chall
-    if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
+    if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -4233,7 +4233,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!\n\r", victim);
     location = real_room(START_ROOM);
@@ -4296,7 +4296,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   int original_loc;
   assert(ch && victim);
 
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
       (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
   {
     send_to_char("Your vision is too clouded to make out anything.\r\n", ch);
@@ -4392,7 +4392,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   int retval;
   assert(ch && victim);
 
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, SAFE))
   {
     send_to_char("That person is in a safe area!\n\r", ch);
     return eFAILURE;
@@ -4405,7 +4405,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   }
 
   if (IS_PC(ch))
-    if (IS_NPC(victim) || !IS_SET(victim->player->toggles, PLR_SUMMONABLE))
+    if (IS_NPC(victim) || !DC::isSet(victim->player->toggles, PLR_SUMMONABLE))
     {
       send_to_char("Someone has tried to summon you!\n\r", victim);
       send_to_char("Something strange about that person prevents your summoning.\r\n", ch);
@@ -4415,8 +4415,8 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
 
   if ((IS_NPC(victim) && GET_LEVEL(ch) < IMPLEMENTER) ||
-      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
-      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_SUMMON))
+      DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
+      DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_SUMMON))
   {
     send_to_char("You have failed to summon your target!\n\r", ch);
     return eFAILURE;
@@ -4442,7 +4442,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
+  if (IS_AFFECTED(victim, AFF_CHAMPION) && (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
   {
     send_to_char("You cannot summon a Champion here.\r\n", ch);
     return eFAILURE;
@@ -4527,7 +4527,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (IS_SET(victim->immune, ISR_CHARM) ||
+  if (DC::isSet(victim->immune, ISR_CHARM) ||
       (IS_MOB(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
   {
     act("$N laughs at your feeble charm attempt.", ch, nullptr, victim,
@@ -4597,7 +4597,7 @@ int spell_sense_life(uint8_t level, Character *ch, Character *victim, class Obje
 void show_obj_class_size_mini(Object *obj, Character *ch)
 {
   for (int i = 12; i < 23; i++)
-    if (IS_SET(obj->obj_flags.extra_flags, 1 << i))
+    if (DC::isSet(obj->obj_flags.extra_flags, 1 << i))
       csendf(ch, " %s", Object::extra_bits[i]);
 }
 
@@ -4633,7 +4633,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         if (!CAN_SEE_OBJ(ch, iobj))
           continue;
         send_to_char(iobj->short_description, ch);
-        if (IS_SET(iobj->obj_flags.more_flags, ITEM_NO_TRADE))
+        if (DC::isSet(iobj->obj_flags.more_flags, ITEM_NO_TRADE))
         {
           send_to_char(" $BNO_TRADE$R", ch);
           show_obj_class_size_mini(iobj, ch);
@@ -4642,7 +4642,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       }
       return eSUCCESS;
     }
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
     {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
       return eFAILURE;
@@ -4749,7 +4749,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     case ITEM_ARMOR:
 
-      if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      if (DC::isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
       {
         value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
       }
@@ -4998,7 +4998,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
       //	dam >>= 1;
 
       retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
     }
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
@@ -5062,7 +5062,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
     return eFAILURE;
   }
 
-  if (IS_SET(victim->combat, COMBAT_BERSERK))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK))
   {
     act(
         "$N looks at you with glazed over eyes, drools, and continues to fight!",
@@ -5213,7 +5213,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (obj)
   {
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
     {
       send_to_char("That item is already glowing with magical light.\r\n", ch);
       return eFAILURE;
@@ -5367,7 +5367,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
   af.location = 0;
   af.bitvector = AFF_CHARM;
   affect_to_char(mob, &af);
-  if (IS_SET(mob->immune, ISR_PIERCE))
+  if (DC::isSet(mob->immune, ISR_PIERCE))
     REMOVE_BIT(mob->immune, ISR_PIERCE);
   add_follower(mob, ch, 0);
 
@@ -5434,13 +5434,13 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
         send_to_char("You can't dispel that!\n\r", ch);
         return eFAILURE;
       }
-      if (IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (DC::isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
       {
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
         send_to_char("You remove the item's invisibility.\r\n", ch);
         return eSUCCESS;
       }
-      else if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
+      else if (DC::isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
       {
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
         send_to_char("You remove the item's $Bglowing$R aura.\r\n", ch);
@@ -5995,16 +5995,16 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (ch != victim)
   {
-    sprintf(buf, "You heal %s of the more serious wounds on $N.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s of the more serious wounds on $N.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of the more serious wounds on $N.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more serious wounds on $N.", TO_ROOM);
   }
   else
   {
-    sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
+    sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s more serious wounds.");
     send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
@@ -6089,9 +6089,9 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (SOMEONE_DIED(retval))
     return retval;
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
   // Burns up ki and mana on victim if learned over skill level 70
 
@@ -6583,12 +6583,12 @@ void make_portal(Character *ch, Character *vict)
     {
       destination = number(0, top_of_world);
       if (!DC::getInstance()->rooms.contains(destination) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, ARENA) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, IMP_ONLY) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, PRIVATE) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, CLAN_ROOM) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, NO_PORTAL) ||
-          IS_SET(DC::getInstance()->world[destination].room_flags, NO_TELEPORT) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, ARENA) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, IMP_ONLY) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, PRIVATE) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, CLAN_ROOM) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, NO_PORTAL) ||
+          DC::isSet(DC::getInstance()->world[destination].room_flags, NO_TELEPORT) ||
           DC::getInstance()->zones.value(DC::getInstance()->world[destination].zone).isNoTeleport())
       {
         good_destination = false;
@@ -6634,9 +6634,9 @@ void make_portal(Character *ch, Character *vict)
 
 int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
-      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, IMP_ONLY) ||
-      IS_SET(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL))
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
+      DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, IMP_ONLY) ||
+      DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL))
   {
     send_to_char("You can't seem to find a path.\r\n", ch);
     return eFAILURE;
@@ -6805,7 +6805,7 @@ int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
         if (!ARE_GROUPED(ch, victim))
         {
           retval = spell_call_lightning(level, ch, victim, 0, skill);
-          if (IS_SET(retval, eCH_DIED))
+          if (DC::isSet(retval, eCH_DIED))
             return retval;
         }
       }
@@ -7137,7 +7137,7 @@ int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_energy_drain(level, ch, victim, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -7184,7 +7184,7 @@ int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_souldrain(level, ch, victim, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -7362,7 +7362,7 @@ int cast_harm(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_harm(level, ch, victim, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -7410,7 +7410,7 @@ int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_power_harm(level, ch, victim, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -7447,7 +7447,7 @@ int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, victim))
       {
         retval = spell_divine_fury(level, ch, victim, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -7698,7 +7698,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (tar_obj)
     { /* It's an object */
-      if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
         send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
@@ -7770,7 +7770,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_SCROLL:
     if (tar_obj)
     { /* It's an object */
-      if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
         send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
@@ -7794,7 +7794,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_WAND:
     if (tar_obj)
     { /* It's an object */
-      if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
         send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
@@ -7826,7 +7826,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
 {
   int retval;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not paralyze anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -7871,7 +7871,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
         {
           retval = spell_paralyze(level, ch, tar_ch, 0, skill);
-          if (IS_SET(retval, eCH_DIED))
+          if (DC::isSet(retval, eCH_DIED))
             return retval;
         }
     return eSUCCESS;
@@ -7891,7 +7891,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not blind anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -7938,7 +7938,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
       if (!IS_AFFECTED(tar_ch, AFF_BLIND))
       {
         retval = spell_blindness(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -8088,7 +8088,7 @@ int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
     for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
     {
       retval = spell_remove_paralysis(level, ch, tar_ch, 0, skill);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
     }
     break;
@@ -8283,7 +8283,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
 {
   int retval;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && tar_ch)
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && tar_ch)
   {
     send_to_char("You cannot curse someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -8327,7 +8327,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
       if (IS_NPC(tar_ch))
       {
         retval = spell_curse(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     break;
@@ -8717,7 +8717,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -8726,7 +8726,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
       next_o = tar_obj->next;
 
       retval = spell_dispel_evil(level, ch, 0, tar_obj, skill);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
     }
     return eSUCCESS;
@@ -8774,7 +8774,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -8783,7 +8783,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
       next_o = tar_obj->next;
 
       retval = spell_dispel_good(level, ch, 0, tar_obj, skill);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
     }
     return eSUCCESS;
@@ -8973,7 +8973,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (tar_obj)
     {
-      if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE))
         send_to_char("Nothing new seems to happen.\r\n", ch);
       else
         return spell_invisibility(level, ch, 0, tar_obj, skill);
@@ -8989,7 +8989,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_SCROLL:
     if (tar_obj)
     {
-      if (!(IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
+      if (!(DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
     else
@@ -9003,7 +9003,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_WAND:
     if (tar_obj)
     {
-      if (!(IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
+      if (!(DC::isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
     else
@@ -9056,7 +9056,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
     return spell_poison(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_SPELL:
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     {
       send_to_char("You can not poison someone in a safe area!\n\r", ch);
       return eFAILURE;
@@ -9074,7 +9074,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_poison(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -9323,7 +9323,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
           continue;
 
         retval &= spell_remove_poison(level, ch, tmp_char, tar_obj, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
         {
           return retval;
         }
@@ -9405,7 +9405,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not sleep someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -9438,7 +9438,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_sleep(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -9654,7 +9654,7 @@ int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_charm_person(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -9799,7 +9799,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
   int retval;
   Character *next_v;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not fear someone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -9830,7 +9830,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_fear(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -10489,7 +10489,7 @@ int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_light(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -10540,7 +10540,7 @@ int cast_cause_critical(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_critical(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -10590,7 +10590,7 @@ int cast_cause_serious(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_cause_serious(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -10640,7 +10640,7 @@ int cast_flamestrike(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_flamestrike(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -10898,7 +10898,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
   Character *next_v;
   int retval;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You can not weaken anyone in a safe area!\n\r", ch);
     return eFAILURE;
@@ -10938,7 +10938,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_weaken(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -11017,7 +11017,7 @@ int cast_acid_blast(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_acid_blast(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -11066,7 +11066,7 @@ int cast_hellstream(uint8_t level, Character *ch, char *arg,
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_hellstream(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -11192,7 +11192,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Objec
   }
   // Extra added bonus 1% of the time
   if (dice(1, 100) == 3)
-    if (!IS_SET(victim->immune, ISR_POISON))
+    if (!DC::isSet(victim->immune, ISR_POISON))
       if (saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0)
       {
         af.type = SPELL_POISON;
@@ -11291,7 +11291,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
       set_cantquit(ch, tmp_victim);
 
       retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
     }
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
@@ -11355,9 +11355,9 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (IS_SET(retval, eEXTRA_VAL2))
+  if (DC::isSet(retval, eEXTRA_VAL2))
     victim = ch;
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
     return retval;
 
   if (skill > 40 && skill <= 60)
@@ -11376,7 +11376,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
 
   if (poison > 0)
   {
-    if (dice(1, 100) <= poison && !IS_SET(victim->immune, ISR_POISON))
+    if (dice(1, 100) <= poison && !DC::isSet(victim->immune, ISR_POISON))
     {
       af.type = SPELL_POISON;
       af.duration = skill / 27;
@@ -11515,17 +11515,17 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
 
     if (ch != victim)
     {
-      sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+      sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_CHAR, 0);
       sprintf(buf, "$n's magic herbs heal $N| and make $M look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
       sprintf(dammsg, ", healing you of $B%d$R damage", healamount);
-      sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+      sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_VICT, 0);
     }
     else
     {
-      sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
+      sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, 0, TO_CHAR, 0);
       sprintf(buf, "$n magic herbs heal $m| and make $m look...hungry?");
       send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
@@ -11710,7 +11710,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
 
 int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
   {
     send_to_char("I don't think your fellow clan members would appreciate the wildlife.\r\n", ch);
     GET_MANA(ch) += 75;
@@ -12486,10 +12486,10 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     return eFAILURE;
   }
 
-  if ((!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
-       IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)) ||
-      (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
-       !IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)))
+  if ((!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
+       DC::isSet(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)) ||
+      (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
+       !DC::isSet(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)))
   {
     send_to_char("Your beacon cannot take you into or out of the arena!\r\n", ch);
     return eFAILURE;
@@ -12503,7 +12503,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
       return eFAILURE;
     }
 
-    if (IS_SET(DC::getInstance()->world[ch->beacon->in_room].room_flags, CLAN_ROOM))
+    if (DC::isSet(DC::getInstance()->world[ch->beacon->in_room].room_flags, CLAN_ROOM))
     {
       send_to_char("You cannot beacon into a clan hall whilst Champion.\r\n", ch);
       return eFAILURE;
@@ -12575,13 +12575,13 @@ int do_beacon(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     send_to_char("You may not place your beacon in an area protected by the gods.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CHAMPION) && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
+  if (IS_AFFECTED(ch, AFF_CHAMPION) && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
   {
     send_to_char("You cannot set a beacon in a clan hall whilst Champion.\r\n", ch);
     return eFAILURE;
@@ -13001,7 +13001,7 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
         if (!ARE_GROUPED(ch, victim))
         {
           retval = spell_sun_ray(level, ch, victim, 0, skill);
-          if (IS_SET(retval, eCH_DIED))
+          if (DC::isSet(retval, eCH_DIED))
             return retval;
         }
       }
@@ -13447,9 +13447,9 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
 
       retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM, 0);
 
-      if (IS_SET(retval2, eVICT_DIED))
+      if (DC::isSet(retval2, eVICT_DIED))
         SET_BIT(retval, eVICT_DIED);
-      else if (IS_SET(retval2, eCH_DIED))
+      else if (DC::isSet(retval2, eCH_DIED))
       {
         SET_BIT(retval, eCH_DIED);
         break;
@@ -13495,7 +13495,7 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_icestorm(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -13647,7 +13647,7 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_blue_bird(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -13774,7 +13774,7 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_debility(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -13896,7 +13896,7 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
       if (!ARE_GROUPED(ch, tar_ch))
       {
         retval = spell_attrition(level, ch, tar_ch, 0, skill);
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
       }
     }
@@ -14651,7 +14651,7 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
   char buf[MAX_STRING_LENGTH];
   Character *next_vict;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot cast this here.\r\n", ch);
     return eFAILURE;
@@ -14766,7 +14766,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
 {
   Object *silence_obj = nullptr;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("You cannot silence this room.\r\n", ch);
     return eFAILURE;
@@ -15591,10 +15591,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags,
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags,
              CLAN_ROOM) ||
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {
@@ -15759,10 +15759,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags,
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags,
              CLAN_ROOM) ||
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {

@@ -165,6 +165,10 @@ public:
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
+  static bool isSet(auto flag, auto bit)
+  {
+    return flag & bit;
+  }
 
 private:
   static string version;

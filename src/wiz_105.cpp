@@ -107,7 +107,7 @@ int do_log(Character *ch, char *argument, int cmd)
     send_to_char("Can't do that to a beast.\r\n", ch);
   else if (GET_LEVEL(vict) > GET_LEVEL(ch))
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
-  else if (IS_SET(vict->player->punish, PUNISH_LOG))
+  else if (DC::isSet(vict->player->punish, PUNISH_LOG))
   {
     send_to_char("LOG removed.\r\n", ch);
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
@@ -151,79 +151,79 @@ int do_showbits(Character *ch, char *argument, int cmd)
 
   csendf(ch, "Player: %s\n\r", GET_NAME(victim));
 
-  if (IS_SET(victim->combat, COMBAT_SHOCKED))
+  if (DC::isSet(victim->combat, COMBAT_SHOCKED))
     send_to_char("COMBAT_SHOCKED\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_BASH1))
+  if (DC::isSet(victim->combat, COMBAT_BASH1))
     send_to_char("COMBAT_BASH1\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_BASH2))
+  if (DC::isSet(victim->combat, COMBAT_BASH2))
     send_to_char("COMBAT_BASH2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_STUNNED))
+  if (DC::isSet(victim->combat, COMBAT_STUNNED))
     send_to_char("COMBAT_STUNNED\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_STUNNED2))
+  if (DC::isSet(victim->combat, COMBAT_STUNNED2))
     send_to_char("COMBAT_STUNNED2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_CIRCLE))
+  if (DC::isSet(victim->combat, COMBAT_CIRCLE))
     send_to_char("COMBAT_CIRCLE\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_BERSERK))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK))
     send_to_char("COMBAT_BERSERK\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_HITALL))
+  if (DC::isSet(victim->combat, COMBAT_HITALL))
     send_to_char("COMBAT_HITALL\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_RAGE1))
+  if (DC::isSet(victim->combat, COMBAT_RAGE1))
     send_to_char("COMBAT_RAGE1\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_RAGE1))
+  if (DC::isSet(victim->combat, COMBAT_RAGE1))
     send_to_char("COMBAT_RAGE2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1))
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1))
     send_to_char("COMBAT_BLADESHIELD1\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
     send_to_char("COMBAT_BLADESHIELD2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_REPELANCE))
+  if (DC::isSet(victim->combat, COMBAT_REPELANCE))
     send_to_char("COMBAT_REPELANCE\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_VITAL_STRIKE))
+  if (DC::isSet(victim->combat, COMBAT_VITAL_STRIKE))
     send_to_char("COMBAT_VITAL_STRIKE\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_MONK_STANCE))
+  if (DC::isSet(victim->combat, COMBAT_MONK_STANCE))
     send_to_char("COMBAT_MONK_STANCE\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_MISS_AN_ATTACK))
+  if (DC::isSet(victim->combat, COMBAT_MISS_AN_ATTACK))
     send_to_char("COMBAT_MISS_AN_ATTACK\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_ORC_BLOODLUST1))
+  if (DC::isSet(victim->combat, COMBAT_ORC_BLOODLUST1))
     send_to_char("COMBAT_ORC_BLOODLUST1\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_ORC_BLOODLUST2))
+  if (DC::isSet(victim->combat, COMBAT_ORC_BLOODLUST2))
     send_to_char("COMBAT_ORC_BLOODLUST2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_THI_EYEGOUGE))
+  if (DC::isSet(victim->combat, COMBAT_THI_EYEGOUGE))
     send_to_char("COMBAT_THI_EYEGOUGE\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_THI_EYEGOUGE2))
+  if (DC::isSet(victim->combat, COMBAT_THI_EYEGOUGE2))
     send_to_char("COMBAT_THI_EYEGOUGE2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_FLEEING))
+  if (DC::isSet(victim->combat, COMBAT_FLEEING))
     send_to_char("COMBAT_FLEEING\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_SHOCKED2))
+  if (DC::isSet(victim->combat, COMBAT_SHOCKED2))
     send_to_char("COMBAT_SHOCKED2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_CRUSH_BLOW))
+  if (DC::isSet(victim->combat, COMBAT_CRUSH_BLOW))
     send_to_char("COMBAT_CRUSH_BLOW\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_CRUSH_BLOW2))
+  if (DC::isSet(victim->combat, COMBAT_CRUSH_BLOW2))
     send_to_char("COMBAT_CRUSH_BLOW2\n\r", ch);
 
-  if (IS_SET(victim->combat, COMBAT_ATTACKER))
+  if (DC::isSet(victim->combat, COMBAT_ATTACKER))
     send_to_char("COMBAT_ATTACKER\n\r", ch);
 
   send_to_char("--------------------\n\r\n\r", ch);
@@ -429,7 +429,7 @@ char *print_classes(int bitv)
 
   for (; *pc_clss_types2[i] != '\n'; i++)
   {
-    if (IS_SET(bitv, 1 << (i - 1)))
+    if (DC::isSet(bitv, 1 << (i - 1)))
       sprintf(buf, "%s %s", buf, pc_clss_types2[i]);
   }
 
@@ -625,7 +625,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
       send_to_char("Invalid class.\r\n", ch);
       return eFAILURE;
     }
-    if (IS_SET(skill->clas, 1 << (i - 1)))
+    if (DC::isSet(skill->clas, 1 << (i - 1)))
       REMOVE_BIT(skill->clas, 1 << (i - 1));
     // skill->clas = i;
     else
@@ -651,7 +651,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     csendf(ch, "$3%s skillquests.$R\r\n", pc_clss_types2[l]);
     for (curren = skill_list; curren; curren = curren->next)
     {
-      if (!IS_SET(curren->clas, 1 << (l - 1)))
+      if (!DC::isSet(curren->clas, 1 << (l - 1)))
         continue;
       csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
       done = true;
@@ -755,9 +755,9 @@ int do_eqmax(Character *ch, char *argument, int cmd)
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
-        !IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
+        !DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
         obj->obj_flags.eq_level <= GET_LEVEL(vict) &&
-        !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       for (o = 0; o < MAX_WEAR; o++)
         if (CAN_WEAR(obj, wear_bitv[o]))

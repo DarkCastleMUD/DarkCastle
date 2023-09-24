@@ -402,7 +402,7 @@ int dawnsword(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     send_to_char("Dawn needs more time to recharge and is not ready to hear your prayer yet.", ch);
     return eSUCCESS;
   }
-  if (!ch->in_room || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (!ch->in_room || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("Something about this room blocks your command.\r\n", ch);
     return eSUCCESS;
@@ -445,7 +445,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     return eFAILURE;
   ch = obj->equipped_by;
   char buf[MAX_STRING_LENGTH];
-  if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET)))
+  if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET)))
     return eFAILURE;
 
   obj->obj_flags.timer--;
@@ -463,7 +463,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && IS_SET(tmp_char->player->toggles, PLR_DAMAGE))
+    if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {
@@ -531,7 +531,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
     return eSUCCESS;
   }
 
-  if (!ch->in_room || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (!ch->in_room || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("Something about this room blocks your command.\r\n", ch);
     return eSUCCESS;
@@ -667,7 +667,7 @@ int holyavenger(Character *ch, class Object *obj, int cmd, const char *arg,
         if (chance > (2 * percent))
         {
           chance = number(1, 100);
-          if (chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH))
+          if (chance > (2 * percent) && !DC::isSet(vict->immune, ISR_SLASH))
           {
             if ((
                     (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
@@ -1127,7 +1127,7 @@ bool assemble_item_index(Character *ch, int item_index)
   Object *item = (Object *)obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
-  if (IS_SET(item->obj_flags.more_flags, ITEM_UNIQUE))
+  if (DC::isSet(item->obj_flags.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(ch, item_real, false))
     {
@@ -1329,7 +1329,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eSUCCESS;
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     send_to_char("That action is impossible to perform in these restrictive confinements.\r\n", ch);
     return eSUCCESS;
@@ -1578,7 +1578,7 @@ int durendal(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       obj->obj_flags.timer--;
     }
-    if (obj->obj_flags.timer < 322 && IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+    if (obj->obj_flags.timer < 322 && DC::isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
     {
       REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
       if (obj->obj_flags.timer > 0 && obj->equipped_by && obj->equipped_by->in_room)
@@ -1604,7 +1604,7 @@ int durendal(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("Your soul is impure. Durendel ignores your contrition.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("Something about this room prohibits your prayer from being heard.\r\n", ch);
     return eSUCCESS;
@@ -1816,7 +1816,7 @@ int restring_machine(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (!IS_SET(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (!DC::isSet(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     send_to_char("'The item must be godload.  *beep*'\n", ch);
     return eSUCCESS;
@@ -1944,7 +1944,7 @@ int pagoda_shield_restorer(Character *ch, class Object *obj, int cmd, const char
   if (!cmd)
     return eFAILURE; // only restore if a player is in the room
 
-  if (!IS_SET(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY))
+  if (!DC::isSet(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY))
   {
     send_to_room("You hear the 'pop' of a magical barrier springing up.\r\n\r\n", obj->in_room);
     SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY);
@@ -2255,7 +2255,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("The box doesn't respond.\r\n", ch);
     return eSUCCESS;
@@ -2721,13 +2721,13 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
 
   if (vict)
   {
-    if (!IS_SET(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
+    if (!DC::isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\r\n", obj->in_room);
     SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
   else
   {
-    if (IS_SET(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
+    if (DC::isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
       send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
     REMOVE_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
@@ -3582,7 +3582,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
 
-      if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+      if (DC::isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
       {
         REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
         strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
@@ -3602,7 +3602,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     }
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
   {
     return eFAILURE;
   }
@@ -3716,7 +3716,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
         buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
         tmp.push_back(buf);
       }
-      if (IS_SET(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
+      if (DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
       {
         buf = "Oh... I suppose we're just going to sit here and gossip for the next few hours, huh?";
         tmp.push_back(buf);
@@ -3815,7 +3815,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+        DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
     {
       send_to_char("Wait until the potato arena is open before you try blowing yourself up!\n\r", vict);
       return eSUCCESS;
@@ -3874,7 +3874,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL)
+        DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL)
     {
       send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
       return eSUCCESS;
@@ -3944,7 +3944,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                  "You have been KILLED!\n\r",
                  vict);
     extract_obj(obj);
-    if (!IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA))
+    if (!DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA))
       fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
     else if (arena.type == POTATO)
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
@@ -4156,7 +4156,7 @@ int godload_wailka(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (str_cmp(arg1, "suloaki"))
     return eFAILURE;
-  if (isTimer(ch, SPELL_PARALYZE) || IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isTimer(ch, SPELL_PARALYZE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     send_to_char("The ring hums, but nothing happens.\r\n", ch);
     return eSUCCESS;
@@ -4382,7 +4382,7 @@ int angie_proc(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
   if (str_cmp(arg1, "door"))
     return eFAILURE;
-  if (!IS_SET(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
+  if (!DC::isSet(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
     return eFAILURE;
   REMOVE_BIT(DC::getInstance()->world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
   REMOVE_BIT(DC::getInstance()->world[29265].dir_option[2]->exit_info, EX_CLOSED);

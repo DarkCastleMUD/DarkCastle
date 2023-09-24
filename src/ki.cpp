@@ -126,7 +126,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
   /*
-   if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
+   if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
    return eFAILURE;
@@ -152,7 +152,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                  "the universe.\r\n",
@@ -201,16 +201,16 @@ int do_ki(Character *ch, char *argument, int cmd)
     /* Locate targets */
     target_ok = false;
 
-    if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+    if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
     {
       argument = one_argument(argument, name);
       if (*name)
       {
-        if (IS_SET(ki_info[spl].targets, TAR_CHAR_ROOM))
+        if (DC::isSet(ki_info[spl].targets, TAR_CHAR_ROOM))
           if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
             target_ok = true;
 
-        if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
+        if (!target_ok && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
           if (str_cmp(GET_NAME(ch), name) == 0)
           {
             tar_char = ch;
@@ -221,14 +221,14 @@ int do_ki(Character *ch, char *argument, int cmd)
       /* No argument was typed */
       else if (!*name)
       {
-        if (IS_SET(ki_info[spl].targets, TAR_FIGHT_VICT))
+        if (DC::isSet(ki_info[spl].targets, TAR_FIGHT_VICT))
           if (ch->fighting)
             if ((ch->fighting)->in_room == ch->in_room)
             {
               tar_char = ch->fighting;
               target_ok = true;
             }
-        if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
+        if (!target_ok && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
         {
           tar_char = ch;
           target_ok = true;
@@ -239,7 +239,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         target_ok = false;
     }
 
-    if (IS_SET(ki_info[spl].targets, TAR_IGNORE))
+    if (DC::isSet(ki_info[spl].targets, TAR_IGNORE))
       target_ok = true;
 
     if (target_ok != true)
@@ -254,12 +254,12 @@ int do_ki(Character *ch, char *argument, int cmd)
 
     else if (target_ok)
     {
-      if ((tar_char == ch) && IS_SET(ki_info[spl].targets, TAR_SELF_NONO))
+      if ((tar_char == ch) && DC::isSet(ki_info[spl].targets, TAR_SELF_NONO))
       {
         send_to_char("You cannot use this power on yourself.\r\n", ch);
         return eFAILURE;
       }
-      else if ((tar_char != ch) && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
+      else if ((tar_char != ch) && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
       {
         send_to_char("You can only use this power upon yourself.\r\n",
                      ch);
@@ -278,7 +278,7 @@ int do_ki(Character *ch, char *argument, int cmd)
      * -Sadus
      * This has hence been fixed. - Pir
      */
-    if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+    if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
       if (!tar_char)
       {
         logentry("Dammit Morc, fix that null tar_char thing in ki", IMPLEMENTER,
@@ -291,7 +291,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       }
 
     /* crasher right here */
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
     {
       send_to_char(
           "You find yourself unable to focus your energy here.\r\n",
@@ -299,7 +299,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+    if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
       if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         return eFAILURE;
 
@@ -318,7 +318,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     {
       if (!skill_success(ch, tar_char,
                          spl + KI_OFFSET) &&
-          !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl) / 2;
@@ -327,7 +327,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
 
-      if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+      if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
         if (!tar_char || (ch->in_room != tar_char->in_room))
         {
           send_to_char("Whom should the power be used upon?\n\r", ch);
@@ -335,7 +335,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         }
 
       /* Stop abusing your betters  */
-      if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+      if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
         if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
         {
           send_to_char("That just might annoy them!\n\r", ch);
@@ -343,8 +343,8 @@ int do_ki(Character *ch, char *argument, int cmd)
         }
 
       /* Imps ignore safe flags  */
-      if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+      if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
+        if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
         {
           send_to_char(
               "There is no safe haven from an angry IMPLEMENTER!\n\r",
@@ -398,7 +398,7 @@ int ki_gain(Character *ch)
 
   gain += age(ch).year / 25;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
@@ -458,8 +458,8 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   }
 
   if (CAN_GO(vict, exit) &&
-      !IS_SET(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-      !IS_SET(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
+      !DC::isSet(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
+      !DC::isSet(DC::getInstance()->world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)) &&
       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
   {
@@ -589,7 +589,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     {
       retval = damage(ch, tmp_victim, dam, TYPE_KI,
                       KI_OFFSET + KI_STORM, 0);
-      if (IS_SET(retval, eCH_DIED))
+      if (DC::isSet(retval, eCH_DIED))
         return retval;
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else

@@ -130,7 +130,7 @@ int check_autojoiners(Character *ch, int skill = 0)
     return eFAILURE;
   if (ch->player && ch->player->unjoinable == true)
     return eFAILURE;
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
 
   Character *tmp;
@@ -259,7 +259,7 @@ void perform_violence(void)
       retval = check_joincharmie(ch);
     if (SOMEONE_DIED(retval))
       continue;
-    if (IS_PC(ch) && IS_SET(ch->player->toggles, PLR_CHARMIEJOIN))
+    if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN))
     {
       if (ch->followers)
       {
@@ -268,7 +268,7 @@ void perform_violence(void)
           folnext = fol->next;
           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
             retval = check_charmiejoin(fol->follower);
-          if (IS_SET(retval, eVICT_DIED))
+          if (DC::isSet(retval, eVICT_DIED))
             break;
         }
       }
@@ -689,7 +689,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     //  if(SOMEONE_DIED(result))       return result;
     // }
 
-    if (IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
+    if (DC::isSet(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
@@ -703,7 +703,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   }    // End of the monk attacks
   else // It's a normal attack
   {
-    if (IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
+    if (DC::isSet(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
@@ -791,63 +791,63 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
 void update_flags(Character *vict)
 {
-  if (IS_SET(vict->combat, COMBAT_BASH1))
+  if (DC::isSet(vict->combat, COMBAT_BASH1))
   {
     REMOVE_BIT(vict->combat, COMBAT_BASH1);
     SET_BIT(vict->combat, COMBAT_BASH2);
   }
-  else if (IS_SET(vict->combat, COMBAT_BASH2))
+  else if (DC::isSet(vict->combat, COMBAT_BASH2))
     REMOVE_BIT(vict->combat, COMBAT_BASH2);
 
-  if (IS_SET(vict->combat, COMBAT_RAGE1))
+  if (DC::isSet(vict->combat, COMBAT_RAGE1))
   {
     REMOVE_BIT(vict->combat, COMBAT_RAGE1);
     SET_BIT(vict->combat, COMBAT_RAGE2);
   }
-  else if (IS_SET(vict->combat, COMBAT_RAGE2))
+  else if (DC::isSet(vict->combat, COMBAT_RAGE2))
   {
     REMOVE_BIT(vict->combat, COMBAT_RAGE2);
     act("$n calms down a bit.", vict, 0, 0, TO_ROOM, 0);
     act("Your mind seems a bit clearer now.", vict, 0, 0, TO_CHAR, 0);
   }
 
-  if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW))
+  if (DC::isSet(vict->combat, COMBAT_CRUSH_BLOW))
   {
     REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW);
     SET_BIT(vict->combat, COMBAT_CRUSH_BLOW2);
   }
-  else if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW2))
+  else if (DC::isSet(vict->combat, COMBAT_CRUSH_BLOW2))
   {
     REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW2);
     act("$n shrugs off $s weakness!", vict, 0, 0, TO_ROOM, 0);
     act("You shrug off your weakness.!", vict, 0, 0, TO_CHAR, 0);
   }
 
-  if (IS_SET(vict->combat, COMBAT_BLADESHIELD1))
+  if (DC::isSet(vict->combat, COMBAT_BLADESHIELD1))
   {
     REMOVE_BIT(vict->combat, COMBAT_BLADESHIELD1);
     SET_BIT(vict->combat, COMBAT_BLADESHIELD2);
   }
-  else if (IS_SET(vict->combat, COMBAT_BLADESHIELD2))
+  else if (DC::isSet(vict->combat, COMBAT_BLADESHIELD2))
     REMOVE_BIT(vict->combat, COMBAT_BLADESHIELD2);
 
-  if (IS_SET(vict->combat, COMBAT_VITAL_STRIKE))
+  if (DC::isSet(vict->combat, COMBAT_VITAL_STRIKE))
     REMOVE_BIT(vict->combat, COMBAT_VITAL_STRIKE);
 
-  if (IS_SET(vict->combat, COMBAT_ORC_BLOODLUST2))
+  if (DC::isSet(vict->combat, COMBAT_ORC_BLOODLUST2))
   {
     REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
     send_to_char("Your bloodlust fades.\r\n", vict);
     act("$n's bloodlust fades.", vict, 0, 0, TO_ROOM, 0);
   }
 
-  if (IS_SET(vict->combat, COMBAT_ORC_BLOODLUST1))
+  if (DC::isSet(vict->combat, COMBAT_ORC_BLOODLUST1))
   {
     REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST1);
     SET_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
   }
 
-  if (IS_SET(vict->combat, COMBAT_THI_EYEGOUGE2))
+  if (DC::isSet(vict->combat, COMBAT_THI_EYEGOUGE2))
   {
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(vict->affected_by, AFF_BLIND);
@@ -855,13 +855,13 @@ void update_flags(Character *vict)
     send_to_char("You clear the blood out of your eyes.\r\n", vict);
   }
 
-  if (IS_SET(vict->combat, COMBAT_THI_EYEGOUGE))
+  if (DC::isSet(vict->combat, COMBAT_THI_EYEGOUGE))
   {
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE);
     SET_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
   }
 
-  if (IS_SET(vict->combat, COMBAT_MONK_STANCE))
+  if (DC::isSet(vict->combat, COMBAT_MONK_STANCE))
   {
     // stance lasts 'modifier' rounds.  Remove bit once used up
     struct affected_type *pspell;
@@ -884,20 +884,20 @@ void update_flags(Character *vict)
 
 void update_stuns(Character *ch)
 {
-  if (IS_SET(ch->combat, COMBAT_SHOCKED))
+  if (DC::isSet(ch->combat, COMBAT_SHOCKED))
   {
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
     SET_BIT(ch->combat, COMBAT_SHOCKED2);
   }
-  else if (IS_SET(ch->combat, COMBAT_SHOCKED2))
+  else if (DC::isSet(ch->combat, COMBAT_SHOCKED2))
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED2);
 
-  if (IS_SET(ch->combat, COMBAT_STUNNED))
+  if (DC::isSet(ch->combat, COMBAT_STUNNED))
   {
     REMOVE_BIT(ch->combat, COMBAT_STUNNED);
     SET_BIT(ch->combat, COMBAT_STUNNED2);
   }
-  else if (IS_SET(ch->combat, COMBAT_STUNNED2))
+  else if (DC::isSet(ch->combat, COMBAT_STUNNED2))
   {
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
     if (ch->getHP() > 0)
@@ -909,7 +909,7 @@ void update_stuns(Character *ch)
           ch->setPOSFighting();
         else
           GET_POS(ch) = POSITION_STANDING;
-        if (IS_SET(ch->combat, COMBAT_BERSERK))
+        if (DC::isSet(ch->combat, COMBAT_BERSERK))
         {
           send_to_char("After that period of unconsciousness, you've forgotten what you were mad about.\r\n", ch);
           REMOVE_BIT(ch->combat, COMBAT_BERSERK);
@@ -959,7 +959,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))
     return eFAILURE;
-  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_ENERGY) || IS_SET(ch->immune, ISR_ENERGY))
+  if (DC::isSet(races[(int)GET_RACE(ch)].immune, ISR_ENERGY) || DC::isSet(ch->immune, ISR_ENERGY))
   {
     dam = 0;
   }
@@ -1075,8 +1075,8 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   if (!IS_AFFECTED(vict, AFF_FIRESHIELD))
     return eFAILURE;
 
-  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
-      IS_SET(ch->immune, ISR_FIRE))
+  if (DC::isSet(races[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
+      DC::isSet(ch->immune, ISR_FIRE))
   {
     dam = 0;
   }
@@ -1164,7 +1164,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   if (!IS_AFFECTED(vict, AFF_ACID_SHIELD))
     return eFAILURE;
 
-  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_ACID) || IS_SET(ch->immune, ISR_ACID))
+  if (DC::isSet(races[(int)GET_RACE(ch)].immune, ISR_ACID) || DC::isSet(ch->immune, ISR_ACID))
     dam = 0;
   else
   {
@@ -1249,8 +1249,8 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   if (!affected_by_spell(vict, SPELL_BONESHIELD))
     return eFAILURE;
 
-  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
-      IS_SET(ch->immune, ISR_PHYSICAL))
+  if (DC::isSet(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
+      DC::isSet(ch->immune, ISR_PHYSICAL))
     dam = 0;
   else
   {
@@ -1341,7 +1341,7 @@ void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
   }
 
   // now check for two-handed weapons
-  if (wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+  if (wielded && DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
       (learned = has_skill(ch, SKILL_TWO_HANDED_WEAPONS)))
   {
     // rare skill increases
@@ -1494,7 +1494,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
     w_type = get_weapon_damage_type(wielded);
 
-  if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && obj_index[wielded->item_number].virt == 30019 && DC::isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
   {                     // Durendal - changes damage type and other stuff
     w_type = TYPE_FIRE; // no skill bonus
   }
@@ -1533,7 +1533,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
 
-  if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && obj_index[wielded->item_number].virt == 30019 && DC::isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
   {
     dam = dam * 85 / 100;
     dam = dam + (getRealSpellDamage(ch) / 2);
@@ -1542,7 +1542,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   // BACKSTAB GOES IN HERE!
   if ((type == SKILL_BACKSTAB || type == SKILL_CIRCLE) && dam < 10000)
   { // Bingo not affected.
-    if (IS_SET(ch->combat, COMBAT_CIRCLE))
+    if (DC::isSet(ch->combat, COMBAT_CIRCLE))
     {
       if (GET_LEVEL(ch) <= MORTAL)
         if (type == SKILL_CIRCLE)
@@ -1565,7 +1565,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     }
   }
 
-  if (wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
+  if (wielded && DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
     if (vict->getHP() < 3500 && vict->getHP() * 100 / GET_MAX_HIT(vict) < 15)
     {
       retval = do_execute_skill(ch, vict, w_type);
@@ -1586,7 +1586,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
       dam += 15 + has_skill(ch, SKILL_NAT_SELECT) / 10;
 
   do_combatmastery(ch, vict, weapon);
-  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
+  if (DC::isSet(ch->combat, COMBAT_CRUSH_BLOW2))
     dam >>= 1; // dam = dam / 2;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
@@ -1618,7 +1618,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   }
 
   // Was last hit a success?
-  if (IS_SET(retval, eSUCCESS))
+  if (DC::isSet(retval, eSUCCESS))
   {
     // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
     if (wielded)
@@ -1718,9 +1718,9 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 // pos of -1 means inventory
 void eq_destroyed(Character *ch, Object *obj, int pos)
 {
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     return;
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_SCRAP))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_SCRAP))
     return;
 
   if (pos != -1) // if its not an inventory item, do this
@@ -1751,7 +1751,7 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
 
   while (obj->contains) // drop contents to floor
   {
-    if (IS_SET(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (DC::isSet(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))
     {
       act("A $p falls to $n's inventory.", ch, obj->contains, 0, TO_ROOM, 0);
       act("A $p falls to your inventory from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
@@ -1778,7 +1778,7 @@ void eq_damage(Character *ch, Character *victim,
   class Object *obj;
   int pos;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
     return;
   if (IS_PC(victim) && IS_PC(ch)) // Don't damage eq on pc->pc fights
     return;
@@ -1940,7 +1940,7 @@ int damage_retval(Character *ch, Character *vict, int value)
   // we need to make sure in the case of a reflect or something
   // that we are returning the death of the CH if he died
 
-  if (ch == vict && IS_SET(value, eVICT_DIED))
+  if (ch == vict && DC::isSet(value, eVICT_DIED))
     return (value | eCH_DIED);
 
   return value;
@@ -2118,7 +2118,7 @@ int damage(Character *ch, Character *victim,
     dam += elemental_damage_bonus(attacktype, ch);
   //
 
-  if (IS_SET(victim->combat, COMBAT_REPELANCE) && !bingo &&
+  if (DC::isSet(victim->combat, COMBAT_REPELANCE) && !bingo &&
       attacktype <= MAX_SPL_LIST)
   {
     if (GET_LEVEL(ch) > 70)
@@ -2145,7 +2145,7 @@ int damage(Character *ch, Character *victim,
     //  }
   }
   bool imm = false;
-  if (IS_SET(victim->immune, weapon_bit))
+  if (DC::isSet(victim->immune, weapon_bit))
     imm = true;
 
   if (attacktype < MAX_SPL_LIST && ch && dam > 1)
@@ -2330,10 +2330,10 @@ int damage(Character *ch, Character *victim,
     if (!victim->fighting && ch->in_room == victim->in_room)
       set_fighting(victim, ch);
 
-    if ((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-        (!IS_SET(victim->combat, COMBAT_STUNNED2)) &&
-        (!IS_SET(victim->combat, COMBAT_BASH1)) &&
-        (!IS_SET(victim->combat, COMBAT_BASH2)))
+    if ((!DC::isSet(victim->combat, COMBAT_STUNNED)) &&
+        (!DC::isSet(victim->combat, COMBAT_STUNNED2)) &&
+        (!DC::isSet(victim->combat, COMBAT_BASH1)) &&
+        (!DC::isSet(victim->combat, COMBAT_BASH2)))
     {
       if (GET_POS(victim) > POSITION_STUNNED)
       {
@@ -2387,21 +2387,21 @@ int damage(Character *ch, Character *victim,
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL)
   {
-    if (IS_SET(ch->combat, COMBAT_BERSERK))
+    if (DC::isSet(ch->combat, COMBAT_BERSERK))
       dam = (int)(dam * 1.75);
     if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
       dam = dam * 5;
-    if (IS_SET(ch->combat, COMBAT_RAGE1) || (IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB))
+    if (DC::isSet(ch->combat, COMBAT_RAGE1) || (DC::isSet(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB))
       dam = (int)(dam * 1.4);
-    if (IS_SET(ch->combat, COMBAT_HITALL))
+    if (DC::isSet(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
-    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1))
+    if (DC::isSet(ch->combat, COMBAT_ORC_BLOODLUST1))
     {
       dam = (int)(dam * 1.7);
       //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
       //      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
-    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2))
+    if (DC::isSet(ch->combat, COMBAT_ORC_BLOODLUST2))
     {
       dam = (int)(dam * 1.7);
       //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
@@ -2415,7 +2415,7 @@ int damage(Character *ch, Character *victim,
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
     }
-    if (IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
+    if (DC::isSet(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2.5);
 
     // we do this AFTER all the multipliers but BEFORE all the reducers
@@ -2445,7 +2445,7 @@ int damage(Character *ch, Character *victim,
     int mod = affected_by_spell(victim, SPELL_SANCTUARY) ? affected_by_spell(victim, SPELL_SANCTUARY)->modifier : 35;
     dam -= (int)(float)((float)dam * ((float)mod / 100.0));
   }
-  if (IS_SET(victim->combat, COMBAT_MONK_STANCE) && dam > 0) // half damage
+  if (DC::isSet(victim->combat, COMBAT_MONK_STANCE) && dam > 0) // half damage
     dam /= 2;
   int reduce = 0, type = 0;
   if (can_miss == 1)
@@ -2458,7 +2458,7 @@ int damage(Character *ch, Character *victim,
       if (SOMEONE_DIED(retval2)) // Riposte
         return damage_retval(ch, victim, retval2);
 
-      if (IS_SET(retval2, eSUCCESS))
+      if (DC::isSet(retval2, eSUCCESS))
       {
         switch (type)
         {
@@ -2598,39 +2598,39 @@ int damage(Character *ch, Character *victim,
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) ||
       (attacktype == SKILL_BACKSTAB))
   {
-    if (IS_SET(victim->immune, ISR_PHYSICAL))
+    if (DC::isSet(victim->immune, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
-    else if (IS_SET(victim->resist, ISR_PHYSICAL))
+    else if (DC::isSet(victim->resist, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
-    else if (IS_SET(victim->suscept, ISR_PHYSICAL))
+    else if (DC::isSet(victim->suscept, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
 
     wielded = ch->equipment[weapon];
 
     if (wielded)
     {
-      //      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
-      //      (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //      if ((DC::isSet(victim->immune, ISR_MAGIC)) &&
+      //      (DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
       //    weapon_bit += ISR_MAGIC;
-      if ((IS_SET(victim->immune, ISR_NON_MAGIC)) &&
-          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+      if ((DC::isSet(victim->immune, ISR_NON_MAGIC)) &&
+          (!DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
-      //      if ((IS_SET(victim->suscept, ISR_MAGIC)) &&
-      //        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //      if ((DC::isSet(victim->suscept, ISR_MAGIC)) &&
+      //        (DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
       //        weapon_bit += ISR_MAGIC;
-      if ((IS_SET(victim->suscept, ISR_NON_MAGIC)) &&
-          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+      if ((DC::isSet(victim->suscept, ISR_NON_MAGIC)) &&
+          (!DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
-      //      if ((IS_SET(victim->resist, ISR_MAGIC)) &&
-      //       (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //      if ((DC::isSet(victim->resist, ISR_MAGIC)) &&
+      //       (DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
       //       weapon_bit += ISR_MAGIC;
-      if ((IS_SET(victim->resist, ISR_NON_MAGIC)) &&
-          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+      if ((DC::isSet(victim->resist, ISR_NON_MAGIC)) &&
+          (!DC::isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
     }
   }
 
-  if (IS_SET(victim->immune, weapon_bit))
+  if (DC::isSet(victim->immune, weapon_bit))
   {
     dam = 0;
     SET_BIT(retval, eIMMUNE_VICTIM);
@@ -2640,7 +2640,7 @@ int damage(Character *ch, Character *victim,
       SET_BIT(retval, eEXTRA_VALUE);
     }
   }
-  else if (IS_SET(victim->suscept, weapon_bit))
+  else if (DC::isSet(victim->suscept, weapon_bit))
   {
     //    magic stuff is handled elsewhere
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
@@ -2649,7 +2649,7 @@ int damage(Character *ch, Character *victim,
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     }
   }
-  else if (IS_SET(victim->resist, weapon_bit))
+  else if (DC::isSet(victim->resist, weapon_bit))
   {
     //    magic stuff is handled elsewhere
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
@@ -2802,18 +2802,18 @@ int damage(Character *ch, Character *victim,
   }
 
   // Sleep spells.
-  if (!IS_SET(victim->combat, COMBAT_STUNNED) &&
-      !IS_SET(victim->combat, COMBAT_STUNNED2))
+  if (!DC::isSet(victim->combat, COMBAT_STUNNED) &&
+      !DC::isSet(victim->combat, COMBAT_STUNNED2))
     if (!AWAKE(victim))
     {
       if (victim->fighting)
         stop_fighting(victim);
 
-      if (IS_SET(victim->combat, COMBAT_BERSERK))
+      if (DC::isSet(victim->combat, COMBAT_BERSERK))
         REMOVE_BIT(victim->combat, COMBAT_BERSERK);
-      if (IS_SET(victim->combat, COMBAT_RAGE1))
+      if (DC::isSet(victim->combat, COMBAT_RAGE1))
         REMOVE_BIT(victim->combat, COMBAT_RAGE1);
-      if (IS_SET(victim->combat, COMBAT_RAGE2))
+      if (DC::isSet(victim->combat, COMBAT_RAGE2))
         REMOVE_BIT(victim->combat, COMBAT_RAGE2);
     }
 
@@ -2845,7 +2845,7 @@ int damage(Character *ch, Character *victim,
           SET_BIT(retval, check_joincharmie(ch));
       if (SOMEONE_DIED(retval))
         return debug_retval(ch, victim, retval);
-      if (IS_PC(ch) && IS_SET(ch->player->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
+      if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
       {
         if (ch->followers)
         {
@@ -2855,7 +2855,7 @@ int damage(Character *ch, Character *victim,
             folnext = fol->next;
             if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
               SET_BIT(retval, check_charmiejoin(fol->follower));
-            if (IS_SET(retval, eVICT_DIED))
+            if (DC::isSet(retval, eVICT_DIED))
               break;
           }
         }
@@ -2989,7 +2989,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
     {
       if (tmpch == ch || tmpch == victim)
         continue;
-      if (IS_PC(tmpch) && IS_SET(tmpch->player->toggles, PLR_DAMAGE))
+      if (IS_PC(tmpch) && DC::isSet(tmpch->player->toggles, PLR_DAMAGE))
         send_tokens(tokens, ch, obj, victim, 0, tmpch);
       else
         send_tokens(tokens2, ch, obj, victim, 0, tmpch);
@@ -2997,14 +2997,14 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
   }
   else if (to == TO_CHAR)
   {
-    if (IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE))
+    if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, ch);
     else
       send_tokens(tokens2, ch, obj, victim, 0, ch);
   }
   else if (to == TO_VICT)
   {
-    if (IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE))
+    if (IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, victim);
     else
       send_tokens(tokens2, ch, obj, victim, 0, victim);
@@ -3193,7 +3193,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
     return;
   }
   bool vict_is_attacker = false;
-  if (IS_SET(vict->combat, COMBAT_ATTACKER))
+  if (DC::isSet(vict->combat, COMBAT_ATTACKER))
     vict_is_attacker = true;
 
   if (vict->fighting)
@@ -3241,12 +3241,12 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
 
 int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce)
 {
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
       (!AWAKE(victim)))
     return eFAILURE; // always hit
@@ -3287,9 +3287,9 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (skill)
     toHit += has_skill(ch, skill) / 8;
 
-  if (IS_SET(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  if (DC::isSet(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
     toHit = (int)((float)toHit * 0.90) - 5;
-  else if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2))
+  else if (DC::isSet(ch->combat, COMBAT_RAGE1) || DC::isSet(ch->combat, COMBAT_RAGE2))
     toHit = (int)((float)toHit * 0.95) - 2;
 
   if (toHit < 1)
@@ -3351,7 +3351,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     skill_increase_check(victim, SKILL_TUMBLING, tumbling, SKILL_INCREASE_HARD + 500);
 
   // Ze random stuff.
-  if (number(1, 100) < (int)percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+  if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
     return eFAILURE;
 
   // Miss, determine a message
@@ -3361,7 +3361,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   int what = number(0, amt);
   int retval = 0;
 
-  if (what < parry || IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+  if (what < parry || DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
     act("$n parries $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
     act("$n parries your attack.", victim, nullptr, ch, TO_VICT, 0);
@@ -3433,16 +3433,16 @@ int checkCounterStrike(Character *ch, Character *victim)
 {
   int retval, lvl = has_skill(victim, SKILL_COUNTER_STRIKE);
 
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       (victim->equipment[WIELD] != nullptr) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
 
   int p = lvl / 2 - (100 - has_skill(victim, SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
@@ -3495,15 +3495,15 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
 {
   int retval;
 
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
 
   switch (number(1, 2))
@@ -3539,16 +3539,16 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
 {
   int retval;
 
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       (ch->equipment[WIELD] == nullptr && number(1, 101) >= 50) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) ||
-      (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD1)) ||
+      (DC::isSet(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
 
   // 25% chance of success for mobs
@@ -3598,14 +3598,14 @@ int check_magic_block(Character *ch, Character *victim, int attacktype)
   int reduce = 0;
   if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       //    (victim->equipment[WEAR_SHIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
   if (IS_NPC(victim))
@@ -3642,14 +3642,14 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
   int reduce = 0;
   if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       //    (victim->equipment[WEAR_SHIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
 
@@ -3715,16 +3715,16 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
 bool check_parry(Character *ch, Character *victim, int attacktype, bool display_results)
 {
   int modifier = 0;
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       (victim->equipment[WIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      ((IS_SET(victim->combat, COMBAT_BASH1) ||
-        IS_SET(victim->combat, COMBAT_BASH2)) &&
-       !IS_SET(victim->combat, COMBAT_BLADESHIELD1) &&
-       !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      ((DC::isSet(victim->combat, COMBAT_BASH1) ||
+        DC::isSet(victim->combat, COMBAT_BASH2)) &&
+       !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) &&
+       !DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return false;
 
@@ -3784,8 +3784,8 @@ bool check_parry(Character *ch, Character *victim, int attacktype, bool display_
   modifier -= GET_DEX(ch) / 2;
   modifier -= 10;
   if (!skill_success(victim, ch, SKILL_PARRY, modifier) &&
-      !IS_SET(victim->combat, COMBAT_BLADESHIELD1) &&
-      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+      !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) &&
+      !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
     return false;
 
   if (display_results == true)
@@ -3855,12 +3855,12 @@ bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_
 {
   //  int chance;
   int modifier = 0;
-  if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-      (IS_SET(victim->combat, COMBAT_BASH1)) ||
-      (IS_SET(victim->combat, COMBAT_BASH2)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
-      (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+  if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
+      (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH1)) ||
+      (DC::isSet(victim->combat, COMBAT_BASH2)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED)) ||
+      (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return false;
 
@@ -4049,7 +4049,7 @@ void update_pos(Character *victim)
 {
   if (victim->getHP() > 0)
   {
-    if ((!IS_SET(victim->combat, COMBAT_STUNNED)) && (!IS_SET(victim->combat, COMBAT_STUNNED2)))
+    if ((!DC::isSet(victim->combat, COMBAT_STUNNED)) && (!DC::isSet(victim->combat, COMBAT_STUNNED2)))
       if (GET_POS(victim) <= POSITION_STUNNED)
         GET_POS(victim) = POSITION_STANDING;
     return;
@@ -4148,10 +4148,10 @@ void set_fighting(Character *ch, Character *vict)
 
   ch->fighting = vict;
 
-  if ((!IS_SET(ch->combat, COMBAT_STUNNED)) &&
-      (!IS_SET(ch->combat, COMBAT_STUNNED2)) &&
-      (!IS_SET(ch->combat, COMBAT_BASH1)) &&
-      (!IS_SET(ch->combat, COMBAT_BASH2)))
+  if ((!DC::isSet(ch->combat, COMBAT_STUNNED)) &&
+      (!DC::isSet(ch->combat, COMBAT_STUNNED2)) &&
+      (!DC::isSet(ch->combat, COMBAT_BASH1)) &&
+      (!DC::isSet(ch->combat, COMBAT_BASH2)))
     ch->setPOSFighting();
 
   return;
@@ -4174,7 +4174,7 @@ void stop_fighting(Character *ch, int clearlag)
   // This is in the command interpreter now, so berserk lasts
   // until you are totally done fighting.
   // -Sadus
-  if (IS_SET(ch->combat, COMBAT_BERSERK))
+  if (DC::isSet(ch->combat, COMBAT_BERSERK))
   {
     bool keepZerk = false;
     for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
@@ -4205,13 +4205,13 @@ void stop_fighting(Character *ch, int clearlag)
     }
   }
 
-  if (IS_SET(ch->combat, COMBAT_RAGE1))
+  if (DC::isSet(ch->combat, COMBAT_RAGE1))
   {
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
     act("$n calms down.", ch, 0, 0, TO_ROOM, 0);
     act("Your mind seems a bit clearer now.", ch, 0, 0, TO_CHAR, 0);
   }
-  if (IS_SET(ch->combat, COMBAT_RAGE2))
+  if (DC::isSet(ch->combat, COMBAT_RAGE2))
   {
     REMOVE_BIT(ch->combat, COMBAT_RAGE2);
     act("$n calms down.", ch, 0, 0, TO_ROOM, 0);
@@ -4219,31 +4219,31 @@ void stop_fighting(Character *ch, int clearlag)
   }
 
   // make sure people aren't stuck unable to do anything
-  if (IS_SET(ch->combat, COMBAT_SHOCKED2))
+  if (DC::isSet(ch->combat, COMBAT_SHOCKED2))
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED2);
-  if (IS_SET(ch->combat, COMBAT_SHOCKED))
+  if (DC::isSet(ch->combat, COMBAT_SHOCKED))
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
 
-  if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1))
+  if (DC::isSet(ch->combat, COMBAT_ORC_BLOODLUST1))
   {
     REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   }
-  if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2))
+  if (DC::isSet(ch->combat, COMBAT_ORC_BLOODLUST2))
   {
     REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
   }
-  if (IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
+  if (DC::isSet(ch->combat, COMBAT_VITAL_STRIKE))
     REMOVE_BIT(ch->combat, COMBAT_VITAL_STRIKE);
-  if (IS_SET(ch->combat, COMBAT_BLADESHIELD1))
+  if (DC::isSet(ch->combat, COMBAT_BLADESHIELD1))
     REMOVE_BIT(ch->combat, COMBAT_BLADESHIELD1);
-  if (IS_SET(ch->combat, COMBAT_BLADESHIELD2))
+  if (DC::isSet(ch->combat, COMBAT_BLADESHIELD2))
     REMOVE_BIT(ch->combat, COMBAT_BLADESHIELD2);
-  if (IS_SET(ch->combat, COMBAT_THI_EYEGOUGE))
+  if (DC::isSet(ch->combat, COMBAT_THI_EYEGOUGE))
   {
     REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOUGE);
     REMBIT(ch->affected_by, AFF_BLIND);
   }
-  if (IS_SET(ch->combat, COMBAT_THI_EYEGOUGE2))
+  if (DC::isSet(ch->combat, COMBAT_THI_EYEGOUGE2))
   {
     REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(ch->affected_by, AFF_BLIND);
@@ -4255,7 +4255,7 @@ void stop_fighting(Character *ch, int clearlag)
   update_pos(ch);
 
   // Remove ch's lag if he wasn't using wimpy.
-  if (IS_PC(ch) && ch->desc && !IS_SET(ch->player->toggles, PLR_WIMPY) && clearlag)
+  if (IS_PC(ch) && ch->desc && !DC::isSet(ch->player->toggles, PLR_WIMPY) && clearlag)
     ch->desc->wait = 0;
 
   if (ch == combat_next_dude)
@@ -4280,17 +4280,17 @@ void stop_fighting(Character *ch, int clearlag)
   ch->next_fighting = 0;
   ch->fighting = 0;
 
-  if (IS_SET(ch->combat, COMBAT_BASH1))
+  if (DC::isSet(ch->combat, COMBAT_BASH1))
     REMOVE_BIT(ch->combat, COMBAT_BASH1);
-  if (IS_SET(ch->combat, COMBAT_BASH2))
+  if (DC::isSet(ch->combat, COMBAT_BASH2))
     REMOVE_BIT(ch->combat, COMBAT_BASH2);
-  if (IS_SET(ch->combat, COMBAT_STUNNED))
+  if (DC::isSet(ch->combat, COMBAT_STUNNED))
     REMOVE_BIT(ch->combat, COMBAT_STUNNED);
-  if (IS_SET(ch->combat, COMBAT_STUNNED2))
+  if (DC::isSet(ch->combat, COMBAT_STUNNED2))
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
-  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW))
+  if (DC::isSet(ch->combat, COMBAT_CRUSH_BLOW))
     REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW);
-  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
+  if (DC::isSet(ch->combat, COMBAT_CRUSH_BLOW2))
     REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW2);
 
   ch->last_damage = time(nullptr);
@@ -4441,7 +4441,7 @@ void make_corpse(Character *ch)
 
       // If the above didn't already set the corpse object with flag ITEM_LIMIT_SACRIFICE
       // then we search its inventory including container contents
-      if (!IS_SET(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE))
+      if (!DC::isSet(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE))
       {
         for (o = ch->carrying; o; o = next_obj)
         {
@@ -4565,18 +4565,18 @@ void make_corpse(Character *ch)
     {
       next_obj = o->next_content;
 
-      if (IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (DC::isSet(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
           (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
         for (o_in_container = o->contains; o_in_container; o_in_container = next_o_in_container)
         {
           next_o_in_container = o_in_container->next_content;
-          if (!IS_SET(o_in_container->obj_flags.extra_flags, ITEM_SPECIAL))
+          if (!DC::isSet(o_in_container->obj_flags.extra_flags, ITEM_SPECIAL))
           {
             move_obj(o_in_container, corpse);
           }
         } // if and for
 
-      if (!IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL))
+      if (!DC::isSet(o->obj_flags.extra_flags, ITEM_SPECIAL))
         move_obj(o, corpse);
 
     } // for
@@ -4618,16 +4618,16 @@ void make_dust(Character *ch)
   {
     next_obj = o->next_content;
 
-    if (IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) && (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
+    if (DC::isSet(o->obj_flags.extra_flags, ITEM_SPECIAL) && (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
       for (tmp_o = o->contains; tmp_o; tmp_o = blah)
       {
         blah = tmp_o->next_content;
-        if (!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (!DC::isSet(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
           move_obj(tmp_o, ch->in_room);
 
       } // if and for
 
-    if (!IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (!DC::isSet(o->obj_flags.extra_flags, ITEM_SPECIAL))
       move_obj(o, ch->in_room);
 
   } // for
@@ -5140,7 +5140,7 @@ int do_behead_skill(Character *ch, Character *vict)
       if (chance > (2 * percent))
       {
         chance = number(0, 101);
-        if (chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH) && skill_success(ch, vict, SKILL_BEHEAD))
+        if (chance > (2 * percent) && !DC::isSet(vict->immune, ISR_SLASH) && skill_success(ch, vict, SKILL_BEHEAD))
         {
           if (((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
                (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
@@ -5197,12 +5197,12 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
       if (chance > (2 * percent))
       {
         if (IS_AFFECTED(vict, AFF_NO_BEHEAD) ||
-            (w_type == TYPE_SLASH && IS_SET(vict->immune, ISR_SLASH)) ||
-            (w_type == TYPE_PIERCE && IS_SET(vict->immune, ISR_PIERCE)) ||
-            (w_type == TYPE_CRUSH && IS_SET(vict->immune, ISR_CRUSH)) ||
-            (w_type == TYPE_BLUDGEON && IS_SET(vict->immune, ISR_BLUDGEON)) ||
-            (w_type == TYPE_WHIP && IS_SET(vict->immune, ISR_WHIP)) ||
-            (w_type == TYPE_STING && IS_SET(vict->immune, ISR_STING)))
+            (w_type == TYPE_SLASH && DC::isSet(vict->immune, ISR_SLASH)) ||
+            (w_type == TYPE_PIERCE && DC::isSet(vict->immune, ISR_PIERCE)) ||
+            (w_type == TYPE_CRUSH && DC::isSet(vict->immune, ISR_CRUSH)) ||
+            (w_type == TYPE_BLUDGEON && DC::isSet(vict->immune, ISR_BLUDGEON)) ||
+            (w_type == TYPE_WHIP && DC::isSet(vict->immune, ISR_WHIP)) ||
+            (w_type == TYPE_STING && DC::isSet(vict->immune, ISR_STING)))
         {
           act("$N deftly dodges your mortal strike!", ch, 0, vict, TO_CHAR, 0);
           act("$N deftly dodges $n's mortal strike!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -5327,7 +5327,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
       act("You easily avoid $n's slow, crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (!IS_SET(vict->combat, COMBAT_CRUSH_BLOW))
+    if (!DC::isSet(vict->combat, COMBAT_CRUSH_BLOW))
     {
       SET_BIT(vict->combat, COMBAT_CRUSH_BLOW);
       act("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_CHAR, 0);
@@ -5372,7 +5372,7 @@ void raw_kill(Character *ch, Character *victim)
     return;
   }
 
-  if (IS_SET(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
   {
     fight_kill(ch, victim, TYPE_ARENA_KILL, 0);
     return;
@@ -5468,7 +5468,7 @@ void raw_kill(Character *ch, Character *victim)
   victim->player->group_pkills = 0;
   victim->player->grpplvl = 0;
   victim->player->group_kills = 0;
-  if (IS_SET(victim->player->punish, PUNISH_SPAMMER))
+  if (DC::isSet(victim->player->punish, PUNISH_SPAMMER))
     REMOVE_BIT(victim->player->punish, PUNISH_SPAMMER);
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
@@ -5502,7 +5502,7 @@ void raw_kill(Character *ch, Character *victim)
   GET_COND(victim, FULL) = 0;
   GET_COND(victim, THIRST) = 0;
 
-  if (victim && IS_SET(victim->combat, COMBAT_BERSERK))
+  if (victim && DC::isSet(victim->combat, COMBAT_BERSERK))
   {
     GET_AC(victim) -= 30;
     victim->combat = 0;
@@ -5991,7 +5991,7 @@ void dam_message(int dam, Character *ch, Character *victim,
   char modstring[200];
   char endstring[200];
 
-  if (0 == dam && IS_SET(modifier, COMBAT_MOD_IGNORE))
+  if (0 == dam && DC::isSet(modifier, COMBAT_MOD_IGNORE))
   {
     sprintf(buf1, "$n's pitiful attack is ignored by $N!");
     sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
@@ -6162,7 +6162,7 @@ void dam_message(int dam, Character *ch, Character *victim,
 
   punct = (dam <= 29) ? '.' : '!';
 
-  if (IS_SET(modifier, COMBAT_MOD_FRENZY))
+  if (DC::isSet(modifier, COMBAT_MOD_FRENZY))
   {
     strcpy(modstring, "frenzied ");
   }
@@ -6171,12 +6171,12 @@ void dam_message(int dam, Character *ch, Character *victim,
 
   if (dam > 0)
   {
-    if (IS_SET(modifier, COMBAT_MOD_SUSCEPT))
+    if (DC::isSet(modifier, COMBAT_MOD_SUSCEPT))
     {
       strcpy(endstring, " doing extra damage");
     }
 
-    if (IS_SET(modifier, COMBAT_MOD_RESIST))
+    if (DC::isSet(modifier, COMBAT_MOD_RESIST))
     {
       strcpy(endstring, " but is resisted");
     }
@@ -6209,7 +6209,7 @@ void dam_message(int dam, Character *ch, Character *victim,
     }
   }
 
-  if (IS_SET(modifier, COMBAT_MOD_REDUCED))
+  if (DC::isSet(modifier, COMBAT_MOD_REDUCED))
   {
     if (GET_CLASS(victim) == CLASS_MONK)
     {
@@ -6242,16 +6242,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
     else if (has_skill(victim, SKILL_TUMBLING))
@@ -6260,15 +6260,15 @@ void dam_message(int dam, Character *ch, Character *victim,
       {
         sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
         sprintf(dammsg, " for $B%d$R damage", dam);
-        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
       }
       else
       {
         sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
         sprintf(dammsg, ", dealing $B%d$R damage", dam);
-        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
       }
     }
     else
@@ -6278,16 +6278,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
   }
@@ -6301,16 +6301,16 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
     }
     else
     {
       if (!attack)
         attack = attack_table[w_type];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && IS_SET(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && IS_SET(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
   //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -6337,7 +6337,7 @@ void disarm(Character *ch, Character *victim)
     send_to_char("Their paralyzed fingers are gripping the weapon too tightly.\r\n", ch);
     return;
   }
-  if (IS_SET(victim->combat, COMBAT_BERSERK))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK))
   {
     send_to_char("In their enraged state, there's no chance they'd let go of their weapon!\r\n", ch);
     return;
@@ -6363,7 +6363,7 @@ void disarm(Character *ch, Character *victim)
 
   obj = unequip_char(victim, WIELD);
   /* If it's gl make it go to inventory. Morc. */
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     obj_to_char(obj, victim);
   else
     obj_to_room(obj, victim->in_room);
@@ -6453,7 +6453,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     }
   }
   // Make sure barbs get their ac back
-  if (IS_SET(victim->combat, COMBAT_BERSERK))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK))
   {
     REMOVE_BIT(victim->combat, COMBAT_BERSERK);
     GET_AC(victim) -= 30;
@@ -6746,7 +6746,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     }
     if (IS_NPC(ch) && ch->master)
     {
-      if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || IS_SET(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
+      if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || DC::isSet(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
         sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\n\r", GET_NAME(ch->master), GET_NAME(victim));
@@ -6872,7 +6872,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     for (const auto &tmp : character_list)
     {
 
-      if (IS_SET(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
+      if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
         if (victim->clan == tmp->clan && victim != tmp && GET_LEVEL(tmp) < IMMORTAL)
           eliminated = 0;
     }
@@ -6900,13 +6900,13 @@ void arena_kill(Character *ch, Character *victim, int type)
 
 int is_stunned(Character *ch)
 {
-  if (IS_SET(ch->combat, COMBAT_STUNNED))
+  if (DC::isSet(ch->combat, COMBAT_STUNNED))
     return true;
-  if (IS_SET(ch->combat, COMBAT_STUNNED2))
+  if (DC::isSet(ch->combat, COMBAT_STUNNED2))
     return true;
-  if (IS_SET(ch->combat, COMBAT_SHOCKED))
+  if (DC::isSet(ch->combat, COMBAT_SHOCKED))
     return true;
-  if (IS_SET(ch->combat, COMBAT_SHOCKED2))
+  if (DC::isSet(ch->combat, COMBAT_SHOCKED2))
     return true;
   return false;
 }
@@ -6914,14 +6914,14 @@ int is_stunned(Character *ch)
 int can_attack(Character *ch)
 {
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
   {
     send_to_char("Wait until it closes!\n\r", ch);
     return false;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
     return false;
@@ -6957,7 +6957,7 @@ int can_be_attacked(Character *ch, Character *vict)
     }
 
   // Prize Arena
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict))
   {
 
     if (ch->fighting && ch->fighting != vict)
@@ -6977,7 +6977,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Clan Chaos Arena
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict))
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
@@ -7005,7 +7005,7 @@ int can_be_attacked(Character *ch, Character *vict)
         vict->master &&
         vict->fighting != ch &&
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
-        IS_SET(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
+        DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
     {
       send_to_char("No fighting permitted in a safe room.\r\n", ch);
       return false;
@@ -7045,7 +7045,7 @@ int can_be_attacked(Character *ch, Character *vict)
     }
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     /* Allow the NPCs to continue fighting */
     if (IS_NPC(ch))
@@ -7362,9 +7362,9 @@ void inform_victim(Character *ch, Character *victim, int dam)
     // Wimp out?
     if (victim->getHP() < (max_hit / 5))
     {
-      if (IS_SET(victim->combat, COMBAT_BERSERK) ||
-          IS_SET(victim->combat, COMBAT_RAGE1) ||
-          IS_SET(victim->combat, COMBAT_RAGE2))
+      if (DC::isSet(victim->combat, COMBAT_BERSERK) ||
+          DC::isSet(victim->combat, COMBAT_RAGE1) ||
+          DC::isSet(victim->combat, COMBAT_RAGE2))
       {
         send_to_char("You are too OUTRAGED to care about your "
                      "wounds!\n\r",
@@ -7384,10 +7384,10 @@ void inform_victim(Character *ch, Character *victim, int dam)
           if (victim->fighting)
             add_memory(victim, GET_NAME(victim->fighting), 'f');
           if ((!IS_AFFECTED(victim, AFF_PARALYSIS)) &&
-              (!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-              (!IS_SET(victim->combat, COMBAT_STUNNED2)) &&
-              (!IS_SET(victim->combat, COMBAT_BASH1)) &&
-              (!IS_SET(victim->combat, COMBAT_BASH2)) &&
+              (!DC::isSet(victim->combat, COMBAT_STUNNED)) &&
+              (!DC::isSet(victim->combat, COMBAT_STUNNED2)) &&
+              (!DC::isSet(victim->combat, COMBAT_BASH1)) &&
+              (!DC::isSet(victim->combat, COMBAT_BASH2)) &&
               (dam > 0))
             do_flee(victim, "", 0);
           return;
@@ -7395,13 +7395,13 @@ void inform_victim(Character *ch, Character *victim, int dam)
       }   // end of if npc
       else
       {
-        if (IS_SET(victim->player->toggles, PLR_WIMPY))
+        if (DC::isSet(victim->player->toggles, PLR_WIMPY))
         {
           if ((!IS_AFFECTED(victim, AFF_PARALYSIS)) &&
-              (!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-              (!IS_SET(victim->combat, COMBAT_STUNNED2)) &&
-              (!IS_SET(victim->combat, COMBAT_BASH1)) &&
-              (!IS_SET(victim->combat, COMBAT_BASH2)) &&
+              (!DC::isSet(victim->combat, COMBAT_STUNNED)) &&
+              (!DC::isSet(victim->combat, COMBAT_STUNNED2)) &&
+              (!DC::isSet(victim->combat, COMBAT_BASH1)) &&
+              (!DC::isSet(victim->combat, COMBAT_BASH2)) &&
               (dam > 0))
             do_flee(victim, "", 0);
           return;
@@ -7492,7 +7492,7 @@ int do_flee(Character *ch, char *argument, int cmd)
 
     // keep mobs from fleeing into a no_track room
     if (CAN_GO(ch, attempt))
-      if (IS_PC(ch) || !IS_SET(DC::getInstance()->world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
+      if (IS_PC(ch) || !DC::isSet(DC::getInstance()->world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
         if (!escape)
         {
@@ -7519,10 +7519,10 @@ int do_flee(Character *ch, char *argument, int cmd)
         if (IS_PC(ch))
           REMOVE_BIT(ch->combat, COMBAT_FLEEING);
 
-        if (IS_SET(retval, eCH_DIED))
+        if (DC::isSet(retval, eCH_DIED))
           return retval;
         REMOVE_BIT(ch->combat, COMBAT_FLEEING);
-        if (IS_SET(retval, eSUCCESS))
+        if (DC::isSet(retval, eSUCCESS))
         {
           stop_fighting(ch);
 
@@ -7547,7 +7547,7 @@ int do_flee(Character *ch, char *argument, int cmd)
         }
         else
         {
-          if (!IS_SET(retval, eCH_DIED))
+          if (!DC::isSet(retval, eCH_DIED))
             act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
           if (last_fighting)
@@ -7587,7 +7587,7 @@ int check_pursuit(Character *ch, Character *victim, char *dircommand)
     act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", ch, 0, victim, TO_ROOM, NOTVICT);
 
     int retval = command_interpreter(ch, dircommand);
-    if (IS_SET(retval, eCH_DIED))
+    if (DC::isSet(retval, eCH_DIED))
       return eSUCCESS;
 
     act("Spotting $N nearby, you rush in towards $m and furiously attack!", ch, 0, victim, TO_CHAR, 0);
@@ -7673,17 +7673,17 @@ void remove_nosave(Character *vict)
     // in this case you lose everything inside the container.
 
     if (GET_ITEM_TYPE(o) == ITEM_CONTAINER &&
-        !IS_SET(o->obj_flags.extra_flags, ITEM_NOSAVE))
+        !DC::isSet(o->obj_flags.extra_flags, ITEM_NOSAVE))
     {
       for (tmp_o = o->contains; tmp_o; tmp_o = blah)
       {
         blah = tmp_o->next_content;
-        if (IS_SET(tmp_o->obj_flags.extra_flags, ITEM_NOSAVE))
+        if (DC::isSet(tmp_o->obj_flags.extra_flags, ITEM_NOSAVE))
           move_obj(tmp_o, vict->in_room);
       }
     }
 
-    if (IS_SET(o->obj_flags.extra_flags, ITEM_NOSAVE))
+    if (DC::isSet(o->obj_flags.extra_flags, ITEM_NOSAVE))
       move_obj(o, vict->in_room);
 
   } // for
@@ -7753,13 +7753,13 @@ int debug_retval(Character *ch, Character *victim, int retval)
   static int dumped = 0;
   bool bugged = false;
 
-  if (!IS_SET(retval, eCH_DIED) && ch && ch->name == (char *)0x95959595)
+  if (!DC::isSet(retval, eCH_DIED) && ch && ch->name == (char *)0x95959595)
   {
     logentry("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LogChannels::LOG_BUG);
     bugged = true;
   }
 
-  if (!IS_SET(retval, eVICT_DIED) && victim && victim->name == (char *)0x95959595)
+  if (!DC::isSet(retval, eVICT_DIED) && victim && victim->name == (char *)0x95959595)
   {
     logentry("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LogChannels::LOG_BUG);
     bugged = true;

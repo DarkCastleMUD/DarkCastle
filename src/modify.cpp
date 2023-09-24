@@ -276,7 +276,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			return 1;
 		}
 
-		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
+		if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
 		{
 			if (GET_LEVEL(ch) < IMPLEMENTER)
 			{
@@ -290,7 +290,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		switch (field)
 		{
 		case 1:
-			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110)
+			if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110)
 			{
 				send_to_char("The moose will get you if you do that.\r\n", ch);
 				return 1;
@@ -656,7 +656,7 @@ void page_string(class Connection *d, const char *str, int keep_internal)
 		return;
 	}
 
-	if (IS_PC(d->character) && !IS_SET(d->character->player->toggles, PLR_PAGER))
+	if (IS_PC(d->character) && !DC::isSet(d->character->player->toggles, PLR_PAGER))
 	{
 		page_string_dep(d, str, keep_internal);
 		return;

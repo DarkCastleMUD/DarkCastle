@@ -89,15 +89,15 @@ void mobile_activity(void)
     if (IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
 
-    if (IS_SET(ch->combat, COMBAT_SHOCKED) || IS_SET(ch->combat, COMBAT_SHOCKED2))
+    if (DC::isSet(ch->combat, COMBAT_SHOCKED) || DC::isSet(ch->combat, COMBAT_SHOCKED2))
       continue;
 
-    if ((IS_SET(ch->combat, COMBAT_STUNNED)) ||
-        (IS_SET(ch->combat, COMBAT_STUNNED2)))
+    if ((DC::isSet(ch->combat, COMBAT_STUNNED)) ||
+        (DC::isSet(ch->combat, COMBAT_STUNNED2)))
       continue;
 
-    if ((IS_SET(ch->combat, COMBAT_BASH1)) ||
-        (IS_SET(ch->combat, COMBAT_BASH2)))
+    if ((DC::isSet(ch->combat, COMBAT_BASH1)) ||
+        (DC::isSet(ch->combat, COMBAT_BASH2)))
       continue;
 
     retval = eSUCCESS;
@@ -122,7 +122,7 @@ void mobile_activity(void)
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
       PerfTimers["mprog"].stop();
 
-      if (!IS_SET(retval, eFAILURE) || SOMEONE_DIED(retval) || isDead(ch) || isNowhere(ch))
+      if (!DC::isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || isDead(ch) || isNowhere(ch))
         continue;
     }
 
@@ -145,14 +145,14 @@ void mobile_activity(void)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
-        if (IS_SET(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
+        if (DC::isSet(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
         {
           continue;
         }
       }
 
       retval = mprog_arandom_trigger(ch);
-      if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
+      if (DC::isSet(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
       {
         continue;
       }
@@ -175,10 +175,10 @@ void mobile_activity(void)
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
-        if (IS_SET(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
+        if (DC::isSet(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
           break; // break so we can continue with the next mob
       }
-      if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
+      if (DC::isSet(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
         continue; // move on to next mob, this one is dead
 
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
@@ -248,7 +248,7 @@ void mobile_activity(void)
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];
-        if (!IS_SET(room_past_door.room_flags, NO_MOB) && !IS_SET(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !IS_SET(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == DC::getInstance()->world[ch->in_room].zone))
+        if (!DC::isSet(room_past_door.room_flags, NO_MOB) && !DC::isSet(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !DC::isSet(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == DC::getInstance()->world[ch->in_room].zone))
         {
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
             ch->mobdata->last_direction = -1;
@@ -257,7 +257,7 @@ void mobile_activity(void)
           {
             ch->mobdata->last_direction = door;
             retval = attempt_move(ch, ++door);
-            if (IS_SET(retval, eCH_DIED))
+            if (DC::isSet(retval, eCH_DIED))
               continue;
           }
         }
@@ -278,12 +278,12 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
         {
-          if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
           {
             act("You growl at $N.", ch, 0, tmp_ch, TO_CHAR, 0);
             act("$n growls at YOU!.", ch, 0, tmp_ch, TO_VICT, 0);
@@ -331,7 +331,7 @@ void mobile_activity(void)
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
       if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
-          !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
         Character *next_aggro;
         int targets = 1;
@@ -364,8 +364,8 @@ void mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                       IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
+            if ((!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                       DC::isSet(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -424,10 +424,10 @@ void mobile_activity(void)
               (!ch->mobdata->hatred || !isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) &&
               tmp_ch->fighting &&
               CAN_SEE(ch, tmp_ch) &&
-              (IS_SET(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
+              (DC::isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
                (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
-              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !IS_SET(races[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
+              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !DC::isSet(races[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
               !affected_by_spell(tmp_ch, FUCK_PTHIEF) && !affected_by_spell(tmp_ch, FUCK_GTHIEF))
           {
             tmp_race = GET_RACE(tmp_ch);
@@ -455,9 +455,9 @@ void mobile_activity(void)
           //           continue;
 
           if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
-               !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
-               !IS_SET(tmp_ch->player->toggles, PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !IS_SET(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
+               !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
+               !DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE)) ||
+              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !DC::isSet(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
                ))
           {
             int i = 0;
@@ -555,7 +555,7 @@ void mobile_activity(void)
             }
 
             if (ISSET(ch->mobdata->actflags, ACT_RACIST) &&
-                IS_SET(races[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
+                DC::isSet(races[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
             {
               tmp_race = GET_RACE(tmp_ch);
               bool wimpy = ISSET(ch->mobdata->actflags, ACT_WIMPY);

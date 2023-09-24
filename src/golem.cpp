@@ -317,7 +317,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     return eFAILURE;
   }
   int retval = verify_existing_components(ch, i);
-  if (IS_SET(retval, eFAILURE))
+  if (DC::isSet(retval, eFAILURE))
   {
     send_to_char("Since you do not have the required spell components, the magic fades into nothingness.\r\n", ch);
     return eFAILURE;
@@ -330,7 +330,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     send_to_char("Something goes wrong, and you fail!", ch);
     return eFAILURE;
   }
-  if (IS_SET(retval, eEXTRA_VALUE))
+  if (DC::isSet(retval, eEXTRA_VALUE))
   {
     send_to_char("Adding in the final ingredient, your golem increases in strength!\r\n", ch);
     SETBIT(golem->affected_by, golem_list[i].special_aff);

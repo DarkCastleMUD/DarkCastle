@@ -155,7 +155,7 @@ int do_guide(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_SET(victim->player->toggles, PLR_GUIDE))
+  if (!DC::isSet(victim->player->toggles, PLR_GUIDE))
   {
     sprintf(buf, "%s is now a guide.\r\n", GET_NAME(victim));
     send_to_char(buf, ch);

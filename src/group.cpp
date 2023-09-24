@@ -34,7 +34,7 @@ int do_abandon(Character *ch, char *argument, int cmd)
   Character *k;
   char buf[MAX_INPUT_LENGTH + 1];
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -86,7 +86,7 @@ int do_found(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -219,8 +219,8 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
   {
     k->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
     int lost = 0;
-    if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
-        (k->clan != clan || (k->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))
+    if (k->clan && get_clan(k)->tax && !DC::isSet(GET_TOGGLES(k), PLR_NOTAX) &&
+        (k->clan != clan || (k->clan == clan && DC::isSet(GET_TOGGLES(this), PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
       k->send(QString("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
@@ -238,8 +238,8 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
     {
       f->follower->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
-      if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
-          (f->follower->clan != clan || (f->follower->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))
+      if (f->follower->clan && get_clan(f->follower)->tax && !DC::isSet(GET_TOGGLES(f->follower), PLR_NOTAX) &&
+          (f->follower->clan != clan || (f->follower->clan == clan && DC::isSet(GET_TOGGLES(this), PLR_NOTAX))))
       {
         lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
         f->follower->send(QString("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
@@ -274,7 +274,7 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
   else
   {
-    if (IS_PC(i) && IS_SET(i->player->toggles, PLR_ANSI))
+    if (IS_PC(i) && DC::isSet(i->player->toggles, PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
         sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
@@ -357,7 +357,7 @@ int do_group(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -543,7 +543,7 @@ int do_disband(Character *ch, char *argument, int cmd)
   Character *adios, *k;
   struct follow_type *f, *next_f;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
@@ -649,7 +649,7 @@ int do_follow(Character *ch, char *argument, int cmd)
   void stop_follower(Character * ch, int cmd);
   void add_follower(Character * ch, Character * leader, int cmd);
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;

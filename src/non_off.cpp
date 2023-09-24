@@ -36,7 +36,6 @@ extern "C"
 #include <map>
 #include <set>
 
-
 extern struct index_data *obj_index;
 extern CVoteData *DCVote;
 
@@ -70,7 +69,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -98,7 +97,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     if (GET_LEVEL(ch) < IMMORTAL)
     {
@@ -115,7 +114,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
   {
     send_to_char("God, what a stupid fucking thing for you to do.\r\n", ch);
     return eFAILURE;
@@ -140,7 +139,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return (eFAILURE);
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
   {
     act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR, 0);
     act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
@@ -185,7 +184,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   int room = 3099;
   int origin;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -222,7 +221,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   // Handle yielding the champion flag
   if (GET_OBJ_VNUM(obj) == 45)
   {
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     {
       if (IS_AFFECTED(ch, AFF_CHAMPION))
       {
@@ -270,13 +269,13 @@ int do_donate(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     send_to_char("Since you can't let go of it, how are you going to donate it?\n\r", ch);
     return eFAILURE;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     if (GET_LEVEL(ch) > IMMORTAL)
     {
@@ -302,7 +301,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     send_to_char("You can't donate godload equipment.\r\n", ch);
     return eFAILURE;
@@ -348,7 +347,7 @@ int do_title(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOTITLE))
+  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOTITLE))
   {
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
@@ -427,7 +426,7 @@ int do_toggle(Character *ch, char *arg, int cmd)
   {
     for (x = 0; toggle_txt[x][0] != '\0'; x++)
     {
-      if (x != 14 || (IS_SET(ch->player->toggles, PLR_GUIDE)))
+      if (x != 14 || (DC::isSet(ch->player->toggles, PLR_GUIDE)))
       {
         sprintf(buf + strlen(buf), "%-11s ", toggle_txt[x]);
       }
@@ -436,94 +435,94 @@ int do_toggle(Character *ch, char *arg, int cmd)
       {
       case 0:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 1:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 2:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 3:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 4:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 5:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 6:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 7:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
+                DC::isSet(ch->player->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
         break;
 
       case 8:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
+                DC::isSet(ch->player->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
         break;
 
       case 9:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 10:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 11:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
         break;
 
       case 12:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 13:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 14:
-        if (IS_SET(ch->player->toggles, PLR_GUIDE))
+        if (DC::isSet(ch->player->toggles, PLR_GUIDE))
         {
           sprintf(buf + strlen(buf), "%s\n\r",
-                  IS_SET(ch->player->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
+                  DC::isSet(ch->player->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
         }
         break;
       case 15:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 16:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
+                DC::isSet(ch->player->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
         break;
       case 17:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
         break;
       case 18:
         sprintf(buf + strlen(buf), "%s\n\r",
-                IS_SET(ch->player->toggles, PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R");
+                DC::isSet(ch->player->toggles, PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R");
         break;
       default:
         break;
@@ -605,7 +604,7 @@ int do_toggle(Character *ch, char *arg, int cmd)
     break;
 
   case 14:
-    if (IS_SET(ch->player->toggles, PLR_GUIDE))
+    if (DC::isSet(ch->player->toggles, PLR_GUIDE))
       do_guide_toggle(ch, "", CMD_DEFAULT);
     else
       send_to_char("You're not a guide!\r\n", ch);
@@ -796,7 +795,7 @@ int do_brief(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_BRIEF))
+  if (DC::isSet(ch->player->toggles, PLR_BRIEF))
   {
     send_to_char("Brief mode $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_BRIEF);
@@ -814,7 +813,7 @@ int do_ansi(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_ANSI))
+  if (DC::isSet(ch->player->toggles, PLR_ANSI))
   {
     send_to_char("ANSI COLOR $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_ANSI);
@@ -832,7 +831,7 @@ int do_vt100(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_VT100))
+  if (DC::isSet(ch->player->toggles, PLR_VT100))
   {
     send_to_char("VT100 $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_VT100);
@@ -850,7 +849,7 @@ int do_compact(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_COMPACT))
+  if (DC::isSet(ch->player->toggles, PLR_COMPACT))
   {
     send_to_char("Compact mode $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_COMPACT);
@@ -868,7 +867,7 @@ int do_summon_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_SUMMONABLE))
+  if (DC::isSet(ch->player->toggles, PLR_SUMMONABLE))
   {
     send_to_char("You may no longer be summoned by other players.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_SUMMONABLE);
@@ -888,7 +887,7 @@ int do_lfg_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_LFG))
+  if (DC::isSet(ch->player->toggles, PLR_LFG))
   {
     send_to_char("You are no longer Looking For Group.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_LFG);
@@ -906,13 +905,13 @@ int do_guide_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!IS_SET(ch->player->toggles, PLR_GUIDE))
+  if (!DC::isSet(ch->player->toggles, PLR_GUIDE))
   {
     send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_SET(ch->player->toggles, PLR_GUIDE_TOG))
+  if (DC::isSet(ch->player->toggles, PLR_GUIDE_TOG))
   {
     send_to_char("You have hidden your $B(Guide)$R tag.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_GUIDE_TOG);
@@ -930,7 +929,7 @@ int do_news_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_NEWS))
+  if (DC::isSet(ch->player->toggles, PLR_NEWS))
   {
     send_to_char("You now view news in an up-down fashion.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_NEWS);
@@ -949,7 +948,7 @@ int do_ascii_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_ASCII))
+  if (DC::isSet(ch->player->toggles, PLR_ASCII))
   {
     REMOVE_BIT(ch->player->toggles, PLR_ASCII);
     send_to_char("Cards are now displayed through ASCII.\r\n", ch);
@@ -968,7 +967,7 @@ int do_damage_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_DAMAGE))
+  if (DC::isSet(ch->player->toggles, PLR_DAMAGE))
   {
     REMOVE_BIT(ch->player->toggles, PLR_DAMAGE);
     send_to_char("Damage numbers will no longer be displayed in combat.\r\n", ch);
@@ -987,7 +986,7 @@ int do_notax_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_NOTAX))
+  if (DC::isSet(ch->player->toggles, PLR_NOTAX))
   {
     send_to_char("You will now be taxed on all your loot.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_NOTAX);
@@ -1006,7 +1005,7 @@ int do_charmiejoin_toggle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_CHARMIEJOIN))
+  if (DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN))
   {
     send_to_char("Your followers will no longer automatically join you.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_CHARMIEJOIN);
@@ -1025,7 +1024,7 @@ int do_autoeat(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_AUTOEAT))
+  if (DC::isSet(ch->player->toggles, PLR_AUTOEAT))
   {
     send_to_char("You no longer automatically eat and drink.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_AUTOEAT);
@@ -1050,7 +1049,7 @@ int do_anonymous(Character *ch, char *argument, int cmd)
     send_to_char("You are too inexperienced to disguise your profession.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(ch->player->toggles, PLR_ANONYMOUS))
+  if (DC::isSet(ch->player->toggles, PLR_ANONYMOUS))
   {
     send_to_char("Your class and level information is now public.\r\n", ch);
   }
@@ -1065,7 +1064,7 @@ int do_anonymous(Character *ch, char *argument, int cmd)
 
 int do_wimpy(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->player->toggles, PLR_WIMPY))
+  if (DC::isSet(ch->player->toggles, PLR_WIMPY))
   {
     send_to_char("You are no longer a wimp....maybe.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_WIMPY);
@@ -1081,7 +1080,7 @@ int do_wimpy(Character *ch, char *argument, int cmd)
 // If it's not set, we do.
 int do_pager(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->player->toggles, PLR_PAGER))
+  if (DC::isSet(ch->player->toggles, PLR_PAGER))
   {
     send_to_char("You now page your strings in 24 line chunks.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_PAGER);
@@ -1095,7 +1094,7 @@ int do_pager(Character *ch, char *argument, int cmd)
 
 int do_bard_song_toggle(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->player->toggles, PLR_BARD_SONG))
+  if (DC::isSet(ch->player->toggles, PLR_BARD_SONG))
   {
     send_to_char("Bard singing now in verbose mode.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_BARD_SONG);
@@ -1109,7 +1108,7 @@ int do_bard_song_toggle(Character *ch, char *argument, int cmd)
 
 int do_nodupekeys_toggle(Character *ch, char *argument, int cmd)
 {
-  if (IS_SET(ch->player->toggles, PLR_NODUPEKEYS))
+  if (DC::isSet(ch->player->toggles, PLR_NODUPEKEYS))
   {
     send_to_char("You will attach duplicate keys to keyrings.\r\n", ch);
     REMOVE_BIT(ch->player->toggles, PLR_NODUPEKEYS);
@@ -1126,7 +1125,7 @@ int do_beep_set(Character *ch, char *arg, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_BEEP))
+  if (DC::isSet(ch->player->toggles, PLR_BEEP))
   {
     REMOVE_BIT(ch->player->toggles, PLR_BEEP);
     send_to_char("\nTell is now silent.\n", ch);
@@ -1190,7 +1189,7 @@ int do_stand(Character *ch, char *argument, int cmd)
 int do_sit(Character *ch, char *argument, int cmd)
 {
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1244,7 +1243,7 @@ int do_sit(Character *ch, char *argument, int cmd)
 int do_rest(Character *ch, char *argument, int cmd)
 {
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1296,7 +1295,7 @@ int do_rest(Character *ch, char *argument, int cmd)
 int do_sleep(Character *ch, char *argument, int cmd)
 {
   struct affected_type *paf;
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1306,7 +1305,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
     send_to_char("You are far too alert for that.\r\n", ch);
     return eFAILURE;
   }
-  if (!IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     if (!check_make_camp(ch->in_room))
     {
       send_to_char("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
@@ -1864,7 +1863,7 @@ int do_random(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int i = 0;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;

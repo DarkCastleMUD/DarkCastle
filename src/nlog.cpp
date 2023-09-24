@@ -168,7 +168,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_MOB(ch) || IS_SET(ch->player->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {
@@ -279,7 +279,7 @@ string handle_ansi(string haystack, Character *ch)
     {
       if (code == true)
       {
-        if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && IS_SET(ch->player->toggles, PLR_ANSI)) || (ch->desc && ch->desc->color))
+        if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, PLR_ANSI)) || (ch->desc && ch->desc->color))
         {
           if (rep.find(c) != rep.end())
           {

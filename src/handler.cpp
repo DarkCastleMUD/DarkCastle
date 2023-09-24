@@ -408,7 +408,7 @@ bool still_affected_by_poison(Character *ch)
 
 	while (af)
 	{
-		if (IS_SET(af->bitvector, AFF_POISON))
+		if (DC::isSet(af->bitvector, AFF_POISON))
 			return 1;
 		af = af->next;
 	}
@@ -1729,7 +1729,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		break;
 	case SPELL_FLY:
 		/* Fly wears off...you fall :) */
-		if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
+		if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
 		{
 			if (do_fall(ch, dir) & eCH_DIED)
 				char_died = true;
@@ -2287,18 +2287,18 @@ int char_from_room(Character *ch, bool stop_all_fighting)
 	if (IS_NPC(ch))
 		ch->mobdata->last_room = ch->in_room;
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK))
+		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && DC::isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK))
 		{
 			REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_TRACK);
 			REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_TRACK);
 		}
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_KI))
+		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && DC::isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_KI))
 		{
 			REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_KI);
 			REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_KI);
 		}
-	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC))
+	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && DC::isSet(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC))
 	{
 		REMOVE_BIT(DC::getInstance()->world[ch->in_room].iFlags, NO_MAGIC);
 		REMOVE_BIT(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC);
@@ -2393,24 +2393,24 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 		DC::getInstance()->zones.value(DC::getInstance()->world[room].zone).incrementPlayers();
 	if (IS_NPC(ch))
 	{
-		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_MAGIC))
+		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !DC::isSet(DC::getInstance()->world[room].room_flags, NO_MAGIC))
 		{
 			SET_BIT(DC::getInstance()->world[room].iFlags, NO_MAGIC);
 			SET_BIT(DC::getInstance()->world[room].room_flags, NO_MAGIC);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_KI))
+		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !DC::isSet(DC::getInstance()->world[room].room_flags, NO_KI))
 		{
 			SET_BIT(DC::getInstance()->world[room].iFlags, NO_KI);
 			SET_BIT(DC::getInstance()->world[room].room_flags, NO_KI);
 		}
-		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(DC::getInstance()->world[room].room_flags, NO_TRACK))
+		if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !DC::isSet(DC::getInstance()->world[room].room_flags, NO_TRACK))
 		{
 			SET_BIT(DC::getInstance()->world[room].iFlags, NO_TRACK);
 			SET_BIT(DC::getInstance()->world[room].room_flags, NO_TRACK);
 		}
 	}
 
-	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
+	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
 	{
 		do_sing(ch, "stop", CMD_DEFAULT);
 	}
@@ -2427,7 +2427,7 @@ int apply_ac(Character *ch, int eq_pos)
 	if (!(GET_ITEM_TYPE(ch->equipment[eq_pos]) == ITEM_ARMOR))
 		return 0;
 
-	if (IS_SET(ch->equipment[eq_pos]->obj_flags.extra_flags, ITEM_ENCHANTED))
+	if (DC::isSet(ch->equipment[eq_pos]->obj_flags.extra_flags, ITEM_ENCHANTED))
 	{
 		value = (ch->equipment[eq_pos]->obj_flags.value[0]) - (ch->equipment[eq_pos]->obj_flags.value[1]);
 	}
@@ -2482,7 +2482,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) && IS_PC(ch))
 	{
-		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) || affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj))
+		if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj))
 		{
 			act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
 			recheck_height_wears(ch);
@@ -2547,7 +2547,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 			}
 		}
 
-	if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
+	if (DC::isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
 		ch->glow_factor++;
 		if (ch->in_room > DC::NOWHERE)
@@ -2651,7 +2651,7 @@ b: // ew
 	ch->equipment[pos] = 0;
 	obj->equipped_by = 0;
 
-	if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
+	if (DC::isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
 		ch->glow_factor--;
 		if (ch->in_room > DC::NOWHERE)
@@ -4554,7 +4554,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		// For now they want me to remove this becuase portals and corpses are item_number -1
 		// if (i->item_number == -1) continue;
 		//
-		if (loc && IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
+		if (loc && DC::isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			GET_LEVEL(ch) < 101)
 			continue;
 		if (isname(tmp, i->name))
@@ -4653,7 +4653,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 			;
 		name[i] = 0;
 		arg += i;
-		if (search_block(name, ignore, true) > -1 || !IS_SET(bitvector, FIND_CHAR_ROOM))
+		if (search_block(name, ignore, true) > -1 || !DC::isSet(bitvector, FIND_CHAR_ROOM))
 			found = true;
 	}
 
@@ -4663,7 +4663,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 	*tar_ch = 0;
 	*tar_obj = 0;
 
-	if (IS_SET(bitvector, FIND_CHAR_ROOM))
+	if (DC::isSet(bitvector, FIND_CHAR_ROOM))
 	{ /* Find person in room */
 		*tar_ch = get_char_room_vis(ch, name);
 		if (*tar_ch)
@@ -4687,7 +4687,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		}
 	}
 
-	if (IS_SET(bitvector, FIND_CHAR_WORLD))
+	if (DC::isSet(bitvector, FIND_CHAR_WORLD))
 	{
 		*tar_ch = get_char_vis(ch, name);
 		if (*tar_ch)
@@ -4711,7 +4711,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		}
 	}
 
-	if (IS_SET(bitvector, FIND_OBJ_INV))
+	if (DC::isSet(bitvector, FIND_OBJ_INV))
 	{
 		*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying);
 		if (*tar_obj)
@@ -4735,7 +4735,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		}
 	}
 
-	if (IS_SET(bitvector, FIND_OBJ_EQUIP))
+	if (DC::isSet(bitvector, FIND_OBJ_EQUIP))
 	{
 		for (found = false, i = 0; i < MAX_WEAR && !found; i++)
 		{
@@ -4766,7 +4766,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		}
 	}
 
-	if (IS_SET(bitvector, FIND_OBJ_ROOM))
+	if (DC::isSet(bitvector, FIND_OBJ_ROOM))
 	{
 		*tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
 		if (*tar_obj)
@@ -4790,7 +4790,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 		}
 	}
 
-	if (IS_SET(bitvector, FIND_OBJ_WORLD))
+	if (DC::isSet(bitvector, FIND_OBJ_WORLD))
 	{
 		*tar_obj = get_obj_vis(ch, name);
 		if (*tar_obj)
@@ -4942,7 +4942,7 @@ void room_mobs_only_hate(Character *ch)
 	for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
 			 {
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
-				(vict != ch) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) {
+				(vict != ch) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) {
 			remove_memory(vict, 'h');
 			add_memory(vict, GET_NAME(ch), 'h');
 		} });

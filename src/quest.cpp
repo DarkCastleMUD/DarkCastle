@@ -830,12 +830,12 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       break;
    case 2:
       retval = cancel_quest(ch, quest);
-      if (IS_SET(retval, eSUCCESS))
+      if (DC::isSet(retval, eSUCCESS))
       {
          sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
       }
-      else if (IS_SET(retval, eEXTRA_VALUE))
+      else if (DC::isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
@@ -848,7 +848,7 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       break;
    case 3:
       retval = start_quest(ch, quest);
-      if (IS_SET(retval, eSUCCESS))
+      if (DC::isSet(retval, eSUCCESS))
       {
          if (quest->number)
          {
@@ -870,12 +870,12 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
             show_quest_footer(ch);
          }
       }
-      else if (IS_SET(retval, eEXTRA_VALUE))
+      else if (DC::isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
       }
-      else if (IS_SET(retval, eEXTRA_VAL2))
+      else if (DC::isSet(retval, eEXTRA_VAL2))
       {
          sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
@@ -893,13 +893,13 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       break;
    case 4:
       retval = complete_quest(ch, quest);
-      if (IS_SET(retval, eSUCCESS))
+      if (DC::isSet(retval, eSUCCESS))
       {
          sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
          ch->save(666);
       }
-      else if (IS_SET(retval, eEXTRA_VALUE))
+      else if (DC::isSet(retval, eEXTRA_VALUE))
       {
          sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
@@ -1612,7 +1612,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
            extract_obj(obj);
            return eSUCCESS;
             } else */
-      if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
+      if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
           search_char_for_item(ch, obj->item_number, false))
       {
          sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
@@ -1669,7 +1669,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+      if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
       {
          time_t now = time(nullptr);
          time_t expires = obj->no_sell_expiration;

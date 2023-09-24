@@ -54,7 +54,7 @@ int do_report(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
@@ -217,13 +217,13 @@ int send_to_gods(QString message, int god_level, LogChannels type)
   {
     if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
-    if (!(IS_SET(i->character->misc, type)))
+    if (!(DC::isSet(i->character->misc, type)))
       continue;
     if (is_busy(i->character))
       continue;
     if (!i->connected && GET_LEVEL(i->character) >= god_level)
     {
-      if (IS_MOB(i->character) || IS_SET(i->character->player->toggles, PLR_ANSI))
+      if (IS_MOB(i->character) || DC::isSet(i->character->player->toggles, PLR_ANSI))
         send_to_char(buf1, i->character);
       else
         send_to_char(buf, i->character);
@@ -287,7 +287,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     {
       for (x = 7; x <= 14; x++)
       {
-        if (IS_SET(ch->misc, (1 << x)))
+        if (DC::isSet(ch->misc, (1 << x)))
           y = 1;
         else
           y = 0;
@@ -300,7 +300,7 @@ int do_channel(Character *ch, char *arg, int cmd)
       int o = GET_LEVEL(ch) == 110 ? 21 : 19;
       for (x = 0; x <= o; x++)
       {
-        if (IS_SET(ch->misc, (1 << x)))
+        if (DC::isSet(ch->misc, (1 << x)))
           y = 1;
         else
           y = 0;
@@ -309,14 +309,14 @@ int do_channel(Character *ch, char *arg, int cmd)
       }
     }
 
-    if (IS_SET(ch->misc, 1 << 22))
+    if (DC::isSet(ch->misc, 1 << 22))
       y = 1;
     else
       y = 0;
     sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
-    if (IS_SET(ch->misc, 1 << 23))
+    if (DC::isSet(ch->misc, 1 << 23))
       y = 1;
     else
       y = 0;
@@ -326,7 +326,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     int o = GET_LEVEL(ch) == 110 ? 26 : 0;
     for (x = 24; x <= o; x++)
     {
-      if (IS_SET(ch->misc, (1 << x)))
+      if (DC::isSet(ch->misc, (1 << x)))
         y = 1;
       else
         y = 0;
@@ -359,7 +359,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
   }
-  if (IS_SET(ch->misc, (1 << x)))
+  if (DC::isSet(ch->misc, (1 << x)))
   {
     sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
     send_to_char(buf, ch);
@@ -638,7 +638,7 @@ int do_emote(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_MOB(ch) && IS_SET(ch->player->punish, PUNISH_NOEMOTE))
+  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You can't show your emotions!!\n\r", ch);
     return eSUCCESS;
@@ -760,7 +760,7 @@ void DC::send_hint(void)
       continue;
     }
 
-    if (IS_SET(i->character->misc, LogChannels::CHANNEL_HINTS))
+    if (DC::isSet(i->character->misc, LogChannels::CHANNEL_HINTS))
     {
       i->character->send(hint);
     }

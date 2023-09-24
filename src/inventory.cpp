@@ -46,7 +46,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (!sub_object || sub_object->carried_by != ch)
   {
-    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
     {
       if (IS_NPC(ch))
       {
@@ -62,7 +62,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     // we only have to check for uniqueness if the container is not on the character
     // or if there is no container
-    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+    if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
     {
       if (search_char_for_item(ch, obj_object->item_number, false))
       {
@@ -210,7 +210,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     buffer = fmt::format("There was {} coins.",
                          obj_object->obj_flags.value[0]);
-    if (IS_MOB(ch) || !IS_SET(ch->player->toggles, PLR_BRIEF))
+    if (IS_MOB(ch) || !DC::isSet(ch->player->toggles, PLR_BRIEF))
     {
       send_to_char(buffer, ch);
       send_to_char("\r\n", ch);
@@ -223,7 +223,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
-      if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
+      if (!IS_MOB(ch) && DC::isSet(ch->player->toggles, PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
@@ -235,17 +235,17 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
     //           !isname("pc",sub_object->name) && ch->clan
-    //            && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+    //            && get_clan(ch)->tax && !DC::isSet(GET_TOGGLES(ch), PLR_NOTAX))
     if (((sub_object && sub_object->obj_flags.value[3] == 1 &&
           !isname("pc", sub_object->name)) ||
          !sub_object) &&
-        ch->clan && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+        ch->clan && get_clan(ch)->tax && !DC::isSet(GET_TOGGLES(ch), PLR_NOTAX))
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
-      if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
+      if (!IS_MOB(ch) && DC::isSet(ch->player->toggles, PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
@@ -275,7 +275,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       buffer = fmt::format("{}\r\n", buffer);
     }
 
-    if (!IS_MOB(ch) && IS_SET(ch->player->toggles, PLR_BRIEF))
+    if (!IS_MOB(ch) && DC::isSet(ch->player->toggles, PLR_BRIEF))
       send_to_char(buffer, ch);
     extract_obj(obj_object);
   }
@@ -426,11 +426,11 @@ int do_get(Character *ch, char *argument, int cmd)
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
-      if (!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
+      if (!alldot && DC::isSet(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
         continue;
 
       // Ignore NO_TRADE items on a 'get all'
-      if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+      if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
       {
         csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
         continue;
@@ -449,7 +449,7 @@ int do_get(Character *ch, char *argument, int cmd)
         continue;
       }
 
-      if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
@@ -559,7 +559,7 @@ int do_get(Character *ch, char *argument, int cmd)
         has_consent = false; // reset it
       }
 
-      if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
@@ -662,7 +662,7 @@ int do_get(Character *ch, char *argument, int cmd)
       }
       if (ARE_CONTAINERS(sub_object))
       {
-        if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+        if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
           sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
           send_to_char(buffer, ch);
@@ -683,7 +683,7 @@ int do_get(Character *ch, char *argument, int cmd)
        for (temp = obj_object->contains;temp;temp = next_contentthing)
        {
       next_contentthing = temp->next_content;
-      if(IS_SET(temp->obj_flags.more_flags, ITEM_NO_TRADE))
+      if(DC::isSet(temp->obj_flags.more_flags, ITEM_NO_TRADE))
       {
       csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n", temp->short_description,obj_object->short_description);
       extract_obj(temp);
@@ -697,13 +697,13 @@ int do_get(Character *ch, char *argument, int cmd)
           }
 
           // Ignore NO_TRADE items on a 'get all'
-          if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100)
+          if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100)
           {
             csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
             continue;
           }
 
-          if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+          if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
               !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
           {
             csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
@@ -725,7 +725,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
                   GET_LEVEL(ch) > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
               {
-                if (has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
+                if (has_consent && DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
                 {
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
@@ -836,7 +836,7 @@ int do_get(Character *ch, char *argument, int cmd)
 
         if ((cmd != CMD_LOOT && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name))) || isname(buffer, sub_object->name))
           has_consent = true;
-        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !DC::isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
           has_consent = true;
         if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
         {
@@ -848,7 +848,7 @@ int do_get(Character *ch, char *argument, int cmd)
       }
       if (ARE_CONTAINERS(sub_object))
       {
-        if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+        if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
           sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
           send_to_char(buffer, ch);
@@ -886,7 +886,7 @@ int do_get(Character *ch, char *argument, int cmd)
           else if (inventorycontainer ||
                    (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
           {
-            if (has_consent && (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) ||
+            if (has_consent && (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) ||
                                 contains_no_trade_item(obj_object)))
             {
               // if I have consent and i'm touching the corpse, then I shouldn't be able
@@ -1080,7 +1080,7 @@ int contents_cause_unique_problem(Object *obj, Character *vict)
     if (lastnum == inside->item_number) // items are in order.  If we've already checked
       continue;                         // this item, don't do it again.
 
-    if (IS_SET(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
+    if (DC::isSet(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(vict, inside->item_number, false))
       return true;
     lastnum = inside->item_number;
@@ -1094,7 +1094,7 @@ int contains_no_trade_item(Object *obj)
 
   while (inside)
   {
-    if (IS_SET(inside->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (DC::isSet(inside->obj_flags.more_flags, ITEM_NO_TRADE))
       return true;
     inside = inside->next_content;
   }
@@ -1114,7 +1114,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   alldot[0] = '\0';
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1180,7 +1180,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (alldot[0] != '\0' && !isname(alldot, tmp_object->name))
           continue;
 
-        if (IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
         if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
@@ -1188,14 +1188,14 @@ int do_drop(Character *ch, char *argument, int cmd)
           send_to_char("Your criminal acts prohibit it.\r\n", ch);
           return eFAILURE;
         }
-        if (IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE))
+        if (DC::isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE))
           continue;
         if (contains_no_trade_item(tmp_object))
           continue;
-        if (!IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
+        if (!DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
             GET_LEVEL(ch) >= IMMORTAL)
         {
-          if (IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
+          if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             send_to_char("(This item is cursed, BTW.)\r\n", ch);
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
@@ -1256,7 +1256,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           send_to_char("Your criminal acts prohibit it.\r\n", ch);
           return eFAILURE;
         }
-        if (IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+        if (DC::isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
         {
           send_to_char("It seems magically attached to you.\r\n", ch);
           return eFAILURE;
@@ -1267,15 +1267,15 @@ int do_drop(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if (IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           send_to_char("Don't be a dork.\r\n", ch);
           return eFAILURE;
         }
-        else if (!IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
+        else if (!DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
                  GET_LEVEL(ch) >= IMMORTAL)
         {
-          if (IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
+          if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             send_to_char("(This item is cursed, BTW.)\r\n", ch);
           sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
           send_to_char(buffer, ch);
@@ -1362,7 +1362,7 @@ int do_put(Character *ch, char *argument, int cmd)
   int bits;
   char allbuf[MAX_STRING_LENGTH];
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
@@ -1395,7 +1395,7 @@ int do_put(Character *ch, char *argument, int cmd)
 
       if (obj_object)
       {
-        if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP))
+        if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP))
         {
           if (GET_LEVEL(ch) < IMMORTAL)
           {
@@ -1410,7 +1410,7 @@ int do_put(Character *ch, char *argument, int cmd)
           send_to_char("You must display this flag for all to see!\r\n", ch);
           return eFAILURE;
         }
-        if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NEWBIE))
+        if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NEWBIE))
         {
           send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n", ch);
           return eFAILURE;
@@ -1441,7 +1441,7 @@ int do_put(Character *ch, char *argument, int cmd)
               return eFAILURE;
             }
 
-            if (!IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+            if (!DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
             {
               // Can't put an item in itself
               if (obj_object == sub_object)
@@ -1458,14 +1458,14 @@ int do_put(Character *ch, char *argument, int cmd)
               }
 
               // Can't put NO_TRADE item in someone else's container/altar/totem
-              if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
+              if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
                   sub_object->carried_by != ch)
               {
                 send_to_char("You can't trade that item.\r\n", ch);
                 return eFAILURE;
               }
 
-              if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
+              if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
               {
                 send_to_char("The object's uniqueness prevents it!\r\n", ch);
                 return eFAILURE;
@@ -1476,7 +1476,7 @@ int do_put(Character *ch, char *argument, int cmd)
               {
                 if (duplicate_key == true)
                 {
-                  if (ch && ch->player && IS_SET(ch->player->toggles, PLR_NODUPEKEYS))
+                  if (ch && ch->player && DC::isSet(ch->player->toggles, PLR_NODUPEKEYS))
                   {
                     csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", GET_OBJ_SHORT(obj_object));
                     return eFAILURE;
@@ -1611,7 +1611,7 @@ int do_give(Character *ch, char *argument, int cmd)
   Character *vict;
   class Object *obj;
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
                  ch);
@@ -1789,7 +1789,7 @@ int do_give(Character *ch, char *argument, int cmd)
                  ch);
     return eFAILURE;
   }
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < OVERSEER)
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < OVERSEER)
   {
     send_to_char("That sure would be a fucking stupid thing to do.\r\n", ch);
     return eFAILURE;
@@ -1801,7 +1801,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     if (GET_LEVEL(ch) < DEITY)
     {
@@ -1813,7 +1813,7 @@ int do_give(Character *ch, char *argument, int cmd)
   }
 
   // Handle no-trade items
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     // Mortal ch cam give immortal vict no-trade items
     if (IS_PC(ch) && IS_PC(vict) && GET_LEVEL(ch) < IMMORTAL && GET_LEVEL(vict) >= IMMORTAL)
@@ -1851,7 +1851,7 @@ int do_give(Character *ch, char *argument, int cmd)
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
+  if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
   {
     send_to_char("The creature doesn't understand what you're trying to do.\r\n", ch);
     return eFAILURE;
@@ -1873,7 +1873,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-          IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
+          DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
           arena.type == POTATO)
       {
         ;
@@ -1896,7 +1896,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
-          IS_SET(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
+          DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
           arena.type == POTATO)
       {
         ;
@@ -1909,7 +1909,7 @@ int do_give(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
@@ -1941,7 +1941,7 @@ int do_give(Character *ch, char *argument, int cmd)
          obj_index[loop_obj->item_number].virt);
 
   if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL &&
-      IS_SET(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
+      DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
   {
     send_to_char("Here, have some for some potato lag!!\r\n", vict);
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
@@ -1955,7 +1955,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   retval = mprog_give_trigger(vict, ch, obj);
   bool objExists(Object * obj);
-  if (!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
+  if (!DC::isSet(retval, eEXTRA_VALUE) && DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) &&
       objExists(obj))
     extract_obj(obj);
 
@@ -1981,7 +1981,7 @@ class Object *bring_type_to_front(Character *ch, int item_type)
   {
     if (GET_ITEM_TYPE(item_carried) == item_type)
       return item_carried;
-    if (GET_ITEM_TYPE(item_carried) == ITEM_CONTAINER && !IS_SET(item_carried->obj_flags.value[1], CONT_CLOSED))
+    if (GET_ITEM_TYPE(item_carried) == ITEM_CONTAINER && !DC::isSet(item_carried->obj_flags.value[1], CONT_CLOSED))
     { // search inside if open
       container_queue.push(item_carried);
     }
@@ -2192,11 +2192,11 @@ in_room == exit->in_room
 bool is_bracing(Character *bracee, struct room_direction_data *exit)
 {
   // this could happen on a repop of the zone
-  if (!IS_SET(exit->exit_info, EX_CLOSED))
+  if (!DC::isSet(exit->exit_info, EX_CLOSED))
     return false;
 
   // this could happen from some sort of bug
-  if (IS_SET(exit->exit_info, EX_BROKEN))
+  if (DC::isSet(exit->exit_info, EX_BROKEN))
     return false;
 
   // has to be standing
@@ -2244,13 +2244,13 @@ int do_open(Character *ch, char *argument, int cmd)
   else if ((door = find_door(ch, type, dir)) >= 0)
   {
     found = true;
-    if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+    if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
       send_to_char("That's impossible, I'm afraid.\r\n", ch);
-    else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
       send_to_char("It's already open!\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
       send_to_char("It seems to be locked.\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_BROKEN))
       send_to_char("It's already been broken open!\r\n", ch);
     else if (EXIT(ch, door)->bracee != nullptr)
     {
@@ -2276,13 +2276,13 @@ int do_open(Character *ch, char *argument, int cmd)
         return do_open(ch, argument, cmd);
       }
     }
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
       send_to_char("It seems to slither and resist your attempt to touch it.\r\n", ch);
     else
     {
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
 
-      if (IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN))
+      if (DC::isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
       {
         if (EXIT(ch, door)->keyword)
         {
@@ -2312,7 +2312,7 @@ int do_open(Character *ch, char *argument, int cmd)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED);
-            if ((back->keyword) && !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+            if ((back->keyword) && !DC::isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s is opened from the other side.\r\n",
                       fname(back->keyword));
@@ -2323,12 +2323,12 @@ int do_open(Character *ch, char *argument, int cmd)
                            EXIT(ch, door)->to_room, true);
           }
 
-      if ((IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
-          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
-          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
-          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
-          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
-          (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
+      if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
+          (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
+          (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
+          (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
+          (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
+          (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
       {
         int success = 0;
 
@@ -2357,11 +2357,11 @@ int do_open(Character *ch, char *argument, int cmd)
     // this is an object
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       send_to_char("That's not a container.\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("But it's already open!\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSEABLE))
       send_to_char("You can't do that.\r\n", ch);
-    else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
       send_to_char("It seems to be locked.\r\n", ch);
     else
     {
@@ -2401,11 +2401,11 @@ int do_close(Character *ch, char *argument, int cmd)
   else if ((door = find_door(ch, type, dir)) >= 0)
   {
     found = true;
-    if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+    if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
       send_to_char("That's absurd.\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
       send_to_char("It's already closed!\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_BROKEN))
       send_to_char("It appears to be broken!\r\n", ch);
     else
     {
@@ -2422,7 +2422,7 @@ int do_close(Character *ch, char *argument, int cmd)
           {
             SET_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) &&
-                !IS_SET(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                !DC::isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s closes quietly.\r\n",
                       fname(back->keyword));
@@ -2439,9 +2439,9 @@ int do_close(Character *ch, char *argument, int cmd)
     found = true;
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       send_to_char("That's not a container.\r\n", ch);
-    else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("But it's already closed!\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSEABLE))
       send_to_char("That's impossible.\r\n", ch);
     else
     {
@@ -2513,13 +2513,13 @@ int do_lock(Character *ch, char *argument, int cmd)
 
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       send_to_char("That's not a container.\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("Maybe you should close it first...\r\n", ch);
     else if (obj->obj_flags.value[2] < 0)
       send_to_char("That thing can't be locked.\r\n", ch);
     else if (!has_key(ch, obj->obj_flags.value[2]))
       send_to_char("You don't seem to have the proper key.\r\n", ch);
-    else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
       send_to_char("It is locked already.\r\n", ch);
     else
     {
@@ -2532,17 +2532,17 @@ int do_lock(Character *ch, char *argument, int cmd)
   {
     /* a door, perhaps */
 
-    if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+    if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
       send_to_char("That's absurd.\r\n", ch);
-    else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
       send_to_char("You have to close it first, I'm afraid.\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_BROKEN))
       send_to_char("You cannot lock it, it is broken.\r\n", ch);
     else if (EXIT(ch, door)->key < 0)
       send_to_char("There does not seem to be any keyholes.\r\n", ch);
     else if (!has_key(ch, EXIT(ch, door)->key))
       send_to_char("You don't have the proper key.\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
       send_to_char("It's already locked!\r\n", ch);
     else
     {
@@ -2587,13 +2587,13 @@ int do_unlock(Character *ch, char *argument, int cmd)
 
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       send_to_char("That's not a container.\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("Silly - it ain't even closed!\r\n", ch);
     else if (obj->obj_flags.value[2] < 0)
       send_to_char("Odd - you can't seem to find a keyhole.\r\n", ch);
     else if (!has_key(ch, obj->obj_flags.value[2]))
       send_to_char("You don't seem to have the proper key.\r\n", ch);
-    else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (!DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
       send_to_char("Oh.. it wasn't locked, after all.\r\n", ch);
     else
     {
@@ -2606,17 +2606,17 @@ int do_unlock(Character *ch, char *argument, int cmd)
   {
     /* it is a door */
 
-    if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+    if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
       send_to_char("That's absurd.\r\n", ch);
-    else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
       send_to_char("Heck ... it ain't even closed!\r\n", ch);
     else if (EXIT(ch, door)->key < 0)
       send_to_char("You can't seem to spot any keyholes.\r\n", ch);
     else if (!has_key(ch, EXIT(ch, door)->key))
       send_to_char("You do not have the proper key for that.\r\n", ch);
-    else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_BROKEN))
       send_to_char("You cannot unlock it, it is broken!\r\n", ch);
-    else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
       send_to_char("It's already unlocked, it seems.\r\n", ch);
     else
     {
@@ -2651,7 +2651,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (!sub_object || sub_object->carried_by != ch)
   {
-    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+    if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
       if (search_char_for_item(ch, obj_object->item_number, false))
       {
         send_to_char("The item's uniqueness prevents it!\r\n", ch);

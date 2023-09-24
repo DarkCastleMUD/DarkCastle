@@ -528,7 +528,7 @@ int do_brew(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (DC::isSet(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     send_to_char("That container is already a brewed potion.\r\n", ch);
     return eFAILURE;

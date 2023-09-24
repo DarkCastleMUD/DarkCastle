@@ -812,7 +812,7 @@ void save_char_obj_db(Character *ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (IS_SET(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
     uchar.load_room = DC::getInstance()->world[this->in_room].number;
   else
     uchar.load_room = real_room(GET_HOME(ch));
@@ -916,7 +916,7 @@ void save_char_obj(Character *ch)
   }
   else
   {
-    if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       uchar.load_room = DC::getInstance()->world[ch->in_room].number;
     else
       uchar.load_room = real_room(GET_HOME(ch));
@@ -1315,10 +1315,10 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   if (GET_ITEM_TYPE(obj) == ITEM_NOTE)
     return true;
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
     return true;
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     // First time we try to save this object we set the
     // expiration to 24 hours from this point
@@ -1369,25 +1369,25 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
       fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
     }*/
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != standard_obj->obj_flags.value[0])
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != standard_obj->obj_flags.value[0])
   {
     fwrite("VA0", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
   }
 
-  if ((obj->obj_flags.type_flag == ITEM_CONTAINER || obj->obj_flags.type_flag == ITEM_DRINKCON || IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[1] != standard_obj->obj_flags.value[1])
+  if ((obj->obj_flags.type_flag == ITEM_CONTAINER || obj->obj_flags.type_flag == ITEM_DRINKCON || DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[1] != standard_obj->obj_flags.value[1])
   {
     fwrite("VA1", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
   }
 
-  if ((obj->obj_flags.type_flag == ITEM_DRINKCON || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[2] != standard_obj->obj_flags.value[2])
+  if ((obj->obj_flags.type_flag == ITEM_DRINKCON || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[2] != standard_obj->obj_flags.value[2])
   {
     fwrite("VA2", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != standard_obj->obj_flags.value[3])
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != standard_obj->obj_flags.value[3])
   {
     fwrite("VA3", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
@@ -1399,7 +1399,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
   {
     fwrite("MOF", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
@@ -1459,7 +1459,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
     */
   // Custom objects get all of their affects copied
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     fwrite("AFF", sizeof(char), 3, fpsave);
     fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
@@ -1518,13 +1518,13 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     fwrite("SAV", sizeof(char), 3, fpsave);
     fwrite(&obj->save_expiration, sizeof(uint32_t), 1, fpsave);
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
   {
     fwrite("SEL", sizeof(char), 3, fpsave);
     fwrite(&obj->no_sell_expiration, sizeof(uint32_t), 1, fpsave);

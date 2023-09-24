@@ -467,7 +467,7 @@ int do_rename_char(Character *ch, char *arg, int cmd)
   for (iWear = 0; iWear < MAX_WEAR; iWear++)
   {
     if (victim->equipment[iWear] &&
-        IS_SET(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
+        DC::isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
       sprintf(tmp, "%s", victim->equipment[iWear]->name);
@@ -479,7 +479,7 @@ int do_rename_char(Character *ch, char *arg, int cmd)
     {
       for (obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
-        if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           char tmp[256];
           sprintf(tmp, "%s", obj->name);
@@ -494,7 +494,7 @@ int do_rename_char(Character *ch, char *arg, int cmd)
   obj = victim->carrying;
   while (obj)
   {
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       char tmp[256];
       sprintf(tmp, "%s", obj->name);
@@ -507,7 +507,7 @@ int do_rename_char(Character *ch, char *arg, int cmd)
       Object *obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
-        if (IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (DC::isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           char tmp[256];
           sprintf(tmp, "%s", obj2->name);

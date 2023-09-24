@@ -691,7 +691,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     else
     {
       struct skill_quest *sq;
-      if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && IS_SET(sq->clas, 1 << (GET_CLASS(ch) - 1)))
+      if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && DC::isSet(sq->clas, 1 << (GET_CLASS(ch) - 1)))
       {
         mprog_driver(sq->message, owner, ch, nullptr, nullptr, nullptr, nullptr);
         switch (skillnumber)
@@ -936,17 +936,17 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   { // remort crap
     int groupnumber;
 
-    if (IS_SET(ch->player->toggles, PLR_CLS_TREE_A))
+    if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_A))
     {
       REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_A);
       groupnumber = 1;
     }
-    else if (IS_SET(ch->player->toggles, PLR_CLS_TREE_B))
+    else if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_B))
     {
       REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_B);
       groupnumber = 2;
     }
-    else if (IS_SET(ch->player->toggles, PLR_CLS_TREE_C))
+    else if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_C))
     {
       REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_C);
       groupnumber = 3;
@@ -997,7 +997,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   else
   {
-    if (IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
+    if (DC::isSet(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
     else if (search_skills(arg, g_skills) != -1)
       do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", CMD_DEFAULT);
@@ -1265,12 +1265,12 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
     return;
   }
 
-  if (IS_SET(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     return;
   }

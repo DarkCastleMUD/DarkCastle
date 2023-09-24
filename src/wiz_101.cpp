@@ -282,7 +282,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* a location has been found. */
-  if (IS_SET(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
       GET_LEVEL(this) < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
@@ -290,14 +290,14 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       GET_LEVEL(this) < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return eFAILURE;
   }
 
-  if ((IS_SET(DC::getInstance()->world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
+  if ((DC::isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
   {
 
     for (i = 0, pers = DC::getInstance()->world[location].people; pers;
@@ -522,14 +522,14 @@ int do_at(Character *ch, char *argument, int cmd)
   }
 
   /* a location has been found. */
-  if (IS_SET(DC::getInstance()->world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     send_to_char("No.\r\n", ch);
     return eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (IS_SET(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       GET_LEVEL(ch) < DEITY)
   {
     send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
@@ -657,7 +657,7 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (IS_SET(ch->player->toggles, PLR_NOHASSLE))
+  if (DC::isSet(ch->player->toggles, PLR_NOHASSLE))
   {
     REMOVE_BIT(ch->player->toggles, PLR_NOHASSLE);
     send_to_char("Mobiles can bother you again.\r\n", ch);
