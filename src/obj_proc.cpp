@@ -39,7 +39,6 @@
 
 #define EMOTING_FILE "emoting-objects.txt"
 
-
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
@@ -564,8 +563,31 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
 int orrowand(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
 {
-  if (cmd != CMD_SAY || str_cmp(arg, " recharge"))
+  switch (cmd)
+  {
+  case CMD_SAY:
+    if (str_cmp(arg, " recharge"))
+    {
+      return eFAILURE;
+    }
+    break;
+  case CMD_PUSH:
+    if (str_cmp(arg, " button"))
+    {
+      return eFAILURE;
+    }
+    ch->send("You push an almost invisible button on the wand with an audible *click*.\r\n");
+    break;
+  default:
     return eFAILURE;
+    break;
+  }
+
+  if (obj->obj_flags.value[2] >= 5)
+  {
+    ch->send("The wand cannot be recharged yet.\r\n");
+    return eSUCCESS;
+  }
 
   class Object *curr;
   class Object *firstP = nullptr, *secondP = nullptr, *vial = nullptr, *diamond = nullptr;
@@ -584,7 +606,27 @@ int orrowand(Character *ch, class Object *obj, int cmd, const char *arg, Charact
 
   if (!firstP || !secondP || !vial || !diamond)
   {
-    send_to_char("Recharge unsuccessful:  Missing required components.\r\n", ch);
+    send_to_char("Recharge unsuccessful. Missing required components:\r\n", ch);
+    if (!firstP && real_object(27903))
+    {
+      auto obj = static_cast<Object *>(obj_index[real_object(27903)].item);
+      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+    }
+    if (!secondP && real_object(27903))
+    {
+      auto obj = static_cast<Object *>(obj_index[real_object(27903)].item);
+      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+    }
+    if (!vial && real_object(27904))
+    {
+      auto obj = static_cast<Object *>(obj_index[real_object(27904)].item);
+      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+    }
+    if (!diamond && real_object(17399))
+    {
+      auto obj = static_cast<Object *>(obj_index[real_object(17399)].item);
+      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+    }
     return eSUCCESS;
   }
   obj_from_char(firstP);
