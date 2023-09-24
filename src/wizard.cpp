@@ -1909,6 +1909,13 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
             (mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699)))
         continue;
 
+      // Skip mobs marked NO_HUNT
+      Character *m = static_cast<Character *>(mob_index[mob].item);
+      if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
+      {
+        continue;
+      }
+
       if (mob_index[mob].number <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))

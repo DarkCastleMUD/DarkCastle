@@ -75,7 +75,8 @@ char *getTemp(Character *ch, char *name);
 #define ACT_NODISPEL 35
 #define ACT_POISONOUS 36
 #define ACT_NO_GOLD_BONUS 37
-#define ACT_MAX 37
+#define ACT_NO_HUNT 38
+#define ACT_MAX 38
 // #define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 
 class SelfPurge

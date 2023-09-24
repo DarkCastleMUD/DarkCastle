@@ -2111,6 +2111,7 @@ const char
         "NODISPEL",
         "POISONOUS",
         "NO_GOLD_BONUS",
+        "NO_HUNT",
         "\n"};
 
 const char *player_bits[] =
