@@ -3247,6 +3247,11 @@ void ansi_color(char *txt, Character *ch)
   }
 }
 
+void send_info(QString messg)
+{
+  send_info(messg.toStdString().c_str());
+}
+
 void send_info(string messg)
 {
   send_info(messg.c_str());

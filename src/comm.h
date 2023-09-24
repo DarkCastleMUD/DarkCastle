@@ -57,6 +57,7 @@ QString scramble_text(QString txt);
 void warn_if_duplicate_ip(Character *ch);
 void record_msg(string messg, Character *ch);
 int write_hotboot_file(char **argv);
+void send_info(QString messg);
 void send_info(string messg);
 void send_info(const char *messg);
 bool is_multi(Character *ch);
