@@ -3432,8 +3432,29 @@ int do_medit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(action_bits, buf4, ch,
-                              ((Character *)mob_index[mob_num].item)->mobdata->actflags);
+    uint32_t old_actflags[2];
+    old_actflags[0] = ((Character *)mob_index[mob_num].item)->mobdata->actflags[0];
+    old_actflags[1] = ((Character *)mob_index[mob_num].item)->mobdata->actflags[1];
+    parse_bitstrings_into_int(action_bits, buf4, ch, ((Character *)mob_index[mob_num].item)->mobdata->actflags);
+
+    uint32_t new_actflags[2];
+    new_actflags[0] = ((Character *)mob_index[mob_num].item)->mobdata->actflags[0];
+    new_actflags[1] = ((Character *)mob_index[mob_num].item)->mobdata->actflags[1];
+
+    if (old_actflags[0] != new_actflags[0] || old_actflags[1] != new_actflags[1])
+    {
+      uint64_t NPCs_changed = 0;
+      for (auto const &c : DC::getInstance()->character_list)
+      {
+        if (IS_NPC(c) && c->mobdata && mob_index[c->mobdata->nr].virt == mobvnum)
+        {
+          c->mobdata->actflags[0] = new_actflags[0];
+          c->mobdata->actflags[1] = new_actflags[1];
+          NPCs_changed++;
+        }
+      }
+      ch->send(QString("%1 NPCs in the world have been updated.\r\n").arg(NPCs_changed));
+    }
   }
   break;
 
