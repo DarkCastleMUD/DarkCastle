@@ -311,7 +311,7 @@ int do_set(Character *ch, char *argument, int cmd)
         "Usage:\n\rset <name> <field> <value>\n\r", ch);
 
     strcpy(help, "\n\rField being one of the following:\n\r");
-    display_string_list(values, ch);
+    ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
                 sprintf(help + strlen(help), "%18s", values[i]);

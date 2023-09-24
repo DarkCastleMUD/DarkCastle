@@ -588,7 +588,6 @@ void parse_bitstrings_into_int(const char *bits[], const char *strings, Characte
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t value[]);
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t &value);
 void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint16_t &value);
-void display_string_list(const char *list[], Character *ch);
 int contains_no_trade_item(Object *obj);
 int contents_cause_unique_problem(Object *obj, Character *vict);
 bool check_make_camp(int);

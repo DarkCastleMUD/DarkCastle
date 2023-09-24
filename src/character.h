@@ -592,6 +592,8 @@ public:
         }
         return "";
     }
+    void display_string_list(QStringList list);
+    void display_string_list(const char **list);
 
 private:
     uint64_t gold_ = {}; /* Money carried                           */

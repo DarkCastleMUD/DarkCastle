@@ -903,6 +903,23 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
   zone.reset_mode = k - 1;
 
   ch->send(QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
+  return eSUCCESS;
+}
+
+const QStringList zedit_subcommands = {
+    "remove", "add", "edit", "list", "name",
+    "lifetime", "mode", "flags", "help", "search",
+    "swap", "copy", "continent", "info"};
+
+command_return_t zedit_help(Character *ch, QStringList arguments, Zone &zone)
+{
+  send_to_char("$3Usage$R: zedit <subcommand> [arguments]\r\n"
+               "       zedit <zone number> <subcommand> [arguments]\r\n"
+               "If you don't specify the zone number then whatever zone you are in is used.\r\n"
+               "Subcommands:\r\n",
+               ch);
+  ch->display_string_list(zedit_subcommands);
+  return eSUCCESS;
 }
 
 int do_zedit(Character *ch, char *argument, int cmd)
@@ -916,22 +933,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
   QSharedPointer<ResetCommand> tmp = {}, temp_com = {};
   char *str = {};
 
-  const char *zedit_subcommands[] = {
-      "remove", "add", "edit", "list", "name",
-      "lifetime", "mode", "flags", "help", "search",
-      "swap", "copy", "continent", "info",
-      "\n"};
-
   QStringList arguments = QString(argument).trimmed().split(' ');
 
   if (arguments.isEmpty() || arguments.at(0).isEmpty())
   {
-    send_to_char("$3Usage$R: zedit <subcommand> [arguments]\r\n"
-                 "       zedit <zone number> <subcommand> [arguments]\r\n"
-                 "If you don't specify the zone number then whatever zone you are in is used.\r\n"
-                 "Subcommands:\r\n",
-                 ch);
-    display_string_list(zedit_subcommands, ch);
+
     return eFAILURE;
   }
 
@@ -942,7 +948,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     arguments.pop_back();
   }
 
-  QString select = arguments.at(0);
+  QString select = arguments.value(0);
   ok = false;
   zone_t zone_key = select.toULongLong(&ok);
   if (!ok)
@@ -952,20 +958,24 @@ int do_zedit(Character *ch, char *argument, int cmd)
   else
   {
     arguments.pop_front();
-    select = arguments.at(0);
+    select = arguments.value(0);
   }
 
+  bool subcommand_found = false;
   for (subcommand = 0;; subcommand++)
   {
     if (zedit_subcommands[subcommand][0] == '\n')
     {
       ch->send(QString("'%1' is an invalid subcommand.\r\n").arg(select));
       ch->send("Valid subcommands are:\r\n");
-      display_string_list(zedit_subcommands, ch);
+      ch->display_string_list(zedit_subcommands);
       return eFAILURE;
     }
     if (is_abbrev(select, zedit_subcommands[subcommand]))
+    {
+      subcommand_found = true;
       break;
+    }
   }
 
   if (!can_modify_room(ch, ch->in_room))
@@ -986,7 +996,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   last_cmd = zone_get_last_command(zone);
 
-  arguments.pop_front();
+  if (!arguments.isEmpty())
+  {
+    arguments.pop_front();
+  }
   switch (subcommand)
   {
   case 0: /* remove */
@@ -1313,7 +1326,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
                  "Use a field with no args to get help on that field.\r\n"
                  "Fields are the following.\r\n",
                  ch);
-    display_string_list(sedit_values, ch);
+    ch->display_string_list(sedit_values);
     return eFAILURE;
   }
 
@@ -1519,7 +1532,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     send_to_char("$3Syntax$R:  oedit [item_num] exdesc <field> [values]\r\n"
                  "The field must be one of the following:\n\r",
                  ch);
-    display_string_list(fields, ch);
+    ch->display_string_list(fields);
     send_to_char("\n\r$3Current Descs$R:\n\r", ch);
     for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
       csendf(ch, "$3%d$R) %s\n\r%s\n\r", x, curr->keyword, curr->description);
@@ -1707,7 +1720,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     send_to_char("$3Syntax$R:  oedit [item_num] affects [affectnumber] [value]\r\n"
                  "The field must be one of the following:\n\r",
                  ch);
-    display_string_list(fields, ch);
+    ch->display_string_list(fields);
     return eFAILURE;
   }
 
@@ -1982,7 +1995,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                  "         oedit [field] [arg]            -- Change that field using last vnum\n\r\n\r"
                  "The field must be one of the following:\n\r",
                  ch);
-    display_string_list(fields, ch);
+    ch->display_string_list(fields);
     return eFAILURE;
   }
 
@@ -2596,7 +2609,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
                  "  Edit a field with no args for help on that field.\r\n\r\n"
                  "  The field must be one of the following:\n\r",
                  ch);
-    display_string_list(fields, ch);
+    ch->display_string_list(fields);
     sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
@@ -3021,7 +3034,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                  "  Edit a field with no args for help on that field.\r\n\r\n"
                  "The field must be one of the following:\n\r",
                  ch);
-    display_string_list(fields, ch);
+    ch->display_string_list(fields);
     return eFAILURE;
   }
 

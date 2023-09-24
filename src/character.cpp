@@ -519,3 +519,38 @@ Sockets::Sockets(Character *ch, QString searchkey)
         connections_.push_back(d);
     }
 }
+
+void Character::display_string_list(QStringList list)
+{
+    QString buf;
+    uint64_t count{};
+    for (const auto &item : list)
+    {
+        send(QString("%1").arg(item, 18));
+        if (++count % 4 == 0)
+        {
+            send("\r\n");
+        }
+    }
+    send("\r\n");
+}
+
+void Character::display_string_list(const char *list[])
+{
+    char buf[MAX_STRING_LENGTH]{};
+    *buf = '\0';
+
+    for (int i = 1; *list[i - 1] != '\n'; i++)
+    {
+        sprintf(buf + strlen(buf), "%18s", list[i - 1]);
+        if (!(i % 4))
+        {
+            strcat(buf, "\r\n");
+            send_to_char(buf, this);
+            *buf = '\0';
+        }
+    }
+    if (*buf)
+        send_to_char(buf, this);
+    send_to_char("\r\n", this);
+}

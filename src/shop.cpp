@@ -44,7 +44,6 @@ extern struct index_data *mob_index;
 
 struct player_shop *g_playershops;
 
-
 extern struct index_data *obj_index;
 
 extern struct time_info_data time_info;
@@ -441,7 +440,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be wielded by these classes: ");
@@ -490,7 +489,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
@@ -582,7 +581,7 @@ void shopping_value(const char *arg, Character *ch,
       if (obj->obj_flags.eq_level < 20)
       {
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
-        sprintbit(obj->obj_flags.size,Object::size_bits, buf2);
+        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "and it can be worn by these classes: ");
@@ -1346,7 +1345,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
     send_to_char("$3Usage$R: design <field> <correct arguments>\r\n"
                  "Fields are the following.\r\n",
                  ch);
-    display_string_list(pdesign_values, ch);
+    ch->display_string_list(pdesign_values);
     return;
   }
 
@@ -1409,7 +1408,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
     send_to_char("$3Usage$R: design <field> <correct arguments>\r\n"
                  "Fields are the following.\r\n",
                  ch);
-    display_string_list(pdesign_values, ch);
+    ch->display_string_list(pdesign_values);
     break;
   }
 }

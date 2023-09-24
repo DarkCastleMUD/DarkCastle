@@ -2333,28 +2333,6 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, C
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
-// Display a \n terminated list to the character
-//
-void display_string_list(const char *list[], Character *ch)
-{
-  char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
-
-  for (int i = 1; *list[i - 1] != '\n'; i++)
-  {
-    sprintf(buf + strlen(buf), "%18s", list[i - 1]);
-    if (!(i % 4))
-    {
-      strcat(buf, "\r\n");
-      send_to_char(buf, ch);
-      *buf = '\0';
-    }
-  }
-  if (*buf)
-    send_to_char(buf, ch);
-  send_to_char("\r\n", ch);
-}
-
 void check_timer()
 { // Called once/sec
   struct timer_data *curr, *nex, *las;
