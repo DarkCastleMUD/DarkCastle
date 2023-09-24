@@ -40,7 +40,7 @@ public:
 };
 
 bool operator==(ResetCommand a, ResetCommand b);
-typedef QList<QSharedPointer<ResetCommand> > zone_commands_t;
+typedef QList<QSharedPointer<ResetCommand>> zone_commands_t;
 
 #define MAX_INDEX 6000
 
@@ -68,12 +68,12 @@ public:
     };
 
     Zone(uint64_t zone_key = 0);
-    char *name = {};   /* name of this zone                  */
-    int lifespan = {}; /* how long between resets (minutes)  */
+    QString name = {};   /* name of this zone                  */
+    uint64_t lifespan = {}; /* how long between resets (minutes)  */
     QDateTime last_full_reset = {};
-    int age = {}; /* current age of ths zone (minutes) */
+    uint64_t age = {}; /* current age of ths zone (minutes) */
 
-    int players = {}; // Number of PCs in the zone
+    uint64_t players = {}; // Number of PCs in the zone
 
     int reset_mode = {}; /* conditions for reset (see below)   */
 

@@ -100,10 +100,10 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 		for (list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
 		{
 			i++;
-			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name)), "%s",
+			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())), "%s",
 					 DC::getInstance()->zones.value(lit->area).name);
 			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%ds $5%%15lld$R xps\r\n",
-					 35 + (strlen(DC::getInstance()->zones.value(lit->area).name) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name)));
+					 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())));
 			csendf(ch, buf2, i, buf, lit->xps);
 		}
 	}
@@ -113,10 +113,10 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 		for (list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
 		{
 			i++;
-			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name)), "%s",
-					 DC::getInstance()->zones.value(lit->area).name);
+			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())), "%s",
+					 DC::getInstance()->zones.value(lit->area).name.toStdString().c_str());
 			snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%ds $5%%15lld$R gold\r\n",
-					 35 + (strlen(DC::getInstance()->zones.value(lit->area).name) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name)));
+					 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())));
 			csendf(ch, buf2, i, buf, lit->gold);
 		}
 	}
@@ -164,7 +164,7 @@ void AreaData::DisplayAreaData(Character *ch)
 	{
 		if (areaStats[zone_key].xps == 0)
 			continue;
-		buf = QString("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n\r").arg(35 + (strlen(zone.name) - nocolor_strlen(zone.name)));
+		buf = QString("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n\r").arg(35 + (strlen(zone.name.toStdString().c_str()) - nocolor_strlen(zone.name.toStdString().c_str())));
 		ch->send(buf.arg(zone_key).arg(zone.name).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
 	}
 	return;

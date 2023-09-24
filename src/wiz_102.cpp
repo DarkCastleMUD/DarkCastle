@@ -465,6 +465,88 @@ int do_mpstat(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
+{
+  if (arguments.isEmpty())
+  {
+    send_to_char("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>\r\n", ch);
+    qDebug() << arguments;
+    return eFAILURE;
+  }
+
+  QString text = arguments.value(0, "");
+
+  if (text == "noclaim")
+  {
+    zone.setNoClaim();
+    if (zone.isNoClaim())
+    {
+      send_to_char("Noclaim turned on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("Noclaim turned off.\r\n", ch);
+    }
+  }
+
+  else if (text == "noteleport")
+  {
+    zone.setNoTeleport();
+    if (zone.isNoTeleport())
+    {
+      send_to_char("Noteleport turned on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("Noteleport turned off.\r\n", ch);
+    }
+  }
+  else if (text == "nohunt")
+  {
+    zone.setNoHunt();
+    if (zone.isNoHunt())
+    {
+      send_to_char("Nohunt turned on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("Nohunt turned off.\r\n", ch);
+    }
+  }
+  else
+  {
+    ch->send(QString("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text));
+    return eFAILURE;
+  }
+  return eSUCCESS;
+}
+
+command_return_t zedit_lifetime(Character *ch, QStringList arguments, Zone &zone)
+{
+  if (arguments.isEmpty())
+  {
+    send_to_char("$3Usage$R: zedit lifetime <tickamount>\r\n"
+                 "The lifetime is the number of ticks the zone takes\r\n"
+                 "before it will attempt to repop itself.\r\n",
+                 ch);
+    return eFAILURE;
+  }
+  QString text = arguments.value(0);
+  bool ok = false;
+  uint64_t ticks = text.toULongLong(&ok);
+
+  if (!ok || ticks > 32000)
+  {
+    send_to_char("You much choose between 1 and 32000.\r\n", ch);
+    return eFAILURE;
+  }
+
+  ch->send(QString("Zone %1's lifetime changed from %2 to %3.\r\n").arg(zone.getID()).arg(zone.lifespan).arg(ticks));
+  zone.lifespan = ticks;
+
+  return eSUCCESS;
+}
+
 command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 {
   if (arguments.size() < 3 || arguments.at(0).isEmpty())
@@ -775,6 +857,54 @@ command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zo
   return eSUCCESS; // so we don't set_zone_modified_zone
 }
 
+command_return_t zedit_name(Character *ch, QStringList arguments, Zone &zone)
+{
+  if (arguments.isEmpty())
+  {
+    send_to_char("$3Usage$R: zedit name <newname>\r\n"
+                 "This changes the name of the zone.\r\n",
+                 ch);
+    return eFAILURE;
+  }
+
+  zone.name = arguments.join(' ');
+
+  ch->send(QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.name));
+
+  return eSUCCESS;
+}
+
+command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
+{
+  if (arguments.isEmpty())
+  {
+    send_to_char("$3Usage$R: zedit mode <modetype>\r\n"
+                 "You much choose the rule the zone follows when it\r\n"
+                 "attempts to repop itself.  Available modes are:\r\n",
+                 ch);
+    QString buffer;
+    for (uint64_t j = 0; *zone_modes[j] != '\n'; j++)
+    {
+      ch->send(QString("  $C%1$R: %2\r\n").arg(j + 1).arg(zone_modes[j]));
+    }
+    return eFAILURE;
+  }
+
+  QString text = arguments.value(0);
+  bool ok = false;
+  uint64_t k = text.toULongLong(&ok);
+
+  if (!ok || k > 3)
+  {
+    send_to_char("You must choose between 1 and 3.\r\n", ch);
+    return eFAILURE;
+  }
+
+  zone.reset_mode = k - 1;
+
+  ch->send(QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
+}
+
 int do_zedit(Character *ch, char *argument, int cmd)
 {
   QString buf, text, arg;
@@ -872,137 +1002,17 @@ int do_zedit(Character *ch, char *argument, int cmd)
     zedit_list(ch, arguments, zone, stats);
     break;
   case 4: /* name */
-    if (arguments.size() < 3)
-    {
-      send_to_char("$3Usage$R: zedit name <newname>\r\n"
-                   "This changes the name of the zone.\r\n",
-                   ch);
-      return eFAILURE;
-    }
-
-    dc_free(zone.name);
-    arguments.pop_front();
-    zone.name = str_dup(arguments.at(0).toStdString().c_str());
-
-    buf = QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(arguments.at(0));
-    send_to_char(buf, ch);
+    zedit_name(ch, arguments, zone);
     break;
-
   case 5: /* lifetime */
-
-    if (arguments.size() < 3)
-    {
-      send_to_char("$3Usage$R: zedit lifetime <tickamount>\r\n"
-                   "The lifetime is the number of ticks the zone takes\r\n"
-                   "before it will attempt to repop itself.\r\n",
-                   ch);
-      return eFAILURE;
-    }
-    text = arguments.at(2);
-    ok = false;
-    ticks = text.toULongLong(&ok);
-
-    if (!ok || ticks > 32000)
-    {
-      send_to_char("You much choose between 1 and 32000.\r\n", ch);
-      return eFAILURE;
-    }
-
-    zone.lifespan = i;
-
-    buf = QString("Zone %1's lifetime changed to %2.\r\n").arg(zone.getID()).arg(zone.lifespan);
-    send_to_char(buf, ch);
+    zedit_lifetime(ch, arguments, zone);
     break;
-
   case 6: /* mode */
-
-    if (arguments.size() < 2)
-    {
-      send_to_char("$3Usage$R: zedit mode <modetype>\r\n"
-                   "You much choose the rule the zone follows when it\r\n"
-                   "attempts to repop itself.  Available modes are:\r\n",
-                   ch);
-      QString buffer;
-      for (j = 0; *zone_modes[j] != '\n'; j++)
-      {
-        buffer += fmt::format("{}  $C{}$R: {}\r\n", buf.toStdString(), j + 1, zone_modes[j]).c_str();
-      }
-
-      send_to_char(buffer, ch);
-      return eFAILURE;
-    }
-
-    text = arguments.at(1);
-    ok = false;
-    k = text.toUInt(&ok);
-
-    if (!ok || i > 3)
-    {
-      send_to_char("You must choose between 1 and 3.\r\n", ch);
-      return eFAILURE;
-    }
-
-    zone.reset_mode = i - 1;
-
-    buf = QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[i - 1]).arg(i);
-    send_to_char(buf, ch);
+    zedit_mode(ch, arguments, zone);
     break;
 
   case 7: /* flags */
-
-    if (arguments.size() < 2)
-    {
-      send_to_char("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>\r\n", ch);
-      return eFAILURE;
-    }
-    text = arguments.at(1);
-
-    if (text == "noclaim")
-    {
-      zone.setNoClaim();
-      if (zone.isNoClaim())
-      {
-        send_to_char("Noclaim turned on.\r\n", ch);
-      }
-      else
-      {
-        send_to_char("Noclaim turned off.\r\n", ch);
-      }
-    }
-
-    else if (text == "noteleport")
-    {
-      zone.setNoTeleport();
-      if (zone.isNoTeleport())
-      {
-        send_to_char("Noteleport turned on.\r\n", ch);
-      }
-      else
-      {
-        send_to_char("Noteleport turned off.\r\n", ch);
-      }
-    }
-    else if (text == "nohunt")
-    {
-      zone.setNoHunt();
-      if (zone.isNoHunt())
-      {
-        send_to_char("Nohunt turned on.\r\n", ch);
-      }
-      else
-      {
-        send_to_char("Nohunt turned off.\r\n", ch);
-      }
-    }
-    else
-    {
-      buf = QString("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text);
-      send_to_char(buf, ch);
-      return eFAILURE;
-    }
-
-    // sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone, zone.isNoTeleport() ? "true" : "false");
-    // send_to_char(buf, ch);
+    zedit_flags(ch, arguments, zone);
     break;
   case 8: /* help */
 
