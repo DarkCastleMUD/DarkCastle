@@ -1861,17 +1861,19 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     num -= 1; // since arrays start at 0
     obj->affected[num].modifier = modifier;
     if (obj->affected[num].location >= 1000)
-      sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
-              get_skill_name(obj->affected[num].location / 1000),
-              obj->affected[num].modifier);
+    {
+      QString skill_name = get_skill_name(obj->affected[num].location / 1000);
+
+      ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
+    }
     else
-      sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
-              apply_types[obj->affected[num].location], obj->affected[num].modifier);
-    send_to_char(buf, ch);
+    {
+      ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
+    }
     break;
   }
   case 5:
-    if (!*select)
+    if (!*select || !*value)
     {
       send_to_char("$3Syntax$R: oedit [item_num] affects 3spell <number> <skill>\r\n"
                    "This sets the affect as affecting skills by 2amount\r\n",
@@ -1896,9 +1898,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     modifier = atoi(value);
     num -= 1;
     obj->affected[num].location = modifier * 1000;
-    sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
-            get_skill_name(obj->affected[num].location / 1000), obj->affected[num].modifier);
-    send_to_char(buf, ch);
+    ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
     break;
   default:
     send_to_char("Illegal value, tell pir.\r\n", ch);
