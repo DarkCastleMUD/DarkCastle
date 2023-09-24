@@ -58,7 +58,6 @@ int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 
-
 // globals to store last command that was done.
 // this is used for debugging.  We output it in case of a crash
 // to the log files.  (char name is so long, in case it was a mob)
@@ -1424,6 +1423,11 @@ bool is_abbrev(const string &aabrev, const string &word)
 
 bool is_abbrev(QString aabrev, QString word)
 {
+  if (aabrev.isEmpty())
+  {
+    return false;
+  }
+
   return word.startsWith(aabrev, Qt::CaseInsensitive);
 }
 

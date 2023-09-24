@@ -55,7 +55,7 @@ public:
         full
     };
 
-    // Remember to update const.C  zone_bits[] if you change this
+    // Remember to update const.C  Zone::zone_bits if you change this
     enum Flag
     {
         NO_TELEPORT = 1,
@@ -67,8 +67,10 @@ public:
         NOHUNT = 1 << 6,
     };
 
+    static QStringList zone_bits;
+
     Zone(uint64_t zone_key = 0);
-    QString name = {};   /* name of this zone                  */
+    QString name = {};      /* name of this zone                  */
     uint64_t lifespan = {}; /* how long between resets (minutes)  */
     QDateTime last_full_reset = {};
     uint64_t age = {}; /* current age of ths zone (minutes) */
@@ -126,6 +128,7 @@ public:
     void setFilename(QString);
 
     void setZoneFlags(uint64_t);
+    uint64_t getZoneFlags(void) { return zone_flags; }
 
     void setGold(uint64_t value);
     void addGold(uint64_t value);

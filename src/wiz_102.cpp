@@ -470,7 +470,7 @@ command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
   if (arguments.isEmpty())
   {
     send_to_char("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>\r\n", ch);
-    qDebug() << arguments;
+    ch->send(QString("Current flags: %1\r\n").arg(sprintbit(zone.getZoneFlags(), Zone::zone_bits)));
     return eFAILURE;
   }
 
@@ -478,39 +478,63 @@ command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
 
   if (text == "noclaim")
   {
-    zone.setNoClaim();
     if (zone.isNoClaim())
     {
-      send_to_char("Noclaim turned on.\r\n", ch);
+      zone.setNoClaim(false);
     }
     else
     {
-      send_to_char("Noclaim turned off.\r\n", ch);
+      zone.setNoClaim(true);
+    }
+
+    if (zone.isNoClaim())
+    {
+      send_to_char("noclaim toggled on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("noclaim toggled off.\r\n", ch);
     }
   }
 
   else if (text == "noteleport")
   {
-    zone.setNoTeleport();
     if (zone.isNoTeleport())
     {
-      send_to_char("Noteleport turned on.\r\n", ch);
+      zone.setNoTeleport(false);
     }
     else
     {
-      send_to_char("Noteleport turned off.\r\n", ch);
+      zone.setNoTeleport(true);
+    }
+
+    if (zone.isNoTeleport())
+    {
+      send_to_char("noteleport toggled on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("noteleport toggled off.\r\n", ch);
     }
   }
   else if (text == "nohunt")
   {
-    zone.setNoHunt();
     if (zone.isNoHunt())
     {
-      send_to_char("Nohunt turned on.\r\n", ch);
+      zone.setNoHunt(false);
     }
     else
     {
-      send_to_char("Nohunt turned off.\r\n", ch);
+      zone.setNoHunt(true);
+    }
+
+    if (zone.isNoHunt())
+    {
+      send_to_char("nohunt toggled on.\r\n", ch);
+    }
+    else
+    {
+      send_to_char("nohunt toggled off.\r\n", ch);
     }
   }
   else
@@ -911,7 +935,7 @@ const QStringList zedit_subcommands = {
     "lifetime", "mode", "flags", "help", "search",
     "swap", "copy", "continent", "info"};
 
-command_return_t zedit_help(Character *ch, QStringList arguments, Zone &zone)
+command_return_t zedit_help(Character *ch)
 {
   send_to_char("$3Usage$R: zedit <subcommand> [arguments]\r\n"
                "       zedit <zone number> <subcommand> [arguments]\r\n"
@@ -925,7 +949,6 @@ command_return_t zedit_help(Character *ch, QStringList arguments, Zone &zone)
 int do_zedit(Character *ch, char *argument, int cmd)
 {
   QString buf, text, arg;
-  uint_fast8_t subcommand = {};
   uint64_t i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
@@ -935,10 +958,9 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   QStringList arguments = QString(argument).trimmed().split(' ');
 
-  if (arguments.isEmpty() || arguments.at(0).isEmpty())
+  if (arguments.isEmpty())
   {
-
-    return eFAILURE;
+    return zedit_help(ch);
   }
 
   bool stats = false;
@@ -949,6 +971,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
   }
 
   QString select = arguments.value(0);
+  if (select.isEmpty())
+  {
+    return zedit_help(ch);
+  }
+
   ok = false;
   zone_t zone_key = select.toULongLong(&ok);
   if (!ok)
@@ -961,21 +988,28 @@ int do_zedit(Character *ch, char *argument, int cmd)
     select = arguments.value(0);
   }
 
-  bool subcommand_found = false;
-  for (subcommand = 0;; subcommand++)
+  if (select.isEmpty())
   {
-    if (zedit_subcommands[subcommand][0] == '\n')
+    return zedit_help(ch);
+  }
+
+  bool subcommand_found{};
+  uint64_t subcommand_id{};
+  for (subcommand_id = 0; subcommand_id < zedit_subcommands.size(); subcommand_id++)
+  {
+    if (is_abbrev(select, zedit_subcommands[subcommand_id]))
     {
-      ch->send(QString("'%1' is an invalid subcommand.\r\n").arg(select));
-      ch->send("Valid subcommands are:\r\n");
-      ch->display_string_list(zedit_subcommands);
-      return eFAILURE;
-    }
-    if (is_abbrev(select, zedit_subcommands[subcommand]))
-    {
+      qDebug() << select;
+      qDebug() << zedit_subcommands[subcommand_id];
       subcommand_found = true;
       break;
     }
+  }
+
+  if (!subcommand_found)
+  {
+    ch->send(QString("'%1' is an invalid subcommand.\r\n").arg(select));
+    return zedit_help(ch);
   }
 
   if (!can_modify_room(ch, ch->in_room))
@@ -1000,7 +1034,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   {
     arguments.pop_front();
   }
-  switch (subcommand)
+  switch (subcommand_id)
   {
   case 0: /* remove */
     zedit_remove(ch, arguments, zone);
@@ -1023,7 +1057,6 @@ int do_zedit(Character *ch, char *argument, int cmd)
   case 6: /* mode */
     zedit_mode(ch, arguments, zone);
     break;
-
   case 7: /* flags */
     zedit_flags(ch, arguments, zone);
     break;

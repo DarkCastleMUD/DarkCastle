@@ -5,6 +5,16 @@ Zone::Zone(zone_t zone_key)
 {
 }
 
+QStringList Zone::zone_bits =
+    {
+        "NO_TELEPORT",
+        "IS_TOWN(keep out STAY_NO_TOWN mobs)",
+        "MODIFIED",
+        "UNUSED",
+        "BPORT",
+        "NOCLAIM",
+        "NOHUNT"};
+
 QString Zone::getFilename(void)
 {
     return filename;

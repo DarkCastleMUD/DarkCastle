@@ -881,17 +881,6 @@ vector<string> get_cont_names()
 
 vector<string> continent_names = get_cont_names();
 
-const char *zone_bits[] =
-    {
-        "NO_TELEPORT",
-        "IS_TOWN(keep out STAY_NO_TOWN mobs)",
-        "MODIFIED",
-        "UNUSED",
-        "BPORT",
-        "NOCLAIM",
-        "NOHUNT",
-        "\n"};
-
 // new obj flags
 const QStringList Object::extra_bits =
     {

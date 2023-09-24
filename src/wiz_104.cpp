@@ -466,7 +466,7 @@ int Zone::show_info(Character *ch)
 				 .arg(last_full_reset.toLocalTime().toString().toStdString().c_str())
 				 .arg(last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str()));
 
-	sprintbit(zone_flags, zone_bits, buf);
+	sprintbit(zone_flags, Zone::zone_bits, buf);
 	send_to_char(buf, ch);
 	sprintf(buf, "\r\n"
 				 "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"

@@ -47,7 +47,6 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char *ban_list[30];
 extern char *nonew_new_list[30];
-extern const char *zone_bits[];
 extern const char *zone_modes[];
 extern const char *equipment_types[];
 extern const char *utility_item_types[];
