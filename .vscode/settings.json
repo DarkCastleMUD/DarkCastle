@@ -69,7 +69,11 @@
         "semaphore": "cpp",
         "qsharedpointer": "cpp",
         "qtconcurrent": "cpp",
-        "qhttpserverrequest": "cpp"
+        "qhttpserverrequest": "cpp",
+        "charconv": "cpp",
+        "span": "cpp",
+        "format": "cpp",
+        "stdfloat": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
