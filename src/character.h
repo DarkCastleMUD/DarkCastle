@@ -222,6 +222,15 @@ struct follow_type
     struct follow_type *next;
 };
 
+class Toggle
+{
+    Toggle(QString name, uint_fast8_t shift, QString on_message, QString off_message);
+};
+
+class Toggles
+{
+};
+
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 class Player
@@ -264,7 +273,7 @@ public:
     constexpr static uint32_t PLR_REMORTED = 1U << 30;
     constexpr static uint32_t PLR_NODUPEKEYS = 1U << 31;
 
-    static QStringList toggle_txt;
+    static const QStringList toggle_txt;
 
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */

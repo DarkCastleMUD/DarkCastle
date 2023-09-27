@@ -555,7 +555,7 @@ void Character::display_string_list(const char *list[])
     send_to_char("\r\n", this);
 }
 
-QStringList Player::toggle_txt = {
+const QStringList Player::toggle_txt = {
     "brief",
     "compact",
     "beep",
