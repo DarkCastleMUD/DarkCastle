@@ -15,9 +15,9 @@ Shops::Shops(QObject *parent) : Database(parent)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     // db.setHostName("localhost");
-    db.setDatabaseName("dcastle");
+    // db.setDatabaseName("dcastle");
     // db.setUserName("dcastle");
-    // db.setPassword("password");
+    //  db.setPassword("password");
     bool ok = db.open();
 
     if (!ok)
