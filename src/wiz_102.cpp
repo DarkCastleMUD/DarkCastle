@@ -2965,7 +2965,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     ch->desc->strnew = &(currprog->comlist);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-    if (DC::isSet(ch->player->toggles, PLR_EDITOR_WEB))
+    if (DC::isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       ch->desc->web_connected = Connection::states::EDIT_MPROG;
     }
@@ -4259,7 +4259,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
           DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
-          if (IS_PC(ch) && !DC::isSet(ch->player->toggles, PLR_ONEWAY))
+          if (IS_PC(ch) && !DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
           {
             // if the destination room has a reverse exit
             if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]])
@@ -4288,7 +4288,7 @@ int do_redit(Character *ch, char *argument, int cmd)
                      destination_room);
               return eSUCCESS;
             }
-          } // end of check if PLR_ONEWAY is toggled
+          } // end of check if Player::PLR_ONEWAY is toggled
           return eSUCCESS;
         } // end of is_abbred for dirs
       }   // end of for loop through directions
@@ -4403,7 +4403,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     send_to_char("Ok.\r\n", ch);
 
-    if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, PLR_ONEWAY))
+    if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4417,11 +4417,11 @@ int do_redit(Character *ch, char *argument, int cmd)
         buf = fmt::format("{} redit exit {} {} {} {} {}", d,
                           return_directions[x], DC::getInstance()->world[ch->in_room].number,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
-        SET_BIT(ch->player->toggles, PLR_ONEWAY);
+        SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
         char *tmp = strdup(buf.c_str());
         do_at(ch, tmp, CMD_DEFAULT);
         free(tmp);
-        REMOVE_BIT(ch->player->toggles, PLR_ONEWAY);
+        REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
       }
     }
   }
@@ -4848,14 +4848,14 @@ int do_oneway(Character *ch, char *arg, int cmd)
 
   if (cmd == 1)
   {
-    if (!DC::isSet(ch->player->toggles, PLR_ONEWAY))
-      SET_BIT(ch->player->toggles, PLR_ONEWAY);
+    if (!DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+      SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
     send_to_char("You generate one-way exits.\r\n", ch);
   }
   else
   {
-    if (DC::isSet(ch->player->toggles, PLR_ONEWAY))
-      REMOVE_BIT(ch->player->toggles, PLR_ONEWAY);
+    if (DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+      REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
     send_to_char("You generate two-way exits.\r\n", ch);
   }
   return eSUCCESS;

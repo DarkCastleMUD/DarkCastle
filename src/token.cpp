@@ -24,7 +24,7 @@ extern "C"
 #include "utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "terminal.h"  // colors
 #include "act.h"       // act flags
-#include "player.h"    // PLR_ANSI PLR_VT100
+#include "player.h"    // Player::PLR_ANSI Player::PLR_VT100
 #include "handler.h"   // fname()
 #include "token.h"     // fname()
 #include "connect.h"
@@ -204,8 +204,8 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
       // cerr << "It's ansi or vt100 code" << endl;
 #endif
       if (IS_MOB(send_to) ||
-          (DC::isSet(send_to->player->toggles, PLR_ANSI) && current->IsAnsi()) ||
-          (DC::isSet(send_to->player->toggles, PLR_VT100) && current->IsVt100()))
+          (DC::isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
+          (DC::isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
       {
         switch (current->GetBuf()[1])
         {

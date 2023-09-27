@@ -1053,7 +1053,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  if (IS_MOB(ch) || DC::isSet(ch->player->toggles, PLR_ANSI))
+  if (IS_MOB(ch) || DC::isSet(ch->player->toggles, Player::PLR_ANSI))
   {
     snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
              tmessage, board->second.msgs[tmessage].date.c_str(),
@@ -1122,7 +1122,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
     std::vector<message>::reverse_iterator msg_it;
     i = board->second.msgs.size() - 1;
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
-      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, PLR_ANSI))
+      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, Player::PLR_ANSI))
       {
         snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\n\r",
                  msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());

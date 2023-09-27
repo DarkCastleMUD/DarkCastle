@@ -1359,7 +1359,7 @@ int ambush(Character *ch)
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
 				if (DC::isSet(retval, eCH_DIED))
 					return (eSUCCESS); // doesn't matter, but don't lag vict
-				if (!IS_MOB(i) && DC::isSet(i->player->toggles, PLR_WIMPY))
+				if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_WIMPY))
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
 				else
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);

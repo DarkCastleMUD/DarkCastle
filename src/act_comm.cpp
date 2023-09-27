@@ -223,7 +223,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
       continue;
     if (!i->connected && GET_LEVEL(i->character) >= god_level)
     {
-      if (IS_MOB(i->character) || DC::isSet(i->character->player->toggles, PLR_ANSI))
+      if (IS_MOB(i->character) || DC::isSet(i->character->player->toggles, Player::PLR_ANSI))
         send_to_char(buf1, i->character);
       else
         send_to_char(buf, i->character);

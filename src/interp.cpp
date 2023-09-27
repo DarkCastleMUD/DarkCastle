@@ -131,7 +131,7 @@ struct command_info cmd_info[] =
 
         // Informational commands
         {"alias", do_alias, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"toggle", do_toggle, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"toggle", nullptr, nullptr, &Character::do_toggle, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"consider", do_consider, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"configure", nullptr, nullptr, &Character::do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"credits", do_credits, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},

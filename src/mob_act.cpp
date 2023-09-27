@@ -278,7 +278,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
@@ -364,8 +364,8 @@ void mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                       DC::isSet(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE)))
+            if ((!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                       DC::isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -456,8 +456,8 @@ void mobile_activity(void)
 
           if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
-               !DC::isSet(tmp_ch->player->toggles, PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !DC::isSet(tmp_ch->desc->original->player->toggles, PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
+               !DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
+              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !DC::isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
                ))
           {
             int i = 0;

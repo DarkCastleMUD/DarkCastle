@@ -463,7 +463,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     if (heal < 5)
       heal = 5;
 
-    if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
+    if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
       {

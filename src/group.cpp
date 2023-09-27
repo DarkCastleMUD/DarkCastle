@@ -131,7 +131,7 @@ int do_found(Character *ch, char *argument, int cmd)
   }
 
   SETBIT(ch->affected_by, AFF_GROUP);
-  REMOVE_BIT(ch->player->toggles, PLR_LFG);
+  REMOVE_BIT(ch->player->toggles, Player::PLR_LFG);
   return eSUCCESS;
 }
 
@@ -219,8 +219,8 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
   {
     k->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
     int lost = 0;
-    if (k->clan && get_clan(k)->tax && !DC::isSet(GET_TOGGLES(k), PLR_NOTAX) &&
-        (k->clan != clan || (k->clan == clan && DC::isSet(GET_TOGGLES(this), PLR_NOTAX))))
+    if (k->clan && get_clan(k)->tax && !DC::isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
+        (k->clan != clan || (k->clan == clan && DC::isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
       k->send(QString("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
@@ -238,8 +238,8 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
     {
       f->follower->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
-      if (f->follower->clan && get_clan(f->follower)->tax && !DC::isSet(GET_TOGGLES(f->follower), PLR_NOTAX) &&
-          (f->follower->clan != clan || (f->follower->clan == clan && DC::isSet(GET_TOGGLES(this), PLR_NOTAX))))
+      if (f->follower->clan && get_clan(f->follower)->tax && !DC::isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
+          (f->follower->clan != clan || (f->follower->clan == clan && DC::isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
         lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
         f->follower->send(QString("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
@@ -274,7 +274,7 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
   else
   {
-    if (IS_PC(i) && DC::isSet(i->player->toggles, PLR_ANSI))
+    if (IS_PC(i) && DC::isSet(i->player->toggles, Player::PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
         sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
@@ -417,7 +417,7 @@ int do_group(Character *ch, char *argument, int cmd)
         act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
         SETBIT(victim->affected_by, AFF_GROUP);
         if (IS_PC(victim))
-          REMOVE_BIT(victim->player->toggles, PLR_LFG);
+          REMOVE_BIT(victim->player->toggles, Player::PLR_LFG);
       }
       return eSUCCESS;
       //    }

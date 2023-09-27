@@ -659,7 +659,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return eFAILURE;
 
-        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -2420,7 +2420,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, PLR_NOHASSLE))
+        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))

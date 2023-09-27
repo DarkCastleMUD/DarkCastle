@@ -554,3 +554,24 @@ void Character::display_string_list(const char *list[])
         send_to_char(buf, this);
     send_to_char("\r\n", this);
 }
+
+QStringList Player::toggle_txt = {
+    "brief",
+    "compact",
+    "beep",
+    "anonymous",
+    "ansi",
+    "vt100",
+    "wimpy",
+    "pager",
+    "bard-songs",
+    "auto-eat",
+    "summonable",
+    "lfg",
+    "charmiejoin",
+    "notax",
+    "guide",
+    "news-up",
+    "ascii",
+    "damage",
+    "nodupekeys"};

@@ -331,7 +331,7 @@ bool IS_DARK(int room);
 
 #define AWAKE(ch) (GET_POS(ch) != POSITION_SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : DC::isSet((ch)->player->toggles, PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : DC::isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
@@ -341,7 +341,7 @@ inline const short IS_ANONYMOUS(Character *ch)
   else if (GET_LEVEL(ch) >= 101)
      return 0;
   else
-     return (DC::isSet(ch->player->toggles, PLR_ANONYMOUS) != 0);
+     return (DC::isSet(ch->player->toggles, Player::PLR_ANONYMOUS) != 0);
 }
 */
 /* Object And Carry related macros */

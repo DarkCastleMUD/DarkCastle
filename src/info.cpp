@@ -524,13 +524,13 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
             if (!i->desc)
                buffer = "*linkdead*  ";
-            if (DC::isSet(i->player->toggles, PLR_GUIDE_TOG))
+            if (DC::isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
                buffer.append("$B$7(Guide)$B$3 ");
 
             buffer.append(GET_SHORT(i));
             if ((GET_LEVEL(i) < OVERSEER) && i->clan && (clan = get_clan(i)))
             {
-               if (IS_PC(ch) && !DC::isSet(ch->player->toggles, PLR_BRIEF))
+               if (IS_PC(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
                   buffer.append(buf);
@@ -544,7 +544,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, PLR_BRIEF))
+               if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -1767,7 +1767,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          send_to_char("\n\r", ch);
 
-         if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, PLR_BRIEF))
+         if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
             send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);

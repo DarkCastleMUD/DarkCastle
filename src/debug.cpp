@@ -42,7 +42,7 @@ void test_handle_ansi(string test)
   // cerr <<  "Testing '" << test << "'" << endl;
   Character *ch = new Character;
   ch->player = new Player;
-  SET_BIT(ch->player->toggles, PLR_ANSI);
+  SET_BIT(ch->player->toggles, Player::PLR_ANSI);
   GET_LEVEL(ch) = 1;
 
   // string str1 = "$b$B$1test$R $ $$ $$$ $$$";
@@ -286,10 +286,10 @@ int main(int argc, char **argv)
   d->output = {};
   do_stand(ch, "", CMD_DEFAULT);
   char_to_room(ch, 3001);
-  do_toggle(ch, "pager", CMD_DEFAULT);
-  do_toggle(ch, "ansi", CMD_DEFAULT);
-  // do_toggle(ch, "", CMD_DEFAULT);
-  //  do_goto(ch, "23", CMD_DEFAULT);
+  ch->do_toggle({"pager"}, CMD_DEFAULT);
+  ch->do_toggle({"ansi"}, CMD_DEFAULT);
+  ch->do_toggle({}, CMD_DEFAULT);
+  // do_goto(ch, "23", CMD_DEFAULT);
   do_look(ch, "", CMD_LOOK);
   process_output(d);
 

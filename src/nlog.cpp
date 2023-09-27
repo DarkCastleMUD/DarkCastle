@@ -11,7 +11,7 @@
 #include "character.h"
 #include "utility.h"
 #include "terminal.h"
-#include "player.h" // PLR_ANSI
+#include "player.h" // Player::PLR_ANSI
 #include "utility.h"
 #include <iostream>
 using namespace std;
@@ -168,7 +168,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {
@@ -279,7 +279,7 @@ string handle_ansi(string haystack, Character *ch)
     {
       if (code == true)
       {
-        if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, PLR_ANSI)) || (ch->desc && ch->desc->color))
+        if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
         {
           if (rep.find(c) != rep.end())
           {

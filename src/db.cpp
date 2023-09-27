@@ -6016,8 +6016,8 @@ void init_char(Character *ch)
 	for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
 		ch->player->quest_complete[j] = 0;
 
-	SET_BIT(ch->player->toggles, PLR_ANSI);
-	SET_BIT(ch->player->toggles, PLR_DAMAGE);
+	SET_BIT(ch->player->toggles, Player::PLR_ANSI);
+	SET_BIT(ch->player->toggles, Player::PLR_DAMAGE);
 	int i;
 	for (i = 0; i < AFF_MAX / ASIZE + 1; i++)
 		ch->affected_by[i] = 0;

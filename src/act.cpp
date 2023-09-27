@@ -85,7 +85,7 @@ act_return act(
   }
   else if (destination == TO_CHAR)
   {
-    if (!DC::isSet(flags, BARDSONG) || ch->player == nullptr || !DC::isSet(ch->player->toggles, PLR_BARD_SONG))
+    if (!DC::isSet(flags, BARDSONG) || ch->player == nullptr || !DC::isSet(ch->player->toggles, Player::PLR_BARD_SONG))
     {
       st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
       retval |= st_return.retval;
@@ -112,7 +112,7 @@ act_return act(
         }
         if (tmp_char->position > POSITION_SLEEPING || DC::isSet(flags, ASLEEP))
         {
-          if (!DC::isSet(flags, BARDSONG) || tmp_char->player == nullptr || !DC::isSet(tmp_char->player->toggles, PLR_BARD_SONG))
+          if (!DC::isSet(flags, BARDSONG) || tmp_char->player == nullptr || !DC::isSet(tmp_char->player->toggles, Player::PLR_BARD_SONG))
           {
             st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char);
             retval |= st_return.retval;

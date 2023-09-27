@@ -28,43 +28,6 @@
 #define FULL 1
 #define THIRST 2
 
-/************************************************************************
-| Player vectors
-| Character->player->toggles
-*/
-#define PLR_BRIEF 1U
-#define PLR_COMPACT 1U << 1
-#define PLR_DONTSET 1U << 2
-#define PLR_DONOTUSE 1U << 3
-#define PLR_NOHASSLE 1U << 4
-#define PLR_SUMMONABLE 1U << 5
-#define PLR_WIMPY 1U << 6
-#define PLR_ANSI 1U << 7
-#define PLR_VT100 1U << 8
-#define PLR_ONEWAY 1U << 9
-#define PLR_DISGUISED 1U << 10
-#define PLR_UNUSED 1U << 11
-#define PLR_PAGER 1U << 12
-#define PLR_BEEP 1U << 13
-#define PLR_BARD_SONG 1U << 14
-#define PLR_ANONYMOUS 1U << 15
-#define PLR_AUTOEAT 1U << 16
-#define PLR_LFG 1U << 17
-#define PLR_CHARMIEJOIN 1U << 18
-#define PLR_NOTAX 1U << 19
-#define PLR_GUIDE 1U << 20
-#define PLR_GUIDE_TOG 1U << 21
-#define PLR_NEWS 1U << 22
-#define PLR_50PLUS 1U << 23
-#define PLR_ASCII 1U << 24
-#define PLR_DAMAGE 1U << 25
-#define PLR_CLS_TREE_A 1U << 26
-#define PLR_CLS_TREE_B 1U << 27
-#define PLR_CLS_TREE_C 1U << 28 // might happen one day
-#define PLR_EDITOR_WEB 1U << 29
-#define PLR_REMORTED 1U << 30
-#define PLR_NODUPEKEYS 1U << 31
-
 /*  For cut and paste purposes
    switch(GET_CLASS(mob))
    {

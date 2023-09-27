@@ -835,7 +835,7 @@ void DC::game_loop(void)
         new_string_add(d, comm.data());
       else if (d->hashstr)
         string_hash_add(d, comm.data());
-      else if (d->strnew && (IS_MOB(d->character) || !DC::isSet(d->character->player->toggles, PLR_EDITOR_WEB)))
+      else if (d->strnew && (IS_MOB(d->character) || !DC::isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
         new_string_add(d, comm.data());
       else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
@@ -1445,7 +1445,7 @@ void make_prompt(class Connection *d, string &prompt)
   }
   else if (d->strnew)
   {
-    if (IS_PC(d->character) && DC::isSet(d->character->player->toggles, PLR_EDITOR_WEB))
+    if (IS_PC(d->character) && DC::isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB))
     {
       prompt += "Web Editor] ";
     }
@@ -1468,7 +1468,7 @@ void make_prompt(class Connection *d, string &prompt)
   }
   else
   {
-    if (!DC::isSet(GET_TOGGLES(d->character), PLR_COMPACT))
+    if (!DC::isSet(GET_TOGGLES(d->character), Player::PLR_COMPACT))
       prompt += "\n\r";
     if (!GET_PROMPT(d->character))
       prompt += "type 'help prompt'> ";
@@ -2133,7 +2133,7 @@ int process_output(class Connection *t)
   i += t->output;
 
   if (t->character && t->connected == Connection::states::PLAYING)
-    blackjack_prompt(t->character, i, t->character->player && !DC::isSet(t->character->player->toggles, PLR_ASCII));
+    blackjack_prompt(t->character, i, t->character->player && !DC::isSet(t->character->player->toggles, Player::PLR_ASCII));
   make_prompt(t, i);
 
   /*
@@ -2758,7 +2758,7 @@ int close_socket(class Connection *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if (d->strnew && (IS_MOB(d->character) || !DC::isSet(d->character->player->toggles, PLR_EDITOR_WEB)))
+  if (d->strnew && (IS_MOB(d->character) || !DC::isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
     strcpy(idiotbuf, "/s\n\r");
     strcat(idiotbuf, "\0");
@@ -3232,12 +3232,12 @@ void ansi_color(char *txt, Character *ch)
   if (txt != nullptr && ch->desc != nullptr)
   {
     if (!IS_MOB(ch) &&
-        !DC::isSet(GET_TOGGLES(ch), PLR_ANSI) &&
-        !DC::isSet(GET_TOGGLES(ch), PLR_VT100))
+        !DC::isSet(GET_TOGGLES(ch), Player::PLR_ANSI) &&
+        !DC::isSet(GET_TOGGLES(ch), Player::PLR_VT100))
       return;
     else if (!IS_MOB(ch) &&
-             DC::isSet(GET_TOGGLES(ch), PLR_VT100) &&
-             !DC::isSet(GET_TOGGLES(ch), PLR_ANSI))
+             DC::isSet(GET_TOGGLES(ch), Player::PLR_VT100) &&
+             !DC::isSet(GET_TOGGLES(ch), Player::PLR_ANSI))
     {
       if ((!strcmp(txt, GREEN)) || (!strcmp(txt, RED)) || (!strcmp(txt, BLUE)) || (!strcmp(txt, BLACK)) || (!strcmp(txt, CYAN)) || (!strcmp(txt, GREY)) || (!strcmp(txt, EEEE)) || (!strcmp(txt, YELLOW)) || (!strcmp(txt, PURPLE)))
         return;
@@ -3446,7 +3446,7 @@ int do_editor(Character *ch, char *argument, int cmd)
   if (IS_MOB(ch))
     return eFAILURE;
 
-  csendf(ch, "Current editor: %s\n\r\n\r", DC::isSet(ch->player->toggles, PLR_EDITOR_WEB) ? "web" : "game");
+  csendf(ch, "Current editor: %s\n\r\n\r", DC::isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
 
   one_argument(argument, arg1);
 
@@ -3454,14 +3454,14 @@ int do_editor(Character *ch, char *argument, int cmd)
   {
     if (!strcmp(arg1, "web"))
     {
-      SET_BIT(ch->player->toggles, PLR_EDITOR_WEB);
+      SET_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       send_to_char("Changing to web editor.\r\n", ch);
       send_to_char("Ok.\r\n", ch);
       return eSUCCESS;
     }
     else if (!strcmp(arg1, "game"))
     {
-      REMOVE_BIT(ch->player->toggles, PLR_EDITOR_WEB);
+      REMOVE_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
       send_to_char("Changing to in game line editor.\r\n", ch);
       send_to_char("Ok.\r\n", ch);
       return eSUCCESS;

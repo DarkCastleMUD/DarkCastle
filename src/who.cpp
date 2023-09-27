@@ -494,11 +494,11 @@ int do_who(Character *ch, char *argument, int cmd)
       {
         continue;
       }
-      if (lfgcheck && !DC::isSet(i->player->toggles, PLR_LFG))
+      if (lfgcheck && !DC::isSet(i->player->toggles, Player::PLR_LFG))
       {
         continue;
       }
-      if (guidecheck && !DC::isSet(i->player->toggles, PLR_GUIDE_TOG))
+      if (guidecheck && !DC::isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
       {
         continue;
       }
@@ -594,7 +594,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *tailBuf = '\0'; // clear it
     }
 
-    if (DC::isSet(i->player->toggles, PLR_GUIDE_TOG))
+    if (DC::isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
     {
       strcpy(preBuf, "$7$B(Guide)$R ");
     }
@@ -603,7 +603,7 @@ int do_who(Character *ch, char *argument, int cmd)
       *preBuf = '\0';
     }
 
-    if (DC::isSet(i->player->toggles, PLR_LFG))
+    if (DC::isSet(i->player->toggles, Player::PLR_LFG))
     {
       strcat(tailBuf, "$3(LFG) ");
     }

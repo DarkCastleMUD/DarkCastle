@@ -610,7 +610,7 @@ void advance_level(Character *ch, int is_conversion)
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (GET_LEVEL(ch) > 10 && !DC::isSet(ch->player->toggles, PLR_REMORTED))
+	if (GET_LEVEL(ch) > 10 && !DC::isSet(ch->player->toggles, Player::PLR_REMORTED))
 	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
@@ -775,7 +775,7 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
@@ -791,7 +791,7 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
@@ -1058,9 +1058,9 @@ void prepare_character_for_sixty(Character *ch)
 			skl = SKILL_SONG_HYPNOTIC_HARMONY;
 			break;
 		}
-		if (has_skill(ch, skl) && !DC::isSet(ch->player->toggles, PLR_50PLUS))
+		if (has_skill(ch, skl) && !DC::isSet(ch->player->toggles, Player::PLR_50PLUS))
 		{
-			SET_BIT(ch->player->toggles, PLR_50PLUS);
+			SET_BIT(ch->player->toggles, Player::PLR_50PLUS);
 			int i = (ch->exp / 100000000) * 500000;
 			if (i > 0)
 			{

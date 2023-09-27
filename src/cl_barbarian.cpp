@@ -614,7 +614,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
 
   if (!DC::isSet(retval, eCH_DIED))
   {
-    if (!DC::isSet(retval, eVICT_DIED) && IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_WIMPY))
+    if (!DC::isSet(retval, eVICT_DIED) && IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);

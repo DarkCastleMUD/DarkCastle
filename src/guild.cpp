@@ -936,19 +936,19 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   { // remort crap
     int groupnumber;
 
-    if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_A))
+    if (DC::isSet(ch->player->toggles, Player::PLR_CLS_TREE_A))
     {
-      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_A);
+      REMOVE_BIT(ch->player->toggles, Player::PLR_CLS_TREE_A);
       groupnumber = 1;
     }
-    else if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_B))
+    else if (DC::isSet(ch->player->toggles, Player::PLR_CLS_TREE_B))
     {
-      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_B);
+      REMOVE_BIT(ch->player->toggles, Player::PLR_CLS_TREE_B);
       groupnumber = 2;
     }
-    else if (DC::isSet(ch->player->toggles, PLR_CLS_TREE_C))
+    else if (DC::isSet(ch->player->toggles, Player::PLR_CLS_TREE_C))
     {
-      REMOVE_BIT(ch->player->toggles, PLR_CLS_TREE_C);
+      REMOVE_BIT(ch->player->toggles, Player::PLR_CLS_TREE_C);
       groupnumber = 3;
     }
     else
@@ -973,7 +973,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("You have remorted back to level 50.\r\n", ch);
     if (GET_LEVEL(ch) <= MAX_MORTAL)
       GET_LEVEL(ch) = 50;
-    SET_BIT(ch->player->toggles, PLR_REMORTED);
+    SET_BIT(ch->player->toggles, Player::PLR_REMORTED);
 
     ch->save(666);
     return eSUCCESS;

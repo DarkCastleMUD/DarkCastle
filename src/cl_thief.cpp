@@ -114,7 +114,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
-  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_WIMPY)))
+  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | eSUCCESS;
 }
@@ -2187,7 +2187,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   // if the victim died and the character did not die
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
-    if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_WIMPY))
+    if (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }

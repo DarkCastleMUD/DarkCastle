@@ -155,21 +155,21 @@ int do_guide(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!DC::isSet(victim->player->toggles, PLR_GUIDE))
+  if (!DC::isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
     sprintf(buf, "%s is now a guide.\r\n", GET_NAME(victim));
     send_to_char(buf, ch);
     send_to_char("You have been selected to be a DC Guide!\r\n", victim);
-    SET_BIT(victim->player->toggles, PLR_GUIDE);
-    SET_BIT(victim->player->toggles, PLR_GUIDE_TOG);
+    SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
+    SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
     sprintf(buf, "%s is no longer a guide.\r\n", GET_NAME(victim));
     send_to_char(buf, ch);
     send_to_char("You have been removed as a DC guide.\r\n", victim);
-    REMOVE_BIT(victim->player->toggles, PLR_GUIDE);
-    REMOVE_BIT(victim->player->toggles, PLR_GUIDE_TOG);
+    REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
+    REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
 
   return eSUCCESS;

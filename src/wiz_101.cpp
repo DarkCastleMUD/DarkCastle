@@ -657,14 +657,14 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, PLR_NOHASSLE))
+  if (DC::isSet(ch->player->toggles, Player::PLR_NOHASSLE))
   {
-    REMOVE_BIT(ch->player->toggles, PLR_NOHASSLE);
+    REMOVE_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
     send_to_char("Mobiles can bother you again.\r\n", ch);
   }
   else
   {
-    SET_BIT(ch->player->toggles, PLR_NOHASSLE);
+    SET_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
     send_to_char("Those pesky mobiles will leave you alone now.\r\n", ch);
   }
   return eSUCCESS;

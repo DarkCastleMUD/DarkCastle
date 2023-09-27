@@ -227,6 +227,45 @@ struct follow_type
 class Player
 {
 public:
+    /************************************************************************
+    | Player vectors
+    | Character->player->toggles
+    */
+    constexpr static uint32_t PLR_BRIEF = 1U;
+    constexpr static uint32_t PLR_COMPACT = 1U << 1;
+    constexpr static uint32_t PLR_DONTSET = 1U << 2;
+    constexpr static uint32_t PLR_DONOTUSE = 1U << 3;
+    constexpr static uint32_t PLR_NOHASSLE = 1U << 4;
+    constexpr static uint32_t PLR_SUMMONABLE = 1U << 5;
+    constexpr static uint32_t PLR_WIMPY = 1U << 6;
+    constexpr static uint32_t PLR_ANSI = 1U << 7;
+    constexpr static uint32_t PLR_VT100 = 1U << 8;
+    constexpr static uint32_t PLR_ONEWAY = 1U << 9;
+    constexpr static uint32_t PLR_DISGUISED = 1U << 10;
+    constexpr static uint32_t PLR_UNUSED = 1U << 11;
+    constexpr static uint32_t PLR_PAGER = 1U << 12;
+    constexpr static uint32_t PLR_BEEP = 1U << 13;
+    constexpr static uint32_t PLR_BARD_SONG = 1U << 14;
+    constexpr static uint32_t PLR_ANONYMOUS = 1U << 15;
+    constexpr static uint32_t PLR_AUTOEAT = 1U << 16;
+    constexpr static uint32_t PLR_LFG = 1U << 17;
+    constexpr static uint32_t PLR_CHARMIEJOIN = 1U << 18;
+    constexpr static uint32_t PLR_NOTAX = 1U << 19;
+    constexpr static uint32_t PLR_GUIDE = 1U << 20;
+    constexpr static uint32_t PLR_GUIDE_TOG = 1U << 21;
+    constexpr static uint32_t PLR_NEWS = 1U << 22;
+    constexpr static uint32_t PLR_50PLUS = 1U << 23;
+    constexpr static uint32_t PLR_ASCII = 1U << 24;
+    constexpr static uint32_t PLR_DAMAGE = 1U << 25;
+    constexpr static uint32_t PLR_CLS_TREE_A = 1U << 26;
+    constexpr static uint32_t PLR_CLS_TREE_B = 1U << 27;
+    constexpr static uint32_t PLR_CLS_TREE_C = 1U << 28; // might happen one day
+    constexpr static uint32_t PLR_EDITOR_WEB = 1U << 29;
+    constexpr static uint32_t PLR_REMORTED = 1U << 30;
+    constexpr static uint32_t PLR_NODUPEKEYS = 1U << 31;
+
+    static QStringList toggle_txt;
+
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */
 
@@ -567,6 +606,7 @@ public:
     command_return_t do_cdeposit(QStringList arguments, int cmd);
     command_return_t generic_command(QStringList arguments, int cmd);
     command_return_t do_sockets(QStringList arguments, int cmd);
+    command_return_t do_toggle(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);

@@ -259,7 +259,7 @@ void perform_violence(void)
       retval = check_joincharmie(ch);
     if (SOMEONE_DIED(retval))
       continue;
-    if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN))
+    if (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN))
     {
       if (ch->followers)
       {
@@ -2845,7 +2845,7 @@ int damage(Character *ch, Character *victim,
           SET_BIT(retval, check_joincharmie(ch));
       if (SOMEONE_DIED(retval))
         return debug_retval(ch, victim, retval);
-      if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
+      if (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
       {
         if (ch->followers)
         {
@@ -2989,7 +2989,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
     {
       if (tmpch == ch || tmpch == victim)
         continue;
-      if (IS_PC(tmpch) && DC::isSet(tmpch->player->toggles, PLR_DAMAGE))
+      if (IS_PC(tmpch) && DC::isSet(tmpch->player->toggles, Player::PLR_DAMAGE))
         send_tokens(tokens, ch, obj, victim, 0, tmpch);
       else
         send_tokens(tokens2, ch, obj, victim, 0, tmpch);
@@ -2997,14 +2997,14 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
   }
   else if (to == TO_CHAR)
   {
-    if (IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE))
+    if (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, ch);
     else
       send_tokens(tokens2, ch, obj, victim, 0, ch);
   }
   else if (to == TO_VICT)
   {
-    if (IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE))
+    if (IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE))
       send_tokens(tokens, ch, obj, victim, 0, victim);
     else
       send_tokens(tokens2, ch, obj, victim, 0, victim);
@@ -4255,7 +4255,7 @@ void stop_fighting(Character *ch, int clearlag)
   update_pos(ch);
 
   // Remove ch's lag if he wasn't using wimpy.
-  if (IS_PC(ch) && ch->desc && !DC::isSet(ch->player->toggles, PLR_WIMPY) && clearlag)
+  if (IS_PC(ch) && ch->desc && !DC::isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
     ch->desc->wait = 0;
 
   if (ch == combat_next_dude)
@@ -6242,16 +6242,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
     else if (has_skill(victim, SKILL_TUMBLING))
@@ -6260,15 +6260,15 @@ void dam_message(int dam, Character *ch, Character *victim,
       {
         sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
         sprintf(dammsg, " for $B%d$R damage", dam);
-        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
       else
       {
         sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
         sprintf(dammsg, ", dealing $B%d$R damage", dam);
-        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "");
-        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
+        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "");
       }
     }
     else
@@ -6278,16 +6278,16 @@ void dam_message(int dam, Character *ch, Character *victim,
         if (!attack)
           attack = races[GET_RACE(ch)].unarmed;
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
       else
       {
         if (!attack)
           attack = attack_table[w_type];
         sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
-        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
-        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
+        sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", shield, attack, punct);
+        sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", attack, shield, punct);
       }
     }
   }
@@ -6301,16 +6301,16 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
     else
     {
       if (!attack)
         attack = attack_table[w_type];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
-      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
-      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
+      sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, IS_PC(victim) && DC::isSet(victim->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
   //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -7395,7 +7395,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
       }   // end of if npc
       else
       {
-        if (DC::isSet(victim->player->toggles, PLR_WIMPY))
+        if (DC::isSet(victim->player->toggles, Player::PLR_WIMPY))
         {
           if ((!IS_AFFECTED(victim, AFF_PARALYSIS)) &&
               (!DC::isSet(victim->combat, COMBAT_STUNNED)) &&

@@ -1139,7 +1139,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 			{
@@ -1483,7 +1483,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 				sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
@@ -1579,7 +1579,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 		if (heal < 5)
 			heal = 5;
 
-		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, PLR_DAMAGE))
+		if (IS_PC(tmp_char) && DC::isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
 		{
 			if (tmp_char == ch)
 			{

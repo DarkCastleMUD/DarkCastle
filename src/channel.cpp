@@ -932,7 +932,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
 
         if (IS_PC(ch) && IS_PC(vict))
         {
@@ -959,7 +959,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
         if (IS_PC(ch) && IS_PC(vict))
           vict->player->last_tell = GET_NAME(ch);
       }
@@ -988,7 +988,7 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
 
         if (IS_PC(ch) && IS_PC(vict))
           vict->player->last_tell = GET_NAME(ch);

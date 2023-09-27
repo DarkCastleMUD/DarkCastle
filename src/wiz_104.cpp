@@ -2366,7 +2366,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		ch->desc->strnew = &(currprog->comlist);
 		ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-		if (DC::isSet(ch->player->toggles, PLR_EDITOR_WEB))
+		if (DC::isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
 		{
 			ch->desc->web_connected = Connection::states::EDIT_MPROG;
 		}

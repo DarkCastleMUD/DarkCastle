@@ -566,7 +566,6 @@ command_return_t do_thunder(Character *ch, char *argument, int cmd);
 command_return_t do_tick(Character *ch, char *argument, int cmd);
 command_return_t do_time(Character *ch, char *argument, int cmd);
 command_return_t do_title(Character *ch, char *argument, int cmd);
-command_return_t do_toggle(Character *ch, char *argument, int cmd);
 command_return_t do_track(Character *ch, char *argument, int cmd);
 command_return_t do_transfer(Character *ch, string argument, int cmd = CMD_DEFAULT);
 command_return_t do_triage(Character *ch, char *argument, int cmd);
