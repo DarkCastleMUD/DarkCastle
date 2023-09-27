@@ -8,6 +8,11 @@
 #include <queue>
 #include <cassert>
 
+#include <QtSql/QSqlRelationalTableModel>
+#include <QtSql/QSqlRecord>
+#include <QtSql/QSqlField>
+#include <QtSql/QSqlError>
+
 #include "spells.h"
 #include "connect.h"
 #include "utility.h"
@@ -187,42 +192,43 @@ void showObject(Character *ch, Object *obj)
   // cerr <<  " " << obj->short_description << " in " << GET_NAME(ch) << endl;
 }
 
+void testStrings(void)
+{
+  test_handle_ansi("");
+  test_handle_ansi("$");
+  test_handle_ansi("$$");
+  test_handle_ansi("$$$");
+  test_handle_ansi("$ $$ $$$");
+  test_handle_ansi("$$$$$$$$");
+  test_handle_ansi("$ ");
+  test_handle_ansi("$x");
+  test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
+
+  char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
+  string arg1 = {}, remainder = "charm sleep ";
+  do
+  {
+    tie(arg1, remainder) = half_chop(remainder);
+
+    half_chop(c_input, c_arg1, c_arg2);
+    strncpy(c_input, c_arg2, sizeof(c_input) - 1);
+
+    assert(arg1 == c_arg1);
+
+    cerr << "[" << arg1 << "]"
+         << "[" << remainder << "]" << endl;
+    cerr << "[" << c_arg1 << "]"
+         << "[" << c_arg2 << "]" << endl;
+  } while (arg1.empty() == false && c_arg1[0] != '\0');
+
+  cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
+}
+
 int main(int argc, char **argv)
 {
-  // Tests only
-  if (argc < 2)
-  {
-    test_handle_ansi("");
-    test_handle_ansi("$");
-    test_handle_ansi("$$");
-    test_handle_ansi("$$$");
-    test_handle_ansi("$ $$ $$$");
-    test_handle_ansi("$$$$$$$$");
-    test_handle_ansi("$ ");
-    test_handle_ansi("$x");
-    test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
-
-    string arg1 = {}, remainder = "charm sleep ";
-    do
-    {
-      tie(arg1, remainder) = half_chop(remainder);
-      // cerr << "[" << arg1 << "]" << "[" << remainder << "]" << endl;
-    } while (arg1.empty() == false);
-
-    char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
-    do
-    {
-      half_chop(c_input, c_arg1, c_arg2);
-      // cerr << "[" << c_arg1 << "]" << "[" << c_arg2 << "]" << endl;
-      strncpy(c_input, c_arg2, sizeof(c_input) - 1);
-    } while (c_arg1[0] != '\0');
-
-    // cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
-
-    exit(0);
-  }
-
   DC debug(argc, argv);
+
+  testStrings();
 
   string orig_cwd, dclib;
   if (getenv("DCLIB"))
@@ -293,7 +299,71 @@ int main(int argc, char **argv)
   do_look(ch, "", CMD_LOOK);
   process_output(d);
 
-  if (argv[1] == string("all") || argv[1] == string("leaderboard"))
+  qDebug("\n");
+
+  qsizetype size_bits = 8 * sizeof(ch->player->toggles);
+  const char *data = reinterpret_cast<const char *>(&ch->player->toggles);
+  QBitArray ba;
+  if (data)
+  {
+    ba = QBitArray::fromBits(data, size_bits);
+  }
+
+  qDebug() << ch->player->toggles;
+  const uint32_t *nr = reinterpret_cast<const uint32_t *>(ba.bits());
+  qDebug() << *nr;
+  qDebug() << ba;
+
+  QSqlDatabase db = QSqlDatabase::database();
+  if (!db.isValid())
+  {
+    db.close();
+    db = QSqlDatabase::addDatabase("QPSQL");
+    // db.setHostName("localhost");
+    // db.setDatabaseName("dcastle");
+    // db.setUserName("dcastle");
+    db.open();
+  }
+
+  if (!db.isValid())
+  {
+    qDebug("Database error");
+    exit(1);
+  }
+
+  QSqlTableModel model{&debug, db};
+  model.setEditStrategy(QSqlTableModel::EditStrategy::OnFieldChange);
+  model.setTable("player_configurations");
+  model.select();
+  int row = model.rowCount();
+  qDebug() << "Rows: " << row;
+  model.insertRows(row, 1);
+  qDebug() << QVariant(ba);
+  int field_index = model.fieldIndex("testbit");
+  bool success = model.setData(model.index(row, field_index), ba.toUInt32(QSysInfo::ByteOrder));
+  if (!success)
+  {
+    qDebug("Failed to setData\n");
+    qDebug() << model.lastError();
+    exit(1);
+  }
+  if (!model.submitAll())
+  {
+    qDebug("Failed to submitAll");
+    qDebug() << model.lastError();
+    exit(1);
+  }
+
+  if (model.rowCount() > 0)
+  {
+    for (int row = 0; row < model.rowCount(); row++)
+    {
+      QSqlRecord rec = model.record(row);
+      qDebug() << rec.field("testbit");
+    }
+  }
+
+  if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {
     Object *obj = nullptr;
     string savepath = dclib + "../save/";
