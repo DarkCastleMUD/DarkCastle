@@ -620,26 +620,27 @@ int meta_get_ki_exp_cost(Character *ch)
 	return (int)(cost * 1.2);
 }
 
-int meta_get_ki_plat_cost(Character *ch)
+uint64_t meta_get_ki_plat_cost(Character *ch)
 {
-	int cost, stat;
+	uint64_t cost{};
+	uint64_t stat{};
+	const uint64_t adjusted_max_ki = MIN(250UL, MAX(0, GET_MAX_KI(ch)));
+
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_MONK:
-		cost = 500;
-		stat = GET_RAW_WIS(ch) - 15;
-		stat = MAX(0, stat);
+		cost = 500UL;
+		stat = MAX(0UL, GET_RAW_WIS(ch) - 15UL);
 		break;
 	case CLASS_BARD:
-		cost = 400;
-		stat = GET_RAW_INT(ch) - 15;
-		stat = MAX(0, stat);
+		cost = 400UL;
+		stat = MAX(0UL, GET_RAW_INT(ch) - 15UL);
 		break;
 	default:
-		return 0;
+		return 0UL;
 	}
-	cost = 500 + cost + (((GET_MAX_KI(ch) - stat) / 2) * ((GET_MAX_KI(ch) - stat) / 10));
-	return (int)(cost * 0.9);
+	cost = 500UL + cost + (((adjusted_max_ki - stat) / 2UL) * ((adjusted_max_ki - stat) / 10UL));
+	return static_cast<uint64_t>(cost * 0.9);
 }
 
 int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
