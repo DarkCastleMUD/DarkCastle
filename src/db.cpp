@@ -4576,7 +4576,7 @@ uint64_t countMobsInWorld(uint64_t vnum)
 	uint64_t count = {};
 	for (const auto ch : DC::getInstance()->character_list)
 	{
-		if (ch->mobdata && mob_index[ch->mobdata->nr].virt == vnum)
+		if (ch->mobdata && mob_index[ch->mobdata->nr].virt == vnum && ch->in_room != DC::NOWHERE)
 		{
 			count++;
 		}
