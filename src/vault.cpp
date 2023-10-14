@@ -67,7 +67,6 @@ vault_search_parameter::~vault_search_parameter()
   }
 }
 
-
 int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 
@@ -380,32 +379,50 @@ int do_vault(Character *ch, char *argument, int cmd)
   else if (!strncmp(arg, "withdraw", strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
-    if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, clanVName(ch->clan));
-    if (!*argument)
+
+    if (arg2)
     {
-      send_to_char("How much $B$5gold$R would you like get from the vault?\r\n", ch);
-      return eSUCCESS;
+      if (!str_cmp(arg2, "clan") && ch->clan)
+      {
+        strcpy(arg2, clanVName(ch->clan));
+      }
+      else if (!*arg2)
+      {
+        sprintf(arg2, "%s", GET_NAME(ch));
+      }
     }
-    else if (!*arg2)
-      sprintf(arg2, "%s", GET_NAME(ch));
-    vault_withdraw(ch, atoi(argument), arg2);
+
+    bool ok = false;
+    auto amount = QString(argument).toUInt(&ok);
+    if (!ok)
+    {
+      amount = 0;
+    }
+    vault_withdraw(ch, amount, arg2);
   }
   else if (!strncmp(arg, "deposit", strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
-    if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, clanVName(ch->clan));
-    if (!*argument)
-    {
-      send_to_char("How much $B$5gold$R would you like to place in the vault?\r\n", ch);
-      return eSUCCESS;
-    }
-    else if (!*arg2)
-      sprintf(arg2, "%s", GET_NAME(ch));
-    vault_deposit(ch, atoi(argument), arg2);
 
-    // put something in your vault
+    if (arg2)
+    {
+      if (!str_cmp(arg2, "clan") && ch->clan)
+      {
+        strcpy(arg2, clanVName(ch->clan));
+      }
+      else if (!*arg2)
+      {
+        sprintf(arg2, "%s", GET_NAME(ch));
+      }
+    }
+
+    bool ok = false;
+    auto amount = QString(argument).toUInt(&ok);
+    if (!ok)
+    {
+      amount = 0;
+    }
+    vault_deposit(ch, amount, arg2);
   }
   else if (!strncmp(arg, "put", strlen(arg)))
   {
@@ -1527,15 +1544,16 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     return;
   }
 
-  if (!amount)
+  auto max_amount = MIN(ch->getGold(), VAULT_MAX_DEPWITH);
+  if (!max_amount)
   {
-    send_to_char("How much gold would you like to place in the vault?\r\n", ch);
+    ch->send("You don't have any $B$5gold$R to deposit.\r\n");
     return;
   }
 
-  if (amount > VAULT_MAX_DEPWITH || amount <= 0)
+  if (amount < 1 || amount > max_amount)
   {
-    csendf(ch, "Valid amounts are from 1 to %d gold.\r\n", VAULT_MAX_DEPWITH);
+    ch->send(QString("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
     return;
   }
 
@@ -1547,7 +1565,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     save_vault(owner);
     sprintf(buf, "%s added %d gold to %s's vault.", GET_NAME(ch), amount, owner);
     vlog(buf, owner);
-    csendf(ch, "Done!  The current balance is now %llu $B$5gold$R.\r\n", vault->gold);
+    csendf(ch, "You deposit %llu $B$5gold$R into the vault. Its new balance is %llu $B$5gold$R.\r\nYou have %llu $B$5gold$R left on you.\r\n", amount, vault->gold, ch->getGold());
   }
   else
   {
@@ -1576,19 +1594,14 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to put gold in %s's vault.\r\n", owner);
+    csendf(ch, "You don't have permission to put $B$5gold$R in %s's vault.\r\n", owner);
     return;
   }
 
-  if (!amount)
+  auto max_amount = MIN(vault->gold, VAULT_MAX_DEPWITH);
+  if (amount < 1 || amount > max_amount)
   {
-    send_to_char("How much $B$5gold$R would you like get from the vault?\r\n", ch);
-    return;
-  }
-
-  if (amount > VAULT_MAX_DEPWITH || amount <= 0)
-  {
-    csendf(ch, "Valid amounts are from 1 to %d gold.\r\n", VAULT_MAX_DEPWITH);
+    ch->send(QString("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
     return;
   }
 
@@ -1604,7 +1617,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
     save_vault(owner);
     sprintf(buf, "%s removed %d gold from %s's vault.", GET_NAME(ch), amount, owner);
     vlog(buf, owner);
-    csendf(ch, "Done!  The current balance is now %llu gold.\r\n", vault->gold);
+    csendf(ch, "You withdraw %llu $B$5gold$R from the vault. Its new balance is %llu $B$5gold$R.\r\nYou have %llu $B$5gold$R left on you.\r\n", amount, vault->gold, ch->getGold());
   }
   else
   {
