@@ -14,11 +14,12 @@ jobs:
             qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git
           zypper -n dup --auto-agree-with-licenses
 
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
       
       - name: make
         run: |
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cat src/version.h
           grep version.h src/DC.cpp
-          make -C build -j$(grep -c process /proc/cpuinfo) VERBOSE=1
+          make -C build -j$(grep -c process /proc/cpuinfo)
