@@ -17,6 +17,7 @@ jobs:
 
       - name: make
         run: |
-          ls
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          make -C build -j$(grep -c process /proc/cpuinfo)
+          cat src/version.h
+          grep version.h src/DC.cpp
+          make -C build -j$(grep -c process /proc/cpuinfo) VERBOSE=1
