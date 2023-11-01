@@ -8,13 +8,14 @@ jobs:
     container: opensuse/tumbleweed
 
     steps:
-      - uses: actions/checkout@v2
       - name: install dependencies
         run: |
           zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
             qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git
           zypper -n dup --auto-agree-with-licenses
 
+      - uses: actions/checkout@v2
+      
       - name: make
         run: |
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
