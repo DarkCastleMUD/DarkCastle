@@ -20,6 +20,7 @@ jobs:
       - name: make
         run: |
           set -x
+          git config --global --add safe.directory /__w/DarkCastle/DarkCastle
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
           git describe --tags --always --abbrev=8
           cat src/version.h
