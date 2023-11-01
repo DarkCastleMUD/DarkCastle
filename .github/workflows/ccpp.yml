@@ -2,22 +2,23 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [master]
   pull_request:
-    branches: [master]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: opensuse/tumbleweed
 
     steps:
       - uses: actions/checkout@v2
-      - name: install ubuntu software
+      - name: install dependencies
         run: |
-          sudo apt update
-          sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++ scons libcurl4 libpq-dev libpq5 libcurl4-openssl-dev \
-                           unzip zlib1g-dev libfmt-dev cmake qt6-base-dev libssh-dev qt6-base-dev
+          zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
+            qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel
+          zypper -n dup --auto-agree-with-licenses
+
       - name: make
         run: |
-          cmake -S src -B build
+          ls
+          cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
           make -C build -j$(grep -c process /proc/cpuinfo)
