@@ -705,19 +705,25 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         return eFAILURE;
       }
 
-      int vnum = 0;
+      room_t vnum = 0;
+      uint_fast8_t argument_number = 0;
+      decltype(zone.cmd[cmd]->arg1) original_value = 0, new_value = 0;
+      QString change_type;
       if (isname(select, "1"))
       {
+        argument_number = 1;
         switch (zone.cmd[cmd]->command)
         {
         case 'M':
           j = real_mobile(i);
+          original_value = mob_index[zone.cmd[cmd]->arg1].virt;
           break;
         case 'P':
         case 'G':
         case 'O':
         case 'E':
           j = real_object(i);
+          original_value = obj_index[zone.cmd[cmd]->arg1].virt;
           break;
         case 'X':
         case 'K':
@@ -727,56 +733,85 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         case '*':
         default:
           j = i;
+          original_value = i;
           break;
         }
         zone.cmd[cmd]->arg1 = j;
-        ch->send(QString("Arg 1 set to %1.\r\n").arg(i));
+        new_value = i;
       }
       else if (isname(select, "2"))
       {
+        argument_number = 2;
         switch (zone.cmd[cmd]->command)
         {
-        case 'K':
-        case 'X':
-          ch->send("There is no arg2 for X commands.\r\n");
+        case 'M': // Load mobile
+        case 'P': // Put object in object
+        case 'E': // Equib item on a mobile
+        case 'O': // Load object on ground
+        case 'G': // Give object to mobile (in inventory)
+          change_type = "quantity";
+          break;
+        case 'D': // Set door state
+          change_type = "direction";
+          break;
+        case '%': // Cause next command to occur x times out of y
+          change_type = "numberator";
+          break;
+        case 'K': // skip the next number of specified zone commands
+        case 'X': // type of if-flags to set to unsure
+          ch->send("There is no arg2 for K or X commands.\r\n");
           return eFAILURE;
         default:
           break;
         }
+        original_value = zone.cmd[cmd]->arg2;
         zone.cmd[cmd]->arg2 = i;
-        ch->send(QString("Arg 2 set to %1.\r\n").arg(i));
+        new_value = zone.cmd[cmd]->arg2;
       }
       else if (isname(select, "3"))
       {
+        argument_number = 3;
         switch (zone.cmd[cmd]->command)
         {
-        case 'M':
-        case 'O':
+        case 'M': // Load mobile
+        case 'O': // Load object on ground
+          change_type = "room ID";
           vnum = i;
           i = real_room(i);
           break;
-        case '%':
-          send_to_char("There is no arg3 for % commands.\r\n", ch);
+        case '%': // Cause next command to occur x times out of y
+        case 'K': // skip the next number of specified zone commands
+        case 'X': // type of if-flags to set to unsure
+          send_to_char("There is no arg3 for %, K or X commands.\r\n", ch);
           return eFAILURE;
-        case 'K':
-        case 'X':
-          send_to_char("There is no arg3 for X commands.\r\n", ch);
-          return eFAILURE;
-        case 'P':
+          break;
+        case 'P': // Put object in object
+          change_type = "object VNUM";
           vnum = i;
           i = real_object(i);
           break;
-        case 'G':
-        case 'E':
-        case 'D':
+        case 'G': // Give object to mobile (in inventory)
+        case 'E': // Equib item on a mobile
+        case 'D': // Set door state
         case 'J':
         default:
           break;
         }
+        original_value = zone.cmd[cmd]->arg3;
         zone.cmd[cmd]->arg3 = i;
-        ch->send(QString("Arg 3 set to %1.\r\n").arg(i));
-        send_to_char(select, ch);
+        new_value = zone.cmd[cmd]->arg3;
       }
+      else
+      {
+        ch->send("Invalid argument. Valid values are 1, 2 or 3.\r\n");
+        return eFAILURE;
+      }
+
+      if (!change_type.isEmpty())
+      {
+        change_type += " ";
+      }
+      ch->send(QString("Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n").arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
     }
     return eFAILURE;
   }
@@ -999,8 +1034,6 @@ int do_zedit(Character *ch, char *argument, int cmd)
   {
     if (is_abbrev(select, zedit_subcommands[subcommand_id]))
     {
-      qDebug() << select;
-      qDebug() << zedit_subcommands[subcommand_id];
       subcommand_found = true;
       break;
     }
@@ -5154,10 +5187,10 @@ int do_instazone(Character *ch, char *arg, int cmd)
       if (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
       {
         if ((DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
-                                                                                                       EX_LOCKED)))
+                                                                                                             EX_LOCKED)))
           value = 2;
         else if (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
-                        EX_CLOSED))
+                           EX_CLOSED))
           value = 1;
         else
           value = 0;
