@@ -1984,31 +1984,31 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			return 1;
+			return true;
 		case 'z':
 			if (mob->beacon)
-				return IS_NPC(((Character *)mob->beacon)) / 100;
+				return IS_NPC(((Character *)mob->beacon));
 			else
-				return -1;
+				return false;
 
 		case 'n':
 			if (actor)
-				return IS_NPC(actor) / 100;
+				return IS_NPC(actor);
 			else
-				return -1;
+				return false;
 		case 't':
 			if (vict)
-				return IS_NPC(vict) / 100;
+				return IS_NPC(vict);
 			else
-				return -1;
+				return false;
 		case 'r':
 			if (rndm)
-				return IS_NPC(rndm) / 100;
+				return IS_NPC(rndm);
 			else
-				return -1;
+				return false;
 		default:
 			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
-			return -1;
+			return false;
 		}
 		break;
 
