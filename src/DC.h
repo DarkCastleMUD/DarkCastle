@@ -168,7 +168,8 @@ public:
   static bool isSet(auto flag, auto bit)
   {
     return flag & bit;
-  }
+  };
+  QRandomGenerator random_;
 
 private:
   static string version;

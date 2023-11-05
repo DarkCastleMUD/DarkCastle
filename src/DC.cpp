@@ -15,7 +15,7 @@
 string DC::version = VERSION;
 
 DC::DC(int &argc, char **argv)
-	: QCoreApplication(argc, argv), ssh(this), shops_(this)
+	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global())
 {
 	// ssh = QSharedPointer<SSH::SSH>(new SSH::SSH);
 }
