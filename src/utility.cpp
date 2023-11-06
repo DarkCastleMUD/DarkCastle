@@ -2429,75 +2429,6 @@ int number(int from, int to)
 }
 */
 
-qint64 number(int lowest, size_t highest)
-{
-  return number(qint64(lowest), qint64(highest));
-}
-
-qint64 number(int lowest, qint64 highest)
-{
-  return number(qint64(lowest), qint64(highest));
-}
-qint64 number(qint64 lowest, int highest)
-{
-  return number(qint64(lowest), qint64(highest));
-}
-
-quint64 number(unsigned lowest, quint64 highest)
-{
-  return number(quint64(lowest), quint64(highest));
-}
-quint64 number(quint64 lowest, unsigned highest)
-{
-  return number(quint64(lowest), quint64(highest));
-}
-
-qint32 number(qint32 from, qint32 to)
-{
-  return number((qint64)from, (qint64)to);
-}
-
-quint32 number(quint32 from, quint32 to)
-{
-  return number((quint64)from, (quint64)to);
-}
-
-qint64 number(qint64 from, qint64 to)
-{
-  if (from == to)
-  {
-    return to;
-  }
-
-  if (from > to)
-  {
-
-    logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
-    produce_coredump();
-    return to;
-  }
-
-  return DC::getInstance()->random_.bounded(from, to + 1);
-}
-
-quint64 number(quint64 from, quint64 to)
-{
-  if (from == to)
-  {
-    return to;
-  }
-
-  if (from > to)
-  {
-
-    logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
-    produce_coredump();
-    return to;
-  }
-
-  return DC::getInstance()->random_.bounded(from, to + 1);
-}
-
 // Random
 int random_percent_change(uint percentage, int value)
 {
@@ -3221,6 +3152,11 @@ bool file_exists(string filename)
   }
 
   return false;
+}
+
+bool file_exists(QString filename)
+{
+  return QFile(filename).exists();
 }
 
 bool char_file_exists(string name)

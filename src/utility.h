@@ -423,16 +423,6 @@ void clan_death(char *b, Character *ch);
 int move_char(Character *ch, int dest, bool stop_all_fighting = true);
 // int number(int from, int to);
 
-qint64 number(int lowest, quint32 highest);
-qint64 number(int lowest, qint64 highest);
-qint64 number(qint64 lowest, int highest);
-quint64 number(unsigned lowest, quint64 highest);
-quint64 number(quint64 lowest, unsigned highest);
-qint32 number(qint32 from, qint32 to);
-quint32 number(quint32 from, quint32 to);
-qint64 number(qint64 from, qint64 to);
-quint64 number(quint64 from, quint64 to);
-
 int dice(int number, int size);
 int str_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(const char *arg1, const char *arg2);
@@ -444,6 +434,7 @@ char *str_dup(const char *str);
 char *str_dup0(const char *str);
 void logentry(QString str, int god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
 void logf(int level, LogChannels type, const char *arg, ...);
+void logf(int level, LogChannels type, QString arg);
 int send_to_gods(QString message, int god_level, LogChannels type);
 
 void sprintbit(uint value[], const char *names[], char *result);
@@ -525,6 +516,7 @@ int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
 bool load_char_obj(class Connection *d, const char *name);
 void save_char_obj(Character *ch);
+bool load_char_obj(class Connection *d, QString name);
 
 #ifdef USE_SQL
 void save_char_obj_db(Character *ch);
@@ -546,6 +538,7 @@ int map_eq_level(Character *mob);
 void disarm(Character *ch, Character *victim);
 int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker);
 void send_to_all(const char *messg);
+void send_to_all(QString messg);
 void ansi_color(char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
 void send_to_char(string messg, Character *ch);
@@ -716,6 +709,7 @@ void produce_coredump(void *ptr = 0);
 bool isDead(Character *ch);
 bool isNowhere(Character *ch);
 bool file_exists(string filename);
+bool file_exists(QString filename);
 bool char_file_exists(string name);
 void show_obj_class_size_mini(Object *obj, Character *ch);
 const char *item_condition(class Object *obj);
@@ -724,11 +718,39 @@ int random_percent_change(int from, int to, int value);
 bool identify(Character *ch, Object *obj);
 extern void end_oproc(Character *ch, Trace trace = Trace("unknown"));
 void undo_race_saves(Character *ch);
+QByteArray handle_ansi(QByteArray, Character *ch);
+QString handle_ansi(QString, Character *ch);
 string handle_ansi(string s, Character *ch);
 char *handle_ansi_(char *s, Character *ch);
 void blackjack_prompt(Character *ch, string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
 void special_log(char *arg);
 int check_social(Character *ch, string pcomm, int length);
+
+template <typename T>
+T number(T from, T to)
+{
+   if (from == to)
+   {
+      return to;
+   }
+
+   if (from > to)
+   {
+
+      logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+      produce_coredump();
+      return to;
+   }
+
+   if (std::is_unsigned<T>::value)
+   {
+      return QRandomGenerator::global()->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
+   }
+   else if (std::is_signed<T>::value)
+   {
+      return QRandomGenerator::global()->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
+   }
+}
 
 #endif /* UTILITY_H_ */
