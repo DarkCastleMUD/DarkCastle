@@ -13,6 +13,7 @@
 #include "version.h"
 
 string DC::version = VERSION;
+extern struct index_data *obj_index;
 
 DC::DC(int &argc, char **argv)
 	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global())
@@ -272,4 +273,24 @@ bool DC::isAllowedHost(QHostAddress address)
 		}
 	}
 	return false;
+}
+
+Object *DC::getObject(vnum_t vnum)
+{
+	vnum_t rnum = real_object(vnum);
+
+	if (rnum == -1)
+	{
+		return nullptr;
+	}
+
+	return static_cast<Object *>(obj_index[rnum].item);
+}
+
+void close_file(std::FILE *fp)
+{
+	if (fp)
+	{
+		std::fclose(fp);
+	}
 }

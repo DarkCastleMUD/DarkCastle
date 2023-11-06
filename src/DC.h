@@ -40,6 +40,8 @@ typedef QList<QString> hints_t;
 using namespace std;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
+void close_file(std::FILE *fp);
+using unique_file_t = std::unique_ptr<std::FILE, decltype(&close_file)>;
 
 typedef set<Character *> character_list_t;
 typedef set<class Object *> obj_list_t;
@@ -89,7 +91,7 @@ public:
   } cf;
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
-  static constexpr room_t NOWHERE = 0;
+  static const room_t NOWHERE = 0ULL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
@@ -140,6 +142,8 @@ public:
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
 
+  static Object *getObject(vnum_t vnum);
+
   explicit DC(int &argc, char **argv);
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
@@ -189,5 +193,31 @@ extern class Object *object_list;
 extern struct spell_info_type spell_info[];
 void renum_world(void);
 void renum_zone_table(void);
+
+union varg_t
+{
+  Character *ch;
+  clan_t clan;
+  struct player_data *player;
+  struct table_data *table;
+  struct machine_data *machine;
+  struct wheel_data *wheel;
+  char *hunting;
+};
+
+typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
+
+struct timer_data
+{
+  int timeleft;
+  struct timer_data *next;
+  varg_t arg1;
+  void *arg2;
+  void *arg3;
+  TIMER_FUNC *function;
+};
+
+void clear_hunt(varg_t arg1, void *arg2, void *arg3);
+void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
 
 #endif
