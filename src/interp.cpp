@@ -446,6 +446,7 @@ struct command_info cmd_info[] =
         {"arena", do_arena, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"load", do_load, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"prize", do_load, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_PRIZE, 0, 1, CommandType::all},
+        {"test", nullptr, nullptr, &Character::do_test, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testport", do_testport, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testuser", do_testuser, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"shutdow", do_shutdow, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},

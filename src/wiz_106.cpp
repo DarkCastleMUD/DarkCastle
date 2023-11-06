@@ -144,3 +144,312 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
   }
   return eSUCCESS;
 }
+
+typedef command_return_t (*test_function_t)(Character *ch);
+
+class Test
+{
+public:
+  Test() : function_(nullptr) {}
+  Test(QString name, test_function_t function = nullptr)
+      : name_(name), function_(function)
+  {
+  }
+  command_return_t run(Character *ch)
+  {
+    if (function_ && ch)
+    {
+      return function_(ch);
+    }
+  }
+  QString getName(void) const { return name_; }
+
+private:
+  QString name_;
+  test_function_t function_;
+};
+typedef QMap<QString, Test> tests_t;
+
+command_return_t run_all_events(Character *ch = nullptr)
+{
+  uint64_t counter{};
+  while (timer_list != nullptr && counter++ < 1000)
+  {
+    if (ch)
+    {
+      ch->send("Running check_timer()\r\n");
+      process_output(ch->desc);
+    }
+    check_timer();
+    process_output(ch->desc);
+  }
+  if (counter >= 1000)
+  {
+    return eFAILURE;
+  }
+  return eSUCCESS;
+}
+
+QString rc_to_qstring(const command_return_t &rc)
+{
+  QStringList strings;
+  if (DC::isSet(rc, eFAILURE))
+  {
+    strings += "eFAILURE";
+  }
+  if (DC::isSet(rc, eSUCCESS))
+  {
+    strings += "eSUCCESS ";
+  }
+  if (DC::isSet(rc, eCH_DIED))
+  {
+    strings += "eCH_DIED ";
+  }
+  if (DC::isSet(rc, eDELAYED_EXEC))
+  {
+    strings += "eDELAYED_EXEC ";
+  }
+  if (DC::isSet(rc, eEXTRA_VAL2))
+  {
+    strings += "eEXTRA_VAL2 ";
+  }
+  if (DC::isSet(rc, eEXTRA_VALUE))
+  {
+    strings += "eEXTRA_VALUE ";
+  }
+  if (DC::isSet(rc, eIMMUNE_VICTIM))
+  {
+    strings += "eIMMUNE_VICTIM ";
+  }
+  if (DC::isSet(rc, eINTERNAL_ERROR))
+  {
+    strings += "eINTERNAL_ERROR ";
+  }
+  if (DC::isSet(rc, eVICT_DIED))
+  {
+    strings += "eVICT_DIED ";
+  }
+
+  return strings.join(',');
+}
+
+typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
+typedef command_return_t (*command_gen2_t)(Character *ch, string argument, int cmd);
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
+typedef int (*command_special_t)(Character *ch, int cmd, char *arg);
+
+void run_check(Character *ch, command_return_t *rc, command_gen1_t function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
+{
+  command_return_t new_rc{};
+  if (ch)
+  {
+    if (function)
+    {
+      new_rc = function(ch, arguments, cmd);
+    }
+    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    if (ch->desc)
+    {
+      process_output(ch->desc);
+    }
+  }
+
+  if (rc)
+  {
+    *rc = *rc | new_rc;
+  }
+}
+
+void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), int cmd = CMD_DEFAULT)
+{
+  command_return_t new_rc{};
+  if (ch)
+  {
+    if (function)
+    {
+      new_rc = function(ch, arguments, cmd);
+    }
+    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    if (ch->desc)
+    {
+      process_output(ch->desc);
+    }
+  }
+
+  if (rc)
+  {
+    *rc = *rc | new_rc;
+  }
+}
+
+void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), int cmd = CMD_DEFAULT)
+{
+  command_return_t new_rc{};
+  if (ch)
+  {
+    if (function)
+    {
+      new_rc = (*ch.*(function))(arguments, cmd);
+    }
+    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    if (ch->desc)
+    {
+      process_output(ch->desc);
+    }
+  }
+
+  if (rc)
+  {
+    *rc = *rc | new_rc;
+  }
+}
+
+void run_check(Character *ch, command_return_t *rc, command_special_t function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
+{
+  command_return_t new_rc{};
+  if (ch)
+  {
+    if (function)
+    {
+      new_rc = function(ch, cmd, arguments);
+    }
+    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    if (ch->desc)
+    {
+      process_output(ch->desc);
+    }
+  }
+
+  if (rc)
+  {
+    *rc = *rc | new_rc;
+  }
+}
+
+command_return_t test_casino(Character *ch)
+{
+  if (!ch || !ch->player)
+  {
+    return eFAILURE;
+  }
+
+  int max_rc{};
+
+  run_check(ch, &max_rc, &Character::do_goto, {"1"});
+  run_check(ch, &max_rc, &Character::do_goto, {"21900"});
+
+  run_check(ch, &max_rc, do_look, "sign", CMD_LOOK);
+  run_check(ch, &max_rc, do_examine, "sign", CMD_EXAMINE);
+
+  run_check(ch, &max_rc, do_move, "", CMD_NORTH);
+
+  run_check(ch, &max_rc, do_look, "fountain", CMD_LOOK);
+  run_check(ch, &max_rc, do_examine, "fountain", CMD_EXAMINE);
+  run_check(ch, &max_rc, do_drink, "fountain");
+
+  run_check(ch, &max_rc, do_look, "machine", CMD_LOOK);
+  run_check(ch, &max_rc, do_examine, "machine", CMD_EXAMINE);
+
+  // saving the player's finances and giving them a consistent
+  // amount of cash in bank to be withdrawn
+  auto original_bank = ch->player->bank;
+  ch->player->bank = 1000000;
+  auto original_gold = ch->getGold();
+  ch->setGold(0);
+
+  // These are special code procedures that should be on the objects in this room
+  run_check(ch, &max_rc, special, "", CMD_BALANCE);
+  run_check(ch, &max_rc, special, "", CMD_WITHDRAW);
+  run_check(ch, &max_rc, special, "1000000", CMD_WITHDRAW);
+
+  run_check(ch, &max_rc, do_move, "", CMD_NORTH);
+
+  run_check(ch, &max_rc, do_look, "table", CMD_LOOK);
+  run_check(ch, &max_rc, do_examine, "table", CMD_EXAMINE);
+
+  auto original_random = DC::getInstance()->random_;
+  DC::getInstance()->random_ = QRandomGenerator(1);
+
+  run_check(ch, &max_rc, special, "", CMD_BET);
+  run_check(ch, &max_rc, special, "-1", CMD_BET);
+  run_check(ch, &max_rc, special, "0", CMD_BET);
+  run_check(ch, &max_rc, special, "1", CMD_BET);
+  run_check(ch, &max_rc, special, "1000001", CMD_BET);
+  run_check(ch, &max_rc, special, "100000111111111111111111111111111111111", CMD_BET);
+  run_check(ch, &max_rc, special, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", CMD_BET);
+  run_check(ch, &max_rc, special, "500", CMD_BET);
+  run_check(ch, &max_rc, special, "500", CMD_BET);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  run_check(ch, &max_rc, special, "", CMD_HIT);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  run_check(ch, &max_rc, special, "", CMD_STAY);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+
+  check_timer();
+  check_timer();
+  process_output(ch->desc);
+
+  if (ch->getGold() > 2000000)
+  {
+    ch->send(QString("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
+    max_rc = max_rc | eFAILURE;
+  }
+
+  ch->player->bank = original_bank;
+  ch->setGold(original_gold);
+  DC::getInstance()->random_ = original_random;
+  return max_rc;
+}
+
+tests_t tests = {{"casino", Test("casino", test_casino)}};
+
+command_return_t Character::do_test(QStringList arguments, int cmd)
+{
+  QString arg1 = arguments.value(0);
+
+  if (arg1.isEmpty() || arg1 == "help")
+  {
+    send("Usage: test [help] [test name]\r\n");
+    send("Test names:\r\n");
+    for (auto const &test : tests)
+    {
+      send(test.getName() + "\r\n");
+    }
+    return eSUCCESS;
+  }
+
+  if (tests.contains(arg1))
+  {
+    auto rc = tests[arg1].run(this);
+    send(QString("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
+
+    return rc;
+  }
+
+  return eFAILURE;
+}
