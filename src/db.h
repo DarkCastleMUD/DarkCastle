@@ -35,7 +35,7 @@
 using namespace std;
 
 extern class Object *object_list;
-extern int top_of_world;
+extern room_t top_of_world;
 
 struct index_data;
 struct error_eof
@@ -114,6 +114,7 @@ bool can_modify_object(Character *ch, int32_t room);
 void write_one_room(FILE *fl, int nr);
 void write_mobile(Character *mob, FILE *fl);
 void write_object(Object *obj, FILE *fl);
+void write_object(Object *obj, QTextStream &fl);
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
@@ -123,19 +124,30 @@ void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
+char *fread_string(QTextStream &stream, bool hasher, bool *ok = nullptr);
+QString fread_string(QTextStream &stream, bool *ok = nullptr);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(ifstream &in, int hasher);
 char *fread_word(FILE *, int);
+QString fread_word(QTextStream &);
 int create_blank_item(int nr);
 int create_blank_mobile(int nr);
 void delete_item_from_index(int nr);
 void delete_mob_from_index(int nr);
 int real_object(int virt);
 int real_mobile(int virt);
+QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
+
 int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
 int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range);
+template <class T>
+T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
 uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char(FILE *fl);
+char fread_char(QTextStream &fl);
+int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
+int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
+
 void add_mobspec(int i);
 void write_object_csv(Object *obj, ofstream &fout);
 index_data *generate_obj_indices(int *top, index_data *index);
@@ -147,12 +159,14 @@ extern index_data mob_index_array[MAX_INDEX];
 #define VIRTUAL 1
 
 class Object *read_object(int nr, FILE *fl, bool zz);
+class Object *read_object(int nr, QTextStream &fl, bool zz);
 Character *read_mobile(int nr, FILE *fl);
 class Object *clone_object(int nr);
 Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
 void string_to_file(FILE *f, char *string);
 void string_to_file(ofstream &f, char *string);
+void string_to_file(QTextStream &f, QString string);
 ofstream &operator<<(ofstream &out, Object *obj);
 ifstream &operator>>(ifstream &in, Object *obj);
 string lf_to_crlf(string &s1);

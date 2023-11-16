@@ -1607,7 +1607,7 @@ int do_give(Character *ch, char *argument, int cmd)
   char arg[80], allbuf[80];
   int64_t amount;
   int retval;
-  extern int top_of_world;
+  extern room_t top_of_world;
   Character *vict;
   class Object *obj;
 

@@ -58,7 +58,7 @@ using namespace std;
 
 #define STATE(d) ((d)->connected)
 
-void AuctionHandleDelete(string name);
+void AuctionHandleDelete(QString name);
 bool is_bracing(Character *bracee, struct room_direction_data *exit);
 void check_for_sold_items(Character *ch);
 void show_question_race(Connection *d);
@@ -672,17 +672,15 @@ void do_on_login_stuff(Character *ch)
    prepare_character_for_sixty(ch);
 
    // Check for deleted characters listed in access list
-   char buf[255];
-   std::queue<char *> todelete;
+   std::queue<QString> todelete;
    vault = has_vault(GET_NAME(ch));
    if (vault)
    {
       for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next)
       {
-         if (access->name)
+         if (!access->name.isEmpty())
          {
-            snprintf(buf, 255, "%s/%c/%s", SAVE_DIR, UPPER(access->name[0]), access->name);
-            if (!file_exists(buf))
+            if (!file_exists(QString("%1/%2/%3").arg(SAVE_DIR).arg(access->name[0].toUpper()).arg(access->name)))
             {
                todelete.push(access->name);
             }
@@ -692,8 +690,7 @@ void do_on_login_stuff(Character *ch)
 
    while (!todelete.empty())
    {
-      snprintf(buf, 255, "Deleting %s from %s's vault access list.\n", todelete.front(), GET_NAME(ch));
-      logentry(buf, 0, LogChannels::LOG_MORTAL);
+      logentry(QString("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(ch)), 0, LogChannels::LOG_MORTAL);
       remove_vault_access(ch, todelete.front(), vault);
       todelete.pop();
    }

@@ -976,7 +976,7 @@ void DC::game_loop_init(void)
                  int do_not_save_corpses = 1;
 
                  QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
-                 send_to_all(buf.toStdString().c_str());
+                 send_to_all(buf);
                  logentry(buf, ANGEL, LogChannels::LOG_GOD);
                  logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
 
@@ -1220,14 +1220,14 @@ void telnet_echo_on(class Connection *d)
 
 void telnet_sga(Connection *d)
 {
-  char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
-  SEND_TO_Q(suppress_go_ahead, d);
+  const char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
+  SEND_TO_Q(QByteArray(suppress_go_ahead), d);
 }
 
 void telnet_ga(Connection *d)
 {
-  char go_ahead[] = {(char)IAC, (char)GA, (char)0};
-  SEND_TO_Q(go_ahead, d);
+  const char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+  SEND_TO_Q(QByteArray(go_ahead), d);
 }
 
 int do_lastprompt(Character *ch, char *arg, int cmd)
@@ -2021,27 +2021,37 @@ QString scramble_text(QString input)
   return output;
 }
 
+void write_to_output(const char *txt, class Connection *t)
+{
+  if (txt)
+  {
+    write_to_output(QByteArray(txt), t);
+  }
+}
+
 void write_to_output(string txt, class Connection *t)
 {
-  string buf = {};
-  string temp = {};
+  if (!txt.empty())
+  {
+    write_to_output(QByteArray(txt.c_str()), t);
+  }
+}
 
+void write_to_output(QByteArray txt, class Connection *t)
+{
   /* if there's no descriptor, don't worry about output */
   if (t->descriptor == 0)
     return;
 
   if (t->allowColor && t->connected != Connection::states::EDITING && t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDIT_MPROG)
   {
-    temp = txt = handle_ansi(txt, t->character);
+    txt = handle_ansi(txt, t->character);
   }
-
-  buf = txt;
   if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == Connection::states::PLAYING)
   {
-    scramble_text(buf);
+    txt = scramble_text(txt.toStdString().c_str()).toStdString().c_str();
   }
-
-  t->output += buf;
+  t->output += txt.toStdString();
 }
 
 /* ******************************************************************
@@ -3216,14 +3226,20 @@ void DC::sendAll(QString message)
   }
 }
 
-void send_to_all(const char *messg)
+void send_to_all(QString message)
 {
   class Connection *i;
 
-  if (messg)
+  if (!message.isEmpty())
+  {
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
+    {
       if (!i->connected)
-        SEND_TO_Q(messg, i);
+      {
+        SEND_TO_Q(message.toStdString().c_str(), i);
+      }
+    }
+  }
 }
 
 void ansi_color(char *txt, Character *ch)

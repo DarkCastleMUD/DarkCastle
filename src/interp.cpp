@@ -161,7 +161,7 @@ struct command_info cmd_info[] =
 
         // Communication commands
         {"ask", do_ask, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
-        {"auction", do_auction, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"auction", nullptr, nullptr, &Character::do_auction, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"awaymsgs", do_awaymsgs, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"channel", do_channel, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"dream", do_dream, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -417,11 +417,11 @@ struct command_info cmd_info[] =
         {"affclear", do_clearaff, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"guide", do_guide, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"addnews", do_addnews, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"linkload", do_linkload, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"linkload", nullptr, nullptr, &Character::do_linkload, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"listproc", do_listproc, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"zap", do_zap, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"slay", do_slay, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"rename", do_rename_char, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"rename", nullptr, nullptr, &Character::do_rename_char, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"archive", do_archive, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"unarchive", do_unarchive, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"stealth", do_stealth, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -449,8 +449,8 @@ struct command_info cmd_info[] =
         {"test", nullptr, nullptr, &Character::do_test, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testport", do_testport, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testuser", do_testuser, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"shutdow", do_shutdow, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"shutdown", do_shutdown, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"shutdow", nullptr, nullptr, &Character::do_shutdow, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"shutdown", nullptr, nullptr, &Character::do_shutdown, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"opedit", do_opedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"opstat", do_opstat, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"procedit", do_procedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -1488,6 +1488,21 @@ string rtrim(string str)
 
   return str;
 }
+std::tuple<QString, QString> half_chop(QString arguments, const char token)
+{
+  QStringList namelist = arguments.trimmed().split(token);
+
+  if (namelist.isEmpty())
+  {
+    return std::tuple<QString, QString>(QString(), QString());
+  }
+
+  QString arg1 = namelist.at(0);
+  namelist.pop_front();
+  QString remainder = namelist.join(' ').trimmed();
+
+  return std::tuple<QString, QString>(arg1, remainder);
+}
 
 tuple<string, string> half_chop(string arguments, const char token)
 {
@@ -1502,6 +1517,17 @@ tuple<string, string> half_chop(string arguments, const char token)
   arguments = ltrim(arguments);
 
   return tuple<string, string>(arg1, arguments);
+}
+
+tuple<string, string> half_chop(const char *c_arg, const char token)
+{
+  string arguments;
+  if (c_arg)
+  {
+    arguments = c_arg;
+  }
+
+  return half_chop(arguments, token);
 }
 
 tuple<string, string> last_argument(string arguments)

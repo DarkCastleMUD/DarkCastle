@@ -202,11 +202,12 @@ struct active_object
 
 #define OBJ_NOTIMER -7000000
 
-typedef uint8_t object_type_t;
+typedef uint16_t object_type_t;
+typedef int32_t object_value_t;
 
 struct obj_flag_data
 {
-    int32_t value[4] = {};        /* Values of the item (see list)    */
+    object_value_t value[4] = {}; /* Values of the item (see list)    */
     object_type_t type_flag = {}; /* Type of item                     */
     uint32_t wear_flags = {};     /* Where you can wear it            */
     uint16_t size = {};           /* Race restrictions                */
@@ -219,6 +220,8 @@ struct obj_flag_data
     Character *origin = {};       /* Creator of object, previously was stored at value[3] */
 };
 
+typedef int32_t location_t;
+typedef int32_t modifier_t;
 struct obj_affected_type
 {
     int32_t location = {}; /* Which ability to change (APPLY_XXX) */

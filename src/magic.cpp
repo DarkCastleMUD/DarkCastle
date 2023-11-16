@@ -1233,7 +1233,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
 #else
                       timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-                      timer->arg1 = (void *)tmp_victim->hunting;
+                      timer->arg1.hunting = tmp_victim->hunting;
                       timer->arg2 = (void *)tmp_victim;
                       timer->function = clear_hunt;
                       timer->next = timer_list;
@@ -1668,9 +1668,9 @@ int spell_divine_fury(uint8_t level, Character *ch, Character *victim, class Obj
 // TODO - make this spell have an effect based on skill level
 int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  int to_room;
+  room_t to_room;
   char buf[100];
-  extern int top_of_world; /* ref to the top element of world */
+  extern room_t top_of_world; /* ref to the top element of world */
 
   if (!victim)
   {
@@ -1726,7 +1726,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   {
     do
     {
-      to_room = number(0, top_of_world);
+      to_room = number<room_t>(1, top_of_world);
     } while (!DC::getInstance()->rooms.contains(to_room) ||
              DC::isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
              DC::isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
@@ -6537,9 +6537,10 @@ void make_portal(Character *ch, Character *vict)
 {
   class Object *ch_portal, *vict_portal;
   extern class Object *object_list;
-  extern int top_of_world;
+  extern room_t top_of_world;
   char buf[250];
-  int chance, destination;
+  int chance{};
+  room_t destination{};
   bool good_destination = false;
 
   ch_portal = new Object;
@@ -6581,7 +6582,7 @@ void make_portal(Character *ch, Character *vict)
   {
     while (!good_destination)
     {
-      destination = number(0, top_of_world);
+      destination = number<room_t>(1, top_of_world);
       if (!DC::getInstance()->rooms.contains(destination) ||
           DC::isSet(DC::getInstance()->world[destination].room_flags, ARENA) ||
           DC::isSet(DC::getInstance()->world[destination].room_flags, IMP_ONLY) ||
@@ -12344,8 +12345,8 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
   mob->mobdata->damnodice = victim->mobdata->damnodice + 5;
   mob->mobdata->damsizedice = victim->mobdata->damsizedice;
   GET_LEVEL(mob) = 50;
-  GET_HITROLL(mob) = GET_HITROLL(victim) + number(1, GET_INT(ch));
-  GET_DAMROLL(mob) = GET_DAMROLL(victim) + number(1, GET_WIS(ch));
+  GET_HITROLL(mob) = GET_HITROLL(victim) + number<decltype(ch->intel)>(1, GET_INT(ch));
+  GET_DAMROLL(mob) = GET_DAMROLL(victim) + number<decltype(ch->wis)>(1, GET_WIS(ch));
   GET_POS(mob) = POSITION_STANDING;
   GET_ALIGNMENT(mob) = GET_ALIGNMENT(ch);
   SETBIT(mob->affected_by, AFF_GOLEM);
@@ -12459,7 +12460,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 
 int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
-  //   extern int top_of_world;
+  //   extern room_t top_of_world;
   //   int to_room = 0;
 
   if (!ch->beacon)
@@ -15592,7 +15593,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags,
-             CLAN_ROOM) ||
+                CLAN_ROOM) ||
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
@@ -15760,7 +15761,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags,
-             CLAN_ROOM) ||
+                CLAN_ROOM) ||
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {

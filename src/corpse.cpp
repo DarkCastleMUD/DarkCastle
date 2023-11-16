@@ -59,7 +59,6 @@ int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tre
 int write_corpse_to_disk(FILE *fp, class Object *obj, int locate);
 void clean_string(char *buffer);
 int get_line_new(FILE *fl, char *buf);
-class Object *read_object_new(int nr, int type);
 char *fread_string_new(FILE *fl, char *error);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
@@ -318,7 +317,6 @@ void load_corpses(void)
 				if ((number = real_object(nr)) < 0)
 					continue;
 				temp = clone_object(number);
-				// temp=read_object_new(nr,VIRTUAL);
 				if (!temp)
 				{
 					continue;
@@ -599,40 +597,6 @@ class Object *create_obj_new(void)
 	GET_OBJ_TIMER(obj) = 0;
 	obj->save_expiration = 0;
 	obj->no_sell_expiration = 0;
-	return obj;
-}
-
-/* create a new object from a prototype */
-class Object *read_object_new(int nr, int type)
-{
-	class Object *obj;
-	int i;
-	char buf[256] = {0};
-
-	if (nr < 0)
-	{
-		perror("SYSERR: trying to create obj with negative num!");
-		return nullptr;
-	}
-	if (type == VIRTUAL)
-	{
-		if ((i = real_object(nr)) < 0)
-		{
-			sprintf(buf, "Object (V) %d does not exist in database.", nr);
-			return nullptr;
-		}
-	}
-	else
-		i = nr;
-
-	CREATE(obj, class Object, 1);
-	clear_object(obj);
-	//  *obj = obj_proto[i];
-	obj->next = object_list;
-	object_list = obj;
-
-	obj_index[i].number++;
-
 	return obj;
 }
 

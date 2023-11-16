@@ -49,9 +49,10 @@ struct pulse_info
 #define BAN_ALL 3
 
 #include "character.h"
+void write_to_output(const char *txt, class Connection *t);
+void write_to_output(QByteArray txt, class Connection *d);
+void write_to_output(std::string txt, class Connection *d);
 
-// void     write_to_output(const char *txt, class Connection *d);
-void write_to_output(string txt, class Connection *d);
 void scramble_text(char *txt);
 QString scramble_text(QString txt);
 void warn_if_duplicate_ip(Character *ch);

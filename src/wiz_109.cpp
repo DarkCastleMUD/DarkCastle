@@ -30,46 +30,32 @@
 #include "bandwidth.h"
 #endif
 
-void AuctionHandleDelete(string name);
+void AuctionHandleDelete(QString name);
 
-int do_linkload(Character *ch, char *arg, int cmd)
+command_return_t Character::do_linkload(QStringList arguments, int cmd)
 {
   class Connection d;
   Character *new_new;
-  char buf[100];
-  char *c;
 
   void add_to_bard_list(Character * ch);
 
-  while (*arg == ' ')
-    arg++;
-
-  if (!*arg)
+  if (arguments.isEmpty())
   {
-    send_to_char("Linkload whom?\n\r", ch);
+    send_to_char("Linkload whom?\n\r", this);
     return eFAILURE;
   }
 
-  one_argument(arg, buf);
+  QString arg1 = arguments.value(0).trimmed();
 
-  if (get_pc(buf))
+  if (get_pc(arg1))
   {
-    send_to_char("That person is already on the game!\n\r", ch);
+    send_to_char("That person is already on the game!\n\r", this);
     return eFAILURE;
   }
 
-  c = buf;
-  *c = UPPER(*c);
-  c++;
-  while (*c)
+  if (!(load_char_obj(&d, arg1)))
   {
-    *c = LOWER(*c);
-    c++;
-  }
-
-  if (!(load_char_obj(&d, buf)))
-  {
-    send_to_char("Unable to load! (Character might not exist...)\n\r", ch);
+    send_to_char("Unable to load! (Character might not exist...)\n\r", this);
     return eFAILURE;
   }
 
@@ -87,11 +73,10 @@ int do_linkload(Character *ch, char *arg, int cmd)
     GET_AC(new_new) -= GET_LEVEL(new_new) * 3;
   isr_set(new_new);
 
-  char_to_room(new_new, ch->in_room);
-  act("$n gestures sharply and $N comes into existence!", ch,
-      0, new_new, TO_ROOM, 0);
-  act("You linkload $N.", ch, 0, new_new, TO_CHAR, 0);
-  logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(ch), GET_NAME(new_new));
+  char_to_room(new_new, in_room);
+  act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
+  act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
+  logf(GET_LEVEL(this), LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
   return eSUCCESS;
 }
 
@@ -393,54 +378,25 @@ int do_global(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shutdown(Character *ch, char *argument, int cmd)
+command_return_t Character::do_shutdown(QStringList arguments, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
   extern int _shutdown;
   extern int try_to_hotboot_on_crash;
   extern int do_not_save_corpses;
   char **new_argv = 0;
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (!has_skill(ch, COMMAND_SHUTDOWN))
+  if (!has_skill(this, COMMAND_SHUTDOWN))
   {
-    send_to_char("Huh?\r\n", ch);
+    send_to_char("Huh?\r\n", this);
     return eFAILURE;
   }
 
-  char arg1[MAX_INPUT_LENGTH];
-  argument = one_argument(argument, arg1);
+  QString arg1 = arguments.value(0);
 
-  // If there was more than 1 argument, create an argument array
-  if (*argument != 0)
-  {
-    char argN[MAX_INPUT_LENGTH];
-    queue<char *> arg_list;
-
-    while (*argument != 0)
-    {
-      argument = one_argumentnolow(argument, argN);
-      arg_list.push(strdup(argN));
-    }
-
-    if (arg_list.size() > 0)
-    {
-      new_argv = new char *[arg_list.size() + 1];
-
-      int index = 0;
-      while (!arg_list.empty())
-      {
-        new_argv[index++] = arg_list.front();
-        arg_list.pop();
-      }
-
-      new_argv[index] = 0;
-    }
-  }
-
-  if (!*arg1)
+  if (arg1.isEmpty())
   {
     send_to_char("Syntax:  shutdown [sub command] [options ...]\n\r"
                  " Sub Commands:\n\r"
@@ -452,31 +408,31 @@ int do_shutdown(Character *ch, char *argument, int cmd)
                  "  core - Produce a core file.\r\n"
                  "  auto - Toggle auto-hotboot on crash setting.\r\n"
                  "   die - Kill boot script and crash mud so it won't reboot.\r\n",
-                 ch);
+                 this);
     return eFAILURE;
   }
 
-  if (!strcmp(arg1, "cold"))
+  if (arg1 == "cold")
   {
-    sprintf(buf, "Shutdown by %s.\r\n", GET_SHORT(ch));
-    send_to_all(buf);
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    QString buffer = QString("Shutdown by %1.\r\n").arg(GET_SHORT(this));
+    send_to_all(buffer);
+    logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     _shutdown = 1;
   }
-  else if (!strcmp(arg1, "hot"))
+  else if (arg1 == "hot")
   {
-    for (const auto &ch : DC::getInstance()->character_list)
+    for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(ch))
+      if (IS_PC(victim))
       {
-        vector<Character *> followers = ch->getFollowers();
+        vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
-              ch->send(fmt::format("Player {} has charmie {} with equipment.\r\n", GET_NAME(ch), GET_NAME(follower)));
+              send(QString("Player %1 has charmie %2 with equipment.\r\n").arg(GET_NAME(victim)).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -485,31 +441,31 @@ int do_shutdown(Character *ch, char *argument, int cmd)
     }
 
     do_not_save_corpses = 1;
-    sprintf(buf, "Hot reboot by %s.\r\n", GET_SHORT(ch));
-    send_to_all(buf);
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    QString buffer = QString("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
+    send_to_all(buffer);
+    logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
-    do_force(ch, "all save", CMD_FORCE);
+    do_force(this, "all save", CMD_FORCE);
     if (!write_hotboot_file(new_argv))
     {
       logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
-      send_to_char("Hot reboot failed.\r\n", ch);
+      send_to_char("Hot reboot failed.\r\n", this);
     }
   }
-  else if (!strcmp(arg1, "auto"))
+  else if (arg1 == "auto")
   {
     if (try_to_hotboot_on_crash)
     {
-      send_to_char("Mud will not try to hotboot when it crashes next.\r\n", ch);
+      send_to_char("Mud will not try to hotboot when it crashes next.\r\n", this);
       try_to_hotboot_on_crash = 0;
     }
     else
     {
-      send_to_char("Mud will now TRY to hotboot when it crashes next.\r\n", ch);
+      send_to_char("Mud will now TRY to hotboot when it crashes next.\r\n", this);
       try_to_hotboot_on_crash = 1;
     }
   }
-  else if (!strcmp(arg1, "crash"))
+  else if (arg1 == "crash")
   {
     // let's crash the mud!
     Character *crashus = nullptr;
@@ -518,12 +474,12 @@ int do_shutdown(Character *ch, char *argument, int cmd)
       return eFAILURE; // this should never be reached
     }
   }
-  else if (!strcmp(arg1, "core"))
+  else if (arg1 == "core")
   {
-    produce_coredump(ch);
+    produce_coredump(this);
     logentry("Corefile produced.", IMMORTAL, LogChannels::LOG_BUG);
   }
-  else if (!strcmp(arg1, "die"))
+  else if (arg1 == "die")
   {
     fclose(fopen("died_in_bootup", "w"));
     try_to_hotboot_on_crash = 0;
@@ -535,41 +491,41 @@ int do_shutdown(Character *ch, char *argument, int cmd)
       return eFAILURE; // this should never be reached
     }
   }
-  else if (!strcmp(arg1, "check"))
+  else if (arg1 == "check")
   {
-    for (const auto &ch : DC::getInstance()->character_list)
+    for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(ch))
+      if (IS_PC(victim))
       {
-        vector<Character *> followers = ch->getFollowers();
+        vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
-              ch->send(fmt::format("Player {} has charmie {} with equipment. Use Force to override.\r\n", GET_NAME(ch), GET_NAME(follower)));
+              send(QString("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(GET_NAME(victim)).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
         }
       }
     }
-    ch->send("Ok.\r\n");
+    send("Ok.\r\n");
     return eSUCCESS;
   }
   return eSUCCESS;
 }
 
-int do_shutdow(Character *ch, char *argument, int cmd)
+command_return_t Character::do_shutdow(QStringList arguments, int cmd)
 {
-  if (!has_skill(ch, COMMAND_SHUTDOWN))
+  if (!has_skill(this, COMMAND_SHUTDOWN))
   {
-    send_to_char("Huh?\r\n", ch);
+    send_to_char("Huh?\r\n", this);
     return eFAILURE;
   }
 
-  send_to_char("If you want to shut something down - say so!\n\r", ch);
+  send_to_char("If you want to shut something down - say so!\n\r", this);
   return eSUCCESS;
 }
 

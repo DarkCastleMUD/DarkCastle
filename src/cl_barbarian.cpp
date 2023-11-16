@@ -28,7 +28,6 @@
 extern struct index_data *obj_index;
 extern int rev_dir[];
 
-
 int do_batter(Character *ch, char *argument, int cmd)
 {
   bool battervbrace = false;
@@ -877,9 +876,9 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void rush_reset(void *arg1, void *arg2, void *arg3)
+void rush_reset(varg_t arg1, void *arg2, void *arg3)
 {
-  Character *ch = (Character *)arg1;
+  Character *ch = arg1.ch;
   extern bool charExists(Character * ch);
   if (!charExists(ch))
     return;
@@ -956,7 +955,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 #else
   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-  timer->arg1 = (void *)ch;
+  timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;
   addtimer(timer);

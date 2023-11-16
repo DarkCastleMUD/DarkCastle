@@ -231,13 +231,13 @@ int emoting_object(Character *ch, class Object *obj, int cmd, const char *arg,
       {
         return eFAILURE;
       }
-      i = number(0, (index_cursor->emote_index_length));
+      i = number<decltype(index_cursor->emote_index_length)>(0, (index_cursor->emote_index_length));
       data_cursor = index_cursor->data;
-      for (i = 0; i < number(0, index_cursor->emote_index_length); i++)
+      for (i = 0; i < number<decltype(index_cursor->emote_index_length)>(0, index_cursor->emote_index_length); i++)
       {
         data_cursor = data_cursor->next;
       }
-      if (number(0, (index_cursor->frequency)) == 0)
+      if (number<decltype(index_cursor->frequency)>(0, (index_cursor->frequency)) == 0)
       {
         act(data_cursor->emote_text, ch, 0, 0, TO_ROOM, 0);
         act(data_cursor->emote_text, ch, 0, 0, TO_CHAR, 0);
@@ -3790,7 +3790,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
 int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *invoker)
 {
-  extern int top_of_world;
+  extern room_t top_of_world;
   int dropped = 0;
   Character *vict = nullptr;
 

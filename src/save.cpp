@@ -51,7 +51,6 @@ using namespace std;
 
 extern struct index_data *obj_index;
 
-
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void restore_weight(class Object *obj);
@@ -953,27 +952,27 @@ void save_char_obj(Character *ch)
 }
 
 // just error crap to avoid using "goto" like we were
-void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH])
+void load_char_obj_error(FILE *fpsave, QString strsave)
 {
-  char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "Load_char_obj: %s", strsave);
-  perror(log_buf);
+  QString log_buf = QString("Load_char_obj: %1").arg(strsave);
+  perror(log_buf.toStdString().c_str());
   logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
 
 // Load a char and inventory into a new_new ch structure.
-bool load_char_obj(class Connection *d, const char *name)
+bool load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
-  char strsave[MAX_INPUT_LENGTH];
+  QString strsave;
   struct char_file_u4 uchar;
   class Object *last_cont = nullptr;
   Character *ch;
 
-  if (!name || !strcmp(name, ""))
+  if (name.isEmpty())
     return false;
+  name[0] = name[0].toUpper();
 
   ch = new Character;
   auto &free_list = DC::getInstance()->free_list;
@@ -988,13 +987,13 @@ bool load_char_obj(class Connection *d, const char *name)
   clear_char(ch);
   ch->desc = d;
 
-  if (DC::getInstance()->cf.bport)
+    if (DC::getInstance()->cf.bport)
   {
-    sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(name[0]), name);
+    strsave = QString("%1/%2/%3").arg(BSAVE_DIR).arg(name[0]).arg(name);
   }
   else
   {
-    sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(name[0]), name);
+    strsave = QString("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
   }
 
   //  struct stat mystats;
@@ -1003,7 +1002,7 @@ bool load_char_obj(class Connection *d, const char *name)
   //  then parse the memory instead of reading each item from file seperately
   //  Should be much faster and save our HD from turning itself to mush -pir
 
-  if ((fpsave = fopen(strsave, "rb")) == nullptr)
+  if ((fpsave = fopen(strsave.toStdString().c_str(), "rb")) == nullptr)
     return false;
 
   if (fread(&uchar, sizeof(uchar), 1, fpsave) == 0)
@@ -1029,7 +1028,7 @@ bool load_char_obj(class Connection *d, const char *name)
   if (!IS_MOB(ch))
   {
     dc_free(GET_NAME(ch));
-    GET_NAME(ch) = str_dup(name);
+    GET_NAME(ch) = str_dup(name.toStdString().c_str());
   }
 
   while (!feof(fpsave))

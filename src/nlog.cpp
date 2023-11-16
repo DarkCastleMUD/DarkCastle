@@ -101,6 +101,11 @@ char *str_hsh(const char *arg)
   return (current->name);
 }
 
+void logf(int level, LogChannels type, QString arg)
+{
+  logentry(arg, level, type);
+}
+
 /* logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
 void logf(int level, LogChannels type, const char *arg, ...)
 {
@@ -252,10 +257,15 @@ char *handle_ansi_(char *s, Character *ch)
   return t;
 }
 
-string handle_ansi(string haystack, Character *ch)
+QString handle_ansi(QString haystack, Character *ch)
 {
-  map<size_t, bool> ignore;
-  map<char, string> rep;
+  return handle_ansi(QByteArray(haystack.toStdString().c_str()), ch);
+}
+
+QByteArray handle_ansi(QByteArray haystack, Character *ch)
+{
+  QMap<size_t, bool> ignore;
+  QMap<char, QByteArray> rep;
   rep['$'] = "$";
   rep['0'] = BLACK;
   rep['1'] = BLUE;
@@ -271,37 +281,31 @@ string handle_ansi(string haystack, Character *ch)
   rep['K'] = BLINK;
   rep['I'] = INVERSE;
 
-  string result;
-  try
+  QByteArray result;
+  bool code = false;
+  for (const char &c : haystack)
   {
-    bool code = false;
-    for (const auto &c : haystack)
+    if (code == true)
     {
-      if (code == true)
+      if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
       {
-        if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
+        if (rep.contains(c))
         {
-          if (rep.find(c) != rep.end())
-          {
-            result += rep[c];
-          }
-          code = false;
-          continue;
+          result += rep.value(c);
         }
-      }
-
-      if (c == '$' && code == false)
-      {
-        code = true;
-      }
-      else
-      {
-        result += c;
+        code = false;
+        continue;
       }
     }
-  }
-  catch (...)
-  {
+
+    if (c == '$' && code == false)
+    {
+      code = true;
+    }
+    else
+    {
+      result += c;
+    }
   }
 
   return result;

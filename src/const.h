@@ -36,7 +36,7 @@ extern const char *pc_clss_abbrev[];
 /* External variables */
 
 extern int max_who;
-extern int top_of_world;
+extern room_t top_of_world;
 
 extern char globalBuf[MAX_STRING_LENGTH];
 extern bool wizlock;
@@ -55,7 +55,7 @@ extern world_file_list_item *mob_file_list;
 extern world_file_list_item *obj_file_list;
 extern int top_of_mobt;
 extern int top_of_objt;
-extern int top_of_world;
+extern room_t top_of_world;
 extern int total_rooms;
 extern const char *action_bits[];
 extern const char *affected_bits[];

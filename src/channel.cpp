@@ -104,11 +104,9 @@ private:
 };
 
 queue<channel_msg> gossip_history;
-queue<string> auction_history;
-queue<string> newbie_history;
-queue<string> trivia_history;
-
-
+queue<QString> auction_history;
+queue<QString> newbie_history;
+queue<QString> trivia_history;
 
 extern struct index_data *obj_index;
 
@@ -418,89 +416,93 @@ int do_gossip(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_auction(Character *ch, char *argument, int cmd)
+command_return_t Character::do_auction(QStringList arguments, int cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  class Connection *i;
-  Object *tmp_obj;
+  class Connection *i{};
+  Object *tmp_obj{};
   bool silence = false;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    send("SHHHHHH!! Can't you see people are trying to read?\r\n");
     return eSUCCESS;
   }
 
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      send("The magical silence prevents you from speaking!\n\r");
       return eFAILURE;
     }
 
-  if (IS_NPC(ch) && ch->master)
+  if (IS_NPC(this) && this->master)
   {
-    do_say(ch, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
+    do_say(this, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
     return eSUCCESS;
   }
 
-  if (IS_PC(ch))
+  if (IS_PC(this))
   {
-    if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_SILENCED))
+    if (!IS_MOB(this) && DC::isSet(this->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
-                   ch);
+                   this);
       return eSUCCESS;
     }
-    if (!(DC::isSet(ch->misc, LogChannels::CHANNEL_AUCTION)))
+    if (!(DC::isSet(this->misc, LogChannels::CHANNEL_AUCTION)))
     {
-      send_to_char("You told yourself not to AUCTION!!\n\r", ch);
+      send_to_char("You told yourself not to AUCTION!!\n\r", this);
       return eSUCCESS;
     }
-    if (GET_LEVEL(ch) < 3)
+    if (GET_LEVEL(this) < 3)
     {
-      send_to_char("You must be at least 3rd level to auction.\r\n", ch);
+      send_to_char("You must be at least 3rd level to auction.\r\n", this);
       return eSUCCESS;
     }
   }
 
-  for (; *argument == ' '; argument++)
-    ;
-
-  if (!(*argument))
+  if (arguments.isEmpty())
   {
-    queue<string> tmp = auction_history;
-    send_to_char("Here are the last 10 auctions:\n\r", ch);
+    queue<QString> tmp = auction_history;
+    send_to_char("Here are the last 10 auctions:\n\r", this);
     while (!tmp.empty())
     {
-      act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+      act(tmp.front(), this, 0, this, TO_VICT, 0);
       tmp.pop();
     }
   }
   else
   {
-    GET_MOVE(ch) -= 5;
-    if (GET_MOVE(ch) < 0)
+    GET_MOVE(this) -= 5;
+    if (GET_MOVE(this) < 0)
     {
-      send_to_char("You're too out of breath!\n\r", ch);
-      GET_MOVE(ch) += 5;
+      send_to_char("You're too out of breath!\n\r", this);
+      GET_MOVE(this) += 5;
       return eSUCCESS;
     }
-    sprintf(buf1, "$6$B%s auctions '%s'$R", GET_NAME(ch), argument);
-    sprintf(buf2, "$6$BYou auction '%s'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+    QString buf1;
+    if (IS_NPC(this))
+    {
+      buf1 = QString("$6$B%1 auctions '%2'$R").arg(GET_SHORT(this)).arg(arguments.join(' '));
+    }
+    else
+    {
+      buf1 = QString("$6$B%1 auctions '%2'$R").arg(GET_NAME(this)).arg(arguments.join(' '));
+    }
+
+    QString buf2 = QString("$6$BYou auction '%1'$R").arg(arguments.join(' '));
+    act(buf2, this, 0, 0, TO_CHAR, 0);
 
     auction_history.push(buf1);
     if (auction_history.size() > 10)
       auction_history.pop();
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-      if (i->character != ch && !i->connected &&
+      if (i->character != this && !i->connected &&
           (DC::isSet(i->character->misc, LogChannels::CHANNEL_AUCTION)) &&
-          !is_ignoring(i->character, ch))
+          !is_ignoring(i->character, this))
       {
         for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
@@ -509,7 +511,7 @@ int do_auction(Character *ch, char *argument, int cmd)
             break;
           }
         if (!silence)
-          act(buf1, ch, 0, i->character, TO_VICT, 0);
+          act(buf1, this, 0, i->character, TO_VICT, 0);
       }
   }
   return eSUCCESS;
@@ -648,11 +650,11 @@ int do_trivia(Character *ch, char *argument, int cmd)
   if (!(*argument))
   {
     {
-      queue<string> tmp = trivia_history;
+      queue<QString> tmp = trivia_history;
       send_to_char("Here are the last 10 messages:\n\r", ch);
       while (!tmp.empty())
       {
-        act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+        act(tmp.front(), ch, 0, ch, TO_VICT, 0);
         tmp.pop();
       }
     }
@@ -1299,11 +1301,11 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
   if (!(*argument))
   {
-    queue<string> tmp = newbie_history;
+    queue<QString> tmp = newbie_history;
     send_to_char("Here are the last 10 messages:\n\r", ch);
     while (!tmp.empty())
     {
-      act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+      act(tmp.front(), ch, 0, ch, TO_VICT, 0);
       tmp.pop();
     }
   }

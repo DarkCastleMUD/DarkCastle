@@ -8,18 +8,15 @@
 #ifndef LEADERBOARD_H_
 #define LEADERBOARD_H_
 
-extern "C" {
 #include <cstdio>
-}
-
 #include <sstream>
 #include <string>
-#include "player.h"
+#include "character.h"
 
 using namespace std;
 
-
-class Leaderboard {
+class Leaderboard
+{
 public:
 	Leaderboard();
 	virtual ~Leaderboard();
@@ -29,10 +26,11 @@ public:
 	void write_file(std::string &filename);
 	void write_file(std::stringstream &filename);
 	void write_file(const char filename[]);
-	int pdscore(Character * ch);
-	void rename(char *oldname, char *newname);
-	void setHP(unsigned int placement, string name, int value);	
-	int scan(Character* ch);
+	int pdscore(Character *ch);
+	void rename(QString oldname, QString newname);
+	void setHP(unsigned int placement, string name, int value);
+	int scan(Character *ch);
+
 private:
 	char *hpactivename[5];
 	char *mnactivename[5];

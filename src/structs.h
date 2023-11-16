@@ -127,7 +127,7 @@ const size_t TO_NOTVICT 2
 const size_t TO_CHAR    3
 const size_t TO_GODS    4
 */
-
+typedef int16_t clan_t;
 extern void debugpoint();
 
 #endif

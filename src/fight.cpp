@@ -62,7 +62,7 @@
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 
-extern int top_of_world;
+extern room_t top_of_world;
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -4094,7 +4094,7 @@ void set_fighting(Character *ch, Character *vict)
 #else
         timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-        timer->arg1 = (void *)vict->hunting;
+        timer->arg1.hunting = vict->hunting;
         timer->arg2 = (void *)vict;
         timer->function = clear_hunt;
         timer->next = timer_list;
@@ -4116,7 +4116,7 @@ void set_fighting(Character *ch, Character *vict)
             timer = (struct timer_data *)dc_alloc(1, sizeof(struct
                                                             timer_data));
 #endif
-            timer->arg1 = (void *)ch->hunting;
+            timer->arg1.hunting = ch->hunting;
             timer->arg2 = (void *)ch;
             timer->function = clear_hunt;
             timer->next = timer_list;

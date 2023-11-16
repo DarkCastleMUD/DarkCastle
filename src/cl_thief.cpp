@@ -31,7 +31,7 @@ extern int rev_dir[];
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern int top_of_world;
+extern room_t top_of_world;
 
 int find_door(Character *ch, char *type, char *dir);
 int get_weapon_damage_type(class Object *wielded);

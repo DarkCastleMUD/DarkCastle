@@ -328,8 +328,7 @@ void Connection::send(QString txt)
 
     if (allowColor && connected != states::EDITING && connected != states::WRITE_BOARD && connected != states::EDIT_MPROG)
     {
-        string buffer = handle_ansi(txt.toStdString(), character);
-        txt = buffer.c_str();
+        txt = handle_ansi(txt, character);
     }
 
     if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && connected == Connection::states::PLAYING)

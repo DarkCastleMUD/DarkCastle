@@ -30,8 +30,6 @@ extern "C"
 #include "clan.h" // clan right
 #include "inventory.h"
 
-using namespace std;
-
 enum vault_search_type
 {
   UNDEFINED,
@@ -47,11 +45,9 @@ public:
   vault_search_parameter();
   ~vault_search_parameter();
   vault_search_type type;
-  union
-  {
-    char *str_argument;
-    int int_argument;
-  };
+
+  QString str_argument;
+  int int_argument;
 };
 
 vault_search_parameter::vault_search_parameter()
@@ -61,10 +57,6 @@ vault_search_parameter::vault_search_parameter()
 
 vault_search_parameter::~vault_search_parameter()
 {
-  if (type == KEYWORD && str_argument != nullptr)
-  {
-    free(str_argument);
-  }
 }
 
 int total_vaults = 0;
@@ -73,27 +65,27 @@ int get_line(FILE *fl, char *buf);
 void item_remove(Object *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
-Character *find_owner(const char *name);
+Character *find_owner(QString name);
 void vault_log(Character *ch, char *owner);
-char *clanVName(int c);
+QString clanVName(uint64_t clan_id);
 void vault_search_usage(Character *ch);
 
 extern struct index_data *obj_index;
 extern class Object *object_list;
 
-struct vault_data *has_vault(const char *name)
+struct vault_data *has_vault(QString name)
 {
   struct vault_data *vault;
 
   for (vault = vault_table; vault; vault = vault->next)
-    if (vault && vault->owner && !strcasecmp(vault->owner, name))
+    if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
       return vault;
   Character *ch = find_owner(name);
   if (ch && GET_LEVEL(ch) >= 10)
   {
     add_new_vault(GET_NAME(ch), 0);
     for (vault = vault_table; vault; vault = vault->next)
-      if (vault && vault->owner && !strcasecmp(vault->owner, name))
+      if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
       {
         //	 send_to_char("A vault was created for you.\r\n",ch);
         return vault;
@@ -120,33 +112,39 @@ void remove_from_object_list(Object *obj)
   }
 }
 
-void save_vault(char *name)
+void save_vault(QString name)
 {
-  FILE *fl;
   struct vault_data *vault;
   struct vault_access_data *access;
   struct vault_items_data *items;
-  char fname[256], buf[MAX_INPUT_LENGTH];
+
+  if (name.isEmpty())
+  {
+    return;
+  }
+  name = name.toLower();
+  name[0] = name[0].toUpper();
 
   if (!(vault = has_vault(name)))
     return;
 
   Character *ch = find_owner(name);
   if (ch)
-    if (vault->size < (unsigned)(GET_LEVEL(ch) * 10))
+    if (vault->size < GET_LEVEL(ch) * 10)
       vault->size = GET_LEVEL(ch) * 10;
 
-  *name = UPPER(*name);
-  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
-  if (!(fl = fopen(fname, "w")))
+  QString fname = QString("../vaults/%1/%2.vault").arg(name[0]).arg(name);
+
+  QFile file(fname);
+  if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
   {
-    sprintf(buf, "save_vaults: could not open vault file for [%s].", fname);
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("save_vault: could not open vault file for [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
-  fprintf(fl, "S %d\n", vault->size);
-  fprintf(fl, "G %llu\n", vault->gold);
+  QTextStream out(&file);
+  out << QString("S %1\n").arg(vault->size);
+  out << QString("G %1\n").arg(vault->gold);
 
   for (items = vault->items; items; items = items->next)
   {
@@ -154,19 +152,18 @@ void save_vault(char *name)
     if (obj == 0)
       continue;
 
-    fprintf(fl, "O %d %d %d\n", items->item_vnum, items->count, items->obj ? 1 : 0);
+    out << QString("O %1 %2 %3\n").arg(items->item_vnum).arg(items->count).arg(items->obj ? 1 : 0);
     if (items->obj)
-      write_object(items->obj, fl);
+      write_object(items->obj, out);
   }
 
   for (access = vault->access; access; access = access->next)
-    fprintf(fl, "A %s\n", access->name);
+    out << QString("A %1\n").arg(access->name);
 
-  fprintf(fl, "$\n");
-  fclose(fl);
+  out << "$\n";
 }
 
-void vault_access(Character *ch, char *who)
+void vault_access(Character *ch, const char *who)
 {
   struct vault_access_data *access;
   struct vault_data *vault = nullptr;
@@ -179,9 +176,9 @@ void vault_access(Character *ch, char *who)
 
   if (!*who)
   {
-    csendf(ch, "The following people have access to your vault:\r\n");
+    ch->send("The following people have access to your vault:\r\n");
     for (access = vault->access; access; access = access->next)
-      csendf(ch, "%s\r\n", access->name);
+      ch->send(QString("%1\r\n").arg(access->name));
     return;
   }
 
@@ -214,8 +211,8 @@ void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
 
   send_to_char("You have access to the following vaults:\r\n", ch);
   for (vault = vault_table; vault; vault = vault->next)
-    if (vault && vault->owner && has_vault_access(GET_NAME(ch), vault))
-      csendf(ch, "%s\r\n", vault->owner);
+    if (vault && has_vault_access(GET_NAME(ch), vault))
+      ch->send(QString("%1\r\n").arg(vault->owner));
 }
 
 void vault_balance(Character *ch, char *owner)
@@ -230,22 +227,22 @@ void vault_balance(Character *ch, char *owner)
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n");
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to see %s's balance.\r\n", owner);
+    ch->send(QString("You don't have permission to see %1's balance.\r\n").arg(owner));
     return;
   }
 
   if (self)
-    csendf(ch, "You have %llu $B$5gold$R coins in your vault.\r\n", vault->gold);
+    ch->send(QString("You have %1 $B$5gold$R coins in your vault.\r\n").arg(vault->gold));
   else
-    csendf(ch, "There are %llu $B$5gold$R coins in %s's vault.\r\n", vault->gold, owner);
+    ch->send(QString("There are %1 $B$5gold$R coins in %2's vault.\r\n").arg(vault->gold).arg(owner));
 }
 
 char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
@@ -278,7 +275,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   }
 
   if (!str_cmp(arg1, "clan") && ch->clan)
-    strcpy(arg1, clanVName(ch->clan));
+    strcpy(arg1, clanVName(ch->clan).toStdString().c_str());
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg)))
@@ -317,7 +314,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     if (*arg1)
     {
-      if (!strcasecmp(arg1, clanVName(ch->clan)))
+      if (!strcasecmp(arg1, clanVName(ch->clan).toStdString().c_str()))
       {
         clan_data *clan = get_clan(ch);
         if (clan == nullptr)
@@ -384,7 +381,7 @@ int do_vault(Character *ch, char *argument, int cmd)
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
-        strcpy(arg2, clanVName(ch->clan));
+        strcpy(arg2, clanVName(ch->clan).toStdString().c_str());
       }
       else if (!*arg2)
       {
@@ -408,7 +405,7 @@ int do_vault(Character *ch, char *argument, int cmd)
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
-        strcpy(arg2, clanVName(ch->clan));
+        strcpy(arg2, clanVName(ch->clan).toStdString().c_str());
       }
       else if (!*arg2)
       {
@@ -428,7 +425,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, clanVName(ch->clan));
+      strcpy(arg2, clanVName(ch->clan).toStdString().c_str());
     if (!*argument)
     {
       send_to_char("What item would you like to place in the vault?\r\n", ch);
@@ -444,7 +441,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     half_chop(arg1, argument, arg2);
     if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, clanVName(ch->clan));
+      strcpy(arg2, clanVName(ch->clan).toStdString().c_str());
 
     if (!*argument)
     {
@@ -480,7 +477,7 @@ void vault_stats(Character *ch, char *name)
     if (vault->owner == nullptr)
       continue; // skip 0 cause its null
 
-    if (name && *name && vault->owner && strncasecmp(vault->owner, name, strlen(name)))
+    if (name && *name && !vault->owner.isEmpty() && !vault->owner.startsWith(name))
       continue;
     count++;
 
@@ -511,8 +508,8 @@ void vault_stats(Character *ch, char *name)
   }
 
   page_string(ch->desc, buf, 1);
-  csendf(ch, "Total Vaults: %d\r\n", count);
-  csendf(ch, "Not Showing: %d\r\n", skipped);
+  ch->send(QString("Total Vaults: %1\r\n").arg(count));
+  ch->send(QString("Not Showing: %1\r\n").arg(skipped));
 }
 
 void reload_vaults(void)
@@ -553,39 +550,39 @@ void reload_vaults(void)
   load_vaults();
 }
 
-void rename_vault_owner(char *oldname, char *newname)
+void rename_vault_owner(QString oldname, QString newname)
 {
-  struct vault_data *vault;
-  struct vault_access_data *access;
-  struct vault_items_data *items;
-  char buf[MAX_INPUT_LENGTH];
   int num = 0;
 
-  if ((vault = has_vault(newname)))
+  vault_data *vault = has_vault(newname);
+  if (vault)
   {
     remove_vault(newname); // free it up first..
   }
+
   if ((vault = has_vault(oldname)))
   {
-    free(vault->owner);
-    vault->owner = str_dup(newname);
+    vault->owner = newname;
     save_vault(newname);
-    sprintf(buf, "Vault owner changed from '%s' to '%s'.", oldname, newname);
-    vlog(buf, newname);
+
+    vlog(QString("Vault owner changed from '%1' to '%2'.").arg(oldname).arg(newname), newname);
   }
 
   if (!vault)
     return;
 
-  for (items = vault->items; items; items = items->next)
+  for (vault_items_data *items = vault->items; items; items = items->next)
   {
     if (items->obj && DC::isSet(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      char tmp[256];
-      sprintf(tmp, "%s", items->obj->name);
-      tmp[strlen(tmp) - strlen(oldname) - 1] = '\0';
-      sprintf(tmp, "%s %s", tmp, newname);
-      items->obj->name = str_hsh(tmp);
+      QStringList tmp = QString(items->obj->name).trimmed().split(' ');
+      if (tmp.length() >= 2)
+      {
+        tmp.pop_back();
+      }
+      tmp.push_back(newname);
+
+      items->obj->name = str_hsh(tmp.join(' ').toStdString().c_str());
     }
   }
   save_vault(newname);
@@ -595,37 +592,36 @@ void rename_vault_owner(char *oldname, char *newname)
     if (!num)
       continue; // skip 0 cause its null
 
-    for (access = vault->access; access; access = access->next)
+    for (vault_access_data *access = vault->access; access; access = access->next)
     {
-      if (!strcasecmp(access->name, oldname))
+      if (oldname == access->name)
       {
-        sprintf(buf, "Replaced '%s' with '%s' in %s's vault access list.", access->name, newname, vault->owner);
-        vlog(buf, vault->owner);
-        free(access->name);
-        access->name = str_dup(newname);
+        vlog(QString("Replaced '%1' with '%2' in %3's vault access list.").arg(access->name).arg(newname).arg(vault->owner), vault->owner);
+        access->name = newname;
         save_vault(vault->owner);
       }
     }
   }
 
-  add_new_vault(newname, 1);
+  add_new_vault(newname.toStdString().c_str(), 1);
   // reload_vaults();
   remove_vault(oldname);
 }
 
-void remove_vault(char *name, BACKUP_TYPE backup)
+void remove_vault(QString name, BACKUP_TYPE backup)
 {
   char src_filename[256];
   char dst_dir[256] = {0};
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == nullptr)
+  if (name.isEmpty())
   {
     return;
   }
 
-  name[0] = UPPER(name[0]);
+  name = name.toLower();
+  name[0] = name[0].toUpper();
 
   switch (backup)
   {
@@ -691,7 +687,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
     }
   }
 
-  remove_vault_accesses(name);
+  remove_vault_accesses(name.toStdString().c_str());
 
   struct vault_data *vault, *next_vault, *prev_vault = nullptr;
   struct vault_items_data *items, *titems;
@@ -733,10 +729,10 @@ void remove_vault(char *name, BACKUP_TYPE backup)
   for (vault = vault_table; vault; vault = next_vault)
   {
     next_vault = vault->next;
-    if (!vault || !vault->owner || !*vault->owner)
+    if (!vault || vault->owner.isEmpty())
       continue;
 
-    if (!strcasecmp(vault->owner, name))
+    if (vault->owner == name)
     {
       if (vault == vault_table)
         vault_table = vault->next;
@@ -749,6 +745,229 @@ void remove_vault(char *name, BACKUP_TYPE backup)
     }
     prev_vault = vault;
   }
+}
+
+void testing_load_vaults(void)
+{
+  struct vault_data *vault;
+  struct vault_access_data *access;
+  struct vault_items_data *items;
+  class Object *obj = nullptr;
+  struct stat statbuf = {};
+  int vnum = 0, full = 0, count = 0;
+  uint64_t gold = 0;
+  bool saveChanges = false;
+  QString buffer;
+
+  QFile vault_index_file(VAULT_INDEX_FILE);
+  if (!vault_index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
+  {
+    logentry("boot_vaults: could not open vault index file, probably doesn't exist.");
+    return;
+  }
+  QTextStream vault_index_stream(&vault_index_file);
+  while (!vault_index_stream.atEnd() && vault_index_stream.readLine() != "$")
+  {
+    total_vaults++;
+  }
+  vault_index_stream.seek(0);
+
+  logentry(QString("load_vaults: found [%1] player vaults to read.").arg(total_vaults));
+  if (total_vaults)
+  {
+    CREATE(vault_table, struct vault_data, total_vaults);
+  }
+
+  QString line = vault_index_stream.readLine();
+  while (line != "$")
+  {
+    saveChanges = false;
+
+    if (!line.isEmpty())
+    {
+      line[0] = line[0].toUpper();
+    }
+
+    QString fname = QString("../vaults/%1/%2.vault").arg(line[0]).arg(line);
+    QFile vault_file(fname);
+    if (!vault_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
+    {
+      logentry(QString("boot_vaults: unable to open file [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+      line = vault_index_stream.readLine();
+      continue;
+    }
+    else
+    {
+      // sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname);
+      //       logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    }
+    QTextStream vault_file_stream(&vault_file);
+    CREATE(vault, struct vault_data, 1);
+
+    vault->owner = line;
+    vault->size = VAULT_BASE_SIZE;
+    vault->gold = 0;
+    vault->weight = 0;
+    vault->access = nullptr;
+    vault->items = nullptr;
+    vault->next = nullptr;
+
+    QString type;
+    qDebugQTextStreamLine(vault_file_stream, "load_vaults() before reading type");
+    vault_file_stream >> type;
+    while (type != '$')
+    {
+      QString value;
+      unsigned int size{};
+      switch (type[0].toLatin1())
+      {
+      case 'S':
+        vault_file_stream >> vault->size >> Qt::ws;
+        vault->size = MIN(vault->size, VAULT_MAX_SIZE);
+        break;
+      case 'G':
+        vault_file_stream >> vault->gold >> Qt::ws;
+        break;
+      case 'O':
+        vault_file_stream >> vnum >> count >> full >> Qt::ws;
+
+        CREATE(items, struct vault_items_data, 1);
+
+        if (!full)
+        {
+          obj = get_obj(vnum);
+          items->obj = nullptr;
+        }
+        else
+        {
+          // We discard the line #VNUM
+          vault_file_stream.readLine();
+          if (real_object(vnum) == 3846 && vault->owner == "Gipsy")
+          {
+            qDebug("3846");
+          }
+          qDebug(vault->owner.toStdString().c_str());
+          obj = read_object(real_object(vnum), vault_file_stream, true);
+          items->obj = obj;
+        }
+
+        if (!obj)
+        {
+          if (full)
+          {
+            // Skip the rest of the full item
+            while (type != 'S')
+            {
+              QString buffer = vault_file_stream.readLine();
+              if (vault_file_stream.atEnd() || buffer.isEmpty())
+              {
+                break;
+              }
+
+              type = buffer[0].toLatin1();
+            }
+          }
+
+          logentry(QString("boot_vaults: bad item vnum (#%1) in vault: %2").arg(vnum).arg(vault->owner), IMMORTAL, LogChannels::LOG_BUG);
+          saveChanges = true;
+        }
+        else
+        {
+          vault->weight += (GET_OBJ_WEIGHT(obj) * count);
+          items->item_vnum = vnum;
+          items->count = count;
+          items->next = vault->items;
+          vault->items = items;
+          /*
+          sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
+          if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
+                             (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
+            logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          */
+        }
+        break;
+      case 'A':
+        qDebugQTextStreamLine(vault_file_stream, "load_vaults, before type A vault_file_stream >> value");
+        vault_file_stream >> value >> Qt::ws;
+        qDebug() << "value = " << value;
+
+        if (!value.isEmpty() && !stat(QString("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value).toStdString().c_str(), &statbuf))
+        {
+          CREATE(access, struct vault_access_data, 1);
+          access->name = value;
+          access->next = vault->access;
+          vault->access = access;
+          // sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
+          //         logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+        }
+        else
+        {
+          vlog(QString("Invalid access entry found. Removing %1's access to %2.").arg(value).arg(vault->owner), vault->owner);
+          saveChanges = true;
+        }
+
+        break;
+      default:
+        logentry(QString("boot_vaults: unknown type [%1] in file [%2].").arg(type).arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+        break;
+      }
+
+      vault_file_stream >> type;
+    }
+
+    vault->next = vault_table;
+    vault_table = vault;
+
+    if (saveChanges)
+    {
+      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+      save_vault(vault->owner);
+    }
+
+    line = vault_index_stream.readLine();
+  }
+}
+
+void add_vault_access(Character *ch, QString name, struct vault_data *vault)
+{
+  struct vault_access_data *access;
+  class Connection d;
+
+  if (!name.isEmpty())
+    name[0] = name[0].toUpper();
+
+  if (name == GET_NAME(ch))
+  {
+    send_to_char("Don't be a moron, you already have access.\r\n", ch);
+    return;
+  }
+
+  // must be done to clear out "d" before it is used
+
+  if (!get_pc(name))
+    if (!(load_char_obj(&d, name)))
+    {
+      send_to_char("You can't give access to someone who doesn't exist.\r\n", ch);
+      return;
+    }
+
+  if (has_vault_access(name, vault))
+  {
+    send_to_char("That person already has access to your vault.\r\n", ch);
+    if (d.character)
+      free_char(d.character, Trace("add_vault_access 1"));
+    return;
+  }
+
+  ch->send(QString("%1 now has access to your vault.\r\n").arg(name));
+  CREATE(access, struct vault_access_data, 1);
+  access->name = name;
+  access->next = vault->access;
+  vault->access = access;
+
+  save_char_obj(ch);
+  if (d.character)
+    free_char(d.character, Trace("add_vault_access 2"));
 }
 
 void load_vaults(void)
@@ -967,55 +1186,16 @@ void load_vaults(void)
   fclose(index);
 }
 
-void add_vault_access(Character *ch, char *name, struct vault_data *vault)
-{
-  struct vault_access_data *access;
-  class Connection d;
-
-  name[0] = UPPER(name[0]);
-
-  if (!strcasecmp(name, GET_NAME(ch)))
-  {
-    send_to_char("Don't be a moron, you already have access.\r\n", ch);
-    return;
-  }
-
-  // must be done to clear out "d" before it is used
-
-  extern Character *get_pc(char *name);
-
-  if (!get_pc(name))
-    if (!(load_char_obj(&d, name)))
-    {
-      send_to_char("You can't give access to someone who doesn't exist.\r\n", ch);
-      return;
-    }
-
-  if (has_vault_access(name, vault))
-  {
-    send_to_char("That person already has access to your vault.\r\n", ch);
-    if (d.character)
-      free_char(d.character, Trace("add_vault_access 1"));
-    return;
-  }
-
-  csendf(ch, "%s now has access to your vault.\r\n", name);
-  CREATE(access, struct vault_access_data, 1);
-  access->name = str_dup(name);
-  access->next = vault->access;
-  vault->access = access;
-
-  save_char_obj(ch);
-  if (d.character)
-    free_char(d.character, Trace("add_vault_access 2"));
-}
-
-void remove_vault_access(Character *ch, char *name, struct vault_data *vault)
+void remove_vault_access(Character *ch, QString name, struct vault_data *vault)
 {
 
-  name[0] = UPPER(name[0]);
+  name = name.toLower();
+  if (!name.isEmpty())
+  {
+    name[0] = name[0].toUpper();
+  }
 
-  if (!strcasecmp(name, GET_NAME(ch)))
+  if (name == GET_NAME(ch))
   {
     send_to_char("Don't be a moron, you can't remove your own access.\r\n", ch);
     return;
@@ -1027,16 +1207,15 @@ void remove_vault_access(Character *ch, char *name, struct vault_data *vault)
     return;
   }
 
-  csendf(ch, "%s no longer has access to your vault.\r\n", name);
+  ch->send(QString("%1 no longer has access to your vault.\r\n").arg(name));
   access_remove(name, vault);
   save_char_obj(ch);
 }
 
-void remove_vault_accesses(char *name)
+void remove_vault_accesses(QString name)
 {
   struct vault_data *vault;
   struct vault_access_data *access, *next_access;
-  char buf[MAX_INPUT_LENGTH];
   int num = 0;
 
   for (vault = vault_table; vault; vault = vault->next, num++)
@@ -1047,10 +1226,9 @@ void remove_vault_accesses(char *name)
     for (access = vault->access; access; access = next_access)
     {
       next_access = access->next;
-      if (!strcasecmp(access->name, name))
+      if (name == access->name)
       {
-        sprintf(buf, "Removed %s's access to %s's vault.", name, vault->owner);
-        vlog(buf, vault->owner);
+        vlog(QString("Removed %1's access to %2's vault.").arg(name).arg(vault->owner), vault->owner);
         access_remove(name, vault);
         save_vault(vault->owner);
       }
@@ -1058,7 +1236,7 @@ void remove_vault_accesses(char *name)
   }
 }
 
-void access_remove(char *name, struct vault_data *vault)
+void access_remove(QString name, struct vault_data *vault)
 {
   struct vault_access_data *access, *next_access, *prev_access = nullptr;
 
@@ -1066,7 +1244,7 @@ void access_remove(char *name, struct vault_data *vault)
   {
     next_access = access->next;
 
-    if (!strcmp(access->name, name))
+    if (name == access->name)
     {
       if (access == vault->access)
         vault->access = access->next;
@@ -1083,34 +1261,32 @@ void access_remove(char *name, struct vault_data *vault)
   }
 }
 
-char *clanVName(int c)
-{ // returns clan1, clan2, etc
-  static char buf[512];
-  sprintf(buf, "Clan%d", c);
-  return &buf[0];
+QString clanVName(uint64_t clan_id)
+{
+  return QString("Clan%1").arg(clan_id);
 }
 
-int has_vault_access(char *who, struct vault_data *vault)
+bool has_vault_access(QString who, struct vault_data *vault)
 {
   struct vault_access_data *access;
   Character *ch;
 
   if ((ch = find_owner(who)) && GET_LEVEL(ch) >= 108)
-    return 1;
+    return true;
 
   // its their vault
-  if (!strcasecmp(vault->owner, who))
-    return 1;
+  if (who == vault->owner)
+    return true;
 
-  if (ch && ch->clan && get_clan(ch->clan) && !str_cmp(clanVName(ch->clan), vault->owner) && has_right(ch, CLAN_RIGHTS_VAULT))
-    return 1;
+  if (ch && ch->clan && get_clan(ch->clan) && vault->owner == clanVName(ch->clan).toStdString().c_str() && has_right(ch, CLAN_RIGHTS_VAULT))
+    return true;
 
   // its not their vault so check all the access lines
   for (access = vault->access; access; access = access->next)
-    if (!strcasecmp(access->name, who))
-      return 1;
+    if (who == access->name)
+      return true;
 
-  return 0;
+  return false;
 }
 
 struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num)
@@ -1187,7 +1363,7 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
   return 0;
 }
 
-class Object *get_obj_in_vault(struct vault_data *vault, char *object, int num)
+class Object *get_obj_in_vault(struct vault_data *vault, QString object, int num)
 {
   struct vault_items_data *items;
   class Object *obj;
@@ -1229,38 +1405,58 @@ class Object *exists_in_vault(struct vault_data *vault, Object *obj)
   return 0;
 }
 
-void vault_get(Character *ch, char *object, char *owner)
+void vault_get(Character *ch, QString object, QString owner)
 {
-  std::string sbuf;
+  QString sbuf;
   char obj_list[50][100];
   class Object *obj, *tmp_obj;
   struct vault_items_data *items;
   struct vault_data *vault;
   int self = 0, num = 1, i;
 
-  owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch)))
+  if (!owner.isEmpty())
+  {
+    owner = owner.toLower();
+    owner[0] = owner[0].toUpper();
+  }
+
+  if (owner == GET_NAME(ch))
     self = 1;
 
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n");
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to take %s's stuff.\r\n", owner);
+    ch->send(QString("You don't have permission to take %1's stuff.\r\n").arg(owner));
     return;
   }
 
-  if (sscanf(object, "%d.%s", &num, object) != 2)
-    num = 1;
+  QStringList namelist = object.trimmed().split('.');
 
-  if (!strcmp(object, "all"))
+  if (namelist.length() != 2)
+  {
+    num = 1;
+  }
+  else
+  {
+    bool ok = false;
+    num = namelist.at(0).toInt(&ok);
+    if (!ok)
+    {
+      num = 1;
+    }
+    namelist.pop_front();
+    object = namelist.join('.');
+  }
+
+  if (object == "all")
   {
     bool ioverload = false;
     for (items = vault->items, i = 0; items; items = items->next)
@@ -1274,7 +1470,7 @@ void vault_get(Character *ch, char *object, char *owner)
         strncpy(obj_list[i], fname(obj->name), sizeof(obj_list[i]));
         if (i > 49)
         {
-          send_to_char("You can only take out 50 items at a time.\r\n", ch);
+          ch->send("You can only take out 50 items at a time.\r\n");
           ioverload = true;
           break;
         }
@@ -1293,8 +1489,9 @@ void vault_get(Character *ch, char *object, char *owner)
     return;
   }
 
-  if (sscanf(object, "all.%s", object))
+  if (object.startsWith("all.")) // sscanf(object, "all.%s", object))
   {
+    object.remove(0, 4);
     num = 0; // count the number of items that match that keyword so we know how many to get
     for (items = vault->items; items; items = items->next)
     {
@@ -1309,7 +1506,7 @@ void vault_get(Character *ch, char *object, char *owner)
 
     if (!num)
     {
-      send_to_char("There is nothing like that in the vault.\r\n", ch);
+      ch->send("There is nothing like that in the vault.\r\n");
       return;
     }
 
@@ -1356,7 +1553,7 @@ void vault_get(Character *ch, char *object, char *owner)
       return;
     }
 
-    std::stringstream ssin;
+    QTextStream ssin;
     ssin << GET_OBJ_VNUM(obj);
 
     if (GET_LEVEL(ch) < IMMORTAL)
@@ -1374,25 +1571,32 @@ void vault_get(Character *ch, char *object, char *owner)
       sbuf += " removed ";
       sbuf += GET_OBJ_SHORT(obj);
       sbuf += "[";
-      sbuf += ssin.str();
+      if (ssin.string())
+      {
+        sbuf += *ssin.string();
+      }
       sbuf += "] from ";
       sbuf += owner;
       sbuf += "'s vault.";
     }
 
-    vlog(sbuf.c_str(), owner);
-    csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
+    vlog(sbuf, owner);
+    ch->send(QString("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     sbuf = GET_NAME(ch);
     sbuf += " removed ";
     sbuf += GET_OBJ_SHORT(obj);
     sbuf += "[";
-    sbuf += ssin.str();
+    if (ssin.string())
+    {
+      sbuf += *ssin.string();
+    }
+
     sbuf += "] from ";
     sbuf += owner;
     sbuf += "'s vault.";
 
-    act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
+    act(sbuf, ch, 0, 0, TO_ROOM, GODS);
 
     item_remove(obj, vault);
 
@@ -1532,15 +1736,15 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n");
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to put $B$5gold$R in %s's vault.\r\n", owner);
+    ch->send(QString("You don't have permission to put $B$5gold$R in %1's vault.\r\n").arg(owner));
     return;
   }
 
@@ -1563,13 +1767,13 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     ch->removeGold(amount);
     save_char_obj(ch);
     save_vault(owner);
-    sprintf(buf, "%s added %d gold to %s's vault.", GET_NAME(ch), amount, owner);
-    vlog(buf, owner);
-    csendf(ch, "You deposit %llu $B$5gold$R into the vault. Its new balance is %llu $B$5gold$R.\r\nYou have %llu $B$5gold$R left on you.\r\n", amount, vault->gold, ch->getGold());
+
+    vlog(QString("%1 added %2 gold to %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
+    ch->send(QString("You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    csendf(ch, "But you only have %lld $B$5gold$R coins!\r\n", ch->getGold());
+    ch->send(QString("But you only have %1 $B$5gold$R coins!\r\n").arg(ch->getGold()));
   }
 }
 
@@ -1586,15 +1790,15 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n");
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to put $B$5gold$R in %s's vault.\r\n", owner);
+    ch->send(QString("You don't have permission to put $B$5gold$R in %1's vault.\r\n").arg(owner));
     return;
   }
 
@@ -1608,20 +1812,19 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   if (vault->gold >= (uint64_t)amount)
   {
     /*    if (amount + ch->getGold() > 2000000000) {
-          csendf(ch, "You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - ch->getGold());
+          ch->send("You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - ch->getGold());
           return;
         }*/
     vault->gold -= amount;
     ch->addGold(amount);
     save_char_obj(ch);
     save_vault(owner);
-    sprintf(buf, "%s removed %d gold from %s's vault.", GET_NAME(ch), amount, owner);
-    vlog(buf, owner);
-    csendf(ch, "You withdraw %llu $B$5gold$R from the vault. Its new balance is %llu $B$5gold$R.\r\nYou have %llu $B$5gold$R left on you.\r\n", amount, vault->gold, ch->getGold());
+    vlog(QString("%1 removed %2 gold from %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
+    ch->send(QString("You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    csendf(ch, "The vault only has %llu $B$5gold$R coins in it!\r\n", vault->gold);
+    ch->send(QString("The vault only has %1 $B$5gold$R coins in it!\r\n").arg(vault->gold));
   }
 }
 
@@ -1631,75 +1834,80 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
-    csendf(ch, "%s is hardly worth saving.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 is hardly worth saving.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (GET_OBJ_VNUM(obj) == 393)
   { // no potatoes in the vaults
-    csendf(ch, "It would rot. EWW!\r\n");
+    ch->send("It would rot. EWW!\r\n");
     return 0;
   }
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
   { // Uniques
-    csendf(ch, "Why would you need another %s?\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("Why would you need another %1?\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self)
   { // GL
-    csendf(ch, "%s is far too valuable to place in someone else's vault.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 is far too valuable to place in someone else's vault.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (!self && DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
   { // no_trade
-    csendf(ch, "%s seems bound to you.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   { // cursed
-    csendf(ch, "%s is stuck! Ack!.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 is stuck! Ack!.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) || DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   { // nosave
-    csendf(ch, "%s doesn't seem to be a permanent part of the world.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 doesn't seem to be a permanent part of the world.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 needs to be emptied first.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
   { // vault is full
-    csendf(ch, "You can't seem to stuff %s in the vault.  Its too big!\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("You can't seem to stuff %s in the vault.  Its too big!\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
   if (obj->obj_flags.timer > 0)
   {
-    csendf(ch, "%s cannot be placed in the vault right now.\r\n", GET_OBJ_SHORT(obj));
+    ch->send(QString("%1 cannot be placed in the vault right now.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   return 1;
 }
 
-void vault_put(Character *ch, char *object, char *owner)
+void vault_put(Character *ch, QString object, QString owner)
 {
   class Object *obj, *tmp_obj;
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
 
-  owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch)))
+  if (!owner.isEmpty())
+  {
+    owner = owner.toLower();
+    owner[0] = owner[0].toUpper();
+  }
+
+  if (owner == GET_NAME(ch))
   {
     self = 1;
   }
@@ -1707,19 +1915,19 @@ void vault_put(Character *ch, char *object, char *owner)
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n");
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to put things in %s's vault.\r\n", owner);
+    ch->send(QString("You don't have permission to put things in %1's vault.\r\n").arg(owner));
     return;
   }
 
-  if (!strcmp(object, "all"))
+  if (object == "all")
   {
     for (obj = ch->carrying; obj; obj = tmp_obj)
     {
@@ -1729,32 +1937,34 @@ void vault_put(Character *ch, char *object, char *owner)
 
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
       {
-        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+        ch->send(QString("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
         continue;
       }
 
+      QString buffer;
       if (GET_LEVEL(ch) < IMMORTAL)
-        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+        buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
-        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+        buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-      vlog(buf, owner);
-      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+      vlog(buffer, owner);
+      ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
-      std::string sbuf;
-      std::stringstream ssin;
+      QString sbuf;
+      QTextStream ssin;
       ssin << GET_OBJ_VNUM(obj);
 
       sbuf = GET_NAME(ch);
       sbuf += " added ";
       sbuf += GET_OBJ_SHORT(obj);
       sbuf += "[";
-      sbuf += ssin.str();
+      if (ssin.string())
+        sbuf += *ssin.string();
       sbuf += "] to ";
       sbuf += owner;
       sbuf += "'s vault.";
 
-      act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
+      act(sbuf, ch, 0, 0, TO_ROOM, GODS);
 
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
@@ -1768,8 +1978,9 @@ void vault_put(Character *ch, char *object, char *owner)
       }
     }
   }
-  else if (sscanf(object, "all.%s", object))
+  else if (object.startsWith("all."))
   {
+    object.remove(0, 4);
     for (obj = ch->carrying; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next_content;
@@ -1780,17 +1991,19 @@ void vault_put(Character *ch, char *object, char *owner)
 
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
       {
-        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+        ch->send(QString("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
         continue;
       }
 
+      QString buffer;
       if (GET_LEVEL(ch) < IMMORTAL)
-        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+        buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
-        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+        buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-      vlog(buf, owner);
-      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+      vlog(buffer, owner);
+
+      ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
         item_add(GET_OBJ_VNUM(obj), vault);
@@ -1816,17 +2029,19 @@ void vault_put(Character *ch, char *object, char *owner)
 
     if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
     {
-      csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+      ch->send(QString("%1 won't fit in the vault!\r\n").arg(GET_OBJ_SHORT(obj)));
       return;
     }
 
+    QString buffer;
     if (GET_LEVEL(ch) < IMMORTAL)
-      snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+      buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
     else
-      snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+      buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
-    vlog(buf, owner);
-    csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+    vlog(buffer, owner);
+
+    ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
     {
@@ -1870,35 +2085,37 @@ void sort_vault(const vault_data &vault, sorted_vault &sv)
   }
 }
 
-void vault_list(Character *ch, char *owner)
+void vault_list(Character *ch, QString owner)
 {
   struct vault_items_data *items;
   struct vault_data *vault;
   class Object *obj;
   int objects = 0, self = 0;
-  char sectionbuf[MAX_STRING_LENGTH * 4];
-  char linebuf[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
   int diff_len = 0;
   int sectionbuf_len = 0;
   int linebuf_len = 0;
 
-  owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch)))
+  if (!owner.isEmpty())
+  {
+    owner = owner.toLower();
+    owner[0] = owner[0].toUpper();
+  }
+
+  if (owner == GET_NAME(ch))
     self = 1;
 
   if (!(vault = has_vault(owner)))
   {
     if (self)
-      csendf(ch, "You don't have a vault.\r\n", ch);
+      ch->send("You don't have a vault.\r\n");
     else
-      csendf(ch, "%s doesn't have a vault.\r\n", owner);
+      ch->send(QString("%1 doesn't have a vault.\r\n").arg(owner));
     return;
   }
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have access to %s's vault.\r\n", owner);
+    ch->send(QString("You don't have access to %1's vault.\r\n").arg(owner));
     return;
   }
 
@@ -1909,7 +2126,7 @@ void vault_list(Character *ch, char *owner)
   {
     if (self)
     {
-      ch->send(fmt::format("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from {} to {}.\r\n", vault->weight, sv.weight));
+      ch->send(QString("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from %1 to %2.\r\n").arg(vault->weight).arg(sv.weight));
     }
     vault->weight = sv.weight;
   }
@@ -1918,22 +2135,22 @@ void vault_list(Character *ch, char *owner)
   {
     if (self)
     {
-      csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
+      ch->send(QString("Your vault is currently empty and can hold %1 pounds.\r\n").arg(vault->size));
     }
     else
     {
-      csendf(ch, "%s's vault is currently empty.\r\n", owner);
+      ch->send(QString("%1's vault is currently empty.\r\n").arg(owner));
     }
     return;
   }
 
   if (self)
   {
-    ch->send(fmt::format("Your vault is at {} of {} maximum pounds and contains:\r\n", vault->weight, vault->size));
+    ch->send(QString("Your vault is at %1 of %2 maximum pounds and contains:\r\n").arg(vault->weight).arg(vault->size));
   }
   else
   {
-    ch->send(fmt::format("{}'s vault is at {} of {} maximum pounds and contains:\r\n", owner, vault->weight, vault->size));
+    ch->send(QString("%1's vault is at %2 of %3 maximum pounds and contains:\r\n").arg(owner).arg(vault->weight).arg(vault->size));
   }
 
   // We are showing the last item in vault first because items were inserted at the
@@ -1946,10 +2163,10 @@ void vault_list(Character *ch, char *owner)
 
     if (count > 1)
     {
-      ch->send(fmt::format("[$5{}$R] ", count));
+      ch->send(QString("[$5%1$R] ").arg(count));
     }
 
-    ch->send(fmt::format("{}$R", GET_OBJ_SHORT(obj)));
+    ch->send(QString("%1$R").arg(GET_OBJ_SHORT(obj)));
 
     if (obj->obj_flags.type_flag == ITEM_ARMOR ||
         obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -1960,18 +2177,18 @@ void vault_list(Character *ch, char *owner)
         obj->obj_flags.type_flag == ITEM_WAND ||
         obj->obj_flags.type_flag == ITEM_LIGHT)
     {
-      ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
+      ch->send(QString("%1 $3Lvl: %2$R").arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
     }
 
     if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
     {
-      ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
+      ch->send(QString(" [%1]").arg(obj_index[obj->item_number].virt));
     }
     ch->send("\r\n");
   }
 }
 
-void add_new_vault(char *name, int indexonly)
+void add_new_vault(const char *name, int indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
   struct vault_data *vault;
@@ -2013,8 +2230,7 @@ void add_new_vault(char *name, int indexonly)
   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = fopen(fname, "w")))
   {
-    sprintf(buf, "add_new_vault: error opening new vault file [%s].", fname);
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("add_new_vault: error opening new vault file [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -2047,7 +2263,7 @@ void add_new_vault(char *name, int indexonly)
   save_vault(name);
 }
 
-Character *find_owner(const char *name)
+Character *find_owner(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
@@ -2056,7 +2272,7 @@ Character *find_owner(const char *name)
     {
 		  produce_coredump(); //Trying to track down bug that causes mob->name to be nullptr
 	  }
-    else if (!strcmp(name, GET_NAME(ch)) && IS_PC(ch))
+    else if (name == GET_NAME(ch) && IS_PC(ch))
     {
 			return true;
 	  }
@@ -2075,7 +2291,7 @@ void vault_log(Character *ch, char *owner)
   char buf[MAX_STRING_LENGTH];
   char fname[256];
 
-  if (!strcmp(owner, clanVName(ch->clan)))
+  if (!strcmp(owner, clanVName(ch->clan).toStdString().c_str()))
   {
     strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\n\r", MAX_STRING_LENGTH);
   }
@@ -2096,7 +2312,7 @@ void vault_log(Character *ch, char *owner)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-void vlog(const char *message, const char *name)
+void vlog(QString message, QString name)
 {
   struct tm *tm = nullptr;
   time_t ct;
@@ -2123,8 +2339,8 @@ void vlog(const char *message, const char *name)
 
   logentry(message, IMMORTAL, LogChannels::LOG_VAULT);
 
-  sprintf(fname, "../vaults/%c/%s.vault.log", *name, name);
-  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", *name, name);
+  sprintf(fname, "../vaults/%c/%s.vault.log", name[0], name.toStdString().c_str());
+  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0], name.toStdString().c_str());
 
   if (!(ofile = fopen(fname, "r")))
   {
@@ -2194,7 +2410,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
   arg = one_argument(arg, arg1);
 
   struct vault_data *vault = has_vault(GET_NAME(ch));
-  struct vault_data *cvault = ch->clan ? has_vault(clanVName(ch->clan)) : 0;
+  struct vault_data *cvault = ch->clan ? has_vault(clanVName(ch->clan).toStdString().c_str()) : 0;
   if (cmd == 59)
   {
     if (!vault)
@@ -2274,7 +2490,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
         return eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
-      add_new_vault(clanVName(ch->clan), 0);
+      add_new_vault(clanVName(ch->clan).toStdString().c_str(), 0);
       save_char_obj(ch);
       cvault = has_vault(clanVName(ch->clan));
       cvault->size = 500;
@@ -2331,13 +2547,14 @@ int vault_search(Character *ch, const char *args)
   bool owner_shown = false;
   int vaults_searched = 0;
   int objects_found = 0;
-  string arg1{};
-  string arguments{args};
+  QString arg1{};
+  QString arguments{args};
   list<vault_search_parameter>::iterator p;
   bool nomatch;
 
   tie(arg1, arguments) = half_chop(arguments);
-  if (arg1.empty())
+
+  if (arg1.isEmpty())
   {
     vault_search_usage(ch);
     return eFAILURE;
@@ -2352,7 +2569,7 @@ int vault_search(Character *ch, const char *args)
     if (arg1 == "keyword")
     {
       tie(arg1, arguments) = half_chop(arguments);
-      if (arg1.empty())
+      if (arg1.isEmpty())
       {
         send_to_char("Missing keyword parameter.\r\n\r\n", ch);
         vault_search_usage(ch);
@@ -2361,7 +2578,7 @@ int vault_search(Character *ch, const char *args)
       else
       {
         parameter.type = KEYWORD;
-        parameter.str_argument = str_dup(arg1.c_str());
+        parameter.str_argument = arg1;
         search.push_back(parameter);
         // We need
         parameter.type = UNDEFINED;
@@ -2370,7 +2587,7 @@ int vault_search(Character *ch, const char *args)
     else if (arg1 == "level")
     {
       tie(arg1, arguments) = half_chop(arguments);
-      if (arg1.empty())
+      if (arg1.isEmpty())
       {
         send_to_char("Missing level parameter.\r\n\r\n", ch);
         vault_search_usage(ch);
@@ -2380,14 +2597,15 @@ int vault_search(Character *ch, const char *args)
       {
         // start parsing level and level ranges
         size_t pos;
-        string level_string(arg1);
+        QString level_string(arg1);
 
         // if a '-' is not found then assume a single number is specified
-        if ((pos = level_string.find('-')) == string::npos)
+        if ((pos = level_string.indexOf('-')) == -1)
         {
-          parameter.int_argument = atoi(arg1.c_str());
+          bool ok = false;
+          parameter.int_argument = arg1.toInt(&ok);
           // Check if a non numeric value is passed
-          if (parameter.int_argument == 0 && level_string != "0")
+          if (!ok)
           {
             send_to_char("Invalid level specified.\r\n\r\n", ch);
             vault_search_usage(ch);
@@ -2400,10 +2618,11 @@ int vault_search(Character *ch, const char *args)
         else
         {
           // Get the first half of a level range
-          string min_level_string = level_string.substr(0, pos);
-          parameter.int_argument = atoi(min_level_string.c_str());
+          QString min_level_string = level_string.sliced(0, pos);
+          bool ok = false;
+          parameter.int_argument = min_level_string.toInt(&ok);
           // Check if a non numeric value is passed
-          if (parameter.int_argument == 0 && min_level_string != "0")
+          if (!ok)
           {
             send_to_char("Invalid minimum level specified.\r\n\r\n", ch);
             vault_search_usage(ch);
@@ -2414,10 +2633,11 @@ int vault_search(Character *ch, const char *args)
           search.push_back(parameter);
 
           // Get the second half of a level range
-          string max_level_string = level_string.substr(pos + 1);
-          parameter.int_argument = atoi(max_level_string.c_str());
+          QString max_level_string = level_string.sliced(pos + 1);
+          ok = false;
+          parameter.int_argument = max_level_string.toInt(&ok);
           // Check if a non numeric value is passed
-          if (parameter.int_argument == 0 && max_level_string != "0")
+          if (!ok)
           {
             send_to_char("Invalid maximum level specified.\r\n\r\n", ch);
             vault_search_usage(ch);
@@ -2436,12 +2656,12 @@ int vault_search(Character *ch, const char *args)
       return eFAILURE;
     }
     tie(arg1, arguments) = half_chop(arguments);
-  } while (!arg1.empty());
+  } while (!arg1.isEmpty());
 
   // now that we know what we're looking for, let's search through all the vaults to find it
   for (vault_data *vault = vault_table; vault; vault = vault->next)
   {
-    if (vault && vault->owner && has_vault_access(GET_NAME(ch), vault))
+    if (vault && !vault->owner.isEmpty() && has_vault_access(GET_NAME(ch), vault))
     {
       vaults_searched++;
       objects = 0;
@@ -2505,7 +2725,7 @@ int vault_search(Character *ch, const char *args)
         if (!owner_shown)
         {
           owner_shown = true;
-          csendf(ch, "\n\r%s:\n\r", vault->owner);
+          ch->send(QString("\n\r%1:\n\r").arg(vault->owner));
         }
 
         const auto &count = o.second;
@@ -2538,8 +2758,7 @@ int vault_search(Character *ch, const char *args)
     }   // if we have access to vault
   }     // for loop of vaults
 
-  csendf(ch, "\n\rSearched %d vaults and found %d objects.\r\n",
-         vaults_searched, objects_found);
+  ch->send(QString("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 
   return eSUCCESS;
 }

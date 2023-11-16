@@ -365,7 +365,7 @@ void mobile_activity(void)
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
             if ((!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                       DC::isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
+                                                                                                  DC::isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -953,19 +953,19 @@ void scavenge(Character *ch)
   }       /* for obj */
 }
 
-void clear_hunt(void *arg1, void *arg2, void *arg3)
+void clear_hunt(varg_t arg1, void *arg2, void *arg3)
 {
-  clear_hunt((char *)arg1, (Character *)arg2, nullptr);
+  clear_hunt(arg1, (Character *)arg2, nullptr);
 }
 
-void clear_hunt(char *arg1, Character *arg2, void *arg3)
+void clear_hunt(varg_t arg1, Character *arg2, void *arg3)
 {
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &curr : character_list)
   {
     if (curr == arg2)
     {
-      dc_free(arg1);
+      dc_free(arg1.hunting);
       arg2->hunting = nullptr;
     }
   }

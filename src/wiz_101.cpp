@@ -133,7 +133,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   Character *tmp_ch = {};
   struct follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
-  extern int top_of_world;
+  extern room_t top_of_world;
 
   if (IS_NPC(this))
   {
@@ -483,7 +483,7 @@ int do_at(Character *ch, char *argument, int cmd)
   int loc_nr, location, original_loc;
   Character *target_mob;
   class Object *target_obj;
-  // extern int top_of_world;
+  // extern room_t top_of_world;
 
   if (IS_NPC(ch))
     return eFAILURE;

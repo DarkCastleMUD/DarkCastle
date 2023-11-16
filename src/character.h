@@ -413,6 +413,7 @@ private:
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
+
 class Character
 {
 
@@ -516,7 +517,7 @@ public:
     int16_t song_mitigation = {};  // modifies song damage
     int16_t spell_reflect = {};
 
-    uint64_t clan = {}; /* Clan the char is in */
+    clan_t clan = {}; /* Clan the char is in */
 
     int16_t armor = {};   // Armor class
     int16_t hitroll = {}; // Any bonus or penalty to the hit roll
@@ -602,6 +603,7 @@ public:
     void send(const char *buffer);
     void send(string buffer);
     void send(QString buffer);
+    void sendln(QString buffer = "") { send(buffer + "\r\n"); }
     command_return_t tell(Character *, string);
     void sendRaw(string);
     vector<Character *> getFollowers(void);
@@ -632,6 +634,12 @@ public:
     command_return_t do_toggle(QStringList arguments, int cmd);
     command_return_t do_who(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
+    command_return_t do_shutdow(QStringList arguments, int cmd);
+    command_return_t do_shutdown(QStringList arguments, int cmd);
+    command_return_t do_linkload(QStringList arguments, int cmd);
+    command_return_t do_rename_char(QStringList arguments, int cmd);
+    command_return_t do_auction(QStringList arguments, int cmd = CMD_DEFAULT);
+    command_return_t do_test(QStringList arguments, int cmd);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
     Object *getVisibleObject(QString name);
@@ -809,8 +817,6 @@ struct profession
     uint8_t c_class;
 };
 
-void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, Character *arg2, void *arg3);
 void prepare_character_for_sixty(Character *ch);
 bool isPaused(Character *mob);
 

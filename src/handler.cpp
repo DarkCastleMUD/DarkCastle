@@ -54,8 +54,6 @@
 #include "corpse.h"
 #include "shop.h"
 
-
-
 extern class Object *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -2677,6 +2675,27 @@ b: // ew
 	return (obj);
 }
 
+int get_number(QString &name)
+{
+	QStringList namelist = name.trimmed().split(".");
+	if (namelist.length() < 2)
+	{
+		return 1;
+	}
+
+	QString number_str = namelist.at(0);
+
+	bool ok = false;
+	int number = number_str.toInt(&ok);
+	if (!ok)
+	{
+		return 1;
+	}
+
+	name = namelist.at(1);
+	return number;
+}
+
 int get_number(string &name)
 {
 	size_t pos = name.find(".");
@@ -4302,8 +4321,7 @@ Character *get_char_vis(Character *ch, const char *name)
 	return partial_match;
 }
 
-Character *
-get_pc(char *name)
+Character *get_pc(QString name)
 {
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
@@ -4497,16 +4515,15 @@ class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *lis
 	return nullptr;
 }
 
-class Object *get_obj_in_list_vis(Character *ch, const char *name, class Object *list, bool blindfighting)
+class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool blindfighting)
 {
 	class Object *i;
 	int j, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp;
 
-	strcpy(tmpname, name);
-	tmp = tmpname;
-	if ((number = get_number(&tmp)) < 0)
+	QString tmpname = name;
+	QString tmp = tmpname;
+
+	if ((number = get_number(tmp)) < 0)
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)

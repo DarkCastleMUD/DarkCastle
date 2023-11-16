@@ -514,7 +514,7 @@ void night_watchman(void);
 int special(Character *ch, int cmd, char *arg);
 int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
-bool load_char_obj(class Connection *d, const char *name);
+bool load_char_obj(class Connection *d, QString name);
 void save_char_obj(Character *ch);
 bool load_char_obj(class Connection *d, QString name);
 
@@ -537,7 +537,6 @@ void check_killer(Character *ch, Character *victim);
 int map_eq_level(Character *mob);
 void disarm(Character *ch, Character *victim);
 int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker);
-void send_to_all(const char *messg);
 void send_to_all(QString messg);
 void ansi_color(char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);

@@ -38,8 +38,6 @@ void display_punishes(Character *ch, Character
 char *str_str(char *first, char *second);
 void setup_dir(FILE *fl, int room, int dir);
 struct time_info_data age(Character *ch);
-Character *get_pc_vis(Character *ch, const char *name);
-Character *get_pc_vis_exact(Character *ch, const char *name);
 void update_wizlist(Character *ch);
 int real_roomb(int virt);
 void save_ban_list(void);
@@ -50,7 +48,6 @@ int mana_gain(Character *ch);
 int hit_gain(Character *ch);
 int move_gain(Character *ch, int extra);
 void isr_set(Character *ch);
-Character *get_pc(char *name);
 void mob_stat(Character *ch, Character *k);
 void obj_stat(Character *ch, class Object *j);
 int number_or_name(char **name, int *num);

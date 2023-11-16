@@ -1455,7 +1455,7 @@ int do_look(Character *ch, char *argument, int cmd)
                else if (ARE_CONTAINERS(tmp_object))
                {
                   if (!DC::isSet(tmp_object->obj_flags.value[1],
-                              CONT_CLOSED))
+                                 CONT_CLOSED))
                   {
                      send_to_char(fname(tmp_object->name), ch);
                      switch (bits)
@@ -4247,7 +4247,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       uint64_t vaults_searched = 0;
       for (auto vault = vault_table; vault; vault = vault->next)
       {
-         if (vault && vault->owner && has_vault_access(GET_NAME(this), vault))
+         if (vault && !vault->owner.isEmpty() && has_vault_access(GET_NAME(this), vault))
          {
             vaults_searched++;
             struct vault_items_data *items;

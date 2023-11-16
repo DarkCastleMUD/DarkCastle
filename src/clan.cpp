@@ -46,7 +46,6 @@ using namespace std;
 
 extern index_data *obj_index;
 
-
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);
 
@@ -3252,9 +3251,9 @@ void check_victory(struct takeover_pulse_data *take)
   }
 }
 
-void check_quitter(void *arg1, void *arg2, void *arg3)
+void check_quitter(varg_t arg1, void *arg2, void *arg3)
 {
-  int clan = (int64_t)arg1;
+  int clan = arg1.clan;
   char buf[MAX_STRING_LENGTH];
   if (count_controlled_areas(clan) > online_clan_members(clan))
   { // One needs to go.
@@ -3306,7 +3305,7 @@ void check_quitter(Character *ch)
 #else
   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-  timer->arg1 = (void *)ch->clan;
+  timer->arg1.clan = ch->clan;
   timer->function = check_quitter;
   timer->timeleft = 30;
   addtimer(timer);

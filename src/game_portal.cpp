@@ -262,7 +262,7 @@ void find_and_remove_player_portal(Character *ch)
   class Object *next_k;
   char searchstr[180];
   extern class Object *object_list;
-  extern int top_of_world;
+  extern room_t top_of_world;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));

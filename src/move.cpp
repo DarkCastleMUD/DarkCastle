@@ -739,7 +739,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 #else
 				timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-				timer->arg1 = (void *)chaser->hunting;
+				timer->arg1.hunting = chaser->hunting;
 				timer->arg2 = (void *)chaser;
 				timer->function = clear_hunt;
 				timer->next = timer_list;

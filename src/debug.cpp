@@ -1,4 +1,3 @@
-#include <string.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -42,7 +41,7 @@ extern Leaderboard leaderboard;
 CVoteData *DCVote;
 bool verbose_mode = false;
 
-void test_handle_ansi(string test)
+void test_handle_ansi(QString test)
 {
   // cerr <<  "Testing '" << test << "'" << endl;
   Character *ch = new Character;
@@ -50,16 +49,16 @@ void test_handle_ansi(string test)
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
   GET_LEVEL(ch) = 1;
 
-  // string str1 = "$b$B$1test$R $ $$ $$$ $$$";
-  string str1 = test;
+  // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
+  QString str1 = test;
   char *str2 = new char[1024];
   memset(str2, 1024, 0);
-  strncpy(str2, str1.c_str(), 1024);
-  string result1 = handle_ansi(str1, ch);
-  string result2 = string(handle_ansi_(str2, ch));
+  strncpy(str2, str1.toStdString().c_str(), 1024);
+  QString result1 = handle_ansi(str1, ch);
+  QString result2 = QString(handle_ansi_(str2, ch));
   // cerr <<  "Result1: [" << result1 << "]" << endl;
   // cerr <<  "Result2: [" << result2 << "]" << endl;
-  assert(handle_ansi(str1, ch) == string(handle_ansi_(str2, ch)));
+  assert(handle_ansi(str1, ch) == QString(handle_ansi_(str2, ch)));
   delete[] str2;
 }
 
@@ -120,54 +119,53 @@ void test_random_stats(void)
   }
 }
 
-void showObjectAffects(Object *obj)
+QString showObjectAffects(Object *obj)
 {
+  QString buffer;
   for (int i = 0; i < obj->num_affects; ++i)
   {
     if (i > 0)
     {
-      // cerr <<  ", ";
+      buffer += ", ";
     }
 
-    char buf2[255];
     if (obj->affected[i].location < 1000)
     {
-      sprinttype(obj->affected[i].location, apply_types, buf2);
+      buffer += sprinttype(obj->affected[i].location, apply_types);
     }
     else if (get_skill_name(obj->affected[i].location / 1000))
     {
-      strncpy(buf2, get_skill_name(obj->affected[i].location / 1000), sizeof(buf2));
+      buffer += get_skill_name(obj->affected[i].location / 1000);
     }
     else
     {
-      strncpy(buf2, "Invalid", sizeof(buf2));
+      buffer += "Invalid";
     }
-    buf2[254] = 0;
 
-    // cerr <<  buf2 << " by " << obj->affected[i].modifier;
+    buffer += " by " + QString::number(obj->affected[i].modifier);
   }
+  return buffer;
 }
 
-void showObjectVault(const char *owner, Object *obj)
+QString showObjectVault(Object *obj)
 {
   // cerr <<  obj_index[obj->item_number].virt << ":";
-  char buf[255];
-
-  sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
+  QString buffer = sprintbit(obj->obj_flags.wear_flags, Object::wear_bits);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
+  buffer += sprintbit(obj->obj_flags.size, Object::size_bits);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
+  buffer += sprintbit(obj->obj_flags.extra_flags, Object::extra_bits);
   // cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
+  buffer += sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits);
   // cerr <<  buf << ":";
 
-  showObjectAffects(obj);
+  buffer += showObjectAffects(obj);
 
   // cerr <<  " " << obj->short_description << " in " << owner << "'s vault." << endl;
+  return buffer;
 }
 
 void showObject(Character *ch, Object *obj)
@@ -205,7 +203,7 @@ void testStrings(void)
   test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
   char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
-  string arg1 = {}, remainder = "charm sleep ";
+  QString arg1 = {}, remainder = "charm sleep ";
   do
   {
     tie(arg1, remainder) = half_chop(remainder);
@@ -213,13 +211,12 @@ void testStrings(void)
     half_chop(c_input, c_arg1, c_arg2);
     strncpy(c_input, c_arg2, sizeof(c_input) - 1);
 
-    assert(arg1 == c_arg1);
-
-    cerr << "[" << arg1 << "]"
-         << "[" << remainder << "]" << endl;
+    cerr << "[" << arg1.toStdString() << "]"
+         << "[" << remainder.toStdString() << "]" << endl;
     cerr << "[" << c_arg1 << "]"
          << "[" << c_arg2 << "]" << endl;
-  } while (arg1.empty() == false && c_arg1[0] != '\0');
+    assert(arg1 == c_arg1);
+  } while (!arg1.isEmpty() && c_arg1[0] != '\0');
 
   cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
 }
@@ -230,14 +227,14 @@ int main(int argc, char **argv)
 
   testStrings();
 
-  string orig_cwd, dclib;
+  QString orig_cwd, dclib;
   if (getenv("DCLIB"))
   {
-    dclib = string(getenv("DCLIB"));
-    if (!dclib.empty())
+    dclib = QString(getenv("DCLIB"));
+    if (!dclib.isEmpty())
     {
       orig_cwd = getcwd(nullptr, 0);
-      chdir(dclib.c_str());
+      chdir(dclib.toStdString().c_str());
     }
   }
 
@@ -245,7 +242,7 @@ int main(int argc, char **argv)
   DC::getInstance()->boot_zones();
 
   logentry("Loading the world.", 0, LogChannels::LOG_MISC);
-  extern int top_of_world_alloc;
+  extern room_t top_of_world_alloc;
   top_of_world_alloc = 2000;
   // clear it (realloc = malloc, not calloc)
 
@@ -270,7 +267,7 @@ int main(int argc, char **argv)
 
   load_vaults();
 
-  chdir(orig_cwd.c_str());
+  chdir(orig_cwd.toStdString().c_str());
 
   // cerr << real_mobile(0) << " " << real_mobile(1) << endl;
 
@@ -366,8 +363,8 @@ int main(int argc, char **argv)
   if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {
     Object *obj = nullptr;
-    string savepath = dclib + "../save/";
-    for (const auto &entry : filesystem::directory_iterator(savepath))
+    QString savepath = dclib + "../save/";
+    for (const auto &entry : filesystem::directory_iterator(savepath.toStdString()))
     {
       if (entry.is_directory() && entry.path() != "../save/qdata" && entry.path() != "../save/deleted")
       {
@@ -375,14 +372,14 @@ int main(int argc, char **argv)
         {
           try
           {
-            string path = pfile.path().string();
-            path.erase(0, path.find_last_of('/') + 1);
-            if (path.empty() == false && path[0] != '.')
+            QString path = pfile.path().string().c_str();
+            path.remove(0, path.lastIndexOf('/') + 1);
+            if (path.isEmpty() == false && path[0] != '.')
             {
               // cerr << pfile.path().c_str() << endl;
-              do_linkload(ch, path.data(), CMD_DEFAULT);
+              ch->do_linkload(path.split(' '), CMD_DEFAULT);
               process_output(d);
-              do_fsave(ch, path, CMD_DEFAULT);
+              do_fsave(ch, path.toStdString().c_str(), CMD_DEFAULT);
               process_output(d);
             }
             else
@@ -390,7 +387,7 @@ int main(int argc, char **argv)
               continue;
             }
 
-            if (argv[1] == string("all"))
+            if (argv[1] == QString("all"))
             {
               Character *ch = d->character;
               for (int iWear = 0; iWear < MAX_WEAR; iWear++)
@@ -435,7 +432,7 @@ int main(int argc, char **argv)
       }
     }
 
-    if (argv[1] == string("leaderboard"))
+    if (argv[1] == QString("leaderboard"))
     {
       do_leaderboard(ch, "scan", CMD_DEFAULT);
       process_output(d);
@@ -443,16 +440,16 @@ int main(int argc, char **argv)
       process_output(d);
     }
     /*
-        multimap<int32_t, string> hp_leaders;
+        multimap<int32_t, QString> hp_leaders;
         for (auto& ch : DC::getInstance()->character_list)
         {
           if (IS_PC(ch))
           {
-            hp_leaders.insert(pair<int32_t,string>(ch->max_hit, ch->name));
+            hp_leaders.insert(pair<int32_t,QString>(ch->max_hit, ch->name));
           }
         }
 
-        queue<pair<int32_t,string>> top_hp_leaders;
+        queue<pair<int32_t,QString>> top_hp_leaders;
         for (auto& l : hp_leaders)
         {
           //// cerr <<  l.first << " " << l.second << endl;
@@ -486,7 +483,7 @@ int main(int argc, char **argv)
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
         if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
         {
-          showObjectVault(vault->owner, obj);
+          ch->send(showObjectVault(obj));
         }
       }
     }

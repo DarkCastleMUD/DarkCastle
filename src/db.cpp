@@ -30,6 +30,7 @@ int load_debug = 0;
 
 #include <sstream>
 #include <limits>
+#include <typeinfo>
 
 #include "affect.h"
 #include "db.h"
@@ -87,8 +88,8 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-int top_of_world = 0;		// index of last room in world
-int top_of_world_alloc = 0; // index of last alloc'd memory in world
+room_t top_of_world = 0;	   // index of last room in world
+room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
 
 class Object *object_list = 0; /* the global linked list of obj's */
 
@@ -115,7 +116,7 @@ struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 struct wizlist_info
 {
 	char *name;
-	int level;
+	uint64_t level;
 };
 struct skill_quest *skill_list; // List of skill quests.
 
@@ -170,9 +171,7 @@ world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
 world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
-int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
-int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
-char fread_char(FILE *fl);
+
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
 
@@ -182,9 +181,10 @@ void reset_time(void);
 void clear_char(Character *ch);
 
 // MOBprogram locals
-int mprog_name_to_type(char *name);
+int mprog_name_to_type(QString name);
 // void		load_mobprogs           ( FILE* fp );
-void mprog_read_programs(FILE *fp, int32_t i, bool zz);
+void mprog_read_programs(FILE *fp, int32_t i, bool ignore);
+void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore);
 
 extern bool MOBtrigger;
 
@@ -483,7 +483,6 @@ void load_skillquests()
 /* body of the booting system */
 void DC::boot_db(void)
 {
-	int i;
 	int help_rec_count = 0;
 
 #ifdef LEAK_CHECK
@@ -2877,6 +2876,41 @@ void write_mprog_recur(ofstream &fl, mob_prog_data *mprg, bool mob)
 	}
 }
 
+void write_mprog_recur(QTextStream &fl, mob_prog_data *mprg, bool mob)
+{
+	if (mprg->next)
+	{
+		write_mprog_recur(fl, mprg->next, mob);
+	}
+
+	if (mob)
+	{
+		fl << ">" << mprog_type_to_name(mprg->type) << " ";
+	}
+	else
+	{
+		fl << "\\" << mprog_type_to_name(mprg->type) << " ";
+	}
+
+	if (mprg->arglist)
+	{
+		string_to_file(fl, mprg->arglist);
+	}
+	else
+	{
+		string_to_file(fl, "Saved During Edit");
+	}
+
+	if (mprg->comlist)
+	{
+		string_to_file(fl, mprg->comlist);
+	}
+	else
+	{
+		string_to_file(fl, "Saved During Edit");
+	}
+}
+
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
@@ -3788,8 +3822,175 @@ void delete_item_from_index(int nr)
 	}
 }
 
+QString qDebugQTextStreamLine(QTextStream &stream, QString message)
+{
+	assert(stream.status() == QTextStream::Status::Ok);
+	auto current_pos = stream.pos();
+	auto current_line = stream.readLine();
+	assert(stream.status() == QTextStream::Status::Ok);
+
+	qDebug(QString("%1: [%2]").arg(message).arg(current_line).toStdString().c_str());
+	auto ok = stream.seek(current_pos);
+	assert(stream.pos() == current_pos);
+	assert(stream.status() == QTextStream::Status::Ok);
+	if (!ok)
+	{
+		qFatal("Failed to seek in qDebugQTextStreamLine");
+	}
+	return current_line;
+}
+
 /* read an object from OBJ_FILE */
-class Object *read_object(int nr, FILE *fl, bool zz)
+class Object *read_object(int nr, QTextStream &fl, bool ignore)
+{
+	int loc{}, mod{};
+
+	QString chk;
+
+	if (nr < 0)
+	{
+		return 0;
+	}
+
+	class Object *obj = new Object;
+	clear_object(obj);
+
+	/* *** string data *** */
+	// read it, add it to the hsh table, free it
+	// that way, we only have one copy of it in memory at any time
+
+	obj->name = fread_string(fl, 1);
+
+	qDebug(QString("Object name: %1").arg(obj->name).toStdString().c_str());
+	obj->short_description = fread_string(fl, 1);
+	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
+	{
+		logf(IMMORTAL, LogChannels::LOG_BUG, "read_object: vnum %d short_description too long.", obj_index[nr].virt);
+	}
+
+	obj->description = fread_string(fl, 1);
+
+	obj->action_description = fread_string(fl, 1);
+	fl.skipWhiteSpace();
+	if (obj->action_description && obj->action_description[0] && (obj->action_description[0] < ' ' || obj->action_description[0] > '~'))
+	{
+		logentry(QString("read_object: vnum %1 action description [%2] removed.").arg(obj_index[nr].virt).arg(obj->action_description));
+		obj->action_description[0] = '\0';
+	}
+	obj->table = 0;
+	curr_virtno = nr;
+	curr_name = obj->name;
+	curr_type = "Object";
+	obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
+	obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(fl);
+	obj->obj_flags.wear_flags = fread_int<decltype(obj->obj_flags.wear_flags)>(fl);
+	obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(fl);
+
+	obj->obj_flags.value[0] = fread_int<object_value_t>(fl);
+	obj->obj_flags.value[1] = fread_int<object_value_t>(fl);
+	obj->obj_flags.value[2] = fread_int<object_value_t>(fl);
+	obj->obj_flags.value[3] = fread_int<object_value_t>(fl);
+	obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(fl, 0, IMPLEMENTER);
+
+	obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(fl);
+	obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(fl);
+	obj->obj_flags.more_flags = fread_int<decltype(obj->obj_flags.more_flags)>(fl);
+	/* currently not stored in object file */
+	obj->obj_flags.timer = 0;
+
+	obj->ex_description = nullptr;
+	obj->affected = nullptr;
+	obj->num_affects = 0;
+	/* *** other flags *** */
+
+	if (nr == 2866 && obj->action_description && *obj->action_description && QString(obj->action_description).at(0) == 'P')
+	{
+		qDebug("Debug point");
+	}
+
+	qDebugQTextStreamLine(fl, "read_object(), before fl >> chk >> Qt::ws");
+	fl >> chk >> Qt::ws;
+	qDebugQTextStreamLine(fl, "read_object(), after fl >> chk >> Qt::ws");
+	qDebug() << "First chk " << chk;
+	struct extra_descr_data *new_new_descr{};
+	qint64 current_pos{};
+	QString current_line{};
+	while (!chk.isEmpty() && chk != "S")
+	{
+		bool ok = false;
+		switch (chk[0].toLatin1())
+		{
+		case 'E':
+			qDebugQTextStreamLine(fl, "Type E before first fread_string");
+			new_new_descr = new struct extra_descr_data;
+
+			new_new_descr->keyword = fread_string(fl, 1);
+
+			qDebugQTextStreamLine(fl, "Type E before second fread_string");
+
+			new_new_descr->description = fread_string(fl, 1);
+
+			qDebugQTextStreamLine(fl, "Type E after second fread_string");
+
+			new_new_descr->next = obj->ex_description;
+			obj->ex_description = new_new_descr;
+			break;
+
+		case '\\':
+			qDebugQTextStreamLine(fl, "before seek: ");
+			ok = fl.seek(fl.pos() - 1);
+			if (!ok)
+			{
+				qFatal("Failed to seek -1 in read_object");
+			}
+
+			qDebugQTextStreamLine(fl, "after seek: ");
+
+			mprog_read_programs(fl, nr, ignore);
+
+			qDebugQTextStreamLine(fl, "after mprog_read_programs seek: ");
+			break;
+
+		case 'A':
+			// these are only two members of obj_affected_type, so nothing else needs initializing
+			loc = fread_int<decltype(loc)>(fl);
+			mod = fread_int<decltype(mod)>(fl, -1000, 1000);
+			add_obj_affect(obj, loc, mod);
+			break;
+
+		default:
+			logentry(QString("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name), IMPLEMENTER, LogChannels::LOG_BUG);
+			break;
+		} // switch
+		  // read in next flag
+		assert(fl.status() == QTextStream::Status::Ok);
+		fl >> chk >> Qt::ws;
+		assert(fl.status() == QTextStream::Status::Ok);
+		qDebug() << "subsequent chk [" << chk << "]";
+	}
+
+	obj->in_room = DC::NOWHERE;
+	obj->next_skill = 0;
+	obj->next_content = 0;
+	obj->carried_by = 0;
+	obj->equipped_by = 0;
+	obj->in_obj = 0;
+	obj->contains = 0;
+	obj->item_number = nr;
+
+	// Keys will now save for up to 24 hours. If there are any with
+	// ITEM_NOSAVE that flag will be removed.
+	if (IS_KEY(obj))
+	{
+		SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
+		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
+	}
+
+	return obj;
+}
+
+/* read an object from OBJ_FILE */
+class Object *read_object(int nr, FILE *fl, bool ignore)
 {
 	class Object *obj;
 	int loc, mod;
@@ -3892,7 +4093,7 @@ class Object *read_object(int nr, FILE *fl, bool zz)
 
 		case '\\':
 			ungetc('\\', fl);
-			mprog_read_programs(fl, nr, zz);
+			mprog_read_programs(fl, nr, ignore);
 			break;
 
 		case 'A':
@@ -4037,7 +4238,7 @@ ifstream &operator>>(ifstream &in, Object *obj)
 
 		case '\\':
 			// ungetc( '\\', in );
-			// mprog_read_programs( in, nr,zz );
+			// mprog_read_programs( in, nr,ignore );
 			break;
 
 		case 'A':
@@ -4066,6 +4267,44 @@ ifstream &operator>>(ifstream &in, Object *obj)
 	obj->item_number = 0;
 
 	return in;
+}
+
+void write_object(Object *obj, QTextStream &fl)
+{
+	struct extra_descr_data *currdesc;
+
+	fl << QString("#%1\n").arg(obj_index[obj->item_number].virt);
+	string_to_file(fl, obj->name);
+	string_to_file(fl, obj->short_description);
+	string_to_file(fl, obj->description);
+	string_to_file(fl, obj->action_description);
+
+	fl << obj->obj_flags.type_flag << " " << obj->obj_flags.extra_flags << " " << obj->obj_flags.wear_flags << " " << obj->obj_flags.size << "\n";
+	fl << obj->obj_flags.value[0] << " " << obj->obj_flags.value[1] << " " << obj->obj_flags.value[2] << " " << obj->obj_flags.value[3] << " " << obj->obj_flags.eq_level << "\n";
+	fl << obj->obj_flags.weight << " " << obj->obj_flags.cost << " " << obj->obj_flags.more_flags << "\n";
+
+	currdesc = obj->ex_description;
+	while (currdesc)
+	{
+		fl << "E\n";
+		string_to_file(fl, currdesc->keyword);
+		string_to_file(fl, currdesc->description);
+		currdesc = currdesc->next;
+	}
+
+	for (int i = 0; i < obj->num_affects; i++)
+	{
+		fl << "A\n";
+		fl << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
+	}
+
+	if (obj_index[obj->item_number].mobprogs)
+	{
+		write_mprog_recur(fl, obj_index[obj->item_number].mobprogs, false);
+		fl << "|\n";
+	}
+
+	fl << "S\n";
 }
 
 // write an object to file
@@ -5029,6 +5268,63 @@ bool Zone::isEmpty(void)
 	return true;
 }
 
+QString fread_string(QTextStream &stream, bool *ok)
+{
+	assert(stream.status() == QTextStream::Status::Ok);
+	QString buffer;
+
+	qDebugQTextStreamLine(stream, "before fread_string()");
+	do
+	{
+		QString line = stream.readLine();
+		if (line.endsWith('~'))
+		{
+			line.remove(line.length() - 1, 1);
+			if (ok)
+			{
+				*ok = true;
+			}
+			assert(stream.status() == QTextStream::Status::Ok);
+			qDebug() << "fread_string returning" << buffer + line << (buffer + line).length();
+			qDebugQTextStreamLine(stream, "after fread_string()");
+			return buffer + line;
+		}
+		else
+		{
+			buffer += line + '\n';
+		}
+
+	} while (!stream.atEnd());
+
+	if (ok)
+	{
+		*ok = false;
+	}
+	assert(stream.status() == QTextStream::Status::Ok);
+	qDebug() << "fread_string returning" << buffer << buffer.length();
+	qDebugQTextStreamLine(stream, "after fread_string()");
+	return buffer;
+}
+
+char *fread_string(QTextStream &in, bool hasher, bool *ok)
+{
+	QString buffer = fread_string(in, ok);
+
+	if (ok && !*ok)
+	{
+		buffer = "";
+	}
+
+	if (hasher)
+	{
+		return str_hsh(buffer.toStdString().c_str());
+	}
+	else
+	{
+		return strdup(buffer.toStdString().c_str());
+	}
+}
+
 /************************************************************************
  *  procs of a (more or less) general utility nature         *
  ********************************************************************** */
@@ -5140,6 +5436,13 @@ char *fread_string(FILE *fl, int hasher)
 	perror("fread_string: string too long");
 	abort();
 	return (nullptr);
+}
+
+QString fread_word(QTextStream &fl)
+{
+	QString buffer;
+	fl >> buffer;
+	return buffer;
 }
 
 /* read and allocate space for a whitespace-terminated string from a given file */
@@ -5454,6 +5757,59 @@ int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range)
 	return number;
 }
 
+template <typename T>
+T fread_int(QTextStream &in, T beg_range, T end_range)
+{
+	T number;
+	QString line = qDebugQTextStreamLine(in, "Before fread_int");
+	QStringList namelist = line.split(' ');
+	QString arg1 = namelist.value(0);
+	in >> number >> Qt::ws;
+
+	bool ok = false;
+	if (std::is_signed<T>::value)
+	{
+		if (arg1.toLongLong(&ok) != number && ok)
+		{
+			logentry(QString("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+		}
+		else if (!ok)
+		{
+			logentry(QString("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(beg_range).name()));
+		}
+	}
+	else if (std::is_unsigned<T>::value)
+	{
+		if (arg1.toULongLong(&ok) != number && ok)
+		{
+			logentry(QString("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+		}
+		else if (!ok)
+		{
+			logentry(QString("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(beg_range).name()));
+		}
+	}
+	else
+	{
+		qFatal("arg1 neither signed nor unsigned");
+	}
+
+	if (number < beg_range)
+	{
+		qDebug("increasing number");
+		number = beg_range;
+	}
+	else if (number > end_range)
+	{
+		qDebug("decreasing number");
+		number = end_range;
+	}
+
+	qDebug() << "fread_int returning" << number;
+	qDebugQTextStreamLine(in, "After fread_int");
+	return number;
+}
+
 /*
  fread_int has the nasty habit of reading on white
  space char after the int it reads.  This can goof
@@ -5548,6 +5904,21 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 	perror("fread_int: something went wrong");
 	abort();
 	return (0);
+}
+
+char fread_char(QTextStream &fl)
+{
+	if (fl.atEnd())
+	{
+		logentry(QString("Reading %1: %2, %3\n").arg(curr_type).arg(curr_name).arg(curr_virtno));
+		perror("fread_char: premature EOF");
+		abort();
+	}
+
+	char c;
+	fl >> c;
+
+	return c;
 }
 
 char fread_char(FILE *fl)
@@ -6156,49 +6527,49 @@ int mob_in_index(char *name, int index)
  *  mob/script files.
  */
 
-int mprog_name_to_type(char *name)
+int mprog_name_to_type(QString name)
 {
-	if (!str_cmp(name, "in_file_prog"))
+	if ((name == "in_file_prog"))
 		return IN_FILE_PROG;
-	if (!str_cmp(name, "act_prog"))
+	if ((name == "act_prog"))
 		return ACT_PROG;
-	if (!str_cmp(name, "speech_prog"))
+	if ((name == "speech_prog"))
 		return SPEECH_PROG;
-	if (!str_cmp(name, "rand_prog"))
+	if ((name == "rand_prog"))
 		return RAND_PROG;
-	if (!str_cmp(name, "arand_prog"))
+	if ((name == "arand_prog"))
 		return ARAND_PROG;
-	if (!str_cmp(name, "fight_prog"))
+	if ((name == "fight_prog"))
 		return FIGHT_PROG;
-	if (!str_cmp(name, "hitprcnt_prog"))
+	if ((name == "hitprcnt_prog"))
 		return HITPRCNT_PROG;
-	if (!str_cmp(name, "death_prog"))
+	if ((name == "death_prog"))
 		return DEATH_PROG;
-	if (!str_cmp(name, "entry_prog"))
+	if ((name == "entry_prog"))
 		return ENTRY_PROG;
-	if (!str_cmp(name, "greet_prog"))
+	if ((name == "greet_prog"))
 		return GREET_PROG;
-	if (!str_cmp(name, "all_greet_prog"))
+	if ((name == "all_greet_prog"))
 		return ALL_GREET_PROG;
-	if (!str_cmp(name, "give_prog"))
+	if ((name == "give_prog"))
 		return GIVE_PROG;
-	if (!str_cmp(name, "bribe_prog"))
+	if ((name == "bribe_prog"))
 		return BRIBE_PROG;
-	if (!str_cmp(name, "catch_prog"))
+	if ((name == "catch_prog"))
 		return CATCH_PROG;
-	if (!str_cmp(name, "attack_prog"))
+	if ((name == "attack_prog"))
 		return ATTACK_PROG;
-	if (!str_cmp(name, "load_prog"))
+	if ((name == "load_prog"))
 		return LOAD_PROG;
-	if (!str_cmp(name, "command_prog"))
+	if ((name == "command_prog"))
 		return COMMAND_PROG;
-	if (!str_cmp(name, "weapon_prog"))
+	if ((name == "weapon_prog"))
 		return WEAPON_PROG;
-	if (!str_cmp(name, "armour_prog"))
+	if ((name == "armour_prog"))
 		return ARMOUR_PROG;
-	if (!str_cmp(name, "can_see_prog"))
+	if ((name == "can_see_prog"))
 		return CAN_SEE_PROG;
-	if (!str_cmp(name, "damage_prog"))
+	if ((name == "damage_prog"))
 		return DAMAGE_PROG;
 	return (ERROR_PROG);
 }
@@ -6281,7 +6652,7 @@ void load_mobprogs(FILE *fp)
 	return;
 }
 
-void mprog_read_programs(FILE *fp, int32_t i, bool zz)
+void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 {
 	mob_prog_data *mprog;
 	char letter;
@@ -6307,14 +6678,14 @@ void mprog_read_programs(FILE *fp, int32_t i, bool zz)
 			mprog_file_read(fread_string(fp, 1), i);
 			break;
 		default:
-			if (!zz)
+			if (!ignore)
 			{
 				if (letter == '>')
 					SET_BIT(mob_index[i].progtypes, type);
 				else
 					SET_BIT(obj_index[i].progtypes, type);
 			}
-			if (!zz)
+			if (!ignore)
 			{
 #ifdef LEAK_CHECK
 				mprog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
@@ -6327,7 +6698,76 @@ void mprog_read_programs(FILE *fp, int32_t i, bool zz)
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, 0);
 			mprog->comlist = fread_string(fp, 0);
-			if (!zz)
+			if (!ignore)
+			{
+				if (letter == '>')
+				{
+					mprog->next = mob_index[i].mobprogs; // when we write them, we write last first
+					mob_index[i].mobprogs = mprog;		 // so reading them this way keeps them in order
+				}
+				else
+				{
+					mprog->next = obj_index[i].mobprogs;
+					obj_index[i].mobprogs = mprog;
+				}
+			}
+			break;
+		}
+	}
+	return;
+}
+
+void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
+{
+	mob_prog_data *mprog;
+	char letter;
+	int type;
+	mob_prog_data lmprog;
+	for (;;)
+	{
+		fp >> letter;
+
+		if (letter == '|')
+		{
+			break;
+		}
+		else if (letter != '>' && letter != '\\')
+		{
+			logentry(QString("Load_mobiles: vnum %1 MOBPROG char").arg(i));
+			return;
+		}
+		QString word = fread_word(fp);
+		type = mprog_name_to_type(word);
+		switch (type)
+		{
+		case ERROR_PROG:
+			logentry(QString("Load_mobiles: vnum %1 MOBPROG type.").arg(i));
+			return;
+		case IN_FILE_PROG:
+			mprog_file_read(fread_string(fp, 1), i);
+			break;
+		default:
+			if (!ignore)
+			{
+				if (letter == '>')
+					SET_BIT(mob_index[i].progtypes, type);
+				else
+					SET_BIT(obj_index[i].progtypes, type);
+			}
+			if (!ignore)
+			{
+#ifdef LEAK_CHECK
+				mprog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
+#else
+				mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
+#endif
+			}
+			else
+				mprog = &lmprog;
+			mprog->type = type;
+			mprog->arglist = fread_string(fp, false);
+			mprog->comlist = fread_string(fp, false);
+			if (!ignore)
 			{
 				if (letter == '>')
 				{
@@ -6396,6 +6836,11 @@ void string_to_file(FILE *f, char *string)
 
 	fprintf(f, "%s~\n", newbuf);
 	delete[] newbuf;
+}
+
+void string_to_file(QTextStream &fl, QString str)
+{
+	fl << str.remove('\r') + "~\n";
 }
 
 void string_to_file(ofstream &f, char *string)

@@ -743,12 +743,12 @@ void DC::send_hint(void)
     return;
   }
 
-  uint64_t num = number(0, hints.size() - 1);
+  auto num = number(0LL, hints.size() - 1);
 
   uint64_t attempts = 0;
   while (hints.value(num).isEmpty() && attempts++ < 100)
   {
-    num = number(0, hints.size() - 1);
+    num = number(0LL, hints.size() - 1);
   }
 
   QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints.value(num));

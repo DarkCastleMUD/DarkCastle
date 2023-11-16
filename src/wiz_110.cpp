@@ -33,8 +33,9 @@
 #include "Leaderboard.h"
 #include "guild.h"
 #include "const.h"
+#include "vault.h"
 
-void AuctionHandleRenames(Character *ch, string old_name, string new_name);
+void AuctionHandleRenames(Character *ch, QString old_name, QString new_name);
 
 int get_max_stat_bonus(Character *ch, int attrs)
 {
@@ -384,123 +385,128 @@ int do_fakelog(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_rename_char(Character *ch, char *arg, int cmd)
+command_return_t Character::do_rename_char(QStringList arguments, int cmd)
 {
-  Character *victim;
-  class Object *obj;
-  char name[160];
-  char strsave[MAX_INPUT_LENGTH];
-  char oldname[MAX_INPUT_LENGTH];
-  char newname[MAX_INPUT_LENGTH];
-  char arg3[MAX_INPUT_LENGTH];
-
-  FILE *fl;
-  int iWear;
-
-  arg = one_argument(arg, oldname);
-  arg = one_argument(arg, newname);
-  arg = one_argument(arg, arg3);
-
-  if (!(*oldname) || !(*newname))
+  if (arguments.size() < 2)
   {
-    send_to_char("Usage: rename <oldname> <newname> [takeplats]\n\r", ch);
+    send("Usage: rename <oldname> <newname> [takeplats]\n\r");
     return eFAILURE;
   }
 
-  oldname[0] = UPPER(oldname[0]);
-  newname[0] = UPPER(newname[0]);
-
-  if (!(victim = get_pc(oldname)))
+  QString oldname = arguments.value(0);
+  if (!oldname.isEmpty())
   {
-    csendf(ch, "%s is not in the game.\r\n", oldname);
+    oldname[0] = oldname[0].toUpper();
+  }
+
+  QString newname = arguments.value(1);
+  if (!newname.isEmpty())
+  {
+    newname[0] = newname[0].toUpper();
+  }
+
+  Character *victim = get_pc(oldname);
+  if (!victim)
+  {
+    send(QString("%1 is not in the game.\r\n").arg(oldname));
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) <= GET_LEVEL(victim))
+  if (GET_LEVEL(this) <= GET_LEVEL(victim))
   {
-    send_to_char("That might just piss them off.\r\n", ch);
-    csendf(victim, "%s just tried to rename you.\r\n", GET_NAME(ch));
+    send("You can't rename someone your level or higher.\r\n");
+    send(QString("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
     return eFAILURE;
   }
 
   // +1 cause you can actually have 13 char names
-  if (strlen(newname) > (MAX_NAME_LENGTH + 1))
+  if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
-    send_to_char("New name too long.\r\n", ch);
+    send(QString("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
     return eFAILURE;
   }
 
-  if (!strcmp(arg3, "takeplats"))
+  QString arg3 = arguments.value(2);
+  if (arg3 == "takeplats")
   {
     if (GET_PLATINUM(victim) < 500)
     {
-      send_to_char("They don't have enough plats.\r\n", ch);
+      send(QString("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
       return eFAILURE;
     }
     else
     {
       GET_PLATINUM(victim) -= 500;
-      csendf(ch, "You reach into %s's soul and remove 500 platinum.\r\n", GET_SHORT(victim));
-      send_to_char("You feel the hand of god slip into your soul and remove 500 platinum.\r\n", victim);
-      sprintf(name, "500 platinum removed from %s for rename.", GET_NAME(victim));
-      logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
+      victim->send(QString("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
+      logentry(QString("500 platinum removed from %1 for rename.").arg(GET_NAME(victim)), GET_LEVEL(this), LogChannels::LOG_GOD);
     }
   }
 
-  // extern short bport;
+  QString strsave;
   if (DC::getInstance()->cf.bport == false)
   {
-    sprintf(strsave, "%s/%c/%s", SAVE_DIR, newname[0], newname);
+    strsave = QString("%1/%2/%3").arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    sprintf(strsave, "%s/%c/%s", BSAVE_DIR, newname[0], newname);
+    strsave = QString("%1/%2/%3").arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
-  if ((fl = fopen(strsave, "r")))
+  unique_file_t fl(std::fopen(strsave.toStdString().c_str(), "r"), &close_file);
+  if (fl)
   {
-    fclose(fl);
-    csendf(ch, "The name %s is already in use.\r\n", newname);
+    send(QString("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
     return eFAILURE;
   }
 
-  for (iWear = 0; iWear < MAX_WEAR; iWear++)
+  for (unsigned iWear = 0; iWear < MAX_WEAR; iWear++)
   {
     if (victim->equipment[iWear] &&
         DC::isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      char tmp[256];
-      sprintf(tmp, "%s", victim->equipment[iWear]->name);
-      tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
-      sprintf(tmp, "%s %s", tmp, newname);
-      victim->equipment[iWear]->name = str_hsh(tmp);
+      QString tmp(victim->equipment[iWear]->name);
+      qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+      if (x >= 0 && x < tmp.length())
+      {
+        tmp[x] = '\0';
+      }
+
+      tmp = QString("%1 %2").arg(tmp).arg(newname);
+      victim->equipment[iWear]->name = str_hsh(tmp.toStdString().c_str());
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
     {
-      for (obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
+      for (Object *obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
         if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          char tmp[256];
-          sprintf(tmp, "%s", obj->name);
-          tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
-          sprintf(tmp, "%s %s", tmp, newname);
-          obj->name = str_hsh(tmp);
+          QString tmp(obj->name);
+          qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+          if (x >= 0 && x < tmp.length())
+          {
+            tmp[x] = '\0';
+          }
+          tmp = QString("%1 %2").arg(tmp).arg(newname);
+          obj->name = str_hsh(tmp.toStdString().c_str());
         }
       }
     }
   }
 
-  obj = victim->carrying;
+  Object *obj = victim->carrying;
   while (obj)
   {
     if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      char tmp[256];
-      sprintf(tmp, "%s", obj->name);
-      tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
-      sprintf(tmp, "%s %s", tmp, newname);
-      obj->name = str_hsh(tmp);
+      QString tmp = QString("%1").arg(obj->name);
+      qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+      if (x >= 0 && x < tmp.length())
+      {
+        tmp[x] = '\0';
+      }
+      tmp = QString("%1 %2").arg(tmp).arg(newname);
+      obj->name = str_hsh(tmp.toStdString().c_str());
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
@@ -509,71 +515,74 @@ int do_rename_char(Character *ch, char *arg, int cmd)
       {
         if (DC::isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          char tmp[256];
-          sprintf(tmp, "%s", obj2->name);
-          tmp[strlen(tmp) - strlen(GET_NAME(victim)) - 1] = '\0';
-          sprintf(tmp, "%s %s", tmp, newname);
-          obj2->name = str_hsh(tmp);
+          QString tmp = QString("%1").arg(obj2->name);
+          qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+          if (x >= 0 && x < tmp.length())
+          {
+            tmp[x] = '\0';
+          }
+          tmp = QString("%1 %2").arg(tmp).arg(newname);
+          obj2->name = str_hsh(tmp.toStdString().c_str());
         }
       }
     }
     obj = obj->next_content;
   }
 
-  int clan = GET_CLAN(victim), rights = plr_rights(victim);
+  auto clan = GET_CLAN(victim);
+  auto rights = plr_rights(victim);
   do_outcast(victim, GET_NAME(victim), CMD_DEFAULT);
 
-  do_fsave(ch, GET_NAME(victim), CMD_DEFAULT);
+  do_fsave(this, GET_NAME(victim), CMD_DEFAULT);
 
   // Copy the pfile
+  QString buffer;
   if (DC::getInstance()->cf.bport == false)
   {
-    sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0], GET_NAME(victim), SAVE_DIR, newname[0], newname);
+    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0], GET_NAME(victim), BSAVE_DIR, newname[0], newname);
+    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
-  system(name);
+  system(buffer.toStdString().c_str());
 
-  char src_filename[256];
-  char dst_filename[256];
-  struct stat buf;
+  struct stat buf = {};
 
   // Only copy golems if they exist
-  for (int i = 0; i < MAX_GOLEMS; i++)
+  for (unsigned i = 0; i < MAX_GOLEMS; i++)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, victim->name[0], GET_NAME(victim), i);
-    if (0 == stat(src_filename, &buf))
+    QString src_filename = QString("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(i);
+    if (0 == stat(src_filename.toStdString().c_str(), &buf))
     {
       // Make backup
-      snprintf(dst_filename, 256, "%s/%c/%s.%d.old", FAMILIAR_DIR, victim->name[0], GET_NAME(victim), i);
-      sprintf(name, "cp %s %s", src_filename, dst_filename);
-      system(name);
+      QString dst_filename = QString("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(i);
+      QString command = QString("cp -f %1 %2").arg(src_filename).arg(dst_filename);
+      system(command.toStdString().c_str());
 
       // Rename
-      snprintf(dst_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, newname[0], newname, i);
-      sprintf(name, "mv -f %s %s", src_filename, dst_filename);
-      system(name);
+      dst_filename = QString("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
+      command = QString("mv -f %1 %2").arg(src_filename).arg(dst_filename);
+      system(command.toStdString().c_str());
     }
   }
 
-  sprintf(name, "%s renamed to %s.", GET_NAME(victim), newname);
-  logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  buffer = QString("%1 renamed to %2.").arg(GET_NAME(victim)).arg(newname);
+  logentry(buffer, GET_LEVEL(this), LogChannels::LOG_GOD);
 
   // handle the renames
-  AuctionHandleRenames(ch, GET_NAME(victim), newname);
+  AuctionHandleRenames(this, GET_NAME(victim), newname);
 
   // Get rid of the existing one
-  do_zap(ch, GET_NAME(victim), 10);
+  do_zap(this, GET_NAME(victim), 10);
 
   // load the new guy
-  do_linkload(ch, newname, CMD_DEFAULT);
+  do_linkload(newname.split(' '), CMD_DEFAULT);
 
   if (!(victim = get_pc(newname)))
   {
-    send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", ch);
+    send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", this);
     return eFAILURE;
   }
   do_name(victim, " %", CMD_DEFAULT);
@@ -585,13 +594,10 @@ int do_rename_char(Character *ch, char *arg, int cmd)
     clan_data *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(GET_NAME(victim), ch->clan)))
+    if ((pmember = get_member(GET_NAME(victim), this->clan)))
       pmember->member_rights = rights;
     add_totem_stats(victim);
   }
-  extern void rename_vault_owner(char *arg1, char *arg2);
-  extern void rename_leaderboard(char *, char *);
-
   rename_vault_owner(oldname, newname);
   leaderboard.rename(oldname, newname);
 

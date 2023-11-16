@@ -2012,14 +2012,11 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-void Leaderboard::rename(char *oldname, char *newname)
+void Leaderboard::rename(QString oldname, QString newname)
 {
-	FILE *fl;
+	FILE *fl{};
 	// lines is the number of lines rewritten back to leaderboard file
 	// after a rename.. must sync up with # of outputs
-	int lines = 35 * (CLASS_MAX - 1);
-	int value[lines], i;
-	char *name[lines];
 
 	if (DC::getInstance()->cf.bport)
 	{
@@ -2031,25 +2028,28 @@ void Leaderboard::rename(char *oldname, char *newname)
 		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
 		abort();
 	}
-	for (i = 0; i < lines; i++)
+
+	QList<int> value;
+	QList<QString> name;
+	auto lines = 35 * (CLASS_MAX - 1);
+	for (auto i = 0; i < lines; i++)
 	{
-		name[i] = fread_string(fl, 0);
-		value[i] = fread_int(fl, 0, 2147483467);
+		name.insert(i, fread_string(fl, 0));
+		value.insert(i, fread_int(fl, 0, 2147483467));
 	}
 	fclose(fl);
 
-	for (i = 0; i < lines; i++)
+	for (auto i = 0; i < lines; i++)
 	{
-		if (!strcmp(name[i], oldname))
+		if (name[i] == oldname)
 		{
-			dc_free(name[i]);
-			name[i] = str_dup(newname);
+			name[i] = newname;
 		}
 	}
 
 	if (DC::getInstance()->cf.leaderboard_check == "suspend")
 	{
-		logf(IMMORTAL, LogChannels::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname, newname);
+		logf(IMMORTAL, LogChannels::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname.toStdString().c_str(), newname.toStdString().c_str());
 	}
 	else
 	{
@@ -2059,18 +2059,12 @@ void Leaderboard::rename(char *oldname, char *newname)
 			abort();
 		}
 
-		for (i = 0; i < lines; i++)
+		for (auto i = 0; i < lines; i++)
 		{
-			fprintf(fl, "%s~ %d\n", name[i], value[i]);
+			fprintf(fl, "%s~ %d\n", name[i].toStdString().c_str(), value[i]);
 		}
 
 		fclose(fl);
-	}
-
-	for (i = 0; i < lines; i++)
-	{
-		dc_free(name[i]);
-		name[i] = nullptr;
 	}
 }
 

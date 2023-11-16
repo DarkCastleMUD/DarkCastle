@@ -73,7 +73,7 @@ extern Character *activeTarget;
 extern Object *activeObj;
 extern void *activeVo;
 
-extern int top_of_world;
+extern room_t top_of_world;
 extern struct index_data *obj_index;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
@@ -746,7 +746,6 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
       prog_error(ch, "Mpgoto - Missing arg after 'pc' argument.");
       return eFAILURE | eINTERNAL_ERROR;
     }
-    extern Character *get_pc(char *name);
     if (!(vict = get_pc(arg)))
       location = -1;
     else
@@ -775,7 +774,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   }
   if (location == ch->in_room)
     return eFAILURE; // zz
-  extern int top_of_world;
+  extern room_t top_of_world;
   if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
     location = 0;
 
@@ -827,7 +826,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
     prog_error(ch, "do_mpat - No such location.");
     return eFAILURE | eINTERNAL_ERROR;
   }
-  extern int top_of_world;
+  extern room_t top_of_world;
   if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
   {
     if (!DC::getInstance()->rooms.contains(1))
@@ -1869,7 +1868,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
 {
   Character *victim;
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-  int to_room = 0;
+  room_t to_room = 0;
 
   if (IS_PC(ch) && GET_LEVEL(ch) < 110)
     return eFAILURE;
@@ -1926,7 +1925,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     }
     else
     {
-      to_room = number(0, top_of_world);
+      to_room = number<room_t>(1, top_of_world);
     }
   } while (!DC::getInstance()->rooms.contains(to_room) ||
            DC::isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||

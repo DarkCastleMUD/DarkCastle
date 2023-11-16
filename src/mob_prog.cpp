@@ -943,9 +943,9 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			else
 			{
 				if (IS_NPC(target))
-					sbval = &target->level;
+					sbval = reinterpret_cast<decltype(sbval)>(&target->level);
 				else
-					sbval = &target->level;
+					sbval = reinterpret_cast<decltype(sbval)>(&target->level);
 			}
 		}
 		else if (!str_cmp(right, "long"))

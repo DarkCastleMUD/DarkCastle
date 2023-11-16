@@ -161,6 +161,7 @@ public:
     {
       return function_(ch);
     }
+    return eFAILURE;
   }
   QString getName(void) const { return name_; }
 
