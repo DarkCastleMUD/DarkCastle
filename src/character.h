@@ -99,9 +99,9 @@ private:
 */
 #define MAX_WEAR 23
 
-#define SEX_NEUTRAL 0
-#define SEX_MALE 1
-#define SEX_FEMALE 2
+#define SEX_NEUTRAL Character::sex_t::NEUTRAL
+#define SEX_MALE Character::sex_t::MALE
+#define SEX_FEMALE Character::sex_t::FEMALE
 
 #define POSITION_DEAD 0
 // #define POSITION_MORTALLYW   1
@@ -415,7 +415,14 @@ private:
 // PC/MOB specific data are held in the appropriate pointed-to structs
 class Character
 {
+
 public:
+    enum sex_t : int8_t
+    {
+        NEUTRAL = 0,
+        MALE = 1,
+        FEMALE = 2
+    };
     static constexpr uint64_t MIN_NAME_SIZE = 3;
     static constexpr uint64_t MAX_NAME_SIZE = 12;
     static const QList<int> wear_to_item_wear;
@@ -433,9 +440,16 @@ public:
     char *description = nullptr; // For 'look mob'
     char *title = nullptr;
 
-    int8_t sex = {};
+    sex_t sex = {};
+
     int8_t c_class = {};
+    auto getClass(void) const { return c_class; }
+    QString getClassName(void) const { return class_names.value(c_class); }
+
     int8_t race = {};
+    auto getRace(void) const { return race; }
+    QString getRaceName(void) const { return race_names.value(race); }
+
     int8_t level = {};
     int8_t position = {}; // Standing, sitting, fighting
 
@@ -502,7 +516,7 @@ public:
     int16_t song_mitigation = {};  // modifies song damage
     int16_t spell_reflect = {};
 
-    intptr_t clan = {}; /* Clan the char is in */
+    uint64_t clan = {}; /* Clan the char is in */
 
     int16_t armor = {};   // Armor class
     int16_t hitroll = {}; // Any bonus or penalty to the hit roll
@@ -602,21 +616,21 @@ public:
     QString getSetting(QString key, QString defaultValue = QString());
     QString getSettingAsColor(QString key, QString defaultValue = QString());
 
-    command_return_t do_clanarea(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_config(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_experience(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_split(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_zsave(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_goto(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_save(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_search(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_identify(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_recall(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_cdeposit(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_sockets(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_toggle(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t do_test(QStringList arguments, int cmd = CMD_DEFAULT);
-    command_return_t generic_command(QStringList arguments, int cmd = CMD_DEFAULT);
+    command_return_t do_clanarea(QStringList arguments, int cmd);
+    command_return_t do_config(QStringList arguments, int cmd);
+    command_return_t do_experience(QStringList arguments, int cmd);
+    command_return_t do_split(QStringList arguments, int cmd);
+    command_return_t do_zsave(QStringList arguments, int cmd);
+    command_return_t do_goto(QStringList arguments, int cmd);
+    command_return_t do_save(QStringList arguments, int cmd);
+    command_return_t do_search(QStringList arguments, int cmd);
+    command_return_t do_identify(QStringList arguments, int cmd);
+    command_return_t do_recall(QStringList arguments, int cmd);
+    command_return_t do_cdeposit(QStringList arguments, int cmd);
+    command_return_t generic_command(QStringList arguments, int cmd);
+    command_return_t do_sockets(QStringList arguments, int cmd);
+    command_return_t do_toggle(QStringList arguments, int cmd);
+    command_return_t do_who(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
@@ -644,6 +658,8 @@ public:
     }
     void display_string_list(QStringList list);
     void display_string_list(const char **list);
+    static const QStringList class_names;
+    static const QStringList race_names;
 
 private:
     uint64_t gold_ = {}; /* Money carried                           */
@@ -672,10 +688,10 @@ public:
 struct char_file_u4
 {
     char_file_u4();
-    int8_t sex = {};     /* Sex */
-    int8_t c_class = {}; /* Class */
-    int8_t race = {};    /* Race */
-    int8_t level = {};   /* Level */
+    Character::sex_t sex = {}; /* Sex */
+    int8_t c_class = {};       /* Class */
+    int8_t race = {};          /* Race */
+    int8_t level = {};         /* Level */
 
     int8_t raw_str = {};
     int8_t raw_intel = {};

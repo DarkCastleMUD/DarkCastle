@@ -1715,13 +1715,13 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 		}
 		else if (choice == MAX_PC_RACE + 1)
 		{
-			int newsex;
+			Character::sex_t newsex{};
 			if (arg2[0] == 'n')
-				newsex = 0;
+				newsex = Character::sex_t::NEUTRAL;
 			else if (arg2[0] == 'm')
-				newsex = 1;
+				newsex = Character::sex_t::MALE;
 			else if (arg2[0] == 'f')
-				newsex = 2;
+				newsex = Character::sex_t::FEMALE;
 			else
 			{
 				csendf(ch, "Syntax: buy %d m/f/n\r\n", MAX_PC_RACE + 1);

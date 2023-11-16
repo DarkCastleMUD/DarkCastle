@@ -1178,7 +1178,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				sbval = &target->sex;
+				sbval = reinterpret_cast<decltype(sbval)>(&target->sex);
 		}
 		else if (!str_cmp(right, "size"))
 		{

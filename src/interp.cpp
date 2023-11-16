@@ -149,7 +149,7 @@ struct command_info cmd_info[] =
         {"title", do_title, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"typo", do_typo, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"weather", do_weather, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"who", do_who, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"who", nullptr, nullptr, &Character::do_who, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"wizlist", do_wizlist, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"socials", do_social, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"index", do_index, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},

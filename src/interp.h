@@ -587,7 +587,6 @@ command_return_t do_wear(Character *ch, char *argument, int cmd);
 command_return_t do_weather(Character *ch, char *argument, int cmd);
 command_return_t do_where(Character *ch, char *argument, int cmd);
 command_return_t do_whisper(Character *ch, char *argument, int cmd);
-command_return_t do_who(Character *ch, char *argument, int cmd);
 command_return_t do_whoarena(Character *ch, char *argument, int cmd);
 command_return_t do_whoclan(Character *ch, char *argument, int cmd);
 command_return_t do_whogroup(Character *ch, char *argument, int cmd);
