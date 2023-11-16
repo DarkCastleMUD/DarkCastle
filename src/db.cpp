@@ -2715,7 +2715,7 @@ Character *read_mobile(int nr, FILE *fl)
 	if (tmp > 2)
 		tmp -= 3;
 
-	mob->sex = (char)tmp;
+	mob->sex = (Character::sex_t)tmp;
 
 	mob->immune = fread_bitvector(fl, 0, 2147483467);
 	mob->suscept = fread_bitvector(fl, 0, 2147483467);

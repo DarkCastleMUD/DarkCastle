@@ -575,3 +575,30 @@ const QStringList Player::toggle_txt = {
     "ascii",
     "damage",
     "nodupekeys"};
+
+const QStringList Character::class_names = {
+    "undefined",
+    "mage",
+    "cleric",
+    "thief",
+    "warrior",
+    "antipaladin",
+    "paladin",
+    "barbarian",
+    "monk",
+    "ranger",
+    "bard",
+    "druid",
+    "psionicist"};
+
+const QStringList Character::race_names = {
+    "undefined",
+    "human",
+    "elf",
+    "dwarf",
+    "hobbit",
+    "pixie",
+    "ogre",
+    "gnome",
+    "orc",
+    "troll"};

@@ -259,41 +259,9 @@ int do_whosolo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_who(Character *ch, char *argument, int cmd)
+command_return_t Character::do_who(QStringList arguments, int cmd)
 {
-  class Connection *d;
-  Character *i;
-  clan_data *clan;
-  int numPC = 0;
-  int numImmort = 0;
-  char *infoField;
-  char infoBuf[64];
-  char extraBuf[128];
-  char tailBuf[64];
-  char preBuf[64];
-  char arg[MAX_INPUT_LENGTH];
-  char oneword[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH];
-  char immbuf[MAX_STRING_LENGTH];
-  int charmatch = 0;
-  char charname[MAX_INPUT_LENGTH];
-  int charmatchistrue = 0;
-  int clss = 0;
-  int levelarg = 0;
-  int lowlevel = 0;
-  int highlevel = 110;
-  int anoncheck = 0;
-  int sexcheck = 0;
-  int sextype = 0;
-  int nomatch = 0;
-  int hasholylight = 0;
-  int lfgcheck = 0;
-  int guidecheck = 0;
-  int race = 0;
-  bool addimmbuf;
-  charname[0] = '\0';
-  immbuf[0] = '\0';
-  char *immortFields[] = {
+  const QStringList immortFields = {
       "   Immortal  ",
       "  Architect  ",
       "    Deity    ",
@@ -303,38 +271,16 @@ int do_who(Character *ch, char *argument, int cmd)
       " Coordinator ",
       "   --------  ",
       " Implementer "};
-  char *clss_types[] = {
-      "mage",
-      "cleric",
-      "thief",
-      "warrior",
-      "antipaladin",
-      "paladin",
-      "barbarian",
-      "monk",
-      "ranger",
-      "bard",
-      "druid",
-      "psionicist",
-      "\n"};
-  char *lowercase_race_types[] = {
-      "human",
-      "elf",
-      "dwarf",
-      "hobbit",
-      "pixie",
-      "ogre",
-      "gnome",
-      "orc",
-      "troll",
-      "\n"};
 
-  hasholylight = IS_MOB(ch) ? 0 : ch->player->holyLite;
-
-  //  Loop through all our arguments
-  for (half_chop(argument, oneword, arg); strlen(oneword); half_chop(arg, oneword, arg))
+  quint64 lowlevel{}, highlevel{UINT64_MAX}, numPC{}, numImmort{};
+  bool anoncheck{}, sexcheck{}, guidecheck{}, lfgcheck{}, charcheck{}, nomatch{}, charmatchistrue{}, addimmbuf{};
+  Character::sex_t sextype{};
+  QString charname, class_found, race_found;
+  for (const auto &oneword : arguments)
   {
-    if ((levelarg = atoi(oneword)))
+    bool ok = false;
+    auto levelarg = oneword.toULongLong(&ok);
+    if (ok)
     {
       if (!lowlevel)
       {
@@ -357,80 +303,72 @@ int do_who(Character *ch, char *argument, int cmd)
     // named himself "Anonymous" or "Penis", etc.
     if (is_abbrev(oneword, "anonymous"))
     {
-      anoncheck = 1;
+      anoncheck = true;
     }
-    else if (is_abbrev(oneword, "penis"))
+    else if (is_abbrev(oneword, "penis") || is_abbrev(oneword, "male"))
     {
-      sexcheck = 1;
-      sextype = SEX_MALE;
+      sexcheck = true;
+      sextype = Character::sex_t::MALE;
     }
     else if (is_abbrev(oneword, "guide"))
     {
-      guidecheck = 1;
+      guidecheck = true;
     }
-    else if (is_abbrev(oneword, "vagina"))
+    else if (is_abbrev(oneword, "vagina") || is_abbrev(oneword, "female"))
     {
-      sexcheck = 1;
-      sextype = SEX_FEMALE;
+      sexcheck = true;
+      sextype = Character::sex_t::FEMALE;
     }
-    else if (is_abbrev(oneword, "other"))
+    else if (is_abbrev(oneword, "other") || is_abbrev(oneword, "neutral"))
     {
-      sexcheck = 1;
-      sextype = SEX_NEUTRAL;
+      sexcheck = true;
+      sextype = Character::sex_t::NEUTRAL;
     }
     else if (is_abbrev(oneword, "lfg"))
     {
-      lfgcheck = 1;
+      lfgcheck = true;
     }
     else
     {
-      for (clss = 0; clss <= 12; clss++)
-      {
-        if (clss == 12)
-        {
-          clss = 0;
-          break;
-        }
-        else if (is_abbrev(oneword, clss_types[clss]))
-        {
-          clss++;
-          break;
-        }
-      }
+      auto is_abbreviation = [&](auto fullname)
+      { return is_abbrev(oneword, fullname); };
 
-      for (race = 0; race <= 9; race++)
+      auto it = std::find_if(begin(class_names), end(class_names), is_abbreviation);
+      if (it != std::end(class_names))
       {
-        if (race == 9)
+        class_found = *it;
+      }
+      else
+      {
+        it = std::find_if(begin(race_names), end(race_names), is_abbreviation);
+        if (it != std::end(race_names))
         {
-          race = 0;
-          break;
+          race_found = *it;
         }
-        else if (is_abbrev(oneword, lowercase_race_types[race]))
+        else
         {
-          race++;
-          break;
+          charname = oneword;
+          charcheck = true;
         }
       }
     }
-
-    // if there's anything left, we'll assume it's a partial name.
-    // and we only take the "last" one in the list, so 'who warrior thief' only matches thief
-    // This is consistent with how the class stuff works too
-    strcpy(charname, oneword);
-    charmatch = 1;
-
   } // end of for loop
 
   // Display the actual stuff
-  send_to_char("[$4:$R]===================================[$4:$R]\n\r"
-               "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
-               "[$4:$R]===================================[$4:$R]\n\r\n\r",
-               ch);
+  send("[$4:$R]===================================[$4:$R]\n\r"
+       "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
+       "[$4:$R]===================================[$4:$R]\n\r\n\r");
 
-  clear_who_buffer();
-
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  QString buf;
+  QString immbuf;
+  bool hasholylight = IS_MOB(this) ? false : player->holyLite;
+  for (auto d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
+    QString infoBuf;
+    QString extraBuf;
+    QString tailBuf;
+    QString preBuf;
+
     // we have an invalid match arg, so nothing is going to match
     if (nomatch)
     {
@@ -442,6 +380,7 @@ int do_who(Character *ch, char *argument, int cmd)
       continue;
     }
 
+    Character *i{};
     if (d->original)
     {
       i = d->original;
@@ -455,7 +394,7 @@ int do_who(Character *ch, char *argument, int cmd)
     {
       continue;
     }
-    if (!CAN_SEE(ch, i))
+    if (!CAN_SEE(this, i))
     {
       continue;
     }
@@ -470,7 +409,7 @@ int do_who(Character *ch, char *argument, int cmd)
       continue;
     }
 
-    if (clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)
+    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != this->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)
     {
       continue;
     }
@@ -480,9 +419,9 @@ int do_who(Character *ch, char *argument, int cmd)
     }
 
     // Skip string based checks if our name matches
-    if (!charmatch || !is_abbrev(charname, GET_NAME(i)))
+    if (!charcheck || !is_abbrev(charname, GET_NAME(i)))
     {
-      if (clss && GET_CLASS(i) != clss && !charmatchistrue)
+      if (!class_found.isEmpty() && i->getClassName() != class_found && !charmatchistrue)
       {
         continue;
       }
@@ -502,69 +441,58 @@ int do_who(Character *ch, char *argument, int cmd)
       {
         continue;
       }
-      if (race && GET_RACE(i) != race && !charmatchistrue)
+      if (!race_found.isEmpty() && i->getRaceName() != race_found && !charmatchistrue)
       {
         continue;
       }
     }
 
-    // At this point, we either pass a filter or our name matches.
-    if (!(clss || anoncheck || sexcheck || lfgcheck || guidecheck || race))
+    if (charcheck)
     {
-      // If there were no filters, the it's only a name match so filter out
-      // anyone that doesn't match the filters
-      if (charmatch && !is_abbrev(charname, GET_NAME(i)))
+      if (!is_abbrev(charname, GET_NAME(i)))
       {
         continue;
       }
     }
 
-    infoField = infoBuf;
-    extraBuf[0] = '\0';
-    buf[0] = '\0';
     addimmbuf = false;
     if (GET_LEVEL(i) > MORTAL)
     {
       /* Immortals can't be anonymous */
       if (!str_cmp(GET_NAME(i), "Urizen"))
       {
-        infoField = infoBuf;
-        sprintf(infoBuf, "   Meatball  ");
+        infoBuf = "   Meatball  ";
       }
       else if (!str_cmp(GET_NAME(i), "Julian"))
       {
-        infoField = infoBuf;
-        sprintf(infoBuf, "    $B$7S$4a$7l$4m$7o$4n$R   ");
+        infoBuf = "    $B$7S$4a$7l$4m$7o$4n$R   ";
       }
       else if (!strcmp(GET_NAME(i), "Apocalypse"))
       {
-        infoField = infoBuf;
-        sprintf(infoBuf, "    $5Moose$R    ");
+        infoBuf = "    $5Moose$R    ";
       }
       else if (!strcmp(GET_NAME(i), "Pirahna"))
       {
-        infoField = infoBuf;
-        sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
+        infoBuf = "   $B$4>$5<$1($2($1($5:$4>$R   ";
       }
       else if (!strcmp(GET_NAME(i), "Petra"))
       {
-        infoField = infoBuf;
-        sprintf(infoBuf, "    $B$1R$2o$1a$2d$1i$2e$R   ");
+        infoBuf = "    $B$1R$2o$1a$2d$1i$2e$R   ";
       }
       else
       {
-        infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
+        infoBuf = immortFields.value(GET_LEVEL(i) - IMMORTAL);
       }
 
-      if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
+      if (GET_LEVEL(this) >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
       {
         if (!IS_MOB(i) && i->player->incognito == true)
         {
-          sprintf(extraBuf, " (Incognito / WizInvis %ld)", i->player->wizinvis);
+          extraBuf = QString(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
         }
         else
         {
-          sprintf(extraBuf, " (WizInvis %ld)", i->player->wizinvis);
+          extraBuf = QString(" (WizInvis %1)").arg(i->player->wizinvis);
         }
       }
       numImmort++;
@@ -572,14 +500,13 @@ int do_who(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight)
+      if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
       {
-        sprintf(infoBuf, " $B$5%2d$7-$1%s  $2%s$R$7 ",
-                GET_LEVEL(i), pc_clss_abbrev[(int)GET_CLASS(i)], race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QString(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(GET_LEVEL(i)).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
       }
       else
       {
-        sprintf(infoBuf, "  $6-==-   $B$2%s$R ", race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QString("  $6-==-   $B$2%1$R ").arg(race_abbrev[(int)GET_RACE(i)]);
       }
       numPC++;
     }
@@ -587,75 +514,61 @@ int do_who(Character *ch, char *argument, int cmd)
     if ((d->connected) == Connection::states::WRITE_BOARD || (d->connected) == Connection::states::EDITING ||
         (d->connected) == Connection::states::EDIT_MPROG)
     {
-      strcpy(tailBuf, "$1$B(writing) ");
-    }
-    else
-    {
-      *tailBuf = '\0'; // clear it
+      tailBuf = "$1$B(writing) ";
     }
 
     if (DC::isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
     {
-      strcpy(preBuf, "$7$B(Guide)$R ");
-    }
-    else
-    {
-      *preBuf = '\0';
+      preBuf = "$7$B(Guide)$R ";
     }
 
     if (DC::isSet(i->player->toggles, Player::PLR_LFG))
     {
-      strcat(tailBuf, "$3(LFG) ");
+      tailBuf += "$3(LFG) ";
     }
 
     if (IS_AFFECTED(i, AFF_CHAMPION))
     {
-      strcat(tailBuf, "$B$4(Champion)$R");
+      tailBuf += "$B$4(Champion)$R";
     }
 
-    if (i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER)
+    auto clanPtr = get_clan(i);
+    if (i->clan && clanPtr && GET_LEVEL(i) < OVERSEER)
     {
-      sprintf(buf, "[%s] %s$3%s %s %s $2[%s$R$2] %s$R\n\r",
-              infoField, preBuf, GET_SHORT(i), i->title,
-              extraBuf, clan->name, tailBuf);
+      buf = QString("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
     else
     {
-      sprintf(buf, "[%s] %s$3%s %s$R$3 %s %s$R\n\r",
-              infoField, preBuf, GET_SHORT(i), i->title,
-              extraBuf, tailBuf);
+      buf = QString("[%1] %2$3%3 %4 %5 %6$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)
     {
-      strcat(immbuf, buf);
+      immbuf += buf;
     }
     else
     {
-      add_to_who(buf);
+      send(buf);
     }
   }
 
   if (numPC && numImmort)
   {
-    add_to_who("\n\r");
+    send("\n\r");
   }
 
   if (numImmort)
   {
-    add_to_who(immbuf);
+    send(immbuf);
   }
 
-  sprintf(buf, "\n\r"
-               "    Visible Players Connected:   %d\n\r"
-               "    Visible Immortals Connected: %d\n\r"
-               "    (Max this boot is %d)\n\r",
-          numPC, numImmort, max_who);
-
-  add_to_who(buf);
-
-  // page it to the player.  the 1 tells page_string to make it's own copy of the data
-  page_string(ch->desc, gWhoBuffer, 1);
+  send(QString("\n\r"
+               "    Visible Players Connected:   %1\n\r"
+               "    Visible Immortals Connected: %2\n\r"
+               "    (Max this boot is %3)\n\r")
+           .arg(numPC)
+           .arg(numImmort)
+           .arg(max_who));
 
   return eSUCCESS;
 }
