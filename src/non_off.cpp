@@ -397,218 +397,54 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    for (qsizetype x = 0; x < Player::toggle_txt.size(); x++)
+    uint64_t longest_toggle_name{};
+    for (const auto &t : Player::togglables)
     {
-      if (x != 14 || (DC::isSet(player->toggles, Player::PLR_GUIDE)))
+      if (t.name_.size() > longest_toggle_name)
       {
-        send(QString("%1 ").arg(Player::toggle_txt[x], -11));
-      }
-
-      switch (x)
-      {
-      case 0:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 1:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 2:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_BEEP) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 3:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 4:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_ANSI) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 5:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_VT100) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 6:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 7:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_PAGER) ? "$B$4off$R" : "$B$2on$R"));
-        break;
-
-      case 8:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)"));
-        break;
-
-      case 9:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 10:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 11:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_LFG) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-
-      case 12:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-      case 13:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-      case 14:
-        if (DC::isSet(player->toggles, Player::PLR_GUIDE))
-        {
-          send(QString("%1\n\r").arg(
-              DC::isSet(player->toggles, Player::PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R"));
-        }
-        break;
-      case 15:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_NEWS) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-      case 16:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_ASCII) ? "$B$4off$R" : "$B$2on$R"));
-        break;
-      case 17:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-      case 18:
-        send(QString("%1\n\r").arg(
-            DC::isSet(player->toggles, Player::PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R"));
-        break;
-      default:
-        break;
+        longest_toggle_name = t.name_.size();
       }
     }
 
+    for (const auto &t : Player::togglables)
+    {
+      if (t.value_ != Player::PLR_GUIDE_TOG || (DC::isSet(player->toggles, Player::PLR_GUIDE)))
+      {
+        send(QString("%1 ").arg(t.name_, -11));
+        send(QString("%1\n\r").arg(DC::isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+      }
+    }
     return eSUCCESS;
   }
 
   bool txt_found = false;
   const QString arg1 = arguments.value(0);
-  qsizetype x{};
+  Toggle found_toggle;
   if (!arg1.isEmpty())
   {
-    for (x = 0; x < Player::toggle_txt.size(); x++)
+    for (const auto &t : Player::togglables)
     {
-      if (is_abbrev(arg1, Player::toggle_txt[x]))
+      if (is_abbrev(arg1, t.name_))
       {
         txt_found = true;
+        found_toggle = t;
         break;
       }
     }
   }
 
-  if (!txt_found)
+  if (!txt_found || !found_toggle.isValid())
   {
     send("Bad option.  Type toggle with no arguments for a list of "
          "good ones.\r\n");
     return eFAILURE;
   }
 
-  switch (x)
+  if (found_toggle.function_)
   {
-  case 0:
-    do_brief(this, "", CMD_DEFAULT);
-    break;
-
-  case 1:
-    do_compact(this, "", CMD_DEFAULT);
-    break;
-
-  case 2:
-    do_beep_set(this, "", CMD_DEFAULT);
-    break;
-
-  case 3:
-    do_anonymous(this, "", CMD_DEFAULT);
-    break;
-
-  case 4:
-    do_ansi(this, "", CMD_DEFAULT);
-    break;
-
-  case 5:
-    do_vt100(this, "", CMD_DEFAULT);
-    break;
-
-  case 6:
-    do_wimpy(this, "", CMD_DEFAULT);
-    break;
-
-  case 7:
-    do_pager(this, "", CMD_DEFAULT);
-    break;
-
-  case 8:
-    do_bard_song_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 9:
-    do_autoeat(this, "", CMD_DEFAULT);
-    break;
-
-  case 10:
-    do_summon_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 11:
-    do_lfg_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 12:
-    do_charmiejoin_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 13:
-    do_notax_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 14:
-    if (DC::isSet(player->toggles, Player::PLR_GUIDE))
-      do_guide_toggle(this, "", CMD_DEFAULT);
-    else
-      send("You're not a guide!\r\n");
-    break;
-
-  case 15:
-    do_news_toggle(this, "", CMD_DEFAULT);
-    break;
-
-  case 16:
-    do_ascii_toggle(this, "", CMD_DEFAULT);
-    break;
-  case 17:
-    do_damage_toggle(this, "", CMD_DEFAULT);
-    break;
-  case 18:
-    do_nodupekeys_toggle(this, "", CMD_DEFAULT);
-    break;
-  default:
-    send("A bad thing just happened.  Tell the gods.\r\n");
-    break;
+    return (this->*(found_toggle.function_))({}, CMD_DEFAULT);
   }
+
   return eSUCCESS;
 }
 
@@ -772,350 +608,345 @@ int Character::do_config(QStringList arguments, int cmd)
   return eFAILURE;
 }
 
-int do_brief(Character *ch, char *argument, int cmd)
+command_return_t Character::do_brief(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
+  if (DC::isSet(player->toggles, Player::PLR_BRIEF))
   {
-    send_to_char("Brief mode $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_BRIEF);
+    send("Brief mode $B$4off$R.\r\n");
+    REMOVE_BIT(player->toggles, Player::PLR_BRIEF);
   }
   else
   {
-    send_to_char("Brief mode $B$2on$R.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_BRIEF);
+    send("Brief mode $B$2on$R.\r\n");
+    SET_BIT(player->toggles, Player::PLR_BRIEF);
   }
   return eSUCCESS;
 }
 
-int do_ansi(Character *ch, char *argument, int cmd)
+command_return_t Character::do_ansi(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_ANSI))
+  if (DC::isSet(player->toggles, Player::PLR_ANSI))
   {
-    send_to_char("ANSI COLOR $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_ANSI);
+    send_to_char("ANSI COLOR $B$4off$R.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_ANSI);
   }
   else
   {
-    send_to_char("ANSI COLOR $B$2on$R.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_ANSI);
+    send_to_char("ANSI COLOR $B$2on$R.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_ANSI);
   }
   return eSUCCESS;
 }
 
-int do_vt100(Character *ch, char *argument, int cmd)
+command_return_t Character::do_vt100(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_VT100))
+  if (DC::isSet(player->toggles, Player::PLR_VT100))
   {
-    send_to_char("VT100 $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_VT100);
+    send_to_char("VT100 $B$4off$R.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_VT100);
   }
   else
   {
-    send_to_char("VT100 $B$2on$R.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_VT100);
+    send_to_char("VT100 $B$2on$R.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_VT100);
   }
   return eSUCCESS;
 }
 
-int do_compact(Character *ch, char *argument, int cmd)
+command_return_t Character::do_compact(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_COMPACT))
+  if (DC::isSet(player->toggles, Player::PLR_COMPACT))
   {
-    send_to_char("Compact mode $B$4off$R.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_COMPACT);
+    send_to_char("Compact mode $B$4off$R.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_COMPACT);
   }
   else
   {
-    send_to_char("Compact mode $B$2on$R.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_COMPACT);
+    send_to_char("Compact mode $B$2on$R.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_COMPACT);
   }
   return eSUCCESS;
 }
 
-int do_summon_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_SUMMONABLE))
+  if (DC::isSet(player->toggles, Player::PLR_SUMMONABLE))
   {
-    send_to_char("You may no longer be summoned by other players.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_SUMMONABLE);
+    send_to_char("You may no longer be summoned by other players.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
   else
   {
     send_to_char("You may now be summoned by other players.\r\n"
                  "Make _sure_ you want this...they could summon you to your death!\r\n",
-                 ch);
-    SET_BIT(ch->player->toggles, Player::PLR_SUMMONABLE);
+                 this);
+    SET_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
   return eSUCCESS;
 }
 
-int do_lfg_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_LFG))
+  if (DC::isSet(player->toggles, Player::PLR_LFG))
   {
-    send_to_char("You are no longer Looking For Group.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_LFG);
+    send_to_char("You are no longer Looking For Group.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_LFG);
   }
   else
   {
-    send_to_char("You are now Looking For Group.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_LFG);
+    send_to_char("You are now Looking For Group.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_LFG);
   }
   return eSUCCESS;
 }
 
-int do_guide_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (!DC::isSet(ch->player->toggles, Player::PLR_GUIDE))
+  if (!DC::isSet(player->toggles, Player::PLR_GUIDE))
   {
-    send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
+    send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", this);
     return eFAILURE;
   }
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_GUIDE_TOG))
+  if (DC::isSet(player->toggles, Player::PLR_GUIDE_TOG))
   {
-    send_to_char("You have hidden your $B(Guide)$R tag.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_GUIDE_TOG);
+    send_to_char("You have hidden your $B(Guide)$R tag.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send_to_char("You will now show your $B(Guide)$R tag.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_GUIDE_TOG);
+    send_to_char("You will now show your $B(Guide)$R tag.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
 
   return eSUCCESS;
 }
-int do_news_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_NEWS))
+  if (DC::isSet(player->toggles, Player::PLR_NEWS))
   {
-    send_to_char("You now view news in an up-down fashion.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_NEWS);
+    send_to_char("You now view news in an up-down fashion.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_NEWS);
   }
   else
   {
-    send_to_char("You now view news in a down-up fashion..\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_NEWS);
+    send_to_char("You now view news in a down-up fashion..\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_NEWS);
   }
 
   return eSUCCESS;
 }
 
-int do_ascii_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_ASCII))
+  if (DC::isSet(player->toggles, Player::PLR_ASCII))
   {
-    REMOVE_BIT(ch->player->toggles, Player::PLR_ASCII);
-    send_to_char("Cards are now displayed through ASCII.\r\n", ch);
+    REMOVE_BIT(player->toggles, Player::PLR_ASCII);
+    send_to_char("Cards are now displayed through ASCII.\r\n", this);
   }
   else
   {
-    send_to_char("Cards are no longer dislayed through ASCII.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_ASCII);
+    send_to_char("Cards are no longer dislayed through ASCII.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_ASCII);
   }
 
   return eSUCCESS;
 }
 
-int do_damage_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_DAMAGE))
+  if (DC::isSet(player->toggles, Player::PLR_DAMAGE))
   {
-    REMOVE_BIT(ch->player->toggles, Player::PLR_DAMAGE);
-    send_to_char("Damage numbers will no longer be displayed in combat.\r\n", ch);
+    REMOVE_BIT(player->toggles, Player::PLR_DAMAGE);
+    send_to_char("Damage numbers will no longer be displayed in combat.\r\n", this);
   }
   else
   {
-    send_to_char("Damage numbers will now be displayed in combat.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_DAMAGE);
+    send_to_char("Damage numbers will now be displayed in combat.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_DAMAGE);
   }
 
   return eSUCCESS;
 }
 
-int do_notax_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_NOTAX))
+  if (DC::isSet(player->toggles, Player::PLR_NOTAX))
   {
-    send_to_char("You will now be taxed on all your loot.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_NOTAX);
+    send_to_char("You will now be taxed on all your loot.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_NOTAX);
   }
   else
   {
-    send_to_char("You will no longer be taxed.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_NOTAX);
+    send_to_char("You will no longer be taxed.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_NOTAX);
   }
 
   return eSUCCESS;
 }
 
-int do_charmiejoin_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_CHARMIEJOIN))
+  if (DC::isSet(player->toggles, Player::PLR_CHARMIEJOIN))
   {
-    send_to_char("Your followers will no longer automatically join you.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_CHARMIEJOIN);
+    send_to_char("Your followers will no longer automatically join you.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
   else
   {
-    send_to_char("Your followers will automatically aid you in battle.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_CHARMIEJOIN);
+    send_to_char("Your followers will automatically aid you in battle.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
 
   return eSUCCESS;
 }
 
-int do_autoeat(Character *ch, char *argument, int cmd)
+command_return_t Character::do_autoeat(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_AUTOEAT))
+  if (DC::isSet(player->toggles, Player::PLR_AUTOEAT))
   {
-    send_to_char("You no longer automatically eat and drink.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_AUTOEAT);
+    send_to_char("You no longer automatically eat and drink.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   else
   {
-    send_to_char("You now automatically eat and drink when hungry and thirsty.\r\n", ch);
-    SET_BIT(ch->player->toggles, Player::PLR_AUTOEAT);
+    send_to_char("You now automatically eat and drink when hungry and thirsty.\r\n", this);
+    SET_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   return eSUCCESS;
 }
 
-int do_anonymous(Character *ch, char *argument, int cmd)
+command_return_t Character::do_anonymous(QStringList arguments, int cmd)
 {
-  if (ch == 0)
+  if (GET_LEVEL(this) < 40)
   {
-    logentry("Null char in do_anonymous.", OVERSEER, LogChannels::LOG_BUG);
-    return eFAILURE;
-  }
-  if (GET_LEVEL(ch) < 40)
-  {
-    send_to_char("You are too inexperienced to disguise your profession.\r\n", ch);
+    send_to_char("You are too inexperienced to disguise your profession.\r\n", this);
     return eSUCCESS;
   }
-  if (DC::isSet(ch->player->toggles, Player::PLR_ANONYMOUS))
+  if (DC::isSet(player->toggles, Player::PLR_ANONYMOUS))
   {
-    send_to_char("Your class and level information is now public.\r\n", ch);
+    send_to_char("Your class and level information is now public.\r\n", this);
   }
   else
   {
-    send_to_char("Your class and level information is now private.\r\n", ch);
+    send_to_char("Your class and level information is now private.\r\n", this);
   }
 
-  TOGGLE_BIT(ch->player->toggles, Player::PLR_ANONYMOUS);
+  TOGGLE_BIT(player->toggles, Player::PLR_ANONYMOUS);
   return eSUCCESS;
 }
 
-int do_wimpy(Character *ch, char *argument, int cmd)
+command_return_t Character::do_wimpy(QStringList arguments, int cmd)
 {
-  if (DC::isSet(ch->player->toggles, Player::PLR_WIMPY))
+  if (DC::isSet(player->toggles, Player::PLR_WIMPY))
   {
-    send_to_char("You are no longer a wimp....maybe.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_WIMPY);
+    send_to_char("You are no longer a wimp....maybe.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_WIMPY);
     return eFAILURE;
   }
 
-  send_to_char("You are now an official wimp.\r\n", ch);
-  SET_BIT(ch->player->toggles, Player::PLR_WIMPY);
+  send_to_char("You are now an official wimp.\r\n", this);
+  SET_BIT(player->toggles, Player::PLR_WIMPY);
   return eSUCCESS;
 }
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-int do_pager(Character *ch, char *argument, int cmd)
+command_return_t Character::do_pager(QStringList arguments, int cmd)
 {
-  if (DC::isSet(ch->player->toggles, Player::PLR_PAGER))
+  if (DC::isSet(player->toggles, Player::PLR_PAGER))
   {
-    send_to_char("You now page your strings in 24 line chunks.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_PAGER);
+    send_to_char("You now page your strings in 24 line chunks.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_PAGER);
     return eFAILURE;
   }
 
-  send_to_char("You no longer page strings in 24 line chunks.\r\n", ch);
-  SET_BIT(ch->player->toggles, Player::PLR_PAGER);
+  send_to_char("You no longer page strings in 24 line chunks.\r\n", this);
+  SET_BIT(player->toggles, Player::PLR_PAGER);
   return eSUCCESS;
 }
 
-int do_bard_song_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
 {
-  if (DC::isSet(ch->player->toggles, Player::PLR_BARD_SONG))
+  if (DC::isSet(player->toggles, Player::PLR_BARD_SONG))
   {
-    send_to_char("Bard singing now in verbose mode.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_BARD_SONG);
+    send_to_char("Bard singing now in verbose mode.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_BARD_SONG);
     return eFAILURE;
   }
 
-  send_to_char("Bard singing now in brief mode.\r\n", ch);
-  SET_BIT(ch->player->toggles, Player::PLR_BARD_SONG);
+  send_to_char("Bard singing now in brief mode.\r\n", this);
+  SET_BIT(player->toggles, Player::PLR_BARD_SONG);
   return eSUCCESS;
 }
 
-int do_nodupekeys_toggle(Character *ch, char *argument, int cmd)
+command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
 {
-  if (DC::isSet(ch->player->toggles, Player::PLR_NODUPEKEYS))
+  if (DC::isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
-    send_to_char("You will attach duplicate keys to keyrings.\r\n", ch);
-    REMOVE_BIT(ch->player->toggles, Player::PLR_NODUPEKEYS);
+    send_to_char("You will attach duplicate keys to keyrings.\r\n", this);
+    REMOVE_BIT(player->toggles, Player::PLR_NODUPEKEYS);
     return eFAILURE;
   }
 
-  send_to_char("You will not attach duplicate keys to keyrings.\r\n", ch);
-  SET_BIT(ch->player->toggles, Player::PLR_NODUPEKEYS);
+  send_to_char("You will not attach duplicate keys to keyrings.\r\n", this);
+  SET_BIT(player->toggles, Player::PLR_NODUPEKEYS);
   return eSUCCESS;
 }
 
-int do_beep_set(Character *ch, char *arg, int cmd)
+command_return_t Character::do_beep_set(QStringList arguments, int cmd)
 {
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_BEEP))
+  if (DC::isSet(player->toggles, Player::PLR_BEEP))
   {
-    REMOVE_BIT(ch->player->toggles, Player::PLR_BEEP);
-    send_to_char("\nTell is now silent.\n", ch);
+    REMOVE_BIT(player->toggles, Player::PLR_BEEP);
+    send_to_char("\r\nTell is now silent.\r\n", this);
     return eFAILURE;
   }
 
-  SET_BIT(ch->player->toggles, Player::PLR_BEEP);
-  send_to_char("\nTell now beeps.\a\n", ch);
+  SET_BIT(player->toggles, Player::PLR_BEEP);
+  send_to_char("\r\nTell now beeps.\a\r\n", this);
   return eSUCCESS;
 }
 

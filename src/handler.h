@@ -100,6 +100,7 @@ Character *get_rand_other_char_room_vis(Character *ch);
 Character *get_char_vis(Character *ch, const char *name);
 Character *get_char_vis(Character *ch, const string &name);
 Character *get_pc_vis(Character *ch, const char *name);
+Character *get_pc_vis(Character *ch, QString name);
 Character *get_pc_vis_exact(Character *ch, const char *name);
 Character *get_mob_vis(Character *ch, char *name);
 Character *get_random_mob_vnum(int vnum);

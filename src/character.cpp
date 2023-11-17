@@ -601,3 +601,29 @@ const QStringList Character::race_names = {
     "gnome",
     "orc",
     "troll"};
+
+const QList<Toggle> Player::togglables = {
+    {"brief", PLR_BRIEF_BIT, &Character::do_brief},
+    {"compact", PLR_COMPACT_BIT, &Character::do_compact},
+    {"beep", PLR_BEEP_BIT, &Character::do_beep_set},
+    {"anonymous", PLR_ANONYMOUS_BIT, &Character::do_anonymous},
+    {"ansi", PLR_ANSI_BIT, &Character::do_ansi},
+    {"vt100", PLR_VT100_BIT, &Character::do_vt100},
+    {"wimpy", PLR_WIMPY_BIT, &Character::do_wimpy},
+    {"pager", PLR_PAGER_BIT, &Character::do_pager, UINT64_MAX, "$B$4off$R", "$B$2on$R"},
+    {"bard-songs", PLR_BARD_SONG_BIT, &Character::do_bard_song_toggle, UINT64_MAX, "$B$2on$R (brief)", "$B$4off$R (verbose)"},
+    {"auto-eat", PLR_AUTOEAT_BIT, &Character::do_autoeat},
+    {"summonable", PLR_SUMMONABLE_BIT, &Character::do_summon_toggle},
+    {"lfg", PLR_LFG_BIT, &Character::do_lfg_toggle},
+    {"charmiejoin", PLR_CHARMIEJOIN_BIT, &Character::do_charmiejoin_toggle},
+    {"notax", PLR_NOTAX_BIT, &Character::do_notax_toggle},
+    {"guide", PLR_GUIDE_TOG_BIT, &Character::do_guide_toggle, PLR_GUIDE_BIT},
+    {"news-up", PLR_NEWS_BIT, &Character::do_news_toggle},
+    {"ascii", PLR_ASCII_BIT, &Character::do_ascii_toggle, UINT64_MAX, "$B$4off$R", "$B$2on$R"},
+    {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
+    {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
+
+Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, int cmd), uint64_t dependency_shift, QString on_message, QString off_message)
+    : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
+{
+}

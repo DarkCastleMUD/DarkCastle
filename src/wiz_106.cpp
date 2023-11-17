@@ -234,11 +234,6 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
-typedef command_return_t (*command_gen2_t)(Character *ch, string argument, int cmd);
-typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
-typedef int (*command_special_t)(Character *ch, int cmd, char *arg);
-
 void run_check(Character *ch, command_return_t *rc, command_gen1_t function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
 {
   command_return_t new_rc{};

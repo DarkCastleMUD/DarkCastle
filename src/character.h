@@ -23,6 +23,7 @@ using namespace std;
 #include <QMap>
 
 class Character;
+#include "DC.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include "structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -221,14 +222,22 @@ struct follow_type
     Character *follower;
     struct follow_type *next;
 };
-
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
 class Toggle
 {
-    Toggle(QString name, uint_fast8_t shift, QString on_message, QString off_message);
-};
+public:
+    Toggle(void) = default;
+    Toggle(QString name, uint64_t shift, command_gen3_t function, uint64_t dependency_shift = UINT64_MAX, QString on_message = "$B$2on$R", QString off_message = "$B$4off$R");
+    bool isValid(void) { return valid_; }
 
-class Toggles
-{
+    QString name_;
+    bool valid_ = false;
+    uint64_t shift_{};
+    uint64_t dependency_shift_{};
+    uint64_t value_{};
+    QString on_message_;
+    QString off_message_;
+    command_return_t (Character::*function_)(QStringList arguments, int cmd);
 };
 
 // DO NOT change most of these types without checking the save files
@@ -241,38 +250,70 @@ public:
     | Character->player->toggles
     */
     constexpr static uint32_t PLR_BRIEF = 1U;
+    constexpr static uint32_t PLR_BRIEF_BIT = 0;
     constexpr static uint32_t PLR_COMPACT = 1U << 1;
+    constexpr static uint32_t PLR_COMPACT_BIT = 1;
     constexpr static uint32_t PLR_DONTSET = 1U << 2;
+    constexpr static uint32_t PLR_DONTSET_BIT = 2;
     constexpr static uint32_t PLR_DONOTUSE = 1U << 3;
+    constexpr static uint32_t PLR_DONOTUSE_BIT = 3;
     constexpr static uint32_t PLR_NOHASSLE = 1U << 4;
+    constexpr static uint32_t PLR_NOHASSLE_BIT = 4;
     constexpr static uint32_t PLR_SUMMONABLE = 1U << 5;
+    constexpr static uint32_t PLR_SUMMONABLE_BIT = 5;
     constexpr static uint32_t PLR_WIMPY = 1U << 6;
+    constexpr static uint32_t PLR_WIMPY_BIT = 6;
     constexpr static uint32_t PLR_ANSI = 1U << 7;
+    constexpr static uint32_t PLR_ANSI_BIT = 7;
     constexpr static uint32_t PLR_VT100 = 1U << 8;
+    constexpr static uint32_t PLR_VT100_BIT = 8;
     constexpr static uint32_t PLR_ONEWAY = 1U << 9;
+    constexpr static uint32_t PLR_ONEWAY_BIT = 9;
     constexpr static uint32_t PLR_DISGUISED = 1U << 10;
+    constexpr static uint32_t PLR_DISGUISED_BIT = 10;
     constexpr static uint32_t PLR_UNUSED = 1U << 11;
+    constexpr static uint32_t PLR_UNUSED_BIT = 11;
     constexpr static uint32_t PLR_PAGER = 1U << 12;
+    constexpr static uint32_t PLR_PAGER_BIT = 12;
     constexpr static uint32_t PLR_BEEP = 1U << 13;
+    constexpr static uint32_t PLR_BEEP_BIT = 13;
     constexpr static uint32_t PLR_BARD_SONG = 1U << 14;
+    constexpr static uint32_t PLR_BARD_SONG_BIT = 14;
     constexpr static uint32_t PLR_ANONYMOUS = 1U << 15;
+    constexpr static uint32_t PLR_ANONYMOUS_BIT = 15;
     constexpr static uint32_t PLR_AUTOEAT = 1U << 16;
+    constexpr static uint32_t PLR_AUTOEAT_BIT = 16;
     constexpr static uint32_t PLR_LFG = 1U << 17;
+    constexpr static uint32_t PLR_LFG_BIT = 17;
     constexpr static uint32_t PLR_CHARMIEJOIN = 1U << 18;
+    constexpr static uint32_t PLR_CHARMIEJOIN_BIT = 18;
     constexpr static uint32_t PLR_NOTAX = 1U << 19;
+    constexpr static uint32_t PLR_NOTAX_BIT = 19;
     constexpr static uint32_t PLR_GUIDE = 1U << 20;
+    constexpr static uint32_t PLR_GUIDE_BIT = 20;
     constexpr static uint32_t PLR_GUIDE_TOG = 1U << 21;
+    constexpr static uint32_t PLR_GUIDE_TOG_BIT = 21;
     constexpr static uint32_t PLR_NEWS = 1U << 22;
+    constexpr static uint32_t PLR_NEWS_BIT = 22;
     constexpr static uint32_t PLR_50PLUS = 1U << 23;
+    constexpr static uint32_t PLR_50PLUS_BIT = 23;
     constexpr static uint32_t PLR_ASCII = 1U << 24;
+    constexpr static uint32_t PLR_ASCII_BIT = 24;
     constexpr static uint32_t PLR_DAMAGE = 1U << 25;
+    constexpr static uint32_t PLR_DAMAGE_BIT = 25;
     constexpr static uint32_t PLR_CLS_TREE_A = 1U << 26;
+    constexpr static uint32_t PLR_CLS_TREE_A_BIT = 26;
     constexpr static uint32_t PLR_CLS_TREE_B = 1U << 27;
+    constexpr static uint32_t PLR_CLS_TREE_B_BIT = 27;
     constexpr static uint32_t PLR_CLS_TREE_C = 1U << 28; // might happen one day
+    constexpr static uint32_t PLR_CLS_TREE_C_BIT = 28;
     constexpr static uint32_t PLR_EDITOR_WEB = 1U << 29;
+    constexpr static uint32_t PLR_EDITOR_WEB_BIT = 29;
     constexpr static uint32_t PLR_REMORTED = 1U << 30;
+    constexpr static uint32_t PLR_REMORTED_BIT = 30;
     constexpr static uint32_t PLR_NODUPEKEYS = 1U << 31;
-
+    constexpr static uint32_t PLR_NODUPEKEYS_BIT = 31;
+    static const QList<Toggle> togglables;
     static const QStringList toggle_txt;
 
     char pwd[PASSWORD_LEN + 1] = {};
@@ -633,6 +674,26 @@ public:
     command_return_t do_sockets(QStringList arguments, int cmd);
     command_return_t do_toggle(QStringList arguments, int cmd);
     command_return_t do_who(QStringList arguments, int cmd);
+    command_return_t do_beep_set(QStringList arguments, int cmd);
+    command_return_t do_bard_song_toggle(QStringList arguments, int cmd);
+    command_return_t do_brief(QStringList arguments, int cmd);
+    command_return_t do_news_toggle(QStringList arguments, int cmd);
+    command_return_t do_ascii_toggle(QStringList arguments, int cmd);
+    command_return_t do_damage_toggle(QStringList arguments, int cmd);
+    command_return_t do_charmiejoin_toggle(QStringList arguments, int cmd);
+    command_return_t do_guide(QStringList arguments, int cmd);
+    command_return_t do_lfg_toggle(QStringList arguments, int cmd);
+    command_return_t do_notax_toggle(QStringList arguments, int cmd);
+    command_return_t do_guide_toggle(QStringList arguments, int cmd);
+    command_return_t do_summon_toggle(QStringList arguments, int cmd);
+    command_return_t do_nodupekeys_toggle(QStringList arguments, int cmd);
+    command_return_t do_compact(QStringList arguments, int cmd);
+    command_return_t do_anonymous(QStringList arguments, int cmd);
+    command_return_t do_ansi(QStringList arguments, int cmd);
+    command_return_t do_vt100(QStringList arguments, int cmd);
+    command_return_t do_wimpy(QStringList arguments, int cmd);
+    command_return_t do_pager(QStringList arguments, int cmd);
+    command_return_t do_autoeat(QStringList arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
     command_return_t do_shutdow(QStringList arguments, int cmd);
     command_return_t do_shutdown(QStringList arguments, int cmd);

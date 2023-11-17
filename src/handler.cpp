@@ -4411,6 +4411,11 @@ Character *get_pc_vis(Character *ch, string name)
 	return get_pc_vis(ch, name.c_str());
 }
 
+Character *get_pc_vis(Character *ch, QString name)
+{
+	return get_pc_vis(ch, name.toStdString().c_str());
+}
+
 Character *get_pc_vis(Character *ch, const char *name)
 {
 	Character *partial_match = 0;

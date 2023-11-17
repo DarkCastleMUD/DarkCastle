@@ -119,39 +119,35 @@ int do_processes(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_guide(Character *ch, char *argument, int cmd)
+command_return_t Character::do_guide(QStringList arguments, int cmd)
 {
-  Character *victim;
-  char name[100], buf[256];
+  Character *victim{};
+  QString name = arguments.value(0);
 
-  one_argument(argument, name);
-
-  if (*name)
+  if (!name.isEmpty())
   {
-    if (!(victim = get_pc_vis(ch, name)))
+    if (!(victim = get_pc_vis(this, name)))
     {
-      send_to_char("That player is not here.\r\n", ch);
+      send_to_char("That player is not here.\r\n", this);
       return eFAILURE;
     }
   }
   else
   {
-    send_to_char("Who exactly would you like to be a guide?\n\r", ch);
+    send_to_char("Who exactly would you like to be a guide?\n\r", this);
     return eFAILURE;
   }
 
   if (!DC::isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    sprintf(buf, "%s is now a guide.\r\n", GET_NAME(victim));
-    send_to_char(buf, ch);
+    send(QString("%1 is now a guide.\r\n").arg(GET_NAME(victim)));
     send_to_char("You have been selected to be a DC Guide!\r\n", victim);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    sprintf(buf, "%s is no longer a guide.\r\n", GET_NAME(victim));
-    send_to_char(buf, ch);
+    send(QString("%1 is no longer a guide.\r\n").arg(GET_NAME(victim)));
     send_to_char("You have been removed as a DC guide.\r\n", victim);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);

@@ -24,19 +24,18 @@ typedef uint64_t vnum_t;
 typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
+#include "connect.h"
 #include "character.h"
 #include "obj.h"
-#include "character.h"
 #include "fileinfo.h"
-#include "connect.h"
 #include "Trace.h"
-#include "connect.h"
 #include "SSH.h"
 #include "weather.h"
 #include "Zone.h"
 #include "Shops.h"
 #include "room.h"
 
+class Connection;
 using namespace std;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
@@ -219,5 +218,10 @@ struct timer_data
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
+typedef int command_return_t;
+typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
+typedef command_return_t (*command_gen2_t)(Character *ch, string argument, int cmd);
+typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
+typedef int (*command_special_t)(Character *ch, int cmd, char *arg);
 
 #endif

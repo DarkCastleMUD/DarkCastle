@@ -415,7 +415,7 @@ struct command_info cmd_info[] =
         {"skillmax", do_maxes, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"damage", do_dmg_eq, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"affclear", do_clearaff, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"guide", do_guide, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"guide", nullptr, nullptr, &Character::do_guide, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"addnews", do_addnews, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"linkload", nullptr, nullptr, &Character::do_linkload, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"listproc", do_listproc, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
