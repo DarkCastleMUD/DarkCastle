@@ -502,7 +502,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     {
       if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
       {
-        infoBuf = QString(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(GET_LEVEL(i)).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QString(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(GET_LEVEL(i), 2).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
       }
       else
       {
