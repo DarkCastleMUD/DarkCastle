@@ -380,7 +380,7 @@ public:
     Character *golem = {}; // CURRENT golem.
     bool hide[MAX_HIDE] = {};
     Character *hiding_from[MAX_HIDE] = {};
-    std::queue<string> *away_msgs = {};
+    QQueue<QString> away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
     joining_t joining = {};
@@ -476,7 +476,8 @@ public:
 
     class Connection *desc = nullptr; // nullptr normally for mobs
 
-    char *name = nullptr;        // Keyword 'kill X'
+    char *name = nullptr; // Keyword 'kill X'
+    QString getName(void) { return name; }
     char *short_desc = nullptr;  // Action 'X hits you.'
     char *long_desc = nullptr;   // For 'look room'
     char *description = nullptr; // For 'look mob'
@@ -627,8 +628,8 @@ public:
     int spec = {};
 
     struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
-    void tell_history(Character *sender, string message);
-    void gtell_history(Character *sender, string message);
+    void tell_history(Character *sender, QString message);
+    void gtell_history(Character *sender, QString message);
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};
@@ -645,7 +646,7 @@ public:
     void send(string buffer);
     void send(QString buffer);
     void sendln(QString buffer = "") { send(buffer + "\r\n"); }
-    command_return_t tell(Character *, string);
+    command_return_t tell(Character *, QString);
     void sendRaw(string);
     vector<Character *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
@@ -701,6 +702,7 @@ public:
     command_return_t do_rename_char(QStringList arguments, int cmd);
     command_return_t do_auction(QStringList arguments, int cmd = CMD_DEFAULT);
     command_return_t do_test(QStringList arguments, int cmd);
+    command_return_t do_tell(QStringList argument, int cmd = CMD_DEFAULT);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
     Object *getVisibleObject(QString name);
@@ -737,10 +739,10 @@ private:
 class communication
 {
 public:
-    communication(Character *ch, string message);
-    string sender;
+    communication(Character *ch, QString message);
+    QString sender;
     bool sender_ispc;
-    string message;
+    QString message;
     time_t timestamp;
 };
 

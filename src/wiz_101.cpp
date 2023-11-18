@@ -754,7 +754,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
         }
         else
         {
-          record_msg(buf1, i->character);
+          record_msg(buf1.c_str(), i->character);
         }
       }
     }

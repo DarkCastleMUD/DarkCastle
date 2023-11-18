@@ -2037,6 +2037,14 @@ void write_to_output(string txt, class Connection *t)
   }
 }
 
+void write_to_output(QString txt, class Connection *t)
+{
+  if (!txt.isEmpty())
+  {
+    write_to_output(QByteArray(txt.toStdString().c_str()), t);
+  }
+}
+
 void write_to_output(QByteArray txt, class Connection *t)
 {
   /* if there's no descriptor, don't worry about output */
@@ -3102,6 +3110,14 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
+void send_to_char_regardless(QString messg, Character *ch)
+{
+  if (ch->desc && !messg.isEmpty())
+  {
+    SEND_TO_Q(messg, ch->desc);
+  }
+}
+
 void send_to_char_regardless(string messg, Character *ch)
 {
   if (ch->desc && !messg.empty())
@@ -3122,42 +3138,37 @@ void send_to_char_nosp(QString messg, Character *ch)
   send_to_char_nosp(messg.toStdString().c_str(), ch);
 }
 
-void record_msg(string messg, Character *ch)
+void record_msg(QString messg, Character *ch)
 {
-  if (messg.empty() || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
+  if (messg.isEmpty() || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
     return;
 
-  if (ch->player->away_msgs == 0)
+  if (ch->player->away_msgs.size() < 1000)
   {
-    ch->player->away_msgs = new std::queue<string>();
-  }
-
-  if (ch->player->away_msgs->size() < 1000)
-  {
-    ch->player->away_msgs->push(messg);
+    ch->player->away_msgs.push_back(messg);
   }
 }
 
 int do_awaymsgs(Character *ch, char *argument, int cmd)
 {
   int lines = 0;
-  string tmp;
+  QString tmp;
 
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if ((ch->player->away_msgs == 0) || ch->player->away_msgs->empty())
+  if (ch->player->away_msgs.isEmpty())
   {
     SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
     return eSUCCESS;
   }
 
   // Show 23 lines of text, then stop
-  while (!ch->player->away_msgs->empty())
+  while (!ch->player->away_msgs.isEmpty())
   {
-    tmp = ch->player->away_msgs->front();
+    tmp = ch->player->away_msgs.front();
     SEND_TO_Q(tmp, ch->desc);
-    ch->player->away_msgs->pop();
+    ch->player->away_msgs.pop_back();
 
     if (++lines == 23)
     {
@@ -3178,7 +3189,7 @@ void check_for_awaymsgs(Character *ch)
   if (IS_NPC(ch))
     return;
 
-  if ((ch->player->away_msgs == 0) || ch->player->away_msgs->empty())
+  if (ch->player->away_msgs.isEmpty())
   {
     return;
   }

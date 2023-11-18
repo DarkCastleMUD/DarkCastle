@@ -92,7 +92,9 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting = true);
 
 /* find if character can see */
 Character *get_active_pc_vis(Character *ch, const char *name);
+Character *get_active_pc_vis(Character *ch, QString name);
 Character *get_active_pc(const char *name);
+Character *get_active_pc(QString name);
 Character *get_all_pc(char *name);
 Character *get_char_room_vis(Character *ch, const char *name);
 Character *get_char_room_vis(Character *ch, string name);

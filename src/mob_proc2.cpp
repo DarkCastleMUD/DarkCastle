@@ -685,12 +685,11 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 				break;
 		if (platsmith_list[o].vnum == 0)
 		{
-			sprintf(buf, "%s Sorry, I don't seem to be working correctly. Do tell someone.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
-		sprintf(buf, "%s Here's what I can do for you, %s.", GET_NAME(ch), pc_clss_types3[GET_CLASS(ch)]);
-		do_tell(owner, buf, 0);
+		owner->do_tell(QString("%1 Here's what I can do for you, %2.").arg(GET_NAME(ch)).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
+
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
 			char *tmp = gl_item((Object *)obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
@@ -714,21 +713,18 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		one_argument(arg, arg2);
 		if (platsmith_list[o].vnum == 0)
 		{
-			sprintf(buf, "%s Sorry, I don't seem to be working correctly. Do tell someone.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		if (!is_number(arg2))
 		{
-			sprintf(buf, "%s Sorry, mate. You type buy <number> to specify what you want..", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		int k = atoi(arg2) - 1;
 		if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
 		{
-			sprintf(buf, "%s Don't have that I'm afraid. Type \"list\" to see my wares.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		class Object *obj;
@@ -736,15 +732,13 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
 		{
-			sprintf(buf, "%s That item is not available to you.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
 			extract_obj(obj);
 			return eSUCCESS;
 		}
 		if (GET_PLATINUM(ch) < (unsigned int)(obj->obj_flags.cost / 10))
 		{
-			sprintf(buf, "%s Come back when you've got the platinum.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Come back when you've got the platinum.").arg(GET_NAME(ch)).split(' '));
 			extract_obj(obj);
 			return eSUCCESS;
 		}
@@ -752,8 +746,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		sprintf(buf, "%s %s", obj->name, GET_NAME(ch));
 		obj->name = str_hsh(buf);
 		obj_to_char(obj, ch);
-		sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
-		do_tell(owner, buf, 0);
+		owner->do_tell(QString("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
 		return eSUCCESS;
 	}
 	else if (cmd == 57)
@@ -769,29 +762,25 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		}
 		if (!obj)
 		{
-			sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		if (!DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 		{
-			sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 I don't deal in worthless junk.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 
 		// don't allow non-empty containers to be sold
 		if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
 		{
-			sprintf(buf, "%s %s$B$2 needs to be emptied first.", GET_NAME(ch), GET_OBJ_SHORT(obj));
-			do_tell(owner, buf, 0);
+			owner->do_tell(QString("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
 			return eSUCCESS;
 		}
 
 		int cost = obj->obj_flags.cost / 10;
 
-		sprintf(buf, "%s I'll give you %d plats for that. Thanks for shoppin'.", GET_NAME(ch), cost);
-		do_tell(owner, buf, 0);
+		owner->do_tell(QString("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
 		extract_obj(obj);
 		GET_PLATINUM(ch) += cost;
 		return eSUCCESS;

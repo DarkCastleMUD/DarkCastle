@@ -173,6 +173,7 @@ public:
     return flag & bit;
   };
   QRandomGenerator random_;
+  QMap<uint64_t, Shop> shop_index;
 
 private:
   static string version;

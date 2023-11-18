@@ -52,11 +52,12 @@ struct pulse_info
 void write_to_output(const char *txt, class Connection *t);
 void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(std::string txt, class Connection *d);
+void write_to_output(QString txt, class Connection *t);
 
 void scramble_text(char *txt);
 QString scramble_text(QString txt);
 void warn_if_duplicate_ip(Character *ch);
-void record_msg(string messg, Character *ch);
+void record_msg(QString messg, Character *ch);
 int write_hotboot_file(char **argv);
 void send_info(QString messg);
 void send_info(string messg);

@@ -57,3 +57,21 @@ Shops::Shops(QObject *parent) : Database(parent)
         model->setRelation(1, QSqlRelation("country", "id", "name"));
     }
 }
+
+Legacy::Legacy(QString filename)
+{
+    file_.setFileName(filename);
+    file_.open(QIODevice::ReadOnly);
+}
+
+QStringList Legacy::toList(void)
+{
+    QStringList list;
+    while (!file_.atEnd())
+    {
+        QByteArray line = file_.readLine();
+        list.push_back(line);
+    }
+
+    return list;
+}

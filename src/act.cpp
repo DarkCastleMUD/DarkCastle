@@ -54,11 +54,11 @@ act_return act(
   TokenList *tokens;
 
   send_tokens_return st_return;
-  st_return.str = string();
+  st_return.str = QString();
   st_return.retval = 0;
 
   act_return ar;
-  ar.str = string();
+  ar.str = QString();
   ar.retval = 0;
 
   tokens = new TokenList(str);
@@ -161,6 +161,21 @@ act_return act(
 | Description:  This function just sends the message to the character,
 |   with no interpretation and no checks.
 */
+
+void send_message(QString str, Character *to)
+{
+  if (str.isEmpty())
+    return;
+
+  if (!to)
+    return;
+
+  if (!to->desc)
+    return;
+
+  SEND_TO_Q(str, to->desc);
+}
+
 void send_message(const char *str, Character *to)
 {
   // This will happen when a token shouldn't be interpreted
@@ -182,25 +197,25 @@ void send_message(string str, Character *to)
 send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to)
 {
   int retval = 0;
-  string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
+  QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags).c_str();
 
   // Uppercase first letter of sentence.
-  if (buf.empty() == false && buf[0] != 0)
+  if (buf.isEmpty() == false && buf[0] != 0)
   {
-    buf[0] = toupper(buf[0]);
+    buf[0] = buf[0].toUpper();
   }
   send_message(buf, to);
 
-  if (MOBtrigger && buf.empty() == false)
-    retval |= mprog_act_trigger(buf, to, ch, obj, vict_obj);
-  if (MOBtrigger && buf.empty() == false)
-    retval |= oprog_act_trigger(buf.c_str(), ch);
+  if (MOBtrigger && buf.isEmpty() == false)
+    retval |= mprog_act_trigger(buf.toStdString(), to, ch, obj, vict_obj);
+  if (MOBtrigger && buf.isEmpty() == false)
+    retval |= oprog_act_trigger(buf.toStdString().c_str(), ch);
 
   MOBtrigger = true;
-  if (buf.empty())
+  if (buf.isEmpty())
   {
     send_tokens_return str;
-    str.str = string();
+    str.str = QString();
     str.retval = retval;
     return str;
   }

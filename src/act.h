@@ -17,7 +17,7 @@
 
 struct act_return
 {
-  string str;
+  QString str;
   int retval;
 };
 
@@ -27,14 +27,14 @@ act_return act(const std::string &str, Character *ch, Object *obj, void *vict_ob
 
 struct send_tokens_return
 {
-  string str;
+  QString str;
   int retval;
 };
 
 send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vch, int flags, Character *to);
 
 void send_message(const char *str, Character *to);
-
+void send_message(QString str, Character *to);
 //--
 // Constants
 //--

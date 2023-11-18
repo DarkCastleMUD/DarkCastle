@@ -557,6 +557,7 @@ void util_unarchive(char *, Character *);
 int is_busy(Character *ch);
 int is_ignoring(const Character *const ch, const Character *const i);
 void colorCharSend(char *s, Character *ch);
+void send_to_char_regardless(QString messg, Character *ch);
 void send_to_char_regardless(string messg, Character *ch);
 int csendf(Character *ch, const char *arg, ...);
 bool check_range_valid_and_convert(uint64_t &value, QString buf, uint64_t begin, uint64_t end);

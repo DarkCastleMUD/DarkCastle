@@ -813,49 +813,51 @@ command_return_t do_tellhistory(Character *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tell(Character *ch, string argument, int cmd)
+command_return_t Character::do_tell(QStringList arguments, int cmd)
 {
   Character *vict = nullptr;
-  string name = {}, message = {}, buf = {}, log_buf = {};
+  QString name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
-  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOTELL))
+  if (!IS_MOB(this) && DC::isSet(this->player->punish, PUNISH_NOTELL))
   {
-    send_to_char("Your message didn't get through!!\n\r", ch);
+    send_to_char("Your message didn't get through!!\n\r", this);
     return eSUCCESS;
   }
 
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = DC::getInstance()->world[this->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      send_to_char("The magical silence prevents you from speaking!\n\r", this);
       return eFAILURE;
     }
 
-  if (!IS_MOB(ch) && !DC::isSet(ch->misc, LogChannels::CHANNEL_TELL))
+  if (!IS_MOB(this) && !DC::isSet(this->misc, LogChannels::CHANNEL_TELL))
   {
-    send_to_char("You have tell channeled off!!\n\r", ch);
+    send_to_char("You have tell channeled off!!\n\r", this);
     return eSUCCESS;
   }
 
-  tie(name, message) = half_chop(argument);
+  name = arguments.value(0);
+  arguments.pop_front();
+  message = arguments.join(' ');
 
-  if (name.empty() || message.empty())
+  if (name.isEmpty() || message.isEmpty())
   {
-    if (ch->player->tell_history == nullptr || ch->player->tell_history->empty())
+    if (this->player->tell_history == nullptr || this->player->tell_history->empty())
     {
-      send_to_char("You have not sent or recieved any tell messages.\r\n", ch);
+      send_to_char("You have not sent or recieved any tell messages.\r\n", this);
       return eSUCCESS;
     }
 
-    send_to_char("Here are the last 10 tell messages:\r\n", ch);
-    history_t tmp = *(ch->player->tell_history);
+    send_to_char("Here are the last 10 tell messages:\r\n", this);
+    history_t tmp = *(this->player->tell_history);
     while (!tmp.empty())
     {
       communication c = tmp.front();
-      string buf = c.message;
+      QString buf = c.message;
       buf += "\r\n";
-      send_to_char(buf, ch);
+      send_to_char(buf, this);
       tmp.pop();
     }
 
@@ -864,33 +866,33 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
 
   if (cmd == 9999)
   {
-    if (!(vict = get_active_pc(name.c_str())))
+    if (!(vict = get_active_pc(name)))
     {
-      send_to_char("They seem to have left!\n\r", ch);
+      send_to_char("They seem to have left!\n\r", this);
       return eSUCCESS;
     }
     cmd = CMD_DEFAULT;
   }
-  else if (!(vict = get_active_pc_vis(ch, name.c_str())))
+  else if (!(vict = get_active_pc_vis(this, name)))
   {
-    vict = get_pc_vis(ch, name.c_str());
+    vict = get_pc_vis(this, name);
     if ((vict != nullptr) && GET_LEVEL(vict) >= IMMORTAL)
     {
-      send_to_char("That person is busy right now.\r\n", ch);
-      send_to_char("Your message has been saved.\r\n", ch);
+      send_to_char("That person is busy right now.\r\n", this);
+      send_to_char("Your message has been saved.\r\n", this);
 
-      buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(ch, vict), message);
+      buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(this, vict), message.toStdString()).c_str();
       record_msg(buf, vict);
 
-      buf = fmt::format("$2$B{} told you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(ch, buf);
+      buf = fmt::format("$2$B{} told you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message);
-      ch->tell_history(ch, buf);
+      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message.toStdString()).c_str();
+      this->tell_history(this, buf);
     }
     else
     {
-      send_to_char("No-one by that name here.\r\n", ch);
+      send_to_char("No-one by that name here.\r\n", this);
     }
 
     return eSUCCESS;
@@ -899,46 +901,46 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && ch->level <= MAX_MORTAL)
+  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && this->level <= MAX_MORTAL)
   {
-    send_to_char("The person is ignoring all tells right now.\r\n", ch);
+    send_to_char("The person is ignoring all tells right now.\r\n", this);
     return eSUCCESS;
   }
   else if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-    send_to_char("That player has tell channeled off btw...\r\n", ch);
+    send_to_char("That player has tell channeled off btw...\r\n", this);
   }
-  if (ch == vict)
-    send_to_char("You try to tell yourself something.\r\n", ch);
-  else if ((GET_POS(vict) == POSITION_SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL)
-    act("Sorry, $E cannot hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
+  if (this == vict)
+    send_to_char("You try to tell yourself something.\r\n", this);
+  else if ((GET_POS(vict) == POSITION_SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(this) < IMMORTAL)
+    act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
   {
     for (tmp_obj = DC::getInstance()->world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
-        act("$E cannot hear you right now.", ch, 0, vict, TO_CHAR, STAYHIDE);
+        act("$E cannot hear you right now.", this, 0, vict, TO_CHAR, STAYHIDE);
         return eSUCCESS;
       }
-    if (is_ignoring(vict, ch))
+    if (is_ignoring(vict, this))
     {
-      csendf(ch, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
+      csendf(this, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
       return eSUCCESS;
     }
-    if (is_busy(vict) && GET_LEVEL(ch) >= OVERSEER)
+    if (is_busy(vict) && GET_LEVEL(this) >= OVERSEER)
     {
       if (IS_MOB(vict))
       {
-        buf = fmt::format("{} tells you, '{}'", PERS(ch, vict), message);
+        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
-        if (IS_PC(ch) && IS_PC(vict))
+        if (IS_PC(this) && IS_PC(vict))
         {
-          vict->player->last_tell = GET_NAME(ch);
+          vict->player->last_tell = GET_NAME(this);
         }
       }
 
@@ -947,77 +949,78 @@ command_return_t do_tell(Character *ch, string argument, int cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(ch, buf);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
-      send_to_char(buf, ch);
+      vict->tell_history(this, buf);
+
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      send_to_char(buf, this);
     }
     else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
     {
       if (IS_MOB(vict))
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
+        buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
       }
       else
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
-        if (IS_PC(ch) && IS_PC(vict))
-          vict->player->last_tell = GET_NAME(ch);
+        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(this, vict), message.toStdString(), DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
+        if (IS_PC(this) && IS_PC(vict))
+          vict->player->last_tell = GET_NAME(this);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(ch, buf);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
-      act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-      ch->tell_history(ch, ar.str);
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
+      this->tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && DC::isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
-             GET_LEVEL(ch) >= SERAPH)
+             GET_LEVEL(this) >= SERAPH)
     {
       send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
       if (IS_MOB(vict))
       {
-        buf = fmt::format("{} tells you, '{}'", PERS(ch, vict), message);
+        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), DC::isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
-        if (IS_PC(ch) && IS_PC(vict))
-          vict->player->last_tell = GET_NAME(ch);
+        if (IS_PC(this) && IS_PC(vict))
+          vict->player->last_tell = GET_NAME(this);
       }
       ansi_color(GREEN, vict);
       ansi_color(BOLD, vict);
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(ch, buf);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
-      act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-      ch->tell_history(ch, ar.str);
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
+      this->tell_history(this, ar.str);
 
-      send_to_char("They were sleeping btw...\r\n", ch);
+      send_to_char("They were sleeping btw...\r\n", this);
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && DC::isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
     }
     else
     {
-      buf = fmt::format("$2$B%s can't hear anything right now.$R", GET_SHORT(vict));
-      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      buf = fmt::format("$2$B%s can't hear anything right now.$R", GET_SHORT(vict)).c_str();
+      act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
     }
   }
   return eSUCCESS;
@@ -1060,7 +1063,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
   }
 
   buf = fmt::format("{} {}", ch->player->last_tell.c_str(), argument);
-  do_tell(ch, buf, CMD_TELL_REPLY);
+  ch->do_tell(QString(buf.c_str()).split(' '), CMD_TELL_REPLY);
   return eSUCCESS;
 }
 
@@ -1180,7 +1183,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
     send_to_char("Here are the last 10 group tells:\r\n", ch);
     while (!copy.empty())
     {
-      csendf(ch, "%s\r\n", copy.front().message.c_str());
+      ch->send(QString("%1\r\n").arg(copy.front().message));
       copy.pop();
     }
 
@@ -1344,7 +1347,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void Character::tell_history(Character *ch, string message)
+void Character::tell_history(Character *ch, QString message)
 {
   if (this->player == nullptr)
   {
@@ -1365,7 +1368,7 @@ void Character::tell_history(Character *ch, string message)
   }
 }
 
-void Character::gtell_history(Character *ch, string message)
+void Character::gtell_history(Character *ch, QString message)
 {
   if (this->player == nullptr)
   {
@@ -1386,7 +1389,7 @@ void Character::gtell_history(Character *ch, string message)
   }
 }
 
-communication::communication(Character *ch, string message)
+communication::communication(Character *ch, QString message)
 {
   this->sender = GET_NAME(ch);
   this->sender_ispc = IS_PC(ch);

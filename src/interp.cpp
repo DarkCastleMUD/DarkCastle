@@ -123,7 +123,7 @@ struct command_info cmd_info[] =
         {"scan", do_scan, nullptr, nullptr, POSITION_RESTING, 1, CMD_DEFAULT, 0, 25, CommandType::all},
         {"stand", do_stand, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
         {"switch", do_switch, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 25, CommandType::all},
-        {"tell", nullptr, do_tell, nullptr, POSITION_RESTING, 0, CMD_TELL, 0, 1, CommandType::all},
+        {"tell", nullptr, nullptr, &Character::do_tell, POSITION_RESTING, 0, CMD_TELL, 0, 1, CommandType::all},
         {"tellhistory", nullptr, do_tellhistory, nullptr, POSITION_RESTING, 0, CMD_TELLH, 0, 1, CommandType::all},
         {"wield", do_wield, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25, CommandType::all},
         {"innate", do_innate, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},

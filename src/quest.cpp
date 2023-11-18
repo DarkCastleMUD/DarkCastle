@@ -27,8 +27,6 @@ using namespace std;
 typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
-
-
 char *valid_fields[] = {
     "name",
     "level",
@@ -943,7 +941,7 @@ int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owne
       if ((choice = atoi(arg)) == 0 || choice < 0)
       {
          sprintf(buf, "%s Try a number from the list.", GET_NAME(ch));
-         do_tell(owner, buf, CMD_DEFAULT);
+         owner->do_tell(QString(buf).split(' '));
          return eSUCCESS;
       }
       switch (atoi(arg))
@@ -953,7 +951,7 @@ int quest_master(Character *ch, Object *obj, int cmd, char *arg, Character *owne
          break;
       default:
          sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
-         do_tell(owner, buf, CMD_DEFAULT);
+         owner->do_tell(QString(buf).split(' '));
          break;
       }
    }
@@ -1537,8 +1535,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
       if (!is_number(arg2))
       {
-         sprintf(buf, "%s Sorry, mate. You type buy <number> to specify what you want..", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 
@@ -1593,8 +1590,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
       if (!FOUND)
       {
-         sprintf(buf, "%s Don't have that I'm afraid. Type \"list\" to see my wares.", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 
@@ -1615,16 +1611,14 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
           search_char_for_item(ch, obj->item_number, false))
       {
-         sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
          extract_obj(obj);
          return eSUCCESS;
       }
 
       if (GET_QPOINTS(ch) < (unsigned int)(obj->obj_flags.cost / 10000))
       {
-         sprintf(buf, "%s Come back when you've got the qpoints.", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 Come back when you've got the qpoints.").arg(GET_NAME(ch)).split(' '));
          extract_obj(obj);
          return eSUCCESS;
       }
@@ -1636,8 +1630,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
       obj_to_char(obj, ch);
-      sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
-      do_tell(owner, buf, 0);
+      owner->do_tell(QString("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
       return eSUCCESS;
    }
    else if (cmd == CMD_SELL)
@@ -1648,8 +1641,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       Object *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
       if (!obj)
       {
-         sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 
@@ -1661,11 +1653,9 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
           obj_index[obj->item_number].virt != 3128 &&
           obj_index[obj->item_number].virt != 27997 &&
           obj_index[obj->item_number].virt != 27998 &&
-          obj_index[obj->item_number].virt != 27999
-          )
+          obj_index[obj->item_number].virt != 27999)
       {
-         sprintf(buf, "%s I only buy quest equipment.", GET_NAME(ch));
-         do_tell(owner, buf, 0);
+         owner->do_tell(QString("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 
@@ -1675,16 +1665,14 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          time_t expires = obj->no_sell_expiration;
          if (now < expires)
          {
-            sprintf(buf, "%s I won't buy that for another %u seconds.", GET_NAME(ch), expires - now);
-            do_tell(owner, buf, 0);
+            owner->do_tell(QString("%1 I won't buy that for another %2 seconds.").arg(GET_NAME(ch)).arg(expires - now).split(' '));
             return eSUCCESS;
          }
       }
 
       int cost = obj->obj_flags.cost / 10000.0;
 
-      sprintf(buf, "%s I'll give you %d qpoints for that. Thanks for shoppin'.", GET_NAME(ch), cost);
-      do_tell(owner, buf, 0);
+      owner->do_tell(QString("%1 I'll give you %2 qpoints for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
       extract_obj(obj);
       GET_QPOINTS(ch) += cost;
       return eSUCCESS;

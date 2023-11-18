@@ -4339,6 +4339,36 @@ Character *get_pc(QString name)
 	return 0;
 }
 
+Character *get_active_pc(QString name)
+{
+	Character *i;
+	Character *partial_match;
+	class Connection *d;
+
+	partial_match = 0;
+
+	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+	{
+		if (!(i = d->character) || d->connected)
+			continue;
+
+		if (isname(name, i->getName()))
+			return (i);
+		else if (isname2(name.toStdString().c_str(), i->getName().toStdString().c_str()))
+		{
+			if (partial_match)
+			{
+				if (partial_match->getName().length() > i->getName().length())
+					partial_match = i;
+			}
+			else
+				partial_match = i;
+		}
+	}
+
+	return (partial_match);
+}
+
 Character *
 get_active_pc(const char *name)
 {
@@ -4466,6 +4496,11 @@ Character *get_pc_vis_exact(Character *ch, const char *name)
 	}
 
 	return 0;
+}
+
+Character *get_active_pc_vis(Character *ch, QString name)
+{
+	return get_active_pc_vis(ch, name.toStdString().c_str());
 }
 
 Character *get_active_pc_vis(Character *ch, const char *name)

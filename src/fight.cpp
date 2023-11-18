@@ -7805,9 +7805,11 @@ void Character::sendRaw(string buffer)
   }
 }
 
-command_return_t Character::tell(Character *victim, string message)
+command_return_t Character::tell(Character *victim, QString message)
 {
-  string buffer = string(GET_NAME(victim)) + " " + message;
-
-  return do_tell(this, buffer, CMD_TELL);
+  if (victim && !message.isEmpty())
+  {
+    return do_tell((victim->getName() + " " + message).split(' '), CMD_TELL);
+  }
+  return eFAILURE;
 }

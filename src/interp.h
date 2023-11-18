@@ -538,7 +538,6 @@ command_return_t do_tactics(Character *ch, char *argument, int cmd);
 command_return_t do_tame(Character *ch, char *argument, int cmd);
 command_return_t do_taste(Character *ch, char *argument, int cmd);
 command_return_t do_teleport(Character *ch, char *argument, int cmd);
-command_return_t do_tell(Character *ch, string argument, int cmd);
 command_return_t do_tellhistory(Character *ch, string argument, int cmd);
 command_return_t do_testhand(Character *ch, char *argument, int cmd);
 command_return_t do_testhit(Character *ch, char *argument, int cmd);

@@ -3657,12 +3657,12 @@ int create_blank_mobile(int nr)
 	/*
 	 Shop fixes follow.
 	 */
-	extern struct shop_data shop_index[MAX_SHOP];
+
 	//   int i;
 	for (i = 0; i < MAX_SHOP; i++)
 	{
-		if (shop_index[i].keeper >= cur_index)
-			shop_index[i].keeper++;
+		if (DC::getInstance()->shop_index[i].keeper >= cur_index)
+			DC::getInstance()->shop_index[i].keeper++;
 	}
 	return cur_index;
 }
@@ -3737,12 +3737,11 @@ void delete_mob_from_index(int nr)
 	/*
 	 Shop fixes follow.
 	 */
-	extern struct shop_data shop_index[MAX_SHOP];
 	int z;
 	for (z = 0; z < MAX_SHOP; z++)
 	{
-		if (shop_index[z].keeper >= nr)
-			shop_index[z].keeper--;
+		if (DC::getInstance()->shop_index[z].keeper >= nr)
+			DC::getInstance()->shop_index[z].keeper--;
 	}
 }
 
@@ -6040,8 +6039,7 @@ void free_char(Character *ch, Trace trace)
 				dc_free(x);
 			}
 
-			if (ch->player->away_msgs)
-				delete ch->player->away_msgs;
+			ch->player->away_msgs.clear();
 
 			if (ch->player->lastseen)
 				delete ch->player->lastseen;
