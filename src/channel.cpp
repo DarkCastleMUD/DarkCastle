@@ -839,7 +839,10 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   }
 
   name = arguments.value(0);
-  arguments.pop_front();
+  if (!arguments.isEmpty())
+  {
+    arguments.pop_front();
+  }
   message = arguments.join(' ');
 
   if (name.isEmpty() || message.isEmpty())

@@ -1019,7 +1019,10 @@ int do_zedit(Character *ch, char *argument, int cmd)
   }
   else
   {
-    arguments.pop_front();
+    if (!arguments.isEmpty())
+    {
+      arguments.pop_front();
+    }
     select = arguments.value(0);
   }
 
