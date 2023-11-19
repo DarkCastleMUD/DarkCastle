@@ -191,16 +191,18 @@ target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_V
 qt_add_executable(debug debug.cpp)
 target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
 
-install (TARGETS dcastle
+install (TARGETS dcastle debug
 BUNDLE DESTINATION .
 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 qt_generate_deploy_app_script(
-    TARGET dcastle debug
+    TARGET dcastle
     OUTPUT_SCRIPT deploy_script
+    NO_TRANSLATIONS
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
+
 install(SCRIPT ${deploy_script})
 
 #set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
