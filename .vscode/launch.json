@@ -6,7 +6,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "128 thread Build and Launch in lib/",
+            "name": "Debug dcastle -P -p6969 in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/dcastle",
@@ -26,10 +26,10 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build src using 128 threads"
+            "preLaunchTask": "Build Debug"
         },
         {
-            "name": "128 thread Debug Build and Launch in lib/",
+            "name": "Production dcastle -P -p6969 in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/dcastle",
@@ -49,75 +49,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build debug src using 128 threads"
-        },
-        {
-            "name": "32 thread Build and Launch in lib/",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
-            "args": [
-                "-P",
-                "-p 6969"
-            ],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/lib/",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "build src using 32 threads"
-        },
-        {
-            "name": "32 thread Debug Build and Launch in lib/",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
-            "args": [
-                "-P",
-                "-p 6969"
-            ],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/lib/",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "build debug src using 32 threads"
-        },
-        {
-            "name": "Launch dcastle in lib/",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
-            "args": [
-                "-P",
-                "-p 6969"
-            ],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/lib/",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
+            "preLaunchTask": "Build Production"
         },
         {
             "name": "debug in lib/",

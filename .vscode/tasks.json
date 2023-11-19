@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build src using 32 threads",
+            "label": "Build Production",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then rebootdc.sh; fi",
+            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja && ninja -C build && if pidof dcastle; then rebootdc.sh; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -23,49 +23,9 @@
             "group": "build"
         },
         {
-            "label": "build debug src using 32 threads",
+            "label": "Build Debug",
             "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 32 && if pidof dcastle; then rebootdc.sh; fi",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "absolute"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "message": 4
-                }
-            },
-            "group": {
-                "kind": "build",
-            }
-        },
-        {
-            "label": "build src using 128 threads",
-            "type": "shell",
-            "command": "cmake -S src -B build && make -C build -j 128 && if pidof dcastle; then rebootdc.sh; fi",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "absolute"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "message": 4
-                }
-            },
-            "group": "build"
-        },
-        {
-            "label": "build debug src using 128 threads",
-            "type": "shell",
-            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug && make -C build -j 128 && if pidof dcastle; then rebootdc.sh; fi",
+            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -GNinja && ninja -C build && if pidof dcastle; then rebootdc.sh; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
