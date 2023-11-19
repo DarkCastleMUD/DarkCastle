@@ -9,6 +9,12 @@ set(CMAKE_CXX_STANDARD 23)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -w")
 #set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
+set(CPACK_GENERATOR "RPM")
+set(CPACK_THREADS 0)
+set(CPACK_PACKAGE_CHECKSUM SHA256)
+set(CPACK_RPM_DEBUGINFO_PACKAGE "ON")
+set(CPACK_RPM_INSTALL_WITH_EXEC "ON")
+set(CPACK_RPM_COMPONENT_INSTALL "ON")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 
@@ -204,6 +210,8 @@ qt_generate_deploy_app_script(
 )
 
 install(SCRIPT ${deploy_script})
+
+include(CPack)
 
 #set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
 #set(TARGETS dcastle debug)
