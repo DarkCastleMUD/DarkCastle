@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(dcastle VERSION 1.0.0 LANGUAGES CXX)
+project(debug VERSION 1.0.0 LANGUAGES CXX)
+project(DC VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -15,7 +17,8 @@ execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUT
 message("${VERSION}")
 message("${BUILD_TIME}")
 configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
-add_library(DC STATIC
+
+add_library(DC SHARED
     act_comm.cpp
     act.cpp
     act_info.cpp
@@ -127,6 +130,7 @@ add_library(DC STATIC
     Database.h
     db.h
     DC.h
+    DC_global.h
     dc_xmlrpc.h
     event.h
     fight.h
@@ -178,20 +182,32 @@ add_library(DC STATIC
     wizard.h
     Zone.h
 )
-target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
-target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+#target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt_add_executable(dcastle dcastle.cpp)
+target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
+
 qt_add_executable(debug debug.cpp)
+target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
 
-target_link_libraries(dcastle PRIVATE DC)
-target_link_libraries(debug PRIVATE DC)
+install (TARGETS dcastle
+BUNDLE DESTINATION .
+RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
 
-set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
-set(TARGETS dcastle debug)
-foreach(D IN LISTS DESTINATIONS)
-    foreach(T IN LISTS TARGETS)
-        install(TARGETS ${T} RUNTIME DESTINATION ${D})
-        install(CODE "execute_process(COMMAND cp -a ${D}/${T} ${D}/${T}.${VERSION})")
-    endforeach()
-endforeach()
+qt_generate_deploy_app_script(
+    TARGET dcastle debug
+    OUTPUT_SCRIPT deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR
+)
+install(SCRIPT ${deploy_script})
+
+#set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
+#set(TARGETS dcastle debug)
+#foreach(D IN LISTS DESTINATIONS)
+#    foreach(T IN LISTS TARGETS)
+#        install(TARGETS ${T} RUNTIME DESTINATION ${D})
+#        install(CODE "execute_process(COMMAND echo cp -a ${D}/${T} ${D}/${T}.${VERSION})")
+#    endforeach()
+#endforeach()

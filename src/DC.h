@@ -19,6 +19,7 @@
 #include <QString>
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
+#include "DC_global.h"
 
 typedef uint64_t vnum_t;
 typedef QMap<QString, bool> joining_t;
@@ -66,7 +67,7 @@ public:
   Room &operator[](room_t room_key);
 };
 
-class DC : public QCoreApplication
+class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
   // Favor reference semantics over pointer semantics
