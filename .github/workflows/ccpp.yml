@@ -11,7 +11,7 @@ jobs:
       - name: install dependencies
         run: |
           zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
-            qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git
+            qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild
           zypper -n dup --auto-agree-with-licenses
 
       - name: Checkout
@@ -21,8 +21,8 @@ jobs:
         run: |
           set -x
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
-          cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
           git describe --tags --always --abbrev=8
           cat src/version.h
           grep version.h src/DC.cpp
-          make -C build -j$(grep -c process /proc/cpuinfo)
+          ninja -C build package
