@@ -397,7 +397,7 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    uint64_t longest_toggle_name{};
+    qsizetype longest_toggle_name{};
     for (const auto &t : Player::togglables)
     {
       if (t.name_.size() > longest_toggle_name)

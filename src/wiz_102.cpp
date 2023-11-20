@@ -164,7 +164,7 @@ int do_check(Character *ch, char *arg, int cmd)
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
   send_to_char(buf, ch);
-  sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10lld $3Bank$R: %-9d $3Align$R: %d\n\r",
+  sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
   if (GET_LEVEL(ch) >= SERAPH)
@@ -3710,7 +3710,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%llu\n",
+      sprintf(buf, "%lu\n",
               ((Character *)mob_index[mob_num].item)->getGold());
       send_to_char(buf, ch);
       send_to_char("$3Valid Range$R: 0 to 10000000\r\n", ch);

@@ -494,7 +494,7 @@ void vault_stats(Character *ch, char *name)
       accesses++;
     }
 
-    sprintf(buf1, "%3d) %-15s $B$5%10llu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
+    sprintf(buf1, "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
             count, vault->owner, vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
     if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH * 4)
       strcat(buf, buf1);
@@ -1078,7 +1078,7 @@ void load_vaults(void)
 
         break;
       case 'G':
-        sscanf(type, "%s %llu", tmp, &gold);
+        sscanf(type, "%s %lu", tmp, &gold);
         vault->gold = gold;
         break;
       case 'O':

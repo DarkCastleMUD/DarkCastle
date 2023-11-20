@@ -331,7 +331,7 @@ FILE *objects_log = 0;
 FILE *quest_log = 0;
 
 // writes a string to the log
-void logentry(QString str, int god_level, LogChannels type, Character *vict)
+void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict)
 {
   FILE **f = 0;
   int stream = 1;

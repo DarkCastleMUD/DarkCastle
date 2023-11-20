@@ -217,10 +217,10 @@ public:
 private:
   QMap<QString, uint64_t> IPs_{};
   QList<Connection *> connections_{};
-  uint64_t longest_name_size_{};
-  uint64_t longest_IP_size_{};
-  uint64_t longest_connection_state_size_{};
-  uint64_t longest_idle_size_{};
+  qsizetype longest_name_size_{};
+  qsizetype longest_IP_size_{};
+  qsizetype longest_connection_state_size_{};
+  qsizetype longest_idle_size_{};
 };
 
 #endif

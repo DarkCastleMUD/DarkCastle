@@ -215,7 +215,7 @@ struct obj_flag_data
     int16_t weight = {};          /* Weight what else                 */
     int32_t cost = {};            /* Value when sold (gp.)            */
     uint32_t more_flags = {};     /* A second bitvector (extra_flags2)*/
-    int16_t eq_level = {};        /* Min level to use it for eq       */
+    level_t eq_level = {};        /* Min level to use it for eq       */
     int16_t timer = {};           /* Timer for object                 */
     Character *origin = {};       /* Creator of object, previously was stored at value[3] */
 };

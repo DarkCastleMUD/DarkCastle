@@ -886,13 +886,13 @@ void AuctionHouse::Save()
     return;
   }
 
-  fprintf(the_file, "%u\n", auction_rooms.size());
+  fprintf(the_file, "%lld\n", auction_rooms.size());
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {
     fprintf(the_file, "%d\n", room_it.key());
   }
 
-  fprintf(the_file, "%u\n", Items_For_Sale.size());
+  fprintf(the_file, "%llu\n", Items_For_Sale.size());
   for (Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
     fprintf(the_file, "%u\n", Item_it.key());

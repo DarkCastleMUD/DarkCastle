@@ -493,7 +493,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (!IS_MOB(k))
   {
-    sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", k->getGold(),
+    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
     send_to_char(buf, ch);
   }
@@ -700,7 +700,7 @@ void mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k));
   send_to_char(buf, ch);
 
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%lld$R]\n\r",
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\n\r",
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   send_to_char(buf, ch);
 

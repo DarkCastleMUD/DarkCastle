@@ -33,7 +33,6 @@
 
 /* extern variables */
 
-
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
@@ -218,7 +217,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     bool tax = false;
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
+                                                                                                        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
@@ -1678,14 +1677,14 @@ int do_give(Character *ch, char *argument, int cmd)
              return eFAILURE;
           }
     */
-    csendf(ch, "You give %lld coin%s to %s.\r\n", amount,
+    csendf(ch, "You give %ld coin%s to %s.\r\n", amount,
            amount == 1 ? "" : "s", GET_SHORT(vict));
 
-    sprintf(buf, "%s gives %lld coin%s to %s", GET_NAME(ch), amount,
+    sprintf(buf, "%s gives %ld coin%s to %s", GET_NAME(ch), amount,
             pluralize(amount), GET_NAME(vict));
     logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
-    sprintf(buf, "%s gives you %lld $B$5gold$R coin%s.", PERS(ch, vict), amount,
+    sprintf(buf, "%s gives you %ld $B$5gold$R coin%s.", PERS(ch, vict), amount,
             amount == 1 ? "" : "s");
     act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
     act("$n gives some gold to $N.", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
@@ -1705,7 +1704,7 @@ int do_give(Character *ch, char *argument, int cmd)
       send_to_char("Warning:  You are giving out more $B$5gold$R than you had.\r\n", ch);
       if (GET_LEVEL(ch) < IMPLEMENTER)
       {
-        sprintf(buf, "%s gives %lld coins to %s (negative!)", GET_NAME(ch),
+        sprintf(buf, "%s gives %ld coins to %s (negative!)", GET_NAME(ch),
                 amount, GET_NAME(vict));
         special_log(buf);
       }
@@ -2773,7 +2772,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
             obj_object->obj_flags.value[0]);
     send_to_char(buffer, ch);
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
-                                                                                     DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
+                                                                                                        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;

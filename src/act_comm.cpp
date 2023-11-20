@@ -90,7 +90,7 @@ int do_report(Character *ch, char *argument, int cmd)
         }
       }
 
-      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
+      snprintf(report, 200, "XP: %ld, XP till level: %ld, Levels to gain: %u",
                GET_EXP(ch),
                (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)),
                levels_to_gain);
@@ -134,7 +134,7 @@ int do_report(Character *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(QString message, int god_level, LogChannels type)
+int send_to_gods(QString message, uint64_t god_level, LogChannels type)
 {
   QString buf1;
   QString buf;

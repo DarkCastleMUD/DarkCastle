@@ -2939,9 +2939,9 @@ void write_mobile(Character *mob, FILE *fl)
 	}
 	fprintf(fl, "-1\n");
 
-	fprintf(fl, "%d %d %d\n"
+	fprintf(fl, "%d %d %llu\n"
 				"%d %d %dd%d+%d %dd%d+%d\n"
-				"%lld %lld\n"
+				"%ld %ld\n"
 				"%d %d %d %d %d %d\n",
 			mob->alignment,
 			GET_RACE(mob),
@@ -4320,7 +4320,7 @@ void write_object(Object *obj, FILE *fl)
 	string_to_file(fl, obj->action_description);
 
 	fprintf(fl, "%d %d %d %d\n"
-				"%d %d %d %d %d\n"
+				"%d %d %d %d %llu\n"
 				"%d %d %d\n",
 			obj->obj_flags.type_flag,
 			obj->obj_flags.extra_flags,
@@ -5717,7 +5717,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 					printf("Buffer: '%s'\n", buf);
 					printf("Reading %s: %s, %d\n", curr_type, curr_name,
 						   curr_virtno);
-					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+					printf("fread_int: Bad value for range %ld - %ld: %ld\n",
 						   beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					throw error_range_int();
@@ -5878,7 +5878,7 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 					printf("Buffer: '%s'\n", buf);
 					printf("Reading %s: %s, %d\n", curr_type, curr_name,
 						   curr_virtno);
-					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+					printf("fread_int: Bad value for range %ld - %ld: %ld\n",
 						   beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					if (i < beg_range)

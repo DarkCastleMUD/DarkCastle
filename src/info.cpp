@@ -354,7 +354,7 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
          {
             char timebuffer[100];
 #if __x86_64__
-            snprintf(timebuffer, 100, " $R($B$0%llu secs left$R)", expires - now);
+            snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
 #else
             snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
 #endif
@@ -374,7 +374,7 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
          {
             char timebuffer[101] = {};
 #if __x86_64__
-            snprintf(timebuffer, 100, " $R($B$0No sell for %llu secs$R)", expires - now);
+            snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
 #else
             snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
 #endif

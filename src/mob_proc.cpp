@@ -41,8 +41,6 @@
 
 /*   external vars  */
 
-
-
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
@@ -2234,7 +2232,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
     send_to_char("Available pets are:\n\r", ch);
     for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
-      sprintf(buf, "%8lld - %s\n\r",
+      sprintf(buf, "%8ld - %s\n\r",
               3 * GET_EXP(pet), pet->short_desc);
       send_to_char(buf, ch);
     }

@@ -2398,7 +2398,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 				 "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
 				 ch);
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "$3Current object set to: %llu\r\n", ch->player->last_obj_vnum);
+	sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
 	send_to_char(buf, ch);
 	return eSUCCESS;
 }

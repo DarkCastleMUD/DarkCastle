@@ -938,7 +938,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (otarget)
 			{
-				intval = &otarget->obj_flags.eq_level;
+				intval = reinterpret_cast<decltype(intval)>(&otarget->obj_flags.eq_level);
 			}
 			else
 			{
@@ -3723,7 +3723,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 		if (lvalui)
 		  sprintf(buf, "%sLvalui: %d\n", buf,*lvalui);
 		if (lvali64)
-		  sprintf(buf, "%sLvali64: %lld\n", buf,*lvali64);
+		  sprintf(buf, "%sLvali64: %ld\n", buf,*lvali64);
 		if (lvalb)
 		  sprintf(buf, "%sLvalb: %d\n", buf,*lvalb);
 		if (lvalstr)
@@ -3770,9 +3770,9 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 			if (lvalstr)
 				sprintf(buf, "%s", *lvalstr);
 			if (lvali64)
-				sprintf(buf, "%lld", *lvali64);
+				sprintf(buf, "%ld", *lvali64);
 			if (lvalui64)
-				sprintf(buf, "%llu", *lvalui64);
+				sprintf(buf, "%lu", *lvalui64);
 			if (lvalb)
 				sprintf(buf, "%d", *lvalb);
 			for (int i = 0; buf[i]; i++)

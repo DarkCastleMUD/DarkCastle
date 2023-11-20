@@ -137,7 +137,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 		ch->send("Area number is outside the limits\r\n");
 		return;
 	}
-	snprintf(buf, MAX_STRING_LENGTH, "%d)%30s -- $5%12lld$R xps -- $5%12lld$R gold\n\r", area,
+	snprintf(buf, MAX_STRING_LENGTH, "%d)%30s -- $5%12ld$R xps -- $5%12ld$R gold\n\r", area,
 			 DC::getInstance()->zones.value(area).name, areaStats[area].xps, areaStats[area].gold);
 	csendf(ch, buf);
 	snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\r\n", "Mob Name", "Killed");

@@ -1657,7 +1657,7 @@ string generate_prompt(Character *ch)
         sprintf(pro, " ");
       break;
     case 'g':
-      sprintf(pro, "%llu", ch->getGold());
+      sprintf(pro, "%lu", ch->getGold());
       break;
     case 'G':
       sprintf(pro, "%u", (int32_t)(ch->getGold() / 20000));
@@ -1746,7 +1746,7 @@ string generate_prompt(Character *ch)
       {
         if (ch->player->last_obj_vnum > 0)
         {
-          sprintf(pro, "%llu", ch->player->last_obj_vnum);
+          sprintf(pro, "%lu", ch->player->last_obj_vnum);
         }
       }
       break;
@@ -1866,10 +1866,10 @@ string generate_prompt(Character *ch)
               GET_MOVE(ch), NTEXT);
       break;
     case 'x':
-      sprintf(pro, "%lld", GET_EXP(ch));
+      sprintf(pro, "%ld", GET_EXP(ch));
       break;
     case 'X':
-      sprintf(pro, "%lld", (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)));
+      sprintf(pro, "%ld", (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)));
       break;
     case 'y':
       charmie = get_charmie(ch);

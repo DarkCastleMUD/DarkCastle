@@ -1525,7 +1525,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   else if (GET_CLASS(ch) == CLASS_MONK && wielded == nullptr)
     dam = get_monk_bare_damage(ch);
   else
-    dam = number(0, GET_LEVEL(ch) / 2);
+    dam = number<quint64>(0, GET_LEVEL(ch) / 2);
 
   /* Damage bonuses */
   //  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
@@ -4302,7 +4302,7 @@ void stop_fighting(Character *ch, int clearlag)
   }
 
   ch->damage_per_second = ch->damage_done / fight_length;
-  csendf(ch, "You caused %llu damage over %llu seconds with DPS of %llu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
+  csendf(ch, "You caused %lu damage over %lu seconds with DPS of %lu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
   return;
 }
 
@@ -5869,7 +5869,7 @@ void group_gain(Character *ch, Character *victim)
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
       share = (int)((double)share * 1.10);
-    sprintf(buf, "You receive %lld exps of %lld total.\r\n", share, base_xp + bonus_xp);
+    sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);
     total_share += share;
@@ -7280,7 +7280,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
 int act_poisonous(Character *ch)
 {
   if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
-    if (!number(0, GET_LEVEL(ch) / 10))
+    if (!number<quint64>(0, GET_LEVEL(ch) / 10))
       return true; // poisoned
 
   return false;

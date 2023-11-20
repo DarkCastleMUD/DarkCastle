@@ -336,7 +336,7 @@ void save_clans(void)
       fprintf(fl, "T\n%d\n", pclan->tax);
 
     if (pclan->getBalance())
-      fprintf(fl, "B\n%llu\n", pclan->getBalance());
+      fprintf(fl, "B\n%lu\n", pclan->getBalance());
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -2717,7 +2717,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
   if (GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
-    sprintf(buf, "$3Balance$R:         %llu coins\r\n", clan->getBalance());
+    sprintf(buf, "$3Balance$R:         %lu coins\r\n", clan->getBalance());
     send_to_char(buf, ch);
   }
   return eSUCCESS;
@@ -2940,7 +2940,7 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
   }
   else
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %llu $B$5gold$R coins from the clan bank account.\r\n", ch->name, wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", ch->name, wdraw);
   }
   clan_data *clan = get_clan(ch);
   if (clan != nullptr)

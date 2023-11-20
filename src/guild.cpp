@@ -505,7 +505,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
       }
     }
 
-    int self_learn_max = (float)skilllist[i].maximum * 0.5;
+    auto self_learn_max = (float)skilllist[i].maximum * 0.5;
     if (GET_LEVEL(ch) * 2 < self_learn_max)
     {
       self_learn_max = GET_LEVEL(ch) * 2;

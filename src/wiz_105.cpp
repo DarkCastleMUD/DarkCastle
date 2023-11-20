@@ -257,10 +257,10 @@ int do_debug(Character *ch, char *args, int cmd)
           string key = pt.first;
           Timer t = pt.second;
           csendf(ch, "%15s: "
-                     "cur:%llus %lluμs"
-                     "\tmin:%llus %lluμs"
-                     "\tmax:%llus %lluμs"
-                     "\tavg:%llus %lluμs\n\r",
+                     "cur:%lus %luμs"
+                     "\tmin:%lus %luμs"
+                     "\tmax:%lus %luμs"
+                     "\tavg:%lus %luμs\n\r",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -276,10 +276,10 @@ int do_debug(Character *ch, char *args, int cmd)
           string key = i->first;
           Timer t = i->second;
           csendf(ch, "%15s: "
-                     "cur:%llus %lluμs"
-                     "\tmin:%llus %lluμs"
-                     "\tmax:%llus %lluμs"
-                     "\tavg:%llus %lluμs\n\r",
+                     "cur:%lus %luμs"
+                     "\tmin:%lus %luμs"
+                     "\tmax:%lus %luμs"
+                     "\tavg:%lus %luμs\n\r",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,

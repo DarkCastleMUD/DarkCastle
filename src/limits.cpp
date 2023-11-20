@@ -1064,7 +1064,7 @@ void prepare_character_for_sixty(Character *ch)
 			int i = (ch->exp / 100000000) * 500000;
 			if (i > 0)
 			{
-				csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %lld experience.$R\n\r", i, ch->exp);
+				csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %ld experience.$R\n\r", i, ch->exp);
 				ch->addGold(i);
 			}
 			else if (ch->exp > 0)

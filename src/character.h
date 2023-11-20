@@ -196,7 +196,7 @@ struct class_skill_defines
 {
     char *skillname;        // name of skill
     int16_t skillnum;       // ID # of skill
-    int16_t levelavailable; // what level class can get it
+    level_t levelavailable; // what level class can get it
     int16_t maximum;        // maximum value PC can train it to (1-100)
     uint8_t group;          // which class tree group it is assigned
     int16_t attrs;          // What attributes the skill is based on
@@ -465,8 +465,8 @@ public:
         MALE = 1,
         FEMALE = 2
     };
-    static constexpr uint64_t MIN_NAME_SIZE = 3;
-    static constexpr uint64_t MAX_NAME_SIZE = 12;
+    static constexpr qsizetype MIN_NAME_SIZE = 3;
+    static constexpr qsizetype MAX_NAME_SIZE = 12;
     static const QList<int> wear_to_item_wear;
     static bool validateName(QString name);
 
@@ -493,7 +493,7 @@ public:
     auto getRace(void) const { return race; }
     QString getRaceName(void) const { return race_names.value(race); }
 
-    int8_t level = {};
+    quint64 level = {};
     int8_t position = {}; // Standing, sitting, fighting
 
     int8_t str = {};

@@ -358,7 +358,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
 {
   char command[MAX_INPUT_LENGTH];
   char lev_str[MAX_INPUT_LENGTH];
-  int lev_nr = 110;
+  uint64_t lev_nr = 110;
 
   if (IS_NPC(ch))
     return eFAILURE;
@@ -837,19 +837,19 @@ int do_metastat(Character *ch, char *argument, int cmd)
           GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
   send_to_char(buf, ch);
 
-  sprintf(buf, "Hit points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+  sprintf(buf, "Hit points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_HIT(victim), hps_exp_spent(victim), hps_plats_spent(victim),
           r_new_meta_platinum_cost(0, hps_plats_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
           r_new_meta_exp_cost(0, hps_exp_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
   send_to_char(buf, ch);
 
-  sprintf(buf, "Mana points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+  sprintf(buf, "Mana points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_MANA(victim), mana_exp_spent(victim), mana_plats_spent(victim),
           r_new_meta_platinum_cost(0, mana_plats_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
           r_new_meta_exp_cost(0, mana_exp_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
   send_to_char(buf, ch);
 
-  sprintf(buf, "Move points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+  sprintf(buf, "Move points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_MOVE(victim), moves_exp_spent(victim), moves_plats_spent(victim),
           r_new_meta_platinum_cost(0, moves_plats_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
           r_new_meta_exp_cost(0, moves_exp_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));

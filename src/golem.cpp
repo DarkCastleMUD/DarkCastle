@@ -406,9 +406,9 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
           "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
           "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
-          "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10lld       |\\|\n\r"
-          "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10lld       |o|\n\r"
-          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10llu $3Platinum$7: %-5d |/|\n\r"
+          "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\n\r"
+          "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\n\r"
+          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lu $3Platinum$7: %-5d |/|\n\r"
           "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\n\r"
           "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
           GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),

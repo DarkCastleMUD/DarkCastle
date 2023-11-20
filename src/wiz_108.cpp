@@ -597,7 +597,7 @@ int do_set(Character *ch, char *argument, int cmd)
     val = atoll(buf);
     int64_t before_exp = vict->exp;
     vict->exp = val;
-    logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s sets %s's exp from %lld to %lld.",
+    logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
          GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
   }
   break;
