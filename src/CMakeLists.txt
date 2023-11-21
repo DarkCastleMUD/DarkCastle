@@ -1,5 +1,19 @@
+execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-([0-9]+).*" "\\1" VERSION_PATCH "${VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-[0-9]+\\-g(.*)" "\\1" VERSION_SHA1 "${VERSION}")
+message("${VERSION}")
+message("Build timestamp: ${BUILD_TIME}")
+message("Major: ${VERSION_MAJOR}")
+message("Minor: ${VERSION_MINOR}")
+message("Patch: ${VERSION_PATCH}")
+message("SHA1: ${VERSION_SHA1}")
+
 cmake_minimum_required(VERSION 3.14)
-project(DC VERSION 1.0.4 LANGUAGES CXX)
+project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -7,6 +21,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -w")
 #set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR "RPM")
 set(CPACK_THREADS 0)
 set(CPACK_PACKAGE_CHECKSUM SHA256)
@@ -17,15 +32,10 @@ set(CPACK_RPM_PACKAGE_RELOCATABLE "ON")
 set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
 set(CPACK_RPM_PACKAGE_REQUIRES "qt6-sql-postgresql")
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/bin/qt.conf")
+
+configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
-
-execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-message("${VERSION}")
-message("${BUILD_TIME}")
-configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
-
 add_library(DC SHARED
     act_comm.cpp
     act.cpp
@@ -191,7 +201,7 @@ add_library(DC SHARED
     Zone.h
 )
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
-#target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt_add_executable(dcastle dcastle.cpp)
 target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
@@ -212,14 +222,5 @@ qt_generate_deploy_app_script(
 )
 
 install(SCRIPT ${deploy_script})
-
 include(CPack)
 
-#set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
-#set(TARGETS dcastle debug)
-#foreach(D IN LISTS DESTINATIONS)
-#    foreach(T IN LISTS TARGETS)
-#        install(TARGETS ${T} RUNTIME DESTINATION ${D})
-#        install(CODE "execute_process(COMMAND echo cp -a ${D}/${T} ${D}/${T}.${VERSION})")
-#    endforeach()
-#endforeach()
