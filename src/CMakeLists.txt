@@ -18,7 +18,7 @@ set(CPACK_RPM_INSTALL_WITH_EXEC "ON")
 set(CPACK_RPM_PACKAGE_RELOCATABLE "ON")
 set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
 set(CPACK_RPM_PACKAGE_REQUIRES "qt6-sql-postgresql")
-set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/usr/bin/qt.conf")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/bin/qt.conf")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 
