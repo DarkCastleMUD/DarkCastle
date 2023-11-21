@@ -33,8 +33,6 @@ extern "C"
 
 using namespace std;
 
-
-
 extern int hit_gain(Character *, int);
 
 struct ki_info_type ki_info[] = {
@@ -523,7 +521,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   manadam = MIN(750, manadam);
   if (vict->getHP() < 500000)
   {
-    int success_chance = (GET_LEVEL(ch) / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (GET_LEVEL(vict) / 5);
+    auto success_chance = (GET_LEVEL(ch) / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (GET_LEVEL(vict) / 5);
     if (number(1, 101) < success_chance)
 
     {
@@ -734,17 +732,17 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 
   if (learned > 85)
   {
-    int level_diff = GET_LEVEL(ch) - GET_LEVEL(victim);
+    level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(victim);
 
-    if (level_diff >= 0)
+    if (level_difference >= 0)
     {
       success_chance = 6;
     }
-    else if (level_diff >= -20)
+    else if (level_difference >= -20)
     {
       success_chance = 5;
     }
-    else if (level_diff >= -100)
+    else if (level_difference >= -100)
     {
       success_chance = 4;
     }

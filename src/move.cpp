@@ -730,7 +730,8 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 		if (IS_NPC(chaser) && chaser->hunting == 0)
 		{
-			if (GET_LEVEL(ch) - GET_LEVEL(chaser) / 2 >= 0 || GET_LEVEL(ch) >= 50)
+			level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(chaser) / 2;
+			if (level_difference >= 0 || GET_LEVEL(ch) >= 50)
 			{
 				add_memory(chaser, GET_NAME(ch), 't');
 				struct timer_data *timer;

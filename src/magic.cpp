@@ -1224,7 +1224,8 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                 if (IS_PC(ch) && IS_NPC(tmp_victim))
                   if (!ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) && !tmp_victim->hunting)
                   {
-                    if (GET_LEVEL(ch) - GET_LEVEL(tmp_victim) / 2 > 0)
+                    level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(tmp_victim) / 2;
+                    if (level_difference > 0)
                     {
                       add_memory(tmp_victim, GET_NAME(ch), 't');
                       struct timer_data *timer;
@@ -6539,7 +6540,7 @@ void make_portal(Character *ch, Character *vict)
   extern class Object *object_list;
   extern room_t top_of_world;
   char buf[250];
-  int chance{};
+  qint64 chance{};
   room_t destination{};
   bool good_destination = false;
 

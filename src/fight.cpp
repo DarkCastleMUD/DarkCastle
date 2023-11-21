@@ -3251,7 +3251,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (!AWAKE(victim)))
     return eFAILURE; // always hit
 
-  int lvldiff = GET_LEVEL(ch) - GET_LEVEL(victim);
+  level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(victim);
   int skill = 0;
 
   // Figure out toHit value.
@@ -3296,17 +3296,18 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     toHit = 1;
 
   // Hitting stuff close to your level gives you a bonus,
-  if (lvldiff > 15 && lvldiff < 25)
+  if (level_difference > 15 && level_difference < 25)
     toHit += 5;
-  else if (lvldiff > 5 && lvldiff <= 15)
+  else if (level_difference > 5 && level_difference <= 15)
     toHit += 7;
-  else if (lvldiff >= 0 && lvldiff <= 5)
+  else if (level_difference >= 0 && level_difference <= 5)
     toHit += 10;
-  else if (lvldiff >= -5 && lvldiff < 0)
+  else if (level_difference >= -5 && level_difference < 0)
     toHit += 5;
 
   // Give a tohit bonus to low level players.
-  float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim) / 2.0)) / 10.0;
+  level_difference = GET_LEVEL(ch) - (GET_LEVEL(victim) / 2.0);
+  float lowlvlmod = (50.0 - level_difference) / 10.0;
   if (lowlvlmod > 1.0)
     toHit = (int)((float)toHit * lowlvlmod);
 
@@ -4085,7 +4086,8 @@ void set_fighting(Character *ch, Character *vict)
   if (IS_PC(ch) && IS_NPC(vict))
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
     {
-      if (GET_LEVEL(ch) - (GET_LEVEL(vict) / 2) > 0 || GET_LEVEL(ch) == 60)
+      level_diff_t level_difference = GET_LEVEL(ch) - (GET_LEVEL(vict) / 2.0);
+      if (level_difference > 0 || GET_LEVEL(ch) == 60)
       {
         add_memory(vict, GET_NAME(ch), 't');
         struct timer_data *timer;
@@ -4104,8 +4106,8 @@ void set_fighting(Character *ch, Character *vict)
       if (IS_PC(vict) && IS_NPC(ch))
         if (!ISSET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
         {
-          if (GET_LEVEL(vict) - (GET_LEVEL(ch) / 2) > 0 ||
-              GET_LEVEL(vict) == 60)
+          level_diff_t level_difference = GET_LEVEL(vict) - (GET_LEVEL(ch) / 2);
+          if (level_difference > 0 || GET_LEVEL(vict) == 60)
           {
             add_memory(ch, GET_NAME(vict), 't');
             struct timer_data *timer;
@@ -4666,23 +4668,6 @@ void change_alignment(Character *ch, Character *victim)
     change /= 2;
   GET_ALIGNMENT(ch) -= change;
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
-#if 0
-  int change = alignment_value(GET_ALIGNMENT(ch));
-  int x = (abs(GET_ALIGNMENT(victim)) + 1000) / 100;
-      
-  x += ((GET_LEVEL(victim) - GET_LEVEL(ch)) / 5);  
-  
-  if(GET_ALIGNMENT(victim) >= 0)
-    x *= (-2);
-  else x /= 2;
-  
-  if(0 == change)
-    x /= 2;
-
-  GET_ALIGNMENT(ch) += x;
-  
-  GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
-#endif
 
   if (change != alignment_value(GET_ALIGNMENT(ch)))
     zap_eq_check(ch);
@@ -5097,8 +5082,6 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
     //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
     //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
     damadd = (int)(dam * 1.5);
-    //    if (GET_LEVEL(vict) > GET_LEVEL(ch))
-    //    damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, vict, retval);
@@ -5838,7 +5821,8 @@ void group_gain(Character *ch, Character *victim)
       continue;
     }
 
-    if (GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -51 && IS_PC(tmp_ch))
+    level_diff_t level_difference = GET_LEVEL(tmp_ch) - GET_LEVEL(highest);
+    if (level_difference <= -51 && IS_PC(tmp_ch))
     {
       act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
@@ -6597,7 +6581,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
                 GET_NAME(victim), GET_NAME(ch));
         break;
       }
-    int level_spread;
+    level_diff_t level_spread;
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score

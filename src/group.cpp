@@ -26,7 +26,6 @@ extern "C"
 #include "spells.h"
 #include "terminal.h"
 
-
 char *calc_color(int hit, int max_hit);
 
 int do_abandon(Character *ch, char *argument, int cmd)
@@ -403,7 +402,7 @@ int do_group(Character *ch, char *argument, int cmd)
         send_to_char("You must found a group, or Disband a group.\r\n", ch);
         return eFAILURE;
       }
-      //      if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
+
       if (IS_AFFECTED(victim, AFF_GROUP))
       {
         stop_grouped_bards(victim, 1);

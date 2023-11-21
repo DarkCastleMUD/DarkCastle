@@ -23,6 +23,7 @@
 
 typedef uint64_t vnum_t;
 typedef quint64 level_t;
+typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;

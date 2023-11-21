@@ -3064,7 +3064,9 @@ int do_consider(Character *ch, char *argument, int cmd)
          percent = Learned;
 
          mod += AWAKE(victim) ? 10 : -50;
-         mod += ((GET_LEVEL(victim) - GET_LEVEL(ch)) / 2);
+         level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
+
+         mod += level_difference / 2;
          mod += 5; /* average item is 5 lbs, steal takes ths into acct */
          if (GET_DEX(ch) < 10)
             mod += ((10 - GET_DEX(ch)) * 5);
@@ -3105,22 +3107,22 @@ int do_consider(Character *ch, char *argument, int cmd)
       }
    }
    /* Level Comparison */
-   x = GET_LEVEL(victim) - GET_LEVEL(ch);
-   if (x <= -15)
+   level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
+   if (level_difference <= -15)
       y = 0;
-   else if (x <= -10)
+   else if (level_difference <= -10)
       y = 1;
-   else if (x <= -5)
+   else if (level_difference <= -5)
       y = 2;
-   else if (x <= -2)
+   else if (level_difference <= -2)
       y = 3;
-   else if (x <= 1)
+   else if (level_difference <= 1)
       y = 4;
-   else if (x <= 2)
+   else if (level_difference <= 2)
       y = 5;
-   else if (x <= 4)
+   else if (level_difference <= 4)
       y = 6;
-   else if (x <= 9)
+   else if (level_difference <= 9)
       y = 7;
    else
       y = 8;

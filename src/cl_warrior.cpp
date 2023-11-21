@@ -31,7 +31,6 @@
 
 using namespace std;
 
-
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
@@ -772,9 +771,10 @@ int do_disarm(Character *ch, char *argument, int cmd)
   wielded = victim->equipment[WIELD];
 
   int modifier = 0;
+  level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
 
   if (GET_LEVEL(ch) < 50 && GET_LEVEL(ch) + 10 < GET_LEVEL(victim)) // keep lowbies from disarming big mobs
-    modifier = -((GET_LEVEL(victim) - GET_LEVEL(ch)) * 2);
+    modifier = -(level_difference * 2);
 
   // Two handed weapons are twice as hard to disarm
   if (DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
@@ -860,7 +860,7 @@ int do_rescue(Character *ch, char *argument, int cmd)
   }
 
   for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch &&
-                                           (tmp_ch->fighting != victim);
+                                                              (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
 

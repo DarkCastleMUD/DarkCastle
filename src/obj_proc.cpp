@@ -3641,7 +3641,8 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
         buf = "Are you sure you can win this one? I mean.... I'll be ok, but I'm pretty sure you're screwed.";
         tmp.push_back(buf);
       }
-      if (IS_NPC(vict->fighting) && (GET_LEVEL(vict) - GET_LEVEL(vict->fighting)) > 40)
+      level_diff_t level_difference = GET_LEVEL(vict) - GET_LEVEL(vict->fighting);
+      if (IS_NPC(vict->fighting) && level_difference > 40)
       {
         buf = "Oh come on... this is fuckin' embarrassing...";
         tmp.push_back(buf);
