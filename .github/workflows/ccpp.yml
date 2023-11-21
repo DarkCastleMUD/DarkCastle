@@ -21,6 +21,8 @@ jobs:
         run: |
           set -x
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
+          git describe --tags --always --abbrev=8
+          git describe --tags --always --abbrev=8 --dirty
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
           git describe --tags --always --abbrev=8
           cat src/version.h
