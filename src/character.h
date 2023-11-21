@@ -57,7 +57,7 @@ struct ignore_entry
 typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
 
 class communication;
-typedef std::queue<communication> history_t;
+typedef QQueue<communication> history_t;
 
 typedef QString player_config_key_t;
 typedef QString player_config_value_t;
@@ -381,8 +381,8 @@ public:
     bool hide[MAX_HIDE] = {};
     Character *hiding_from[MAX_HIDE] = {};
     QQueue<QString> away_msgs = {};
-    history_t *tell_history = {};
-    history_t *gtell_history = {};
+    history_t tell_history;
+    history_t gtell_history;
     joining_t joining = {};
     uint32_t quest_points = {};
     int16_t quest_current[QUEST_MAX] = {};

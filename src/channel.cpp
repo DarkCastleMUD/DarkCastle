@@ -847,21 +847,16 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
 
   if (name.isEmpty() || message.isEmpty())
   {
-    if (this->player->tell_history == nullptr || this->player->tell_history->empty())
+    if (this->player->tell_history.isEmpty())
     {
       send_to_char("You have not sent or recieved any tell messages.\r\n", this);
       return eSUCCESS;
     }
 
     send_to_char("Here are the last 10 tell messages:\r\n", this);
-    history_t tmp = *(this->player->tell_history);
-    while (!tmp.empty())
+    for (const auto &c : player->tell_history)
     {
-      communication c = tmp.front();
-      QString buf = c.message;
-      buf += "\r\n";
-      send_to_char(buf, this);
-      tmp.pop();
+      sendln(c.message);
     }
 
     return eSUCCESS;
@@ -1176,18 +1171,16 @@ int do_grouptell(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (ch->player->gtell_history == nullptr || ch->player->gtell_history->empty())
+    if (ch->player->gtell_history.isEmpty())
     {
       send_to_char("No one has said anything.\r\n", ch);
       return eFAILURE;
     }
 
-    history_t copy = *(ch->player->gtell_history);
     send_to_char("Here are the last 10 group tells:\r\n", ch);
-    while (!copy.empty())
+    for (const auto &c : ch->player->gtell_history)
     {
-      ch->send(QString("%1\r\n").arg(copy.front().message));
-      copy.pop();
+      ch->sendln(c.message);
     }
 
     return eSUCCESS;
@@ -1357,17 +1350,12 @@ void Character::tell_history(Character *ch, QString message)
     return;
   }
 
-  if (this->player->tell_history == nullptr)
-  {
-    this->player->tell_history = new history_t();
-  }
-
   communication c(ch, message);
 
-  this->player->tell_history->push(c);
-  if (this->player->tell_history->size() > 10)
+  this->player->tell_history.push_back(c);
+  if (this->player->tell_history.size() > 10)
   {
-    this->player->tell_history->pop();
+    this->player->tell_history.pop_front();
   }
 }
 
@@ -1378,17 +1366,12 @@ void Character::gtell_history(Character *ch, QString message)
     return;
   }
 
-  if (this->player->gtell_history == nullptr)
-  {
-    this->player->gtell_history = new history_t();
-  }
-
   communication c(ch, message);
 
-  this->player->gtell_history->push(c);
-  if (this->player->gtell_history->size() > 10)
+  this->player->gtell_history.push_back(c);
+  if (this->player->gtell_history.size() > 10)
   {
-    this->player->gtell_history->pop();
+    this->player->gtell_history.pop_front();
   }
 }
 

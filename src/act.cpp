@@ -220,12 +220,15 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
     return str;
   }
 
-  size_t buf_len = buf.length();
-  if (buf_len >= 2)
+  if (buf.endsWith("\r\n") || buf.endsWith("\n\r"))
   {
-    // Remove \r\n at end before returning string
-    buf[buf_len - 2] = '\0';
+    buf = buf.chopped(2);
   }
+  if (buf.endsWith("\n") || buf.endsWith("\r"))
+  {
+    buf = buf.chopped(1);
+  }
+
   send_tokens_return str;
   str.str = buf;
   str.retval = retval;
