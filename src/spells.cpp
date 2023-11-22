@@ -54,7 +54,6 @@ extern "C"
 
 // Global data
 
-
 extern struct class_skill_defines w_skills[];
 extern struct class_skill_defines t_skills[];
 extern struct class_skill_defines d_skills[];
@@ -1553,7 +1552,7 @@ int do_release(Character *ch, char *argument, int cmd)
       if (aff->type > MAX_SPL_LIST)
         continue;
       if (!DC::isSet(spell_info[aff->type].targets,
-                  TAR_SELF_DEFAULT) &&
+                     TAR_SELF_DEFAULT) &&
           aff->type != SPELL_HOLY_AURA)
         continue;
       if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
@@ -1718,7 +1717,6 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   }
   int i = 0, learned = 0;
 
-  // if (IS_PC(ch)) debug_point();
   if (!IS_MOB(ch))
   {
     i = learned = has_skill(ch, skillnum);
@@ -1744,7 +1742,10 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
       i = 75;
   }
   if (stat && victim)
-    i -= stat_mod[get_stat(victim, stat)] * GET_LEVEL(ch) / 60; // less impact on low levels..
+  {
+    auto max_level_percent = GET_LEVEL(ch) / 60.0;
+    i -= stat_mod[get_stat(victim, stat)] * max_level_percent; // less impact on low levels..
+  }
   i += mod;
 
   if (IS_PC(ch))
