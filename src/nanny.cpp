@@ -1138,11 +1138,8 @@ void nanny(class Connection *d, string arg)
          STATE(d) = Connection::states::GET_NEW_PASSWORD;
          // at this point, player hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
-#ifdef LEAK_CHECK
-         ch->player = (Player *)calloc(1, sizeof(Player));
-#else
-         ch->player = (Player *)dc_alloc(1, sizeof(Player));
-#endif
+         ch->player = new Player;
+         assert(ch->player);
          break;
 
       case 'n':
