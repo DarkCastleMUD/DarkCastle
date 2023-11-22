@@ -466,12 +466,12 @@ int do_set(Character *ch, char *argument, int cmd)
   case 3: /* level */
   {
     value = atoi(buf);
-    if (value > MAX_MORTAL && value < MIN_GOD)
+    if (value > DC::MAX_MORTAL_LEVEL && value < MIN_GOD)
     {
       send_to_char("That level doesn't exist!\n\r", ch);
       return eFAILURE;
     }
-    if (((value < 0) || (value > MAX_MORTAL)) && GET_LEVEL(ch) < OVERSEER)
+    if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && GET_LEVEL(ch) < OVERSEER)
     {
       send_to_char(
           "Level must be between 0 and 101.\r\n", ch);

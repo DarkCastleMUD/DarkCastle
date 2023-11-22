@@ -1605,7 +1605,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     if (pch == ch || pch->clan != ch->clan ||
         !DC::isSet(pch->misc, LogChannels::CHANNEL_CLAN))
       continue;
-    if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level <= MAX_MORTAL)
+    if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level <= DC::MAX_MORTAL_LEVEL)
       continue;
 
     for (tmp_obj = DC::getInstance()->world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)

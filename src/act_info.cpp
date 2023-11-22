@@ -52,7 +52,7 @@ int do_levels(Character *ch, char *argument, int cmd) {
 
 	buf[0] = '\0';
 
-	for (i = 1; i <= MAX_MORTAL; i++)
+	for (i = 1; i <= DC::MAX_MORTAL_LEVEL; i++)
 		sprintf(buf + strlen(buf), "[%2d] %9d\n\r", i, exp_table[i]);
 
 	page_string(ch->desc, buf, 1);

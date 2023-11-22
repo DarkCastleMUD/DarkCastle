@@ -359,7 +359,7 @@ void Leaderboard::check(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < MAX_MORTAL)
+			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdactive[i])
 			{
@@ -478,7 +478,7 @@ void Leaderboard::check(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < MAX_MORTAL)
+			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdactiveclass[k][i])
 			{
@@ -895,7 +895,7 @@ void Leaderboard::check_offline(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(ch) < MAX_MORTAL)
+			if (GET_LEVEL(ch) < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(ch) > rdactive[i])
 			{
@@ -1014,7 +1014,7 @@ void Leaderboard::check_offline(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(ch) < MAX_MORTAL)
+			if (GET_LEVEL(ch) < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(ch) > rdactiveclass[k][i])
 			{
@@ -1677,7 +1677,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < MAX_MORTAL)
+			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdonline[i])
 			{

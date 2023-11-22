@@ -1571,7 +1571,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   // calculate the gold needed
   level = GET_LEVEL(victim);
-  if ((level > 10) && (level <= MAX_MORTAL))
+  if ((level > 10) && (level <= DC::MAX_MORTAL_LEVEL))
   {
     cf = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);

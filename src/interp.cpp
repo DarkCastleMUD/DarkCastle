@@ -868,7 +868,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !DC::isSet(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-          ch->desc->original->level <= MAX_MORTAL && !DC::isSet(found->flags, COM_CHARMIE_OK))
+          ch->desc->original->level <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, COM_CHARMIE_OK))
       {
         send_to_char("The spirit cannot perform that action.\r\n", ch);
         return eFAILURE;

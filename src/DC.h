@@ -105,6 +105,7 @@ public:
   static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
+  static const level_t MAX_MORTAL_LEVEL = 60ULL;
   const QString HINTS_FILE_NAME = "playerhints.txt";
   static const QStringList connected_states;
 

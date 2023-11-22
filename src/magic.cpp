@@ -2662,7 +2662,7 @@ int spell_enchant_armor(uint8_t level, Character *ch, Character *victim, class O
 
     SET_BIT(obj->obj_flags.extra_flags, ITEM_ENCHANTED);
 
-    obj->obj_flags.value[1] += 1 + (level >= MAX_MORTAL);
+    obj->obj_flags.value[1] += 1 + (level >= DC::MAX_MORTAL_LEVEL);
 
     if (IS_GOOD(ch))
     {
@@ -2715,7 +2715,7 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class 
                                 (level >= 48) + (level >= DEITY);
 
     obj->affected[1].location = APPLY_DAMROLL;
-    obj->affected[1].modifier = 4 + (level >= 20) + (level >= 40) + (level >= MAX_MORTAL) +
+    obj->affected[1].modifier = 4 + (level >= 20) + (level >= 40) + (level >= DC::MAX_MORTAL_LEVEL) +
                                 (level >= DEITY);
 
     if (IS_GOOD(ch))

@@ -958,7 +958,7 @@ void save_help(Character *ch)
 
   for (i = 0; i < new_top_of_helpt; i++)
   {
-    if (new_help_table[i].min_level <= MAX_MORTAL)
+    if (new_help_table[i].min_level <= DC::MAX_MORTAL_LEVEL)
     {
       help_string_to_file(f, new_help_table[i].keyword1);
       help_string_to_file(f, new_help_table[i].keyword2);

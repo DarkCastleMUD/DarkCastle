@@ -332,7 +332,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       wielded = vict->equipment[WIELD];
       if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (GET_LEVEL(vict) <= MAX_MORTAL))
+          (GET_LEVEL(vict) <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && GET_LEVEL(ch) > 9 && number(0, 2) == 0)
         {
           MOB_WAIT_STATE(ch) = 2;
@@ -2798,7 +2798,7 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
   if (ch->equipment[WIELD] && vict->equipment[WIELD])
     if (IS_PC(ch) || IS_PC(vict))
       if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (GET_LEVEL(vict) <= MAX_MORTAL))
+          (GET_LEVEL(vict) <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && GET_LEVEL(ch) > 9 && number(0, 2) == 0)
         {
           disarm(ch, vict);

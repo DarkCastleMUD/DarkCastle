@@ -899,7 +899,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && this->level <= MAX_MORTAL)
+  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && this->level <= DC::MAX_MORTAL_LEVEL)
   {
     send_to_char("The person is ignoring all tells right now.\r\n", this);
     return eSUCCESS;

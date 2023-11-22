@@ -1019,7 +1019,7 @@ void update_corpses_and_portals(void)
 
 void prepare_character_for_sixty(Character *ch)
 {
-	if (IS_PC(ch) && MAX_MORTAL == 60)
+	if (IS_PC(ch) && DC::MAX_MORTAL_LEVEL == 60)
 	{
 		int skl = -1;
 		switch (GET_CLASS(ch))

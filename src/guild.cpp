@@ -839,7 +839,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd == 171 && !IS_MOB(ch))
   { /*   gain crap...  */
 
-    if ((GET_LEVEL(ch) >= IMMORTAL) || (GET_LEVEL(ch) == MAX_MORTAL))
+    if ((GET_LEVEL(ch) >= IMMORTAL) || (GET_LEVEL(ch) == DC::MAX_MORTAL_LEVEL))
     {
       send_to_char("You have already reached the highest level!\n\r", ch);
       return eSUCCESS;
@@ -909,7 +909,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     advance_level(ch, 0);
     GET_EXP(ch) -= (int)exp_needed;
     int bonus = (GET_LEVEL(ch) - 50) * 250;
-    if (bonus > 0 && MAX_MORTAL == 60)
+    if (bonus > 0 && DC::MAX_MORTAL_LEVEL == 60)
     {
       char buf[MAX_STRING_LENGTH];
       if (GET_LEVEL(ch) == 60)
@@ -971,7 +971,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
       }
 
     send_to_char("You have remorted back to level 50.\r\n", ch);
-    if (GET_LEVEL(ch) <= MAX_MORTAL)
+    if (GET_LEVEL(ch) <= DC::MAX_MORTAL_LEVEL)
       GET_LEVEL(ch) = 50;
     SET_BIT(ch->player->toggles, Player::PLR_REMORTED);
 

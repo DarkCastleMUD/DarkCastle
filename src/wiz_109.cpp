@@ -197,7 +197,7 @@ int do_advance(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((new_newlevel > MAX_MORTAL) && (new_newlevel < MIN_GOD))
+  if ((new_newlevel > DC::MAX_MORTAL_LEVEL) && (new_newlevel < MIN_GOD))
   {
     send_to_char("That level doesn't exist!!\n\r", ch);
     return eFAILURE;

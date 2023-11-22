@@ -6,7 +6,6 @@
 #include "structs.h"
 
 #define MORTAL 60
-#define MAX_MORTAL 60
 /* #define GLADIATOR */
 
 // #define IMMORTAL 101
@@ -19,7 +18,7 @@
 // #define G_POWER 108
 // #define OVERSEER 109
 // #define IMPLEMENTER 110
-// #define MAX_MORTAL 50
+// #define DC::MAX_MORTAL_LEVEL 50
 // #define MIN_GOD IMMORTAL
 
 #define GIFTED_COMMAND 101 // noone should ever "be" this level
