@@ -13,14 +13,12 @@ jobs:
           zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
             qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild
           zypper -n dup --auto-agree-with-licenses
-
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
       
       - name: make
         run: |
           set -x
-          git config --global --add safe.directory /__w/DarkCastle/DarkCastle
+          git clone https://github.com/DarkCastleMUD/DarkCastle.git
+          cd DarkCastle
           git describe --tags --always --abbrev=8
           git describe --tags --always --abbrev=8 --dirty
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
