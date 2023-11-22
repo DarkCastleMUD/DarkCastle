@@ -6049,7 +6049,10 @@ void free_char(Character *ch, Trace trace)
 				delete ch->player->config;
 			}
 
-			delete ch->player;
+			if (ch->player)
+			{
+				delete ch->player;
+			}
 		}
 	}
 	else if (ch->mobdata != nullptr)
