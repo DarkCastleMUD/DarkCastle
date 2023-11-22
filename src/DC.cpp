@@ -23,10 +23,10 @@ DC::DC(int &argc, char **argv)
 
 void DC::removeDead(void)
 {
-
 	for (auto &node : death_list)
 	{
 		character_list.erase(node.first);
+		assert(!character_list.contains(node.first));
 		shooting_list.erase(node.first);
 		Trace &t = node.second;
 		t.addTrack("DC::removeDeath");
