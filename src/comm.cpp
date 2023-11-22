@@ -2150,7 +2150,7 @@ int process_output(class Connection *t)
   /* now, append the 'real' output */
   i += t->output;
 
-  if (t->character && t->connected == Connection::states::PLAYING)
+  if (t && t->character && t->character->player && t->connected == Connection::states::PLAYING)
     blackjack_prompt(t->character, i, t->character->player && !DC::isSet(t->character->player->toggles, Player::PLR_ASCII));
   make_prompt(t, i);
 
