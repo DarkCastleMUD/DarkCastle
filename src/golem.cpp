@@ -171,7 +171,8 @@ void save_golem_data(Character *ch)
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
-  fwrite(&(golem->level), sizeof(golem->level), 1, fpfile);
+  uint8_t legacy_level = (uint8_t)golem->level;
+  fwrite(&legacy_level, 1, 1, fpfile);
   fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
   obj_to_store(golem->carrying, golem, fpfile, -1);
@@ -280,8 +281,8 @@ void load_golem_data(Character *ch, int golemtype)
   golem = clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
   ch->player->golem = golem;
-  fread(&(golem->level), sizeof(golem->level), 1, fpfile);
-  int level = golem->level;
+  fread(&(golem->level), 1, 1, fpfile);
+  auto level = golem->level;
   for (; level > 1; level--)
     advance_golem_level(golem); // Level it up again.
   fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
@@ -369,6 +370,13 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   string isrString;
 
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
+  if (GET_LEVEL(ch) + 19 > 60)
+  {
+    logentry(QString("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(GET_LEVEL(ch)).arg(GET_LEVEL(ch) + 19));
+    master->send("There is an error with your golem. Contact an immortal.\r\n");
+    produce_coredump(ch);
+    return eSUCCESS;
+  }
   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64_t)GET_EXP(ch));
 
   to_hit = GET_REAL_HITROLL(ch);
