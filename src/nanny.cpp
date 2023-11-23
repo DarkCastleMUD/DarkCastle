@@ -2762,7 +2762,7 @@ void show_question_stats(Connection *d)
    buffer += fmt::format("Class: {}\r\n", classes[clss].name);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
    buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\r\n");
-   if (d->stats->selection == 1)
+   if (d->stats->selection == attribute_t::STRENGTH)
    {
       buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
                             d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
@@ -2773,7 +2773,7 @@ void show_question_stats(Connection *d)
                             d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
    }
 
-   if (d->stats->selection == 2)
+   if (d->stats->selection == attribute_t::DEXTERITY)
    {
       buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\r\n",
                             d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
@@ -2784,40 +2784,40 @@ void show_question_stats(Connection *d)
                             d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
    }
 
-   if (d->stats->selection == 3)
+   if (d->stats->selection == attribute_t::INTELLIGENCE)
    {
-      buffer += fmt::format("3. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
-                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
-   }
-   else
-   {
-      buffer += fmt::format("3. Constitution   {:2}      {:2}               {:2}\r\n",
-                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
-   }
-
-   if (d->stats->selection == 4)
-   {
-      buffer += fmt::format("4. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
+      buffer += fmt::format("3. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
                             d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
    }
    else
    {
-      buffer += fmt::format("4. Intelligence   {:2}      {:2}               {:2}\r\n",
+      buffer += fmt::format("3. Intelligence   {:2}      {:2}               {:2}\r\n",
                             d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
    }
 
-   if (d->stats->selection == 5)
+   if (d->stats->selection == attribute_t::WISDOM)
    {
-      buffer += fmt::format("5. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
+      buffer += fmt::format("4. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
                             d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
    }
    else
    {
-      buffer += fmt::format("5. Wisdom         {:2}      {:2}               {:2}\r\n",
+      buffer += fmt::format("4. Wisdom         {:2}      {:2}               {:2}\r\n",
                             d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
    }
 
-   if (d->stats->selection == 0)
+   if (d->stats->selection == attribute_t::CONSTITUTION)
+   {
+      buffer += fmt::format("5. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
+                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+   }
+   else
+   {
+      buffer += fmt::format("5. Constitution   {:2}      {:2}               {:2}\r\n",
+                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+   }
+
+   if (d->stats->selection == attribute_t::UNDEFINED)
    {
       buffer += "Type 1-5 or help strength,wisdom,etc: ";
    }
@@ -2837,19 +2837,30 @@ bool handle_get_stats(Connection *d, string arg)
 {
    if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
    {
+      unsigned long input{};
       try
       {
-         d->stats->selection = stoul(arg);
+         input = stoul(arg);
       }
       catch (...)
       {
-         d->stats->selection = 0;
+         input = 0;
+      }
+
+      if (input >= 0 || input <= 5)
+      {
+         d->stats->selection = static_cast<decltype(d->stats->selection)>(input);
+      }
+      else
+      {
+         d->stats->selection = attribute_t::UNDEFINED;
          SEND_TO_Q("Invalid number specified.\r\n", d);
       }
+
       return false;
    }
 
-   if (d->stats->selection > 0 && d->stats->selection < 6)
+   if (d->stats->selection != attribute_t::UNDEFINED)
    {
       if (arg == "+")
       {
@@ -3166,7 +3177,7 @@ bool check_race_attributes(Character *ch, int race)
 }
 
 stat_data::stat_data(void)
-    : min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0), race(0), clss(0)
+    : min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(attribute_t::UNDEFINED), race(0), clss(0)
 {
    memset(str, 0, sizeof(str));
    memset(dex, 0, sizeof(dex));
@@ -3185,32 +3196,32 @@ bool stat_data::increase(uint64_t number)
    int *attribute_to_change = nullptr;
    switch (selection)
    {
-   case 1: // STR
+   case attribute_t::STRENGTH:
       if (str[0] < 18)
       {
          attribute_to_change = &str[0];
       }
       break;
 
-   case 2: // DEX
+   case attribute_t::DEXTERITY:
       if (dex[0] < 18)
       {
          attribute_to_change = &dex[0];
       }
       break;
-   case 3: // CON
+   case attribute_t::CONSTITUTION:
       if (con[0] < 18)
       {
          attribute_to_change = &con[0];
       }
       break;
-   case 4: // INT
+   case attribute_t::INTELLIGENCE:
       if (tel[0] < 18)
       {
          attribute_to_change = &tel[0];
       }
       break;
-   case 5: // WIS
+   case attribute_t::WISDOM:
       if (wis[0] < 18)
       {
          attribute_to_change = &wis[0];
@@ -3249,32 +3260,31 @@ bool stat_data::decrease(uint64_t number)
    int *attribute_to_change = nullptr;
    switch (selection)
    {
-   case 1: // STR
+   case attribute_t::STRENGTH:
       if (str[0] > 12)
       {
          attribute_to_change = &str[0];
       }
       break;
-
-   case 2: // DEX
+   case attribute_t::DEXTERITY:
       if (dex[0] > 12)
       {
          attribute_to_change = &dex[0];
       }
       break;
-   case 3: // CON
+   case attribute_t::CONSTITUTION:
       if (con[0] > 12)
       {
          attribute_to_change = &con[0];
       }
       break;
-   case 4: // INT
+   case attribute_t::INTELLIGENCE:
       if (tel[0] > 12)
       {
          attribute_to_change = &tel[0];
       }
       break;
-   case 5: // WIS
+   case attribute_t::WISDOM:
       if (wis[0] > 12)
       {
          attribute_to_change = &wis[0];

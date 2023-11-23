@@ -330,25 +330,25 @@ int64_t mana_plats_spent(Character *ch)
 	return platcost;
 }
 
-int meta_get_stat_exp_cost(Character *ch, uint8_t stat)
+int meta_get_stat_exp_cost(Character *ch, attribute_t stat)
 {
 	int xp_price;
 	int curr_stat = 0;
 	switch (stat)
 	{
-	case CONSTITUTION:
+	case attribute_t::CONSTITUTION:
 		curr_stat = ch->raw_con;
 		break;
-	case STRENGTH:
+	case attribute_t::STRENGTH:
 		curr_stat = ch->raw_str;
 		break;
-	case DEXTERITY:
+	case attribute_t::DEXTERITY:
 		curr_stat = ch->raw_dex;
 		break;
-	case INTELLIGENCE:
+	case attribute_t::INTELLIGENCE:
 		curr_stat = ch->raw_intel;
 		break;
-	case WISDOM:
+	case attribute_t::WISDOM:
 		curr_stat = ch->raw_wis;
 		break;
 	default:
@@ -413,26 +413,26 @@ int meta_get_stat_exp_cost(Character *ch, uint8_t stat)
 	return xp_price;
 }
 
-int meta_get_stat_plat_cost(Character *ch, uint8_t targetstat)
+int meta_get_stat_plat_cost(Character *ch, attribute_t targetstat)
 {
 	int plat_cost;
 	int stat;
 
 	switch (targetstat)
 	{
-	case CONSTITUTION:
+	case attribute_t::CONSTITUTION:
 		stat = ch->raw_con;
 		break;
-	case STRENGTH:
+	case attribute_t::STRENGTH:
 		stat = ch->raw_str;
 		break;
-	case DEXTERITY:
+	case attribute_t::DEXTERITY:
 		stat = ch->raw_dex;
 		break;
-	case WISDOM:
+	case attribute_t::WISDOM:
 		stat = ch->raw_wis;
 		break;
-	case INTELLIGENCE:
+	case attribute_t::INTELLIGENCE:
 		stat = ch->raw_intel;
 		break;
 	default:
@@ -458,45 +458,45 @@ void meta_list_stats(Character *ch)
 {
 	int xp_price, plat_cost, max_stat;
 
-	xp_price = meta_get_stat_exp_cost(ch, STRENGTH);
-	plat_cost = meta_get_stat_plat_cost(ch, STRENGTH);
-	max_stat = get_max_stat(ch, STRENGTH);
+	xp_price = meta_get_stat_exp_cost(ch, attribute_t::STRENGTH);
+	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::STRENGTH);
+	max_stat = get_max_stat(ch, attribute_t::STRENGTH);
 	if (ch->raw_str >= max_stat)
 		csendf(ch, "$B$31)$R Str:       Your strength is already %d.\r\n", max_stat);
 	else
 		csendf(ch, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
 			   (ch->raw_str + 1), xp_price, plat_cost);
 
-	xp_price = meta_get_stat_exp_cost(ch, DEXTERITY);
-	plat_cost = meta_get_stat_plat_cost(ch, DEXTERITY);
-	max_stat = get_max_stat(ch, DEXTERITY);
+	xp_price = meta_get_stat_exp_cost(ch, attribute_t::DEXTERITY);
+	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::DEXTERITY);
+	max_stat = get_max_stat(ch, attribute_t::DEXTERITY);
 	if (ch->raw_dex >= max_stat)
 		csendf(ch, "$B$32)$R Dex:       Your dexterity is already %d.\r\n", max_stat);
 	else
 		csendf(ch, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_dex + 1), xp_price, plat_cost);
 
-	xp_price = meta_get_stat_exp_cost(ch, CONSTITUTION);
-	plat_cost = meta_get_stat_plat_cost(ch, CONSTITUTION);
-	max_stat = get_max_stat(ch, CONSTITUTION);
+	xp_price = meta_get_stat_exp_cost(ch, attribute_t::CONSTITUTION);
+	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::CONSTITUTION);
+	max_stat = get_max_stat(ch, attribute_t::CONSTITUTION);
 	if (ch->raw_con >= max_stat)
 		csendf(ch, "$B$33)$R Con:       Your constitution is already %d.\r\n", max_stat);
 	else
 		csendf(ch, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_con + 1), xp_price, plat_cost);
 
-	xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
-	plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
-	max_stat = get_max_stat(ch, INTELLIGENCE);
+	xp_price = meta_get_stat_exp_cost(ch, attribute_t::INTELLIGENCE);
+	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::INTELLIGENCE);
+	max_stat = get_max_stat(ch, attribute_t::INTELLIGENCE);
 	if (ch->raw_intel >= max_stat)
 		csendf(ch, "$B$34)$R Int:       Your intelligence is already %d.\r\n", max_stat);
 	else
 		csendf(ch, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_intel + 1), xp_price, plat_cost);
 
-	xp_price = meta_get_stat_exp_cost(ch, WISDOM);
-	plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
-	max_stat = get_max_stat(ch, WISDOM);
+	xp_price = meta_get_stat_exp_cost(ch, attribute_t::WISDOM);
+	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::WISDOM);
+	max_stat = get_max_stat(ch, attribute_t::WISDOM);
 	if (ch->raw_wis >= max_stat)
 		csendf(ch, "$B$35)$R Wis:       Your wisdom is already %d.\r\n", max_stat);
 	else
@@ -829,37 +829,37 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		case 1:
 			stat = ch->raw_str;
 			pstat = &(ch->raw_str);
-			pprice = meta_get_stat_exp_cost(ch, STRENGTH);
-			statplatprice = meta_get_stat_plat_cost(ch, STRENGTH);
-			max_stat = get_max_stat(ch, STRENGTH);
+			pprice = meta_get_stat_exp_cost(ch, attribute_t::STRENGTH);
+			statplatprice = meta_get_stat_plat_cost(ch, attribute_t::STRENGTH);
+			max_stat = get_max_stat(ch, attribute_t::STRENGTH);
 			break;
 		case 2:
 			stat = ch->raw_dex;
 			pstat = &(ch->raw_dex);
-			pprice = meta_get_stat_exp_cost(ch, DEXTERITY);
-			statplatprice = meta_get_stat_plat_cost(ch, DEXTERITY);
-			max_stat = get_max_stat(ch, DEXTERITY);
+			pprice = meta_get_stat_exp_cost(ch, attribute_t::DEXTERITY);
+			statplatprice = meta_get_stat_plat_cost(ch, attribute_t::DEXTERITY);
+			max_stat = get_max_stat(ch, attribute_t::DEXTERITY);
 			break;
 		case 3:
 			stat = ch->raw_con;
 			pstat = &(ch->raw_con);
-			pprice = meta_get_stat_exp_cost(ch, CONSTITUTION);
-			statplatprice = meta_get_stat_plat_cost(ch, CONSTITUTION);
-			max_stat = get_max_stat(ch, CONSTITUTION);
+			pprice = meta_get_stat_exp_cost(ch, attribute_t::CONSTITUTION);
+			statplatprice = meta_get_stat_plat_cost(ch, attribute_t::CONSTITUTION);
+			max_stat = get_max_stat(ch, attribute_t::CONSTITUTION);
 			break;
 		case 4:
 			stat = ch->raw_intel;
 			pstat = &(ch->raw_intel);
-			pprice = meta_get_stat_exp_cost(ch, INTELLIGENCE);
-			statplatprice = meta_get_stat_plat_cost(ch, INTELLIGENCE);
-			max_stat = get_max_stat(ch, INTELLIGENCE);
+			pprice = meta_get_stat_exp_cost(ch, attribute_t::INTELLIGENCE);
+			statplatprice = meta_get_stat_plat_cost(ch, attribute_t::INTELLIGENCE);
+			max_stat = get_max_stat(ch, attribute_t::INTELLIGENCE);
 			break;
 		case 5:
 			stat = ch->raw_wis;
 			pstat = &(ch->raw_wis);
-			pprice = meta_get_stat_exp_cost(ch, WISDOM);
-			statplatprice = meta_get_stat_plat_cost(ch, WISDOM);
-			max_stat = get_max_stat(ch, WISDOM);
+			pprice = meta_get_stat_exp_cost(ch, attribute_t::WISDOM);
+			statplatprice = meta_get_stat_plat_cost(ch, attribute_t::WISDOM);
+			max_stat = get_max_stat(ch, attribute_t::WISDOM);
 			break;
 		default:
 			stat = 0;
@@ -1668,23 +1668,23 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 
 				GET_RACE(ch) = choice;
 
-				GET_RAW_STR(ch) = MIN(get_max_stat(ch, STRENGTH), GET_RAW_STR(ch));
+				GET_RAW_STR(ch) = MIN(get_max_stat(ch, attribute_t::STRENGTH), GET_RAW_STR(ch));
 				GET_RAW_STR(ch) -= 2;
 				GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
 
-				GET_RAW_CON(ch) = MIN(get_max_stat(ch, CONSTITUTION), GET_RAW_CON(ch));
+				GET_RAW_CON(ch) = MIN(get_max_stat(ch, attribute_t::CONSTITUTION), GET_RAW_CON(ch));
 				GET_RAW_CON(ch) -= 2;
 				GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
 
-				GET_RAW_DEX(ch) = MIN(get_max_stat(ch, DEXTERITY), GET_RAW_DEX(ch));
+				GET_RAW_DEX(ch) = MIN(get_max_stat(ch, attribute_t::DEXTERITY), GET_RAW_DEX(ch));
 				GET_RAW_DEX(ch) -= 2;
 				GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
 
-				GET_RAW_WIS(ch) = MIN(get_max_stat(ch, WISDOM), GET_RAW_WIS(ch));
+				GET_RAW_WIS(ch) = MIN(get_max_stat(ch, attribute_t::WISDOM), GET_RAW_WIS(ch));
 				GET_RAW_WIS(ch) -= 2;
 				GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
 
-				GET_RAW_INT(ch) = MIN(get_max_stat(ch, INTELLIGENCE), GET_RAW_INT(ch));
+				GET_RAW_INT(ch) = MIN(get_max_stat(ch, attribute_t::INTELLIGENCE), GET_RAW_INT(ch));
 				GET_RAW_INT(ch) -= 2;
 				GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
 

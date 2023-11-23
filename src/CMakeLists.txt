@@ -142,6 +142,7 @@ add_library(DC SHARED
     combinables.h
     CommandStack.h
     comm.h
+    common.h
     connect.h
     const.h
     corpse.h

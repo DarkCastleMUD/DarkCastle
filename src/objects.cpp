@@ -246,7 +246,7 @@ int do_switch(Character *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, STR) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
     send_to_char("Your primary wield is too heavy to wield as secondary.\r\n", ch);
     return eFAILURE;
@@ -1979,10 +1979,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   case 12:
     if (CAN_WEAR(obj_object, ITEM_WEAR_WIELD))
     {
-      if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, STR)) &&
+      if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use.\r\n", ch);
-      else if (ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, STR) / 2) &&
+      else if (ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
         act("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, TO_CHAR, 0);

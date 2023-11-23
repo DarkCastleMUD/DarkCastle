@@ -1629,90 +1629,89 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
-  extern int get_stat(Character * ch, int stat);
   // struct class_skill_defines *t;
-  int stat = 0;
+  attribute_t stat{};
 
   switch (skillnum)
   {
   case SKILL_AMBUSH:
-    stat = INT;
+    stat = attribute_t::INTELLIGENCE;
     break;
   case SKILL_KICK:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_BASH:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_RAGE:
-    stat = CON;
+    stat = attribute_t::CONSTITUTION;
     break;
   case SKILL_BERSERK:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case KI_OFFSET + KI_PUNCH:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case KI_OFFSET + KI_DISRUPT:
-    stat = INT;
+    stat = attribute_t::INTELLIGENCE;
     break;
   case SKILL_DISARM:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_TRACK:
-    stat = WIS;
+    stat = attribute_t::WISDOM;
     break;
   case SKILL_BULLRUSH:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_HEADBUTT:
-    stat = CON;
+    stat = attribute_t::CONSTITUTION;
     break;
   case SKILL_HITALL:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_STUN:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     mod -= GET_DEX(victim) / 2; // ADDITIONAL mod
     break;
   case SKILL_DEATHSTROKE:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_QUIVERING_PALM:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_EAGLE_CLAW:
-    stat = STR;
+    stat = attribute_t::STRENGTH;
     break;
   case SKILL_BACKSTAB:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_ARCHERY:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_DUAL_BACKSTAB:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_CIRCLE:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_TRIP:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_STEAL:
-    stat = DEX;
+    stat = attribute_t::DEXTERITY;
     break;
   case SKILL_POCKET:
-    stat = INT;
+    stat = attribute_t::INTELLIGENCE;
     break;
   case SKILL_STALK:
-    stat = CON;
+    stat = attribute_t::CONSTITUTION;
     break;
   case SKILL_CONSIDER:
-    stat = WIS;
+    stat = attribute_t::WISDOM;
     break;
   case SKILL_EYEGOUGE:
-    stat = CON;
+    stat = attribute_t::CONSTITUTION;
     break;
   }
   int i = 0, learned = 0;
@@ -1741,7 +1740,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
     else
       i = 75;
   }
-  if (stat && victim)
+  if (stat != attribute_t::UNDEFINED && victim)
   {
     auto max_level_percent = GET_LEVEL(ch) / 60.0;
     i -= stat_mod[get_stat(victim, stat)] * max_level_percent; // less impact on low levels..

@@ -1180,23 +1180,23 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int get_stat(Character *ch, int stat)
+int get_stat(Character *ch, attribute_t stat)
 {
   switch (stat)
   {
-  case STRENGTH:
+  case attribute_t::STRENGTH:
     return GET_RAW_STR(ch);
     break;
-  case INTELLIGENCE:
+  case attribute_t::INTELLIGENCE:
     return GET_RAW_INT(ch);
     break;
-  case WISDOM:
+  case attribute_t::WISDOM:
     return GET_RAW_WIS(ch);
     break;
-  case DEXTERITY:
+  case attribute_t::DEXTERITY:
     return GET_RAW_DEX(ch);
     break;
-  case CONSTITUTION:
+  case attribute_t::CONSTITUTION:
     return GET_RAW_CON(ch);
     break;
   };
@@ -1209,34 +1209,34 @@ int get_stat_bonus(Character *ch, int stat)
   switch (stat)
   {
   case STRDEX:
-    bonus = MAX(0, get_stat(ch, STRENGTH) - 15) + MAX(0, get_stat(ch, DEXTERITY) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15);
     break;
   case STRCON:
-    bonus = MAX(0, get_stat(ch, STRENGTH) - 15) + MAX(0, get_stat(ch, CONSTITUTION) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15);
     break;
   case STRINT:
-    bonus = MAX(0, get_stat(ch, STRENGTH) - 15) + MAX(0, get_stat(ch, INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
     break;
   case STRWIS:
-    bonus = MAX(0, get_stat(ch, STRENGTH) - 15) + MAX(0, get_stat(ch, WISDOM) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
     break;
   case DEXCON:
-    bonus = MAX(0, get_stat(ch, DEXTERITY) - 15) + MAX(0, get_stat(ch, CONSTITUTION) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15);
     break;
   case DEXINT:
-    bonus = MAX(0, get_stat(ch, DEXTERITY) - 15) + MAX(0, get_stat(ch, INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
     break;
   case DEXWIS:
-    bonus = MAX(0, get_stat(ch, DEXTERITY) - 15) + MAX(0, get_stat(ch, WISDOM) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
     break;
   case CONINT:
-    bonus = MAX(0, get_stat(ch, CONSTITUTION) - 15) + MAX(0, get_stat(ch, INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
     break;
   case CONWIS:
-    bonus = MAX(0, get_stat(ch, CONSTITUTION) - 15) + MAX(0, get_stat(ch, WISDOM) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
     break;
   case INTWIS:
-    bonus = MAX(0, get_stat(ch, INTELLIGENCE) - 15) + MAX(0, get_stat(ch, WISDOM) - 15);
+    bonus = MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
     break;
   default:
     bonus = 0;

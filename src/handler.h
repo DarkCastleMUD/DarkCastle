@@ -44,7 +44,7 @@ affected_type *affected_by_random(Character *ch);
 /* utility */
 class Object *create_money(int amount);
 char *fname(char *namelist);
-int get_max_stat(Character *ch, uint8_t stat);
+int get_max_stat(Character *ch, attribute_t stat);
 // TIMERS
 bool isTimer(Character *ch, int spell);
 void addTimer(Character *ch, int spell, int ticks);

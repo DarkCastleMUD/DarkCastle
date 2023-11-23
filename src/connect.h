@@ -8,6 +8,7 @@
 #include "character.h"
 #include "structs.h" // MAX_INPUT_LENGTH
 #include "comm.h"
+#include "common.h"
 
 int isbanned(QHostAddress address);
 
@@ -27,7 +28,7 @@ public:
   int str[5], tel[5], wis[5], dex[5], con[5];
   int min_str, min_int, min_wis, min_dex, min_con;
   uint64_t points;
-  uint64_t selection;
+  attribute_t selection{};
   uint8_t race;
   uint8_t clss;
   bool increase(uint64_t points = 1);

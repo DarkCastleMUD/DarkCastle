@@ -566,7 +566,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     break;
   }
 
-  int stat_mod = get_stat(ch, STR) - get_stat(victim, STR);
+  int stat_mod = get_stat(ch, attribute_t::STRENGTH) - get_stat(victim, attribute_t::STRENGTH);
   if (stat_mod > 10)
     stat_mod = 10;
   if (stat_mod < -10)

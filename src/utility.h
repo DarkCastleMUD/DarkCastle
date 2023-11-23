@@ -29,6 +29,7 @@
 #include <vector>
 #include <queue>
 
+#include "common.h"
 #include "DC.h"
 #include "structs.h"
 #include "weather.h"
@@ -629,7 +630,7 @@ int oprog_greet_trigger(Character *ch);
 int oprog_load_trigger(Object *item);
 int oprog_can_see_trigger(Character *ch, Object *item);
 bool is_in_game(Character *ch);
-int get_stat(Character *ch, int stat);
+int get_stat(Character *ch, attribute_t stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);

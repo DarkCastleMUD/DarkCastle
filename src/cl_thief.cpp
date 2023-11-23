@@ -575,7 +575,7 @@ int do_trip(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_TRIP))
     return eSUCCESS;
 
-  int modifier = get_stat(ch, DEX) - get_stat(victim, DEX);
+  int modifier = get_stat(ch, attribute_t::DEXTERITY) - get_stat(victim, attribute_t::DEXTERITY);
   if (modifier > 10)
     modifier = 10;
   if (modifier < -10)

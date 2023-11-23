@@ -30,7 +30,7 @@ extern "C"
 #include "clan.h" // clan right
 #include "inventory.h"
 
-enum vault_search_type
+enum class vault_search_type
 {
   UNDEFINED,
   KEYWORD,
@@ -51,7 +51,7 @@ public:
 };
 
 vault_search_parameter::vault_search_parameter()
-    : type(UNDEFINED)
+    : type(vault_search_type::UNDEFINED)
 {
 }
 
@@ -2577,11 +2577,11 @@ int vault_search(Character *ch, const char *args)
       }
       else
       {
-        parameter.type = KEYWORD;
+        parameter.type = vault_search_type::KEYWORD;
         parameter.str_argument = arg1;
         search.push_back(parameter);
         // We need
-        parameter.type = UNDEFINED;
+        parameter.type = vault_search_type::UNDEFINED;
       }
     }
     else if (arg1 == "level")
@@ -2612,7 +2612,7 @@ int vault_search(Character *ch, const char *args)
             return eFAILURE;
           }
 
-          parameter.type = LEVEL;
+          parameter.type = vault_search_type::LEVEL;
           search.push_back(parameter);
         }
         else
@@ -2629,7 +2629,7 @@ int vault_search(Character *ch, const char *args)
             return eFAILURE;
           }
 
-          parameter.type = MIN_LEVEL;
+          parameter.type = vault_search_type::MIN_LEVEL;
           search.push_back(parameter);
 
           // Get the second half of a level range
@@ -2644,7 +2644,7 @@ int vault_search(Character *ch, const char *args)
             return eFAILURE;
           }
 
-          parameter.type = MAX_LEVEL;
+          parameter.type = vault_search_type::MAX_LEVEL;
           search.push_back(parameter);
         } // end of level range parsing
       }   // end of level parsing
@@ -2681,27 +2681,27 @@ int vault_search(Character *ch, const char *args)
         {
           switch ((*p).type)
           {
-          case UNDEFINED:
+          case vault_search_type::UNDEFINED:
             break;
-          case KEYWORD:
+          case vault_search_type::KEYWORD:
             if (!isname((*p).str_argument, GET_OBJ_NAME(obj)))
             {
               nomatch = true;
             }
             break;
-          case LEVEL:
+          case vault_search_type::LEVEL:
             if (obj->obj_flags.eq_level != (*p).int_argument)
             {
               nomatch = true;
             }
             break;
-          case MIN_LEVEL:
+          case vault_search_type::MIN_LEVEL:
             if (obj->obj_flags.eq_level < (*p).int_argument)
             {
               nomatch = true;
             }
             break;
-          case MAX_LEVEL:
+          case vault_search_type::MAX_LEVEL:
             if (obj->obj_flags.eq_level > (*p).int_argument)
             {
               nomatch = true;

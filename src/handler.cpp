@@ -260,37 +260,37 @@ int isname(const char *str, const char *namelist)
 	return 0;
 }
 
-int get_max_stat(Character *ch, uint8_t stat)
+int get_max_stat(Character *ch, attribute_t stat)
 {
 	switch (GET_RACE(ch))
 	{
 	case RACE_ELVEN:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 24;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 27;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 27;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 24;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 23;
 		}
 		break;
 	case RACE_TROLL:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 28;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 25;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 20;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 22;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 30;
 		}
 		break;
@@ -298,15 +298,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_DWARVEN:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 27;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 22;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 22;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 26;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 28;
 		}
 		break;
@@ -314,15 +314,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_HOBBIT:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 22;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 30;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 25;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 25;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 23;
 		}
 		break;
@@ -330,15 +330,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_PIXIE:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 20;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 28;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 30;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 27;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 20;
 		}
 		break;
@@ -346,15 +346,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_GIANT:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 30;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 23;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 22;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 23;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 27;
 		}
 		break;
@@ -362,15 +362,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_GNOME:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 22;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 22;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 27;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 30;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 24;
 		}
 		break;
@@ -378,15 +378,15 @@ int get_max_stat(Character *ch, uint8_t stat)
 	case RACE_ORC:
 		switch (stat)
 		{
-		case STRENGTH:
+		case attribute_t::STRENGTH:
 			return 27;
-		case DEXTERITY:
+		case attribute_t::DEXTERITY:
 			return 25;
-		case INTELLIGENCE:
+		case attribute_t::INTELLIGENCE:
 			return 24;
-		case WISDOM:
+		case attribute_t::WISDOM:
 			return 23;
-		case CONSTITUTION:
+		case attribute_t::CONSTITUTION:
 			return 26;
 		}
 		break;
@@ -944,7 +944,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		GET_STR_BONUS(ch) += mod;
 		GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
-		i = get_max_stat(ch, STRENGTH);
+		i = get_max_stat(ch, attribute_t::STRENGTH);
 		if (i <= GET_RAW_STR(ch))
 			GET_STR(ch) = MIN(30, GET_STR(ch));
 		else
@@ -961,7 +961,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		GET_DEX_BONUS(ch) += mod;
 		GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
-		i = get_max_stat(ch, DEXTERITY);
+		i = get_max_stat(ch, attribute_t::DEXTERITY);
 		if (i <= GET_RAW_DEX(ch))
 			GET_DEX(ch) = MIN(30, GET_DEX(ch));
 		else
@@ -973,7 +973,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		GET_INT_BONUS(ch) += mod;
 		GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
-		i = get_max_stat(ch, INTELLIGENCE);
+		i = get_max_stat(ch, attribute_t::INTELLIGENCE);
 		if (i <= GET_RAW_INT(ch))
 			GET_INT(ch) = MIN(30, GET_INT(ch));
 		else
@@ -985,7 +985,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		GET_WIS_BONUS(ch) += mod;
 		GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
-		i = get_max_stat(ch, WISDOM);
+		i = get_max_stat(ch, attribute_t::WISDOM);
 		if (i <= GET_RAW_WIS(ch))
 			GET_WIS(ch) = MIN(30, GET_WIS(ch));
 		else
@@ -997,7 +997,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		GET_CON_BONUS(ch) += mod;
 		GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
-		i = get_max_stat(ch, CONSTITUTION);
+		i = get_max_stat(ch, attribute_t::CONSTITUTION);
 		if (i <= GET_RAW_CON(ch))
 			GET_CON(ch) = MIN(30, GET_CON(ch));
 		else
