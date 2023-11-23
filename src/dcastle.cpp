@@ -24,7 +24,6 @@ using namespace std;
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 CVoteData *DCVote;
 
-void init_random();
 void init_game(void);
 void backup_executable(char *const argv[]);
 DC::config parse_arguments(int argc, char *const argv[]);
@@ -56,8 +55,6 @@ int main(int argc, char **argv)
     dc->cf.ports.push_back(DFLT_PORT3);
     dc->cf.ports.push_back(DFLT_PORT4);
   }
-
-  init_random();
 
   logf(0, LogChannels::LOG_MISC, "Using %s as data directory.", dc->cf.dir.c_str());
 

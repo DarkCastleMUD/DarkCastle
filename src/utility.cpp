@@ -2352,31 +2352,6 @@ int get_line(FILE *fl, char *buf)
   }
 }
 
-void init_random()
-{
-  int urandom_fd;
-  unsigned int seed = time(0); // In case getting data from /dev/urandom fails
-
-  if ((urandom_fd = open("/dev/urandom", O_RDONLY)) == -1)
-  {
-    logf(0, LogChannels::LOG_MISC, "Unable to open /dev/urandom: %s", strerror(errno));
-  }
-  else
-  {
-    if (read(urandom_fd, &seed, sizeof(seed)) == -1)
-    {
-      logf(0, LogChannels::LOG_MISC, "Read error: %s", strerror(errno));
-    }
-
-    close(urandom_fd);
-  }
-
-  logf(0, LogChannels::LOG_MISC, "Seeding random numbers with %u", seed);
-  char *state = (char *)malloc(256);
-  initstate(seed, state, 256);
-  return;
-}
-
 //
 // return value can include the from or to variable
 //

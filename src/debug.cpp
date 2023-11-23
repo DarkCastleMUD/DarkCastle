@@ -31,7 +31,6 @@ void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 int read_pc_or_mob_data(Character *ch, FILE *fpsave);
-void init_random();
 void load_vaults();
 
 extern struct index_data *obj_index;
@@ -66,8 +65,6 @@ bool test_rolls(uint8_t total)
 {
   int x, a, b;
   stat_data stats;
-
-  init_random();
 
   uint64_t attempts = 0;
   while (1)
@@ -104,8 +101,6 @@ bool test_rolls(uint8_t total)
 
 void test_random_stats(void)
 {
-  init_random();
-
   map<int, int> results;
   for (int i = 0; i < 10000; ++i)
   {
