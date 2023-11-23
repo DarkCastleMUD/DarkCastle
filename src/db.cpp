@@ -485,10 +485,6 @@ void DC::boot_db(void)
 {
 	int help_rec_count = 0;
 
-#ifdef LEAK_CHECK
-	void cause_leak();
-#endif
-
 	void add_commands_to_radix(void);
 
 	reset_time();
@@ -513,17 +509,9 @@ void DC::boot_db(void)
 
 	funny_boot_message();
 
-#ifdef LEAK_CHECK
-	cause_leak();
-#endif
-
 	do_godlist();
 	logentry("Godlist done!", 0, LogChannels::LOG_MISC);
 	logentry("Booting clans...", 0, LogChannels::LOG_MISC);
-
-#ifdef LEAK_CHECK
-	cause_leak();
-#endif
 
 	boot_clans();
 

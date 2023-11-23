@@ -1959,34 +1959,6 @@ command_return_t Character::generic_command(QStringList argument, int cmd)
   return eSUCCESS;
 }
 
-// Used for debugging with dmalloc
-int do_memoryleak(Character *ch, char *argument, int cmd)
-{
-  if (GET_LEVEL(ch) < OVERSEER)
-  {
-    send_to_char("The 'leak' command is not available to you.\r\n", ch);
-    return eFAILURE;
-  }
-  void *ptr = malloc(10);
-  if (ptr == nullptr)
-  {
-    perror("malloc");
-  }
-
-  send_to_char("A memory leak was just caused.\r\n", ch);
-  return eSUCCESS;
-}
-
-// Used for debugging with dmalloc
-void cause_leak()
-{
-  void *ptr = malloc(10);
-  if (ptr == nullptr)
-  {
-    perror("malloc");
-  }
-}
-
 int do_beep(Character *ch, char *argument, int cmd)
 {
   send_to_char("Beep!\a\r\n", ch);

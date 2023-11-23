@@ -340,7 +340,6 @@ struct command_info cmd_info[] =
         {"where", do_where, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"write", do_write, nullptr, nullptr, POSITION_STANDING, 0, CMD_WRITE, 0, 0, CommandType::all},
         {"beacon", do_beacon, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"leak", do_memoryleak, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"beep", do_beep, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"guard", do_guard, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"release", do_release, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 1, CommandType::all},

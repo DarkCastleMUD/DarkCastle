@@ -368,7 +368,6 @@ command_return_t do_listPathsByZone(Character *ch, char *argument, int cmd);
 command_return_t do_listproc(Character *ch, char *argument, int cmd);
 command_return_t do_load(Character *ch, char *argument, int cmd);
 command_return_t do_medit(Character *ch, char *argument, int cmd);
-command_return_t do_memoryleak(Character *ch, char *argument, int cmd);
 command_return_t do_mortal_set(Character *ch, char *argument, int cmd);
 // command_return_t do_motdload (Character *ch, char *argument, int cmd);
 command_return_t do_msave(Character *ch, char *argument, int cmd);

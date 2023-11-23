@@ -244,7 +244,6 @@ int main(int argc, char **argv)
   logentry("Loading the world.", 0, LogChannels::LOG_MISC);
   extern room_t top_of_world_alloc;
   top_of_world_alloc = 2000;
-  // clear it (realloc = malloc, not calloc)
 
   DC::getInstance()->boot_world();
 

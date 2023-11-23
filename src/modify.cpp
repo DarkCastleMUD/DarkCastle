@@ -165,7 +165,6 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string)
 	return;
 }
 
-/* modification of malloc'ed strings in chars/objects */
 int do_string(Character *ch, char *arg, int cmd)
 {
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
