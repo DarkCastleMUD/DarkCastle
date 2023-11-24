@@ -794,7 +794,7 @@ command_return_t do_tellhistory(Character *ch, string argument, int cmd)
 
   if (arg1 == "timestamp")
   {
-    QString tell_history_timestamp = ch->player->config->value("tell.history.timestamp");
+    QString tell_history_timestamp = ch->getSetting("tell.history.timestamp", "0");
 
     if (tell_history_timestamp == "0" || tell_history_timestamp.isEmpty())
     {

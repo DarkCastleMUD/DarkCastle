@@ -592,9 +592,15 @@ int Character::do_config(QStringList arguments, int cmd)
         return eFAILURE;
       }
     }
-    else if (key != "tell.history.timestamp" && key != "locale")
+    else if (key != "tell.history.timestamp" && key != "locale" && key != "fighting.showdps")
     {
       send("Invalid config option.\r\n");
+      return eFAILURE;
+    }
+
+    if (key == "fighting.showdps" && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
+    {
+      sendln("Invalid config option. Valid options are: 0, 1, t, f, true and false.");
       return eFAILURE;
     }
 
