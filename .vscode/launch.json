@@ -37,7 +37,7 @@
                 "-p 6969"
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/lib/",
+            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
