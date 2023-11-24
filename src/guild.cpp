@@ -487,7 +487,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
   for (int i = 0; *skilllist[i].skillname != '\n'; i++)
   {
     known = has_skill(ch, skilllist[i].skillnum);
-    if (!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
+    if (!known && ch->getLevel() < skilllist[i].levelavailable)
       continue;
 
     if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->player->profession)
@@ -506,9 +506,9 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
     }
 
     quint64 self_learn_max = skilllist[i].maximum * 0.5;
-    if (GET_LEVEL(ch) * 2 < self_learn_max)
+    if (ch->getLevel() * 2 < self_learn_max)
     {
-      self_learn_max = GET_LEVEL(ch) * 2;
+      self_learn_max = ch->getLevel() * 2;
     }
 
     sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
@@ -671,7 +671,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < skilllist[skillnumber].levelavailable)
+  if (ch->getLevel() < skilllist[skillnumber].levelavailable)
   {
     send_to_char("You aren't advanced enough for that yet.\r\n", ch);
     return eSUCCESS;
@@ -746,7 +746,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   float maxlearn = (float)skilllist[skillnumber].maximum;
   maxlearn *= 0.5;
 
-  if (known >= (GET_LEVEL(ch) * 2))
+  if (known >= (ch->getLevel() * 2))
   {
     send_to_char("You are not experienced enough to practice that any further right now.\r\n", ch);
     return eSUCCESS;
@@ -839,7 +839,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd == 171 && !IS_MOB(ch))
   { /*   gain crap...  */
 
-    if ((GET_LEVEL(ch) >= IMMORTAL) || (GET_LEVEL(ch) == DC::MAX_MORTAL_LEVEL))
+    if ((ch->getLevel() >= IMMORTAL) || (ch->getLevel() == DC::MAX_MORTAL_LEVEL))
     {
       send_to_char("You have already reached the highest level!\n\r", ch);
       return eSUCCESS;
@@ -847,7 +847,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
 
     // TODO - make it so you have to be at YOUR guildmaster to gain
 
-    if (GET_LEVEL(ch) == 50)
+    if (ch->getLevel() == 50)
     { // To get past 50 you need to know your q skill.
       int skl = -1;
       switch (GET_CLASS(ch))
@@ -892,7 +892,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
         return eSUCCESS;
       }
     }
-    exp_needed = exp_table[(int)GET_LEVEL(ch) + 1];
+    exp_needed = exp_table[(int)ch->getLevel() + 1];
 
     if (exp_needed > GET_EXP(ch))
     {
@@ -903,16 +903,16 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     }
 
     send_to_char("You raise a level!\n\r", ch);
-    logf(IMMORTAL, LogChannels::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], GET_LEVEL(ch) + 1);
+    logf(IMMORTAL, LogChannels::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
 
-    GET_LEVEL(ch) += 1;
+    ch->incrementLevel();
     advance_level(ch, 0);
     GET_EXP(ch) -= (int)exp_needed;
-    int bonus = (GET_LEVEL(ch) - 50) * 250;
+    int bonus = (ch->getLevel() - 50) * 250;
     if (bonus > 0 && DC::MAX_MORTAL_LEVEL == 60)
     {
       char buf[MAX_STRING_LENGTH];
-      if (GET_LEVEL(ch) == 60)
+      if (ch->getLevel() == 60)
       {
         sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
         do_say(owner, buf, CMD_DEFAULT);
@@ -971,8 +971,9 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
       }
 
     send_to_char("You have remorted back to level 50.\r\n", ch);
-    if (GET_LEVEL(ch) <= DC::MAX_MORTAL_LEVEL)
-      GET_LEVEL(ch) = 50;
+    if (ch->getLevel() <= DC::MAX_MORTAL_LEVEL)
+      ch->setLevel(50);
+
     SET_BIT(ch->player->toggles, Player::PLR_REMORTED);
 
     ch->save(666);
@@ -1075,7 +1076,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   if (cmd == 56)
   {
-    if (GET_LEVEL(ch) < 50)
+    if (ch->getLevel() < 50)
     {
       do_say(invoker, "You have not obtained a high enough level to buy anything from me.", 9);
       return eSUCCESS;
@@ -1125,7 +1126,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
     {
       int known = has_skill(ch, g_skills[i].skillnum);
-      if (GET_LEVEL(ch) < g_skills[i].levelavailable)
+      if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
       sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
@@ -1158,7 +1159,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("You are already learned in this area.\r\n", ch);
     return eSUCCESS;
   }
-  if (learned >= (GET_LEVEL(ch) * 3))
+  if (learned >= (ch->getLevel() * 3))
   {
     send_to_char("You aren't experienced enough to practice that any further right now.\r\n", ch);
     return eSUCCESS;
@@ -1300,7 +1301,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
   }
 
   // If we've already learned it 2*level or more then we can't learn it anymore until we gain more levels
-  if (learned >= (GET_LEVEL(ch) * 2))
+  if (learned >= (ch->getLevel() * 2))
   {
     return;
   }

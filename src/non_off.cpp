@@ -98,7 +98,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
     {
       send_to_char("You are unable to destroy this item, it must be CURSED!\n\r", ch);
       return eFAILURE;
@@ -113,7 +113,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
   {
     send_to_char("God, what a stupid fucking thing for you to do.\r\n", ch);
     return eFAILURE;
@@ -276,7 +276,7 @@ int do_donate(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (ch->getLevel() > IMMORTAL)
     {
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
     }
@@ -289,7 +289,7 @@ int do_donate(Character *ch, char *argument, int cmd)
 
   if (contains_no_trade_item(obj))
   {
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (ch->getLevel() > IMMORTAL)
     {
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
     }
@@ -856,7 +856,7 @@ command_return_t Character::do_autoeat(QStringList arguments, int cmd)
 
 command_return_t Character::do_anonymous(QStringList arguments, int cmd)
 {
-  if (GET_LEVEL(this) < 40)
+  if (level_ < 40)
   {
     send_to_char("You are too inexperienced to disguise your profession.\r\n", this);
     return eSUCCESS;
@@ -1428,7 +1428,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
 
 void CVoteData::DisplayResults(Character *ch)
 {
-  if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && GET_LEVEL(ch) < IMMORTAL)
+  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("Sorry, but you have to cast a vote before you can see the results.\r\n", ch);
     return;
@@ -1447,7 +1447,7 @@ void CVoteData::DisplayResults(Character *ch)
   csendf(ch, "\n\r");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
     {
       percent = (answer_it->votes * 100) / total_votes;
       csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());
@@ -1658,7 +1658,7 @@ int do_vote(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_LEVEL(ch) < 40)
+  if (ch->getLevel() < 40)
   {
     send_to_char("Sorry, you must be at least level 40 to vote.\r\n", ch);
     return eSUCCESS;

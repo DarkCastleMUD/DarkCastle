@@ -118,13 +118,13 @@ int do_ki(Character *ch, char *argument, int cmd)
   bool target_ok;
   int learned;
 
-  if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
+  if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
     send_to_char("You are unable to control your ki in this way!\n\r", ch);
     return eFAILURE;
   }
   /*
-   if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
+   if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
    return eFAILURE;
@@ -150,7 +150,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                  "the universe.\r\n",
@@ -301,7 +301,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         return eFAILURE;
 
-    if (GET_LEVEL(ch) < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
+    if (ch->getLevel() < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
     {
       send_to_char("You do not have enough ki!\n\r", ch);
       return eFAILURE;
@@ -334,7 +334,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Stop abusing your betters  */
       if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_PC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
+        if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           send_to_char("That just might annoy them!\n\r", ch);
           return eFAILURE;
@@ -342,7 +342,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
       /* Imps ignore safe flags  */
       if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
-        if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+        if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
         {
           send_to_char(
               "There is no safe haven from an angry IMPLEMENTER!\n\r",
@@ -352,7 +352,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       send_to_char("Ok.\r\n", ch);
       GET_KI(ch) -= use_ki(ch, spl);
 
-      return ((*ki_info[spl].ki_pointer)(GET_LEVEL(ch), ch, argument,
+      return ((*ki_info[spl].ki_pointer)(ch->getLevel(), ch, argument,
                                          tar_char));
     }
     return eFAILURE;
@@ -364,7 +364,7 @@ void reduce_ki(Character *ch, int type)
 {
   int amount = 0;
 
-  amount += GET_LEVEL(ch) / type; /* the higher the response
+  amount += ch->getLevel() / type; /* the higher the response
                                    * the lower the divisor */
 
   amount -= dice(1, 10);
@@ -378,7 +378,7 @@ int ki_gain(Character *ch)
   int gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(ch) == CLASS_MONK ? (int)(ch->max_ki * 0.04) : (int)(ch->max_ki * 0.05); /*(GET_LEVEL(ch) / 8) + 1;*/
+  gain = GET_CLASS(ch) == CLASS_MONK ? (int)(ch->max_ki * 0.04) : (int)(ch->max_ki * 0.05); /*(ch->getLevel() / 8) + 1;*/
   gain += ch->ki_regen;
 
   // Normalize these so we dont underun the array below
@@ -434,7 +434,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     return eINTERNAL_ERROR;
   }
 
-  success += GET_LEVEL(ch);
+  success += ch->getLevel();
 
   if (vict->weight < 50)
     success += 50;
@@ -521,7 +521,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   manadam = MIN(750, manadam);
   if (vict->getHP() < 500000)
   {
-    auto success_chance = (GET_LEVEL(ch) / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (GET_LEVEL(vict) / 5);
+    auto success_chance = (ch->getLevel() / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (vict->getLevel() / 5);
     if (number(1, 101) < success_chance)
 
     {
@@ -732,7 +732,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 
   if (learned > 85)
   {
-    level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(victim);
+    level_diff_t level_difference = ch->getLevel() - victim->getLevel();
 
     if (level_difference >= 0)
     {
@@ -826,7 +826,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 
   int retval = 0;
 
-  if (number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch) - 1)
+  if (number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
   {
     // We've failed this time, so we'll make it easier for next time
     if (af)
@@ -1138,7 +1138,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   SET_BIT(ch->combat, COMBAT_MONK_STANCE);
 
   af.type = KI_STANCE + KI_OFFSET;
-  af.duration = 50 - ((GET_LEVEL(ch) / 5) * 2);
+  af.duration = 50 - ((ch->getLevel() / 5) * 2);
   af.modifier = 1;
   af.location = APPLY_NONE;
   af.bitvector = -1;
@@ -1152,7 +1152,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   int learned, chance, percent;
   struct affected_type af;
 
-  if (IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+  if (IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
     learned = 75;
   else if (!(learned = has_skill(ch, KI_AGILITY + KI_OFFSET)))
   {

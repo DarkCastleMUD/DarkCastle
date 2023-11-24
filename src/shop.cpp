@@ -310,7 +310,7 @@ void shopping_sell(const char *arg, Character *ch,
 
   if (contains_no_trade_item(obj))
   {
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (ch->getLevel() > IMMORTAL)
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
     else
     {

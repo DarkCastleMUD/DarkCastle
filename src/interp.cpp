@@ -795,7 +795,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
   // Old method used a linear search. *yuck* (Sadus)
   if ((found = find_cmd_in_radix(pcomm.c_str())))
   {
-    if (GET_LEVEL(ch) >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))
+    if (ch->getLevel() >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))
     {
       if (found->minimum_level == GIFTED_COMMAND)
       {
@@ -867,7 +867,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !DC::isSet(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-          ch->desc->original->level <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, COM_CHARMIE_OK))
+          ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, COM_CHARMIE_OK))
       {
         send_to_char("The spirit cannot perform that action.\r\n", ch);
         return eFAILURE;
@@ -903,7 +903,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(ch->player->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (ch->getLevel() >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(ch->player->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
         }
@@ -938,7 +938,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::immortals_only:
-        if (ch == nullptr || ch->player == nullptr || GET_LEVEL(ch) < IMMORTAL)
+        if (ch == nullptr || ch->player == nullptr || ch->getLevel() < IMMORTAL)
         {
           return eFAILURE;
         }
@@ -946,7 +946,7 @@ int command_interpreter(Character *ch, string pcomm, bool procced)
         break;
 
       case CommandType::implementors_only:
-        if (ch == nullptr || ch->player == nullptr || GET_LEVEL(ch) < IMP_ONLY)
+        if (ch == nullptr || ch->player == nullptr || ch->getLevel() < IMP_ONLY)
         {
           return eFAILURE;
         }

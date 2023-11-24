@@ -133,7 +133,7 @@ void do_mload(Character *ch, int rnum, int cnt)
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
     }
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   }
   else
   {
@@ -143,7 +143,7 @@ void do_mload(Character *ch, int rnum, int cnt)
              mob_index[rnum].virt,
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n", ch);
   }
 }
@@ -170,7 +170,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
     }
 
     if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
-        (GET_LEVEL(ch) < IMPLEMENTER || !IS_IMMORTAL(ch)))
+        (ch->getLevel() < IMPLEMENTER || !IS_IMMORTAL(ch)))
     {
       extract_obj(obj);
       ch->send("Denied.\r\n");
@@ -193,7 +193,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
                     obj->short_description,
                     DC::getInstance()->world[ch->in_room].number,
                     DC::getInstance()->world[ch->in_room].name);
-  logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
 
   return obj_list;
 }
@@ -218,7 +218,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
     }
 
     if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
-        (GET_LEVEL(ch) < IMPLEMENTER))
+        (ch->getLevel() < IMPLEMENTER))
     {
       extract_obj(obj);
       send_to_char("Denied.\r\n", ch);
@@ -255,7 +255,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
-  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 }
 
 //
@@ -326,7 +326,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
 
           buf2, // who the mob hates
-          k->level,
+          k->getLevel(),
           GET_MOVE(k), move_limit(k), move_gain(k, 0),
           /* end of first line */
 
@@ -631,7 +631,7 @@ void mob_stat(Character *ch, Character *k)
 
   strcat(buf, buf2);
 
-  sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->level,
+  sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->getLevel(),
           k->alignment);
   strcat(buf, buf2);
   send_to_char(buf, ch);
@@ -966,7 +966,7 @@ void obj_stat(Character *ch, class Object *j)
   int its;
 
   /*
-    if(DC::isSet(j->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
+    if(DC::isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
       return;
@@ -1339,14 +1339,12 @@ void do_start(Character *ch)
 {
   char buf[256];
 
-  send_to_char("This is now your character in Dark Castle mud.  You lucky "
-               "piece of shit you.\r\n",
-               ch);
+  ch->sendln("This is now your character in Dark Castle MUD");
 
   if (IS_MOB(ch))
     return;
 
-  GET_LEVEL(ch) = 1;
+  ch->setLevel(1);
   GET_EXP(ch) = 1;
 
   if (GET_TITLE(ch) == nullptr)
@@ -1404,7 +1402,7 @@ void do_start(Character *ch)
 
 command_return_t do_repop(Character *ch, string arguments, int cmd)
 {
-  if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
+  if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
     send_to_char("You may only repop inside of your room range.\r\n", ch);
     return eFAILURE;
@@ -1417,14 +1415,14 @@ command_return_t do_repop(Character *ch, string arguments, int cmd)
   {
     send_to_char("Performing full zone reset!\n\r", ch);
     string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     send_to_char("Resetting this entire zone!\n\r", ch);
     string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
@@ -1436,7 +1434,7 @@ int do_clear(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int zone = DC::getInstance()->world[ch->in_room].zone;
 
-  if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
+  if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
     send_to_char("You may only repop inside of your R range.\r\n", ch);
     return eFAILURE;
@@ -1474,7 +1472,7 @@ int do_clear(Character *ch, char *argument, int cmd)
   }
   send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r", ch);
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
-  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -1560,7 +1558,7 @@ int do_restore(Character *ch, char *argument, int cmd)
     GET_MOVE(victim) = GET_MAX_MOVE(victim);
     GET_KI(victim) = GET_MAX_KI(victim);
 
-    if (GET_LEVEL(victim) >= IMMORTAL)
+    if (victim->getLevel() >= IMMORTAL)
     {
       GET_COND(victim, FULL) = -1;
       GET_COND(victim, THIRST) = -1;
@@ -1575,7 +1573,7 @@ int do_restore(Character *ch, char *argument, int cmd)
     }
 
     sprintf(buf, "%s restored %s.", GET_NAME(ch), GET_NAME(victim));
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1590,11 +1588,11 @@ int do_restore(Character *ch, char *argument, int cmd)
   else
   { /* Restore all */
 
-    if (GET_LEVEL(ch) < OVERSEER)
+    if (ch->getLevel() < OVERSEER)
     {
       send_to_char("You don't have the ability to do that!\n\r", ch);
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
       return eFAILURE;
     }
@@ -1609,7 +1607,7 @@ int do_restore(Character *ch, char *argument, int cmd)
         GET_MOVE(victim) = GET_MAX_MOVE(victim);
         GET_KI(victim) = GET_MAX_KI(victim);
 
-        if (GET_LEVEL(victim) >= IMMORTAL)
+        if (victim->getLevel() >= IMMORTAL)
         {
           GET_COND(victim, FULL) = -1;
           GET_COND(victim, THIRST) = -1;
@@ -1625,7 +1623,7 @@ int do_restore(Character *ch, char *argument, int cmd)
         victim->save();
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     send_to_char("Trying to be Mister Popularity?\n\r", ch);
   }
   return eSUCCESS;

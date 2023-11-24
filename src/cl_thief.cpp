@@ -45,7 +45,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
   int level = has_skill(ch, SKILL_EYEGOUGE);
 
   if (IS_NPC(ch))
-    level = 50 + GET_LEVEL(ch) / 2;
+    level = 50 + ch->getLevel() / 2;
 
   argument = one_argument(argument, name);
 
@@ -201,7 +201,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
 
   // Check the killer/victim
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -210,7 +210,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   int itemp = number(1, 100);
   if (IS_PC(ch) && IS_PC(victim))
   {
-    if (GET_LEVEL(victim) > GET_LEVEL(ch))
+    if (victim->getLevel() > ch->getLevel())
       itemp = 0; // not gonna happen
     else if (GET_MAX_HIT(victim) > GET_MAX_HIT(ch))
     {
@@ -230,7 +230,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHANGEL) || (IS_NPC(ch) && GET_LEVEL(ch) > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
+  if ((((IS_PC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || ch->getLevel() >= ARCHANGEL) || (IS_NPC(ch) && ch->getLevel() > 70)) && (ch->equipment[SECOND_WIELD]) && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
   {
     if (skill_success(ch, victim, SKILL_DUAL_BACKSTAB) || IS_NPC(ch))
     {
@@ -257,7 +257,7 @@ int do_backstab(Character *ch, char *argument, int cmd)
   }
   // success
   else if (
-      ((GET_LEVEL(victim) < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 19) && ((IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && DC::isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !DC::isSet(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !DC::isSet(victim->immune, ISR_STING))))
+      ((victim->getLevel() < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= ch->getLevel() + 19) && ((IS_PC(ch) && ch->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && DC::isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !DC::isSet(victim->immune, ISR_PIERCE)) || (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !DC::isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -408,7 +408,7 @@ int do_circle(Character *ch, char *argument, int cmd)
   }
 
   // Check the killer/victim
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -466,7 +466,7 @@ int do_circle(Character *ch, char *argument, int cmd)
       return retval;
 
     // Now go for dual backstab
-    if (ch->equipment[SECOND_WIELD] && (has_skill(ch, SKILL_DUAL_BACKSTAB) || (GET_LEVEL(ch) >= ARCHANGEL)))
+    if (ch->equipment[SECOND_WIELD] && (has_skill(ch, SKILL_DUAL_BACKSTAB) || (ch->getLevel() >= ARCHANGEL)))
     {
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (AWAKE(victim) && !skill_success(ch, victim, SKILL_DUAL_BACKSTAB))
@@ -652,7 +652,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   // SKILL_INCREASE_HARD);
 
   af.type = SKILL_SNEAK;
-  af.duration = MAX(5, GET_LEVEL(ch) / 2);
+  af.duration = MAX(5, ch->getLevel() / 2);
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_SNEAK;
@@ -851,7 +851,7 @@ int do_steal(Character *ch, char *argument, int cmd)
   if (IS_MOB(ch))
     return eFAILURE;
 
-  if ((GET_LEVEL(ch) < (GET_LEVEL(victim) - 19)))
+  if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
     send_to_char("That person is far too experienced for you to steal from.\r\n", ch);
     return eFAILURE;
@@ -1175,7 +1175,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
-          _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
+          _exp = (GET_OBJ_WEIGHT(obj) * victim->getLevel());
         if (GET_POS(victim) <= POSITION_SLEEPING)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
@@ -1251,7 +1251,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     }
   } // of else, not in inventory
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ANGEL)
+  if (ohoh && IS_NPC(victim) && AWAKE(victim) && ch->getLevel() < ANGEL)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
@@ -1305,13 +1305,13 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(ch) < (GET_LEVEL(victim) - 19)))
+  if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
     send_to_char("That person is far too experienced to steal from.\r\n", ch);
     return eFAILURE;
   }
 
-  if (IS_PC(victim) && ((GET_LEVEL(victim) + 20) < GET_LEVEL(ch)))
+  if (IS_PC(victim) && ((victim->getLevel() + 20) < ch->getLevel()))
   {
     send_to_char("That person is too low level, you don't want to tarnish your reputation!\r\n", ch);
     return eFAILURE;
@@ -1394,7 +1394,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     {
       ch->addGold(gold);
       victim->removeGold(gold);
-      _exp = gold / 100 * GET_LEVEL(victim) / 5;
+      _exp = gold / 100 * victim->getLevel() / 5;
       if (IS_PC(victim))
         _exp = 0;
       if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
@@ -1435,7 +1435,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch) < ANGEL)
+  if (ohoh && IS_NPC(victim) && AWAKE(victim) && ch->getLevel() < ANGEL)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
@@ -1641,7 +1641,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\n\r", ch);
       return eFAILURE;
     }
-    if ((ch->getGold() < (uint32_t)amount) && (GET_LEVEL(ch) < DEITY))
+    if ((ch->getGold() < (uint32_t)amount) && (ch->getLevel() < DEITY))
     {
       send_to_char("You haven't got that many coins!\n\r", ch);
       return eFAILURE;
@@ -1671,7 +1671,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     if (!skill_success(ch, vict, SKILL_SLIP))
     {
       send_to_char("Whoops!  You dropped the coins!\n\r", ch);
-      if (GET_LEVEL(ch) >= IMMORTAL)
+      if (ch->getLevel() >= IMMORTAL)
       {
         sprintf(buf, "%s tries to slip %d coins to %s and drops them!", GET_NAME(ch),
                 amount, GET_NAME(vict));
@@ -1685,7 +1685,7 @@ int do_slip(Character *ch, char *argument, int cmd)
           "them.\r\n",
           ch, 0, vict, TO_ROOM, NOTVICT);
 
-      if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
+      if (IS_NPC(ch) || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
 
       tmp_object = create_money(amount);
@@ -1698,7 +1698,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     {
       csendf(ch, "You slip %d coins to %s.\r\n", amount, GET_NAME(vict));
 
-      if (GET_LEVEL(ch) >= IMMORTAL)
+      if (ch->getLevel() >= IMMORTAL)
       {
         sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
                 GET_NAME(vict));
@@ -1714,7 +1714,7 @@ int do_slip(Character *ch, char *argument, int cmd)
               GET_NAME(vict));
       logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
-      if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
+      if (IS_NPC(ch) || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
 
       vict->addGold(amount);
@@ -1761,7 +1761,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    if (GET_LEVEL(ch) < DEITY)
+    if (ch->getLevel() < DEITY)
     {
       send_to_char("You can't let go of it! Yeech!!\n\r", ch);
       return eFAILURE;
@@ -1871,7 +1871,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_LEVEL(ch) >= IMMORTAL && GET_LEVEL(ch) <= DEITY)
+    if (ch->getLevel() >= IMMORTAL && ch->getLevel() <= DEITY)
     {
       sprintf(buf, "%s slips %s to %s and fumbles it.", GET_NAME(ch),
               obj->short_description, GET_NAME(vict));
@@ -1893,7 +1893,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   // Success
   else
   {
-    /*      if (GET_LEVEL(ch) >= IMMORTAL  && GET_LEVEL(ch) <= DEITY ) {
+    /*      if (ch->getLevel() >= IMMORTAL  && ch->getLevel() <= DEITY ) {
              sprintf(buf, "%s slips %s to %s.", GET_NAME(ch),
                      obj->short_description, GET_NAME(vict));
              special_log(buf);
@@ -1917,7 +1917,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (affected_by_spell(ch, SKILL_VITAL_STRIKE) && GET_LEVEL(ch) < IMMORTAL)
+  if (affected_by_spell(ch, SKILL_VITAL_STRIKE) && ch->getLevel() < IMMORTAL)
   {
     send_to_char("Your body is still recovering from your last vitalstrike technique.\r\n", ch);
     return eFAILURE;
@@ -2056,7 +2056,7 @@ int do_jab(Character *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if (affected_by_spell(ch, SKILL_JAB) && GET_LEVEL(ch) < IMMORTAL)
+  if (affected_by_spell(ch, SKILL_JAB) && ch->getLevel() < IMMORTAL)
   {
     send_to_char("Your arm is still sore from your last attempt.\r\n", ch);
     return eFAILURE;
@@ -2119,7 +2119,7 @@ int do_jab(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
+  if ((ch->getLevel() < G_POWER) || IS_NPC(ch))
   {
     if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
@@ -2387,7 +2387,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(ch) < IMMORTAL) || IS_NPC(ch))
+  if ((ch->getLevel() < IMMORTAL) || IS_NPC(ch))
     if (!can_attack(ch) || !can_be_attacked(ch, vict))
       return eFAILURE;
 

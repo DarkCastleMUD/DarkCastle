@@ -666,7 +666,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	if (IS_NPC(ch))
 		return eFAILURE;
 
-	if (GET_LEVEL(ch) < 10)
+	if (ch->getLevel() < 10)
 	{
 		send_to_char("$B$2The Meta-physician tells you, 'You're too low level for$R "
 					 "$B$2me to waste my time on you.$R\n\r"

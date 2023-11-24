@@ -185,7 +185,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(GET_LEVEL(ch) < wand->obj_flags.value[0]) 
+  if(ch->getLevel() < wand->obj_flags.value[0]) 
   {
     send_to_char("This wand is too powerful for you to imbue.\r\n", ch);
     return eFAILURE;

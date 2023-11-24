@@ -818,7 +818,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
 
     ch->addHP((float)GET_MAX_HIT(ch) * modifier);
 
-    duration = 36 - (GET_LEVEL(ch) / 6);
+    duration = 36 - (ch->getLevel() / 6);
   }
 
   af.type = SKILL_BLOOD_FURY;
@@ -836,7 +836,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 20;
-  if (affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && GET_LEVEL(ch) < IMMORTAL)
+  if (affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && ch->getLevel() < IMMORTAL)
   {
     send_to_char("Your body is still recovering from your last crazed assault technique.\r\n", ch);
     return eFAILURE;

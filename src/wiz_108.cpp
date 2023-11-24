@@ -254,7 +254,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
       {
         csendf(ch, "You purloin %s from %s.\r\n",
                k->short_description, GET_NAME(vict));
-        logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s purloins %s from %s",
+        logf(ch->getLevel(), LogChannels::LOG_GOD, "%s purloins %s from %s",
              GET_NAME(ch), k->short_description, GET_NAME(vict));
       }
       else
@@ -276,7 +276,7 @@ int do_set(Character *ch, char *argument, int cmd)
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(Character *ch, char *argument, int cmd);
   //
-  //    if(GET_LEVEL(ch) < IMMORTAL || IS_NPC(ch)) {
+  //    if(ch->getLevel() < IMMORTAL || IS_NPC(ch)) {
   //      do_mortal_set(ch, argument, cmd);
   //      return;
   //    }
@@ -333,7 +333,7 @@ int do_set(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < GET_LEVEL(vict))
+  if (ch->getLevel() < vict->getLevel())
   {
     send_to_char("Get real! You ain't that big.\r\n", ch);
     if (IS_PC(vict))
@@ -344,7 +344,7 @@ int do_set(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_PC(vict) && (GET_LEVEL(vict) == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
+  if (IS_PC(vict) && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
   {
     send_to_char("Forget it dweeb.\r\n", ch);
     return eFAILURE;
@@ -471,21 +471,21 @@ int do_set(Character *ch, char *argument, int cmd)
       send_to_char("That level doesn't exist!\n\r", ch);
       return eFAILURE;
     }
-    if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && GET_LEVEL(ch) < OVERSEER)
+    if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && ch->getLevel() < OVERSEER)
     {
       send_to_char(
           "Level must be between 0 and 101.\r\n", ch);
       return eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
-    if (IS_PC(vict) && value > GET_LEVEL(ch))
+    if (IS_PC(vict) && value > ch->getLevel())
     {
       send_to_char("That level is higher than you!\n\r", ch);
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
     /* set level of victim */
-    vict->level = value;
+    vict->setLevel(value);
     update_wizlist(vict);
   }
   break;
@@ -597,7 +597,7 @@ int do_set(Character *ch, char *argument, int cmd)
     val = atoll(buf);
     int64_t before_exp = vict->exp;
     vict->exp = val;
-    logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
+    logf(ch->getLevel(), LogChannels::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
          GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
   }
   break;
@@ -720,12 +720,12 @@ int do_set(Character *ch, char *argument, int cmd)
   case 23: /* bank */
   {
     GET_BANK(vict) = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 24: /* platinum */
   {
-    if (GET_LEVEL(ch) == IMPLEMENTER)
+    if (ch->getLevel() == IMPLEMENTER)
     {
       uint32_t before_plat = GET_PLATINUM(vict);
       GET_PLATINUM(vict) = atoi(buf);
@@ -737,13 +737,13 @@ int do_set(Character *ch, char *argument, int cmd)
   case 25: /* ki */
   {
     vict->raw_ki = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
     vict->clan = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_BUG);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_BUG);
   }
   break;
   case 27: // saves
@@ -778,25 +778,25 @@ int do_set(Character *ch, char *argument, int cmd)
   case 28:
   {
     GET_HP_METAS(vict) = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 29:
   {
     GET_MANA_METAS(vict) = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 30:
   {
     GET_MOVE_METAS(vict) = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 31:
   {
     vict->armor = atoi(buf);
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   case 32:
@@ -820,7 +820,7 @@ int do_set(Character *ch, char *argument, int cmd)
     }
 
     vict->player->profession = value;
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   break;
   }

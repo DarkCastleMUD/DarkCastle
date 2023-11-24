@@ -278,7 +278,7 @@ bool check_available_quest(Character *ch, struct quest_info *quest)
    if (!quest)
       return false;
 
-   if (GET_LEVEL(ch) >= quest->level && !check_quest_current(ch, quest->number) && !check_quest_complete(ch, quest->number) && !(quest->active))
+   if (ch->getLevel() >= quest->level && !check_quest_current(ch, quest->number) && !check_quest_complete(ch, quest->number) && !(quest->active))
       return true;
 
    return false;
@@ -344,7 +344,7 @@ void show_quest_footer(Character *ch)
    {
       quest = *node;
 
-      if (GET_LEVEL(ch) >= quest->level)
+      if (ch->getLevel() >= quest->level)
       {
          if (check_quest_current(ch, quest->number))
          {
@@ -574,7 +574,7 @@ int start_quest(Character *ch, struct quest_info *quest)
       while (++dontwannabeinthisforever < 100)
       {
          mob = get_mob_vnum(number(1, 34000));
-         if (mob && (GET_LEVEL(mob) < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (strlen(mob->description) > 80))
+         if (mob && (mob->getLevel() < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (strlen(mob->description) > 80))
             break;
       }
       quest->hint1 = str_hsh(mob->description);
@@ -1033,7 +1033,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       {
          quest = *node;
 
-         if (GET_LEVEL(ch) >= quest->level)
+         if (ch->getLevel() >= quest->level)
          {
             if (check_quest_current(ch, quest->number))
             {

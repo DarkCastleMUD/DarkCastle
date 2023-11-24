@@ -237,7 +237,7 @@ int innate_repair(Character *ch, char *arg, int cmd)
 {
   class Object *obj;
   char buf[MAX_STRING_LENGTH];
-  int i, chance = 60-GET_LEVEL(ch);
+  int i, chance = 60-ch->getLevel();
   bool found = false;
   arg = one_argument(arg,buf);
   if ( ( obj = get_obj_in_list_vis( ch, buf, ch->carrying ) ) == nullptr )
@@ -245,7 +245,7 @@ int innate_repair(Character *ch, char *arg, int cmd)
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;
   }
-  if (GET_LEVEL(ch) < obj->obj_flags.eq_level)
+  if (ch->getLevel() < obj->obj_flags.eq_level)
   {
    send_to_char("This item is beyond your skill.\r\n",ch);
    return eFAILURE;

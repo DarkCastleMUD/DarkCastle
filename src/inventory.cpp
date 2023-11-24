@@ -365,7 +365,7 @@ int do_get(Character *ch, char *argument, int cmd)
   }
 
   if ((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
-      (GET_LEVEL(ch) < IMMORTAL))
+      (ch->getLevel() < IMMORTAL))
   {
     send_to_char("I bet you think you're a thief.\r\n", ch);
     return eFAILURE;
@@ -425,31 +425,31 @@ int do_get(Character *ch, char *argument, int cmd)
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
-      if (!alldot && DC::isSet(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
+      if (!alldot && DC::isSet(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && ch->getLevel() < IMMORTAL)
         continue;
 
       // Ignore NO_TRADE items on a 'get all'
-      if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+      if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < IMMORTAL)
       {
         csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
         continue;
       }
       if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
           obj_object->obj_flags.value[0] > 10000 &&
-          GET_LEVEL(ch) < 5)
+          ch->getLevel() < 5)
       {
         send_to_char("You cannot pick up that much money!\r\n", ch);
         continue;
       }
 
-      if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+      if (obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
       {
         csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
         continue;
       }
 
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
+          !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
         continue;
@@ -461,11 +461,11 @@ int do_get(Character *ch, char *argument, int cmd)
         sprintf(buffer, "%s_consent", GET_NAME(ch));
         if ((isname("thiefcorpse", obj_object->name) &&
              !isname(GET_NAME(ch), obj_object->name)) ||
-            isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
+            isname(GET_NAME(ch), obj_object->name) || ch->getLevel() >= OVERSEER)
           has_consent = true;
         if (!has_consent && !isname(GET_NAME(ch), obj_object->name))
         {
-          if (GET_LEVEL(ch) < OVERSEER)
+          if (ch->getLevel() < OVERSEER)
           {
             send_to_char("You don't have consent to take the corpse.\r\n", ch);
             continue;
@@ -473,30 +473,30 @@ int do_get(Character *ch, char *argument, int cmd)
         }
         if (has_consent && contains_no_trade_item(obj_object))
         {
-          if (GET_LEVEL(ch) < OVERSEER)
+          if (ch->getLevel() < OVERSEER)
           {
             send_to_char("This item contains no_trade items that cannot be picked up.\r\n", ch);
             has_consent = false; // bugfix, could loot without consent
             continue;
           }
         }
-        if (GET_LEVEL(ch) < OVERSEER)
+        if (ch->getLevel() < OVERSEER)
           has_consent = false; // reset it for the next item:P
         else
           has_consent = true; // reset it for the next item:P
       }
 
-      if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) < IMMORTAL)
+      if (CAN_SEE_OBJ(ch, obj_object) && ch->getLevel() < IMMORTAL)
       {
         // Don't bother checking this if item is gold coins.
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
-            !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+            !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
         {
           sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
           send_to_char(buffer, ch);
           fail = true;
         }
-        else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
+        else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
           sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
           send_to_char(buffer, ch);
@@ -513,7 +513,7 @@ int do_get(Character *ch, char *argument, int cmd)
           fail = true;
         }
       }
-      else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object, ITEM_TAKE))
+      else if (CAN_SEE_OBJ(ch, obj_object) && ch->getLevel() >= IMMORTAL && CAN_WEAR(obj_object, ITEM_TAKE))
       {
         get(ch, obj_object, sub_object, 0, cmd);
         found = true;
@@ -559,19 +559,19 @@ int do_get(Character *ch, char *argument, int cmd)
       }
 
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
+          !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-               !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+               !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
       {
         sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
         send_to_char(buffer, ch);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
-               GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
+               ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
         sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
         send_to_char(buffer, ch);
@@ -579,13 +579,13 @@ int do_get(Character *ch, char *argument, int cmd)
       }
       else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
                obj_object->obj_flags.value[0] > 10000 &&
-               GET_LEVEL(ch) < 5)
+               ch->getLevel() < 5)
       {
         send_to_char("You cannot pick up that much money!\r\n", ch);
         fail = true;
       }
 
-      else if (obj_object->obj_flags.eq_level > 19 && GET_LEVEL(ch) < 5)
+      else if (obj_object->obj_flags.eq_level > 19 && ch->getLevel() < 5)
       {
         if (ch->in_room != real_room(3099))
         {
@@ -651,7 +651,7 @@ int do_get(Character *ch, char *argument, int cmd)
            isname("thiefcorpse", sub_object->name)))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
+        if ((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name) || ch->getLevel() > 105)
           has_consent = true;
         if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
         {
@@ -696,14 +696,14 @@ int do_get(Character *ch, char *argument, int cmd)
           }
 
           // Ignore NO_TRADE items on a 'get all'
-          if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100)
+          if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
           {
             csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
             continue;
           }
 
           if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
+              !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
           {
             csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
             continue;
@@ -712,7 +712,7 @@ int do_get(Character *ch, char *argument, int cmd)
           if (CAN_SEE_OBJ(ch, obj_object))
           {
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
             {
               sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
               send_to_char(buffer, ch);
@@ -722,14 +722,14 @@ int do_get(Character *ch, char *argument, int cmd)
             {
               if (inventorycontainer ||
                   (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
-                  GET_LEVEL(ch) > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
+                  ch->getLevel() > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
               {
                 if (has_consent && DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
                 {
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
-                  if (GET_LEVEL(ch) < IMMORTAL)
+                  if (ch->getLevel() < IMMORTAL)
                   {
                     if (isname(obj_object->name, "thiefcorpse"))
                     {
@@ -743,13 +743,13 @@ int do_get(Character *ch, char *argument, int cmd)
                 }
                 if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
                     obj_object->obj_flags.value[0] > 10000 &&
-                    GET_LEVEL(ch) < 5)
+                    ch->getLevel() < 5)
                 {
                   send_to_char("You cannot pick up that much money!\r\n", ch);
                   continue;
                 }
 
-                if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+                if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
                 {
                   csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
                   continue;
@@ -835,7 +835,7 @@ int do_get(Character *ch, char *argument, int cmd)
 
         if ((cmd != CMD_LOOT && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name))) || isname(buffer, sub_object->name))
           has_consent = true;
-        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !DC::isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !DC::isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
         if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
         {
@@ -863,20 +863,20 @@ int do_get(Character *ch, char *argument, int cmd)
         {
           if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
               obj_object->obj_flags.value[0] > 10000 &&
-              GET_LEVEL(ch) < 5)
+              ch->getLevel() < 5)
           {
             send_to_char("You cannot pick up that much money!\r\n", ch);
             fail = true;
           }
 
-          else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+          else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
           {
             csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
             fail = true;
           }
 
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                   !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+                   !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
           {
             sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
             send_to_char(buffer, ch);
@@ -891,7 +891,7 @@ int do_get(Character *ch, char *argument, int cmd)
               // if I have consent and i'm touching the corpse, then I shouldn't be able
               // to pick up no_trade items because it is someone else's corpse.  If I am
               // the other of the corpse, has_consent will be false.
-              if (GET_LEVEL(ch) < IMMORTAL)
+              if (ch->getLevel() < IMMORTAL)
               {
                 if (isname("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isname("lootable", sub_object->name)))
                 {
@@ -1021,7 +1021,7 @@ int do_consent(Character *ch, char *arg, int cmd)
     send_to_char("Silly, you don't need to consent yourself!\r\n", ch);
     return eFAILURE;
   }
-  if (GET_LEVEL(vict) < 10)
+  if (vict->getLevel() < 10)
   {
     send_to_char("That person is too low level to be consented.\r\n", ch);
     return eFAILURE;
@@ -1158,7 +1158,7 @@ int do_drop(Character *ch, char *argument, int cmd)
     tmp_object = create_money(amount);
     obj_to_room(tmp_object, ch->in_room);
     ch->removeGold(amount);
-    if (GET_LEVEL(ch) >= IMMORTAL)
+    if (ch->getLevel() >= IMMORTAL)
     {
       sprintf(buffer, "%s dropped %d coins.", GET_NAME(ch), amount);
       special_log(buffer);
@@ -1192,7 +1192,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (contains_no_trade_item(tmp_object))
           continue;
         if (!DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
-            GET_LEVEL(ch) >= IMMORTAL)
+            ch->getLevel() >= IMMORTAL)
         {
           if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             send_to_char("(This item is cursed, BTW.)\r\n", ch);
@@ -1255,7 +1255,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           send_to_char("Your criminal acts prohibit it.\r\n", ch);
           return eFAILURE;
         }
-        if (DC::isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+        if (DC::isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < IMMORTAL)
         {
           send_to_char("It seems magically attached to you.\r\n", ch);
           return eFAILURE;
@@ -1272,7 +1272,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
         else if (!DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
-                 GET_LEVEL(ch) >= IMMORTAL)
+                 ch->getLevel() >= IMMORTAL)
         {
           if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             send_to_char("(This item is cursed, BTW.)\r\n", ch);
@@ -1396,7 +1396,7 @@ int do_put(Character *ch, char *argument, int cmd)
       {
         if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP))
         {
-          if (GET_LEVEL(ch) < IMMORTAL)
+          if (ch->getLevel() < IMMORTAL)
           {
             send_to_char("You are unable to! That item must be CURSED!\r\n", ch);
             return eFAILURE;
@@ -1648,7 +1648,7 @@ int do_give(Character *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\r\n", ch);
       return eFAILURE;
     }
-    if (ch->getGold() < amount && GET_LEVEL(ch) < DEITY)
+    if (ch->getGold() < amount && ch->getLevel() < DEITY)
     {
       send_to_char("You haven't got that many coins!\r\n", ch);
       return eFAILURE;
@@ -1691,7 +1691,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
     ch->removeGold(amount);
 
-    if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || GET_LEVEL(ch) > 50))
+    if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || ch->getLevel() > 50))
     {
       sprintf(buf, "%s (mob) giving gold to %s.", GET_NAME(ch),
               GET_NAME(vict));
@@ -1702,7 +1702,7 @@ int do_give(Character *ch, char *argument, int cmd)
     {
       ch->setGold(0);
       send_to_char("Warning:  You are giving out more $B$5gold$R than you had.\r\n", ch);
-      if (GET_LEVEL(ch) < IMPLEMENTER)
+      if (ch->getLevel() < IMPLEMENTER)
       {
         sprintf(buf, "%s gives %ld coins to %s (negative!)", GET_NAME(ch),
                 amount, GET_NAME(vict));
@@ -1788,7 +1788,7 @@ int do_give(Character *ch, char *argument, int cmd)
                  ch);
     return eFAILURE;
   }
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < OVERSEER)
+  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < OVERSEER)
   {
     send_to_char("That sure would be a fucking stupid thing to do.\r\n", ch);
     return eFAILURE;
@@ -1802,7 +1802,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    if (GET_LEVEL(ch) < DEITY)
+    if (ch->getLevel() < DEITY)
     {
       send_to_char("You can't let go of it! Yeech!!\r\n", ch);
       return eFAILURE;
@@ -1815,7 +1815,7 @@ int do_give(Character *ch, char *argument, int cmd)
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     // Mortal ch cam give immortal vict no-trade items
-    if (IS_PC(ch) && IS_PC(vict) && GET_LEVEL(ch) < IMMORTAL && GET_LEVEL(vict) >= IMMORTAL)
+    if (IS_PC(ch) && IS_PC(vict) && ch->getLevel() < IMMORTAL && vict->getLevel() >= IMMORTAL)
     {
       send_to_char("It seems to no longer be magically attached to you.\r\n", ch);
     }
@@ -1824,7 +1824,7 @@ int do_give(Character *ch, char *argument, int cmd)
       // You can give no_trade items to mobs for quest purposes.  It's taken care of later
       if (IS_PC(vict) && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
       {
-        if (GET_LEVEL(ch) > IMMORTAL)
+        if (ch->getLevel() > IMMORTAL)
           send_to_char("That was a NO_TRADE item btw....\r\n", ch);
         else
         {
@@ -1834,7 +1834,7 @@ int do_give(Character *ch, char *argument, int cmd)
       }
       if (contains_no_trade_item(obj))
       {
-        if (GET_LEVEL(ch) > IMMORTAL)
+        if (ch->getLevel() > IMMORTAL)
           send_to_char("That was a NO_TRADE item btw....\r\n", ch);
         else
         {
@@ -1865,7 +1865,7 @@ int do_give(Character *ch, char *argument, int cmd)
   // Check if mortal ch is trying to give more items to vict than they can carry
   if ((1 + IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
   {
-    if (GET_LEVEL(ch) >= IMMORTAL)
+    if (ch->getLevel() >= IMMORTAL)
     {
       act("$N seems to have $S hands full but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
     }
@@ -1888,7 +1888,7 @@ int do_give(Character *ch, char *argument, int cmd)
   // Check if mortal ch is trying to give more weight to vict than they can carry
   if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
-    if (GET_LEVEL(ch) >= IMMORTAL)
+    if (ch->getLevel() >= IMMORTAL)
     {
       act("$E can't carry that much weight but you give it to $M anyways.", ch, 0, vict, TO_CHAR, 0);
     }
@@ -1939,7 +1939,7 @@ int do_give(Character *ch, char *argument, int cmd)
          loop_obj->short_description,
          obj_index[loop_obj->item_number].virt);
 
-  if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL &&
+  if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && vict->getLevel() < IMMORTAL &&
       DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393)
   {
     send_to_char("Here, have some for some potato lag!!\r\n", vict);
@@ -2275,7 +2275,7 @@ int do_open(Character *ch, char *argument, int cmd)
         return do_open(ch, argument, cmd);
       }
     }
-    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
+    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && ch->getLevel() < IMMORTAL)
       send_to_char("It seems to slither and resist your attempt to touch it.\r\n", ch);
     else
     {
@@ -2668,7 +2668,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
   if (obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
   {
-    if (IS_NPC(ch) || GET_LEVEL(ch) <= 5)
+    if (IS_NPC(ch) || ch->getLevel() <= 5)
       return eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
     sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));

@@ -168,17 +168,17 @@ player_config_t::const_iterator PlayerConfig::constEnd() const
 
 bool Character::isMortal(void)
 {
-    return GET_LEVEL(this) < IMMORTAL;
+    return level_ < IMMORTAL;
 }
 
 bool Character::isImmortal(void)
 {
-    return GET_LEVEL(this) >= IMMORTAL;
+    return level_ >= IMMORTAL;
 }
 
 bool Character::isImplementer(void)
 {
-    return GET_LEVEL(this) == IMPLEMENTER;
+    return level_ == IMPLEMENTER;
 }
 
 uint64_t Character::getGold(void)
@@ -240,7 +240,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
     FILE *fpfile = nullptr;
 
-    if (IS_NPC(this) || GET_LEVEL(this) < IMMORTAL)
+    if (IS_NPC(this) || level_ < IMMORTAL)
     {
         return false;
     }
@@ -269,7 +269,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
         logentry("Error. clone_mobile(real_mobile(8)) returned nullptr.");
         return false;
     }
-    charmie->level = 1;
+    charmie->setLevel(1);
     class Object *last_cont = nullptr; // Last container.
     while (!feof(fpfile))
     {
@@ -465,7 +465,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
 {
     for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
-        if (GET_LEVEL(ch) < OVERSEER)
+        if (ch->getLevel() < OVERSEER)
         {
             if (d->character == nullptr)
                 continue;
@@ -476,9 +476,9 @@ Sockets::Sockets(Character *ch, QString searchkey)
         {
             if (!CAN_SEE(ch, d->character))
                 continue;
-            if (GET_LEVEL(ch) < GET_LEVEL(d->character))
+            if (ch->getLevel() < d->character->getLevel())
                 continue;
-            if ((d->connected != Connection::states::PLAYING) && (GET_LEVEL(ch) < GET_LEVEL(d->character)))
+            if ((d->connected != Connection::states::PLAYING) && (ch->getLevel() < d->character->getLevel()))
                 continue;
         }
 
@@ -626,4 +626,26 @@ const QList<Toggle> Player::togglables = {
 Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, int cmd), uint64_t dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
+}
+
+level_t Character::getLevel(void) const
+{
+    if (level_ > 110)
+    {
+        produce_coredump();
+        logentry(QString("Warning: getLevel returned %1.").arg(level_));
+    }
+
+    return level_;
+}
+
+void Character::setLevel(level_t level)
+{
+    level_ = level;
+
+    if (level_ > 110)
+    {
+        produce_coredump();
+        logentry(QString("Warning: setLevel(%1).").arg(level_));
+    }
 }

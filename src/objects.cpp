@@ -819,7 +819,7 @@ int do_name(Character *ch, char *arg, int cmd)
     send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
   }
-  if (GET_LEVEL(ch) < 5)
+  if (ch->getLevel() < 5)
   {
     send_to_char("You cannot use the \"name\" command until you have reached level 5.\r\n", ch);
     return eFAILURE;
@@ -934,7 +934,7 @@ int do_drink(Character *ch, char *argument, int cmd)
     act("You are full.", ch, 0, 0, TO_CHAR, 0);
     act("You are not thirsty anymore.", ch, 0, 0, TO_CHAR, 0);
 
-    if (GET_LEVEL(ch) >= IMMORTAL)
+    if (ch->getLevel() >= IMMORTAL)
       return eSUCCESS;
 
     if (GET_COND(ch, FULL) != -1)
@@ -972,7 +972,7 @@ int do_drink(Character *ch, char *argument, int cmd)
       sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
       send_to_char(buf, ch);
 
-      if (GET_LEVEL(ch) >= IMMORTAL)
+      if (ch->getLevel() >= IMMORTAL)
         return eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
@@ -1008,7 +1008,7 @@ int do_drink(Character *ch, char *argument, int cmd)
         ch->addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (GET_LEVEL(ch) < IMMORTAL))
+      if (temp->obj_flags.value[3] && (ch->getLevel() < IMMORTAL))
       {
         /* The shit was poisoned ! */
         act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
@@ -1071,7 +1071,7 @@ int do_eat(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (GET_LEVEL(ch) < IMMORTAL))
+  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (ch->getLevel() < IMMORTAL))
   {
     act("Your stomach refuses to eat that!?!", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -1091,7 +1091,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   if (GET_COND(ch, FULL) > 20)
     act("You are full.", ch, 0, 0, TO_CHAR, 0);
 
-  if (temp->obj_flags.value[3] && (GET_LEVEL(ch) < IMMORTAL))
+  if (temp->obj_flags.value[3] && (ch->getLevel() < IMMORTAL))
   {
     /* The shit was poisoned ! */
     act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
@@ -1645,7 +1645,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   if (IS_PC(ch))
   {
-    if (GET_LEVEL(ch) < obj_object->obj_flags.eq_level)
+    if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
       sprintf(buffer, "You must be level %d to use $p.",
               obj_object->obj_flags.eq_level);
@@ -1656,7 +1656,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   else
   {
     if (mob_index[ch->mobdata->nr].virt != 8)
-      if (GET_LEVEL(ch) < obj_object->obj_flags.eq_level)
+      if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
         sprintf(buffer, "You must be level %d to use $p.",
                 obj_object->obj_flags.eq_level);
@@ -1671,7 +1671,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     }*/
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMPLEMENTER)
+      !isname(GET_NAME(ch), obj->name) && ch->getLevel() < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;
@@ -2505,7 +2505,7 @@ int do_remove(Character *ch, char *argument, int cmd)
           if (ch->equipment[j] && CAN_SEE_OBJ(ch, ch->equipment[j]))
           {
             obj_object = ch->equipment[j];
-            if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL)
+            if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
               sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
               send_to_char(arg1, ch);
@@ -2548,7 +2548,7 @@ int do_remove(Character *ch, char *argument, int cmd)
       {
         if (CAN_CARRY_N(ch) != IS_CARRYING_N(ch))
         {
-          if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL)
+          if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
             sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
             send_to_char(arg1, ch);

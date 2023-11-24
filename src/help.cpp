@@ -115,7 +115,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
       send_to_char(new_help, ch);
     else
       send_to_char(new_ihelp, ch);
@@ -146,7 +146,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
     multimap<unsigned int, char *, ltstr> ltable;
     multimap<unsigned int, char *, ltstr>::iterator cur;
 
-    int level = GET_LEVEL(ch) == 0 ? 1 : GET_LEVEL(ch);
+    int level = ch->getLevel() == 0 ? 1 : ch->getLevel();
 
     for (h = 0; h < new_top_of_helpt; h++)
     {
@@ -228,7 +228,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
   }
 
   dc_free(upper_argument);
-  int a = GET_LEVEL(ch) == 0 ? 1 : GET_LEVEL(ch);
+  int a = ch->getLevel() == 0 ? 1 : ch->getLevel();
   if (this_help->min_level > a)
   {
     send_to_char("There is no help on that word.\r\n", ch);
@@ -259,7 +259,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
           "$1$B| | $B$5Related Help: $B$7%-57.57s $1$B| |\r\n"
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R",
-          buf, ((GET_LEVEL(ch) >= IMMORTAL) ? rec_level : " "),
+          buf, ((ch->getLevel() >= IMMORTAL) ? rec_level : " "),
           ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
           this_help->entry, this_help->related);
 

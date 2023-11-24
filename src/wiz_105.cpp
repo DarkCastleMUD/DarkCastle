@@ -105,21 +105,21 @@ int do_log(Character *ch, char *argument, int cmd)
     send_to_char("Couldn't find any such creature.\r\n", ch);
   else if (IS_NPC(vict))
     send_to_char("Can't do that to a beast.\r\n", ch);
-  else if (GET_LEVEL(vict) > GET_LEVEL(ch))
+  else if (vict->getLevel() > ch->getLevel())
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
   else if (DC::isSet(vict->player->punish, PUNISH_LOG))
   {
     send_to_char("LOG removed.\r\n", ch);
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   else
   {
     send_to_char("LOG set.\r\n", ch);
     SET_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
-    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }
@@ -383,7 +383,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
           GET_NAME(ch), GET_NAME(victim), flag);
-  logentry(log_buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(log_buf, ch->getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -756,7 +756,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
         !DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
-        obj->obj_flags.eq_level <= GET_LEVEL(vict) &&
+        obj->obj_flags.eq_level <= vict->getLevel() &&
         !DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       for (o = 0; o < MAX_WEAR; o++)

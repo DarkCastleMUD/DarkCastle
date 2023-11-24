@@ -79,9 +79,9 @@ int do_report(Character *ch, char *argument, int cmd)
       int64_t players_exp = GET_EXP(ch);
       while (levels_to_gain < IMMORTAL)
       {
-        if (players_exp >= (int64_t)exp_table[(int)GET_LEVEL(ch) + levels_to_gain + 1])
+        if (players_exp >= (int64_t)exp_table[(int)ch->getLevel() + levels_to_gain + 1])
         {
-          players_exp -= (int64_t)exp_table[(int)GET_LEVEL(ch) + levels_to_gain + 1];
+          players_exp -= (int64_t)exp_table[(int)ch->getLevel() + levels_to_gain + 1];
           levels_to_gain++;
         }
         else
@@ -92,7 +92,7 @@ int do_report(Character *ch, char *argument, int cmd)
 
       snprintf(report, 200, "XP: %ld, XP till level: %ld, Levels to gain: %u",
                GET_EXP(ch),
-               (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)),
+               (int64_t)(exp_table[(int)ch->getLevel() + 1] - (int64_t)GET_EXP(ch)),
                levels_to_gain);
 
       sprintf(buf, "$n reports '%s'", report);
@@ -215,13 +215,13 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
-    if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
+    if ((i->character == nullptr) || (i->character->getLevel() <= MORTAL))
       continue;
     if (!(DC::isSet(i->character->misc, type)))
       continue;
     if (is_busy(i->character))
       continue;
-    if (!i->connected && GET_LEVEL(i->character) >= god_level)
+    if (!i->connected && i->character->getLevel() >= god_level)
     {
       if (IS_MOB(i->character) || DC::isSet(i->character->player->toggles, Player::PLR_ANSI))
         send_to_char(buf1, i->character);
@@ -283,7 +283,7 @@ int do_channel(Character *ch, char *arg, int cmd)
   {
     //    send_to_char("\n\r", ch);
 
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
     {
       for (x = 7; x <= 14; x++)
       {
@@ -297,7 +297,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     }
     else
     {
-      int o = GET_LEVEL(ch) == 110 ? 21 : 19;
+      int o = ch->getLevel() == 110 ? 21 : 19;
       for (x = 0; x <= o; x++)
       {
         if (DC::isSet(ch->misc, (1 << x)))
@@ -323,7 +323,7 @@ int do_channel(Character *ch, char *arg, int cmd)
     sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]);
     send_to_char(buf2, ch);
 
-    int o = GET_LEVEL(ch) == 110 ? 26 : 0;
+    int o = ch->getLevel() == 110 ? 26 : 0;
     for (x = 24; x <= o; x++)
     {
       if (DC::isSet(ch->misc, (1 << x)))
@@ -348,13 +348,13 @@ int do_channel(Character *ch, char *arg, int cmd)
       break;
   }
 
-  if (GET_LEVEL(ch) < IMMORTAL &&
+  if (ch->getLevel() < IMMORTAL &&
       (x < 7 || (x > 14 && x < 22)))
   {
     send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
   }
-  if (x > 19 && GET_LEVEL(ch) != 110 && x < 22)
+  if (x > 19 && ch->getLevel() != 110 && x < 22)
   {
     send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
@@ -440,7 +440,7 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
+  if (IS_MOB(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
   {
     return false;
   }
@@ -485,7 +485,7 @@ int do_write(Character *ch, char *argument, int cmd)
 
   if (!ch->desc)
     return eSUCCESS;
-  if (GET_LEVEL(ch) < 5)
+  if (ch->getLevel() < 5)
   {
     send_to_char("You need to be at least level 5 to write on the board.\r\n", ch);
     return eSUCCESS;

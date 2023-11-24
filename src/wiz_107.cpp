@@ -31,7 +31,7 @@ int do_archive(Character *ch, char *argument, int cmd)
   if (!(victim = get_pc(name)))
     return eFAILURE;
 
-  if (GET_LEVEL(victim) >= MIN_GOD)
+  if (victim->getLevel() >= MIN_GOD)
   {
     act("I think $N can archive $Mself, thank you.", ch, 0, victim,
         TO_CHAR, 0);
@@ -124,7 +124,7 @@ int do_snoop(Character *ch, char *argument, int cmd)
     send_to_char("(You can only snoop a link-active pc.)\n\r", ch);
     return eFAILURE;
   }
-  if ((GET_LEVEL(victim) > GET_LEVEL(ch)) && (GET_NAME(ch) != GET_NAME(victim)))
+  if ((victim->getLevel() > ch->getLevel()) && (GET_NAME(ch) != GET_NAME(victim)))
   {
     send_to_char("Can't do that. That mob is higher than you!\n\r", ch);
     sprintf(buf, "%s tried to snoop a higher mob\n\r", GET_NAME(ch));
@@ -141,7 +141,7 @@ int do_snoop(Character *ch, char *argument, int cmd)
       ch->desc->snooping = 0;
     }
     sprintf(buf, "%s snoops themself.", GET_NAME(ch));
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     return eSUCCESS;
   }
 
@@ -150,7 +150,7 @@ int do_snoop(Character *ch, char *argument, int cmd)
     send_to_char("Busy already. \n\r", ch);
     return eFAILURE;
 
-    if (GET_LEVEL(victim) == IMPLEMENTER)
+    if (victim->getLevel() == IMPLEMENTER)
     {
       send_to_char("What are you!? Crazy! You can't snoop an Imp.\r\n", ch);
     }
@@ -169,7 +169,7 @@ int do_snoop(Character *ch, char *argument, int cmd)
   ch->desc->snooping = victim->desc;
   victim->desc->snoop_by = ch->desc;
   sprintf(buf, "%s snoops %s.", GET_NAME(ch), GET_NAME(victim));
-  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 

@@ -84,13 +84,13 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
       send_to_char("No one by that name here..\r\n", ch);
     else
     {
-      if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict))
+      if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
       {
         send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
         logentry(QString("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
-      if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && IS_PC(vict))
+      if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
       {
         send_to_char("Why be forceful?\n\r", ch);
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
@@ -107,14 +107,14 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
         buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
                           GET_NAME(vict), to_force);
         command_interpreter(vict, to_force);
-        logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+        logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
       }
     }
   }
 
   else
   { /* force all */
-    if (GET_LEVEL(ch) < OVERSEER)
+    if (ch->getLevel() < OVERSEER)
     {
       send_to_char("Not gonna happen.\r\n", ch);
       return eFAILURE;
@@ -125,11 +125,11 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
       if (i->character != ch && !i->connected)
       {
         vict = i->character;
-        if (GET_LEVEL(ch) <= GET_LEVEL(vict))
+        if (ch->getLevel() <= vict->getLevel())
           continue;
         else
         {
-          if (ch->player->stealth == false || GET_LEVEL(ch) < 109)
+          if (ch->player->stealth == false || ch->getLevel() < 109)
           {
             buf = fmt::format("$n has forced you to '{}'.", to_force);
             act(buf, ch, 0, vict, TO_VICT, 0);
@@ -140,7 +140,7 @@ int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
     }
     send_to_char("Ok.\r\n", ch);
     buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }

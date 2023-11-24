@@ -221,7 +221,7 @@ int write_hotboot_file(char **new_argv)
   for (d = DC::getInstance()->descriptor_list; d; d = sd)
   {
     sd = d->next;
-    if (STATE(d) != Connection::states::PLAYING || !d->character || GET_LEVEL(d->character) < 1)
+    if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
     {
       // Kick out anyone not currently playing in the game.
       write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
@@ -1869,7 +1869,7 @@ string generate_prompt(Character *ch)
       sprintf(pro, "%ld", GET_EXP(ch));
       break;
     case 'X':
-      sprintf(pro, "%ld", (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)));
+      sprintf(pro, "%ld", (int64_t)(exp_table[(int)ch->getLevel() + 1] - (int64_t)GET_EXP(ch)));
       break;
     case 'y':
       charmie = get_charmie(ch);
@@ -2571,7 +2571,7 @@ int process_input(class Connection *t)
     << "(" << buffer.length() << ")" << endl;
 #endif
 
-    if (t->character == nullptr || GET_LEVEL(t->character) < IMMORTAL)
+    if (t->character == nullptr || t->character->getLevel() < IMMORTAL)
     {
       buffer = remove_all_codes(buffer);
     }
@@ -2802,7 +2802,7 @@ int close_socket(class Connection *d)
               DC::getInstance()->world[d->character->in_room].number);
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
         sprintf(buf, "%s with CQ.", buf);
-      logentry(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
+      logentry(buf, d->character->getLevel() > SERAPH ? d->character->getLevel() : SERAPH, LogChannels::LOG_SOCKET);
       d->character->desc = nullptr;
     }
     else
@@ -3140,7 +3140,7 @@ void send_to_char_nosp(QString messg, Character *ch)
 
 void record_msg(QString messg, Character *ch)
 {
-  if (messg.isEmpty() || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
+  if (messg.isEmpty() || IS_NPC(ch) || ch->getLevel() < IMMORTAL)
     return;
 
   if (ch->player->away_msgs.size() < 1000)
@@ -3441,7 +3441,7 @@ void warn_if_duplicate_ip(Character *ch)
 
       multi_list.push_back(m);
 
-      highlev = MAX(GET_LEVEL(d->character), GET_LEVEL(ch));
+      highlev = MAX(d->character->getLevel(), ch->getLevel());
       highlev = MAX(highlev, OVERSEER);
 
       // Mark both characters as multi-playing until they log out

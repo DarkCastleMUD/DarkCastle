@@ -45,7 +45,7 @@ void test_handle_ansi(QString test)
   Character *ch = new Character;
   ch->player = new Player;
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
-  GET_LEVEL(ch) = 1;
+  ch->setLevel(1);
 
   // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
   QString str1 = test;
@@ -276,7 +276,7 @@ int main(int argc, char **argv)
   ch->player = new Player;
 
   ch->desc = d;
-  ch->level = 110;
+  ch->setLevel(110);
   d->descriptor = 1;
   d->character = ch;
   d->output = {};

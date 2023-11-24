@@ -66,7 +66,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_HARM_TOUCH) && GET_LEVEL(ch) <= IMMORTAL)
+  if (affected_by_spell(ch, SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
   {
     send_to_char("You have not spend enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
     return eFAILURE;
@@ -98,7 +98,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
       if (has_skill(ch, SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
         char dammsg[MAX_STRING_LENGTH];
-        int amount = GET_LEVEL(ch) * 10;
+        int amount = ch->getLevel() * 10;
         if (amount + ch->getHP() > GET_MAX_HIT(ch))
           amount = GET_MAX_HIT(ch) - ch->getHP();
         sprintf(dammsg, "$B%d$R", amount);

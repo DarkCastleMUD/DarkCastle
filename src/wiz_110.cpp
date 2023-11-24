@@ -205,7 +205,7 @@ command_return_t do_bestow(Character *ch, string arg, int cmd)
   // give it
   learn_skill(vict, bestowable_god_commands[i].num, 1, 1);
   buf = fmt::format("{} has been bestowed {} by {}.", GET_NAME(vict), bestowable_god_commands[i].name, GET_NAME(ch));
-  logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
 
   ch->send(fmt::format("{} has been bestowed {}.\r\n", GET_NAME(vict), bestowable_god_commands[i].name));
   ch->send(fmt::format("{} has bestowed {} upon you.\r\n", GET_NAME(ch), bestowable_god_commands[i].name));
@@ -248,7 +248,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
     send_to_char(buf, ch);
     sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
             GET_NAME(ch));
-    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
     send_to_char(buf, vict);
     return eSUCCESS;
@@ -278,7 +278,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
   send_to_char(buf, ch);
   sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict),
           bestowable_god_commands[i].name, GET_NAME(ch));
-  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch),
           bestowable_god_commands[i].name);
   send_to_char(buf, vict);
@@ -412,7 +412,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(this) <= GET_LEVEL(victim))
+  if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
     send(QString("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
@@ -439,7 +439,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       GET_PLATINUM(victim) -= 500;
       send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QString("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QString("500 platinum removed from %1 for rename.").arg(GET_NAME(victim)), GET_LEVEL(this), LogChannels::LOG_GOD);
+      logentry(QString("500 platinum removed from %1 for rename.").arg(GET_NAME(victim)), level_, LogChannels::LOG_GOD);
     }
   }
 
@@ -569,7 +569,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   }
 
   buffer = QString("%1 renamed to %2.").arg(GET_NAME(victim)).arg(newname);
-  logentry(buffer, GET_LEVEL(this), LogChannels::LOG_GOD);
+  logentry(buffer, level_, LogChannels::LOG_GOD);
 
   // handle the renames
   AuctionHandleRenames(this, GET_NAME(victim), newname);

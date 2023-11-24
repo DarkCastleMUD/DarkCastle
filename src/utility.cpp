@@ -1057,7 +1057,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     if (!obj->player) // noncreated char
       return true;
 
-    if (GET_LEVEL(sub) < obj->player->wizinvis)
+    if (sub->getLevel() < obj->player->wizinvis)
     {
       if (obj->player->incognito == true)
       {
@@ -1081,7 +1081,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     else if (DC::isSet(prog, eEXTRA_VAL2))
       return false;
   }
-  if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL)
+  if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->getLevel() < IMMORTAL)
     return true;
 
   if (obj->in_room == DC::NOWHERE)
@@ -1153,13 +1153,13 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   skill = 0;
   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_GOOD)))
     skill = (int)cur_af->modifier;
-  if ((skill >= 80 || GET_LEVEL(sub) >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
     return true;
 
   skill = 0;
   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_EVIL)))
     skill = (int)cur_af->modifier;
-  if ((skill >= 80 || GET_LEVEL(sub) >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
     return true;
 
   if (IS_OBJ_STAT(obj, ITEM_NOSEE))
@@ -1504,7 +1504,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   }
   else
   {
-    if (GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
+    if (GET_HOME(victim) == 0 || victim->getLevel() < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
     {
       location = real_room(START_ROOM);
     }
@@ -1570,7 +1570,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   }
 
   // calculate the gold needed
-  level = GET_LEVEL(victim);
+  level = victim->getLevel();
   if ((level > 10) && (level <= DC::MAX_MORTAL_LEVEL))
   {
     cf = 1 + ((level - 11) * .347f);
@@ -1648,7 +1648,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && GET_LEVEL(ch) < IMMORTAL)
+  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && ch->getLevel() < IMMORTAL)
   {
     send_to_char("This room doesn't feel...SAFE enough to do that.\r\n", ch);
     return eFAILURE;
@@ -1835,7 +1835,7 @@ command_return_t Character::save(int cmd)
   // 9 = save with a round of lag
   // -pir 3/15/1999
 
-  if (IS_NPC(this) || GET_LEVEL(this) > IMPLEMENTER)
+  if (IS_NPC(this) || level_ > IMPLEMENTER)
     return eFAILURE;
 
   if (cmd != 666)
@@ -1909,7 +1909,7 @@ int do_home(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_LEVEL(ch) < 11)
+    if (ch->getLevel() < 11)
     {
       send_to_char("You must grow a bit before you can leave the nursery.\r\n", ch);
       GET_HOME(ch) = START_ROOM;
@@ -2640,8 +2640,8 @@ int get_leadership_bonus(Character *ch)
   {
     next_f = f->next;
 
-    if (highlevel < GET_LEVEL(f->follower))
-      highlevel = GET_LEVEL(f->follower);
+    if (highlevel < f->follower->getLevel())
+      highlevel = f->follower->getLevel();
   }
 
   for (f = leader->followers; f; f = next_f)
@@ -2652,7 +2652,7 @@ int get_leadership_bonus(Character *ch)
       continue;
     if (leader->in_room != f->follower->in_room)
       continue;
-    if (GET_LEVEL(f->follower) + 25 <= highlevel)
+    if (f->follower->getLevel() + 25 <= highlevel)
       continue;
     if (!IS_AFFECTED(f->follower, AFF_GROUP))
       continue;

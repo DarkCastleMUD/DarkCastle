@@ -98,13 +98,13 @@ bool player_resist_reallocation(Character *victim, int skill)
 bool malediction_res(Character *ch, Character *victim, int spell)
 {
   // A lower level character cannot resist a Deity+ immortal
-  if (IS_MINLEVEL_PC(ch, DEITY) && GET_LEVEL(victim) < GET_LEVEL(ch))
+  if (IS_MINLEVEL_PC(ch, DEITY) && victim->getLevel() < ch->getLevel())
   {
     return false;
   }
 
   // An immortal+ victim always resists a lesser character's spell
-  if (IS_MINLEVEL_PC(victim, IMMORTAL) && GET_LEVEL(victim) > GET_LEVEL(ch))
+  if (IS_MINLEVEL_PC(victim, IMMORTAL) && victim->getLevel() > ch->getLevel())
   {
     return true;
   }
@@ -401,7 +401,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   /* Drown BINGO Effect */
   if (skill > 80)
   {
-    if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL)
+    if (number(1, 100) == 1 && victim->getLevel() < IMMORTAL)
     {
       dam = victim->getHP() * 5 + 20;
       sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
@@ -1053,10 +1053,10 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
   /*  double o = 0.0, m = 0.0, avglevel = 0.0;
    for (tmp_victim = DC::getInstance()->world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
-   { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
+   { o++; m++; avglevel *= o-1; avglevel += tmp_victim->getLevel(); avglevel /= o;}
    else m++;
    m--; // don't count player
-   avglevel -= (double)GET_LEVEL(ch);
+   avglevel -= (double)ch->getLevel();
    double powmod = 0.2;
    powmod -= (avglevel*0.001);
    powmod -= (has_skill(ch, SPELL_LIFE_LEECH) * 0.001);
@@ -1217,14 +1217,14 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
           {
             // don't blind surrounding rooms
             // do_solar_blind(ch, tmp_victim);
-            if (GET_LEVEL(tmp_victim))
+            if (tmp_victim->getLevel())
               if (IS_NPC(tmp_victim))
               {
                 add_memory(tmp_victim, GET_NAME(ch), 'h');
                 if (IS_PC(ch) && IS_NPC(tmp_victim))
                   if (!ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) && !tmp_victim->hunting)
                   {
-                    level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(tmp_victim) / 2;
+                    level_diff_t level_difference = ch->getLevel() - tmp_victim->getLevel() / 2;
                     if (level_difference > 0)
                     {
                       add_memory(tmp_victim, GET_NAME(ch), 't');
@@ -1239,7 +1239,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                       timer->function = clear_hunt;
                       timer->next = timer_list;
                       timer_list = timer;
-                      timer->timeleft = (ch->level / 4) * 60;
+                      timer->timeleft = (ch->getLevel() / 4) * 60;
                     }
                   }
                 if (GET_POS(tmp_victim) != POSITION_STANDING)
@@ -1365,7 +1365,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
         (ARE_GROUPED(ch, tmp_victim)))
     {
-      if (GET_COND(tmp_victim, FULL) > -1 && GET_LEVEL(tmp_victim) < 60)
+      if (GET_COND(tmp_victim, FULL) > -1 && tmp_victim->getLevel() < 60)
       {
         GET_COND(tmp_victim, FULL) = result;
         GET_COND(tmp_victim, THIRST) = result;
@@ -1850,7 +1850,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   /* save the newbies! */
-  if (IS_PC(ch) && IS_PC(victim) && (GET_LEVEL(victim) < 10))
+  if (IS_PC(ch) && IS_PC(victim) && (victim->getLevel() < 10))
   {
     send_to_char("Your cold-blooded act causes your magic to misfire!\n\r", ch);
     victim = ch;
@@ -1870,7 +1870,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     return eSUCCESS;
   }
 
-  if (IS_NPC(victim) && (GET_LEVEL(victim) == 0))
+  if (IS_NPC(victim) && (victim->getLevel() == 0))
   {
     logentry("Null victim level in spell_paralyze.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
@@ -1900,8 +1900,8 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   /* if they are too big - do a dice roll to see if they backfire */
-  if (IS_PC(ch) && IS_PC(victim) && ((level - GET_LEVEL(victim)) > 10) &&
-      (!IS_MINLEVEL_PC(ch, DEITY) || GET_LEVEL(victim) >= GET_LEVEL(ch)))
+  if (IS_PC(ch) && IS_PC(victim) && ((level - victim->getLevel()) > 10) &&
+      (!IS_MINLEVEL_PC(ch, DEITY) || victim->getLevel() >= ch->getLevel()))
   {
     act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
     victim = ch;
@@ -2335,13 +2335,13 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       save = -30;
     }
 
-    if (IS_PC(victim) && GET_LEVEL(victim) < 11)
+    if (IS_PC(victim) && victim->getLevel() < 11)
     {
       send_to_char("The curse fizzles!\r\n", ch);
       return eSUCCESS;
     }
 
-    if (malediction_res(ch, victim, SPELL_CURSE) || (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL))
+    if (malediction_res(ch, victim, SPELL_CURSE) || (IS_PC(victim) && victim->getLevel() >= IMMORTAL))
     {
       act("$N resists your attempt to curse $M!", ch, nullptr, victim, TO_CHAR, 0);
       act("$N resists $n's attempt to curse $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -2755,7 +2755,7 @@ int spell_mana(uint8_t level, Character *ch, Character *victim, class Object *ob
     logentry("Null victim sent to mana!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
-  mana = GET_LEVEL(victim) * 4;
+  mana = victim->getLevel() * 4;
   GET_MANA(victim) += mana;
 
   if (GET_MANA(victim) > GET_MAX_MANA(victim))
@@ -3076,7 +3076,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
     // If owner, PC, with desc and not con_playing or wizinvis,
     if (owner && owner->player && is_in_game(owner) &&
-        (owner->player->wizinvis > GET_LEVEL(ch)))
+        (owner->player->wizinvis > ch->getLevel()))
     {
       if (isname(tmp, i->name))
       {
@@ -3142,7 +3142,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
   if (j == 0)
     send_to_char("The tremendous amount of information leaves you very confused.\r\n", ch);
 
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
   {
     ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
@@ -3167,7 +3167,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
     }
     else if (DC::isSet(victim->immune, ISR_POISON) ||
              malediction_res(ch, victim, SPELL_POISON) ||
-             (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL))
+             (IS_PC(victim) && victim->getLevel() >= IMMORTAL))
     {
       act("$N resists your attempt to poison $M!", ch, nullptr, victim, TO_CHAR, 0);
       act("$N resists $n's attempt to poison $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -3968,7 +3968,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
 
   set_cantquit(ch, victim);
 
-  if (!IS_MOB(victim) && GET_LEVEL(victim) <= 15)
+  if (!IS_MOB(victim) && victim->getLevel() <= 15)
   {
     send_to_char("Oh come on....at least wait till $e's high enough level to have decent gear.\r\n", ch);
     return eFAILURE;
@@ -4027,7 +4027,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     return eFAILURE;
   }
 
-  if (level < GET_LEVEL(victim))
+  if (level < victim->getLevel())
   {
     snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\r\n", GET_SHORT(victim));
     send_to_char(buf, ch);
@@ -4043,7 +4043,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
     {
       af.type = SPELL_SLEEP;
-      af.duration = ch->level / 20;
+      af.duration = ch->getLevel() / 20;
       ;
       af.modifier = 1;
       af.location = APPLY_NONE;
@@ -4298,7 +4298,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   assert(ch && victim);
 
   if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
-      (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
+      (victim->getLevel() >= IMMORTAL && ch->getLevel() < IMMORTAL))
   {
     send_to_char("Your vision is too clouded to make out anything.\r\n", ch);
     return eFAILURE;
@@ -4351,7 +4351,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   }
 
   if (!OUTSIDE(victim) ||
-      (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
+      (victim->getLevel() >= IMMORTAL && ch->getLevel() < IMMORTAL))
   {
     send_to_char("Your eagle cannot scan the area.\r\n", ch);
     return eFAILURE;
@@ -4399,7 +4399,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(victim) > MIN(MORTAL, level + 3)) && GET_LEVEL(ch) < IMPLEMENTER)
+  if ((victim->getLevel() > MIN(MORTAL, level + 3)) && ch->getLevel() < IMPLEMENTER)
   {
     send_to_char("You failed.\r\n", ch);
     return eFAILURE;
@@ -4415,7 +4415,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   if (IS_NPC(ch) && IS_NPC(victim))
     return eFAILURE;
 
-  if ((IS_NPC(victim) && GET_LEVEL(ch) < IMPLEMENTER) ||
+  if ((IS_NPC(victim) && ch->getLevel() < IMPLEMENTER) ||
       DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, PRIVATE) ||
       DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_SUMMON))
   {
@@ -4472,7 +4472,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
   do_look(victim, "", 15);
 
-  if (IS_NPC(victim) && GET_LEVEL(victim) >= GET_LEVEL(ch))
+  if (IS_NPC(victim) && victim->getLevel() >= ch->getLevel())
   {
     act("$n growls.", victim, 0, 0, TO_ROOM, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
@@ -4513,7 +4513,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) || level <= GET_LEVEL(victim))
+  if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) || level <= victim->getLevel())
     return eFAILURE;
 
   if (circle_follow(victim, ch))
@@ -4643,7 +4643,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       }
       return eSUCCESS;
     }
-    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
+    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
       return eFAILURE;
@@ -4808,7 +4808,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
               GET_HEIGHT(victim), GET_WEIGHT(victim));
       send_to_char(buf, ch);
 
-      if (GET_LEVEL(victim) > 9)
+      if (victim->getLevel() > 9)
       {
 
         sprintf(buf, "Str%d,  Int %d,  Wis %d,  Dex %d,  Con %d\n\r",
@@ -4861,7 +4861,7 @@ int spell_frost_breath(uint8_t level, Character *ch, Character *victim, class Ob
   /*
   // TODO - make frost breath do something cool *pun!*
 
-     if(number(0,100) < GET_LEVEL(ch))
+     if(number(0,100) < ch->getLevel())
      {
       if(!saves_spell(ch, victim, SAVING_BREATH) )
     {
@@ -4910,7 +4910,7 @@ int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Obj
   /* And now for the damage on equipment */
   /*
   // TODO - make this do something cool
-     if(number(0,100)<GET_LEVEL(ch))
+     if(number(0,100)<ch->getLevel())
      {
       if(!saves_spell(ch, victim, SAVING_BREATH))
     {
@@ -5254,7 +5254,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
   struct affected_type af;
   int number, r_num;
 
-  if (!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
+  if (!IS_EVIL(ch) && ch->getLevel() < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
   {
     send_to_char("You aren't evil enough to cast such a repugnant spell.\r\n",
                  ch);
@@ -5781,9 +5781,9 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     savebonus = 0;
 
   // If victim higher level, they get a save vs magic for no effect
-  //      if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
+  //      if((victim->getLevel() > ch->getLevel()) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
   //          return eFAILURE;
-  if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch) - 1)
+  if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != ch->getLevel() - 1)
   {
     act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -6577,9 +6577,9 @@ void make_portal(Character *ch, Character *vict)
   ch_portal->obj_flags.timer = 2;
   vict_portal->obj_flags.timer = 2;
 
-  chance = ((GET_LEVEL(vict) * 2) - GET_LEVEL(ch));
+  chance = ((vict->getLevel() * 2) - ch->getLevel());
 
-  if (GET_LEVEL(vict) > GET_LEVEL(ch) && chance > number(0, 100))
+  if (vict->getLevel() > ch->getLevel() && chance > number(0, 100))
   {
     while (!good_destination)
     {
@@ -6644,7 +6644,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if ((IS_PC(victim)) && (GET_LEVEL(victim) >= IMMORTAL))
+  if ((IS_PC(victim)) && (victim->getLevel() >= IMMORTAL))
   {
     send_to_char("Just who do you think you are?\n\r", ch);
     return eFAILURE;
@@ -9096,7 +9096,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL)
+    if (IS_EVIL(ch) && ch->getLevel() < ARCHANGEL)
     {
       send_to_char("You are too evil to invoke the protection of your god.\r\n", ch);
       return eFAILURE;
@@ -9185,7 +9185,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (IS_GOOD(ch) && GET_LEVEL(ch) < ARCHANGEL)
+    if (IS_GOOD(ch) && ch->getLevel() < ARCHANGEL)
     {
       send_to_char("Your goodness finds disfavor amongst the forces of darkness.\r\n", ch);
       return eFAILURE;
@@ -11177,7 +11177,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Objec
 {
   int dam;
   int retval;
-  int bees = 1 + (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch) == 60);
+  int bees = 1 + (ch->getLevel() / 15) + (ch->getLevel() == 60);
   affected_type af;
   int i;
   set_cantquit(ch, victim);
@@ -11402,7 +11402,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
 
   if (bingo > 0)
   {
-    if (number(1, 100) <= bingo && GET_LEVEL(victim) < IMMORTAL)
+    if (number(1, 100) <= bingo && victim->getLevel() < IMMORTAL)
     {
       dam = 9999999;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
@@ -12135,9 +12135,13 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
 
   // Set mob level - within 5 levels of the character
   if (dice(1, 2) - 1)
-    GET_LEVEL(mob) -= dice(1, 5);
+  {
+    mob->decrementLevel(dice(1, 5));
+  }
   else
-    GET_LEVEL(mob) += dice(1, 5);
+  {
+    mob->incrementLevel(dice(1, 5));
+  }
 
   // Now set the AFF_CREATOR flag on the character for two hours
   af.type = 0;
@@ -12226,7 +12230,7 @@ int check_components(Character *ch, int destroy, int item_one = 0,
   if (all_ok && item_four)
     all_ok = (int64_t)ptr_four;
 
-  if (GET_LEVEL(ch) > ARCHANGEL && !all_ok && !silent)
+  if (ch->getLevel() > ARCHANGEL && !all_ok && !silent)
   {
     send_to_char("You didn't have the right components, but yer a god:)\r\n", ch);
     return true;
@@ -12345,7 +12349,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
   GET_AC(mob) = GET_AC(victim) - 30;
   mob->mobdata->damnodice = victim->mobdata->damnodice + 5;
   mob->mobdata->damsizedice = victim->mobdata->damsizedice;
-  GET_LEVEL(mob) = 50;
+  mob->setLevel(50);
   GET_HITROLL(mob) = GET_HITROLL(victim) + number<decltype(ch->intel)>(1, GET_INT(ch));
   GET_DAMROLL(mob) = GET_DAMROLL(victim) + number<decltype(ch->wis)>(1, GET_WIS(ch));
   GET_POS(mob) = POSITION_STANDING;
@@ -12397,7 +12401,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
     SETBIT(mob->affected_by, AFF_true_SIGHT);
 
   // lag mage
-  if (number(1, 3) == 3 && GET_LEVEL(ch) < ARCHANGEL)
+  if (number(1, 3) == 3 && ch->getLevel() < ARCHANGEL)
   {
     act("$n falls to the ground, unable to move while $s body recovers from such an incredible and draining magical feat.",
         ch, 0, 0, TO_ROOM, 0);
@@ -12565,7 +12569,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
   class Object *new_obj = nullptr;
   if (IS_NPC(ch))
     return eFAILURE;
-  if (GET_CLASS(ch) != CLASS_ANTI_PAL && GET_LEVEL(ch) < ARCHANGEL)
+  if (GET_CLASS(ch) != CLASS_ANTI_PAL && ch->getLevel() < ARCHANGEL)
   {
     send_to_char("Sorry, but you cannot do that here!\r\n", ch);
     return eFAILURE;
@@ -13572,7 +13576,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Objec
   int dam;
   int count;
   int retval = eSUCCESS;
-  int ch_level = GET_LEVEL(ch);
+  int ch_level = ch->getLevel();
   if (ch_level < 5)
     ch_level = 5;
   set_cantquit(ch, victim);
@@ -14679,19 +14683,19 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
   {
     next_vict = victim->next_in_room;
 
-    if (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL)
+    if (IS_PC(victim) && victim->getLevel() >= IMMORTAL)
       continue;
     if (victim == ch)
       continue; // save for last
 
-    dam = GET_LEVEL(victim) * 10 + skill * 2;
+    dam = victim->getLevel() * 10 + skill * 2;
     sprintf(buf, "$B%d$R", dam_percent(skill, dam));
     send_damage("The holy tempest damages you for | hitpoints!", victim, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
     retval &= damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD, 0);
   }
 
   // damage the caster!!
-  dam = GET_LEVEL(ch) * 10 + skill * 2;
+  dam = ch->getLevel() * 10 + skill * 2;
   sprintf(buf, "$B%d$R", dam_percent(skill, dam));
   send_damage("The holy tempest damages you for | hitpoints!", ch, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
   retval &= damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD, 0);

@@ -63,11 +63,11 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
   int v;
-  for (v = GET_LEVEL(ch); v > 100; v--)
+  for (v = ch->getLevel(); v > 100; v--)
     for (cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++)
     {
       if (cmd_info[cmd].minimum_level == GIFTED_COMMAND &&
-          v == GET_LEVEL(ch))
+          v == ch->getLevel())
       {
         for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
           if (!strcmp(bestowable_god_commands[i].name, cmd_info[cmd].command_name))
@@ -283,7 +283,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   /* a location has been found. */
   if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
-      GET_LEVEL(this) < OVERSEER)
+      level_ < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
     return eFAILURE;
@@ -291,13 +291,13 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   /* Let's keep 104-'s out of clan halls....sigh... */
   if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
-      GET_LEVEL(this) < DEITY)
+      level_ < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return eFAILURE;
   }
 
-  if ((DC::isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
+  if ((DC::isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
   {
 
     for (i = 0, pers = DC::getInstance()->world[location].people; pers;
@@ -315,7 +315,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   if (!IS_MOB(this))
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -337,7 +337,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   if (!IS_MOB(this))
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
 
         ansi_color(RED, tmp_ch);
@@ -362,7 +362,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
     {
       next_dude = k->next;
       if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
-          GET_LEVEL(k->follower) >= IMMORTAL)
+          k->follower->getLevel() >= IMMORTAL)
       {
         csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(this));
         k->follower->do_goto(arguments, CMD_DEFAULT);
@@ -522,7 +522,7 @@ int do_at(Character *ch, char *argument, int cmd)
   }
 
   /* a location has been found. */
-  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     send_to_char("No.\r\n", ch);
     return eFAILURE;
@@ -530,7 +530,7 @@ int do_at(Character *ch, char *argument, int cmd)
 
   /* Let's keep 104-'s out of clan halls....sigh... */
   if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
-      GET_LEVEL(ch) < DEITY)
+      ch->getLevel() < DEITY)
   {
     send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
     return eFAILURE;
@@ -571,7 +571,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(victim) < IMMORTAL)
+  if (victim->getLevel() < IMMORTAL)
   {
     send_to_char("What you wanna give a mortal a high-five for?! *smirk* \n\r", ch);
     return eFAILURE;
@@ -634,7 +634,7 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
   {
     if (ch->player->wizinvis == 0)
     {
-      ch->player->wizinvis = GET_LEVEL(ch);
+      ch->player->wizinvis = ch->getLevel();
     }
     else
     {
@@ -643,8 +643,8 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (arg1 > GET_LEVEL(ch))
-      arg1 = GET_LEVEL(ch);
+    if (arg1 > ch->getLevel())
+      arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
   sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
@@ -743,7 +743,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && IS_PC(i->character))
+      if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && IS_PC(i->character))
       {
         if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
           continue;

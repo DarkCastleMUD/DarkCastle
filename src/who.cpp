@@ -140,7 +140,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
         sprintf(tempbuffer,
                 "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
-                pc_clss_types[(int)GET_CLASS(k)], GET_LEVEL(k));
+                pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
       }
       else
       {
@@ -163,7 +163,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
               sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
-                      pc_clss_types[(int)GET_CLASS(f->follower)], GET_LEVEL(f->follower));
+                      pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
             else
               sprintf(tempbuffer,
                       "   %-18s %-10s Anonymous            \n\r",
@@ -230,7 +230,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
     if (*buf && !foundtarget)
       continue;
 
-    if (GET_LEVEL(i) <= MORTAL)
+    if (i->getLevel() <= MORTAL)
       if (!IS_AFFECTED(i, AFF_GROUP))
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
@@ -238,7 +238,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
                   "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
                   i->name,
                   races[(int)GET_RACE(i)].singular_name,
-                  pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
+                  pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
                   IS_MOB(i) ? 0 : i->player->totalpkills,
                   IS_MOB(i) ? 0 : i->player->pdeathslogin,
                   IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
@@ -399,17 +399,17 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       continue;
     }
     // Level checks.  These happen no matter what
-    if (GET_LEVEL(i) < lowlevel)
+    if (i->getLevel() < lowlevel)
     {
       continue;
     }
 
-    if (GET_LEVEL(i) > highlevel)
+    if (i->getLevel() > highlevel)
     {
       continue;
     }
 
-    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != this->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)
+    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != this->clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
     {
       continue;
     }
@@ -456,7 +456,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     }
 
     addimmbuf = false;
-    if (GET_LEVEL(i) > MORTAL)
+    if (i->getLevel() > MORTAL)
     {
       /* Immortals can't be anonymous */
       if (!str_cmp(GET_NAME(i), "Urizen"))
@@ -481,10 +481,10 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       }
       else
       {
-        infoBuf = immortFields.value(GET_LEVEL(i) - IMMORTAL);
+        infoBuf = immortFields.value(i->getLevel() - IMMORTAL);
       }
 
-      if (GET_LEVEL(this) >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
+      if (level_ >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
       {
         if (!IS_MOB(i) && i->player->incognito == true)
         {
@@ -502,7 +502,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     {
       if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
       {
-        infoBuf = QString(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(GET_LEVEL(i), 2).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QString(" $B$5%1$7-$1%2  $2%3$R$7 ").arg(i->getLevel(), 2).arg(pc_clss_abbrev[(int)GET_CLASS(i)]).arg(race_abbrev[(int)GET_RACE(i)]);
       }
       else
       {
@@ -533,7 +533,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     }
 
     auto clanPtr = get_clan(i);
-    if (i->clan && clanPtr && GET_LEVEL(i) < OVERSEER)
+    if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
       buf = QString("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
@@ -580,7 +580,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
 
   send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
 
-  if (GET_LEVEL(ch) <= MORTAL)
+  if (ch->getLevel() <= MORTAL)
   {
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &tmp : character_list)
@@ -589,7 +589,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
       {
         if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA) && !DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
-          if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
+          if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->getLevel() < IMMORTAL)
             csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
           else
             csendf(ch, "%-20s\n\r", GET_NAME(tmp));
@@ -612,14 +612,14 @@ int do_whoarena(Character *ch, char *argument, int cmd)
     {
       if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
       {
-        if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
+        if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->getLevel() < IMMORTAL)
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
                  GET_NAME(tmp),
-                 GET_LEVEL(tmp), tmp->getHP(), tmp->in_room, clan->name);
+                 tmp->getLevel(), tmp->getHP(), tmp->in_room, clan->name);
         else
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
                  GET_NAME(tmp),
-                 GET_LEVEL(tmp), tmp->getHP(), tmp->in_room);
+                 tmp->getLevel(), tmp->getHP(), tmp->in_room);
         count++;
       }
     }
@@ -638,7 +638,7 @@ int do_where(Character *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
 
-  if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all"))
+  if (ch->getLevel() >= IMMORTAL && *buf && !strcmp(buf, "all"))
   { //  immortal noly, shows all
     send_to_char("All Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
@@ -658,7 +658,7 @@ int do_where(Character *ch, char *argument, int cmd)
       }
     } // for
   }
-  else if (GET_LEVEL(ch) >= IMMORTAL && *buf)
+  else if (ch->getLevel() >= IMMORTAL && *buf)
   { // immortal only, shows ONE person
     send_to_char("Search of Players:\n\r--------\n\r", ch);
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)

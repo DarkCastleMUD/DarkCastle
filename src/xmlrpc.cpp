@@ -25,7 +25,7 @@ protected:
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
     Character * ch = get_all_pc(buffer);
 
-    if (ch && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->player->pwd &&
+    if (ch && IS_PC(ch) && ch->getLevel() >= IMMORTAL && ch->player->pwd &&
 	!strncmp(crypt(password.c_str(), ch->player->pwd),
 		 ch->player->pwd, (PASSWORD_LEN))) {
       return 1;
@@ -85,7 +85,7 @@ public:
 	contents.erase(index, 1);
     }
 
-    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew) {
+    if (IS_PC(ch) && ch->getLevel() >= IMMORTAL && ch->desc->strnew) {
       switch(ch->desc->web_connected) {
       case Connection::states::EDIT_MPROG:
 	if (!contents.empty()) {
@@ -154,7 +154,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) {
+    if (IS_PC(ch) && ch->getLevel() >= IMMORTAL) {
       switch(ch->desc->web_connected) {
       case Connection::states::EDIT_MPROG:
 	result = "Obj or Mob program";

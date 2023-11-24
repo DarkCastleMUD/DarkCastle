@@ -171,7 +171,7 @@ string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Charac
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";
-  if ((GET_LEVEL(send_to) < MIN_GOD) && (flags & GODS))
+  if ((send_to->getLevel() < MIN_GOD) && (flags & GODS))
     return "";
   if ((GET_POS(send_to) <= POSITION_SLEEPING) && !(flags & ASLEEP))
     return "";

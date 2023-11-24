@@ -92,7 +92,7 @@ int do_spec(Character *ch, char *argument, int cmd)
           skills_to_delete.push(curr.first);
         }
       }
-      while(skills_to_delete.empty() == false)
+      while (skills_to_delete.empty() == false)
       {
         ch->skills.erase(skills_to_delete.front());
         skills_to_delete.pop();
@@ -100,31 +100,31 @@ int do_spec(Character *ch, char *argument, int cmd)
     }
     ch->spec = 0;
     GET_PLATINUM(ch) -= 10000;
-    ch->saves[SAVE_TYPE_FIRE] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                        : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                        : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_FIRE] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                        : 0 + ch->getLevel() > 53   ? 1
+                                                        : 0 + ch->getLevel() > 50   ? 1
                                                                                    : 0);
-    ch->saves[SAVE_TYPE_COLD] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                        : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                        : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_COLD] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                        : 0 + ch->getLevel() > 53   ? 1
+                                                        : 0 + ch->getLevel() > 50   ? 1
                                                                                    : 0);
-    ch->saves[SAVE_TYPE_ENERGY] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                          : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                          : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_ENERGY] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                          : 0 + ch->getLevel() > 53   ? 1
+                                                          : 0 + ch->getLevel() > 50   ? 1
                                                                                      : 0);
-    ch->saves[SAVE_TYPE_ACID] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                        : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                        : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_ACID] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                        : 0 + ch->getLevel() > 53   ? 1
+                                                        : 0 + ch->getLevel() > 50   ? 1
                                                                                    : 0);
-    ch->saves[SAVE_TYPE_MAGIC] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                         : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                         : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_MAGIC] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                         : 0 + ch->getLevel() > 53   ? 1
+                                                         : 0 + ch->getLevel() > 50   ? 1
                                                                                     : 0);
-    ch->saves[SAVE_TYPE_POISON] -= (GET_LEVEL(ch) == 60 ? 1 : 0 + GET_LEVEL(ch) > 56 ? 1
-                                                          : 0 + GET_LEVEL(ch) > 53   ? 1
-                                                          : 0 + GET_LEVEL(ch) > 50   ? 1
+    ch->saves[SAVE_TYPE_POISON] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                          : 0 + ch->getLevel() > 53   ? 1
+                                                          : 0 + ch->getLevel() > 50   ? 1
                                                                                      : 0);
-    GET_LEVEL(ch) = 51;
+    ch->setLevel(51);
 
     // messagemoose
     send_to_char("You forget your specilization.\r\n", ch);

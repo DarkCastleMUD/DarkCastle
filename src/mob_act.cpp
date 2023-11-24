@@ -563,7 +563,7 @@ void mobile_activity(void)
               // if mob isn't wimpy, always attack
               // if mob is wimpy, but is equal or greater, attack
               // if mob is wimpy, and lower level.. flee
-              if (!wimpy || (wimpy && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch)))
+              if (!wimpy || (wimpy && ch->getLevel() >= tmp_ch->getLevel()))
               {
                 sprintf(buf, "$n screams 'Oooo, I HATE %s!'", races[tmp_race].plural_name);
                 act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -630,34 +630,34 @@ bool is_protected(Character *vict, Character *ch)
 {
   struct affected_type *aff = affected_by_spell(vict, SPELL_PROTECT_FROM_EVIL);
   int level_protected = aff ? aff->modifier : 0;
-  if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && GET_LEVEL(vict) > level_protected)
-    level_protected = GET_LEVEL(vict);
+  if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
+    level_protected = vict->getLevel();
 
-  if (IS_EVIL(ch) && GET_LEVEL(ch) < level_protected)
+  if (IS_EVIL(ch) && ch->getLevel() < level_protected)
     return (true);
 
-  if (IS_EVIL(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_EVIL))
+  if (IS_EVIL(ch) && ch->getLevel() <= vict->getLevel() && IS_AFFECTED(vict, AFF_PROTECT_EVIL))
     return true;
 
   aff = affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD);
   level_protected = aff ? aff->modifier : 0;
-  if (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict) && GET_LEVEL(vict) > level_protected)
-    level_protected = GET_LEVEL(vict);
+  if (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict) && vict->getLevel() > level_protected)
+    level_protected = vict->getLevel();
 
-  if (IS_GOOD(ch) && GET_LEVEL(ch) < level_protected)
+  if (IS_GOOD(ch) && ch->getLevel() < level_protected)
     return (true);
 
-  if (IS_GOOD(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_GOOD))
+  if (IS_GOOD(ch) && ch->getLevel() <= vict->getLevel() && IS_AFFECTED(vict, AFF_PROTECT_GOOD))
     return true;
 
   /* old version
-     if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
+     if(IS_EVIL(ch) && ch->getLevel() <= (vict->getLevel())) {
         if((IS_AFFECTED(vict, AFF_PROTECT_EVIL)) ||
           (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict)))
              return(true);
      }
 
-     if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
+     if(IS_GOOD(ch) && ch->getLevel() <= (vict->getLevel())) {
         if((affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD)) ||
           (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict)))
              return(true);

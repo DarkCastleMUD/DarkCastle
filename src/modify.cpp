@@ -202,7 +202,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			return 1;
 		}
 
-		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && IS_PC(mob))
+		if ((mob->getLevel() > ch->getLevel()) && IS_PC(mob))
 		{
 			sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
 			send_to_char(message, ch);
@@ -212,7 +212,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		switch (field)
 		{
 		case 1:
-			if (IS_PC(mob) && GET_LEVEL(ch) < IMPLEMENTER)
+			if (IS_PC(mob) && ch->getLevel() < IMPLEMENTER)
 			{
 				send_to_char("You can't change that field for players.", ch);
 				return 1;
@@ -225,7 +225,7 @@ int do_string(Character *ch, char *arg, int cmd)
 				send_to_char("WARNING: You have changed the name of a player.\r\n", ch);
 			break;
 		case 2:
-			if (GET_LEVEL(ch) < POWER)
+			if (ch->getLevel() < POWER)
 			{
 				send_to_char("You must be a God to do that.\r\n", ch);
 				return 1;
@@ -277,7 +277,7 @@ int do_string(Character *ch, char *arg, int cmd)
 
 		if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
 		{
-			if (GET_LEVEL(ch) < IMPLEMENTER)
+			if (ch->getLevel() < IMPLEMENTER)
 			{
 				send_to_char("That item is not restringable.\r\n", ch);
 				return 1;
@@ -289,7 +289,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		switch (field)
 		{
 		case 1:
-			if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110)
+			if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < 110)
 			{
 				send_to_char("The moose will get you if you do that.\r\n", ch);
 				return 1;

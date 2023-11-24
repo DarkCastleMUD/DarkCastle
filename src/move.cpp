@@ -145,7 +145,7 @@ void record_track_data(Character *ch, int cmd)
 //{
 //   short chance = number(0,30);
 //
-//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || GET_LEVEL(ch) >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || ch->getLevel() >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
 //     ; //poop on a stick!
 //   } else if(GET_DEX(ch) > chance) {
 //      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
@@ -167,7 +167,7 @@ int do_unstable(Character *ch)
 	short chance = number(0, 30);
 
 	if (IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) ||
-		GET_LEVEL(ch) >= IMMORTAL)
+		ch->getLevel() >= IMMORTAL)
 		return eFAILURE;
 
 	if (GET_DEX(ch) > chance)
@@ -200,7 +200,7 @@ int do_fall(Character *ch, short dir)
 	if (IS_AFFECTED(ch, AFF_FLYING))
 		return eFAILURE;
 
-	if (GET_LEVEL(ch) == 50)
+	if (ch->getLevel() == 50)
 		dam = number(100, 200);
 
 	if (GET_MAX_HIT(ch) > 2000)
@@ -208,7 +208,7 @@ int do_fall(Character *ch, short dir)
 	else if (GET_MAX_HIT(ch) > 1000)
 		dam = number(200, 400);
 
-	if (GET_LEVEL(ch) >= IMMORTAL)
+	if (ch->getLevel() >= IMMORTAL)
 	{
 		return eFAILURE;
 	}
@@ -231,7 +231,7 @@ int do_fall(Character *ch, short dir)
 
 	target = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 		return eFAILURE;
 
 	if (DC::isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
@@ -516,7 +516,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 					if (ch->equipment[x])
 						if (ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
 							has_boat = true;
-			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && GET_LEVEL(ch) < IMMORTAL &&
+			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && ch->getLevel() < IMMORTAL &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
 				send_to_char("You need a boat to go there.\r\n", ch);
@@ -537,7 +537,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	} // else if !FLYING
 
 	if (DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].room_flags, IMP_ONLY) &&
-		GET_LEVEL(ch) < IMPLEMENTER)
+		ch->getLevel() < IMPLEMENTER)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;
@@ -545,7 +545,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	Room *rm = &(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room]);
 
-	if (rm->sector_type != DC::getInstance()->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->level <= DC::MAX_MORTAL_LEVEL)
+	if (rm->sector_type != DC::getInstance()->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL)
 	{
 		int s2 = rm->sector_type, s1 = DC::getInstance()->world[ch->in_room].sector_type;
 		if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) || (s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) || (s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) || (s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) || (s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) || (s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) || (s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) || (s1 == SECT_BEACH && (s2 != SECT_DESERT)) || (s1 == SECT_DESERT && (s2 != SECT_BEACH)) || (s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) || (s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) || (s1 == SECT_AIR) || (s1 == SECT_SWAMP))
@@ -571,7 +571,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (GET_LEVEL(ch) < IMMORTAL)
+	if (ch->getLevel() < IMMORTAL)
 	{
 		bool classRestrictions = false;
 		// Determine if any class restrictions are in place
@@ -646,7 +646,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (GET_LEVEL(ch) < IMMORTAL && IS_PC(ch))
+	if (ch->getLevel() < IMMORTAL && IS_PC(ch))
 		GET_MOVE(ch) -= need_movement;
 
 	// Everyone
@@ -730,8 +730,8 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 		if (IS_NPC(chaser) && chaser->hunting == 0)
 		{
-			level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(chaser) / 2;
-			if (level_difference >= 0 || GET_LEVEL(ch) >= 50)
+			level_diff_t level_difference = ch->getLevel() - chaser->getLevel() / 2;
+			if (level_difference >= 0 || ch->getLevel() >= 50)
 			{
 				add_memory(chaser, GET_NAME(ch), 't');
 				struct timer_data *timer;
@@ -745,7 +745,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				timer->function = clear_hunt;
 				timer->next = timer_list;
 				timer_list = timer;
-				timer->timeleft = (ch->level / 4) * 60;
+				timer->timeleft = (ch->getLevel() / 4) * 60;
 			}
 		}
 		if (chaser->fighting == ch)
@@ -841,7 +841,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				act("$N looks at you expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_CHAR, 0);
 				act("$N looks at $n expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
 			}
-			else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch) && CAN_SEE(tmp_ch, ch))
+			else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && ch->getLevel() >= tmp_ch->getLevel() && CAN_SEE(tmp_ch, ch))
 			{
 				act("$N moves submissively out of your way.", ch, nullptr, tmp_ch, TO_CHAR, 0);
 				act("$N moves submissively out of $n's way.", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
@@ -1115,7 +1115,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eSUCCESS;
 	}
 
-	if (GET_LEVEL(ch) > IMMORTAL && GET_LEVEL(ch) < DEITY && DC::isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
+	if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && DC::isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
 	{
 		send_to_char("You may not enter a clanhall at your level.\r\n", ch);
 		return eFAILURE;
@@ -1355,7 +1355,7 @@ int ambush(Character *ch)
 				//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
 				//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
 				//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-				retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0);
+				retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH, 0);
 				if (DC::isSet(retval, eVICT_DIED))
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
 				if (DC::isSet(retval, eCH_DIED))

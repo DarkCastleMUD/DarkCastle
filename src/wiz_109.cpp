@@ -70,13 +70,13 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
   if (!GET_TITLE(new_new))
     GET_TITLE(new_new) = str_dup("is a virgin");
   if (GET_CLASS(new_new) == CLASS_MONK)
-    GET_AC(new_new) -= GET_LEVEL(new_new) * 3;
+    GET_AC(new_new) -= new_new->getLevel() * 3;
   isr_set(new_new);
 
   char_to_room(new_new, in_room);
   act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
   act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
-  logf(GET_LEVEL(this), LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
+  logf(level_, LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
   return eSUCCESS;
 }
 
@@ -203,14 +203,14 @@ int do_advance(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < OVERSEER && new_newlevel >= IMMORTAL)
+  if (ch->getLevel() < OVERSEER && new_newlevel >= IMMORTAL)
   {
     send_to_char("Limited to levels lower than Titan.\r\n", ch);
     return eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
-  if (new_newlevel > GET_LEVEL(ch))
+  if (new_newlevel > ch->getLevel())
   {
     send_to_char("Yeah right.\r\n", ch);
     return eFAILURE;
@@ -222,11 +222,11 @@ int do_advance(Character *ch, char *argument, int cmd)
      a higher level.  Note, currently, an implementor can lower another imp.
      -- Swifttest */
 
-  if (new_newlevel <= GET_LEVEL(victim))
+  if (new_newlevel <= victim->getLevel())
   {
     send_to_char("Warning:  Lowering a player's level!\n\r", ch);
 
-    GET_LEVEL(victim) = 1;
+    victim->setLevel(1);
     GET_EXP(victim) = 1;
 
     victim->max_hit = 5; /* These are BASE numbers  */
@@ -252,15 +252,15 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
           GET_NAME(victim), new_newlevel);
-  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
-  if (GET_LEVEL(victim) == 0)
+  if (victim->getLevel() == 0)
     do_start(victim);
   else
-    while (GET_LEVEL(victim) < new_newlevel)
+    while (victim->getLevel() < new_newlevel)
     {
       send_to_char("You raise a level!!  ", victim);
-      GET_LEVEL(victim) += 1;
+      victim->incrementLevel();
       advance_level(victim, 0);
     }
   update_wizlist(victim);
@@ -289,7 +289,7 @@ int do_zap(Character *ch, char *argument, int cmd)
 
   if (victim)
   {
-    if (IS_PC(victim) && (GET_LEVEL(ch) < GET_LEVEL(victim)))
+    if (IS_PC(victim) && (ch->getLevel() < victim->getLevel()))
     {
       act("$n casts a massive lightning bolt at you.", ch, 0, victim,
           TO_VICT, 0);
@@ -298,7 +298,7 @@ int do_zap(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_LEVEL(victim) == IMPLEMENTER)
+    if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
       send_to_char("Get stuffed.\r\n", ch);
       return eFAILURE;
@@ -325,7 +325,7 @@ int do_zap(Character *ch, char *argument, int cmd)
     if (cmd == CMD_DEFAULT) // cmd9 = someone typed it. 10 = rename.
       remove_vault(victim->name, ZAPPED);
 
-    GET_LEVEL(victim) = 1;
+    victim->setLevel(1);
     update_wizlist(victim);
 
     if (ch->clan)

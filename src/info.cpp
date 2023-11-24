@@ -528,7 +528,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
                buffer.append("$B$7(Guide)$B$3 ");
 
             buffer.append(GET_SHORT(i));
-            if ((GET_LEVEL(i) < OVERSEER) && i->clan && (clan = get_clan(i)))
+            if ((i->getLevel() < OVERSEER) && i->clan && (clan = get_clan(i)))
             {
                if (IS_PC(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
@@ -617,7 +617,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
          if (IS_AFFECTED(i, AFF_INVISIBLE))
             buffer.append(" $1(invisible) ");
-         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80) || GET_LEVEL(ch) > IMMORTAL || ARE_GROUPED(i, ch)))
+         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80) || ch->getLevel() > IMMORTAL || ARE_GROUPED(i, ch)))
             buffer.append(" $4(hidden) ");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
             buffer.append(" $B$4(red halo) ");
@@ -748,7 +748,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          }
       }
 
-      if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || GET_LEVEL(ch) > IMMORTAL)
+      if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || ch->getLevel() > IMMORTAL)
       {
          found = false;
          send_to_char("\n\rYou attempt to peek at the inventory:\n\r", ch);
@@ -756,9 +756,9 @@ void show_char_to_char(Character *i, Character *ch, int mode)
               tmp_obj = tmp_obj->next_content)
          {
             if ((DC::isSet(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
-                 GET_LEVEL(ch) > IMMORTAL) &&
+                 ch->getLevel() > IMMORTAL) &&
                 CAN_SEE_OBJ(ch, tmp_obj) &&
-                number(0, MORTAL) < GET_LEVEL(ch))
+                number(0, MORTAL) < ch->getLevel())
             {
                show_obj_to_char(tmp_obj, ch, 1);
                found = true;
@@ -816,7 +816,7 @@ int do_botcheck(Character *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (GET_LEVEL(victim) > GET_LEVEL(ch))
+   if (victim->getLevel() > ch->getLevel())
    {
       send_to_char("Unable to show information.\r\n", ch);
       csendf(ch, "%s is a higher level than you.\r\n", GET_NAME(victim));
@@ -881,7 +881,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
    {
       if (ch == i)
          continue;
-      if (!IS_MOB(i) && (i->player->wizinvis > GET_LEVEL(ch)))
+      if (!IS_MOB(i) && (i->player->wizinvis > ch->getLevel()))
          if (!i->player->incognito || !(ch->in_room == i->in_room))
             continue;
       if (IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
@@ -920,14 +920,14 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    class Object *cont = nullptr;
    int found = false;
 
-   if (GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) < DEITY)
+   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() < DEITY)
    {
       send_to_char("They might object to you trying to look in their pockets...", ch);
       return;
    }
 
    if (!(cont = get_obj_in_list_vis(ch, container, vict->carrying)) ||
-       number(0, MORTAL + 30) > GET_LEVEL(ch))
+       number(0, MORTAL + 30) > ch->getLevel())
    {
       send_to_char("You cannot see a container named that to peek into.\r\n", ch);
       return;
@@ -950,7 +950,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    }
 
    for (obj = cont->contains; obj; obj = obj->next_content)
-      if (CAN_SEE_OBJ(ch, obj) && number(0, MORTAL + 30) < GET_LEVEL(ch))
+      if (CAN_SEE_OBJ(ch, obj) && number(0, MORTAL + 30) < ch->getLevel())
       {
          show_obj_to_char(obj, ch, 1);
          found = true;
@@ -1026,7 +1026,7 @@ bool identify(Character *ch, Object *obj)
    int i = 0, value = 0, bits = 0;
    bool found = false;
 
-   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < IMMORTAL)
+   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < IMMORTAL)
    {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
       return false;
@@ -1551,7 +1551,7 @@ int do_look(Character *ch, char *argument, int cmd)
                   show_char_to_char(tmp_char, ch, 1);
                if (ch != tmp_char)
                {
-                  if (!IS_MOB(ch) && (GET_LEVEL(tmp_char) < ch->player->wizinvis))
+                  if (!IS_MOB(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
                   {
                      return eSUCCESS;
                   }
@@ -1954,7 +1954,7 @@ int do_score(Character *ch, char *argument, int cmd)
    // int i;
 
    sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
-   exp_needed = (exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
+   exp_needed = (exp_table[(int)ch->getLevel() + 1] - GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);
@@ -1979,7 +1979,7 @@ int do_score(Character *ch, char *argument, int cmd)
            "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
            GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
            GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
-           GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
+           GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
            GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
            GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), hit_gain(ch, 777),
            mana_gain(ch), move_gain(ch, 777), ki_gain(ch), GET_AGE(ch),
@@ -2268,7 +2268,7 @@ int do_score(Character *ch, char *argument, int cmd)
 
    if (IS_PC(ch)) // mob can't view this part
    {
-      if (GET_LEVEL(ch) > IMMORTAL && ch->player->buildLowVnum && ch->player->buildHighVnum)
+      if (ch->getLevel() > IMMORTAL && ch->player->buildLowVnum && ch->player->buildHighVnum)
       {
          if (ch->player->buildLowVnum == ch->player->buildOLowVnum &&
              ch->player->buildLowVnum == ch->player->buildMLowVnum)
@@ -2343,7 +2343,7 @@ int do_time(Character *ch, char *argument, int cmd)
    // Changed to the below code without seconds in an attempt to stop
    // the timing of bingos... - pir 2/7/1999
    timep = time(0);
-   if (GET_LEVEL(ch) > IMMORTAL)
+   if (ch->getLevel() > IMMORTAL)
    {
       sprintf(buf, "The system time is %ld.\r\n", timep);
 
@@ -2404,7 +2404,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    else
       send_to_char("You have no feeling about the weather at all.\r\n", ch);
 
-   if (GET_LEVEL(ch) >= IMMORTAL)
+   if (ch->getLevel() >= IMMORTAL)
    {
       csendf(ch, "Pressure: %4d  Change: %d (- = worse)\r\n",
              weather_info.pressure, weather_info.change);
@@ -2495,7 +2495,7 @@ int do_count(Character *ch, char *arg, int cmd)
          i = d->character;
       if (!CAN_SEE(ch, i))
          continue;
-      if (GET_LEVEL(i) > MORTAL)
+      if (i->getLevel() > MORTAL)
       {
          immortal++;
          total++;
@@ -2921,7 +2921,7 @@ int do_consider(Character *ch, char *argument, int cmd)
    if (Learned > 40)
    {
 
-      if (IS_PC(victim) && GET_LEVEL(victim) > IMMORTAL)
+      if (IS_PC(victim) && victim->getLevel() > IMMORTAL)
       {
          csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\r\n",
                 GET_SHORT(victim));
@@ -2929,7 +2929,7 @@ int do_consider(Character *ch, char *argument, int cmd)
       else
       {
 
-         if (ch->getHP() >= victim->getHP() || GET_LEVEL(ch) > MORTAL)
+         if (ch->getHP() >= victim->getHP() || ch->getLevel() > MORTAL)
          {
             x = victim->getHP() / ch->getHP() * 100;
             x /= 10;
@@ -3058,13 +3058,13 @@ int do_consider(Character *ch, char *argument, int cmd)
    if (Learned > 80)
    {
       /* CHANCES TO STEAL */
-      if ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) > IMMORTAL))
+      if ((GET_CLASS(ch) == CLASS_THIEF) || (ch->getLevel() > IMMORTAL))
       {
 
          percent = Learned;
 
          mod += AWAKE(victim) ? 10 : -50;
-         level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
+         level_diff_t level_difference = victim->getLevel() - ch->getLevel();
 
          mod += level_difference / 2;
          mod += 5; /* average item is 5 lbs, steal takes ths into acct */
@@ -3077,7 +3077,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
          if (GET_POS(victim) <= POSITION_SLEEPING)
             percent = 100;
-         if (GET_LEVEL(victim) > IMMORTAL)
+         if (victim->getLevel() > IMMORTAL)
             percent = 0;
          if (percent < 0)
             percent = 0;
@@ -3107,7 +3107,7 @@ int do_consider(Character *ch, char *argument, int cmd)
       }
    }
    /* Level Comparison */
-   level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
+   level_diff_t level_difference = victim->getLevel() - ch->getLevel();
    if (level_difference <= -15)
       y = 0;
    else if (level_difference <= -10)
@@ -3343,13 +3343,13 @@ int do_tick(Character *ch, char *argument, int cmd)
 
 command_return_t Character::do_experience(QStringList arguments, int cmd)
 {
-   if (level >= IMMORTAL)
+   if (level_ >= IMMORTAL)
    {
       send("Immortals cannot gain levels by gaining experience.\r\n");
       return eSUCCESS;
    }
 
-   quint64 next_level = level;
+   level_t next_level = level_;
    qint64 experience_remaining = 0;
    QLocale::setDefault(QLocale::English);
 

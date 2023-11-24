@@ -213,9 +213,9 @@ bool IS_DARK(int room);
 #define IS_OBJ(ch) (DC::isSet((ch)->misc, MISC_IS_OBJ))
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
-#define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
-#define IS_MAXLEVEL_PC(ch, level) (GET_LEVEL(ch) <= level && IS_PC(ch))
-#define IS_MINLEVEL_NPC(ch, level) (GET_LEVEL(ch) >= level && IS_NPC(ch))
+#define IS_MINLEVEL_PC(ch, level) (ch->getLevel() >= level && IS_PC(ch))
+#define IS_MAXLEVEL_PC(ch, level) (ch->getLevel() <= level && IS_PC(ch))
+#define IS_MINLEVEL_NPC(ch, level) (ch->getLevel() >= level && IS_NPC(ch))
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
 #define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL - 1))
 
@@ -245,7 +245,6 @@ bool IS_DARK(int room);
 #define GET_SHORT(ch) ((ch)->short_desc ? (ch)->short_desc : (ch)->name)
 #define GET_SHORT_ONLY(ch) ((ch)->short_desc)
 #define GET_TITLE(ch) ((ch)->title)
-#define GET_LEVEL(ch) ((ch)->level)
 
 #define GET_ZONE(ch) (DC::getInstance()->world[(ch)->in_room].zone)
 
@@ -332,14 +331,14 @@ bool IS_DARK(int room);
 
 #define AWAKE(ch) (GET_POS(ch) != POSITION_SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : DC::isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : DC::isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
   if (IS_MOB(ch))
      // this should really never be called on mobs
      return 1;
-  else if (GET_LEVEL(ch) >= 101)
+  else if (ch->getLevel() >= 101)
      return 0;
   else
      return (DC::isSet(ch->player->toggles, Player::PLR_ANONYMOUS) != 0);
@@ -387,7 +386,7 @@ inline const short IS_ANONYMOUS(Character *ch)
 /* char name/short_desc(for mobs) or someone?  */
 
 #define PERS(ch, vict) ( \
-    GET_LEVEL(ch) > MIN_GOD ? (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "an immortal presence") : (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "someone"))
+    ch->getLevel() > MIN_GOD ? (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "an immortal presence") : (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "someone"))
 
 #define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? (obj)->short_description : "something")
 

@@ -1016,7 +1016,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
     {
       vch_next = vch->next_in_room;
 
-      if (GET_LEVEL(vch) < IMMORTAL && CAN_SEE(ch, vch))
+      if (vch->getLevel() < IMMORTAL && CAN_SEE(ch, vch))
       {
         command_interpreter(vch, argument);
       }
@@ -1040,7 +1040,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 
     if (CAN_SEE(ch, victim))
     {
-      if (GET_LEVEL(victim) < IMMORTAL)
+      if (victim->getLevel() < IMMORTAL)
         command_interpreter(victim, argument);
       else
       {
@@ -1183,7 +1183,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
   }
 
   int index = search_skills2(skillnum, skilllist);
-  if (GET_LEVEL(victim) < skilllist[index].levelavailable)
+  if (victim->getLevel() < skilllist[index].levelavailable)
   {
     csendf(victim, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
     return eFAILURE;
@@ -1419,7 +1419,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
-    if (victim && (GET_LEVEL(victim) > MORTAL || IS_MOB(victim))) // don't target immortals
+    if (victim && (victim->getLevel() > MORTAL || IS_MOB(victim))) // don't target immortals
       victim = nullptr;
 
     if (!victim)
@@ -1543,7 +1543,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
     for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
-      if ((IS_PC(victim) && GET_LEVEL(victim) > MORTAL) || victim == ch)
+      if ((IS_PC(victim) && victim->getLevel() > MORTAL) || victim == ch)
       {
         continue;
       }
@@ -1870,7 +1870,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   room_t to_room = 0;
 
-  if (IS_PC(ch) && GET_LEVEL(ch) < 110)
+  if (IS_PC(ch) && ch->getLevel() < 110)
     return eFAILURE;
 
   half_chop(argument, person, type);

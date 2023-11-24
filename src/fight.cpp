@@ -630,14 +630,14 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   }
   else if (GET_CLASS(ch) == CLASS_MONK && wielded == nullptr)
   {
-    if (GET_LEVEL(ch) >= MORTAL)
+    if (ch->getLevel() >= MORTAL)
     {
       result = one_hit(ch, vict, type, FIRST);
       if (SOMEONE_DIED(result))
         return result;
     }
 
-    if (GET_LEVEL(ch) > 47)
+    if (ch->getLevel() > 47)
       if (number(0, 1))
       {
         result = one_hit(ch, vict, type, FIRST);
@@ -645,13 +645,13 @@ int attack(Character *ch, Character *vict, int type, int weapon)
           return result;
       }
 
-    if (GET_LEVEL(ch) > 39)
+    if (ch->getLevel() > 39)
     {
       result = one_hit(ch, vict, type, FIRST);
       if (SOMEONE_DIED(result))
         return result;
     }
-    else if (GET_LEVEL(ch) > 29)
+    else if (ch->getLevel() > 29)
       if (number(0, 1))
       {
         result = one_hit(ch, vict, type, FIRST);
@@ -659,7 +659,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
           return result;
       }
 
-    if (GET_LEVEL(ch) > 19)
+    if (ch->getLevel() > 19)
     {
       result = one_hit(ch, vict, type, FIRST);
       if (SOMEONE_DIED(result))
@@ -684,7 +684,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
 
     // lose an attack if using a shield
-    //    if(GET_LEVEL(ch) > 9 && !ch->equipment[WEAR_SHIELD]) {
+    //    if(ch->getLevel() > 9 && !ch->equipment[WEAR_SHIELD]) {
     //    result = one_hit(ch, vict, type, FIRST);
     //  if(SOMEONE_DIED(result))       return result;
     // }
@@ -955,7 +955,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == POSITION_DEAD)
     return eFAILURE;
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))
     return eFAILURE;
@@ -1070,7 +1070,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == POSITION_DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_FIRESHIELD))
     return eFAILURE;
@@ -1159,7 +1159,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == POSITION_DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_ACID_SHIELD))
     return eFAILURE;
@@ -1244,7 +1244,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == POSITION_DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
     return eFAILURE;
   if (!affected_by_spell(vict, SPELL_BONESHIELD))
     return eFAILURE;
@@ -1405,23 +1405,23 @@ int get_monk_bare_damage(Character *ch)
 {
   int dam = 0;
 
-  if (GET_LEVEL(ch) < 11)
+  if (ch->getLevel() < 11)
     dam = dice(4, 1);
-  else if (GET_LEVEL(ch) < 21)
+  else if (ch->getLevel() < 21)
     dam = dice(4, 2);
-  else if (GET_LEVEL(ch) < 31)
+  else if (ch->getLevel() < 31)
     dam = dice(4, 3);
-  else if (GET_LEVEL(ch) < 41)
+  else if (ch->getLevel() < 41)
     dam = dice(4, 4);
-  else if (GET_LEVEL(ch) < 50)
+  else if (ch->getLevel() < 50)
     dam = dice(4, 5);
-  else if (GET_LEVEL(ch) < 60)
+  else if (ch->getLevel() < 60)
     dam = dice(5, 5);
-  else if (GET_LEVEL(ch) < 61)
+  else if (ch->getLevel() < 61)
     dam = dice(6, 5);
-  else if (GET_LEVEL(ch) < IMMORTAL)
+  else if (ch->getLevel() < IMMORTAL)
     dam = dice(10, 6);
-  else if (GET_LEVEL(ch) < IMPLEMENTER)
+  else if (ch->getLevel() < IMPLEMENTER)
     dam = dice(10, 10);
   else
     dam = dice(50, 5);
@@ -1435,10 +1435,10 @@ int calculate_paladin_damage_bonus(Character *ch, Character *victim)
     return 0;
 
   if (GET_ALIGNMENT(victim) > 350)
-    return (-(GET_LEVEL(ch) / 10));
+    return (-(ch->getLevel() / 10));
 
   if (GET_ALIGNMENT(victim) < -350)
-    return (GET_LEVEL(ch) / 10);
+    return (ch->getLevel() / 10);
 
   return 0;
 }
@@ -1525,7 +1525,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   else if (GET_CLASS(ch) == CLASS_MONK && wielded == nullptr)
     dam = get_monk_bare_damage(ch);
   else
-    dam = number<quint64>(0, GET_LEVEL(ch) / 2);
+    dam = number<quint64>(0, ch->getLevel() / 2);
 
   /* Damage bonuses */
   //  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
@@ -1544,11 +1544,11 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   { // Bingo not affected.
     if (DC::isSet(ch->combat, COMBAT_CIRCLE))
     {
-      if (GET_LEVEL(ch) <= MORTAL)
+      if (ch->getLevel() <= MORTAL)
         if (type == SKILL_CIRCLE)
           dam = dam * 3 / 2; // non stabbing weapons
         else
-          dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
+          dam *= ((backstab_mult[(int)ch->getLevel()]) / 2);
       else
         dam *= 25;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
@@ -1556,9 +1556,9 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     else if ((GET_CLASS(ch) == CLASS_THIEF) ||
              (GET_CLASS(ch) == CLASS_ANTI_PAL) || IS_NPC(ch))
     {
-      if (GET_LEVEL(ch) <= MORTAL)
+      if (ch->getLevel() <= MORTAL)
       {
-        dam *= backstab_mult[(int)GET_LEVEL(ch)];
+        dam *= backstab_mult[(int)ch->getLevel()];
       }
       else
         dam *= 25;
@@ -1699,7 +1699,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (act_poisonous(ch))
   {
-    retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, nullptr, GET_LEVEL(ch));
+    retval = cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, nullptr, ch->getLevel());
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, vict, retval) | eSUCCESS;
   }
@@ -1879,7 +1879,7 @@ void eq_damage(Character *ch, Character *victim,
 void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
 {
   char log_buf[MAX_STRING_LENGTH] = {};
-  if (GET_LEVEL(victim) < 50)
+  if (victim->getLevel() < 50)
     return;
   chance /= 2;
   /* Pir's extra stat loss.  Bwahahah */
@@ -2094,7 +2094,7 @@ int damage(Character *ch, Character *victim,
     if (IS_NPC(ch))
       l = 50;
     if (IS_NPC(ch) && ch->master)
-      l *= (ch->master->level / 50);
+      l *= (ch->master->getLevel() / 50);
     //   if (l || IS_PC(ch))
     if (weapon && attacktype <= MAX_SPL_LIST)
     {
@@ -2121,7 +2121,7 @@ int damage(Character *ch, Character *victim,
   if (DC::isSet(victim->combat, COMBAT_REPELANCE) && !bingo &&
       attacktype <= MAX_SPL_LIST)
   {
-    if (GET_LEVEL(ch) > 70)
+    if (ch->getLevel() > 70)
       send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
     else if (!(number(0, 9)))
       send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
@@ -2314,7 +2314,7 @@ int damage(Character *ch, Character *victim,
   }
 
   // Can't hurt god, but he likes to see the messages.
-  if (GET_LEVEL(victim) >= IMMORTAL && IS_PC(victim))
+  if (victim->getLevel() >= IMMORTAL && IS_PC(victim))
     dam = 0;
 
   if (victim != ch)
@@ -2550,7 +2550,7 @@ int damage(Character *ch, Character *victim,
   int pre_stoneshield_dam = 0;
   stringstream string1;
   struct affected_type *pspell = nullptr;
-  if (GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
+  if (victim->getLevel() < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
        (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))))
   {
@@ -3079,7 +3079,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
       sprintf(dmgmsg, "$B%d$R", dam);
     if (!messages)
       return;
-    if (IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL)
+    if (IS_PC(victim) && victim->getLevel() >= IMMORTAL)
     {
       act(replaceString(messages->god_msg.attacker_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_CHAR, 0);
@@ -3251,12 +3251,12 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (!AWAKE(victim)))
     return eFAILURE; // always hit
 
-  level_diff_t level_difference = GET_LEVEL(ch) - GET_LEVEL(victim);
+  level_diff_t level_difference = ch->getLevel() - victim->getLevel();
   int skill = 0;
 
   // Figure out toHit value.
   int toHit = GET_REAL_HITROLL(ch);
-  //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  //  toHit += speciality_bonus(ch, attacktype, victim->getLevel());
 
   switch (attacktype)
   {
@@ -3306,7 +3306,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     toHit += 5;
 
   // Give a tohit bonus to low level players.
-  level_difference = GET_LEVEL(ch) - (GET_LEVEL(victim) / 2.0);
+  level_difference = ch->getLevel() - (victim->getLevel() / 2.0);
   float lowlvlmod = (50.0 - level_difference) / 10.0;
   if (lowlvlmod > 1.0)
     toHit = (int)((float)toHit * lowlvlmod);
@@ -3319,8 +3319,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
 
   // Determine defensive skills.
-  int parry = IS_NPC(victim) ? ISSET(victim->mobdata->actflags, ACT_PARRY) ? GET_LEVEL(victim) / 2 : 0 : has_skill(victim, SKILL_PARRY);
-  int dodge = IS_NPC(victim) ? ISSET(victim->mobdata->actflags, ACT_DODGE) ? GET_LEVEL(victim) / 2 : 0 : has_skill(victim, SKILL_DODGE);
+  int parry = IS_NPC(victim) ? ISSET(victim->mobdata->actflags, ACT_PARRY) ? victim->getLevel() / 2 : 0 : has_skill(victim, SKILL_PARRY);
+  int dodge = IS_NPC(victim) ? ISSET(victim->mobdata->actflags, ACT_DODGE) ? victim->getLevel() / 2 : 0 : has_skill(victim, SKILL_DODGE);
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
   int tumbling = has_skill(victim, SKILL_TUMBLING);
@@ -3331,7 +3331,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (!victim->equipment[WEAR_SHIELD])
     block = 0;
   else if (IS_NPC(victim))
-    block = GET_LEVEL(victim) / 2;
+    block = victim->getLevel() / 2;
 
   // Modify defense rate accordingly
   int amt = parry + dodge + block + martial + tumbling;
@@ -3570,7 +3570,7 @@ int check_riposte(Character *ch, Character *victim, int attacktype)
     {
       int modifier = 0;
 
-      modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+      modifier += speciality_bonus(ch, attacktype, victim->getLevel());
       modifier -= GET_DEX(ch) / 2;
       modifier -= 10;
 
@@ -3610,7 +3610,7 @@ int check_magic_block(Character *ch, Character *victim, int attacktype)
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
   if (IS_NPC(victim))
-    reduce = GET_LEVEL(victim) / 2; // shrug
+    reduce = victim->getLevel() / 2; // shrug
   if (!(reduce = has_skill(victim, SKILL_SHIELDBLOCK)) && !(GET_CLASS(victim) == CLASS_MONK))
     return 0;
   else if (!((reduce = has_skill(victim, SKILL_DEFENSE)) && GET_CLASS(victim) == CLASS_MONK))
@@ -3657,7 +3657,7 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
   // TODO - remove this when mobs have "skills"
   if (IS_NPC(victim))
   {
-    reduce = GET_LEVEL(victim) / 2;
+    reduce = victim->getLevel() / 2;
     switch (GET_CLASS(victim))
     {
     case CLASS_MONK:
@@ -3680,7 +3680,7 @@ int check_shieldblock(Character *ch, Character *victim, int attacktype)
     return 0;
   else if (GET_CLASS(victim) == CLASS_MONK && !((reduce = has_skill(victim, SKILL_DEFENSE))))
     return 0;
-  modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  modifier += speciality_bonus(ch, attacktype, victim->getLevel());
 
   //  extern int stat_mod[];
   // modifier -= stat_mod[GET_DEX(ch)];
@@ -3778,7 +3778,7 @@ bool check_parry(Character *ch, Character *victim, int attacktype, bool display_
   else if (IS_NPC(victim) && !ISSET(victim->mobdata->actflags, ACT_PARRY))
     return false; // damned mobs
 
-  modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  modifier += speciality_bonus(ch, attacktype, victim->getLevel());
   //  if (IS_NPC(victim)) modifier -= 50;
   //  if (attacktype==TYPE_HIT) modifier += 30; // Harder to parry unarmed attacks
   //  else modifier += 22;
@@ -3830,20 +3830,20 @@ int speciality_bonus(Character *ch, int attacktype, int level)
   default:
     break;
   }
-  level -= GET_LEVEL(ch);
+  level -= ch->getLevel();
   if (!skill)
     return 0;
   else
     return has_skill(ch, skill) / 10;
 
   if (level < -20 && IS_NPC(ch))
-    return 0 - (int)(GET_LEVEL(ch) / 2.4);
+    return 0 - (int)(ch->getLevel() / 2.4);
   else if (level < -10 && IS_NPC(ch))
-    return 0 - (int)(GET_LEVEL(ch) / 2.6);
+    return 0 - (int)(ch->getLevel() / 2.6);
   else if (level < 0 && IS_NPC(ch))
-    return 0 - (int)(GET_LEVEL(ch) / 2.8);
+    return 0 - (int)(ch->getLevel() / 2.8);
   else if (IS_NPC(ch))
-    return 0 - (int)(GET_LEVEL(ch) / 3.5);
+    return 0 - (int)(ch->getLevel() / 3.5);
 
   int l = has_skill(ch, skill) / 2;
   return 0 - l;
@@ -3918,7 +3918,7 @@ bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_
   if (modifier == 0 && IS_NPC(victim))
     return false;
 
-  modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  modifier += speciality_bonus(ch, attacktype, victim->getLevel());
   //  if (IS_NPC(victim)) modifier = 50; // 75 is base, and it's calculated
   // around here
   modifier -= GET_DEX(ch) / 2;
@@ -4086,8 +4086,8 @@ void set_fighting(Character *ch, Character *vict)
   if (IS_PC(ch) && IS_NPC(vict))
     if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
     {
-      level_diff_t level_difference = GET_LEVEL(ch) - (GET_LEVEL(vict) / 2.0);
-      if (level_difference > 0 || GET_LEVEL(ch) == 60)
+      level_diff_t level_difference = ch->getLevel() - (vict->getLevel() / 2.0);
+      if (level_difference > 0 || ch->getLevel() == 60)
       {
         add_memory(vict, GET_NAME(ch), 't');
         struct timer_data *timer;
@@ -4101,13 +4101,13 @@ void set_fighting(Character *ch, Character *vict)
         timer->function = clear_hunt;
         timer->next = timer_list;
         timer_list = timer;
-        timer->timeleft = (ch->level / 4) * 60;
+        timer->timeleft = (ch->getLevel() / 4) * 60;
       }
       if (IS_PC(vict) && IS_NPC(ch))
         if (!ISSET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
         {
-          level_diff_t level_difference = GET_LEVEL(vict) - (GET_LEVEL(ch) / 2);
-          if (level_difference > 0 || GET_LEVEL(vict) == 60)
+          level_diff_t level_difference = vict->getLevel() - (ch->getLevel() / 2);
+          if (level_difference > 0 || vict->getLevel() == 60)
           {
             add_memory(ch, GET_NAME(vict), 't');
             struct timer_data *timer;
@@ -4123,7 +4123,7 @@ void set_fighting(Character *ch, Character *vict)
             timer->function = clear_hunt;
             timer->next = timer_list;
             timer_list = timer;
-            timer->timeleft = (vict->level / 4) * 60;
+            timer->timeleft = (vict->getLevel() / 4) * 60;
           }
         }
     }
@@ -4384,7 +4384,7 @@ void make_corpse(Character *ch)
   {
     corpse->obj_flags.wear_flags = ITEM_TAKE;
 
-    if (GET_LEVEL(ch) >= 50)
+    if (ch->getLevel() >= 50)
       sprintf(buf, "corpse %s pc lootable", GET_NAME(ch));
     else
       sprintf(buf, "corpse %s pc", GET_NAME(ch));
@@ -4473,7 +4473,7 @@ void make_corpse(Character *ch)
   }
 
   // level 1-19 PC's can keep their eq
-  if (IS_MOB(ch) || GET_LEVEL(ch) > 19)
+  if (IS_MOB(ch) || ch->getLevel() > 19)
   {
     for (i = 0; i < MAX_WEAR; i++)
       if (ch->equipment[i])
@@ -4486,7 +4486,7 @@ void make_corpse(Character *ch)
       obj_to_obj(money, corpse);
     }
 
-    if (IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) > 90) // 10%
+    if (IS_MOB(ch) && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
       class Object *recipeitem = nullptr;
       int rarity = number(1, 100);
@@ -5035,9 +5035,9 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
 {
   int damadd = 0;
 
-  if ((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)
+  if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return 0;
-  if (IS_PC(vict) && GET_LEVEL(vict) >= IMMORTAL)
+  if (IS_PC(vict) && vict->getLevel() >= IMMORTAL)
     return 0;
   if (!ch->equipment[weapon])
     return 0;
@@ -5245,9 +5245,9 @@ int do_execute_skill(Character *ch, Character *vict, int w_type)
 
 void do_combatmastery(Character *ch, Character *vict, int weapon)
 {
-  if ((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)
+  if ((GET_CLASS(ch) != CLASS_WARRIOR) && ch->getLevel() < ARCHANGEL)
     return;
-  if (IS_PC(vict) && GET_LEVEL(vict) >= IMMORTAL)
+  if (IS_PC(vict) && vict->getLevel() >= IMMORTAL)
     return;
   if (!ch->equipment[weapon])
     return;
@@ -5289,21 +5289,21 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   }
   if (type == TYPE_BLUDGEON || type == TYPE_CRUSH)
   {
-    if (GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
+    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
     {
       act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
+    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
     {
       act("$N swarms around your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N swarms around $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You swarm around $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
+    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
     {
       act("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -5366,7 +5366,7 @@ void raw_kill(Character *ch, Character *victim)
     REMBIT(victim->affected_by, AFF_CHAMPION);
     do_champ_flag_death(victim);
   }
-  if (ch && IS_NPC(victim) && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+  if (ch && IS_NPC(victim) && IS_PC(ch) && ch->getLevel() >= IMMORTAL)
   {
     sprintf(buf, "%s killed %s.", GET_NAME(ch), GET_NAME(victim));
     special_log(buf);
@@ -5398,7 +5398,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (IS_PC(victim))
       {
-        master->player->grpplvl += GET_LEVEL(victim);
+        master->player->grpplvl += victim->getLevel();
         master->player->group_pkills += 1;
       }
       master->player->group_kills += 1;
@@ -5434,7 +5434,7 @@ void raw_kill(Character *ch, Character *victim)
     void release_message(Character * ch);
     void shatter_message(Character * ch);
 
-    if (number(0, 99) < (GET_LEVEL(victim) / 10 + victim->player->golem->level / 5))
+    if (number(0, 99) < (victim->getLevel() / 10 + victim->player->golem->getLevel() / 5))
     { /* rk */
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
@@ -5480,7 +5480,7 @@ void raw_kill(Character *ch, Character *victim)
     GET_MANA(victim) = 1;
   add_totem_stats(victim);
   if (GET_CLASS(victim) == CLASS_MONK)
-    GET_AC(victim) -= (GET_LEVEL(victim) * 2);
+    GET_AC(victim) -= (victim->getLevel() * 2);
   GET_AC(victim) -= has_skill(victim, SKILL_COMBAT_MASTERY) / 2;
   GET_COND(victim, FULL) = 0;
   GET_COND(victim, THIRST) = 0;
@@ -5536,7 +5536,7 @@ void raw_kill(Character *ch, Character *victim)
     GET_RDEATHS(victim) += 1;
 
     /* gods don't suffer from stat loss */
-    if (GET_LEVEL(victim) < IMMORTAL && GET_LEVEL(victim) > 19)
+    if (victim->getLevel() < IMMORTAL && victim->getLevel() > 19)
     {
       /* New death system... dying is a BITCH!  */
       // thief + mob kill = stat loss
@@ -5544,15 +5544,15 @@ void raw_kill(Character *ch, Character *victim)
 
       if (is_thief)
         pir_stat_loss(victim, 100, true, is_thief);
-      else if (GET_LEVEL(victim) > 20)
+      else if (victim->getLevel() > 20)
       {
-        int chance = ch ? GET_LEVEL(ch) / 10 : 50 / 10;
-        chance += GET_LEVEL(victim) / 2;
-        if (GET_LEVEL(victim) >= 50)
+        int chance = ch ? ch->getLevel() / 10 : 50 / 10;
+        chance += victim->getLevel() / 2;
+        if (victim->getLevel() >= 50)
         {
-          chance += (int)(25.0 * (float)((float)(ch ? GET_LEVEL(ch) : 50) / 100.0) * (float)((float)(ch ? GET_LEVEL(ch) : 50) / 100.0));
+          chance += (int)(25.0 * (float)((float)(ch ? ch->getLevel() : 50) / 100.0) * (float)((float)(ch ? ch->getLevel() : 50) / 100.0));
           // An extra 1% for each level over 50.
-          chance += GET_LEVEL(victim) - 50;
+          chance += victim->getLevel() - 50;
         }
 
         if (number(0, 99) < chance)
@@ -5771,7 +5771,7 @@ void raw_kill(Character *ch, Character *victim)
 
     float penalty = 1;
     if (ch)
-      penalty += GET_LEVEL(ch) * .05;
+      penalty += ch->getLevel() * .05;
     penalty = MIN(penalty, 2);
     GET_EXP(victim) = (int64_t)(GET_EXP(victim) / penalty);
   } // IS_PC
@@ -5805,7 +5805,7 @@ void group_gain(Character *ch, Character *victim)
     leader = ch;
 
   highest = get_highest_level_killer(leader, ch);
-  no_members = count_xp_eligibles(leader, ch, GET_LEVEL(highest), &total_levels);
+  no_members = count_xp_eligibles(leader, ch, highest->getLevel(), &total_levels);
 
   // loop with leader first, then all the followers
   tmp_ch = leader;
@@ -5821,7 +5821,7 @@ void group_gain(Character *ch, Character *victim)
       continue;
     }
 
-    level_diff_t level_difference = GET_LEVEL(tmp_ch) - GET_LEVEL(highest);
+    level_diff_t level_difference = tmp_ch->getLevel() - highest->getLevel();
     if (level_difference <= -51 && IS_PC(tmp_ch))
     {
       act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
@@ -5848,7 +5848,7 @@ void group_gain(Character *ch, Character *victim)
     /* calculate this character's share of the XP */
     else
     {
-      share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp);
+      share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, highest->getLevel(), base_xp, &bonus_xp);
     }
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
@@ -5872,7 +5872,7 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
   Character *highest = killer;
 
   /* check to see if the group leader was involved and outranks the killer */
-  if (leader->in_room == killer->in_room && GET_LEVEL(leader) > GET_LEVEL(killer))
+  if (leader->in_room == killer->in_room && leader->getLevel() > killer->getLevel())
     highest = leader;
 
   /* loop through all groupies */
@@ -5882,7 +5882,7 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
         f->follower->in_room == killer->in_room && // and in the room
         !IS_MOB(f->follower))
     {
-      if (GET_LEVEL(f->follower) > GET_LEVEL(highest))
+      if (f->follower->getLevel() > highest->getLevel())
         highest = f->follower;
     }
   }
@@ -5899,10 +5899,10 @@ int32_t count_xp_eligibles(Character *leader, Character *killer,
   *total_levels = 0;
 
   /* check to see if the group leader was involved and eligible for XP */
-  if (leader->in_room == killer->in_room && highest_level - GET_LEVEL(leader) < 20)
+  if (leader->in_room == killer->in_room && highest_level - leader->getLevel() < 20)
   {
     num_eligibles += 1;
-    *total_levels += GET_LEVEL(leader);
+    *total_levels += leader->getLevel();
   }
 
   /* loop through all the groupies */
@@ -5911,10 +5911,10 @@ int32_t count_xp_eligibles(Character *leader, Character *killer,
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&     // if grouped
         f->follower->in_room == killer->in_room && // and in the room
         !IS_MOB(f->follower) &&
-        (highest_level - GET_LEVEL(f->follower)) < 25)
+        (highest_level - f->follower->getLevel()) < 25)
     {
       num_eligibles += 1;
-      *total_levels += GET_LEVEL(f->follower);
+      *total_levels += f->follower->getLevel();
     }
   }
   return (num_eligibles);
@@ -5928,10 +5928,10 @@ int64_t scale_char_xp(Character *ch, Character *killer, Character *victim,
   int32_t scaled_share;
   *bonus_xp = 0;
 
-  scaled_share = ((base_xp + *bonus_xp) * GET_LEVEL(ch)) / total_levels;
+  scaled_share = ((base_xp + *bonus_xp) * ch->getLevel()) / total_levels;
 
-  if (scaled_share > (GET_LEVEL(ch) * 8000))
-    scaled_share = GET_LEVEL(ch) * 8000;
+  if (scaled_share > (ch->getLevel() * 8000))
+    scaled_share = ch->getLevel() * 8000;
 
   return (scaled_share);
 }
@@ -6499,7 +6499,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     else if (!str_cmp(GET_NAME(ch), GET_NAME(victim)))
       sprintf(killer_message, "");
     //    sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
-    else if (GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
+    else if (victim->getLevel() < PKILL_COUNT_LIMIT || ch == victim)
       // sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
       // sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", GET_NAME(victim));
       sprintf(killer_message, "");
@@ -6520,7 +6520,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     else if (IS_ANONYMOUS(ch))
       sprintf(killer_message, "\n\r##%s was just DEFEATED in battle by %s!\n\r",
               GET_NAME(victim), GET_NAME(ch));
-    else if (GET_LEVEL(ch) > MORTAL)
+    else if (ch->getLevel() > MORTAL)
       sprintf(killer_message, "\n\r##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n\r", GET_NAME(victim), GET_NAME(ch));
     else if (type == KILL_BINGO)
       sprintf(killer_message, "\n\r##%s was just BINGOED by %s!\n\r",
@@ -6586,24 +6586,24 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
     if (!IS_MOB(ch)
-        // && GET_LEVEL(victim) > PKILL_COUNT_LIMIT
+        // && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      level_spread = GET_LEVEL(ch) - GET_LEVEL(victim);
+      level_spread = ch->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
       {
         if (GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
       }
-      else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+      else if (victim->getLevel() > PKILL_COUNT_LIMIT)
       {
         GET_PDEATHS(victim) += 1;
         GET_PDEATHS_LOGIN(victim) += 1;
 
         GET_PKILLS(ch) += 1;
         GET_PKILLS_LOGIN(ch) += 1;
-        GET_PKILLS_TOTAL(ch) += GET_LEVEL(victim);
-        GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
+        GET_PKILLS_TOTAL(ch) += victim->getLevel();
+        GET_PKILLS_TOTAL_LOGIN(ch) += victim->getLevel();
 
         if (IS_AFFECTED(ch, AFF_GROUP))
         {
@@ -6612,7 +6612,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
           {
             if (IS_PC(victim))
             {
-              master->player->grpplvl += GET_LEVEL(victim);
+              master->player->grpplvl += victim->getLevel();
               master->player->group_pkills += 1;
             }
             master->player->group_kills += 1;
@@ -6622,24 +6622,24 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     }
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master
-        //  && GET_LEVEL(victim) > PKILL_COUNT_LIMIT
+        //  && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      level_spread = GET_LEVEL(ch->master) - GET_LEVEL(victim);
+      level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
       {
         if (GET_PKILLS(ch->master) > 0)
           GET_PKILLS(ch->master) -= 1;
       }
-      else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+      else if (victim->getLevel() > PKILL_COUNT_LIMIT)
       {
         GET_PDEATHS(victim) += 1;
         GET_PDEATHS_LOGIN(victim) += 1;
 
         GET_PKILLS(ch->master) += 1;
         GET_PKILLS_LOGIN(ch->master) += 1;
-        GET_PKILLS_TOTAL(ch->master) += GET_LEVEL(victim);
-        GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+        GET_PKILLS_TOTAL(ch->master) += victim->getLevel();
+        GET_PKILLS_TOTAL_LOGIN(ch->master) += victim->getLevel();
 
         if (ch->master->master)
         {
@@ -6650,7 +6650,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
             {
               if (IS_PC(victim))
               {
-                master->player->grpplvl += GET_LEVEL(victim);
+                master->player->grpplvl += victim->getLevel();
                 master->player->group_pkills += 1;
               }
               master->player->group_kills += 1;
@@ -6660,16 +6660,16 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
       }
     }
     if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master
-        // && GET_LEVEL(victim) > PKILL_COUNT_LIMIT
+        // && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      level_spread = GET_LEVEL(ch->master) - GET_LEVEL(victim);
+      level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
       {
         if (GET_PKILLS(ch->master) > 0)
           GET_PKILLS(ch->master) -= 1;
       }
-      else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+      else if (victim->getLevel() > PKILL_COUNT_LIMIT)
       {
 
         GET_PDEATHS(victim) += 1;
@@ -6677,8 +6677,8 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
 
         GET_PKILLS(ch->master) += 1;
         GET_PKILLS_LOGIN(ch->master) += 1;
-        GET_PKILLS_TOTAL(ch->master) += GET_LEVEL(victim);
-        GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+        GET_PKILLS_TOTAL(ch->master) += victim->getLevel();
+        GET_PKILLS_TOTAL_LOGIN(ch->master) += victim->getLevel();
 
         if (ch->master->master)
         {
@@ -6689,7 +6689,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
             {
               if (IS_PC(victim))
               {
-                master->player->grpplvl += GET_LEVEL(victim);
+                master->player->grpplvl += victim->getLevel();
                 master->player->group_pkills += 1;
               }
               master->player->group_kills += 1;
@@ -6791,9 +6791,9 @@ void arena_kill(Character *ch, Character *victim, int type)
     affect_remove(victim, victim->affected, SUPPRESS_ALL);
   if (ch && arena.type == CHAOS)
   {
-    if (ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)
+    if (ch && ch->clan && ch->getLevel() < IMMORTAL)
       ch_clan = get_clan(ch);
-    if (victim->clan && GET_LEVEL(victim) < IMMORTAL)
+    if (victim->clan && victim->getLevel() < IMMORTAL)
       victim_clan = get_clan(victim);
 
     if (type == KILL_BINGO)
@@ -6857,7 +6857,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     {
 
       if (DC::isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
-        if (victim->clan == tmp->clan && victim != tmp && GET_LEVEL(tmp) < IMMORTAL)
+        if (victim->clan == tmp->clan && victim != tmp && tmp->getLevel() < IMMORTAL)
           eliminated = 0;
     }
     if (eliminated)
@@ -6930,7 +6930,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return false;
 
   // Ch should not be able to attack a wizinvis immortal player
-  if (IS_PC(vict) && GET_LEVEL(ch) < vict->player->wizinvis)
+  if (IS_PC(vict) && ch->getLevel() < vict->player->wizinvis)
     return false;
 
   if (IS_NPC(vict))
@@ -6998,7 +6998,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return true;
   }
 
-  if (IS_PC(ch) && IS_PC(vict) && GET_LEVEL(ch) < 5)
+  if (IS_PC(ch) && IS_PC(vict) && ch->getLevel() < 5)
   {
     send_to_char("You are too new in this realm to make enemies!\n\r", ch);
     return false;
@@ -7007,7 +7007,7 @@ int can_be_attacked(Character *ch, Character *vict)
   if (IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF) || IS_AFFECTED(vict, AFF_CHAMPION))
     return true;
 
-  if (IS_PC(ch) && GET_LEVEL(vict) < 5)
+  if (IS_PC(ch) && vict->getLevel() < 5)
   {
     act("The magic of the MUD school is protecting $M from harm.", ch, 0, vict, TO_CHAR, 0);
     return false;
@@ -7022,7 +7022,7 @@ int can_be_attacked(Character *ch, Character *vict)
       return false;
     if (vict == ch->master)
       return false;
-    if (GET_LEVEL(vict) < 5)
+    if (vict->getLevel() < 5)
     {
       do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
       return eFAILURE;
@@ -7044,7 +7044,7 @@ int can_be_attacked(Character *ch, Character *vict)
         return true;
     }
     /* Imps ignore safe flags  */
-    if (IS_PC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
+    if (IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
     {
       send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", vict);
       return true;
@@ -7126,116 +7126,116 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
     switch (current_affect)
     {
     case WEP_MAGIC_MISSILE:
-      retval = spell_magic_missile(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_magic_missile(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_BLIND:
-      retval = spell_blindness(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_blindness(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_EARTHQUAKE:
-      retval = spell_earthquake(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_earthquake(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_CURSE:
-      retval = spell_curse(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_curse(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_COLOUR_SPRAY:
-      retval = spell_colour_spray(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_colour_spray(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_DISPEL_EVIL:
-      retval = spell_dispel_evil(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_dispel_evil(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_ENERGY_DRAIN:
-      retval = spell_energy_drain(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_energy_drain(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_FIREBALL:
-      retval = spell_fireball(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_fireball(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_LIGHTNING_BOLT:
-      retval = spell_lightning_bolt(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_lightning_bolt(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_HARM:
-      retval = spell_harm(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_harm(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_POISON:
-      retval = spell_poison(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_poison(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_SLEEP:
-      retval = spell_sleep(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_sleep(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_FEAR:
-      retval = spell_fear(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_fear(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_DISPEL_MAGIC:
-      retval = spell_dispel_magic(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_dispel_magic(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_WEAKEN:
-      retval = spell_weaken(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_weaken(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_CAUSE_LIGHT:
-      retval = spell_cause_light(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_cause_light(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_CAUSE_CRITICAL:
-      retval = spell_cause_critical(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_cause_critical(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_PARALYZE:
-      retval = spell_paralyze(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_paralyze(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_ACID_BLAST:
-      retval = spell_acid_blast(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_acid_blast(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_BEE_STING:
-      retval = spell_bee_sting(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_bee_sting(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_CURE_LIGHT:
-      retval = spell_cure_light(GET_LEVEL(ch), ch, ch, weap, wep_skill);
+      retval = spell_cure_light(ch->getLevel(), ch, ch, weap, wep_skill);
       break;
     case WEP_FLAMESTRIKE:
-      retval = spell_flamestrike(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_flamestrike(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_HEAL_SPRAY:
-      retval = spell_heal_spray(GET_LEVEL(ch), ch, ch, weap, wep_skill);
+      retval = spell_heal_spray(ch->getLevel(), ch, ch, weap, wep_skill);
       break;
     case WEP_DROWN:
-      retval = spell_drown(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_drown(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_HOWL:
-      retval = spell_howl(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_howl(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_SOULDRAIN:
-      retval = spell_souldrain(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_souldrain(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_SPARKS:
-      retval = spell_sparks(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_sparks(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_DISPEL_GOOD:
-      retval = spell_dispel_good(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_dispel_good(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_TELEPORT:
-      retval = spell_teleport(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_teleport(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_CHILL_TOUCH:
-      retval = spell_chill_touch(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_chill_touch(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_POWER_HARM:
-      retval = spell_power_harm(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_power_harm(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_VAMPIRIC_TOUCH:
-      retval = spell_vampiric_touch(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_vampiric_touch(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_LIFE_LEECH:
-      retval = spell_life_leech(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_life_leech(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_METEOR_SWARM:
-      retval = spell_meteor_swarm(GET_LEVEL(ch), ch, vict, weap, wep_skill);
+      retval = spell_meteor_swarm(ch->getLevel(), ch, vict, weap, wep_skill);
       break;
     case WEP_ENTANGLE:
       /* This is a hack since Morc did the spell wrong  - pir */
-      retval = cast_entangle(GET_LEVEL(ch), ch, "", 0, vict, weap, wep_skill);
+      retval = cast_entangle(ch->getLevel(), ch, "", 0, vict, weap, wep_skill);
       break;
     case WEP_CREATE_FOOD:
-      retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, weap, wep_skill);
+      retval = cast_create_food(ch->getLevel(), ch, "", 0, vict, weap, wep_skill);
       break;
     case WEP_WILD_MAGIC:
-      retval = cast_wild_magic(GET_LEVEL(ch), ch, "offense", 0, vict, weap, wep_skill);
+      retval = cast_wild_magic(ch->getLevel(), ch, "offense", 0, vict, weap, wep_skill);
       break;
       /*
           case WEP_THIEF_POISON:
@@ -7264,7 +7264,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
 int act_poisonous(Character *ch)
 {
   if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
-    if (!number<quint64>(0, GET_LEVEL(ch) / 10))
+    if (!number<quint64>(0, ch->getLevel() / 10))
       return true; // poisoned
 
   return false;
@@ -7432,7 +7432,7 @@ int do_flee(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     if (IS_NPC(ch))
-      escape = 50 + GET_LEVEL(ch) / 3;
+      escape = 50 + ch->getLevel() / 3;
 
     if (!ch->fighting)
     {

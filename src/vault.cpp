@@ -81,7 +81,7 @@ struct vault_data *has_vault(QString name)
     if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
       return vault;
   Character *ch = find_owner(name);
-  if (ch && GET_LEVEL(ch) >= 10)
+  if (ch && ch->getLevel() >= 10)
   {
     add_new_vault(GET_NAME(ch), 0);
     for (vault = vault_table; vault; vault = vault->next)
@@ -130,8 +130,8 @@ void save_vault(QString name)
 
   Character *ch = find_owner(name);
   if (ch)
-    if (vault->size < GET_LEVEL(ch) * 10)
-      vault->size = GET_LEVEL(ch) * 10;
+    if (vault->size < ch->getLevel() * 10)
+      vault->size = ch->getLevel() * 10;
 
   QString fname = QString("../vaults/%1/%2.vault").arg(name[0]).arg(name);
 
@@ -269,7 +269,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   if (!*arg)
   {
     send_to_char(vault_usage, ch);
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (ch->getLevel() > IMMORTAL)
       send_to_char(imm_vault_usage, ch);
     return eSUCCESS;
   }
@@ -304,7 +304,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     vault_access(ch, arg1);
   }
-  else if (GET_LEVEL(ch) > IMMORTAL && !strncmp(arg, "stats", strlen(arg)))
+  else if (ch->getLevel() > IMMORTAL && !strncmp(arg, "stats", strlen(arg)))
   {
     vault_stats(ch, arg1);
 
@@ -339,7 +339,7 @@ int do_vault(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-      else if (GET_LEVEL(ch) >= IMMORTAL)
+      else if (ch->getLevel() >= IMMORTAL)
       {
         vault_log(ch, arg1);
       }
@@ -455,7 +455,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   else
   {
     send_to_char(vault_usage, ch);
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (ch->getLevel() > IMMORTAL)
       send_to_char(imm_vault_usage, ch);
   }
   return eSUCCESS;
@@ -1271,7 +1271,7 @@ bool has_vault_access(QString who, struct vault_data *vault)
   struct vault_access_data *access;
   Character *ch;
 
-  if ((ch = find_owner(who)) && GET_LEVEL(ch) >= 108)
+  if ((ch = find_owner(who)) && ch->getLevel() >= 108)
     return true;
 
   // its their vault
@@ -1532,7 +1532,7 @@ void vault_get(Character *ch, QString object, QString owner)
       return;
     }
 
-    if (!self && (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL)
+    if (!self && (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && ch->getLevel() < IMMORTAL)
     {
       send_to_char("That item seems to be bound to the vault.\r\n", ch);
       return;
@@ -1541,7 +1541,7 @@ void vault_get(Character *ch, QString object, QString owner)
     if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch))
     {
       send_to_char("You cannot hold any more.\r\n", ch);
-      if (GET_LEVEL(ch) < IMMORTAL)
+      if (ch->getLevel() < IMMORTAL)
         return;
       else
         send_to_char("But since you're an immortal, you get it anyway.\r\n", ch);
@@ -1556,7 +1556,7 @@ void vault_get(Character *ch, QString object, QString owner)
     QTextStream ssin;
     ssin << GET_OBJ_VNUM(obj);
 
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
     {
       sbuf = GET_NAME(ch);
       sbuf += " removed ";
@@ -1856,7 +1856,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
     return 0;
   }
 
-  if (!self && DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+  if (!self && DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < IMMORTAL)
   { // no_trade
     ch->send(QString("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
@@ -1942,7 +1942,7 @@ void vault_put(Character *ch, QString object, QString owner)
       }
 
       QString buffer;
-      if (GET_LEVEL(ch) < IMMORTAL)
+      if (ch->getLevel() < IMMORTAL)
         buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
         buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
@@ -1996,7 +1996,7 @@ void vault_put(Character *ch, QString object, QString owner)
       }
 
       QString buffer;
-      if (GET_LEVEL(ch) < IMMORTAL)
+      if (ch->getLevel() < IMMORTAL)
         buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
         buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
@@ -2034,7 +2034,7 @@ void vault_put(Character *ch, QString object, QString owner)
     }
 
     QString buffer;
-    if (GET_LEVEL(ch) < IMMORTAL)
+    if (ch->getLevel() < IMMORTAL)
       buffer = QString("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
     else
       buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
@@ -2180,7 +2180,7 @@ void vault_list(Character *ch, QString owner)
       ch->send(QString("%1 $3Lvl: %2$R").arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
     }
 
-    if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
+    if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
     {
       ch->send(QString(" [%1]").arg(obj_index[obj->item_number].virt));
     }
@@ -2235,7 +2235,7 @@ void add_new_vault(const char *name, int indexonly)
   }
 
   if (ch)
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * GET_LEVEL(ch));
+    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * ch->getLevel());
   else
     fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
@@ -2251,7 +2251,7 @@ void add_new_vault(const char *name, int indexonly)
 
   vault->owner = str_dup(name);
   if (ch)
-    vault->size = VAULT_BASE_SIZE * GET_LEVEL(ch);
+    vault->size = VAULT_BASE_SIZE * ch->getLevel();
   else
     vault->size = VAULT_BASE_SIZE;
   vault->weight = 0;
@@ -2749,7 +2749,7 @@ int vault_search(Character *ch, const char *args)
           ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
         }
 
-        if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
+        if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
         {
           ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
         }

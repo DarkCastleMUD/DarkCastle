@@ -208,11 +208,11 @@ int do_slay(Character *ch, char *argument, int cmd)
   if (ch == victim)
       send_to_char("Your mother would be so sad.. :(\n\r", ch);
     else {
-      if (GET_LEVEL(victim) >= IMPLEMENTER) {
+      if (victim->getLevel() >= IMPLEMENTER) {
         send_to_char("You no make ME into chop suey!\r\n", ch);
         sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
-        if(GET_LEVEL(ch) > IMMORTAL) {
+        if(ch->getLevel() > IMMORTAL) {
 	  fight_kill(victim, ch, TYPE_RAW_KILL, 0);
 	  send_to_char("Lunch.\r\n", ch);
 	}
@@ -261,7 +261,7 @@ int do_kill(Character *ch, char *argument, int cmd)
      return eFAILURE;
   }
 
-  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+  if((ch->getLevel() < G_POWER) || IS_NPC(ch)) {
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
     return do_hit(ch, argument, 0);
@@ -270,11 +270,11 @@ int do_kill(Character *ch, char *argument, int cmd)
     if (ch == victim)
       send_to_char("Your mother would be so sad.. :(\n\r", ch);
     else {
-      if (GET_LEVEL(victim) >= IMPLEMENTER) {
+      if (victim->getLevel() >= IMPLEMENTER) {
         send_to_char("You no make ME into chop suey!\r\n", ch);
         sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
-        if(GET_LEVEL(ch) > IMMORTAL) {
+        if(ch->getLevel() > IMMORTAL) {
 	  fight_kill(victim, ch, TYPE_CHOOSE, 0);
 	  send_to_char("Lunch.\r\n", ch);
 	}

@@ -481,7 +481,24 @@ public:
     auto getRace(void) const { return race; }
     QString getRaceName(void) const { return race_names.value(race); }
 
-    quint64 level = {};
+    level_t getLevel(void) const;
+    level_t *getLevelPtr(void) { return &level_; }
+    void setLevel(level_t level);
+    void incrementLevel(level_t level_change = 1)
+    {
+        if (level_ <= INT64_MAX - level_change)
+        {
+            level_ += level_change;
+        }
+    }
+    void decrementLevel(level_t level_change = 1)
+    {
+        if (level_ >= level_change)
+        {
+            level_ -= level_change;
+        }
+    }
+
     int8_t position = {}; // Standing, sitting, fighting
 
     int8_t str = {};
@@ -721,7 +738,8 @@ public:
     static const QStringList race_names;
 
 private:
-    uint64_t gold_ = {}; /* Money carried                           */
+    uint64_t gold_ = {}; /* Money carried */
+    level_t level_ = {};
 };
 
 class communication

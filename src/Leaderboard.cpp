@@ -78,7 +78,7 @@ void Leaderboard::check(void)
 
 	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
-		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL || IS_NPC(d->character))
+		if (!d->character || d->character->getLevel() >= IMMORTAL || IS_NPC(d->character))
 			continue;
 		if (!d->connected == Connection::states::PLAYING)
 			continue;
@@ -359,7 +359,7 @@ void Leaderboard::check(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
+			if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdactive[i])
 			{
@@ -478,7 +478,7 @@ void Leaderboard::check(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
+			if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdactiveclass[k][i])
 			{
@@ -615,7 +615,7 @@ void Leaderboard::check_offline(void)
 
 	for (const auto &ch : DC::getInstance()->character_list)
 	{
-		if (GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch))
+		if (ch->getLevel() >= IMMORTAL || IS_NPC(ch))
 			continue;
 
 		if (ch->player == nullptr)
@@ -895,7 +895,7 @@ void Leaderboard::check_offline(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(ch) < DC::MAX_MORTAL_LEVEL)
+			if (ch->getLevel() < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(ch) > rdactive[i])
 			{
@@ -1014,7 +1014,7 @@ void Leaderboard::check_offline(void)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(ch) < DC::MAX_MORTAL_LEVEL)
+			if (ch->getLevel() < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(ch) > rdactiveclass[k][i])
 			{
@@ -1392,7 +1392,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 	char *clss_types[] = {"mage", "cleric", "thief", "warrior", "antipaladin",
 						  "paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n"};
 
-	if (IS_PC(ch) && GET_LEVEL(ch) >= IMPLEMENTER)
+	if (IS_PC(ch) && ch->getLevel() >= IMPLEMENTER)
 	{
 		string arg1, remainder;
 		tie(arg1, remainder) = half_chop(argument);
@@ -1583,7 +1583,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 	for (d = DC::getInstance()->descriptor_list; d; d = d->next)
 	{
 
-		if (!d->character || GET_LEVEL(d->character) >= IMMORTAL)
+		if (!d->character || d->character->getLevel() >= IMMORTAL)
 			continue;
 		if (!d->connected == Connection::states::PLAYING)
 			continue;
@@ -1677,7 +1677,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 		}
 		for (i = 0; i < 5; i++)
 		{
-			if (GET_LEVEL(d->character) < DC::MAX_MORTAL_LEVEL)
+			if (d->character->getLevel() < DC::MAX_MORTAL_LEVEL)
 				break;
 			if ((int)GET_RDEATHS(d->character) > rdonline[i])
 			{

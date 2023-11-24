@@ -670,7 +670,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
       return eSUCCESS;
     }
     if (
-        ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && GET_LEVEL(ch) < PATRON))
+        ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       send_to_char("You can't erase posts from this board.\r\n", ch);
       return eSUCCESS;
@@ -719,7 +719,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO
   time_t timep; // clock time
   char *tmstr;
 
-  if (board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER)
+  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
     {
@@ -732,13 +732,13 @@ void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO
       return;
     }
   }
-  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
     send_to_char("You do not understand the writings written on this board.\r\n", ch);
     return;
   }
 
-  if ((GET_LEVEL(ch) < board->second.min_write_level))
+  if ((ch->getLevel() < board->second.min_write_level))
   {
     send_to_char("You pick up a quill to write, but realize "
                  "you're not powerful enough\n\rto submit "
@@ -779,7 +779,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO
 
   // if the title is Topic, this clears the date to let us know that
   // during the callback the topic will need updated.
-  if (!(strcmp("Topic", arg)) && GET_LEVEL(ch) > IMMORTAL)
+  if (!(strcmp("Topic", arg)) && ch->getLevel() > IMMORTAL)
   {
     reserve->new_post.date.clear();
   }
@@ -821,7 +821,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   ind = tmessage;
 
   // if clan board
-  if (board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER)
+  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
     {
@@ -834,12 +834,12 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
       return eSUCCESS;
     }
   }
-  else if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  else if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
     send_to_char("You do not understand the writings written on this board.\r\n", ch);
     return eSUCCESS;
   }
-  else if ((GET_LEVEL(ch) < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && GET_LEVEL(ch) < OVERSEER)
+  else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
     send_to_char("You try and grab one of the notes of the board but "
                  "get a nasty\n\rshock. Maybe you'd better leave it "
@@ -1006,7 +1006,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   if (!(tmessage = atoi(number)))
     return eFAILURE;
 
-  if (board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER)
+  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
     {
@@ -1019,13 +1019,13 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
       return eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
     send_to_char("You do not understand the writings written on this board.\r\n", ch);
     return eSUCCESS;
   }
 
-  if ((GET_LEVEL(ch) < board->second.min_read_level))
+  if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board but"
                  " you\n\rcannot comprehend their meaning.\n\r\n\r",
@@ -1079,7 +1079,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   int i;
   std::string board_msg;
   char buf[MAX_STRING_LENGTH];
-  if (board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER)
+  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
     {
@@ -1092,13 +1092,13 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
       return eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
     send_to_char("You do not understand the writings written on this board.\r\n", ch);
     return eSUCCESS;
   }
 
-  if ((GET_LEVEL(ch) < board->second.min_read_level))
+  if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board "
                  "but you\n\rcannot comprehend their meaning.\r\n",

@@ -131,7 +131,7 @@ int mana_gain(Character *ch)
 	int modifier;
 
 	if (IS_NPC(ch))
-		gain = GET_LEVEL(ch);
+		gain = ch->getLevel();
 	else
 	{
 		//    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
@@ -171,14 +171,14 @@ int mana_gain(Character *ch)
 		gain += modifier;
 	}
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
+	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
 		gain >>= 2;
 	gain /= 4;
 	gain /= divisor;
 	gain += MIN(age(ch).year, 100) / 5;
-	if (GET_LEVEL(ch) < 50)
+	if (ch->getLevel() < 50)
 
-		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
 
 	if (ch->mana_regen > 0)
 		gain += ch->mana_regen;
@@ -264,7 +264,7 @@ int hit_gain(Character *ch, int position)
 	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 5;
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
+	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
 		gain >>= 2;
 
 	gain /= 4;
@@ -273,8 +273,8 @@ int hit_gain(Character *ch, int position)
 	gain /= divisor;
 	if (ch->hit_regen > 0)
 		gain += ch->hit_regen;
-	if (GET_LEVEL(ch) < 50)
-		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
+	if (ch->getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
 
 	if (ch->in_room >= 0)
 		if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
@@ -302,7 +302,7 @@ int move_gain(Character *ch, int extra)
 
 	if (IS_NPC(ch))
 	{
-		return (GET_LEVEL(ch));
+		return (ch->getLevel());
 		/* Neat and fast */
 	}
 	else
@@ -333,7 +333,7 @@ int move_gain(Character *ch, int extra)
 			gain += (int)(af->modifier * 1.5);
 	}
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
+	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
 		gain >>= 2;
 	gain /= divisor;
 	gain -= MIN(100, age(ch).year) / 10;
@@ -344,8 +344,8 @@ int move_gain(Character *ch, int extra)
 	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 10;
 
-	if (GET_LEVEL(ch) < 50)
-		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
+	if (ch->getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
 
 	if (ch->in_room >= 0)
 		if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
@@ -474,47 +474,47 @@ void advance_level(Character *ch, int is_conversion)
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_MAGIC_USER:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(3, 6);
 		add_mana += number(5, 10);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_CLERIC:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(4, 8);
 		add_mana += number(4, 9);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_THIEF:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(4, 11);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_WARRIOR:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(14, 18);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_ANTI_PAL:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(8, 12);
 		add_mana += number(3, 5);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_PALADIN:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(10, 14);
 		add_mana += number(2, 4);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
 
 	case CLASS_BARBARIAN:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(16, 20);
 		add_moves += number(1, (GET_CON(ch) / 2));
 		break;
@@ -527,7 +527,7 @@ void advance_level(Character *ch, int is_conversion)
 		break;
 
 	case CLASS_RANGER:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		add_hp += number(8, 12);
 		add_mana += number(3, 5);
 		add_moves += number(1, (GET_CON(ch) / 2));
@@ -541,7 +541,7 @@ void advance_level(Character *ch, int is_conversion)
 		break;
 
 	case CLASS_DRUID:
-		add_ki += (GET_LEVEL(ch) % 2);
+		add_ki += (ch->getLevel() % 2);
 		;
 		add_hp += number(5, 9);
 		add_mana += number(4, 9);
@@ -597,7 +597,7 @@ void advance_level(Character *ch, int is_conversion)
 	if (!is_conversion)
 		send_to_char(buf, ch);
 
-	if (GET_LEVEL(ch) % 3 == 0)
+	if (ch->getLevel() % 3 == 0)
 		for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 			ch->saves[i]++;
 
@@ -606,11 +606,11 @@ void advance_level(Character *ch, int is_conversion)
 	GET_MOVE(ch) = GET_MAX_MOVE(ch);
 	GET_KI(ch) = GET_MAX_KI(ch);
 
-	if (GET_LEVEL(ch) > IMMORTAL)
+	if (ch->getLevel() > IMMORTAL)
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (GET_LEVEL(ch) > 10 && !DC::isSet(ch->player->toggles, Player::PLR_REMORTED))
+	if (ch->getLevel() > 10 && !DC::isSet(ch->player->toggles, Player::PLR_REMORTED))
 	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
@@ -621,22 +621,22 @@ void advance_level(Character *ch, int is_conversion)
 		}
 	}
 
-	if (GET_LEVEL(ch) == 6)
+	if (ch->getLevel() == 6)
 		send_to_char("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\n", ch);
-	if (GET_LEVEL(ch) == 10)
+	if (ch->getLevel() == 10)
 	{
 		send_to_char("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n", ch);
 		add_new_vault(GET_NAME(ch), 0);
 	}
-	if (GET_LEVEL(ch) == 11)
+	if (ch->getLevel() == 11)
 		send_to_char("It now costs you $B$5gold$R every time you recall.\r\n", ch);
-	if (GET_LEVEL(ch) == 20)
+	if (ch->getLevel() == 20)
 		send_to_char(
 			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
 			ch);
-	if (GET_LEVEL(ch) == 40)
+	if (ch->getLevel() == 40)
 		send_to_char("You are now able to use the Anonymous command. See \"HELP ANON\" for details.\r\n", ch);
-	if (GET_LEVEL(ch) == 50)
+	if (ch->getLevel() == 50)
 		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
 }
 
@@ -645,10 +645,10 @@ void gain_exp(Character *ch, int64_t gain)
 	int x = 0;
 	int64_t y;
 
-	if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL)
+	if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
 		return;
 
-	y = exp_table[GET_LEVEL(ch) + 1];
+	y = exp_table[ch->getLevel() + 1];
 
 	if (GET_EXP(ch) >= y)
 		x = 1;
@@ -676,7 +676,7 @@ void gain_exp(Character *ch, int64_t gain)
 	if (!x && GET_EXP(ch) >= y)
 	{
 		send_to_char("You now have enough experience to level!\n\r", ch);
-		if (GET_LEVEL(ch) == 1)
+		if (ch->getLevel() == 1)
 			csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\n\r",
 				   pc_clss_types[GET_CLASS(ch)]);
 	}
@@ -694,10 +694,10 @@ void gain_exp_regardless(Character *ch, int gain)
 	if (IS_NPC(ch))
 		return;
 
-	while (GET_EXP(ch) >= (int32_t)exp_table[GET_LEVEL(ch) + 1])
+	while (GET_EXP(ch) >= (int32_t)exp_table[ch->getLevel() + 1])
 	{
 		send_to_char("You raise a level!!  ", ch);
-		GET_LEVEL(ch) += 1;
+		ch->incrementLevel();
 		advance_level(ch, 0);
 	}
 
@@ -723,7 +723,7 @@ void gain_condition(Character *ch, int condition, int value)
 	GET_COND(ch, condition) = MAX(0, (int)GET_COND(ch, condition));
 	GET_COND(ch, condition) = MIN(24, (int)GET_COND(ch, condition));
 
-	if (GET_COND(ch, condition) || GET_LEVEL(ch) >= 60)
+	if (GET_COND(ch, condition) || ch->getLevel() >= 60)
 		return;
 
 	switch (condition)
@@ -773,7 +773,7 @@ void food_update(void)
 		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
 			amt = -3;
 		gain_condition(i, FULL, amt);
-		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60)
+		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
@@ -789,7 +789,7 @@ void food_update(void)
 		}
 		gain_condition(i, DRUNK, -1);
 		gain_condition(i, THIRST, amt);
-		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60)
+		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
 			{
@@ -857,7 +857,7 @@ void point_update(void)
 			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i, 0), move_limit(i));
 			GET_KI(i) = MIN(GET_KI(i) + ki_gain(i), ki_limit(i));
 		}
-		else if (!IS_MOB(i) && GET_LEVEL(i) < 1 && !i->desc)
+		else if (!IS_MOB(i) && i->getLevel() < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", 666);

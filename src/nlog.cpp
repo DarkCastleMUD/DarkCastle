@@ -106,7 +106,7 @@ void logf(int level, LogChannels type, QString arg)
   logentry(arg, level, type);
 }
 
-/* logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
+/* logf(ch->getLevel(), LogChannels::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
 void logf(int level, LogChannels type, const char *arg, ...)
 {
   va_list args;

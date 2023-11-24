@@ -151,7 +151,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   int pot_low = 6362;
   int pot_hi = 6379;
 
-  if (arena.low > GET_LEVEL(ch) || arena.high < GET_LEVEL(ch))
+  if (arena.low > ch->getLevel() || arena.high < ch->getLevel())
   {
     send_to_char("The arena is not open for anyone your level.\r\n", ch);
     return eFAILURE;

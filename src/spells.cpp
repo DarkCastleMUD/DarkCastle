@@ -895,7 +895,7 @@ const char *spells[] =
 bool canPerform(Character *const &ch, const int_fast32_t &skillType,
                 string failMessage)
 {
-  if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL)
+  if (IS_PC(ch) && has_skill(ch, skillType) == 0 && ch->getLevel() < ARCHANGEL)
   {
     send_to_char(
         failMessage.c_str(),
@@ -933,7 +933,7 @@ int use_mana(Character *ch, int sn)
   /*
       int divisor;
 
-      divisor = 2 + GET_LEVEL(ch);
+      divisor = 2 + ch->getLevel();
       if ( GET_CLASS(ch) == CLASS_CLERIC )
     divisor -= spell_info[sn].min_level_cleric;
       else
@@ -1436,7 +1436,7 @@ int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_typ
   }
 
   // If a God attacks you, nothing can save you
-  if (IS_MINLEVEL_PC(ch, DEITY) && GET_LEVEL(vict) < GET_LEVEL(ch))
+  if (IS_MINLEVEL_PC(ch, DEITY) && vict->getLevel() < ch->getLevel())
   {
     return -100;
   }
@@ -1729,20 +1729,20 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   }
   else
   {
-    if (GET_LEVEL(ch) < 30)
+    if (ch->getLevel() < 30)
       i = 30;
-    else if (GET_LEVEL(ch) < 50)
+    else if (ch->getLevel() < 50)
       i = 40;
-    else if (GET_LEVEL(ch) < 70)
+    else if (ch->getLevel() < 70)
       i = 60;
-    else if (GET_LEVEL(ch) < 90)
+    else if (ch->getLevel() < 90)
       i = 70;
     else
       i = 75;
   }
   if (stat != attribute_t::UNDEFINED && victim)
   {
-    auto max_level_percent = GET_LEVEL(ch) / 60.0;
+    auto max_level_percent = ch->getLevel() / 60.0;
     i -= stat_mod[get_stat(victim, stat)] * max_level_percent; // less impact on low levels..
   }
   i += mod;
@@ -1766,12 +1766,12 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
     i = 101; // auto success on songs and ki with focus
 
   int a = get_difficulty(skillnum);
-  /*  int o = GET_LEVEL(ch)*2+1;
+  /*  int o = ch->getLevel()*2+1;
     if (o > 101 || IS_NPC(ch)) o = 101;
     if (i > o) o = i+1;
   */
 
-  if (i > number(1, 100) || GET_LEVEL(ch) >= IMMORTAL)
+  if (i > number(1, 100) || ch->getLevel() >= IMMORTAL)
   {
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && (GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING)))
       skill_increase_check(ch, skillnum, learned, a + 500);
@@ -1828,7 +1828,7 @@ int do_cast(Character *ch, char *argument, int cmd)
   //    return eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL)
+  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->getLevel() < IMMORTAL)
   {
     send_to_char("You cannot cast in this form.\r\n", ch);
     return eFAILURE;
@@ -1854,7 +1854,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (ch->getLevel() < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
@@ -1965,7 +1965,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       {
         if (!(learned = has_skill(ch, spl)))
         {
-          if (GET_LEVEL(ch) < 101)
+          if (ch->getLevel() < 101)
           {
             send_to_char("You do not know how to cast that spell!\n\r", ch);
             return eFAILURE;
@@ -2352,7 +2352,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch))
+      if (ch->getLevel() < ARCHANGEL && !IS_MOB(ch))
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -2408,7 +2408,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
         if (IS_MOB(ch))
         {
-          learned = GET_LEVEL(ch);
+          learned = ch->getLevel();
         }
 
         chance += learned / 1.5;
@@ -2424,7 +2424,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         else
           chance = MIN(97, chance);
 
-        if (GET_LEVEL(ch) == 1)
+        if (ch->getLevel() == 1)
           chance++;
 
         if (check_conc_loss(ch, spl))
@@ -2433,7 +2433,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
           chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier / 10;
 
-        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+        if (ch->getLevel() < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);
@@ -2600,7 +2600,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
         }
 
-        uint8_t level = GET_LEVEL(ch);
+        uint8_t level = ch->getLevel();
         char *argument_ptr = nullptr;
 
         if (group_spell)

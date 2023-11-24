@@ -116,7 +116,7 @@ struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 struct wizlist_info
 {
 	char *name;
-	uint64_t level;
+	level_t level;
 };
 struct skill_quest *skill_list; // List of skill quests.
 
@@ -760,11 +760,11 @@ void update_wizlist(Character *ch)
 	{
 		if (wizlist[x].name[0] == '@')
 		{
-			if (GET_LEVEL(ch) < IMMORTAL)
+			if (ch->getLevel() < IMMORTAL)
 				return;
 			dc_free(wizlist[x].name);
 			wizlist[x].name = str_dup(GET_NAME(ch));
-			wizlist[x].level = GET_LEVEL(ch);
+			wizlist[x].level = ch->getLevel();
 
 			wizlist[x + 1].name = str_dup("@");
 			wizlist[x + 1].level = 0;
@@ -774,7 +774,7 @@ void update_wizlist(Character *ch)
 		{
 			if (isname(wizlist[x].name, GET_NAME(ch)))
 			{
-				wizlist[x].level = GET_LEVEL(ch);
+				wizlist[x].level = ch->getLevel();
 				break;
 			}
 		}
@@ -1096,131 +1096,131 @@ void add_mobspec(int i)
 	switch (a->c_class)
 	{
 	case CLASS_MAGIC_USER:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 101;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 102;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 103;
 		else
 			mob = 104;
 		break;
 	case CLASS_CLERIC:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 105;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 106;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 107;
 		else
 			mob = 108;
 		break;
 	case CLASS_WARRIOR:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 109;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 110;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 111;
 		else
 			mob = 112;
 		break;
 	case CLASS_BARBARIAN:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 113;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 114;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 115;
 		else
 			mob = 116;
 		break;
 	case CLASS_MONK:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 117;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 118;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 119;
 		else
 			mob = 120;
 		break;
 	case CLASS_THIEF:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 121;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 122;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 123;
 		else
 			mob = 124;
 		break;
 	case CLASS_PALADIN:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 125;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 126;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 127;
 		else
 			mob = 128;
 		break;
 	case CLASS_ANTI_PAL:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 129;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 130;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 131;
 		else
 			mob = 132;
 		break;
 	case CLASS_RANGER:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 133;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 134;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 135;
 		else
 			mob = 136;
 		break;
 	case CLASS_BARD:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 137;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 138;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 139;
 		else
 			mob = 140;
 		break;
 	case CLASS_DRUID:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 141;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 142;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 143;
 		else
 			mob = 144;
 		break;
 	case CLASS_NECROMANCER:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob = 145;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob = 146;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob = 147;
 		else
 			mob = 148;
 		break;
 	case CLASS_PSIONIC:
-		if (a->level < 21)
+		if (a->getLevel() < 21)
 			mob_index[i].mobspec = mob_index[real_mobile(149)].mobprogs;
-		else if (a->level < 35)
+		else if (a->getLevel() < 35)
 			mob_index[i].mobspec = mob_index[real_mobile(150)].mobprogs;
-		else if (a->level < 51)
+		else if (a->getLevel() < 51)
 			mob_index[i].mobspec = mob_index[real_mobile(151)].mobprogs;
 		else
 			mob_index[i].mobspec = mob_index[real_mobile(152)].mobprogs;
@@ -2661,7 +2661,7 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->raw_intel = mob->intel = BASE_STAT + mob_race_mod[GET_RACE(mob)][3];
 	mob->raw_wis = mob->wis = BASE_STAT + mob_race_mod[GET_RACE(mob)][4];
 
-	GET_LEVEL(mob) = fread_int(fl, 0, IMPLEMENTER);
+	mob->setLevel(fread_int(fl, 0, IMPLEMENTER));
 
 	mob->hitroll = 20 - fread_int(fl, -64000, 64000);
 	mob->armor = 10 * fread_int(fl, -64000, 64000);
@@ -2678,13 +2678,13 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->mobdata->damsizedice = fread_int(fl, 0, 64000);
 	mob->damroll = fread_int(fl, 0, 64000);
 	mob->mobdata->last_room = 0;
-	mob->mana = 100 + (mob->level * 10);
-	mob->max_mana = 100 + (mob->level * 10);
+	mob->mana = 100 + (mob->getLevel() * 10);
+	mob->max_mana = 100 + (mob->getLevel() * 10);
 
-	mob->move = 100 + (mob->level * 10);
-	mob->max_move = 100 + (mob->level * 10);
+	mob->move = 100 + (mob->getLevel() * 10);
+	mob->max_move = 100 + (mob->getLevel() * 10);
 
-	mob->max_ki = 100.0 * (mob->level / 60.0);
+	mob->max_ki = 100.0 * (mob->getLevel() / 60.0);
 	mob->ki = mob->max_ki;
 	mob->raw_ki = mob->max_ki;
 
@@ -2774,7 +2774,7 @@ Character *read_mobile(int nr, FILE *fl)
 	// TODO - eventually have mob saving throws work by race too, but this should be good for now
 
 	for (i = 0; i <= SAVE_TYPE_MAX; i++)
-		mob->saves[i] = GET_LEVEL(mob) / 3;
+		mob->saves[i] = mob->getLevel() / 3;
 
 	if (DC::isSet(mob->resist, ISR_FIRE))
 		mob->saves[SAVE_TYPE_FIRE] += 50;
@@ -2933,7 +2933,7 @@ void write_mobile(Character *mob, FILE *fl)
 				"%d %d %d %d %d %d\n",
 			mob->alignment,
 			GET_RACE(mob),
-			GET_LEVEL(mob),
+			mob->getLevel(),
 
 			(20 - mob->hitroll),
 			(int)(mob->armor / 10),
@@ -2995,72 +2995,72 @@ void handle_automatic_mob_damdice(Character *mob)
 	int sizedice = 1;
 
 	// set dependant on level
-	if (GET_LEVEL(mob) < 5)
+	if (mob->getLevel() < 5)
 	{
 		nodice = 1;
 		sizedice = 2;
 	}
-	else if (GET_LEVEL(mob) < 10)
+	else if (mob->getLevel() < 10)
 	{
 		nodice = 1;
 		sizedice = 4;
 	}
-	else if (GET_LEVEL(mob) < 15)
+	else if (mob->getLevel() < 15)
 	{
 		nodice = 2;
 		sizedice = 3;
 	}
-	else if (GET_LEVEL(mob) < 20)
+	else if (mob->getLevel() < 20)
 	{
 		nodice = 2;
 		sizedice = 4;
 	}
-	else if (GET_LEVEL(mob) < 25)
+	else if (mob->getLevel() < 25)
 	{
 		nodice = 3;
 		sizedice = 3;
 	}
-	else if (GET_LEVEL(mob) < 30)
+	else if (mob->getLevel() < 30)
 	{
 		nodice = 3;
 		sizedice = 4;
 	}
-	else if (GET_LEVEL(mob) < 35)
+	else if (mob->getLevel() < 35)
 	{
 		nodice = 4;
 		sizedice = 3;
 	}
-	else if (GET_LEVEL(mob) < 40)
+	else if (mob->getLevel() < 40)
 	{
 		nodice = 4;
 		sizedice = 4;
 	}
-	else if (GET_LEVEL(mob) < 45)
+	else if (mob->getLevel() < 45)
 	{
 		nodice = 5;
 		sizedice = 3;
 	}
-	else if (GET_LEVEL(mob) < 50)
+	else if (mob->getLevel() < 50)
 	{
 		nodice = 5;
 		sizedice = 4;
 	}
-	else if (GET_LEVEL(mob) < 55)
+	else if (mob->getLevel() < 55)
 	{
 		nodice = 5;
 		sizedice = 5;
 	}
-	else if (GET_LEVEL(mob) < 60)
+	else if (mob->getLevel() < 60)
 	{
 		nodice = 6;
 		sizedice = 6;
 	}
-	else if (GET_LEVEL(mob) < 65)
+	else if (mob->getLevel() < 65)
 	{
 		nodice = 7;
 		sizedice = 7;
 	}
-	else if (GET_LEVEL(mob) < 70)
+	else if (mob->getLevel() < 70)
 	{
 		nodice = 8;
 		sizedice = 8;
@@ -3093,7 +3093,7 @@ void handle_automatic_mob_damdice(Character *mob)
 
 void handle_automatic_mob_hitpoints(Character *mob)
 {
-	int base;
+	quint64 base{};
 
 	switch (GET_CLASS(mob))
 	{
@@ -3141,11 +3141,12 @@ void handle_automatic_mob_hitpoints(Character *mob)
 		break;
 	}
 
-	if (GET_LEVEL(mob) > 0)
-		base *= GET_LEVEL(mob);
+	if (mob->getLevel() > 0)
+		base *= mob->getLevel();
 
-	// mobs get auto hp bonus
-	base = (int)(base * 1.5);
+	auto old_base = base;
+	base *= 1.5;
+	qDebug() << old_base << "vs" << base;
 
 	mob->raw_hit = base;
 	mob->hit = base;
@@ -3157,30 +3158,30 @@ void handle_automatic_mob_hitdamroll(Character *mob)
 {
 	int curhit;
 
-	curhit = GET_LEVEL(mob);
+	curhit = mob->getLevel();
 
-	if (GET_LEVEL(mob) > 1 && GET_LEVEL(mob) < 11)
+	if (mob->getLevel() > 1 && mob->getLevel() < 11)
 		curhit--;
 
-	if (GET_LEVEL(mob) > 25)
+	if (mob->getLevel() > 25)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 30)
+	if (mob->getLevel() > 30)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 35)
+	if (mob->getLevel() > 35)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 40)
+	if (mob->getLevel() > 40)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 45)
+	if (mob->getLevel() > 45)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 49)
+	if (mob->getLevel() > 49)
 		curhit++;
 
-	if (GET_LEVEL(mob) > 54)
+	if (mob->getLevel() > 54)
 		curhit += 5;
 
 	mob->hitroll = curhit;
@@ -3193,15 +3194,15 @@ void handle_automatic_mob_settings(Character *mob)
 	// New matrix is handled here.
 	if (ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
 		return;
-	if (mob->level > 110)
+	if (mob->getLevel() > 110)
 		return;
-	int baselevel = mob->level;
-	float alevel = (float)mob->level;
+	int baselevel = mob->getLevel();
+	float alevel = (float)mob->getLevel();
 
 	int percent = number(-3, 3);
 
 	if (mob->c_class != 0)
-		alevel -= mob->level > 20 ? 3.0 : 2.0;
+		alevel -= mob->getLevel() > 20 ? 3.0 : 2.0;
 	bool c = (mob->c_class);
 	if (ISSET(mob->mobdata->actflags, ACT_AGGRESSIVE))
 		alevel -= 1.5;
@@ -3378,23 +3379,23 @@ Character *clone_mobile(int nr)
 	float mult = 1.0;
 	if (!ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
 	{
-		if (GET_LEVEL(mob) > 100)
+		if (mob->getLevel() > 100)
 		{
 			mult = 1.5;
 		}
-		else if (GET_LEVEL(mob) > 95)
+		else if (mob->getLevel() > 95)
 		{
 			mult = 1.4;
 		}
-		else if (GET_LEVEL(mob) > 90)
+		else if (mob->getLevel() > 90)
 		{
 			mult = 1.3;
 		}
-		else if (GET_LEVEL(mob) > 85)
+		else if (mob->getLevel() > 85)
 		{
 			mult = 1.2;
 		}
-		else if (GET_LEVEL(mob) > 75)
+		else if (mob->getLevel() > 75)
 		{
 			mult = 1.1;
 		}

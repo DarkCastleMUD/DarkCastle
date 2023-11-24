@@ -795,7 +795,7 @@ void save_char_obj_db(Character *ch)
   if (ch == 0)
     return;
 
-  if (IS_NPC(ch) || GET_LEVEL(ch) < 2)
+  if (IS_NPC(ch) || ch->getLevel() < 2)
     return;
 
   // so weapons stop falling off
@@ -869,7 +869,7 @@ void save_char_obj(Character *ch)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (IS_NPC(ch) || GET_LEVEL(ch) < 1)
+  if (IS_NPC(ch) || ch->getLevel() < 1)
   {
     return;
   }
@@ -987,7 +987,7 @@ bool load_char_obj(class Connection *d, QString name)
   clear_char(ch);
   ch->desc = d;
 
-    if (DC::getInstance()->cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     strsave = QString("%1/%2/%3").arg(BSAVE_DIR).arg(name[0]).arg(name);
   }
@@ -1572,10 +1572,10 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   GET_SEX(ch) = st->sex;
   GET_CLASS(ch) = st->c_class;
   GET_RACE(ch) = st->race;
-  GET_LEVEL(ch) = st->level;
+  ch->setLevel(st->level);
 
   ch->hometown = st->hometown;
-  if (GET_LEVEL(ch) < 11)
+  if (ch->getLevel() < 11)
     ch->hometown = START_ROOM;
 
   GET_STR(ch) = GET_RAW_STR(ch) = st->raw_str;
@@ -1637,7 +1637,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
   if (ch->in_room == DC::NOWHERE)
   {
-    if (GET_LEVEL(ch) >= IMMORTAL)
+    if (ch->getLevel() >= IMMORTAL)
       ch->in_room = real_room(17);
     else
       ch->in_room = real_room(START_ROOM);
@@ -1671,7 +1671,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   st->sex = GET_SEX(ch);
   st->c_class = GET_CLASS(ch);
   st->race = GET_RACE(ch);
-  st->level = GET_LEVEL(ch);
+  st->level = ch->getLevel();
 
   st->raw_str = GET_RAW_STR(ch);
   st->raw_intel = GET_RAW_INT(ch);

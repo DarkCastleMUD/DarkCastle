@@ -1026,7 +1026,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		break;
 
 	case APPLY_LEVEL:
-		/* ??? GET_LEVEL(ch) += mod; */
+		/* ??? ch->getLevel() += mod; */
 		break;
 
 	case APPLY_AGE:
@@ -3739,8 +3739,8 @@ void extract_char(Character *ch, bool pull, Trace t)
 		isGolem = true;
 		if (pull)
 		{
-			if (ch->level > 1)
-				ch->level--;
+			if (ch->getLevel() > 1)
+				ch->decrementLevel();
 			ch->exp = 0; // Lower level, lose exp.
 		}
 		omast = ch->master;
@@ -4612,7 +4612,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		// if (i->item_number == -1) continue;
 		//
 		if (loc && DC::isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
-			GET_LEVEL(ch) < 101)
+			ch->getLevel() < 101)
 			continue;
 		if (isname(tmp, i->name))
 			if (CAN_SEE_OBJ(ch, i))

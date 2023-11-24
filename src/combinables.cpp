@@ -126,7 +126,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_TRADE_POISON);
 
-  if (GET_LEVEL(ch) > IMMORTAL)
+  if (ch->getLevel() > IMMORTAL)
     learned = 500;
 
   if (!learned)
@@ -200,7 +200,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
 int do_poisonweapon(Character *ch, char *argument, int cmd)
 {
-  if (GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) <= IMMORTAL)
+  if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
     send_to_char("Only thieves are trained enough to poison their weapons.\r\n", ch);
     return eFAILURE;
@@ -411,7 +411,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   int learned = has_skill(ch, SKILL_BREW);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned)
+  if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
     send_to_char("You just don't have the mind for potion brewing.\r\n", ch);
     return eFAILURE;
@@ -422,7 +422,7 @@ int do_brew(Character *ch, char *argument, int cmd)
     send_to_char("Brew what?\n\r"
                  "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
                  ch);
-    if (GET_LEVEL(ch) >= 106)
+    if (ch->getLevel() >= 106)
     {
       send_to_char("        brew load\n\r"
                    "        brew save\n\r"
@@ -436,7 +436,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) >= 106)
+  if (IS_PC(ch) && ch->getLevel() >= 106)
   {
     if (!str_cmp(arg1, "load"))
     {
@@ -918,7 +918,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   int learned = has_skill(ch, SKILL_SCRIBE);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned)
+  if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
     send_to_char("You just don't have the mind for scribing.\r\n", ch);
     return eFAILURE;
@@ -929,7 +929,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     send_to_char("Scribe what?\n\r"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
-    if (GET_LEVEL(ch) >= 106)
+    if (ch->getLevel() >= 106)
     {
       send_to_char("        scribe load\n\r"
                    "        scribe save\n\r"
@@ -943,7 +943,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) >= 106)
+  if (IS_PC(ch) && ch->getLevel() >= 106)
   {
     if (!str_cmp(arg1, "load"))
     {
@@ -1105,7 +1105,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     // 50% of a failure causing 'wild magic' to be cast on self
     if (number(1, 100) > 50)
     {
-      cast_wild_magic(GET_LEVEL(ch), ch, "offense", 0, ch, 0, 0);
+      cast_wild_magic(ch->getLevel(), ch, "offense", 0, ch, 0, 0);
     }
   }
   else
@@ -1147,7 +1147,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     scrolllong << "a " << paper_key << " " << dust_key << " scroll " << pen_key << " in " << ink_key << "ink lies here";
 
     paperobj->obj_flags.type_flag = ITEM_SCROLL;
-    paperobj->obj_flags.value[0] = learned / 4 + GET_LEVEL(ch) / 2;
+    paperobj->obj_flags.value[0] = learned / 4 + ch->getLevel() / 2;
     paperobj->obj_flags.value[1] = spell;
     paperobj->obj_flags.value[2] = 0;
     paperobj->obj_flags.value[3] = 0;

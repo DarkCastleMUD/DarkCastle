@@ -78,13 +78,13 @@ void release_message(Character *ch)
 void golem_gain_exp(Character *ch)
 {
   //  extern int exp_table[~];
-  int level = 19 + ch->level;
-  if (ch->level >= 20)
+  int level = 19 + ch->getLevel();
+  if (ch->getLevel() >= 20)
     return;
   if (ch->exp > exp_table[level])
   {
     ch->exp = 0;
-    ch->level++;
+    ch->incrementLevel();
     advance_golem_level(ch);
     ch->master->save(666);
     do_say(ch, "Errrrrhhgg...", 0);
@@ -96,7 +96,7 @@ int verify_existing_components(Character *ch, int golemtype)
   int retval = 0;
 
   // OVERSEERS or higher don't need components
-  if (GET_LEVEL(ch) >= OVERSEER)
+  if (ch->getLevel() >= OVERSEER)
   {
     SET_BIT(retval, eSUCCESS);
     SET_BIT(retval, eEXTRA_VALUE); // Special effect.
@@ -171,7 +171,7 @@ void save_golem_data(Character *ch)
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
-  uint8_t legacy_level = (uint8_t)golem->level;
+  uint8_t legacy_level = (uint8_t)golem->getLevel();
   fwrite(&legacy_level, 1, 1, fpfile);
   fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
@@ -242,7 +242,7 @@ void set_golem(Character *golem, int golemtype)
   SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
   golem->misc = MISC_IS_MOB;
   golem->armor = 0;
-  golem->level = 1;
+  golem->setLevel(1);
   golem->hitroll = golem_list[golemtype].hit / 20;
   golem->damroll = golem_list[golemtype].dam / 20;
   golem->armor = golem_list[golemtype].ac / 20;
@@ -265,7 +265,7 @@ void load_golem_data(Character *ch, int golemtype)
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->player->golem)
+  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && ch->getLevel() < OVERSEER) || ch->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
@@ -281,10 +281,15 @@ void load_golem_data(Character *ch, int golemtype)
   golem = clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
   ch->player->golem = golem;
-  fread(&(golem->level), 1, 1, fpfile);
-  auto level = golem->level;
-  for (; level > 1; level--)
+  uint8_t golem_level{};
+  fread(&(golem_level), sizeof(golem_level), 1, fpfile);
+  golem->setLevel(golem_level);
+
+  for (; golem_level > 1; golem_level--)
+  {
     advance_golem_level(golem); // Level it up again.
+  }
+
   fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   class Object *last_cont = nullptr; // Last container.
   while (!feof(fpfile))
@@ -370,14 +375,14 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   string isrString;
 
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
-  if (GET_LEVEL(ch) + 19 > 60)
+  if (ch->getLevel() + 19 > 60)
   {
-    logentry(QString("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(GET_LEVEL(ch)).arg(GET_LEVEL(ch) + 19));
+    logentry(QString("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return eSUCCESS;
   }
-  exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64_t)GET_EXP(ch));
+  exp_needed = (int)(exp_table[(int)ch->getLevel() + 19] - (int64_t)GET_EXP(ch));
 
   to_hit = GET_REAL_HITROLL(ch);
   to_dam = GET_REAL_DAMROLL(ch);
@@ -401,7 +406,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
           GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
           GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
-          GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
+          GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
           GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
           GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch),
           mana_gain(ch), move_gain(ch, 0), ki_gain(ch), GET_AGE(ch),
@@ -422,7 +427,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
-          get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == 50 ? 0 : exp_needed,
+          get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
           get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   send_to_char(buf, master);

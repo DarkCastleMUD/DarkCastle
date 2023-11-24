@@ -520,7 +520,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
     return eSUCCESS;
   }
 
-  if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || GET_LEVEL(victim) > 50)
+  if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || victim->getLevel() > 50)
   {
     act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
     return eSUCCESS;
@@ -1334,7 +1334,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("That action is impossible to perform in these restrictive confinements.\r\n", ch);
     return eSUCCESS;
   }
-  if (GET_LEVEL(victim) > 70)
+  if (victim->getLevel() > 70)
   {
     send_to_char("Some great force prevents you.\r\n", ch);
     return eSUCCESS;
@@ -1404,9 +1404,9 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
     send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
 
-    // cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
+    // cast_protection_from_evil(ch->getLevel(), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
     // changed to spell_type_potion so that the align check doesn't happen for this item
-    //      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_POTION, ch, 0,
+    //      cast_protection_from_evil(ch->getLevel(), ch, 0, SPELL_TYPE_POTION, ch, 0,
     // 50);
     if (IS_AFFECTED(ch, AFF_PROTECT_EVIL) || affected_by_spell(ch, SPELL_PROTECT_FROM_GOOD))
     {
@@ -1419,7 +1419,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       af.type = SPELL_PROTECT_FROM_EVIL;
       af.duration = 5;
-      af.modifier = GET_LEVEL(ch) + 10;
+      af.modifier = ch->getLevel() + 10;
       af.location = APPLY_NONE;
       af.bitvector = AFF_PROTECT_EVIL;
       affect_to_char(ch, &af);
@@ -1828,13 +1828,13 @@ int restring_machine(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (GET_PLATINUM(ch) < (uint32_t)(GET_LEVEL(ch)))
+  if (GET_PLATINUM(ch) < (uint32_t)(ch->getLevel()))
   {
     send_to_char("'Insufficient platinum.  *beep*'\n", ch);
     return eSUCCESS;
   }
 
-  GET_PLATINUM(ch) -= (GET_LEVEL(ch));
+  GET_PLATINUM(ch) -= (ch->getLevel());
 
   //  dc_free(target_obj->short_description);
   //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
@@ -2052,7 +2052,7 @@ int portal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("magiskhal", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
@@ -2066,7 +2066,7 @@ int portal_word(Character *ch, class Object *obj, int cmd, char *arg,
   }
   else
   {
-    spell_portal(GET_LEVEL(ch), ch, victim, 0, 0);
+    spell_portal(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
     ch->equipment[HOLD]->obj_flags.value[3] = 600;
   }
@@ -2113,7 +2113,7 @@ int full_heal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("heltlaka", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
@@ -2127,9 +2127,9 @@ int full_heal_word(Character *ch, class Object *obj, int cmd, char *arg,
   }
   else
   {
-    spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
-    spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
-    spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
+    spell_full_heal(ch->getLevel(), ch, victim, 0, 0);
+    spell_full_heal(ch->getLevel(), ch, victim, 0, 0);
+    spell_full_heal(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
     ch->equipment[HOLD]->obj_flags.value[3] = 300;
   }
@@ -2195,7 +2195,7 @@ int fireshield_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("feuerschild", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
@@ -2203,7 +2203,7 @@ int fireshield_word(Character *ch, class Object *obj, int cmd, char *arg,
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   send_to_char("You quietly whisper 'feuerschild' into your hands.\r\n", ch);
 
-  spell_fireshield(GET_LEVEL(ch), ch, ch, 0, 0);
+  spell_fireshield(ch->getLevel(), ch, ch, 0, 0);
   // set charge time
   ch->equipment[HOLD]->obj_flags.value[3] = 900;
 
@@ -2250,7 +2250,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("sbiadirsivia", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
@@ -2270,7 +2270,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   }
   else
   {
-    spell_teleport(GET_LEVEL(ch), ch, victim, 0, 0);
+    spell_teleport(ch->getLevel(), ch, victim, 0, 0);
     // set charge time
     ch->equipment[HOLD]->obj_flags.value[3] = 1000;
   }
@@ -2318,7 +2318,7 @@ int alignment_word(Character *ch, class Object *obj, int cmd, char *arg,
 
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   send_to_char("You quietly whisper 'moralevalore' into your hands.\r\n", ch);
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return eSUCCESS;
@@ -2378,7 +2378,7 @@ int protection_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("protezione", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
   {
     send_to_char("The item seems to be recharging.\r\n", ch);
     return true;
@@ -2386,14 +2386,14 @@ int protection_word(Character *ch, class Object *obj, int cmd, char *arg,
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   send_to_char("You quietly whisper 'protezione' into your hands.\r\n", ch);
 
-  spell_armor(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_bless(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_protection_from_evil(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_invisibility(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_stone_skin(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_resist_fire(GET_LEVEL(ch), ch, ch, 0, 0);
-  spell_resist_cold(GET_LEVEL(ch), ch, ch, 0, 0);
-  cast_barkskin(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
+  spell_armor(ch->getLevel(), ch, ch, 0, 0);
+  spell_bless(ch->getLevel(), ch, ch, 0, 0);
+  spell_protection_from_evil(ch->getLevel(), ch, ch, 0, 0);
+  spell_invisibility(ch->getLevel(), ch, ch, 0, 0);
+  spell_stone_skin(ch->getLevel(), ch, ch, 0, 0);
+  spell_resist_fire(ch->getLevel(), ch, ch, 0, 0);
+  spell_resist_cold(ch->getLevel(), ch, ch, 0, 0);
+  cast_barkskin(ch->getLevel(), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
 
   // set charge time
   ch->equipment[HOLD]->obj_flags.value[3] = 1000;
@@ -2539,7 +2539,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
           if (IS_PC(v) && v->in_room && real_room(30000) > 0 && DC::getInstance()->world[v->in_room].zone == DC::getInstance()->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
           {
-            if (GET_LEVEL(v) >= IMMORTAL)
+            if (v->getLevel() >= IMMORTAL)
             {
               act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", v, 0, 0, TO_CHAR, 0);
               act("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", v, 0, 0, TO_ROOM, 0);
@@ -2591,7 +2591,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, int cmd, const char *
       continue;
     if (real_room(30000) > 0 && DC::getInstance()->world[i->in_room].zone != DC::getInstance()->world[real_room(30000)].zone)
       continue;
-    if (GET_LEVEL(i) >= 100)
+    if (i->getLevel() >= 100)
       continue;
     if (i->in_room == real_room(30000))
       continue;
@@ -2603,7 +2603,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, int cmd, const char *
       act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
       act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
 
-      if (GET_LEVEL(i) >= IMMORTAL)
+      if (i->getLevel() >= IMMORTAL)
       {
         act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", i, 0, 0, TO_CHAR, 0);
         act("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", i, 0, 0, TO_ROOM, 0);
@@ -3092,7 +3092,7 @@ int magic_missile_boots(Character *ch, class Object *obj, int cmd, char *arg,
       ch, obj, ch->fighting, TO_ROOM, 0);
   send_to_char("Your boots glow briefly and release a magic missle spell!\r\n", ch);
 
-  return spell_magic_missile((GET_LEVEL(ch) / 2), ch, ch->fighting, 0, 0);
+  return spell_magic_missile((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 }
 
 int shield_combat_procs(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -3113,14 +3113,14 @@ int shield_combat_procs(Character *ch, class Object *obj, int cmd, const char *a
 
     act("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, TO_ROOM, 0);
     send_to_char("Your shield glows yellow as it charges up with electrical energy.\r\n", ch);
-    return spell_lightning_bolt((GET_LEVEL(ch) / 2), ch, ch->fighting, 0, 0);
+    return spell_lightning_bolt((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
     break;
   case 555: // wicked boneshield
     if (number(0, 9))
       return eFAILURE;
     act("The spikes $n's $o glimmer brightly.", ch, obj, ch->fighting, TO_ROOM, 0);
     send_to_char("The spikes on your shield glimmer brightly.\r\n", ch);
-    return spell_cause_critical(GET_LEVEL(ch), ch, ch->fighting, 0, 0);
+    return spell_cause_critical(ch->getLevel(), ch, ch->fighting, 0, 0);
     break;
   case 5208: // thalos beholder shield
     if (number(0, 4))
@@ -3129,7 +3129,7 @@ int shield_combat_procs(Character *ch, class Object *obj, int cmd, const char *a
     act("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
     act("$n's $o begins to tremble violently upon contact with you!", ch, obj, ch->fighting, TO_VICT, 0);
     send_to_char("Your shield begins to violently shake after the hit!\r\n", ch);
-    return spell_cause_serious((GET_LEVEL(ch) / 2), ch, ch->fighting, 0, 0);
+    return spell_cause_serious((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
     break;
 
   default:
@@ -3166,7 +3166,7 @@ int generic_weapon_combat(Character *ch, class Object *obj, int cmd, char *arg,
     send_to_char("The hammer begins to hum and strikes out with the power of Thor!\r\n", ch);
     act("$n's hammer begins to hum and strikes out with the power of Thor!",
         ch, obj, 0, TO_ROOM, 0);
-    return spell_lightning_bolt((GET_LEVEL(ch) / 2), ch, ch->fighting, 0, 0);
+    return spell_lightning_bolt((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 
   case 19327: // EC Icicle
     if (number(1, 100) < GET_DEX(ch) / 4)
@@ -3174,7 +3174,7 @@ int generic_weapon_combat(Character *ch, class Object *obj, int cmd, char *arg,
     send_to_char("The Icicle begins to pulse repidly...\r\n", ch);
     act("$n's $o begins to pulse rapidly...",
         ch, obj, 0, TO_ROOM, 0);
-    return spell_icestorm((GET_LEVEL(ch) / 2), ch, ch->fighting, 0, 0);
+    return spell_icestorm((ch->getLevel() / 2), ch, ch->fighting, 0, 0);
 
   default:
     send_to_char("Weapon with invalid generic_weapon_combat, tell an Immortal.\r\n", ch);
@@ -3246,7 +3246,7 @@ int gotta_dance_boots(Character *ch, class Object *obj, int cmd, const char *arg
   do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!", CMD_DEFAULT);
   make_person_dance(obj->equipped_by);
   send_to_char("You slump back down, exhausted.\r\n", obj->equipped_by);
-  if (GET_LEVEL(obj->equipped_by) <= MORTAL)
+  if (obj->equipped_by->getLevel() <= MORTAL)
     WAIT_STATE(obj->equipped_by, DC::PULSE_VIOLENCE * 3);
 
   return eSUCCESS;
@@ -3325,7 +3325,7 @@ int glove_combat_procs(Character *ch, class Object *obj, int cmd, char *arg,
     if (number(0, 17))
       return eFAILURE;
 
-    dam = dice(1, GET_LEVEL(ch));
+    dam = dice(1, ch->getLevel());
     act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
     act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
     send_to_char("The mud on your gloves spoils the flesh of your enemy.\r\n", ch);
@@ -3335,17 +3335,17 @@ int glove_combat_procs(Character *ch, class Object *obj, int cmd, char *arg,
   case 4818:
     if (number(0, 19))
       return eFAILURE;
-    return spell_burning_hands(ch->level, ch, ch->fighting, nullptr, 50);
+    return spell_burning_hands(ch->getLevel(), ch, ch->fighting, nullptr, 50);
   case 4819:
     if (number(0, 19))
       return eFAILURE;
-    return spell_chill_touch(ch->level, ch, ch->fighting, nullptr, 50);
+    return spell_chill_touch(ch->getLevel(), ch, ch->fighting, nullptr, 50);
   case 21718:
     if (affected_by_spell(ch, BASE_SETS + SET_SAIYAN))
     {
       if (number(0, 19))
         return eFAILURE;
-      return spell_sparks(ch->level, ch, ch->fighting, nullptr, 0);
+      return spell_sparks(ch->getLevel(), ch, ch->fighting, nullptr, 0);
     }
     break;
   case 19503: // Gloves of the Dreamer
@@ -3636,12 +3636,12 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     if (GET_POS(vict) == POSITION_FIGHTING)
     {
       tmp = sword_combat;
-      if (IS_NPC(vict->fighting) && GET_LEVEL(vict->fighting) > 99)
+      if (IS_NPC(vict->fighting) && vict->fighting->getLevel() > 99)
       {
         buf = "Are you sure you can win this one? I mean.... I'll be ok, but I'm pretty sure you're screwed.";
         tmp.push_back(buf);
       }
-      level_diff_t level_difference = GET_LEVEL(vict) - GET_LEVEL(vict->fighting);
+      level_diff_t level_difference = vict->getLevel() - vict->fighting->getLevel();
       if (IS_NPC(vict->fighting) && level_difference > 40)
       {
         buf = "Oh come on... this is fuckin' embarrassing...";
@@ -3875,14 +3875,14 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL)
+        DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && vict->getLevel() < IMMORTAL)
     {
       send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
       return eSUCCESS;
     }
 
     // if it's a player, go ahead
-    if (number(1, 100) > 90 && GET_LEVEL(vict) < 100)
+    if (number(1, 100) > 90 && vict->getLevel() < 100)
       dropped = 1;
     else
       return eFAILURE;
@@ -4233,7 +4233,7 @@ int godload_leprosy(Character *ch, class Object *obj, int cmd, char *arg,
       ch, obj, ch->fighting, TO_ROOM, 0);
   send_to_char("Your feet releases a cloud of disease!\r\n", ch);
 
-  return spell_harm(GET_LEVEL(ch), ch, ch->fighting, 0, 150);
+  return spell_harm(ch->getLevel(), ch, ch->fighting, 0, 150);
 }
 
 // 540
@@ -4571,7 +4571,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
   //      send_to_char("Which glyph?\n\r", ch);
   if (ch->spellcraftglyph == 7)
   {
-    if (GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 50 && !has_skill(ch, SKILL_SPELLCRAFT))
+    if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !has_skill(ch, SKILL_SPELLCRAFT))
     {
       send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
       send_to_char("A beam of light hits you in the head!\n\rYou have learned spellcraft!\n\r", ch);

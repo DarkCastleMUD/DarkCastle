@@ -235,7 +235,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   dam = dice(ch->equipment[WIELD]->obj_flags.value[1],
              ch->equipment[WIELD]->obj_flags.value[2]);
   dam += to_dam;
-  dam *= (GET_LEVEL(ch) / 6); // 10 at level 50
+  dam *= (ch->getLevel() / 6); // 10 at level 50
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
   attacktype = ch->equipment[WIELD]->obj_flags.value[3] + TYPE_HIT;
@@ -380,7 +380,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
 int do_hitall(Character *ch, char *argument, int cmd)
 {
-  if (IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_HITALL))
+  if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !has_skill(ch, SKILL_HITALL))
   {
     send_to_char("You better learn how to first...\r\n", ch);
     return eFAILURE;
@@ -745,7 +745,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    if (GET_LEVEL(victim) >= IMMORTAL)
+    if (victim->getLevel() >= IMMORTAL)
     {
       send_to_char("You can't seem to work it loose.\r\n", ch);
       return eFAILURE;
@@ -771,9 +771,9 @@ int do_disarm(Character *ch, char *argument, int cmd)
   wielded = victim->equipment[WIELD];
 
   int modifier = 0;
-  level_diff_t level_difference = GET_LEVEL(victim) - GET_LEVEL(ch);
+  level_diff_t level_difference = victim->getLevel() - ch->getLevel();
 
-  if (GET_LEVEL(ch) < 50 && GET_LEVEL(ch) + 10 < GET_LEVEL(victim)) // keep lowbies from disarming big mobs
+  if (ch->getLevel() < 50 && ch->getLevel() + 10 < victim->getLevel()) // keep lowbies from disarming big mobs
     modifier = -(level_difference * 2);
 
   // Two handed weapons are twice as hard to disarm
@@ -784,7 +784,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
   {
 
     if (((DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || DC::isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
-         (GET_LEVEL(victim) >= IMMORTAL)) &&
+         (victim->getLevel() >= IMMORTAL)) &&
         (IS_PC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
          mob_index[victim->mobdata->nr].virt < 2300))
       send_to_char("You can't seem to work it loose.\r\n", ch);
@@ -918,7 +918,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_BLADESHIELD) && GET_LEVEL(ch) < IMMORTAL)
+  if (affected_by_spell(ch, SKILL_BLADESHIELD) && ch->getLevel() < IMMORTAL)
   {
     send_to_char("Your body is still recovering from your last use of the blade shield technique.\r\n", ch);
     return eFAILURE;
@@ -1206,7 +1206,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_MAKE_CAMP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("You do not know how to set up a safe camp.\r\n", ch);
     return eFAILURE;
@@ -1310,7 +1310,7 @@ int do_triage(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_TRIAGE);
   struct affected_type af;
 
-  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned)
+  if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
     send_to_char("You do not know how to aid your regeneration in that way.\r\n", ch);
     return eFAILURE;
@@ -1369,7 +1369,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_BATTLESENSE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("You do not know how to heighten your battle awareness.\r\n", ch);
     return eFAILURE;
@@ -1411,7 +1411,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("You do not know how to smite your enemies effectively.\r\n", ch);
     return eFAILURE;
@@ -1495,7 +1495,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_LEADERSHIP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("You do not know that ability.\r\n", ch);
     return eFAILURE;
@@ -1554,7 +1554,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_PERSEVERANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("Your lack of fortitude is stunning.\r\n", ch);
     return eFAILURE;
@@ -1595,7 +1595,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned)
+  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     send_to_char("You do not know how to use this to your advantage.\r\n", ch);
     return eFAILURE;
@@ -1639,7 +1639,7 @@ int do_onslaught(Character *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_ONSLAUGHT);
   struct affected_type af;
 
-  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned)
+  if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
     send_to_char("You do not know how to use this to your advantage.\r\n", ch);
     return eFAILURE;

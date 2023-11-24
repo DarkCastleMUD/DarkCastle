@@ -866,7 +866,7 @@ void clan_death(Character *ch, Character *killer)
     return;
 
   // Don't give away any imms listening in
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
     return;
 
   if (!(curr = strstr(clan->death_message, "%")))
@@ -908,7 +908,7 @@ void clan_login(Character *ch)
   }
 
   // Don't give away any imms listening in
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
   {
     return;
   }
@@ -952,7 +952,7 @@ void clan_logout(Character *ch)
   }
 
   // Don't give away any imms listening in
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
   {
     return;
   }
@@ -1008,7 +1008,7 @@ int do_accept(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(victim) || GET_LEVEL(victim) >= IMMORTAL)
+  if (IS_NPC(victim) || victim->getLevel() >= IMMORTAL)
   {
     send_to_char("Yeah right.\r\n", ch);
     return eFAILURE;
@@ -1559,7 +1559,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   while (isspace(*arg))
     arg++;
-  if (!has_right(ch, CLAN_RIGHTS_CHANNEL) && ch->level < 51)
+  if (!has_right(ch, CLAN_RIGHTS_CHANNEL) && ch->getLevel() < 51)
   {
     send_to_char("You don't have the right to talk to your clan.\r\n", ch);
     return eFAILURE;
@@ -1605,7 +1605,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     if (pch == ch || pch->clan != ch->clan ||
         !DC::isSet(pch->misc, LogChannels::CHANNEL_CLAN))
       continue;
-    if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level <= DC::MAX_MORTAL_LEVEL)
+    if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->getLevel() <= DC::MAX_MORTAL_LEVEL)
       continue;
 
     for (tmp_obj = DC::getInstance()->world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -1638,7 +1638,7 @@ void do_clan_list(Character *ch)
   clan_data *clan = 0;
   string buf, buf2;
 
-  if (GET_LEVEL(ch) > 103)
+  if (ch->getLevel() > 103)
   {
     send_to_char("$B$7## Clan                 Leader           Tax   $B$5Gold$7 Balance$R\n\r", ch);
   }
@@ -1650,7 +1650,7 @@ void do_clan_list(Character *ch)
   std::locale("en_US.UTF-8");
   for (clan = clan_list; clan; clan = clan->next)
   {
-    if (GET_LEVEL(ch) > 103)
+    if (ch->getLevel() > 103)
     {
       buf = fmt::format("{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, clan->name, clan->leader, clan->tax, clan->getBalance());
     }
@@ -2649,7 +2649,7 @@ int do_clans(Character *ch, char *arg, int cmd)
     }
   }
 
-  if (IS_PC(ch) && (GET_LEVEL(ch) >= COORDINATOR))
+  if (IS_PC(ch) && (ch->getLevel() >= COORDINATOR))
   {
     do_god_clans(ch, arg, cmd);
     return eSUCCESS;
@@ -2703,7 +2703,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
           clan->description ? clan->description : "(No Description)\r\n");
   send_to_char(buf, ch);
 
-  if (GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
+  if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MESSAGES)))
   {
     sprintf(buf, "$3Login$R:          %s\r\n"
@@ -2714,7 +2714,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
             clan->death_message ? clan->death_message : "(No Message)");
     send_to_char(buf, ch);
   }
-  if (GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
+  if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
     sprintf(buf, "$3Balance$R:         %lu coins\r\n", clan->getBalance());
@@ -2751,7 +2751,7 @@ int do_whoclan(Character *ch, char *arg, int cmd)
     {
       if (desc->connected || !(pch = desc->character))
         continue;
-      if (pch->clan != clan->number || GET_LEVEL(pch) >= OVERSEER ||
+      if (pch->clan != clan->number || pch->getLevel() >= OVERSEER ||
           (!CAN_SEE(ch, pch) && ch->clan != pch->clan))
         continue;
       if (found == 0)
@@ -2897,7 +2897,7 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
     send_to_char("You not a member of a clan.\r\n", ch);
     return eFAILURE;
   }
-  if (!has_right(ch, CLAN_RIGHTS_WITHDRAW) && GET_LEVEL(ch) < 108)
+  if (!has_right(ch, CLAN_RIGHTS_WITHDRAW) && ch->getLevel() < 108)
   {
     send_to_char("You don't have the right to withdraw $B$5gold$R from your clan's account.\r\n", ch);
     return eFAILURE;
@@ -3081,7 +3081,7 @@ int count_plrs(int zone, int clan)
   int i = count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
                    {
       if (IS_PC(tmpch) && DC::getInstance()->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
-	  GET_LEVEL(tmpch) < 100 && GET_LEVEL(tmpch) > 10)
+	  tmpch->getLevel() < 100 && tmpch->getLevel() > 10)
       return true;
       else
       return false; });
@@ -3226,7 +3226,7 @@ int online_clan_members(int clan)
   int i = count_if(character_list.begin(), character_list.end(),
                    [&clan](Character *const &Tmpch)
                    {
-                     if (IS_PC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc && GET_LEVEL(Tmpch) > 10)
+                     if (IS_PC(Tmpch) && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
                        return true;
                      else
                        return false;
@@ -3296,7 +3296,7 @@ void check_quitter(varg_t arg1, void *arg2, void *arg3)
 
 void check_quitter(Character *ch)
 {
-  if (!ch->clan || GET_LEVEL(ch) >= 100)
+  if (!ch->clan || ch->getLevel() >= 100)
     return;
 
   struct timer_data *timer;
@@ -3583,7 +3583,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
       send_to_char("You need to wait before you can attempt to challenge an area.\r\n", this);
       return eFAILURE;
     }
-    if (GET_LEVEL(this) < 40)
+    if (level_ < 40)
     {
       send_to_char("You must be level 40 to issue a challenge.\r\n", this);
       return eFAILURE;

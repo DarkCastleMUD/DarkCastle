@@ -206,7 +206,7 @@ void damage_all_players_in_room(Character *ch, int damage)
       continue;
     if (ch == vict)
       continue;
-    if (GET_LEVEL(vict) >= IMMORTAL)
+    if (vict->getLevel() >= IMMORTAL)
       continue;
 
     if (affected_by_spell(vict, SPELL_DIVINE_INTER) && damage > affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier)
@@ -321,7 +321,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   // Deathstroke my opponent whenever possible
-  if (GET_LEVEL(ch) > 39 && GET_POS(vict) < POSITION_FIGHTING)
+  if (ch->getLevel() > 39 && GET_POS(vict) < POSITION_FIGHTING)
   {
     MOB_WAIT_STATE(ch) = 2;
     return do_deathstroke(ch, "", CMD_DEFAULT);
@@ -332,8 +332,8 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       wielded = vict->equipment[WIELD];
       if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (GET_LEVEL(vict) <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && GET_LEVEL(ch) > 9 && number(0, 2) == 0)
+          (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
+        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
         {
           MOB_WAIT_STATE(ch) = 2;
           disarm(ch, vict);
@@ -341,12 +341,12 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
         }
     }
 
-  if (vict == ch->fighting && GET_LEVEL(ch) > 3 && number(0, 2) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
   {
     MOB_WAIT_STATE(ch) = 3;
     return do_bash(ch, "", CMD_DEFAULT);
   }
-  if (vict == ch->fighting && GET_LEVEL(ch) > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
   {
     MOB_WAIT_STATE(ch) = 2;
     return do_kick(ch, "", CMD_DEFAULT);
@@ -371,7 +371,7 @@ int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (GET_LEVEL(ch) > 30 && number(0, 2) == 0)
+    if (ch->getLevel() > 30 && number(0, 2) == 0)
     {
       if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
           (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
@@ -380,27 +380,27 @@ int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
 
         act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM,
             INVIS_NULL);
-        return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+        return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
       }
     }
 
-  if (GET_LEVEL(ch) > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && number(0, 2) == 0)
   {
     act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
-  if (GET_LEVEL(ch) > 40 && number(0, 1) == 0)
+  if (ch->getLevel() > 40 && number(0, 1) == 0)
   {
     act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
       INVIS_NULL);
-  return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  return cast_acid_blast(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 int active_grandmaster(Character *ch, class Object *obj, int command, const char *arg,
@@ -419,7 +419,7 @@ int active_grandmaster(Character *ch, class Object *obj, int command, const char
     return eFAILURE;
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (GET_LEVEL(ch) > 30 && number(0, 4) == 0)
+    if (ch->getLevel() > 30 && number(0, 4) == 0)
     {
       if ((IS_AFFECTED(vict, AFF_SANCTUARY)) ||
           (IS_AFFECTED(vict, AFF_FIRESHIELD)) ||
@@ -428,36 +428,36 @@ int active_grandmaster(Character *ch, class Object *obj, int command, const char
 
         act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0,
             TO_ROOM, INVIS_NULL);
-        return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+        return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
       }
     }
 
-  if (GET_LEVEL(ch) > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && number(0, 2) == 0)
   {
     act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
-  if (GET_LEVEL(ch) > 40 && number(0, 2) == 0)
+  if (ch->getLevel() > 40 && number(0, 2) == 0)
   {
     act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if (GET_LEVEL(ch) > 40 && number(0, 1) == 0)
+    if (ch->getLevel() > 40 && number(0, 1) == 0)
     {
       act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
           INVIS_NULL);
-      return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+      return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
     }
 
   act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
       INVIS_NULL);
   return cast_acid_blast(
-      GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+      ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 static char *frostyYellText[] = {
@@ -662,12 +662,12 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
         {
-          if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+          if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
         }
         if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD))
         {
-          if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+          if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
         }
 
@@ -715,7 +715,7 @@ int white_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   act("$n breathes frost.", ch, 0, 0, TO_ROOM, 0);
-  cast_frost_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  cast_frost_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 
   return eSUCCESS;
 }
@@ -740,7 +740,7 @@ int black_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   act("$n breathes acid.", ch, 0, 0, TO_ROOM, 0);
-  return cast_acid_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  return cast_acid_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -760,7 +760,7 @@ int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   act("$n breathes fire.", ch, 0, 0, TO_ROOM, 0);
-  return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+  return cast_fire_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
 int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -780,7 +780,7 @@ int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
-  return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+  return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
 int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -808,7 +808,7 @@ int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (number(0, 4) == 0)
   {
     act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
-    return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
   }
 
   vict = ch->fighting;
@@ -826,7 +826,7 @@ int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   }
 
   act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
-  return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  return cast_lightning_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 int francis_guard(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -2020,7 +2020,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
     {
       send_to_char("You choke and gag as noxious gases fill the air.\r\n",
                    tmp_victim);
-      dam = dice(GET_LEVEL(ch), 8);
+      dam = dice(ch->getLevel(), 8);
       act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
           TO_ROOM, 0);
       retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
@@ -2030,7 +2030,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
         if (!DC::isSet(tmp_victim->immune, ISR_POISON))
         {
           af.type = SPELL_POISON;
-          af.duration = GET_LEVEL(ch) * 2;
+          af.duration = ch->getLevel() * 2;
           af.modifier = -5;
           af.location = APPLY_STR;
           af.bitvector = AFF_POISON;
@@ -2063,15 +2063,15 @@ int adept(Character *ch, class Object *obj, int cmd, const char *arg,
   {
   case 3:
     act("$n utters the words 'garf'.", ch, 0, 0, TO_ROOM, 0);
-    cast_cure_light(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
+    cast_cure_light(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
     return eSUCCESS;
   case 7:
     act("$n utters the words 'nahk'.", ch, 0, 0, TO_ROOM, 0);
-    cast_bless(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
+    cast_bless(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
     return eSUCCESS;
   case 6:
     act("$n utters the words 'tehctah'.", ch, 0, 0, TO_ROOM, 0);
-    cast_armor(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
+    cast_armor(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
     return eSUCCESS;
   case 4:
     do_say(ch, "Finish school.  Don't drop out.", 0);
@@ -2163,7 +2163,7 @@ int bee(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * GET_LEVEL(ch))
+      number(0, 120) < 2 * ch->getLevel())
   {
     act("You sting $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);
@@ -2171,8 +2171,8 @@ int bee(Character *ch, class Object *obj, int cmd, const char *arg,
         ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
     act("$n sinks a barbed stinger into you!", ch, 0,
         ch->fighting, TO_VICT, 0);
-    return cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
-                       ch->fighting, 0, GET_LEVEL(ch));
+    return cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
+                       ch->fighting, 0, ch->getLevel());
   }
   return eFAILURE;
 }
@@ -2309,10 +2309,10 @@ int newbie_zone_guard(Character *ch, class Object *obj, int cmd, const char *arg
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if ((GET_LEVEL(ch) > 10                            /* mud school */
+  if ((ch->getLevel() > 10                            /* mud school */
        && ch->in_room == real_room(257) && cmd == 1) /* north */
       ||
-      (GET_LEVEL(ch) > 20                             /* newbie caves */
+      (ch->getLevel() > 20                             /* newbie caves */
        && ch->in_room == real_room(6400) && cmd == 6) /* down */
   )
 
@@ -2368,16 +2368,16 @@ int hellstreamer(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return eSUCCESS;
   }
 
-  // removed && GET_LEVEL(ch) > 49
+  // removed && ch->getLevel() > 49
   if (number(0, 2) == 0)
   {
     act("$n utters the words 'Burn motherfucker!'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   return eFAILURE;
@@ -2392,7 +2392,7 @@ int firestormer(Character *ch, class Object *obj, int cmd, const char *arg,
 
   act("$n utters the words 'Fry bitch!'.", ch, 0, 0,
       TO_ROOM, INVIS_NULL);
-  return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -2422,10 +2422,10 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
-          if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+          if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
         if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD))
-          if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+          if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
 
         if (GET_RACE(tch) != RACE_HUMAN)
@@ -2531,7 +2531,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
   if (!vict)
     return eFAILURE;
 
-  if (GET_LEVEL(ch) > 3 && number(0, 3) == 0 && GET_POS(vict) > POSITION_SITTING)
+  if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > POSITION_SITTING)
   {
     retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
     if (DC::isSet(retval, eCH_DIED))
@@ -2547,9 +2547,9 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
 
     return eSUCCESS;
   }
-  if (vict == ch->fighting && GET_LEVEL(ch) > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
   {
-    return damage(ch, vict, GET_LEVEL(ch) >> 1, TYPE_HIT, SKILL_KICK, 0);
+    return damage(ch, vict, ch->getLevel() >> 1, TYPE_HIT, SKILL_KICK, 0);
   }
 
   return eFAILURE;
@@ -2607,7 +2607,7 @@ int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * GET_LEVEL(ch))
+      number(0, 120) < 2 * ch->getLevel())
   {
     act("You peck $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);
@@ -2615,8 +2615,8 @@ int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
         ch->fighting, TO_ROOM, INVIS_NULL | NOTVICT);
     act("$n pecks at you with it's beak!", ch, 0,
         ch->fighting, TO_VICT, 0);
-    return cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
-                          ch->fighting, 0, GET_LEVEL(ch));
+    return cast_blindness(ch->getLevel(), ch, "", SPELL_TYPE_SPELL,
+                          ch->fighting, 0, ch->getLevel());
   }
   return eFAILURE;
 }
@@ -2716,14 +2716,14 @@ int bounder(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return eSUCCESS;
   }
 
   do_say(ch, "I hope you land in enfan hell!", CMD_DEFAULT);
   act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
       INVIS_NULL);
-  return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+  return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
 // I love to dispel stuff!
@@ -2746,7 +2746,7 @@ int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+    cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return eSUCCESS;
   }
 
@@ -2756,13 +2756,13 @@ int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("$n utters the words 'fjern magi'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
   else
   {
     act("$n utters the words 'frys din nisse'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return cast_chill_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
+    return cast_chill_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
   return eFAILURE;
 }
@@ -2798,18 +2798,18 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
   if (ch->equipment[WIELD] && vict->equipment[WIELD])
     if (IS_PC(ch) || IS_PC(vict))
       if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
-          (GET_LEVEL(vict) <= DC::MAX_MORTAL_LEVEL))
-        if (vict == ch->fighting && GET_LEVEL(ch) > 9 && number(0, 2) == 0)
+          (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
+        if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
         {
           disarm(ch, vict);
           return eSUCCESS;
         }
 
-  if (vict == ch->fighting && GET_LEVEL(ch) > 3 && number(0, 2) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 3 && number(0, 2) == 0)
   {
     return do_bash(ch, "", CMD_DEFAULT);
   }
-  if (vict == ch->fighting && GET_LEVEL(ch) > 2 && number(0, 1) == 0)
+  if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
   {
     return do_kick(ch, "", CMD_DEFAULT);
   }
@@ -2955,7 +2955,7 @@ int koban_combat(Character *ch, class Object *obj, int cmd, const char *arg,
     temp_chr = ch->fighting;
     stop_fighting(ch);
     act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
+    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
     set_fighting(ch, temp_chr);
     return eSUCCESS;
   }
@@ -2964,13 +2964,13 @@ int koban_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)) && number(0, 1))
   {
     act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
+    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
     return eSUCCESS;
   }
 
   // call lightning
   act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  return cast_call_lightning(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+  return cast_call_lightning(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
 int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
@@ -2990,7 +2990,7 @@ int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
   {
     act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
+    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
     return eSUCCESS;
   }
 
@@ -2998,7 +2998,7 @@ int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (iasenko && ((iasenko->getHP() + 5) < GET_MAX_HIT(iasenko)))
   {
     act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
+    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, iasenko, 0, ch->getLevel());
     return eSUCCESS;
   }
 
@@ -3006,7 +3006,7 @@ int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!IS_AFFECTED(ch, AFF_SANCTUARY))
   {
     act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+    cast_sanctuary(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return eSUCCESS;
   }
 
@@ -3014,7 +3014,7 @@ int koban_non_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if ((ch->getHP() + 5) < GET_MAX_HIT(ch))
   {
     act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+    cast_full_heal(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return eSUCCESS;
   }
 
@@ -3079,19 +3079,19 @@ int takahashi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   case 1:
     // firestorm
     act("$n summons the power of the shadows to envelop you in fire!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    retval = cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     if (SOMEONE_DIED(retval))
       return retval;
-    return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   case 2:
     // vampiric touch
     act("$n calls upon the arcane knowledge of his ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    retval = cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     if (SOMEONE_DIED(retval))
       return retval;
-    return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_vampiric_touch(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   } // end of switch
@@ -3151,7 +3151,7 @@ int surimoto_combat(Character *ch, class Object *obj, int cmd, const char *arg,
 
   case 1:
     act("$n utters the words, 'moshi-moshi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   default:
@@ -3179,12 +3179,12 @@ int hiryushi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
 
   case 1:
     act("$n utters the words, 'solar flare'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_solar_gate(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_solar_gate(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   case 2:
     act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   case 3:
@@ -3194,7 +3194,7 @@ int hiryushi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
       if (IS_NPC(victim))
         continue;
       act("$n points a wand at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
-      return cast_drown(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, victim, 0, GET_LEVEL(ch));
+      return cast_drown(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, victim, 0, ch->getLevel());
     }
     break;
 
@@ -3215,15 +3215,15 @@ int izumi_combat(Character *ch, class Object *obj, int cmd, const char *arg,
 
   case 1:
     act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    retval = cast_poison(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     if (SOMEONE_DIED(retval))
       return retval;
-    cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   default:
     act("$n utters the words, 'ga!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_colour_spray(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_colour_spray(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
     break;
 
   } // end of switch
@@ -3240,13 +3240,13 @@ int shogura_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (GET_HIT(ch->fighting) < 5000)
   {
     do_say(ch, "It's time to finish this, little one.", CMD_DEFAULT);
-    return ki_punch(GET_LEVEL(ch), ch, "", ch->fighting);
+    return ki_punch(ch->getLevel(), ch, "", ch->fighting);
   }
 
   if (IS_AFFECTED(ch->fighting, AFF_FIRESHIELD) ||
       IS_AFFECTED(ch->fighting, AFF_FIRESHIELD))
   {
-    return ki_disrupt(GET_LEVEL(ch), ch, "", ch->fighting);
+    return ki_disrupt(ch->getLevel(), ch, "", ch->fighting);
   }
 
   switch (number(1, 2))
@@ -3410,7 +3410,7 @@ int mage_familiar_imp(Character *ch, class Object *obj, int cmd, const char *arg
                       Character *owner)
 {
   if (number(0, 1))
-    return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+    return cast_fireball(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 
   return eFAILURE;
 }

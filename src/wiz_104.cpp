@@ -76,7 +76,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 		for (i = DC::getInstance()->descriptor_list; i; i = i->next)
 			if (i->character != ch && !i->connected)
 			{
-				if (IS_PC(ch) && ch->player->wizinvis && i->character->level < ch->player->wizinvis)
+				if (IS_PC(ch) && ch->player->wizinvis && i->character->getLevel() < ch->player->wizinvis)
 					sprintf(buf3, "Someone");
 				else
 					sprintf(buf3, GET_SHORT(ch));
@@ -239,7 +239,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				send_to_char("No such mobile.\r\n", ch);
 				return eFAILURE;
 			}
-			if (GET_LEVEL(ch) < DEITY && !can_modify_mobile(ch, num))
+			if (ch->getLevel() < DEITY && !can_modify_mobile(ch, num))
 			{
 				send_to_char("You may only load mobs inside of your range.\r\n", ch);
 				return eFAILURE;
@@ -264,7 +264,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				send_to_char("No such object.\r\n", ch);
 				return eFAILURE;
 			}
-			if ((GET_LEVEL(ch) < 108) &&
+			if ((ch->getLevel() < 108) &&
 				DC::isSet(((class Object *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
 				send_to_char("Why would you want to load that?\n\r", ch);
@@ -275,7 +275,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				send_to_char("This command can only load prize items.\r\n", ch);
 				return eFAILURE;
 			}
-			else if (cmd != CMD_PRIZE && GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num))
+			else if (cmd != CMD_PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
 			{
 				send_to_char("You may only load objects inside of your range.\r\n", ch);
 				return eFAILURE;
@@ -309,9 +309,9 @@ int do_load(Character *ch, char *arg, int cmd)
 			send_to_char("No such object.\r\n", ch);
 			return eFAILURE;
 		}
-		if ((GET_LEVEL(ch) < IMPLEMENTER) &&
+		if ((ch->getLevel() < IMPLEMENTER) &&
 			DC::isSet(((class Object *)(obj_index[num].item))->obj_flags.extra_flags,
-				   ITEM_SPECIAL))
+					  ITEM_SPECIAL))
 		{
 			send_to_char("Why would you want to load that?\n\r", ch);
 			return eFAILURE;
@@ -342,9 +342,9 @@ int do_purge(Character *ch, char *argument, int cmd)
 
 	if (*name)
 	{ /* argument supplied. destroy single object or char */
-		if ((vict = get_char_room_vis(ch, name)) && (GET_LEVEL(ch) > G_POWER))
+		if ((vict = get_char_room_vis(ch, name)) && (ch->getLevel() > G_POWER))
 		{
-			if (IS_PC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
+			if (IS_PC(vict) && (ch->getLevel() <= vict->getLevel()))
 			{
 				sprintf(buf, "%s is surrounded with scorching flames but is"
 							 " unharmed.\r\n",
@@ -879,7 +879,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_mobile(begin)) >= 0)
 				{
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
-							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 				}
@@ -894,7 +894,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
@@ -923,7 +923,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
@@ -1391,16 +1391,16 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 			if (immune)
 				if (!DC::isSet(((Character *)(mob_index[nr].item))->immune,
-							immune))
+							   immune))
 					continue;
 			if (clas)
 				if (((Character *)(mob_index[nr].item))->c_class != clas)
 					continue;
 			if (levlow != -555)
-				if (((Character *)(mob_index[nr].item))->level < levlow)
+				if (((Character *)(mob_index[nr].item))->getLevel() < levlow)
 					continue;
 			if (levhigh != -555)
-				if (((Character *)(mob_index[nr].item))->level > levhigh)
+				if (((Character *)(mob_index[nr].item))->getLevel() > levhigh)
 					continue;
 			if (*act)
 				for (i = 0; i < ACT_MAX; i++)
@@ -1423,7 +1423,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
-					((Character *)(mob_index[nr].item))->level,
+					((Character *)(mob_index[nr].item))->getLevel(),
 					((Character *)(mob_index[nr].item))->short_desc);
 			send_to_char(buf, ch);
 		eheh:
@@ -1787,7 +1787,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
 				{
 					if (DC::isSet(DC::getInstance()->rooms[i].dir_option[nr]->exit_info,
-							   EX_ISDOOR) &&
+								  EX_ISDOOR) &&
 						DC::getInstance()->rooms[i].dir_option[nr]->key == count)
 					{
 						csendf(ch,
@@ -1946,14 +1946,14 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		} /* if */
 	}	  /* if */
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
+	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;
 	}
 
 	if (DC::isSet(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
-		GET_LEVEL(ch) < DEITY)
+		ch->getLevel() < DEITY)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;

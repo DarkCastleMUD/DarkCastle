@@ -85,11 +85,11 @@ char *Path::determineRoute(Character *ch, int from, int to)
   leastSteps(from, to, 1, &i);
   static char buf[MAX_STRING_LENGTH];
   buf[0] = 0;
-  if (ch && GET_LEVEL(ch) >= 105)
+  if (ch && ch->getLevel() >= 105)
     csendf(ch, "# of steps: %d\r\n", i);
   resetPath();
   findRoom(from, to, 1, i, &buf[0]);
-  if (ch && GET_LEVEL(ch) >= 105)
+  if (ch && ch->getLevel() >= 105)
     csendf(ch, "Best route: %s\r\n", buf);
 
   return &buf[0];

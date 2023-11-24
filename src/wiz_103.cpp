@@ -38,7 +38,7 @@ int do_boot(Character *ch, char *arg, int cmd)
 
   if (victim)
   {
-    if (IS_PC(victim) && (GET_LEVEL(ch) <= GET_LEVEL(victim)))
+    if (IS_PC(victim) && (ch->getLevel() <= victim->getLevel()))
     {
       act("You cast a stream of fire at $N.", ch, 0, victim, TO_CHAR, 0);
       act("$n casts a stream of fire at you.", ch, 0, victim, TO_VICT, 0);
@@ -79,7 +79,7 @@ int do_boot(Character *ch, char *arg, int cmd)
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     sprintf(name, "%s has booted %s.", GET_NAME(ch), GET_NAME(victim));
-    logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(name, ch->getLevel(), LogChannels::LOG_GOD);
 
     if (!strcmp(type, "boot"))
     {
@@ -180,7 +180,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
   {
     if (d->descriptor == sdesc)
     {
-      if (d->character && (GET_LEVEL(d->character) > GET_LEVEL(ch)))
+      if (d->character && (d->character->getLevel() > ch->getLevel()))
       {
         sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", GET_NAME(ch));
         send_to_char(buf, d->character);
@@ -233,7 +233,7 @@ int do_fsave(Character *ch, string argument, int cmd)
   }
   vict->save();
 
-  logentry(QString("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(QString("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), LogChannels::LOG_GOD);
 
   return eSUCCESS;
 }

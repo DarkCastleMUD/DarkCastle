@@ -943,9 +943,9 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			else
 			{
 				if (IS_NPC(target))
-					sbval = reinterpret_cast<decltype(sbval)>(&target->level);
+					sbval = reinterpret_cast<decltype(sbval)>(target->getLevelPtr());
 				else
-					sbval = reinterpret_cast<decltype(sbval)>(&target->level);
+					sbval = reinterpret_cast<decltype(sbval)>(target->getLevelPtr());
 			}
 		}
 		else if (!str_cmp(right, "long"))
@@ -2236,32 +2236,32 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eISIMMORT:
 		if (fvict)
-			return GET_LEVEL(fvict) > IMMORTAL;
+			return fvict->getLevel() > IMMORTAL;
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			return (GET_LEVEL(mob) > IMMORTAL);
+			return (mob->getLevel() > IMMORTAL);
 		case 'z':
 			if (mob->beacon)
-				return (GET_LEVEL(((Character *)mob->beacon)) > IMMORTAL);
+				return ((Character *)mob->beacon)->getLevel() > IMMORTAL;
 			else
 				return -1;
 
 		case 'n':
 			if (actor)
-				return (GET_LEVEL(actor) > IMMORTAL);
+				return (actor->getLevel() > IMMORTAL);
 			else
 				return -1;
 		case 't':
 			if (vict)
-				return (GET_LEVEL(vict) > IMMORTAL);
+				return (vict->getLevel() > IMMORTAL);
 			else
 				return -1;
 		case 'r':
 			if (rndm)
-				return (GET_LEVEL(rndm) > IMMORTAL);
+				return (rndm->getLevel() > IMMORTAL);
 			else
 				return -1;
 		default:

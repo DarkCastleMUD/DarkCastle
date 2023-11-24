@@ -270,7 +270,7 @@ int do_pray(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
   {
     send_to_char("Why pray? You are a god!\n\r", ch);
     return eSUCCESS;
@@ -292,7 +292,7 @@ int do_pray(Character *ch, char *arg, int cmd)
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
-    if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
+    if ((i->character == nullptr) || (i->character->getLevel() <= MORTAL))
       continue;
     if (!(DC::isSet(i->character->misc, LogChannels::LOG_PRAYER)))
       continue;
@@ -352,7 +352,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
       send_to_char("You told yourself not to GOSSIP!!\n\r", ch);
       return eSUCCESS;
     }
-    if (GET_LEVEL(ch) < 3)
+    if (ch->getLevel() < 3)
     {
       send_to_char("You must be at least 3rd level to gossip.\r\n", ch);
       return eSUCCESS;
@@ -368,7 +368,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     send_to_char("Here are the last 10 gossips:\n\r", ch);
     while (!msgs.empty())
     {
-      act(msgs.front().get_msg(ch->level), ch, 0, ch, TO_VICT, 0);
+      act(msgs.front().get_msg(ch->getLevel()), ch, 0, ch, TO_VICT, 0);
       msgs.pop();
     }
   }
@@ -408,7 +408,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
         if (!silence)
         {
-          act(msg.get_msg(i->character->level), ch, 0, i->character, TO_VICT, 0);
+          act(msg.get_msg(i->character->getLevel()), ch, 0, i->character, TO_VICT, 0);
         }
       }
     }
@@ -455,7 +455,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
       send_to_char("You told yourself not to AUCTION!!\n\r", this);
       return eSUCCESS;
     }
-    if (GET_LEVEL(this) < 3)
+    if (level_ < 3)
     {
       send_to_char("You must be at least 3rd level to auction.\r\n", this);
       return eSUCCESS;
@@ -556,7 +556,7 @@ int do_shout(Character *ch, char *argument, int cmd)
     send_to_char("You told yourself not to SHOUT!!\n\r", ch);
     return eSUCCESS;
   }
-  if (IS_PC(ch) && GET_LEVEL(ch) < 3)
+  if (IS_PC(ch) && ch->getLevel() < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
                  "to shout.\r\n",
@@ -635,7 +635,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
       send_to_char("You told yourself not to listen to Trivia!!\n\r", ch);
       return eSUCCESS;
     }
-    if (GET_LEVEL(ch) < 3)
+    if (ch->getLevel() < 3)
     {
       send_to_char("You must be at least 3rd level to participate in "
                    "trivia.\r\n",
@@ -669,7 +669,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_LEVEL(ch) >= 102)
+  if (ch->getLevel() >= 102)
   {
     sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument);
@@ -710,7 +710,7 @@ int do_dream(Character *ch, char *argument, int cmd)
   class Connection *i = nullptr;
   int ctr = 0;
 
-  if ((GET_POS(ch) != POSITION_SLEEPING) && (GET_LEVEL(ch) < MIN_GOD))
+  if ((GET_POS(ch) != POSITION_SLEEPING) && (ch->getLevel() < MIN_GOD))
   {
     send_to_char("How are you going to dream if you're awake?\n\r", ch);
     return eSUCCESS;
@@ -735,7 +735,7 @@ int do_dream(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_LEVEL(ch) < 3)
+  if (ch->getLevel() < 3)
   {
     send_to_char("You must be at least 3rd level to dream.\r\n", ch);
     return eSUCCESS;
@@ -770,7 +770,7 @@ int do_dream(Character *ch, char *argument, int cmd)
           !is_ignoring(i->character, ch) &&
           (DC::isSet(i->character->misc, LogChannels::CHANNEL_DREAM)) &&
           ((GET_POS(i->character) == POSITION_SLEEPING) ||
-           (GET_LEVEL(i->character) >= MIN_GOD)))
+           (i->character->getLevel() >= MIN_GOD)))
         send_to_char(buf1, i->character);
     }
   }
@@ -874,7 +874,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   else if (!(vict = get_active_pc_vis(this, name)))
   {
     vict = get_pc_vis(this, name);
-    if ((vict != nullptr) && GET_LEVEL(vict) >= IMMORTAL)
+    if ((vict != nullptr) && vict->getLevel() >= IMMORTAL)
     {
       send_to_char("That person is busy right now.\r\n", this);
       send_to_char("Your message has been saved.\r\n", this);
@@ -899,7 +899,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && this->level <= DC::MAX_MORTAL_LEVEL)
+  if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
     send_to_char("The person is ignoring all tells right now.\r\n", this);
     return eSUCCESS;
@@ -911,7 +911,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   }
   if (this == vict)
     send_to_char("You try to tell yourself something.\r\n", this);
-  else if ((GET_POS(vict) == POSITION_SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(this) < IMMORTAL)
+  else if ((GET_POS(vict) == POSITION_SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
     act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
   {
@@ -926,7 +926,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       csendf(this, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
       return eSUCCESS;
     }
-    if (is_busy(vict) && GET_LEVEL(this) >= OVERSEER)
+    if (is_busy(vict) && level_ >= OVERSEER)
     {
       if (IS_MOB(vict))
       {
@@ -982,7 +982,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
-             GET_LEVEL(this) >= SERAPH)
+             level_ >= SERAPH)
     {
       send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
       if (IS_MOB(vict))

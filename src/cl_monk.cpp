@@ -81,7 +81,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   else 
   {
     // 1% bingo chance 
-    if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) {
+    if (number(1, 100) == 1 && victim->getLevel() < IMMORTAL) {
       time ( &time_raw_format );
       ptr_time = localtime ( &time_raw_format );
       if( 11 == ptr_time->tm_mon ) {
@@ -92,7 +92,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
       act("You slide your fingers between $N's ribs and give $S's left ventricle a tickle with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
       dam = 9999999;
     } else {
-      dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
+      dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, ch->getLevel()) + 100;
     }
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
   }
@@ -156,7 +156,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(GET_KI(ch) < 40 && GET_LEVEL(ch) < ARCHANGEL) {
+  if(GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL) {
     send_to_char("You don't possess enough ki!\r\n", ch);
     return eFAILURE;
   }
@@ -226,7 +226,7 @@ int do_stun(Character *ch, char *argument, int cmd)
       return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < IMMORTAL && IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL) {
+  if (ch->getLevel() < IMMORTAL && IS_PC(victim) && victim->getLevel() >= IMMORTAL) {
      act_return ar = act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
      retval = ar.retval;
      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
@@ -260,7 +260,7 @@ int do_stun(Character *ch, char *argument, int cmd)
      victim = ch;
   }
 
-  if(GET_LEVEL(victim) == IMPLEMENTER) {
+  if(victim->getLevel() == IMPLEMENTER) {
     send_to_char("You gotta be kidding!\n\r",ch);
     return eFAILURE;
   }

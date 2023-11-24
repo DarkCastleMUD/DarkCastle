@@ -153,7 +153,7 @@ int do_check(Character *ch, char *arg, int cmd)
     if (!GET_TITLE(vict))
       GET_TITLE(vict) = str_dup("is a virgin");
     if (GET_CLASS(vict) == CLASS_MONK)
-      GET_AC(vict) -= GET_LEVEL(vict) * 3;
+      GET_AC(vict) -= vict->getLevel() * 3;
     isr_set(vict);
   }
 
@@ -161,13 +161,13 @@ int do_check(Character *ch, char *arg, int cmd)
   send_to_char(buf, ch);
   sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
           races[(int)(GET_RACE(vict))].singular_name,
-          pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
+          pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
   send_to_char(buf, ch);
   sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
-  if (GET_LEVEL(ch) >= SERAPH)
+  if (ch->getLevel() >= SERAPH)
   {
     sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
             DC::getInstance()->world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
@@ -183,7 +183,7 @@ int do_check(Character *ch, char *arg, int cmd)
           GET_KI(vict), GET_MAX_KI(vict));
   send_to_char(buf, ch);
 
-  if (GET_LEVEL(ch) >= OVERSEER && !IS_MOB(vict) && GET_LEVEL(ch) >= GET_LEVEL(vict))
+  if (ch->getLevel() >= OVERSEER && !IS_MOB(vict) && ch->getLevel() >= vict->getLevel())
   {
     sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
     send_to_char(buf, ch);
@@ -199,7 +199,7 @@ int do_check(Character *ch, char *arg, int cmd)
   if (connected)
     if (vict->desc)
     {
-      if (GET_LEVEL(ch) >= OVERSEER && GET_LEVEL(ch) >= GET_LEVEL(vict))
+      if (ch->getLevel() >= OVERSEER && ch->getLevel() >= vict->getLevel())
       {
         sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getPeerOriginalAddress().toString().toStdString().c_str());
         send_to_char(buf, ch);
@@ -386,7 +386,7 @@ int do_stat(Character *ch, char *arg, int cmd)
     if (!GET_TITLE(vict))
       GET_TITLE(vict) = str_dup("is a virgin");
     if (GET_CLASS(vict) == CLASS_MONK)
-      GET_AC(vict) -= GET_LEVEL(vict) * 3;
+      GET_AC(vict) -= vict->getLevel() * 3;
     isr_set(vict);
 
     char_to_room(vict, ch->in_room);
@@ -1405,7 +1405,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(vict) > GET_LEVEL(ch))
+  if (vict->getLevel() > ch->getLevel())
   {
     ch->send("You like to play dangerously don't you....\r\n");
     return eFAILURE;
@@ -1471,7 +1471,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     learn_skill(vict, skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch)));
     break;
   }
@@ -1489,7 +1489,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
       ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
-      logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
       ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, GET_NAME(vict)));
     }
     else
@@ -1521,7 +1521,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     learn_skill(vict, skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
-    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", GET_NAME(vict), text, i, learned));
     break;
   }
@@ -3370,7 +3370,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%d\n",
-              ((Character *)mob_index[mob_num].item)->level);
+              ((Character *)mob_index[mob_num].item)->getLevel());
       send_to_char(buf, ch);
       return eFAILURE;
     }
@@ -3379,7 +3379,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->level = intval;
+    ((Character *)mob_index[mob_num].item)->setLevel(intval);
     sprintf(buf, "Mob level set to %d.\r\n", intval);
     send_to_char(buf, ch);
   }
@@ -3721,7 +3721,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
-    if (intval > 250000 && GET_LEVEL(ch) <= DEITY)
+    if (intval > 250000 && ch->getLevel() <= DEITY)
     {
       send_to_char(
           "104-'s can only set a mob to 250k gold.  If you need more ask someone.\r\n",
@@ -5441,7 +5441,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     }
     rm = &DC::getInstance()->world[loc];
   }
-  if (DC::isSet(rm->room_flags, CLAN_ROOM) && GET_LEVEL(ch) < PATRON)
+  if (DC::isSet(rm->room_flags, CLAN_ROOM) && ch->getLevel() < PATRON)
   {
     send_to_char("And you are rstating a clan room because?\r\n", ch);
     sprintf(buf, "%s just rstat'd clan room %d.", GET_NAME(ch), rm->number);
@@ -5575,8 +5575,8 @@ int do_possess(Character *ch, char *argument, int cmd)
         send_to_char("He he he... We are jolly funny today, eh?\n\r", ch);
         return eFAILURE;
       }
-      else if ((GET_LEVEL(victim) > GET_LEVEL(ch)) &&
-               (GET_LEVEL(ch) < IMPLEMENTER))
+      else if ((victim->getLevel() > ch->getLevel()) &&
+               (ch->getLevel() < IMPLEMENTER))
       {
         send_to_char("That mob is a bit too tough for you to handle.\r\n", ch);
         return eFAILURE;
@@ -5608,7 +5608,7 @@ int do_possess(Character *ch, char *argument, int cmd)
       {
         send_to_char("Ok.\r\n", ch);
         sprintf(buf, "%s possessed %s", GET_NAME(ch), GET_NAME(victim));
-        logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+        logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;
         ch->desc->original = ch;
@@ -5794,7 +5794,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   if (i > 5)
     i = 5;
 
-  if (GET_LEVEL(vict) > GET_LEVEL(ch))
+  if (vict->getLevel() > ch->getLevel())
   {
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;
@@ -5806,7 +5806,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
       send_to_char("STUPID removed.\r\n", ch);
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
       REMOVE_BIT(vict->player->punish, PUNISH_STUPID);
       REMOVE_BIT(vict->player->punish, PUNISH_SILENCED);
       REMOVE_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5821,7 +5821,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("STUPID set.\r\n", ch);
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
       SET_BIT(vict->player->punish, PUNISH_STUPID);
       SET_BIT(vict->player->punish, PUNISH_SILENCED);
       SET_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5837,7 +5837,7 @@ int do_punish(Character *ch, char *arg, int cmd)
                    vict);
       send_to_char("SILENCE removed.\r\n", ch);
       sprintf(buf, "%s removes %s's silence", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5845,7 +5845,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("SILENCE set.\r\n", ch);
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_SILENCED);
   }
@@ -5856,7 +5856,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("You now can do things again.\r\n", vict);
       send_to_char("FREEZE removed.\r\n", ch);
       sprintf(buf, "%s unfrozen by %s", GET_NAME(vict), GET_NAME(ch));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5864,7 +5864,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("FREEZE set.\r\n", ch);
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_FREEZE);
   }
@@ -5953,7 +5953,7 @@ int do_punish(Character *ch, char *arg, int cmd)
         send_to_char("The gods remove your poor luck.\r\n", vict);
       send_to_char("UNLUCKY removed.\r\n", ch);
       sprintf(buf, "%s removes %s's unlucky.", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5964,7 +5964,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       }
       send_to_char(buf, vict);
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_UNLUCKY);
   }
@@ -6005,7 +6005,7 @@ void display_punishes(Character *ch, Character *vict)
   if (DC::isSet(vict->player->punish, PUNISH_NOEMOTE))
     send_to_char("noemote ", ch);
 
-  if (DC::isSet(vict->player->punish, PUNISH_LOG) && GET_LEVEL(ch) > 108)
+  if (DC::isSet(vict->player->punish, PUNISH_LOG) && ch->getLevel() > 108)
     send_to_char("log ", ch);
 
   if (DC::isSet(vict->player->punish, PUNISH_FREEZE))

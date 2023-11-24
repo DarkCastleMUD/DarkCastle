@@ -411,7 +411,7 @@ void do_on_login_stuff(Character *ch)
    // add character base saves to saving throws
    for (int i = 0; i <= SAVE_TYPE_MAX; i++)
    {
-      ch->saves[i] += GET_LEVEL(ch) / 4;
+      ch->saves[i] += ch->getLevel() / 4;
       ch->saves[i] += ch->player->saves_mods[i];
    }
 
@@ -422,7 +422,7 @@ void do_on_login_stuff(Character *ch)
 
    if (GET_CLASS(ch) == CLASS_MONK)
    {
-      GET_AC(ch) -= (GET_LEVEL(ch) * 2);
+      GET_AC(ch) -= (ch->getLevel() * 2);
    }
    GET_AC(ch) -= has_skill(ch, SKILL_COMBAT_MASTERY) / 2;
 
@@ -436,18 +436,18 @@ void do_on_login_stuff(Character *ch)
    isr_set(ch);
    ch->altar = clan_altar(ch);
 
-   if (!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL)
+   if (!IS_MOB(ch) && ch->getLevel() >= IMMORTAL)
    {
       ch->player->holyLite = true;
       GET_COND(ch, THIRST) = -1;
       GET_COND(ch, FULL) = -1;
    }
    add_totem_stats(ch);
-   if (GET_LEVEL(ch) < 5 && GET_AGE(ch) < 21)
+   if (ch->getLevel() < 5 && GET_AGE(ch) < 21)
       char_to_room(ch, real_room(200));
    else if (ch->in_room >= 2)
       char_to_room(ch, ch->in_room);
-   else if (GET_LEVEL(ch) >= IMMORTAL)
+   else if (ch->getLevel() >= IMMORTAL)
       char_to_room(ch, real_room(17));
    else
       char_to_room(ch, real_room(START_ROOM));
@@ -466,7 +466,7 @@ void do_on_login_stuff(Character *ch)
    {
       if (vault)
       {
-         int adder = GET_LEVEL(ch) - 50;
+         int adder = ch->getLevel() - 50;
          if (adder < 0)
             adder = 0; // Heh :P
          vault->size += adder * 10;
@@ -478,10 +478,10 @@ void do_on_login_stuff(Character *ch)
 
    if (vault)
    {
-      if (vault->size < (unsigned)(GET_LEVEL(ch) * 10))
+      if (vault->size < (unsigned)(ch->getLevel() * 10))
       {
-         logf(IMMORTAL, LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, GET_LEVEL(ch) * 10);
-         vault->size = GET_LEVEL(ch) * 10;
+         logf(IMMORTAL, LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, ch->getLevel() * 10);
+         vault->size = ch->getLevel() * 10;
       }
 
       save_vault(vault->owner);
@@ -540,16 +540,16 @@ void do_on_login_stuff(Character *ch)
       }
    }
 
-   if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
+   if (GET_CLASS(ch) == CLASS_MONK && ch->getLevel() > 10)
    {
       ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
    }
-   if (GET_CLASS(ch) == CLASS_PALADIN && GET_LEVEL(ch) >= 41)
+   if (GET_CLASS(ch) == CLASS_PALADIN && ch->getLevel() >= 41)
    {
       ch->swapSkill(SPELL_ARMOR, SPELL_AEGIS);
       ch->swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
    }
-   if (GET_CLASS(ch) == CLASS_RANGER && GET_LEVEL(ch) > 9)
+   if (GET_CLASS(ch) == CLASS_RANGER && ch->getLevel() > 9)
    {
       if (ch->skills.contains(SKILL_SHIELDBLOCK))
       {
@@ -557,15 +557,15 @@ void do_on_login_stuff(Character *ch)
          ch->setSkillMin(SKILL_DODGE, 50);
       }
    }
-   if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
+   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch->getLevel() >= 44)
    {
       ch->swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
    }
-   if (GET_CLASS(ch) == CLASS_BARD && GET_LEVEL(ch) >= 30)
+   if (GET_CLASS(ch) == CLASS_BARD && ch->getLevel() >= 30)
    {
       ch->swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
    }
-   if (GET_CLASS(ch) == CLASS_CLERIC && GET_LEVEL(ch) >= 42)
+   if (GET_CLASS(ch) == CLASS_CLERIC && ch->getLevel() >= 42)
    {
       ch->swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
       ch->skills.erase(SPELL_RESIST_COLD);
@@ -577,7 +577,7 @@ void do_on_login_stuff(Character *ch)
       ch->skills.erase(SPELL_KNOW_ALIGNMENT);
    }
    // Remove pick if they're no longer allowed to have it.
-   if (GET_CLASS(ch) == CLASS_THIEF && GET_LEVEL(ch) < 22 && has_skill(ch, SKILL_PICK_LOCK))
+   if (GET_CLASS(ch) == CLASS_THIEF && ch->getLevel() < 22 && has_skill(ch, SKILL_PICK_LOCK))
    {
       ch->skills.erase(SKILL_PICK_LOCK);
    }
@@ -1026,7 +1026,7 @@ void nanny(class Connection *d, string arg)
          {
             if (ad != d && d->getPeerOriginalAddress() == ad->getPeerOriginalAddress())
             {
-               if (ad->character && GET_LEVEL(ad->character) == IMPLEMENTER && IS_PC(ad->character))
+               if (ad->character && ad->character->getLevel() == IMPLEMENTER && IS_PC(ad->character))
                {
                   password = ad->character->player->pwd;
                   logf(OVERSEER, LogChannels::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
@@ -1071,14 +1071,14 @@ void nanny(class Connection *d, string arg)
          return;
 
       buffer = QString("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
-      if (GET_LEVEL(ch) < ANGEL)
+      if (ch->getLevel() < ANGEL)
          logentry(buffer, OVERSEER, LogChannels::LOG_SOCKET);
       else
-         logentry(buffer, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
+         logentry(buffer, ch->getLevel(), LogChannels::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
-      if (GET_LEVEL(ch) < IMMORTAL)
+      if (ch->getLevel() < IMMORTAL)
          send_to_char(motd, d->character);
       else
          send_to_char(imotd, d->character);
@@ -1745,7 +1745,7 @@ void nanny(class Connection *d, string arg)
       case '1':
          // I believe this is here to stop a dupe bug
          // by logging in twice, and leaving one at the password: prompt
-         if (GET_LEVEL(ch) > 0)
+         if (ch->getLevel() > 0)
          {
             strcpy(tmp_name, GET_NAME(ch));
             free_char(d->character, Trace("nanny Connection::states::SELECT_MENU 1"));
@@ -1753,11 +1753,11 @@ void nanny(class Connection *d, string arg)
             load_char_obj(d, tmp_name);
             ch = d->character;
 
-            if (DC::getInstance()->cf.implementer.isEmpty() == false)
+            if (!DC::getInstance()->cf.implementer.isEmpty())
             {
                if (QString(GET_NAME(ch)).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
                {
-                  GET_LEVEL(ch) = 110;
+                  ch->setLevel(110);
                }
             }
 
@@ -1791,7 +1791,7 @@ void nanny(class Connection *d, string arg)
 
          do_on_login_stuff(ch);
 
-         if (GET_LEVEL(ch) < OVERSEER)
+         if (ch->getLevel() < OVERSEER)
             clan_login(ch);
 
          act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1803,14 +1803,14 @@ void nanny(class Connection *d, string arg)
          STATE(d) = Connection::states::PLAYING;
          update_max_who();
 
-         if (GET_LEVEL(ch) == 0)
+         if (ch->getLevel() == 0)
          {
             do_start(ch);
             do_new_help(ch, "new", 0);
          }
          do_look(ch, "", 8);
          {
-            if (GET_LEVEL(ch) >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
+            if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
                send_to_char("\n\rThere is an active vote in which you have not yet voted.\r\n"
                             "Enter \"vote\" to see details\n\r\n\r",
@@ -1903,7 +1903,7 @@ void nanny(class Connection *d, string arg)
          }
          remove_character(d->character->name, SELFDELETED);
 
-         GET_LEVEL(d->character) = 1;
+         d->character->setLevel(1);
          update_wizlist(d->character);
          close_socket(d);
          d = nullptr;
@@ -1963,7 +1963,7 @@ void nanny(class Connection *d, string arg)
       SEND_TO_Q("\n\rDone.\r\n", d);
       SEND_TO_Q(menu, d);
       STATE(d) = Connection::states::SELECT_MENU;
-      if (GET_LEVEL(ch) > 1)
+      if (ch->getLevel() > 1)
       {
          char blah1[50], blah2[50];
          // this prevents a dupe bug
@@ -2082,13 +2082,13 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0,
              0, TO_ROOM, INVIS_NULL);
 
-         if (GET_LEVEL(tmp_ch) < IMMORTAL)
+         if (tmp_ch->getLevel() < IMMORTAL)
          {
             logentry(log_buf, COORDINATOR, LogChannels::LOG_SOCKET);
          }
          else
          {
-            logentry(log_buf, GET_LEVEL(tmp_ch), LogChannels::LOG_SOCKET);
+            logentry(log_buf, tmp_ch->getLevel(), LogChannels::LOG_SOCKET);
          }
 
          STATE(d) = Connection::states::PLAYING;
@@ -2170,7 +2170,7 @@ void short_activity()
 // commands, while still allowing other.
 void add_command_lag(Character *ch, int amount)
 {
-   if (GET_LEVEL(ch) < IMMORTAL)
+   if (ch->getLevel() < IMMORTAL)
       ch->timer += amount;
 }
 
@@ -2236,7 +2236,7 @@ void update_characters()
       }
 
       // handle drowning
-      if (IS_PC(i) && GET_LEVEL(i) < IMMORTAL && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
+      if (IS_PC(i) && i->getLevel() < IMMORTAL && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
       {
          tmp = GET_MAX_HIT(i) / 5;
          sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
@@ -2257,7 +2257,7 @@ void update_characters()
       // handle command lag
       if (i->timer > 0)
       {
-         if (GET_LEVEL(i) < IMMORTAL)
+         if (i->getLevel() < IMMORTAL)
             i->timer--;
          else
             i->timer = 0;
@@ -2352,7 +2352,7 @@ void checkConsecrate(int pulseType)
                      continue;
                   }
 
-                  if (IS_PC(tmp_ch) && GET_LEVEL(tmp_ch) >= IMMORTAL)
+                  if (IS_PC(tmp_ch) && tmp_ch->getLevel() >= IMMORTAL)
                   {
                      continue;
                   }
@@ -2392,7 +2392,7 @@ void checkConsecrate(int pulseType)
             for (tmp_ch = DC::getInstance()->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
                next_ch = tmp_ch->next_in_room;
-               if (IS_PC(tmp_ch) && GET_LEVEL(tmp_ch) >= IMMORTAL)
+               if (IS_PC(tmp_ch) && tmp_ch->getLevel() >= IMMORTAL)
                {
                   continue;
                }

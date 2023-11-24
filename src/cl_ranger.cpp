@@ -60,14 +60,14 @@ int charm_space(int level)
 
 int charm_levels(Character *ch)
 {
-  int i = GET_LEVEL(ch) / 5;
+  int i = ch->getLevel() / 5;
   int z = 3;
   struct follow_type *f;
   for (f = ch->followers; f; f = f->next)
     if (IS_AFFECTED(f->follower, AFF_CHARM))
     {
       z--;
-      i -= charm_space(GET_LEVEL(f->follower));
+      i -= charm_space(f->follower->getLevel());
     }
   if (z <= 0)
     return -1;
@@ -164,7 +164,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   }
 
   if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
-      (GET_LEVEL(ch) < GET_LEVEL(victim)))
+      (ch->getLevel() < victim->getLevel()))
   {
     send_to_char("You find yourself unable to tame this creature.\r\n", ch);
     return eFAILURE;
@@ -176,7 +176,7 @@ int do_tame(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0)
+  if (charm_levels(ch) - charm_space(victim->getLevel()) < 0)
   {
     send_to_char("How you plan on controlling so many followers?\n\r", ch);
     return eFAILURE;
@@ -264,7 +264,7 @@ int do_track(Character *ch, char *argument, int cmd)
 
   learned = how_deep = ((has_skill(ch, SKILL_TRACK) / 10) + 1);
 
-  if (GET_LEVEL(ch) >= IMMORTAL)
+  if (ch->getLevel() >= IMMORTAL)
     how_deep = 50;
 
   quarry = get_char_room_vis(ch, victim);
@@ -290,7 +290,7 @@ int do_track(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL)
+  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && ch->getLevel() < ANGEL)
   {
     send_to_char("Only a ranger could track someone by name.\r\n", ch);
     return eFAILURE;
@@ -854,7 +854,7 @@ int do_forage(Character *ch, char *arg, int cmd)
 int parse_arrow(Character *ch, char *arrow)
 {
 
-  if (GET_CLASS(ch) != CLASS_RANGER && GET_LEVEL(ch) < 100)
+  if (GET_CLASS(ch) != CLASS_RANGER && ch->getLevel() < 100)
     return 0;
 
   while (*arrow == ' ')
@@ -1300,7 +1300,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     }
   }
 
-  if ((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
+  if ((GET_MANA(ch) < cost) && (ch->getLevel() < ANGEL))
   {
     send_to_char("You don't have enough mana for that arrow.\r\n", ch);
     return eFAILURE;
@@ -1434,7 +1434,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   }
 
   /* Protect the newbies! */
-  if (IS_PC(victim) && GET_LEVEL(victim) < 6)
+  if (IS_PC(victim) && victim->getLevel() < 6)
   {
     send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
     return eFAILURE;
@@ -1800,7 +1800,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   /*
     TODO - make this into a skill and put it in
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    if(IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = has_skill(ch, SKILL_MIND_DELVE))) {
        send_to_char("You try to think like a chipmunk and go nuts.\r\n", ch);
@@ -1813,7 +1813,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
   target = get_char_room_vis(ch, arg);
 
-  if (GET_LEVEL(ch) < GET_LEVEL(target))
+  if (ch->getLevel() < target->getLevel())
   {
     send_to_char("You can't seem to understand your target's mental processes.\r\n", ch);
     return eFAILURE;

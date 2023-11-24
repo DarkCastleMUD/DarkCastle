@@ -415,7 +415,7 @@ void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_nam
   {
     plural = "s ";
   }
-  logentry(QString("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(QString("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), LogChannels::LOG_GOD);
   Save();
   return;
 }
@@ -629,7 +629,7 @@ bool AuctionHouse::IsWearable(Character *ch, int vnum)
     return true;
 
   Object *obj = (class Object *)(obj_index[nr].item);
-  return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > GET_LEVEL(ch)));
+  return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
 }
 
 /*
@@ -731,7 +731,7 @@ void AuctionHouse::AddRoom(Character *ch, int room)
   {
     auction_rooms[room] = 1;
     csendf(ch, "Done. Room %d added to auction houses.\r\n", room);
-    logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
+    logf(ch->getLevel(), LogChannels::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -748,7 +748,7 @@ void AuctionHouse::RemoveRoom(Character *ch, int room)
   if (1 == auction_rooms.remove(room))
   {
     csendf(ch, "Done. Room %d has been removed from auction houses.\r\n", room);
-    logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
+    logf(ch->getLevel(), LogChannels::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -1489,7 +1489,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
         (options == LIST_MINE && !Item_it->seller.compare(GET_NAME(ch))) || (options == LIST_ALL) || (options == LIST_RECENT) || (options == LIST_PRIVATE && !Item_it->buyer.compare(GET_NAME(ch))) || (options == LIST_BY_NAME && IsName(name, Item_it->vitem)) || (options == LIST_BY_LEVEL && IsLevel(to, from, Item_it->vitem)) || (options == LIST_BY_SLOT && IsSlot(name, Item_it->vitem)) || (options == LIST_BY_SELLER && IsSeller(name, Item_it->seller)) || (options == LIST_BY_CLASS && IsClass(Item_it->vitem, name)) || (options == LIST_BY_RACE && IsRace(Item_it->vitem, name)))
     {
       // don't show it if its expired or sold and its not the searchers item
-      if ((Item_it->state == AUC_EXPIRED || Item_it->state == AUC_SOLD) && options != LIST_MINE && GET_LEVEL(ch) < OVERSEER)
+      if ((Item_it->state == AUC_EXPIRED || Item_it->state == AUC_SOLD) && options != LIST_MINE && ch->getLevel() < OVERSEER)
         continue;
 
       /*
@@ -1498,7 +1498,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
       Search parameters are met.
       */
 
-      if (!Item_it->buyer.isEmpty() && GET_LEVEL(ch) < OVERSEER) // if its a private auction
+      if (!Item_it->buyer.isEmpty() && ch->getLevel() < OVERSEER) // if its a private auction
       {
         if (Item_it->buyer.compare(GET_NAME(ch))      // if the buyer isn't the searcher
             && Item_it->seller.compare(GET_NAME(ch))) // and isn't the seller
@@ -1861,7 +1861,7 @@ int do_vend(Character *ch, char *argument, int cmd)
   Object *obj;
   unsigned int price;
 
-  if (!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 104)
+  if (!TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
     send_to_char("You must be in an auction house to do this!\n\r", ch);
     return eFAILURE;
@@ -1878,7 +1878,7 @@ int do_vend(Character *ch, char *argument, int cmd)
   if (!*buf)
   {
     send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
-    if (GET_LEVEL(ch) >= 104)
+    if (ch->getLevel() >= 104)
       send_to_char("Also: <addroom | removeroom | listrooms | stats>\r\n", ch);
     return eSUCCESS;
   }
@@ -2159,14 +2159,14 @@ int do_vend(Character *ch, char *argument, int cmd)
   }
 
   /*SHOW STATS*/
-  if (GET_LEVEL(ch) >= 104 && !strcmp(buf, "stats"))
+  if (ch->getLevel() >= 104 && !strcmp(buf, "stats"))
   {
     TheAuctionHouse.ShowStats(ch);
     return eSUCCESS;
   }
 
   /*ADD ROOM*/
-  if (GET_LEVEL(ch) >= 104 && !strcmp(buf, "addroom"))
+  if (ch->getLevel() >= 104 && !strcmp(buf, "addroom"))
   {
     argument = one_argument(argument, buf);
     if (!*buf)
@@ -2179,7 +2179,7 @@ int do_vend(Character *ch, char *argument, int cmd)
   }
 
   /*REMOVE ROOM*/
-  if (GET_LEVEL(ch) >= 104 && !strcmp(buf, "removeroom"))
+  if (ch->getLevel() >= 104 && !strcmp(buf, "removeroom"))
   {
     argument = one_argument(argument, buf);
     if (!*buf)
@@ -2192,14 +2192,14 @@ int do_vend(Character *ch, char *argument, int cmd)
   }
 
   /*LIST ROOMS*/
-  if (GET_LEVEL(ch) >= 104 && !strcmp(buf, "listrooms"))
+  if (ch->getLevel() >= 104 && !strcmp(buf, "listrooms"))
   {
     TheAuctionHouse.ListRooms(ch);
     return eSUCCESS;
   }
 
   send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
-  if (GET_LEVEL(ch) >= 104)
+  if (ch->getLevel() >= 104)
     send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
   return eSUCCESS;
 }
