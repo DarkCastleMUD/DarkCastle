@@ -688,7 +688,7 @@ void DC::load_hints(void)
       if (line.endsWith('~'))
       {
         buffer.erase(buffer.cend() - 1, buffer.cend());
-        hints.push_back(buffer);
+        hints_.push_back(buffer);
         break;
       }
       else
@@ -706,7 +706,7 @@ void DC::load_hints(void)
       char *buffer = fread_string(fl, 0);
       if (buffer != nullptr)
       {
-        hints.push_back(buffer);
+        hints_.push_back(buffer);
         free(buffer);
       }
     }
@@ -727,7 +727,7 @@ void DC::save_hints(void)
   QTextStream out(&file);
 
   uint64_t hint_key = 0;
-  for (hints_t::iterator i = hints.begin(); i != hints.end(); ++i)
+  for (hints_t::iterator i = hints_.begin(); i != hints_.end(); ++i)
   {
     out << "#" << ++hint_key << "\n";
     out << (*i).remove('\r') << "~"
@@ -738,20 +738,20 @@ void DC::save_hints(void)
 
 void DC::send_hint(void)
 {
-  if (hints.isEmpty())
+  if (hints_.isEmpty())
   {
     return;
   }
 
-  auto num = number(0LL, hints.size() - 1);
+  auto num = number(0LL, hints_.size() - 1);
 
   uint64_t attempts = 0;
-  while (hints.value(num).isEmpty() && attempts++ < 100)
+  while (hints_.value(num).isEmpty() && attempts++ < 100)
   {
-    num = number(0LL, hints.size() - 1);
+    num = number(0LL, hints_.size() - 1);
   }
 
-  QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints.value(num));
+  QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
 
   for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
   {

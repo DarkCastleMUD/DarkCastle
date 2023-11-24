@@ -5,6 +5,82 @@
 #ifndef DC_H_
 #define DC_H_
 
+#define SAVE_DIR "../save"
+#define BSAVE_DIR "../bsave"
+#define QSAVE_DIR "../save/qdata"
+#define NEWSAVE_DIR "../newsave"
+#define ARCHIVE_DIR "../archive"
+#define MOB_DIR "../MOBProgs/"
+#define BAN_FILE "banned.txt"
+#define SHOP_DIR "../lib/shops"
+#define PLAYER_SHOP_DIR "../lib/playershops"
+#define FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
+#define SKILL_QUEST_FILE "../lib/skill_quests.txt"
+#define FAMILIAR_DIR "../familiar"
+#define FOLLOWER_DIR "../follower"
+#define VAULT_DIR "../vaults"
+
+// TODO - Remove tinyworld.shp and divide the stops up into some meaningful
+//        format in their own directory like the world/mob/obj files
+#define SHOP_FILE "tinyworld.shp"
+
+#define WEBPAGE_FILE "webresponse.txt"
+#define GREETINGS1_FILE "greetings1.txt"
+#define GREETINGS2_FILE "greetings3.txt"
+#define GREETINGS3_FILE "greetings4.txt"
+#define GREETINGS4_FILE "greetings5.txt"
+#define CREDITS_FILE "credits.txt"
+#define MOTD_FILE "../lib/motd.txt"
+#define IMOTD_FILE "motdimm.txt"
+#define STORY_FILE "story.txt"
+#define TIME_FILE "time.txt"
+#define IDEA_LOG "ideas.log"
+#define TYPO_LOG "typos.log"
+#define MESS_FILE "messages.txt"
+#define MESS2_FILE "messages2.txt"
+#define SOCIAL_FILE "social.txt"
+#define HELP_KWRD_FILE "help_key.txt"
+#define HELP_PAGE_FILE "help.txt"
+#define INFO_FILE "info.txt"
+#define LOCAL_WHO_FILE "onlinewho.txt"
+
+#define WEB_WHO_FILE "/srv/www/www.dcastle.org/htdocs/onlinewho.txt"
+#define WEB_AUCTION_FILE "/srv/www/www.dcastle.org/htdocs/auctions.txt"
+#define NEW_HELP_FILE "new_help.txt"
+#define WEB_HELP_FILE "/srv/www/www.dcastle.org/htdocs/webhelp.txt"
+#define NEW_HELP_PAGE_FILE "new_help_screen.txt"
+#define NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
+#define LEADERBOARD_FILE "leaderboard.txt"
+#define QUEST_FILE "quests.txt"
+#define WEBCLANSLIST_FILE "webclanslist.txt"
+#define HTDOCS_DIR "/srv/www/www.dcastle.org/htdocs/"
+
+#define PLAYER_DIR "player/"
+#define BUG_LOG "bug.log"
+#define GOD_LOG "god.log"
+#define MORTAL_LOG "mortal.log"
+#define SOCKET_LOG "socket.log"
+#define PLAYER_LOG "player.log"
+#define WORLD_LOG "world.log"
+#define ARENA_LOG "arena.log"
+#define CLAN_LOG "clan.log"
+#define OBJECTS_LOG "objects.log"
+#define QUEST_LOG "quest.log"
+
+#define WORLD_INDEX_FILE "worldindex"
+#define OBJECT_INDEX_FILE "objectindex"
+#define MOB_INDEX_FILE "mobindex"
+#define ZONE_INDEX_FILE "zoneindex"
+#define PLAYER_SHOP_INDEX "playershopindex"
+
+#define OBJECT_INDEX_FILE_TINY "objectindex.tiny"
+#define WORLD_INDEX_FILE_TINY "worldindex.tiny"
+#define MOB_INDEX_FILE_TINY "mobindex.tiny"
+#define ZONE_INDEX_FILE_TINY "zoneindex.tiny"
+
+#define VAULT_INDEX_FILE "../vaults/vaultindex"
+#define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
+
 #include <set>
 #include <queue>
 #include <unordered_set>
@@ -87,13 +163,13 @@ public:
     bool stderr_timestamp = true;
     bool allow_multi = false;
     bool allow_newstatsys = false;
-    string dir = DFLT_DIR;
-    string leaderboard_check;
+    QString library_directory = DEFAULT_LIBRARY_PATH;
+    QString leaderboard_check;
     QString implementer;
   } cf;
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
-  static const room_t NOWHERE = 0ULL;
+  static constexpr room_t NOWHERE = 0ULL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
@@ -105,8 +181,9 @@ public:
   static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
-  static const level_t MAX_MORTAL_LEVEL = 60ULL;
-  const QString HINTS_FILE_NAME = "playerhints.txt";
+  static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
+  static const QString HINTS_FILE_NAME;
+  static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
 
   Connection *descriptor_list = nullptr; /* master desc list */
@@ -131,8 +208,8 @@ public:
   QMap<room_t, Room> rooms;
   class World world;
 
-  static string getVersion();
-  static string getBuildTime();
+  static QString getBuildVersion();
+  static QString getBuildTime();
   static DC *getInstance();
   static zone_t getRoomZone(room_t room_nr);
   static QString getZoneName(zone_t zone_key);
@@ -144,16 +221,14 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
-
   static Object *getObject(vnum_t vnum);
+  static bool isSet(auto flag, auto bit) { return flag & bit; };
 
   explicit DC(int &argc, char **argv);
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
-  // as there is only one object, assignment would always be assign to self
   DC &operator=(const DC &) = delete;
   DC &operator=(DC &&) = delete;
-
   void main_loop2(void);
   void removeDead(void);
   void handleShooting(void);
@@ -172,26 +247,24 @@ public:
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
-  static bool isSet(auto flag, auto bit)
-  {
-    return flag & bit;
-  };
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
+  CVoteData DCVote;
 
 private:
-  static string version;
-  struct timeval last_time = {}, delay_time = {}, now_time = {};
-  hints_t hints;
+  static const QString build_version_;
+  static const QString build_time_;
+  struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
+  hints_t hints_;
+  Shops shops_;
+  QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
+
   void game_loop_init(void);
   void game_loop(void);
   int init_socket(in_port_t port);
-  Shops shops_;
-  QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
 };
 
 extern vector<string> continent_names;
-extern class CVoteData *DCVote;
 
 extern class Object *object_list;
 extern struct spell_info_type spell_info[];

@@ -314,7 +314,7 @@ int write_hotboot_file(char **new_argv)
     }
     delete argv;
 
-    chdir(DFLT_DIR);
+    chdir(DC::getInstance()->cf.library_directory.toStdString().c_str());
     return 0;
   }
 
@@ -902,11 +902,11 @@ void DC::game_loop(void)
   // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
   // we want to pulse DC::PASSES_PER_SEC times a second (duh).  This is currently 4.
 
-  gettimeofday(&now_time, nullptr);
+  gettimeofday(&now_time_, nullptr);
 
   // temp removing this since it's spamming the crap out of us
   // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
-  gettimeofday(&last_time, nullptr);
+  gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
 }
 
@@ -919,7 +919,7 @@ void DC::game_loop_init(void)
 
   ssh.setup();
 
-  gettimeofday(&last_time, nullptr);
+  gettimeofday(&last_time_, nullptr);
 
   QTimer *gameLoopTimer = new QTimer(this);
   connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);

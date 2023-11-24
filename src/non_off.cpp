@@ -37,7 +37,6 @@ extern "C"
 #include <set>
 
 extern struct index_data *obj_index;
-extern CVoteData *DCVote;
 
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)
@@ -1536,6 +1535,7 @@ void CVoteData::SetQuestion(Character *ch, std::string question)
 }
 
 CVoteData::CVoteData()
+    : active(false), total_votes(0)
 {
   char buf[MAX_STRING_LENGTH];
   FILE *the_file = nullptr;
@@ -1643,18 +1643,18 @@ int do_vote(Character *ch, char *arg, int cmd)
 
   if (!strcmp(buf, "results"))
   {
-    DCVote->DisplayResults(ch);
+    DC::getInstance()->DCVote.DisplayResults(ch);
     return eSUCCESS;
   }
 
-  if (!DCVote->IsActive())
+  if (!DC::getInstance()->DCVote.IsActive())
   {
     send_to_char("Sorry, there is nothing to vote on right now.\r\n", ch);
     return eSUCCESS;
   }
   if (!strlen(buf))
   {
-    DCVote->DisplayVote(ch);
+    DC::getInstance()->DCVote.DisplayVote(ch);
     return eSUCCESS;
   }
 
@@ -1665,7 +1665,7 @@ int do_vote(Character *ch, char *arg, int cmd)
   }
 
   vote = atoi(buf);
-  if (true == DCVote->Vote(ch, vote))
+  if (true == DC::getInstance()->DCVote.Vote(ch, vote))
     logf(IMMORTAL, LogChannels::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;

@@ -85,8 +85,6 @@ extern char imotd[MAX_STRING_LENGTH];
 extern Object *object_list;
 extern struct index_data *obj_index;
 
-extern CVoteData *DCVote;
-
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
 void update_wizlist(Character *ch);
@@ -1812,7 +1810,7 @@ void nanny(class Connection *d, string arg)
          }
          do_look(ch, "", 8);
          {
-            if (GET_LEVEL(ch) >= 40 && DCVote->IsActive() && !DCVote->HasVoted(ch))
+            if (GET_LEVEL(ch) >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
                send_to_char("\n\rThere is an active vote in which you have not yet voted.\r\n"
                             "Enter \"vote\" to see details\n\r\n\r",

@@ -5705,21 +5705,22 @@ int do_setvote(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  auto dc = DC::getInstance();
   if (!strcmp(buf, "start"))
   {
-    DCVote->StartVote(ch);
+    dc->DCVote.StartVote(ch);
     return eSUCCESS;
   }
 
   if (!strcmp(buf, "clear"))
   {
-    DCVote->Reset(ch);
+    dc->DCVote.Reset(ch);
     return eSUCCESS;
   }
 
   if (!strcmp(buf, "end"))
   {
-    DCVote->EndVote(ch);
+    dc->DCVote.EndVote(ch);
     return eSUCCESS;
   }
 
@@ -5731,17 +5732,17 @@ int do_setvote(Character *ch, char *arg, int cmd)
 
   if (!strcmp(buf, "question"))
   {
-    DCVote->SetQuestion(ch, buf2);
+    dc->DCVote.SetQuestion(ch, buf2);
     return eSUCCESS;
   }
   if (!strcmp(buf, "add"))
   {
-    DCVote->AddAnswer(ch, buf2);
+    dc->DCVote.AddAnswer(ch, buf2);
     return eSUCCESS;
   }
   if (!strcmp(buf, "remove"))
   {
-    DCVote->RemoveAnswer(ch, (unsigned int)atoi(buf2));
+    dc->DCVote.RemoveAnswer(ch, (unsigned int)atoi(buf2));
     return eSUCCESS;
   }
 

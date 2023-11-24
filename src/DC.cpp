@@ -12,7 +12,10 @@
 #include "db.h"
 #include "version.h"
 
-string DC::version = VERSION;
+const QString DC::build_version_ = BUILD_VERSION;
+const QString DC::build_time_ = BUILD_TIME;
+const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
+const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 extern struct index_data *obj_index;
 
 DC::DC(int &argc, char **argv)
@@ -71,14 +74,14 @@ void DC::handleShooting(void)
 	}
 }
 
-string DC::getVersion(void)
+QString DC::getBuildVersion(void)
 {
-	return version;
+	return build_version_;
 }
 
-string DC::getBuildTime(void)
+QString DC::getBuildTime(void)
 {
-	return string(BUILD_TIME);
+	return build_time_;
 }
 
 DC *DC::getInstance(void)

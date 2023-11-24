@@ -3466,7 +3466,7 @@ int do_version(Character *ch, char *arg, int cmd)
 {
    if (ch)
    {
-      csendf(ch, "Version: %s Build time: %s\n", DC::getVersion().c_str(), DC::getBuildTime().c_str());
+      ch->sendln(QString("Version: %1 Build time: %2").arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
    }
    return eSUCCESS;
 }

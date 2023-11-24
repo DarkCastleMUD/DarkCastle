@@ -1,28 +1,12 @@
-// System C headers
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <unistd.h>
 #include <string.h>
-#include <errno.h>
-
-// System C++ headers
-#include <sstream>
-#include <iostream>
-
 #include <QCoreApplication>
-
-// DC headers
-#include "fileinfo.h"
-#include "utility.h"
 #include "DC.h"
 
-using namespace std;
-
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
-CVoteData *DCVote;
 
 void init_game(void);
 void backup_executable(char *const argv[]);
@@ -37,87 +21,69 @@ int main(int argc, char **argv)
   DC dcastle(argc, argv);
   QThread::currentThread()->setObjectName("Main Thread");
 
-  struct stat stat_buffer;
-  char char_buffer[512] = {'\0'};
+  // DC *dc = dynamic_cast<DC *>(DC::instance());
+  dcastle.cf = parse_arguments(argc, argv);
 
-  DC *dc = dynamic_cast<DC *>(DC::instance());
-  dc->cf = parse_arguments(argc, argv);
-
-  logf(0, LogChannels::LOG_MISC, "Executable: %s Version: %s Build date: %s\n", argv[0], DC::getVersion().c_str(), DC::getBuildTime().c_str());
+  logentry(QString("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
   backup_executable(argv);
 
   // If no ports specified then set default ports
-  if (dc->cf.ports.size() == 0)
+  if (dcastle.cf.ports.size() == 0)
   {
-    dc->cf.ports.push_back(DFLT_PORT);
-    dc->cf.ports.push_back(DFLT_PORT2);
-    dc->cf.allow_multi = true;
-    dc->cf.ports.push_back(DFLT_PORT3);
-    dc->cf.ports.push_back(DFLT_PORT4);
+    dcastle.cf.ports.push_back(DFLT_PORT);
+    dcastle.cf.ports.push_back(DFLT_PORT2);
+    dcastle.cf.allow_multi = true;
+    dcastle.cf.ports.push_back(DFLT_PORT3);
+    dcastle.cf.ports.push_back(DFLT_PORT4);
   }
 
-  logf(0, LogChannels::LOG_MISC, "Using %s as data directory.", dc->cf.dir.c_str());
+  logentry(QString("Using %1 as data directory.").arg(dcastle.cf.library_directory));
 
-  if (stat(dc->cf.dir.c_str(), &stat_buffer) == -1)
+  if (!QFile(dcastle.cf.library_directory).exists())
   {
-    if (errno == ENOENT)
-    {
-      logf(0, LogChannels::LOG_MISC, "Data directory %s is missing.", dc->cf.dir.c_str());
-    }
-    else
-    {
-      perror("stat");
-    }
+    logentry(QString("Data directory %1 is missing.").arg(dcastle.cf.library_directory));
     exit(EXIT_FAILURE);
   }
 
-  if (chdir(dc->cf.dir.c_str()) < 0)
+  if (chdir(dcastle.cf.library_directory.toStdString().c_str()) < 0)
   {
-    const char *strerror_result = strerror_r(errno, char_buffer, sizeof(char_buffer));
-    logf(0, LogChannels::LOG_MISC, "Error changing current directory to %s: %s", dc->cf.dir, strerror_result);
+    char strerror_buffer[512];
+    const char *strerror_result = strerror_r(errno, strerror_buffer, sizeof(strerror_buffer));
+    logentry(QString("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
     exit(EXIT_FAILURE);
   }
 
-  DCVote = new CVoteData();
-
-  if (dc->cf.check_syntax)
+  if (dcastle.cf.check_syntax)
   {
-    dc->boot_zones();
-    dc->boot_world();
+    dcastle.boot_zones();
+    dcastle.boot_world();
     logentry("Done.", 0, LogChannels::LOG_MISC);
     exit(EXIT_SUCCESS);
   }
   else
   {
-    dc->init_game();
+    dcastle.init_game();
   }
-
-  delete DCVote;
 
   return 0;
 }
 
 void backup_executable(char *const argv[])
 {
-#ifndef __CYGWIN__
-  struct stat stat_buffer;
-  char char_buffer[512] = {'\0'};
-
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
-  stringstream backup_filename, cmd;
-  backup_filename << argv[0] << "." << DC::getVersion().c_str() << "." << getpid();
+  QString backup_filename = QString("%1.%2.%3").arg(argv[0]).arg(DC::getBuildVersion()).arg(getpid());
 
   // If backup file does not exist already then link to it
-  if (stat(backup_filename.str().c_str(), &stat_buffer) == -1)
+  if (!QFile(backup_filename).exists())
   {
-    if (link(argv[0], backup_filename.str().c_str()) == -1)
+    if (link(argv[0], backup_filename.toStdString().c_str()) == -1)
     {
-      const char *strerror_result = strerror_r(errno, char_buffer, sizeof(char_buffer));
-      logf(0, LogChannels::LOG_MISC, "Error linking %s to %s: %s", argv[0], backup_filename.str().c_str(), strerror_result);
+      char buffer[512];
+      const char *strerror_result = strerror_r(errno, buffer, sizeof(buffer));
+      logentry(QString("Error linking %1 to %2: %3").arg(argv[0]).arg(backup_filename).arg(strerror_result));
     }
   }
-#endif
   return;
 }
 
@@ -164,7 +130,7 @@ DC::config parse_arguments(int argc, char *const argv[])
       cf.ports.push_back(7003);
       break;
     case 'd':
-      cf.dir = optarg;
+      cf.library_directory = optarg;
       break;
     case 's':
       cf.check_syntax = true;
