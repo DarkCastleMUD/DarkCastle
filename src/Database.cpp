@@ -1,455 +1,113 @@
-#ifdef USE_SQL
-#include <string>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include "levels.h"
 #include "Database.h"
+#include "utility.h" // logentry
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
 
-using namespace std;
-
-PGconn *Database::conn = 0;
-map<string, PGresult *> Prepare::existing_prepares;
-
-Database::Database()
-    : Backend()
+Database::Database(const QString &name, const QString &hostname, const QString &type)
+    : name_(name), hostname_(hostname), type_(type)
 {
-  if (conn == 0 || PQstatus(conn) != CONNECTION_OK)
+  if (QSqlDatabase::contains("qt_sql_default_connection"))
   {
-    conn = PQconnectdb(CONN_OPTS);
-    if (PQstatus(conn) != CONNECTION_OK)
-    {
-      stringstream errormsg;
-      errormsg << "Unable to connect to database in Database::Database(): " << PQerrorMessage(conn);
-      logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
-      return;
-    }
+    database_ = QSqlDatabase::database("qt_sql_default_connection");
+    database_.close();
+  }
+  else
+  {
+    database_ = QSqlDatabase::addDatabase(type);
+  }
 
-    if (PQsetnonblocking(conn, 1) == 0)
-    {
-      stringstream errormsg;
-      errormsg << "Unable to set database connection non-blocking: " << PQerrorMessage(conn);
-      logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
-    }
+  if (!hostname.isEmpty())
+  {
+    database_.setHostName(hostname);
+  }
+
+  if (!name.isEmpty())
+  {
+    database_.setDatabaseName(name);
+  }
+
+  if (!database_.open())
+  {
+    logentry(QString("Failed to open database %1.").arg(name));
+    qWarning() << database_ << database_.isOpen();
+    logentry(database_.lastError().databaseText());
+    logentry(database_.lastError().driverText());
   }
 }
 
-/* PQprepare(conn, "char_file_u4_INSERT", "UPDATE players
-
-const char *players_cols[] = {"sex", "c_class", "race", "level",
-          "raw_str", "raw_intel", "raw_wiz", "raw_dex",
-          "raw_con", "conditions0", "conditions1",
-          "conditions2", "conditions3", "weight", "height",
-          "hometown", "gold", "plat", "exp", "immune",
-          "resist", "suscept", "mana", "raw_mana",
-          "hit", "raw_hit", "move", "raw_move", "ki",
-          "raw_ki", "alignment", "hpmetas",
-          "manametas", "movemetas", "armor", "hitroll",
-          "damroll", "afected_by", "afected_by2",
-          "misc", "clan", "load_room", nullptr};
-generic_prepares("players", "player_id", players_cols);
-*/
-
-int Database::lookupPlayerID(const char *name)
+Table Database::table(QString name)
 {
-  if (name == 0)
-    return 0;
-
-  const char *paramValues[1];
-  paramValues[0] = name;
-
-  PGresult *res = PQexecParams(conn, "SELECT player_id FROM player_lookup WHERE name=$1", 1, nullptr, paramValues, nullptr, nullptr, 0);
-  if (PQresultStatus(res) != PGRES_TUPLES_OK)
+  if (!tables.contains(name))
   {
-    // cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
-    PQclear(res);
-    return 0;
+    Table table(*this, name);
+    tables.insert(name, table);
   }
 
-  if (PQntuples(res) < 1)
-  {
-    PQclear(res);
-    return 0;
-  }
-
-  char *buffer = PQgetvalue(res, 0, 0);
-  if (buffer == 0 || PQgetlength(res, 0, 0) < 1)
-  {
-    // cerr << "Error occured getting player_id from player_lookup table." << endl;
-    PQclear(res);
-    return 0;
-  }
-
-  int player_id = atoi(buffer);
-  PQclear(res);
-  return player_id;
+  return tables.value(name, Table(*this, name));
 }
 
-int Database::createPlayerID(char *name)
+Table::Table(Database &database, const QString &name)
+    : database_(database), name_(name)
 {
-  if (name == 0)
-    return 0;
-
-  // New player in database
-  Prepare pl = createPrepare("player_lookup_add_player");
-  pl.setTableName("player_lookup");
-  pl.addCol("name", name);
-  pl.exec();
-
-  PGresult *res = PQexec(conn, "SELECT lastval()");
-  if (PQresultStatus(res) != PGRES_TUPLES_OK)
+  auto db = database.getQSqlDatabase();
+  if (db.isOpen())
   {
-    // cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
-    PQclear(res);
-    return 0;
-  }
-
-  if (PQntuples(res) < 1)
-  {
-    PQclear(res);
-    return 0;
-  }
-
-  char *buffer = PQgetvalue(res, 0, 0);
-  if (buffer == 0 || PQgetlength(res, 0, 0) < 1)
-  {
-    // cerr << "Error occured getting player_id from player_lookup table." << endl;
-    PQclear(res);
-    return 0;
-  }
-
-  int player_id = atoi(buffer);
-  PQclear(res);
-  return player_id;
-}
-
-void Database::save(Character *ch, char_file_u4 *st)
-{
-  if (ch == 0 || st == 0 || IS_NPC(ch))
-    return;
-
-  if (ch->player_id == 0)
-  {
-    ch->player_id = lookupPlayerID(ch->name);
-
-    if (ch->player_id == 0)
+    if (!db.tables().contains(name))
     {
-      ch->player_id = createPlayerID(ch->name);
-
-      if (ch->player_id == 0)
+      QSqlQuery query;
+      if (query.exec(QString("CREATE TABLE %1 (id BIGINT GENERATED ALWAYS AS IDENTITY)").arg(name)))
       {
-        // cerr << "Error creating player_id. Aborting DB save." << endl;
+        logentry(QString("Created database table %1.").arg(name));
+        if (!db.tables().contains(name))
+        {
+          logentry(QString("Failed to find database table %1 after creating it.").arg(name));
+          return;
+        }
+      }
+      else
+      {
+        logentry(QString("Failed to create database table %1.").arg(name));
+        logentry(query.lastError().databaseText());
+        logentry(query.lastError().driverText());
+      }
+    }
+  }
+}
+Column Table::column(QString name, QString type)
+{
+  return Column(*this, name, type);
+}
+
+Column::Column(Table &table, const QString &name, const QString &type)
+    : table_(table), name_(name), type_(type)
+{
+  QSqlRecord table_fields = table.getDatabase().getQSqlDatabase().record(table.getName());
+  if (!table_fields.contains(name))
+  {
+    QSqlQuery query;
+    if (query.exec(QString("ALTER TABLE %1 ADD %2 %3").arg(table.getName()).arg(name).arg(type)))
+    {
+      logentry(QString("Created table %1 column %2.").arg(table.getName()).arg(name));
+
+      // Check again
+      QSqlRecord table_fields = table.getDatabase().getQSqlDatabase().record(table.getName());
+      if (!table_fields.contains(name))
+      {
+        logentry(QString("Failed to find table %1 column %2 after creating it.").arg(table.getName()).arg(name));
         return;
       }
     }
-  }
-
-  Prepare p = createPrepare("char_file_u4_update");
-  p.setTableName("players");
-  p.addCol("sex", st->sex);
-  p.addCol("c_class", st->c_class);
-  p.addCol("race", st->race);
-  p.addCol("level", st->level);
-  p.addCol("raw_str", st->raw_str);
-  p.addCol("raw_intel", st->raw_intel);
-  p.addCol("raw_wis", st->raw_wis);
-  p.addCol("raw_dex", st->raw_dex);
-  p.addCol("raw_con", st->raw_con);
-  p.addCol("conditions_0", st->conditions[0]);
-  p.addCol("conditions_1", st->conditions[1]);
-  p.addCol("conditions_2", st->conditions[2]);
-  p.addCol("weight", st->weight);
-  /*
-    p.addCol(uint8_t height;
-
-      int16_t hometown;
-      uint32_t gold;
-      uint32_t plat;
-      int64_t exp;
-      uint32_t immune;
-      uint32_t resist;
-      uint32_t suscept;
-
-      int32_t mana;        // current
-      int32_t raw_mana;    // max without eq/stat bonuses
-      int32_t hit;
-      int32_t raw_hit;
-      int32_t move;
-      int32_t raw_move;
-      int32_t ki;
-      int32_t raw_ki;
-
-      int16_t alignment;
-     uint32_t hpmetas; // Used by familiars too... why not.
-     uint32_t manametas;
-     uint32_t movemetas;
-
-      int16_t armor;       // have to save these since mobs have different bases
-      int16_t hitroll;
-      int16_t damroll;
-      int32_t afected_by;
-      int32_t afected_by2;
-      uint32_t misc;          // channel flags
-
-      int16_t clan;
-      int32_t load_room;                  // Which room to place char in
-
-      int32_t extra_ints[5];             // available just in case
-  */
-
-  p.where("player_id", ch->player_id);
-  execqueue.push(p);
-
-  // If unable to UPDATE then INSERT a new entry
-  if (false && p.lastResult)
-  {
-    char *buffer = PQcmdTuples(p.lastResult);
-    if (buffer && !strcmp("0", buffer))
-    {
-      Prepare p2 = createPrepare("char_file_u4_insert");
-      p2.setTableName("players");
-      p2.addCol("sex", st->sex);
-      p2.addCol("c_class", st->c_class);
-      p2.addCol("race", st->race);
-      p2.addCol("level", st->level);
-      p2.addCol("raw_str", st->raw_str);
-      p2.addCol("raw_intel", st->raw_intel);
-      p2.addCol("raw_wis", st->raw_wis);
-      p2.addCol("raw_dex", st->raw_dex);
-      p2.addCol("raw_con", st->raw_con);
-      p2.addCol("conditions_0", st->conditions[0]);
-      p2.addCol("conditions_1", st->conditions[1]);
-      p2.addCol("conditions_2", st->conditions[2]);
-      p2.addCol("player_id", ch->player_id);
-      p2.exec();
-    }
-  }
-}
-
-Character *Database::load(void)
-{
-
-  return 0;
-}
-
-void Database::processqueue(void)
-{
-  PQconsumeInput(conn);
-
-  if (PQisBusy(conn) == false)
-  {
-    PGresult *res = PQgetResult(conn);
-    if (res == nullptr)
-    {
-      // We're ready to process a new SQL statement
-
-      if (execqueue.size() > 0)
-      {
-        Prepare p = execqueue.front();
-        execqueue.pop();
-
-        p.exec();
-      }
-    }
     else
     {
-      int status = PQresultStatus(res);
-      if (status != PGRES_COMMAND_OK)
-      {
-        stringstream errormsg;
-        errormsg << "Error in result found in Database::processqueue(): " << status;
-        logentry(errormsg.str().c_str(), ANGEL, LogChannels::LOG_DATABASE);
-      }
-
-      PQclear(res);
+      logentry(QString("Failed to create table %1 column %2.").arg(table.getName()).arg(name));
+      logentry(query.lastError().databaseText());
+      logentry(query.lastError().driverText());
     }
   }
 }
 
-Prepare Database::createPrepare(string prepareID)
+Column Column::column(QString name, QString type)
 {
-  return Prepare(Database::conn, prepareID);
+  return Column(table_, name, type);
 }
-
-Prepare::Prepare(PGconn *conn, string prepareID)
-    : conn(conn), prepareID(prepareID), lastResult(0)
-{
-}
-
-void Prepare::setTableName(string tableName)
-{
-  this->tableName = tableName;
-}
-
-void Prepare::setConn(PGconn *conn)
-{
-  this->conn = conn;
-}
-
-void Prepare::setPrepareID(string prepareID)
-{
-  this->prepareID = prepareID;
-}
-
-void Prepare::addCol(string colName, int value)
-{
-  if (tableName.empty())
-    throw emptyName();
-
-  if (prepareID.empty())
-    throw emptyPrepareID();
-
-  stringstream ss;
-  ss << value;
-
-  current_prepare.push_back(make_pair(colName, ss.str().c_str()));
-}
-
-void Prepare::addCol(string colName, char *value)
-{
-  if (tableName.empty())
-    throw emptyName();
-
-  if (prepareID.empty())
-    throw emptyPrepareID();
-
-  stringstream ss;
-  ss << value;
-
-  current_prepare.push_back(make_pair(colName, ss.str().c_str()));
-}
-
-void Prepare::where(string ws, int wd)
-{
-  whereString = ws;
-
-  stringstream ss;
-  ss << wd;
-  whereData = ss.str();
-}
-
-void Prepare::where(string ws, char *wd)
-{
-  whereString = ws;
-
-  stringstream ss;
-  ss << wd;
-  whereData = ss.str();
-}
-
-void Prepare::exec(void)
-{
-  // Number of parameters in the current prepare
-  int nParams = current_prepare.size();
-  if (whereString.size() > 0)
-  {
-    nParams++;
-  }
-
-  // Check if prepare exists already
-  PGresult *res = Prepare::existing_prepares[prepareID];
-
-  // If not or existing one is bad, create a new one
-  if ((res == 0) || (PQresultStatus(res) != PGRES_COMMAND_OK))
-  {
-    // Perform update
-    string query;
-    if (whereString.size() > 0)
-    {
-      query = generateUpdateQuery();
-    }
-    else
-    {
-      query = generateInsertQuery();
-    }
-
-    res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, nullptr);
-    if (PQresultStatus(res) != PGRES_COMMAND_OK)
-    {
-      // cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
-      PQclear(res);
-      return;
-    }
-
-    Prepare::existing_prepares[prepareID] = res;
-  }
-
-  const char **paramValues = new const char *[nParams];
-  int i = 0;
-  for (PrepareVector::iterator j = current_prepare.begin(); j != current_prepare.end(); j++)
-  {
-    paramValues[i++] = j->second.c_str();
-  }
-
-  // Perform update
-  if (whereString.size() > 0)
-  {
-    paramValues[i] = whereData.c_str();
-  }
-
-  if (lastResult)
-    PQclear(lastResult);
-
-  // lastResult = res = PQexecPrepared(this->conn, prepareID.c_str(), nParams, paramValues, nullptr, nullptr, 0);
-  int status = PQsendQueryPrepared(this->conn, prepareID.c_str(), nParams, paramValues, nullptr, nullptr, 0);
-  if (status == 0)
-  {
-    // cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
-  }
-
-  delete paramValues;
-}
-
-string Prepare::generateInsertQuery(void)
-{
-  stringstream sql;
-  sql << "INSERT INTO " << tableName << " (";
-
-  PrepareVector::iterator index;
-  for (index = current_prepare.begin(); index != current_prepare.end(); index++)
-  {
-    sql << index->first;
-    if (index + 1 != current_prepare.end())
-      sql << ", ";
-  }
-
-  sql << ") VALUES (";
-  int numCols = current_prepare.size();
-  for (int j = 0; j < numCols; j++)
-  {
-    sql << "$" << j + 1;
-    if (j + 1 != numCols)
-      sql << ", ";
-  }
-
-  sql << ")";
-
-  return sql.str().c_str();
-}
-
-string Prepare::generateUpdateQuery(void)
-{
-  stringstream sql;
-  sql << "UPDATE " << tableName << " SET ";
-
-  int j = 1;
-  for (PrepareVector::iterator index = current_prepare.begin(); index != current_prepare.end(); index++)
-  {
-    sql << index->first << " = $" << j++;
-    if (index + 1 != current_prepare.end())
-      sql << ", ";
-  }
-
-  sql << " WHERE " << whereString << " = $" << j;
-
-  return sql.str().c_str();
-}
-
-Prepare::~Prepare()
-{
-  if (lastResult)
-    PQclear(lastResult);
-}
-
-#endif

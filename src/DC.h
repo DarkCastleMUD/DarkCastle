@@ -113,6 +113,7 @@ typedef QList<QString> hints_t;
 #include "Zone.h"
 #include "Shops.h"
 #include "room.h"
+#include "Database.h"
 
 class Connection;
 using namespace std;
@@ -247,6 +248,9 @@ public:
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
+  Database getDatabase(void) { return database_; }
+  Database db(void) { return database_; }
+
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
   CVoteData DCVote;
@@ -258,6 +262,7 @@ private:
   hints_t hints_;
   Shops shops_;
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
+  Database database_;
 
   void game_loop_init(void);
   void game_loop(void);

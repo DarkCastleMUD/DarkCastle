@@ -23,6 +23,7 @@
 #include "Leaderboard.h"
 #include "interp.h"
 #include "DC.h"
+#include "Database.h"
 
 using namespace std;
 
@@ -218,6 +219,10 @@ void testStrings(void)
 int main(int argc, char **argv)
 {
   DC debug(argc, argv);
+
+  debug.db().table("shops").column("name", "text").column("name2", "bigint");
+
+  exit(1);
 
   testStrings();
 

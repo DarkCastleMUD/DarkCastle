@@ -1,70 +1,58 @@
-#ifdef USE_SQL
-#ifndef DATABASE_H_
-#define DATABASE_H_
+#ifndef DATABASE_H
+#define DATABASE_H
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include <queue>
-#include <string>
-#include <libpq-fe.h>
-#include "character.h"
-#include "Backend.h"
+#include <QObject>
+#include <QSqlDatabase>
+#include <QMap>
+#include <QString>
 
-using namespace std;
+class Table;
+class Column;
+class Database
+{
+public:
+  Database(const QString &name = "", const QString &hostname = "", const QString &type = "QPSQL");
+  QSqlDatabase getQSqlDatabase(void) { return database_; }
+  QString getName(void) { return name_; }
+  QString getHostname(void) { return hostname_; }
+  QString getType(void) { return type_; }
+  Table table(QString name);
 
-const char CONN_OPTS[]="host=127.0.0.1 dbname=dcastle user=dcastle";
+  QMap<QString, Table> tables;
 
-typedef vector<pair<string, string> > PrepareVector;
-
-class Prepare {
- private:
-  string generateInsertQuery(void);
-  string generateUpdateQuery(void);
-  static map<string, PGresult *> existing_prepares;
-  PGconn *conn;
-    
-  string tableName;
-  string prepareID;
-  string whereString;
-  string whereData;
-  PrepareVector current_prepare;
-
- public:
-  Prepare(PGconn *conn, string prepare_id);
-  ~Prepare();
-  void setTableName(string tableName);
-  void setConn(PGconn *conn);
-  void setPrepareID(string prepareID);
-  void addCol(string colName, int value);
-  void addCol(string colName, char * value);
-  void where(string ws, int wd);
-  void where(string ws, char * wd);
-  void exec(void);
-
-  // Exceptions
-  class emptyName {};
-  class emptyPrepareID {};
-  
-  PGresult *lastResult;
+private:
+  QString name_;
+  QString hostname_;
+  QString type_;
+  QSqlDatabase database_;
 };
 
-class Database : public Backend {
- private:
-  static PGconn *conn;
-  queue<Prepare> execqueue;
- protected:
+class Table
+{
+public:
+  Table(Database &database, const QString &name = "");
+  Database &getDatabase(void) { return database_; }
+  QString getName(void) { return name_; }
+  Column column(QString name, QString type);
 
- public:
-  Database();
-  virtual void save(Character *ch, char_file_u4 *st);
-  virtual Character *load(void);
-  Prepare createPrepare(string prepare_id);
-  int lookupPlayerID(const char *name);
-  int createPlayerID(char *name);  
-  void processqueue(void);
+private:
+  Database database_;
+  QString name_;
 };
 
+class Column
+{
+public:
+  Column(Table &table, const QString &name = "", const QString &type = "");
+  Table &getTable(void) { return table_; }
+  QString getName(void) { return name_; }
+  QString getType(void) { return type_; }
+  Column column(QString name, QString type);
 
-#endif
+private:
+  Table table_;
+  QString name_;
+  QString type_;
+};
+
 #endif

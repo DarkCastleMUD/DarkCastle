@@ -43,7 +43,6 @@ add_library(DC SHARED
     arena.cpp
     assign_proc.cpp
     auction.cpp
-    Backend.cpp
     ban.cpp
     board.cpp
     casino.cpp
@@ -133,7 +132,6 @@ add_library(DC SHARED
     affect.h
     alias.h
     arena.h
-    Backend.h
     bandwidth.h
     character.h
     clan.h

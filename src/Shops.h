@@ -8,15 +8,6 @@
 #include <QFile>
 typedef uint64_t room_t;
 
-class Database : public QObject
-{
-    Q_OBJECT
-public:
-    explicit Database(QObject *parent = nullptr) : QObject(parent) {}
-
-private:
-};
-
 class Legacy
 {
 public:
@@ -49,9 +40,8 @@ public:
                                 */
 };
 
-class Shops : public Database
+class Shops
 {
-    Q_OBJECT
 public:
     explicit Shops(QObject *parent = nullptr);
 
