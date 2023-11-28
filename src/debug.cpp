@@ -542,3 +542,10 @@ int main(int argc, char **argv)
 }
 //      // cerr <<  "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
 //      // cerr <<  "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
+
+template <typename T>
+class DebugNumber
+{
+private:
+  T number_;
+};

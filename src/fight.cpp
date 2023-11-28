@@ -3246,9 +3246,28 @@ QString translate_name(const Character *ch)
   return GET_NAME(ch);
 }
 
-void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, int tohit, QString message = QString())
+void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, const int &tohit, const QString message = QString())
 {
-  logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), 105, LOG_BUG);
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, LOG_BUG);
+  }
+}
+
+void debug_isHit_toHit(const Character *ch, const Character *victim, const int &toHit)
+{
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("isHit: toHit=%1").arg(toHit), DIVINITY, LOG_BUG);
+  }
+}
+
+void debug_isHit_generic(const Character *ch, const Character *victim, const auto &parry, const auto &dodge, const auto &block, const auto &martial, const auto &tumbling)
+{
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, LOG_BUG);
+  }
 }
 
 // New toHit code
@@ -3272,7 +3291,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   // Figure out toHit value.
   int toHit = GET_REAL_HITROLL(ch);
-  logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  debug_isHit_toHit(ch, victim, toHit);
   //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
 
   switch (attacktype)
@@ -3304,46 +3323,46 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (skill)
   {
     toHit += has_skill(ch, skill) / 8;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
 
   if (DC::isSet(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
     toHit = (int)((float)toHit * 0.90) - 5;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
   else if (DC::isSet(ch->combat, COMBAT_RAGE1) || DC::isSet(ch->combat, COMBAT_RAGE2))
   {
     toHit = (int)((float)toHit * 0.95) - 2;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
 
   if (toHit < 1)
   {
     toHit = 1;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
 
   // Hitting stuff close to your level gives you a bonus,
   if (lvldiff > 15 && lvldiff < 25)
   {
     toHit += 5;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
   else if (lvldiff > 5 && lvldiff <= 15)
   {
     toHit += 7;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
   else if (lvldiff >= 0 && lvldiff <= 5)
   {
     toHit += 10;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
   else if (lvldiff >= -5 && lvldiff < 0)
   {
     toHit += 5;
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
 
   // Give a tohit bonus to low level players.
@@ -3351,7 +3370,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (lowlvlmod > 1.0)
   {
     toHit = (int)((float)toHit * lowlvlmod);
-    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+    debug_isHit_toHit(ch, victim, toHit);
   }
 
   // The stuff.
@@ -3368,7 +3387,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   int martial = has_skill(victim, SKILL_DEFENSE);
   int tumbling = has_skill(victim, SKILL_TUMBLING);
 
-  logentry(QString("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), 105, LOG_BUG);
+  debug_isHit_generic(ch, victim, parry, dodge, block, martial, tumbling);
 
   if (victim->equipment[WIELD] == nullptr)
     parry = 0;

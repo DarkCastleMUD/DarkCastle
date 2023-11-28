@@ -27,6 +27,7 @@ const uint64_t IMMORTAL = 102;
 #define ANGEL 103
 #define DEITY 104
 #define OVERSEER 105
+#define DIVINITY 106
 #define COORDINATOR 108
 const uint64_t IMPLEMENTER = 110;
 
