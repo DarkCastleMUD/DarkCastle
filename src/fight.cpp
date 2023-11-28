@@ -3366,8 +3366,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   }
 
   // Give a tohit bonus to low level players.
-  level_difference = ch->getLevel() - (victim->getLevel() / 2.0);
-  float lowlvlmod = (50.0 - level_difference) / 10.0;
+
+  float lowlvlmod = (50.0 - ch->getLevel() - (victim->getLevel() / 2.0)) / 10.0;
   if (lowlvlmod > 1.0)
   {
     toHit = (int)((float)toHit * lowlvlmod);
