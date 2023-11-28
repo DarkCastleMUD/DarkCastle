@@ -3241,6 +3241,8 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
 
 int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce)
 {
+  if (ch->player)
+    qDebug("isHit");
   if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
       (DC::isSet(victim->combat, COMBAT_STUNNED2)) ||
       (DC::isSet(victim->combat, COMBAT_BASH1)) ||
@@ -3249,7 +3251,11 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
       (!AWAKE(victim)))
+  {
+    if (ch->player)
+      qDebug() << "returning: stunned,bash,shock,paralysis";
     return eFAILURE; // always hit
+  }
 
   int lvldiff = GET_LEVEL(ch) - GET_LEVEL(victim);
   int skill = 0;
@@ -3352,7 +3358,11 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   // Ze random stuff.
   if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  {
+    if (ch->player)
+      qDebug() << "return ze random stuff";
     return eFAILURE;
+  }
 
   // Miss, determine a message
 
@@ -3368,7 +3378,13 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
     retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval))
+    {
+      if (ch->player)
+      {
+        qDebug() << "returning: because someone died";
+      }
       return debug_retval(ch, victim, retval);
+    }
   }
   else if (what < (parry + tumbling))
   { // Tumbling
@@ -3395,7 +3411,11 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     case 2: // riposte style damage
       retval = doTumblingCounterStrike(ch, victim);
       if (SOMEONE_DIED(retval))
+      {
+        if (ch->player)
+          qDebug() << "returning: because someone died";
         return debug_retval(ch, victim, retval);
+      }
       break;
     default:
       send_to_char("Messed up tumbling. tell somebody, whore!\r\n", ch);
@@ -3407,7 +3427,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
     act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
     act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
-    qDebug() << "isHit: dodge";
+    if (ch->player)
+      qDebug("dodge");
   }
   else if (what < (parry + tumbling + dodge + block))
   { // Shieldblock
@@ -3423,7 +3444,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   { // Miss
     type = 3;
   }
-  qDebug() << "type:" << type << "what:" << what << "parry:" << parry << "tumbling:" << tumbling << "dodge:" << dodge << "reduce:" << reduce;
+  if (ch->player)
+    qDebug() << "returning: type:" << type << "what:" << what << "parry:" << parry << "tumbling:" << tumbling << "dodge:" << dodge << "reduce:" << reduce;
   return eSUCCESS;
 }
 
