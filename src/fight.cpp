@@ -3407,6 +3407,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
     act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
     act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
+    qDebug() << "isHit: dodge";
   }
   else if (what < (parry + tumbling + dodge + block))
   { // Shieldblock
@@ -3422,7 +3423,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   { // Miss
     type = 3;
   }
-
+  qDebug() << "type:" << type << "what:" << what << "parry:" << parry << "tumbling:" << tumbling << "dodge:" << dodge << "reduce:" << reduce;
   return eSUCCESS;
 }
 
