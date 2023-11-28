@@ -3246,9 +3246,9 @@ QString translate_name(const Character *ch)
   return GET_NAME(ch);
 }
 
-void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, QString message = QString())
+void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, int tohit, QString message = QString())
 {
-  logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 %6").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(message), 105, LOG_BUG);
+  logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), 105, LOG_BUG);
 }
 
 // New toHit code
@@ -3263,7 +3263,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
       (!AWAKE(victim)))
   {
-    debug_isHit(ch, victim, attacktype, type, reduce, "stunned,bash,shocked return eFAILURE");
+    debug_isHit(ch, victim, attacktype, type, reduce, 0, "stunned,bash,shocked return eFAILURE");
     return eFAILURE; // always hit
   }
 
@@ -3370,7 +3370,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
 
-    debug_isHit(ch, victim, attacktype, type, reduce, QString("Ze random stuff percent=%1").arg(percent));
+    debug_isHit(ch, victim, attacktype, type, reduce, toHit, QString("Ze random stuff percent=%1").arg(percent));
     return eFAILURE;
   }
 
@@ -3389,7 +3389,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval))
     {
-      debug_isHit(ch, victim, attacktype, type, reduce, "SOMEONE_DIED");
+      debug_isHit(ch, victim, attacktype, type, reduce, toHit, "SOMEONE_DIED");
       return debug_retval(ch, victim, retval);
     }
   }
@@ -3419,7 +3419,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       retval = doTumblingCounterStrike(ch, victim);
       if (SOMEONE_DIED(retval))
       {
-        debug_isHit(ch, victim, attacktype, type, reduce, "SOMEONE_DIED");
+        debug_isHit(ch, victim, attacktype, type, reduce, toHit, "SOMEONE_DIED");
         return debug_retval(ch, victim, retval);
       }
       break;
@@ -3448,7 +3448,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   { // Miss
     type = 3;
   }
-  debug_isHit(ch, victim, attacktype, type, reduce, "return eSUCCESS");
+  debug_isHit(ch, victim, attacktype, type, reduce, toHit, "return eSUCCESS");
   return eSUCCESS;
 }
 
