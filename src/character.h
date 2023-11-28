@@ -632,6 +632,9 @@ public:
 #endif
     int spec = {};
 
+    bool getDebug(void) const { return debug_; }
+    void setDebug(bool state) { debug_ = state; }
+
     struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
     void tell_history(Character *sender, QString message);
     void gtell_history(Character *sender, QString message);
@@ -740,6 +743,7 @@ public:
 private:
     uint64_t gold_ = {}; /* Money carried */
     level_t level_ = {};
+    bool debug_ = false;
 };
 
 class communication

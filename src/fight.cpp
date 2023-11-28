@@ -3237,8 +3237,40 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
   }
 }
 
-// New toHit code
+QString translate_name(const Character *ch)
+{
+  if (IS_NPC(ch))
+  {
+    return QString("%1(v%2)").arg(GET_NAME(ch)).arg(mob_index[ch->mobdata->nr].virt);
+  }
+  return GET_NAME(ch);
+}
 
+void debug_isHit(const Character *ch, const Character *victim, const int &attacktype, const int &type, const int &reduce, const int &tohit, const QString message = QString())
+{
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, LOG_BUG);
+  }
+}
+
+void debug_isHit_toHit(const Character *ch, const Character *victim, const int &toHit)
+{
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("isHit: toHit=%1").arg(toHit), DIVINITY, LOG_BUG);
+  }
+}
+
+void debug_isHit_generic(const Character *ch, const Character *victim, const auto &parry, const auto &dodge, const auto &block, const auto &martial, const auto &tumbling)
+{
+  if (ch->getDebug() || victim->getDebug())
+  {
+    logentry(QString("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, LOG_BUG);
+  }
+}
+
+// New toHit code
 int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce)
 {
   if ((DC::isSet(victim->combat, COMBAT_STUNNED)) ||
@@ -3249,14 +3281,18 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       (DC::isSet(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
       (!AWAKE(victim)))
+  {
+    debug_isHit(ch, victim, attacktype, type, reduce, 0, "stunned,bash,shocked return eFAILURE");
     return eFAILURE; // always hit
+  }
 
   level_diff_t level_difference = ch->getLevel() - victim->getLevel();
   int skill = 0;
 
   // Figure out toHit value.
   int toHit = GET_REAL_HITROLL(ch);
-  //  toHit += speciality_bonus(ch, attacktype, victim->getLevel());
+  debug_isHit_toHit(ch, victim, toHit);
+  //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
 
   switch (attacktype)
   {
@@ -3285,31 +3321,58 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     break;
   }
   if (skill)
+  {
     toHit += has_skill(ch, skill) / 8;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
 
   if (DC::isSet(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  {
     toHit = (int)((float)toHit * 0.90) - 5;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
   else if (DC::isSet(ch->combat, COMBAT_RAGE1) || DC::isSet(ch->combat, COMBAT_RAGE2))
+  {
     toHit = (int)((float)toHit * 0.95) - 2;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
 
   if (toHit < 1)
+  {
     toHit = 1;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
 
   // Hitting stuff close to your level gives you a bonus,
   if (level_difference > 15 && level_difference < 25)
+  {
     toHit += 5;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
   else if (level_difference > 5 && level_difference <= 15)
+  {
     toHit += 7;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
   else if (level_difference >= 0 && level_difference <= 5)
+  {
     toHit += 10;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
   else if (level_difference >= -5 && level_difference < 0)
+  {
     toHit += 5;
+    debug_isHit_toHit(ch, victim, toHit);
+  }
 
   // Give a tohit bonus to low level players.
   level_difference = ch->getLevel() - (victim->getLevel() / 2.0);
   float lowlvlmod = (50.0 - level_difference) / 10.0;
   if (lowlvlmod > 1.0)
+  {
     toHit = (int)((float)toHit * lowlvlmod);
+    debug_isHit_toHit(ch, victim, toHit);
+  }
 
   // The stuff.
   float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
@@ -3324,6 +3387,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
   int tumbling = has_skill(victim, SKILL_TUMBLING);
+
+  debug_isHit_generic(ch, victim, parry, dodge, block, martial, tumbling);
 
   if (victim->equipment[WIELD] == nullptr)
     parry = 0;
@@ -3353,7 +3418,10 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   // Ze random stuff.
   if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  {
+    debug_isHit(ch, victim, attacktype, type, reduce, toHit, QString("Ze random stuff percent=%1").arg(percent));
     return eFAILURE;
+  }
 
   // Miss, determine a message
 
@@ -3369,7 +3437,10 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
     retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval))
+    {
+      debug_isHit(ch, victim, attacktype, type, reduce, toHit, "SOMEONE_DIED");
       return debug_retval(ch, victim, retval);
+    }
   }
   else if (what < (parry + tumbling))
   { // Tumbling
@@ -3396,7 +3467,10 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     case 2: // riposte style damage
       retval = doTumblingCounterStrike(ch, victim);
       if (SOMEONE_DIED(retval))
+      {
+        debug_isHit(ch, victim, attacktype, type, reduce, toHit, "SOMEONE_DIED");
         return debug_retval(ch, victim, retval);
+      }
       break;
     default:
       send_to_char("Messed up tumbling. tell somebody, whore!\r\n", ch);
@@ -3423,7 +3497,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   { // Miss
     type = 3;
   }
-
+  debug_isHit(ch, victim, attacktype, type, reduce, toHit, "return eSUCCESS");
   return eSUCCESS;
 }
 

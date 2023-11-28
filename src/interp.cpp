@@ -537,7 +537,7 @@ struct command_info cmd_info[] =
         {"dopathpath", do_pathpath, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"botcheck", do_botcheck, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"showbits", do_showbits, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"debug", do_debug, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"debug", do_debug, nullptr, nullptr, POSITION_DEAD, DIVINITY, CMD_DEFAULT, 0, 1, CommandType::all},
 
         // Bug way down here after 'buy'
         {"bug", do_bug, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},

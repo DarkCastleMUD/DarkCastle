@@ -309,12 +309,66 @@ int do_debug(Character *ch, char *args, int cmd)
       ch->load_charmie_equipment(QString(arg2.c_str()));
     }
   }
+  else if (arg1 == "player")
+  {
+    tie(arg2, remainder) = half_chop(remainder);
+    auto victim = get_pc(arg2.c_str());
+    if (!victim)
+    {
+      ch->sendln("Player not found.");
+      return eFAILURE;
+    }
+    victim->setDebug(!victim->getDebug());
+    ch->sendln(QString("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
+    return eSUCCESS;
+  }
+  else if (arg1 == "mobile")
+  {
+    tie(arg2, remainder) = half_chop(remainder);
+    auto match = QRegularExpression("^v{0,1}([0-9]+)$").match(arg2.c_str());
+
+    if (match.hasMatch())
+    {
+      bool ok = false;
+      vnum_t vnum = match.captured(1).toULongLong(&ok);
+      if (ok)
+      {
+
+        // All NPCs instances of a specific VNUM will have debug toggled
+        // according to the first matching NPC.
+        uint64_t change_count{};
+        bool first_npc_found = false;
+        bool first_npc_debug_state = false;
+        for (const auto &c : DC::getInstance()->character_list)
+        {
+          if (IS_NPC(c) && c->mobdata && mob_index[c->mobdata->nr].virt == vnum)
+          {
+            if (!first_npc_found)
+            {
+              first_npc_found = true;
+              first_npc_debug_state = c->getDebug();
+            }
+            c->setDebug(!first_npc_debug_state);
+            ch->sendln(QString("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
+            change_count++;
+          }
+        }
+        ch->sendln(QString("%1 mobiles changed.").arg(change_count));
+        return eSUCCESS;
+      }
+    }
+
+    ch->sendln("Invalid vnum. Valid example: 1 or v1");
+    return eFAILURE;
+  }
   else
   {
-    csendf(ch, "debug <perf> <list>\n\r");
-    csendf(ch, "      <perf> <show> <key>\n\r");
-    csendf(ch, "      <perf> <set> <key> <value>\n\r");
-    csendf(ch, "      <charmie> <name> [previous]\n\r");
+    csendf(ch, "debug perf list\n\r");
+    csendf(ch, "      perf show <key>\n\r");
+    csendf(ch, "      perf set <key> <value>\n\r");
+    csendf(ch, "      charmie <name> [previous]\n\r");
+    ch->sendln("      player <name>");
+    ch->sendln("      mobile <vnum>");
   }
 
   csendf(ch, "\n\r");
