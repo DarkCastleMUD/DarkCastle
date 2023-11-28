@@ -3272,6 +3272,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
 
   // Figure out toHit value.
   int toHit = GET_REAL_HITROLL(ch);
+  logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
   //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
 
   switch (attacktype)
@@ -3301,30 +3302,57 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
     break;
   }
   if (skill)
+  {
     toHit += has_skill(ch, skill) / 8;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
 
   if (DC::isSet(ch->combat, COMBAT_BERSERK) || IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  {
     toHit = (int)((float)toHit * 0.90) - 5;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
   else if (DC::isSet(ch->combat, COMBAT_RAGE1) || DC::isSet(ch->combat, COMBAT_RAGE2))
+  {
     toHit = (int)((float)toHit * 0.95) - 2;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
 
   if (toHit < 1)
+  {
     toHit = 1;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
 
   // Hitting stuff close to your level gives you a bonus,
   if (lvldiff > 15 && lvldiff < 25)
+  {
     toHit += 5;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
   else if (lvldiff > 5 && lvldiff <= 15)
+  {
     toHit += 7;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
   else if (lvldiff >= 0 && lvldiff <= 5)
+  {
     toHit += 10;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
   else if (lvldiff >= -5 && lvldiff < 0)
+  {
     toHit += 5;
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
 
   // Give a tohit bonus to low level players.
   float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim) / 2.0)) / 10.0;
   if (lowlvlmod > 1.0)
+  {
     toHit = (int)((float)toHit * lowlvlmod);
+    logentry(QString("toHit=%1").arg(toHit), 105, LOG_BUG);
+  }
 
   // The stuff.
   float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
@@ -3339,6 +3367,8 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
   int tumbling = has_skill(victim, SKILL_TUMBLING);
+
+  logentry(QString("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), 105, LOG_BUG);
 
   if (victim->equipment[WIELD] == nullptr)
     parry = 0;
@@ -3369,7 +3399,6 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   // Ze random stuff.
   if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-
     debug_isHit(ch, victim, attacktype, type, reduce, toHit, QString("Ze random stuff percent=%1").arg(percent));
     return eFAILURE;
   }
