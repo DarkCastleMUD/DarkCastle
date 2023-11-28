@@ -371,7 +371,6 @@ int do_debug(Character *ch, char *args, int cmd)
     ch->sendln("      mobile <vnum>");
   }
 
-  csendf(ch, "\n\r");
   return eSUCCESS;
 }
 
