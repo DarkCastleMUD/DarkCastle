@@ -73,7 +73,8 @@
         "charconv": "cpp",
         "span": "cpp",
         "format": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "expected": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
