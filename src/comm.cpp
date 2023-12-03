@@ -2001,8 +2001,6 @@ void scramble_text(std::string &txt)
 
 QString scramble_text(QString input)
 {
-  QString output;
-
   for (auto &c : input)
   {
     // only scramble letters, but not 'm' cause 'm' is used in ansi codes
@@ -2012,7 +2010,7 @@ QString scramble_text(QString input)
     }
   }
 
-  return output;
+  return input;
 }
 
 void write_to_output(const char *txt, class Connection *t)
