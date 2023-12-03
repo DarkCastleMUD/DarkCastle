@@ -9,38 +9,39 @@
 #define SING_H_
 
 #include "structs.h" // uint8_t, uint8_t, etc..
+#include "common.h"
 
 #define BARD_MAX_RATING 3
 
-typedef int	SING_FUN		( uint8_t level, Character *ch, char *arg, Character *victim, int skill);
+typedef int SING_FUN(uint8_t level, Character *ch, char *arg, Character *victim, int skill);
 
 struct song_info_type
 {
-	uint8_t beats;	/* Waiting time after ki */
-	uint8_t minimum_position; /* min position for use */
-	uint8_t min_useski;	/* minimum ki used */
-        int16_t skill_num;       /* skill number of the song */
-	int16_t targets;		/* Legal targets */
-        int16_t rating;		/* Rating for orchestrate */
-	SING_FUN *song_pointer;	/* function to call */
-        SING_FUN *exec_pointer; /* other function to call */
-        SING_FUN *song_pulse;    /* other other function to call */
-        SING_FUN *intrp_pointer; /* other other function to call */
-        int difficulty;
+	uint8_t beats;				 /* Waiting time after ki */
+	position_t minimum_position; /* min position for use */
+	uint8_t min_useski;			 /* minimum ki used */
+	int16_t skill_num;			 /* skill number of the song */
+	int16_t targets;			 /* Legal targets */
+	int16_t rating;				 /* Rating for orchestrate */
+	SING_FUN *song_pointer;		 /* function to call */
+	SING_FUN *exec_pointer;		 /* other function to call */
+	SING_FUN *song_pulse;		 /* other other function to call */
+	SING_FUN *intrp_pointer;	 /* other other function to call */
+	int difficulty;
 };
 
 struct songInfo
 {
-	int16_t song_timer; /* status for songs being sung */
+	int16_t song_timer;	 /* status for songs being sung */
 	int16_t song_number; /* number of song being sung */
-	char * song_data; 
+	char *song_data;
 };
 
 /************************************************************************
 | Function declarations
 */
 
-char * skip_spaces(char *string);
+char *skip_spaces(char *string);
 void stop_grouped_bards(Character *ch, int action);
 
 SING_FUN song_whistle_sharp;

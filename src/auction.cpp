@@ -43,8 +43,6 @@ void load_auction_tickets()
 #include "const.h"
 #include "inventory.h"
 
-using namespace std;
-
 #define auction_duration 1209600
 #define AUC_MIN_PRICE 1000
 #define AUC_MAX_PRICE 2000000000
@@ -376,7 +374,7 @@ void AuctionHouse::HandleDelete(QString name)
   {
     Items_For_Sale.remove(tickets_to_delete.front());
 
-    stringstream obj_filename;
+    std::stringstream obj_filename;
     obj_filename << "../lib/auctions/" << tickets_to_delete.front() << ".auction_obj";
     struct stat sbuf;
     if (stat(obj_filename.str().c_str(), &sbuf) == 0)
@@ -906,11 +904,11 @@ void AuctionHouse::Save()
 
     if (Item_it->obj)
     {
-      stringstream obj_filename;
+      std::stringstream obj_filename;
       obj_filename << "../lib/auctions/" << Item_it.key() << ".auction_obj";
 
-      ofstream auction_obj_file;
-      auction_obj_file.exceptions(ofstream::failbit | ofstream::badbit);
+      std::ofstream auction_obj_file;
+      auction_obj_file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
       errno = 0;
       try
       {
@@ -924,7 +922,7 @@ void AuctionHouse::Save()
           }
         }
         auction_obj_file.open(obj_filename.str().c_str());
-        auction_obj_file << Item_it->obj << flush;
+        auction_obj_file << Item_it->obj << std::flush;
         auction_obj_file.close();
       }
       catch (...)
@@ -1183,7 +1181,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     }
   }
 
-  stringstream obj_filename;
+  std::stringstream obj_filename;
   obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
   struct stat sbuf;
   if (stat(obj_filename.str().c_str(), &sbuf) == 0)
@@ -1265,14 +1263,14 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
   // If obj is nullptr then either we haven't loaded this object yet or it's not custom
   if (Item_it->obj == nullptr)
   {
-    stringstream obj_filename;
+    std::stringstream obj_filename;
     obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
 
-    ifstream auction_obj_file;
+    std::ifstream auction_obj_file;
     auction_obj_file.open(obj_filename.str().c_str());
     if (auction_obj_file.is_open())
     {
-      auction_obj_file.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+      auction_obj_file.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
 
       try
       {
@@ -1280,19 +1278,19 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
         auction_obj_file >> Item_it->obj;
         auction_obj_file.close();
       }
-      catch (ifstream::failure &e)
+      catch (std::ifstream::failure &e)
       {
-        if ((auction_obj_file.rdstate() & ios_base::eofbit) == ios_base::eofbit)
+        if ((auction_obj_file.rdstate() & std::ios_base::eofbit) == std::ios_base::eofbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::eofbit", ticket);
+          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
         }
-        else if ((auction_obj_file.rdstate() & ios_base::badbit) == ios_base::badbit)
+        else if ((auction_obj_file.rdstate() & std::ios_base::badbit) == std::ios_base::badbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::badbit", ticket);
+          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
         }
-        else if ((auction_obj_file.rdstate() & ios_base::failbit) == ios_base::failbit)
+        else if ((auction_obj_file.rdstate() & std::ios_base::failbit) == std::ios_base::failbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::failbit", ticket);
+          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
         }
         else
         {
@@ -1420,7 +1418,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
     Items_For_Sale.remove(ticket);
 
-    stringstream obj_filename;
+    std::stringstream obj_filename;
     obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
     struct stat sbuf;
     if (stat(obj_filename.str().c_str(), &sbuf) == 0)
@@ -1451,7 +1449,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     return;
   }
 
-  stringstream obj_filename;
+  std::stringstream obj_filename;
   obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
   struct stat sbuf;
   if (stat(obj_filename.str().c_str(), &sbuf) == 0)
@@ -1524,8 +1522,8 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
         break;
       }
       i++;
-      stringstream ss;
-      ss.imbue(locale("en_US"));
+      std::stringstream ss;
+      ss.imbue(std::locale("en_US"));
       ss << Item_it->price;
       sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\n\r",
               Item_it.key(),

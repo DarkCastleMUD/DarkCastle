@@ -41,13 +41,6 @@ public:
   Proxy(QString);
   Proxy(void) {}
 
-  enum class inet_protocol_family_t
-  {
-    UNKNOWN,
-    TCP4,
-    TCP6,
-    UNRECOGNIZED
-  };
   inet_protocol_family_t getInet_Protocol_Fanily(void) { return inet_protocol_family; }
   QString getHeader(void) { return header; }
   bool isActive(void) { return active; }
@@ -135,11 +128,11 @@ public:
   char **hashstr = {};
   char *astr = {};
   int max_str = {};
-  string buf = {};        /* buffer for raw input	*/
-  string last_input = {}; /* the last input	*/
-  string output = {};     /* queue of strings to send	*/
-  string inbuf = {};
-  queue<string> input = {};        /* queue of unprocessed input	*/
+  std::string buf = {};        /* buffer for raw input	*/
+  std::string last_input = {}; /* the last input	*/
+  std::string output = {};     /* queue of strings to send	*/
+  std::string inbuf = {};
+  std::queue<std::string> input = {};        /* queue of unprocessed input	*/
   Character *character = {};       /* linked to char		*/
   Character *original = {};        /* for switch / return		*/
   class Connection *snooping = {}; /* Who is this char snooping       */

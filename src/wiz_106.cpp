@@ -15,7 +15,7 @@
 
 #include <fmt/format.h>
 
-using namespace std;
+
 
 int do_plats(Character *ch, char *argument, int cmd)
 {
@@ -53,25 +53,25 @@ int do_plats(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
+int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
 {
   class Connection *i = {};
   class Connection *next_i = {};
   Character *vict = {};
-  string name = {}, to_force = {}, buf = {};
+  std::string name = {}, to_force = {}, buf = {};
 
   if (IS_NPC(ch))
   {
     return eFAILURE;
   }
 
-  if (!has_skill(ch, COMMAND_FORCE) && cmd != CMD_FORCE)
+  if (!ch->has_skill( COMMAND_FORCE) && cmd != CMD_FORCE)
   {
     ch->send("Huh?\r\n");
     return eFAILURE;
   }
 
-  tie(name, to_force) = half_chop(argument);
+  std::tie(name, to_force) = half_chop(argument);
 
   if (name.empty() || to_force.empty())
   {

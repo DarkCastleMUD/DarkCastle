@@ -60,8 +60,6 @@ int load_debug = 0;
 #include "const.h"
 #include "wizard.h"
 
-using namespace std;
-
 int load_new_help(FILE *fl, int reload, Character *ch);
 void load_vaults();
 void load_auction_tickets();
@@ -72,13 +70,13 @@ void find_unordered_objects(void);
 void find_unordered_mobiles(void);
 char *mprog_type_to_name(int type);
 void write_wizlist(std::stringstream &filename);
-void write_wizlist(string filename);
+void write_wizlist(std::string filename);
 void write_wizlist(const char filename[]);
 
 /* load stuff */
-char *curr_type;
-char *curr_name;
-int curr_virtno;
+QString curr_type;
+QString curr_name;
+vnum_t curr_virtno;
 
 /**************************************************************************
  *  declarations of most of the 'global' variables                         *
@@ -166,7 +164,7 @@ void setup_dir(FILE *fl, int room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
-void half_chop(const char *string, char *arg1, char *arg2);
+void half_chop(const char *str, char *arg1, char *arg2);
 world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
 world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
@@ -348,7 +346,7 @@ char *funnybootmessages[] =
 		"Connecting logical circuit...\r\n",
 		"Binding proper ports....\r\n",
 		"Creating obj references...\r\n",
-		"Cacheing zone connection map...\r\n",
+		"Cacheing zone connection std::map...\r\n",
 		"Feeding mean llamas...\r\n",
 		"Breeding squirrels...\r\n",
 		"Graphing optimization lines...\r\n",
@@ -623,7 +621,7 @@ void DC::boot_db(void)
 	{
 		if (cf.verbose_mode)
 		{
-			// cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << endl;
+			// std::cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << std::endl;
 		}
 
 		zone.reset(Zone::ResetType::full);
@@ -720,7 +718,7 @@ void write_wizlist(std::stringstream &filename)
 	write_wizlist(filename.str().c_str());
 }
 
-void write_wizlist(string filename)
+void write_wizlist(std::string filename)
 {
 	write_wizlist(filename.c_str());
 }
@@ -788,7 +786,7 @@ void update_wizlist(Character *ch)
 		port1 = DC::getInstance()->cf.ports[0];
 	}
 
-	stringstream ssbuffer;
+	std::stringstream ssbuffer;
 	ssbuffer << HTDOCS_DIR << port1 << "/wizlist.txt";
 	write_wizlist(ssbuffer.str().c_str());
 }
@@ -1673,7 +1671,7 @@ QString read_next_worldfile_name(FILE *flWorldIndex)
 
 bool can_modify_this_room(Character *ch, int32_t vnum)
 {
-	if (has_skill(ch, COMMAND_RANGE))
+	if (ch->has_skill(COMMAND_RANGE))
 		return true;
 
 	if (ch->player->buildLowVnum <= 0 || ch->player->buildHighVnum <= 0)
@@ -1687,7 +1685,7 @@ bool can_modify_this_room(Character *ch, int32_t vnum)
 
 bool can_modify_room(Character *ch, int32_t vnum)
 {
-	if (has_skill(ch, COMMAND_RANGE))
+	if (ch->has_skill(COMMAND_RANGE))
 		return true;
 
 	if (ch->player->buildLowVnum <= 0 || ch->player->buildHighVnum <= 0)
@@ -1701,7 +1699,7 @@ bool can_modify_room(Character *ch, int32_t vnum)
 
 bool can_modify_this_mobile(Character *ch, int32_t vnum)
 {
-	if (has_skill(ch, COMMAND_RANGE))
+	if (ch->has_skill(COMMAND_RANGE))
 		return true;
 
 	if (ch->player->buildMLowVnum <= 0 || ch->player->buildMHighVnum <= 0)
@@ -1720,7 +1718,7 @@ bool can_modify_mobile(Character *ch, int32_t mob)
 
 bool can_modify_this_object(Character *ch, int32_t vnum)
 {
-	if (has_skill(ch, COMMAND_RANGE))
+	if (ch->has_skill(COMMAND_RANGE))
 		return true;
 
 	if (ch->player->buildOLowVnum <= 0 || ch->player->buildOHighVnum <= 0)
@@ -2523,7 +2521,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	// copy the temp into the memory
 	zone.cmd = reset_tab;
-	// // cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << endl;
+	// // std::cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << std::endl;
 	zones.insert(new_zone_key, zone);
 	return new_zone_key;
 }
@@ -2577,7 +2575,7 @@ void DC::boot_zones(void)
 		auto zone_key = read_one_zone(fl);
 		auto &zone = zones[zone_key];
 		zone.setFilename(temp);
-		// // cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << endl;
+		// // std::cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << std::endl;
 
 		fclose(fl);
 	}
@@ -2613,10 +2611,10 @@ Character *read_mobile(int nr, FILE *fl)
 
 	/***** String data *** */
 
-	mob->name = fread_string(fl, 1);
+	mob->setName(fread_string(fl, 1));
 	/* set up the fread debug stuff */
 	curr_type = "Mob";
-	curr_name = mob->name;
+	curr_name = mob->getName();
 	mob->short_desc = fread_string(fl, 1);
 	mob->long_desc = fread_string(fl, 1);
 	mob->description = fread_string(fl, 1);
@@ -2681,7 +2679,7 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->mana = 100 + (mob->getLevel() * 10);
 	mob->max_mana = 100 + (mob->getLevel() * 10);
 
-	mob->move = 100 + (mob->getLevel() * 10);
+	mob->setMove(100 + (mob->getLevel() * 10));
 	mob->max_move = 100 + (mob->getLevel() * 10);
 
 	mob->max_ki = 100.0 * (mob->getLevel() / 60.0);
@@ -2692,8 +2690,8 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->plat = 0;
 	GET_EXP(mob) = (int64_t)fread_int(fl, -2147483467, 2147483467);
 
-	mob->position = fread_int(fl, 0, 10);
-	mob->mobdata->default_pos = fread_int(fl, 0, 10);
+	mob->setPosition(static_cast<position_t>(fread_int(fl, 0, 10)));
+	mob->mobdata->default_pos = static_cast<position_t>(fread_int(fl, 0, 10));
 
 	tmp = fread_int(fl, 0, 12);
 
@@ -2829,7 +2827,7 @@ void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
 		string_to_file(fl, "Saved During Edit");
 }
 
-void write_mprog_recur(ofstream &fl, mob_prog_data *mprg, bool mob)
+void write_mprog_recur(std::ofstream &fl, mob_prog_data *mprg, bool mob)
 {
 	if (mprg->next)
 	{
@@ -2907,7 +2905,7 @@ void write_mobile(Character *mob, FILE *fl)
 	int i = 0;
 
 	fprintf(fl, "#%d\n", mob_index[mob->mobdata->nr].virt);
-	string_to_file(fl, mob->name);
+	string_to_file(fl, mob->getName());
 	string_to_file(fl, mob->short_desc);
 	string_to_file(fl, mob->long_desc);
 	string_to_file(fl, mob->description);
@@ -2947,7 +2945,7 @@ void write_mobile(Character *mob, FILE *fl)
 			mob->getGold(),
 			GET_EXP(mob),
 
-			mob->position,
+			mob->getPosition(),
 			mob->mobdata->default_pos,
 			mob->sex,
 			mob->immune,
@@ -3544,7 +3542,7 @@ int create_blank_mobile(int nr)
 
 	clear_char(mob);
 	reset_char(mob);
-	mob->name = str_hsh("empty mob");
+	mob->setName("empty mob");
 	mob->short_desc = str_hsh("an empty mob");
 	mob->long_desc = str_hsh("an empty mob description\r\n");
 	mob->description = str_hsh("");
@@ -3573,7 +3571,7 @@ int create_blank_mobile(int nr)
 	mob->mobdata->reset = {};
 	mob->mobdata->damnodice = 1;
 	mob->mobdata->damsizedice = 1;
-	mob->mobdata->default_pos = POSITION_STANDING;
+	mob->mobdata->default_pos = position_t::STANDING;
 	mob->mobdata->last_room = 0;
 	mob->mobdata->nr = cur_index;
 	mob->misc = MISC_IS_MOB;
@@ -3843,7 +3841,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	class Object *obj = new Object;
 	clear_object(obj);
 
-	/* *** string data *** */
+	/* *** std::string data *** */
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
 
@@ -3999,7 +3997,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 
 	clear_object(obj);
 
-	/* *** string data *** */
+	/* *** std::string data *** */
 	// read it, add it to the hsh table, free it
 	// that way, we only have one copy of it in memory at any time
 	obj->name = fread_string(fl, 1);
@@ -4131,7 +4129,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	return obj;
 }
 
-ifstream &operator>>(ifstream &in, Object *obj)
+std::ifstream &operator>>(std::ifstream &in, Object *obj)
 {
 	int loc, mod, nr;
 
@@ -4149,7 +4147,7 @@ ifstream &operator>>(ifstream &in, Object *obj)
 	{
 		in >> nr;
 	}
-	in >> ws;
+	in >> std::ws;
 
 	obj->name = fread_string(in, true);
 
@@ -4350,7 +4348,7 @@ void write_object(Object *obj, FILE *fl)
 	fprintf(fl, "S\n");
 }
 
-ofstream &operator<<(ofstream &out, Object *obj)
+std::ofstream &operator<<(std::ofstream &out, Object *obj)
 {
 	out << "#" << obj_index[obj->item_number].virt << "\n";
 	string_to_file(out, obj->name);
@@ -4400,19 +4398,19 @@ ofstream &operator<<(ofstream &out, Object *obj)
 	return out;
 }
 
-string quotequotes(string &s1);
+std::string quotequotes(std::string &s1);
 
-string quotequotes(const char *str)
+std::string quotequotes(const char *str)
 {
-	string s1(str);
+	std::string s1(str);
 
 	return quotequotes(s1);
 }
 
-string quotequotes(string &s1)
+std::string quotequotes(std::string &s1)
 {
 	size_t pos = s1.find("\"");
-	while (pos != string::npos)
+	while (pos != std::string::npos)
 	{
 		s1.insert(pos, 1, '\"');
 		pos = s1.find('\"', pos + 2);
@@ -4421,10 +4419,10 @@ string quotequotes(string &s1)
 	return s1;
 }
 
-string lf_to_crlf(string &s1)
+std::string lf_to_crlf(std::string &s1)
 {
 	size_t pos = s1.find('\n'); // @suppress("Ambiguous problem")
-	while (pos != string::npos)
+	while (pos != std::string::npos)
 	{
 		s1.insert(pos, 1, '\r');
 		pos = s1.find('\n', pos + 2);
@@ -4433,7 +4431,7 @@ string lf_to_crlf(string &s1)
 	return s1;
 }
 
-void write_bitvector_csv(uint32_t vector, QStringList names, ofstream &fout)
+void write_bitvector_csv(uint32_t vector, QStringList names, std::ofstream &fout)
 {
 
 	for (uint32_t nr = 0; nr < names.size(); nr++)
@@ -4450,7 +4448,7 @@ void write_bitvector_csv(uint32_t vector, QStringList names, ofstream &fout)
 	return;
 }
 
-void write_bitvector_csv(uint32_t vector, const char *const *array, ofstream &fout)
+void write_bitvector_csv(uint32_t vector, const char *const *array, std::ofstream &fout)
 {
 	int nr = 0;
 	while (*array[nr] != '\n')
@@ -4468,7 +4466,7 @@ void write_bitvector_csv(uint32_t vector, const char *const *array, ofstream &fo
 	return;
 }
 
-void write_object_csv(Object *obj, ofstream &fout)
+void write_object_csv(Object *obj, std::ofstream &fout)
 {
 	try
 	{
@@ -4510,14 +4508,14 @@ void write_object_csv(Object *obj, ofstream &fout)
 			}
 		}
 	}
-	catch (ofstream::failure &e)
+	catch (std::ofstream::failure &e)
 	{
-		stringstream errormsg;
+		std::stringstream errormsg;
 		errormsg << "Exception while writing in write_obj_csv.";
 		logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
 	}
 
-	fout << endl;
+	fout << std::endl;
 }
 
 bool has_random(Object *obj)
@@ -5316,17 +5314,17 @@ char *fread_string(QTextStream &in, bool hasher, bool *ok)
 /************************************************************************
  *  procs of a (more or less) general utility nature         *
  ********************************************************************** */
-char *fread_string(ifstream &in, int hasher)
+char *fread_string(std::ifstream &in, int hasher)
 {
 	char buffer[MAX_STRING_LENGTH];
 
 	// Save original exception mask so we can restore it later
-	ios_base::iostate orig_exceptions = in.exceptions();
-	in.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+	std::ios_base::iostate orig_exceptions = in.exceptions();
+	in.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
 	try
 	{
 		in.getline(buffer, MAX_STRING_LENGTH, '~');
-		in >> ws;
+		in >> std::ws;
 	}
 	catch (...)
 	{
@@ -5335,9 +5333,9 @@ char *fread_string(ifstream &in, int hasher)
 	}
 	in.exceptions(orig_exceptions);
 
-	string orig_str(buffer);
+	std::string orig_str(buffer);
 	// Change \n into \r\n
-	string swapstr = lf_to_crlf(orig_str);
+	std::string swapstr = lf_to_crlf(orig_str);
 
 	char *retval;
 	if (hasher)
@@ -5352,7 +5350,7 @@ char *fread_string(ifstream &in, int hasher)
 	return retval;
 }
 
-/* read and allocate space for a '~'-terminated string from a given file */
+/* read and allocate space for a '~'-terminated std::string from a given file */
 char *fread_string(FILE *fl, int hasher)
 {
 	char buf[MAX_STRING_LENGTH];
@@ -5421,7 +5419,7 @@ char *fread_string(FILE *fl, int hasher)
 		} // switch
 	}	  // for
 
-	perror("fread_string: string too long");
+	perror("fread_string: std::string too long");
 	abort();
 	return (nullptr);
 }
@@ -5433,7 +5431,7 @@ QString fread_word(QTextStream &fl)
 	return buffer;
 }
 
-/* read and allocate space for a whitespace-terminated string from a given file */
+/* read and allocate space for a whitespace-terminated std::string from a given file */
 char *fread_word(FILE *fl, int hasher)
 {
 	char buf[MAX_STRING_LENGTH];
@@ -5497,13 +5495,13 @@ char *fread_word(FILE *fl, int hasher)
 		} // switch
 	}	  // for
 
-	perror("fread_word: string too long");
+	perror("fread_word: std::string too long");
 	abort();
 	return (nullptr);
 }
 
 // This is here to allow us to read a bitvector in as either a number
-// or as a string of characters.  ie, 4, and c are the same.
+// or as a std::string of characters.  ie, 4, and c are the same.
 // 5 (1+4) would be the same at 'ac'
 
 int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
@@ -5575,14 +5573,14 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	return (0);
 }
 
-int fread_bitvector(ifstream &in, int32_t beg_range, int32_t end_range)
+int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 {
 	int ch;
 	int32_t i = 0;
 
 	// Save original exception mask so we can restore it later
-	ios_base::iostate orig_exceptions = in.exceptions();
-	in.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+	std::ios_base::iostate orig_exceptions = in.exceptions();
+	in.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
 	try
 	{
 		// eat space till we hit the next one
@@ -5666,8 +5664,8 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		// cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
-		// cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
+		// std::cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << std::endl;
+		// std::cerr << "fread_int: Bad value - < 0 on positive only num" << std::endl;
 		while (isdigit(getc(fl)))
 		{
 		}
@@ -5726,19 +5724,19 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	return (0);
 }
 
-int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range)
+int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range)
 {
 	int64_t number;
 	in >> number;
 
 	if (number < beg_range)
 	{
-		// cerr << "fread_int: error " << number << " less than " << beg_range << ". " << "Setting to " << beg_range << endl;
+		// std::cerr << "fread_int: error " << number << " less than " << beg_range << ". " << "Setting to " << beg_range << std::endl;
 		number = beg_range;
 	}
 	else if (number > end_range)
 	{
-		// cerr << "fread_int: error " << number << " greater than " << beg_range << ". " << "Setting to " << beg_range << endl;
+		// std::cerr << "fread_int: error " << number << " greater than " << beg_range << ". " << "Setting to " << beg_range << std::endl;
 		number = end_range;
 	}
 
@@ -5827,8 +5825,8 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		// cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
-		// cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
+		// std::cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << std::endl;
+		// std::cerr << "fread_int: Bad value - < 0 on positive only num" << std::endl;
 		while (isdigit(getc(fl)))
 		{
 		}
@@ -5943,7 +5941,7 @@ void free_char(Character *ch, Trace trace)
 	if (free_list.contains(ch))
 	{
 		Trace trace = free_list.at(ch);
-		stringstream ss;
+		std::stringstream ss;
 		ss << trace;
 		logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in free_list from %s", ch, ss.str().c_str());
 
@@ -5991,8 +5989,6 @@ void free_char(Character *ch, Trace trace)
 
 	if (IS_PC(ch))
 	{
-		if (ch->name)
-			dc_free(ch->name);
 		if (ch->short_desc)
 			dc_free(ch->short_desc);
 		if (ch->long_desc)
@@ -6115,7 +6111,7 @@ int file_to_string(const char *name, char *buf)
 		{
 			if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
 			{
-				logentry("fl->strng: string too big (db.c, file_to_string)",
+				logentry("fl->strng: std::string too big (db.c, file_to_string)",
 						 0, LogChannels::LOG_BUG);
 				*buf = '\0';
 				return (-1);
@@ -6153,7 +6149,7 @@ void reset_char(Character *ch)
 	ch->next_fighting = 0;
 	ch->next_in_room = 0;
 	ch->fighting = 0;
-	ch->position = POSITION_STANDING;
+	ch->setStanding();
 	ch->carry_weight = 0;
 	ch->carry_items = 0;
 
@@ -6203,7 +6199,7 @@ void reset_char(Character *ch)
 	if (ch->getHP() < 1)
 		ch->setHP(1);
 	if (GET_MOVE(ch) < 1)
-		GET_MOVE(ch) = 1;
+		ch->setMove(1);
 	if (GET_MANA(ch) < 1)
 		GET_MANA(ch) = 1;
 
@@ -6242,7 +6238,7 @@ void clear_char(Character *ch)
 
 	*ch = {};
 	ch->in_room = DC::NOWHERE;
-	ch->position = POSITION_STANDING;
+	ch->setStanding();
 	GET_HOME(ch) = START_ROOM;
 	GET_AC(ch) = 100; /* Basic Armor */
 }
@@ -6316,8 +6312,8 @@ void init_char(Character *ch)
 	redo_mana(ch);
 
 	ch->mana = GET_MAX_MANA(ch);
-	ch->hit = GET_MAX_HIT(ch);
-	ch->move = GET_MAX_MOVE(ch);
+	ch->setHP(GET_MAX_HIT(ch));
+	ch->setMove(GET_MAX_MOVE(ch));
 
 	switch (GET_CLASS(ch))
 	{
@@ -6808,24 +6804,9 @@ void find_unordered_mobiles(void)
 	}
 }
 
-void string_to_file(FILE *f, char *string)
+void string_to_file(FILE *f, QString str)
 {
-	char *newbuf = new char[strlen(string) + 1];
-	strcpy(newbuf, string);
-
-	// remove all \r's
-	for (char *curr = newbuf; *curr != '\0'; curr++)
-	{
-		if (*curr == '\r')
-		{
-			for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
-				*blah = *(blah + 1);
-			curr--; // (to check for \r\r cases)
-		}
-	}
-
-	fprintf(f, "%s~\n", newbuf);
-	delete[] newbuf;
+	fprintf(f, "%s~\n", str.remove('\r').toStdString().c_str());
 }
 
 void string_to_file(QTextStream &fl, QString str)
@@ -6833,24 +6814,9 @@ void string_to_file(QTextStream &fl, QString str)
 	fl << str.remove('\r') + "~\n";
 }
 
-void string_to_file(ofstream &f, char *string)
+void string_to_file(std::ofstream &fl, QString str)
 {
-	char *newbuf = new char[strlen(string) + 1];
-	strcpy(newbuf, string);
-
-	// remove all \r's
-	for (char *curr = newbuf; *curr != '\0'; curr++)
-	{
-		if (*curr == '\r')
-		{
-			for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
-				*blah = *(blah + 1);
-			curr--; // (to check for \r\r cases)
-		}
-	}
-
-	f << newbuf << "~" << endl;
-	delete[] newbuf;
+	fl << str.remove('\r').toStdString() << "~\n";
 }
 
 void copySaveData(Object *target, Object *source)

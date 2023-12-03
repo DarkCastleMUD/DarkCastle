@@ -123,7 +123,7 @@ int do_ban(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
   struct ban_list_element *ban_node;
-  string buffer;
+  std::string buffer;
 
   *buf = '\0';
 

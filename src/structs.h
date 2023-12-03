@@ -19,7 +19,7 @@ extern "C"
 
 const size_t MAX_STRING_LENGTH = 8192;
 
-using namespace std;
+
 
 // FILE * fopen(const char *filename, const char *type);
 // int fclose(FILE * fl);
@@ -35,7 +35,7 @@ const size_t MESS_ROOM = 3;
 /* ======================================================================== */
 struct txt_block
 {
-  string text = {};
+  std::string text = {};
   struct txt_block *next = {};
   int aliased = {};
 };

@@ -31,59 +31,55 @@ extern "C"
 #include <vector>
 #include "handler.h"
 
-using namespace std;
-
-extern int hit_gain(Character *, int);
-
 struct ki_info_type ki_info[] = {
     {/* 0 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_blast,
      SKILL_INCREASE_HARD},
 
     {/* 1 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, ki_punch,
      SKILL_INCREASE_HARD},
 
     {/* 2 */
-     3 * DC::PULSE_TIMER, POSITION_STANDING, 5,
+     3 * DC::PULSE_TIMER, position_t::STANDING, 5,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_sense,
      SKILL_INCREASE_MEDIUM},
 
     {/* 3 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 8,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 8,
      TAR_IGNORE, ki_storm, SKILL_INCREASE_HARD},
 
     {/* 4 */
-     3 * DC::PULSE_TIMER, POSITION_STANDING, 25,
+     3 * DC::PULSE_TIMER, position_t::STANDING, 25,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_speed,
      SKILL_INCREASE_HARD},
 
     {/* 5 */
-     3 * DC::PULSE_TIMER, POSITION_RESTING, 8,
+     3 * DC::PULSE_TIMER, position_t::RESTING, 8,
      TAR_IGNORE | TAR_CHAR_ROOM | TAR_SELF_ONLY, ki_purify,
      SKILL_INCREASE_MEDIUM},
 
     {/* 6 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 10,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 10,
      TAR_CHAR_ROOM | TAR_FIGHT_VICT, ki_disrupt,
      SKILL_INCREASE_HARD},
 
     {/* 7 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 12,
      TAR_IGNORE, ki_stance, SKILL_INCREASE_EASY},
 
     {/* 8 */
-     3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20,
+     3 * DC::PULSE_TIMER, position_t::FIGHTING, 20,
      TAR_IGNORE, ki_agility, SKILL_INCREASE_MEDIUM},
 
     {/* 9 */
-     3 * DC::PULSE_TIMER, POSITION_RESTING, 15,
+     3 * DC::PULSE_TIMER, position_t::RESTING, 15,
      TAR_IGNORE, ki_meditation, SKILL_INCREASE_HARD},
 
     {/* 10 */
-     3 * DC::PULSE_TIMER, POSITION_STANDING, 1,
+     3 * DC::PULSE_TIMER, position_t::STANDING, 1,
      TAR_CHAR_ROOM | TAR_SELF_NONO, ki_transfer, SKILL_INCREASE_HARD}
 
 };
@@ -158,7 +154,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  learned = has_skill(ch, (spl + KI_OFFSET));
+  learned = ch->has_skill((spl + KI_OFFSET));
   if (!learned)
   {
     send_to_char("You do not know that ki power!\r\n", ch);
@@ -167,22 +163,22 @@ int do_ki(Character *ch, char *argument, int cmd)
 
   if (ki_info[spl].ki_pointer)
   {
-    if (GET_POS(ch) < ki_info[spl].minimum_position || (spl == KI_MEDITATION && (GET_POS(ch) == POSITION_FIGHTING || GET_POS(ch) <= POSITION_SLEEPING)))
+    if (GET_POS(ch) < ki_info[spl].minimum_position || (spl == KI_MEDITATION && (GET_POS(ch) == position_t::FIGHTING || GET_POS(ch) <= position_t::SLEEPING)))
     {
       switch (GET_POS(ch))
       {
-      case POSITION_SLEEPING:
+      case position_t::SLEEPING:
         send_to_char("You dream of wonderful ki powers.\r\n", ch);
         break;
-      case POSITION_RESTING:
+      case position_t::RESTING:
         send_to_char("You cannot harness that much energy while "
                      "resting!\n\r",
                      ch);
         break;
-      case POSITION_SITTING:
+      case position_t::SITTING:
         send_to_char("You can't do this sitting!\n\r", ch);
         break;
-      case POSITION_FIGHTING:
+      case position_t::FIGHTING:
         send_to_char("This is a peaceful ki power.\r\n", ch);
         break;
       default:
@@ -205,7 +201,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (*name)
       {
         if (DC::isSet(ki_info[spl].targets, TAR_CHAR_ROOM))
-          if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
+          if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
             target_ok = true;
 
         if (!target_ok && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
@@ -365,7 +361,7 @@ void reduce_ki(Character *ch, int type)
   int amount = 0;
 
   amount += ch->getLevel() / type; /* the higher the response
-                                   * the lower the divisor */
+                                    * the lower the divisor */
 
   amount -= dice(1, 10);
   if (amount < 0)
@@ -373,42 +369,42 @@ void reduce_ki(Character *ch, int type)
   GET_KI(ch) -= amount;
 }
 
-int ki_gain(Character *ch)
+int Character::ki_gain_lookup(void)
 {
   int gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(ch) == CLASS_MONK ? (int)(ch->max_ki * 0.04) : (int)(ch->max_ki * 0.05); /*(ch->getLevel() / 8) + 1;*/
-  gain += ch->ki_regen;
+  gain = GET_CLASS(this) == CLASS_MONK ? (int)(this->max_ki * 0.04) : (int)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
+  gain += this->ki_regen;
 
   // Normalize these so we dont underun the array below
-  int norm_wis = MAX(0, GET_WIS(ch));
-  int norm_int = MAX(0, GET_INT(ch));
+  int norm_wis = MAX(0, GET_WIS(this));
+  int norm_int = MAX(0, GET_INT(this));
 
-  if (GET_CLASS(ch) == CLASS_MONK)
+  if (GET_CLASS(this) == CLASS_MONK)
   {
     gain += wis_app[norm_wis].ki_regen;
   }
-  else if (GET_CLASS(ch) == CLASS_BARD)
+  else if (GET_CLASS(this) == CLASS_BARD)
   {
     gain += int_app[norm_int].ki_regen;
   }
 
-  gain += age(ch).year / 25;
+  gain += age().year / 25;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
-  switch (GET_POS(ch))
+  switch (GET_POS(this))
   {
-  case POSITION_SLEEPING:
+  case position_t::SLEEPING:
     multiplyer = 3;
     break;
-  case POSITION_RESTING:
+  case position_t::RESTING:
     multiplyer = 2;
     break;
-  case POSITION_SITTING:
+  case position_t::SITTING:
     multiplyer = 2;
     break;
   default:
@@ -472,7 +468,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     {
       if (IS_NPC(vict))
       {
-        add_memory(vict, GET_NAME(ch), 'h');
+        vict->add_memory(GET_NAME(ch), 'h');
         remove_memory(vict, 'f');
       }
       Character *tmp;
@@ -483,7 +479,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     }
 
     move_char(vict, (DC::getInstance()->world[(ch)->in_room].dir_option[exit])->to_room);
-    GET_POS(vict) = POSITION_SITTING;
+    vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     return eSUCCESS;
   }
@@ -494,7 +490,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
     strcpy(name, GET_SHORT(vict));
     int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST, 0);
-    GET_POS(vict) = POSITION_SITTING;
+    vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     if (!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
       return attack(vict, ch, TYPE_UNDEFINED);
@@ -521,7 +517,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   manadam = MIN(750, manadam);
   if (vict->getHP() < 500000)
   {
-    auto success_chance = (ch->getLevel() / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (vict->getLevel() / 5);
+    auto success_chance = (ch->getLevel() / 5) + (ch->has_skill(KI_OFFSET + KI_PUNCH) * 0.75) - (vict->getLevel() / 5);
     if (number(1, 101) < success_chance)
 
     {
@@ -633,7 +629,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
     return eSUCCESS;
 
   af.type = SPELL_HASTE;
-  af.duration = has_skill(ch, KI_OFFSET + KI_SPEED) / 15;
+  af.duration = ch->has_skill(KI_OFFSET + KI_SPEED) / 15;
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_HASTE;
@@ -641,8 +637,8 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   affect_to_char(vict, &af);
 
   af.type = SPELL_HASTE;
-  af.duration = has_skill(ch, KI_OFFSET + KI_SPEED) / 15;
-  af.modifier = -has_skill(ch, KI_OFFSET + KI_SPEED) / 4;
+  af.duration = ch->has_skill(KI_OFFSET + KI_SPEED) / 15;
+  af.modifier = -ch->has_skill(KI_OFFSET + KI_SPEED) / 4;
   af.location = APPLY_AC;
   af.bitvector = -1;
 
@@ -728,7 +724,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 
   bool disrupt_bingo = false;
   int success_chance = 0;
-  int learned = has_skill(ch, KI_OFFSET + KI_DISRUPT);
+  int learned = ch->has_skill(KI_OFFSET + KI_DISRUPT);
 
   if (learned > 85)
   {
@@ -812,7 +808,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   if (af)
   {
     // We've KI_DISRUPTED the victim and failed before so we get a bonus
-    if (af->caster == string(GET_NAME(ch)))
+    if (af->caster == std::string(GET_NAME(ch)))
     {
       savebonus -= af->modifier;
     }
@@ -843,7 +839,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       newaf.modifier = 1 + (learned / 20);
       newaf.location = APPLY_NONE;
       newaf.bitvector = -1;
-      newaf.caster = string(GET_NAME(ch));
+      newaf.caster = std::string(GET_NAME(ch));
 
       affect_to_char(victim, &newaf);
     }
@@ -856,7 +852,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
         0);
 
     if (IS_NPC(victim) && (!victim->fighting) &&
-        GET_POS(ch) > POSITION_SLEEPING)
+        GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -958,7 +954,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   // adds them to a list called aff_list. Then a random element of
   // the list will be chosen for removal. This ensures we pick a random
   // affect only out of those that the player is using.
-  vector<affected_type> aff_list;
+  std::vector<affected_type> aff_list;
 
   // Since we're looking for either these 3 affects OR the spells that cause them
   // we're keeping a track of which is found so we don't mark them twice
@@ -1154,7 +1150,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
     learned = 75;
-  else if (!(learned = has_skill(ch, KI_AGILITY + KI_OFFSET)))
+  else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {
     send_to_char("You aren't experienced enough to teach others graceful movement.\r\n", ch);
     return eFAILURE;
@@ -1218,7 +1214,7 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
   act("You enter a brief meditative state and focus your ki to heal your injuries.", ch, 0, vict, TO_CHAR, 0);
   act("$n enters a brief meditative state and focuses $s ki to heal several wounds.", ch, 0, vict, TO_ROOM, 0);
 
-  gain = hit_gain(ch, POSITION_SLEEPING);
+  gain = ch->hit_gain(position_t::SLEEPING);
 
   ch->setHP(MIN(ch->getHP() + gain, hit_limit(ch)));
 
@@ -1249,7 +1245,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
     return eFAILURE;
   }
 
-  int learned = has_skill(ch, KI_TRANSFER + KI_OFFSET);
+  int learned = ch->has_skill(KI_TRANSFER + KI_OFFSET);
 
   if (affected_by_spell(victim, SPELL_KI_TRANS_TIMER))
   {
@@ -1298,7 +1294,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
     if (GET_MANA(victim) > GET_MAX_MANA(victim))
       GET_MANA(victim) = GET_MAX_MANA(victim);
 
-    string buffer;
+    std::string buffer;
     buffer = fmt::format("You focus intently, bonding briefly with $N's spirit, transferring {} ki of your essence into {} mana for $M.", amount, temp);
     act(buffer.c_str(), ch, 0, victim, TO_CHAR, 0);
 

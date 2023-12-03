@@ -35,14 +35,14 @@ struct clan_room_data
 
 struct clan_member_data
 {
-  char *member_name;
+  QString member_name;
   uint32_t member_rights;
   int32_t member_rank;
 
   int32_t unused1;
   int32_t unused2;
   uint32_t unused3;
-  char *unused4; // this is saved as a variable length string
+  QString unused4; // this is saved as a variable length std::string
 
   //  I'd like to put "time joined" here for CC purposes
   uint32_t time_joined;
@@ -103,7 +103,7 @@ void add_clan_member(clan_data *theClan, Character *ch);
 void remove_clan_member(clan_data *theClan, Character *ch);
 void remove_clan_member(int clannumber, Character *ch);
 void free_member(struct clan_member_data *member);
-struct clan_member_data *get_member(char *strName, int nClanId);
+struct clan_member_data *get_member(QString strName, int nClanId);
 void show_clan_log(Character *ch);
 void clan_death(Character *ch, Character *killer);
 

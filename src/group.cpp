@@ -147,7 +147,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(this, FUCK_GTHIEF))
+  if (affected_by_spell(FUCK_GTHIEF))
   {
     send("Nobody wants any part of your stolen booty!\r\n");
     return eFAILURE;
@@ -362,7 +362,7 @@ int do_group(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  if (!(victim = ch->get_char_room_vis( name)))
     send_to_char("No one here by that name.\r\n", ch);
 
   else
@@ -456,7 +456,7 @@ int do_promote(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(new_new_leader = get_char_room_vis(ch, name)))
+  if (!(new_new_leader = ch->get_char_room_vis( name)))
   {
     send_to_char("I see no person by that name here!\n\r", ch);
     return eFAILURE;
@@ -604,7 +604,7 @@ int do_disband(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!(adios = get_char_room_vis(ch, name)))
+  if (!(adios = ch->get_char_room_vis( name)))
   {
     send_to_char("I see no person by that name here!\n\r", ch);
     return eFAILURE;
@@ -730,7 +730,7 @@ int do_follow(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
+command_return_t do_autojoin(Character *ch, std::string str_arguments, int cmd)
 {
   if (ch->player == nullptr)
   {
@@ -772,9 +772,9 @@ command_return_t do_autojoin(Character *ch, string str_arguments, int cmd)
   return eSUCCESS;
 }
 
-vector<Character *> Character::getFollowers(void)
+std::vector<Character *> Character::getFollowers(void)
 {
-  vector<Character *> followers = {};
+  std::vector<Character *> followers = {};
   follow_type *f = {};
   Character *leader = nullptr;
 

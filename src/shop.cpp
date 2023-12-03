@@ -53,7 +53,7 @@ int max_shop;
 // extern function
 int fwrite_string(char *buf, FILE *fl);
 
-map<string, reroll_t> reroll_sessions = {};
+std::map<std::string, reroll_t> reroll_sessions = {};
 
 /*
  * See if a shop keeper wants to trade.
@@ -1467,7 +1467,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
   if(IS_NPC(ch))
     return eFAILURE;
 
-  if(!has_skill(ch, COMMAND_PSHOPEDIT)) {
+  if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
@@ -1660,12 +1660,12 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       else if (eddie[i].cost_exp > 0)
       {
-        string cost_buf_str = fmt::format(locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
+        std::string cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
         snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
       else if (eddie[i].cost_plats > 0)
       {
-        string cost_buf_str = fmt::format(locale("en_US.UTF-8"), "{:L} platinum", eddie[i].cost_plats);
+        std::string cost_buf_str = fmt::format(std::locale("en_US.UTF-8"), "{:L} platinum", eddie[i].cost_plats);
         snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
 
@@ -1749,11 +1749,11 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       if (GET_EXP(ch) >= eddie[choice - 1].cost_exp)
       {
         GET_EXP(ch) -= eddie[choice - 1].cost_exp;
-        ch->send(fmt::format(locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
       }
       else
       {
-        ch->send(fmt::format(locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
         return eSUCCESS;
       }
     }
@@ -1762,11 +1762,11 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       if (GET_PLATINUM(ch) >= eddie[choice - 1].cost_plats)
       {
         GET_PLATINUM(ch) -= eddie[choice - 1].cost_plats;
-        ch->send(fmt::format(locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
       }
       else
       {
-        ch->send(fmt::format(locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
         return eSUCCESS;
       }
     }
@@ -1847,8 +1847,8 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     return eFAILURE;
   }
 
-  string arg1, remainder_args;
-  tie(arg1, remainder_args) = half_chop(arg);
+  std::string arg1, remainder_args;
+  std::tie(arg1, remainder_args) = half_chop(arg);
 
   reroll_t r = {};
   if (reroll_sessions.contains(GET_NAME(ch)))

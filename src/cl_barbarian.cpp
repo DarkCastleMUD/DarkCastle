@@ -37,7 +37,7 @@ int do_batter(Character *ch, char *argument, int cmd)
   struct room_direction_data *exit, *back;
   int other_room, door, dam, skill, retval;
 
-  if (!(skill = has_skill(ch, SKILL_BATTERBRACE)))
+  if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
   {
     send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
     return eFAILURE;
@@ -117,7 +117,7 @@ int do_batter(Character *ch, char *argument, int cmd)
         return retval;
       }
 
-      GET_POS(ch) = POSITION_SITTING;
+      ch->setSitting();
       update_pos(ch);
       return eFAILURE;
     }
@@ -131,16 +131,12 @@ int do_batter(Character *ch, char *argument, int cmd)
         int bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + number(1, 10);
         if (batterer < bracee) // batterer fails (ch fails)
         {
-          GET_MOVE(ch) -= 100;
-          if (GET_MOVE(ch) < 0)
-            GET_MOVE(ch) = 0;
+          ch->decrementMove(100);
         }
         else
         {
           batterwins = true;
-          GET_MOVE(exit->bracee) -= 100;
-          if (GET_MOVE(exit->bracee) < 0)
-            GET_MOVE(exit->bracee) = 0;
+          exit->bracee->decrementMove(100);
         }
       }
 
@@ -161,7 +157,7 @@ int do_batter(Character *ch, char *argument, int cmd)
         {
           csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword));
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
-          GET_POS(exit->bracee) = POSITION_SITTING;
+          exit->bracee->setSitting();
           update_pos(exit->bracee);
           do_brace(exit->bracee, "", 0); // unbrace
         }
@@ -216,7 +212,7 @@ int do_batter(Character *ch, char *argument, int cmd)
               ch, 0, exit->keyword, TO_ROOM, 0);
         }
 
-        GET_POS(ch) = POSITION_SITTING;
+        ch->setSitting();
         update_pos(ch);
       }
       return eSUCCESS;
@@ -234,7 +230,7 @@ int do_brace(Character *ch, char *argument, int cmd)
 
   argument_interpreter(argument, type, dir);
 
-  if (!has_skill(ch, SKILL_BATTERBRACE))
+  if (!ch->has_skill(SKILL_BATTERBRACE))
   {
     send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
     return eFAILURE;
@@ -343,96 +339,94 @@ int do_brace(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_rage(Character *ch, char *argument, int cmd)
+command_return_t Character::do_rage(QStringList arguments, int cmd)
 {
-  int retval = 0;
-  Character *victim;
-  char name[256];
-
-  if (ch->getHP() == 1)
+  if (getHP() == 1)
   {
-    send_to_char("You are feeling too weak right now to work yourself up into "
-                 "a rage.",
-                 ch);
+    sendln("You are feeling too weak right now to work yourself up into a rage.");
     return eFAILURE;
   }
 
-  if (!canPerform(ch, SKILL_RAGE, "You should learn the skill before you try doing any raging in this machine...\r\n"))
+  if (!canPerform(SKILL_RAGE, "You should learn the skill before you try doing any raging in this machine...\r\n"))
   {
     return eFAILURE;
   }
 
-  one_argument(argument, name);
+  QString name = arguments.value(0);
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  Character *victim = get_char_room_vis(name);
+  if (!victim)
   {
-    if (ch->fighting)
-      victim = ch->fighting;
+    if (fighting)
+    {
+      victim = fighting;
+    }
     else
     {
-      send_to_char("Who do you want to rage on?\n\r", ch);
+      sendln("Who do you want to rage on?");
       return eFAILURE;
     }
   }
 
-  if (ch->in_room != victim->in_room)
+  if (in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\r\n", ch);
+    send_to_char("That person seems to have left.\r\n", this);
     return eFAILURE;
   }
 
-  if (victim == ch)
+  if (victim == this)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    send_to_char("Aren't we funny today...\r\n", this);
     return eFAILURE;
   }
 
-  if (!can_attack(ch) || !can_be_attacked(ch, victim))
+  if (!can_attack(this) || !can_be_attacked(this, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_RAGE))
+  if (!charge_moves(SKILL_RAGE))
     return eSUCCESS;
 
-  if (!skill_success(ch, victim, SKILL_RAGE))
+  int retval = 0;
+  if (!skill_success(victim, SKILL_RAGE))
   {
     act("You start advancing towards $N, but trip over your own feet!",
-        ch, 0, victim, TO_CHAR, 0);
+        this, 0, victim, TO_CHAR, 0);
     act("$n starts advancing towards $N, but trips over $s own feet!",
-        ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+        this, 0, victim, TO_ROOM, NOTVICT);
+    act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
     if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
 
-    GET_POS(ch) = POSITION_SITTING;
-    SET_BIT(ch->combat, COMBAT_BASH1);
+    this->setSitting();
+    SET_BIT(this->combat, COMBAT_BASH1);
   }
   else
   {
     act("You advance confidently towards $N, and fly into a rage!",
-        ch, 0, victim, TO_CHAR, 0);
+        this, 0, victim, TO_CHAR, 0);
     act("$n advances confidently towards $N, and flies into a rage!",
-        ch, 0, victim, TO_ROOM, NOTVICT);
-    act_return ar = act("$n advances confidently towards you, and flies into a rage!", ch, 0, victim, TO_VICT, 0);
+        this, 0, victim, TO_ROOM, NOTVICT);
+    act_return ar = act("$n advances confidently towards you, and flies into a rage!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
     if (DC::isSet(retval, eVICT_DIED))
     {
       return retval;
     }
 
-    SET_BIT(ch->combat, COMBAT_RAGE1);
+    SET_BIT(this->combat, COMBAT_RAGE1);
   }
 
-  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
+  WAIT_STATE(this, DC::PULSE_VIOLENCE * 3);
 
-  if (!ch->fighting)
-    return attack(ch, victim, TYPE_UNDEFINED);
+  if (!this->fighting)
+    return attack(this, victim, TYPE_UNDEFINED);
 
   // chance of bonus round at high level of skill
-  if (has_skill(ch, SKILL_RAGE) > 75 && !number(0, 9))
-    return attack(ch, victim, TYPE_UNDEFINED);
+  if (has_skill(SKILL_RAGE) > 75 && !number(0, 9))
+    return attack(this, victim, TYPE_UNDEFINED);
 
   return eSUCCESS;
 }
@@ -441,7 +435,7 @@ int do_battlecry(Character *ch, char *argument, int cmd)
 {
   struct follow_type *f = 0;
 
-  if (!canPerform(ch, SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
+  if (!ch->canPerform(SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
   {
     return eFAILURE;
   }
@@ -466,7 +460,7 @@ int do_battlecry(Character *ch, char *argument, int cmd)
     act("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
     act("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
 
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
     SET_BIT(ch->combat, COMBAT_BASH1);
   }
   else
@@ -487,7 +481,7 @@ int do_battlecry(Character *ch, char *argument, int cmd)
           (!f->follower->fighting))
         continue;
 
-      if (number(1, 101) > has_skill(ch, SKILL_BATTLECRY))
+      if (number(1, 101) > ch->has_skill(SKILL_BATTLECRY))
       {
         act("You look away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_CHAR, 0);
         act("$n looks away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_ROOM, 0);
@@ -502,7 +496,7 @@ int do_battlecry(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (has_skill(ch, SKILL_BATTLECRY) > 40 && !number(0, 4))
+  if (ch->has_skill(SKILL_BATTLECRY) > 40 && !number(0, 4))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   else
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
@@ -516,7 +510,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
   int bSuccess = 0;
   int retval = 0;
 
-  if (!canPerform(ch, SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n"))
+  if (!ch->canPerform(SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n"))
   {
     return eFAILURE;
   }
@@ -531,7 +525,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  if (!(victim = ch->get_char_room_vis(name)))
   {
     if (ch->fighting)
       victim = ch->fighting;
@@ -576,8 +570,8 @@ int do_berserk(Character *ch, char *argument, int cmd)
       return retval;
     }
 
-    GET_POS(ch) = POSITION_SITTING;
-    if (has_skill(ch, SKILL_BERSERK) > 50 && !number(0, 5))
+    ch->setSitting();
+    if (ch->has_skill(SKILL_BERSERK) > 50 && !number(0, 5))
     {
       SET_BIT(ch->combat, COMBAT_BASH2);
       send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
@@ -638,15 +632,15 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   char name[256];
   int retval = 0;
 
-  if (!canPerform(ch, SKILL_HEADBUTT,
-                  "You'd bonk yourself silly without proper training.\r\n"))
+  if (!ch->canPerform(SKILL_HEADBUTT,
+                      "You'd bonk yourself silly without proper training.\r\n"))
   {
     return eFAILURE;
   }
 
   one_argument(argument, name);
 
-  victim = get_char_room_vis(ch, name);
+  victim = ch->get_char_room_vis(name);
   if (victim == nullptr)
     victim = ch->fighting;
 
@@ -662,7 +656,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86)
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
     send_to_char("You are too puny to headbutt someone that HUGE!\n\r", ch);
     return eFAILURE;
@@ -698,7 +692,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_HEADBUTT))
     return eSUCCESS;
 
-  if (DC::isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
   {
     act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
@@ -784,8 +778,8 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
   float modifier;
   int duration = 42;
 
-  if (!canPerform(ch, SKILL_BLOOD_FURY,
-                  "You've no idea how to raise such bloodlust.\r\n"))
+  if (!ch->canPerform(SKILL_BLOOD_FURY,
+                      "You've no idea how to raise such bloodlust.\r\n"))
   {
     return eFAILURE;
   }
@@ -814,7 +808,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
                  "your bones.\r\n",
                  ch);
 
-    modifier = .2 + (.00375 * has_skill(ch, SKILL_BLOOD_FURY)); // mod = .2 - .5
+    modifier = .2 + (.00375 * ch->has_skill(SKILL_BLOOD_FURY)); // mod = .2 - .5
 
     ch->addHP((float)GET_MAX_HIT(ch) * modifier);
 
@@ -842,7 +836,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!canPerform(ch, SKILL_CRAZED_ASSAULT, "You just aren't crazy enough...try assaulting old ladies.\r\n"))
+  if (!ch->canPerform(SKILL_CRAZED_ASSAULT, "You just aren't crazy enough...try assaulting old ladies.\r\n"))
     return eFAILURE;
 
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT))
@@ -858,11 +852,11 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
     af.type = SKILL_CRAZED_ASSAULT;
     af.duration = 2;
-    af.modifier = (has_skill(ch, SKILL_CRAZED_ASSAULT) / 5) + 5;
+    af.modifier = (ch->has_skill(SKILL_CRAZED_ASSAULT) / 5) + 5;
     af.location = APPLY_HITROLL;
     af.bitvector = -1;
     affect_to_char(ch, &af);
-    duration = 16 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
+    duration = 16 - ch->has_skill(SKILL_CRAZED_ASSAULT) / 10;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -904,7 +898,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
     send_to_char("You must take a moment to gather your strength before another rush!\r\n", ch);
     return eFAILURE;
   }
-  if (!canPerform(ch, SKILL_BULLRUSH, "Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n"))
+  if (!ch->canPerform(SKILL_BULLRUSH, "Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n"))
   {
     return eFAILURE;
   }
@@ -964,7 +958,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   if (SOMEONE_DIED(retval))
     return retval;
 
-  if (!(victim = get_char_room_vis(ch, who)))
+  if (!(victim = ch->get_char_room_vis(who)))
   {
     send_to_char("You charge in, but are left confused by the complete lack of such a target!\r\n", ch);
     //     WAIT_STATE(ch,DC::PULSE_VIOLENCE/2);
@@ -995,7 +989,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (!canPerform(ch, SKILL_FEROCITY, "You're just not angry enough!\r\n"))
+  if (!ch->canPerform(SKILL_FEROCITY, "You're just not angry enough!\r\n"))
   {
     return eFAILURE;
   }
@@ -1034,7 +1028,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
     send_to_char("Your heart beats adrenaline through your body and you roar with ferocity!\r\n", ch);
 
     af.type = SKILL_FEROCITY_TIMER;
-    af.duration = 1 + has_skill(ch, SKILL_FEROCITY) / 10;
+    af.duration = 1 + ch->has_skill(SKILL_FEROCITY) / 10;
     af.location = 0;
     af.bitvector = -1;
     af.modifier = 0;
@@ -1052,12 +1046,12 @@ int do_ferocity(Character *ch, char *argument, int cmd)
       act("$n's fierce roar gets your adrenaline pumping!", ch, 0, tmp_char, TO_VICT, 0);
 
       af.type = SKILL_FEROCITY;
-      af.duration = 1 + has_skill(ch, SKILL_FEROCITY) / 10;
-      af.modifier = 31 + has_skill(ch, SKILL_FEROCITY) / 2;
+      af.duration = 1 + ch->has_skill(SKILL_FEROCITY) / 10;
+      af.modifier = 31 + ch->has_skill(SKILL_FEROCITY) / 2;
       af.location = APPLY_HIT;
       af.bitvector = -1;
       affect_to_char(tmp_char, &af);
-      af.modifier = 1 + has_skill(ch, SKILL_FEROCITY) / 15;
+      af.modifier = 1 + ch->has_skill(SKILL_FEROCITY) / 15;
       af.location = APPLY_HP_REGEN;
       affect_to_char(tmp_char, &af);
     }
@@ -1090,7 +1084,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!canPerform(ch, SKILL_KNOCKBACK, "You'd bounce off of your opponent before you caused any damage.\r\n"))
+  if (!ch->canPerform(SKILL_KNOCKBACK, "You'd bounce off of your opponent before you caused any damage.\r\n"))
   {
     return eFAILURE;
   }
@@ -1104,7 +1098,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  victim = get_char_room_vis(ch, who);
+  victim = ch->get_char_room_vis(who);
 
   if (victim == nullptr)
     victim = ch->fighting;
@@ -1166,7 +1160,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     }
   }
 
-  learned = has_skill(ch, SKILL_KNOCKBACK);
+  learned = ch->has_skill(SKILL_KNOCKBACK);
   dam = 100;
 
   if (*where)
@@ -1216,7 +1210,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
       return retval;
     }
 
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
     return eFAILURE;
@@ -1233,7 +1227,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
       return retval;
     }
 
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
@@ -1278,7 +1272,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
       {
         if (IS_NPC(victim))
         {
-          add_memory(victim, GET_NAME(ch), 'h');
+          victim->add_memory(GET_NAME(ch), 'h');
           remove_memory(victim, 'f');
         }
 
@@ -1326,7 +1320,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (!has_skill(ch, SKILL_PRIMAL_FURY))
+  if (!ch->has_skill(SKILL_PRIMAL_FURY))
   {
     send_to_char("You don't know how to.\r\n", ch);
     return eSUCCESS;
@@ -1336,7 +1330,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     send_to_char("You must wait before using this ability again.\r\n", ch);
     return eSUCCESS;
   }
-  if (!ch->fighting || GET_POS(ch) != POSITION_FIGHTING)
+  if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
   {
     send_to_char("You must be in combat in order to use this ability.\r\n", ch);
     return eSUCCESS;
@@ -1363,14 +1357,14 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     affect_to_char(ch, &af);
     send_to_char("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!\r\n", ch);
     act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
-    GET_MOVE(ch) /= 2;
+    ch->setMove(ch->getMove() / 2.0);
     return eSUCCESS;
   }
 
   // Success below.
 
-  GET_MOVE(ch) -= 40;
-  if (number(1, 101) > (5 + has_skill(ch, SKILL_PRIMAL_FURY) / 5))
+  ch->decrementMove(40);
+  if (number(1, 101) > (5 + ch->has_skill(SKILL_PRIMAL_FURY) / 5))
   { // Str loss.
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
@@ -1379,7 +1373,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
   }
 
   // rest already set
-  af.duration = 2 + has_skill(ch, SKILL_PRIMAL_FURY) / 30;
+  af.duration = 2 + ch->has_skill(SKILL_PRIMAL_FURY) / 30;
   af.bitvector = AFF_PRIMAL_FURY;
   affect_to_char(ch, &af);
 
@@ -1391,7 +1385,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
 
 int do_pursue(Character *ch, char *argument, int cmd)
 {
-  if (!has_skill(ch, SKILL_PURSUIT))
+  if (!ch->has_skill(SKILL_PURSUIT))
   {
     send_to_char("You don't know how to.\r\n", ch);
     return eFAILURE;

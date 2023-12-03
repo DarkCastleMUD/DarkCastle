@@ -14,7 +14,7 @@
 #include "player.h" // Player::PLR_ANSI
 #include "utility.h"
 #include <iostream>
-using namespace std;
+
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
  */
@@ -142,7 +142,7 @@ char *handle_ansi_(char *s, Character *ch)
   char nullstring[] = "";
   char dollarstring[] = "$";
 
-  // Worse case scenario is a string of color codes that are all $R's.  These take up
+  // Worse case scenario is a std::string of color codes that are all $R's.  These take up
   // 11 characters each.  So to handle that, we'll count the number of $'s and multiply
   // that by 11 for the amount of extra space we need.
 

@@ -238,9 +238,9 @@ int do_switch(Character *ch, char *arg, int cmd)
     send_to_char("You are too tired to switch your weapons!", ch);
     return eFAILURE;
   }
-  GET_MOVE(ch) -= 4;
+  ch->decrementMove(4);
 
-  if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
+  if (!ch->has_skill( SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
   {
     act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -874,7 +874,7 @@ int do_name(Character *ch, char *arg, int cmd)
     _convert[1] = '\0';
     if (arg[ctr] == '%')
     {
-      strcat(buf, fname(GET_NAME(ch)));
+      strcat(buf, fname(GET_NAME(ch)).toStdString().c_str());
       if (arg[ctr + 1] != '\0' && isalpha(arg[ctr + 1]))
         strcat(buf, " ");
     }
@@ -2154,9 +2154,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         send_to_char("You are too tired to switch your weapons!", ch);
         return;
       }
-      GET_MOVE(ch) -= 4;
+      ch->decrementMove(4);
 
-      if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
+      if (!ch->has_skill( SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
       {
         act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
         act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -2299,7 +2299,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   }
 
   obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-  if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+  if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
     blindlag = true;
@@ -2354,7 +2354,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   if (*arg1)
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
     {
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
       blindlag = true;
@@ -2404,7 +2404,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   if (*arg1)
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
     {
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
       blindlag = true;
@@ -2539,7 +2539,7 @@ int do_remove(Character *ch, char *argument, int cmd)
     else
     {
       obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, false);
-      if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+      if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
       {
         obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, true);
         blindlag = true;

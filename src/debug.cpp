@@ -25,8 +25,6 @@
 #include "DC.h"
 #include "Database.h"
 
-using namespace std;
-
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
@@ -42,7 +40,7 @@ bool verbose_mode = false;
 
 void test_handle_ansi(QString test)
 {
-  // cerr <<  "Testing '" << test << "'" << endl;
+  // std::cerr <<  "Testing '" << test << "'" << std::endl;
   Character *ch = new Character;
   ch->player = new Player;
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
@@ -55,8 +53,8 @@ void test_handle_ansi(QString test)
   strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
-  // cerr <<  "Result1: [" << result1 << "]" << endl;
-  // cerr <<  "Result2: [" << result2 << "]" << endl;
+  // std::cerr <<  "Result1: [" << result1 << "]" << std::endl;
+  // std::cerr <<  "Result2: [" << result2 << "]" << std::endl;
   assert(handle_ansi(str1, ch) == QString(handle_ansi_(str2, ch)));
   delete[] str2;
 }
@@ -90,9 +88,9 @@ bool test_rolls(uint8_t total)
       unsigned total = stats.str[x] + stats.dex[x] + stats.con[x] + stats.tel[x] + stats.wis[x];
       if (total >= 88)
       {
-        // cerr <<  "Total = " << total << endl;
-        // cerr <<  "Took " << attempts << " attempts." << endl;
-        // cerr <<  (float)attempts / 4 / 60.0 / 60.0 << " hours" << endl;
+        // std::cerr <<  "Total = " << total << std::endl;
+        // std::cerr <<  "Took " << attempts << " attempts." << std::endl;
+        // std::cerr <<  (float)attempts / 4 / 60.0 / 60.0 << " hours" << std::endl;
         return 0;
       }
     }
@@ -101,7 +99,7 @@ bool test_rolls(uint8_t total)
 
 void test_random_stats(void)
 {
-  map<int, int> results;
+  std::map<int, int> results;
   for (int i = 0; i < 10000; ++i)
   {
     int result = random_percent_change(33, 6);
@@ -110,7 +108,7 @@ void test_random_stats(void)
   // printf("%d\n", result);
   for (const auto &cur : results)
   {
-    // cerr <<  cur.first << "=" << cur.second << endl;
+    // std::cerr <<  cur.first << "=" << cur.second << std::endl;
   }
 }
 
@@ -144,45 +142,45 @@ QString showObjectAffects(Object *obj)
 
 QString showObjectVault(Object *obj)
 {
-  // cerr <<  obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  obj_index[obj->item_number].virt << ":";
   QString buffer = sprintbit(obj->obj_flags.wear_flags, Object::wear_bits);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   buffer += sprintbit(obj->obj_flags.size, Object::size_bits);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   buffer += sprintbit(obj->obj_flags.extra_flags, Object::extra_bits);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   buffer += sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   buffer += showObjectAffects(obj);
 
-  // cerr <<  " " << obj->short_description << " in " << owner << "'s vault." << endl;
+  // std::cerr <<  " " << obj->short_description << " in " << owner << "'s vault." << std::endl;
   return buffer;
 }
 
 void showObject(Character *ch, Object *obj)
 {
-  // cerr <<  obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  obj_index[obj->item_number].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.size, Object::size_bits, buf);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
-  // cerr <<  buf << ":";
+  // std::cerr <<  buf << ":";
 
   showObjectAffects(obj);
 
-  // cerr <<  " " << obj->short_description << " in " << GET_NAME(ch) << endl;
+  // std::cerr <<  " " << obj->short_description << " in " << GET_NAME(ch) << std::endl;
 }
 
 void testStrings(void)
@@ -201,19 +199,19 @@ void testStrings(void)
   QString arg1 = {}, remainder = "charm sleep ";
   do
   {
-    tie(arg1, remainder) = half_chop(remainder);
+    std::tie(arg1, remainder) = half_chop(remainder);
 
     half_chop(c_input, c_arg1, c_arg2);
     strncpy(c_input, c_arg2, sizeof(c_input) - 1);
 
-    cerr << "[" << arg1.toStdString() << "]"
-         << "[" << remainder.toStdString() << "]" << endl;
-    cerr << "[" << c_arg1 << "]"
-         << "[" << c_arg2 << "]" << endl;
+    std::cerr << "[" << arg1.toStdString() << "]"
+              << "[" << remainder.toStdString() << "]" << std::endl;
+    std::cerr << "[" << c_arg1 << "]"
+              << "[" << c_arg2 << "]" << std::endl;
     assert(arg1 == c_arg1);
   } while (!arg1.isEmpty() && c_arg1[0] != '\0');
 
-  cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
+  std::cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << std::endl;
 }
 
 int main(int argc, char **argv)
@@ -267,7 +265,7 @@ int main(int argc, char **argv)
 
   chdir(orig_cwd.toStdString().c_str());
 
-  // cerr << real_mobile(0) << " " << real_mobile(1) << endl;
+  // std::cerr << real_mobile(0) << " " << real_mobile(1) << std::endl;
 
   int vnum = 0;
   if (argc >= 3)
@@ -277,7 +275,7 @@ int main(int argc, char **argv)
 
   d = new Connection;
   Character *ch = new Character;
-  ch->name = strdup("DebugIMP");
+  ch->setName("DebugIMP");
   ch->player = new Player;
 
   ch->desc = d;
@@ -362,11 +360,11 @@ int main(int argc, char **argv)
   {
     Object *obj = nullptr;
     QString savepath = dclib + "../save/";
-    for (const auto &entry : filesystem::directory_iterator(savepath.toStdString()))
+    for (const auto &entry : std::filesystem::directory_iterator(savepath.toStdString()))
     {
       if (entry.is_directory() && entry.path() != "../save/qdata" && entry.path() != "../save/deleted")
       {
-        for (const auto &pfile : filesystem::directory_iterator(entry.path().c_str()))
+        for (const auto &pfile : std::filesystem::directory_iterator(entry.path().c_str()))
         {
           try
           {
@@ -374,7 +372,7 @@ int main(int argc, char **argv)
             path.remove(0, path.lastIndexOf('/') + 1);
             if (path.isEmpty() == false && path[0] != '.')
             {
-              // cerr << pfile.path().c_str() << endl;
+              // std::cerr << pfile.path().c_str() << std::endl;
               ch->do_linkload(path.split(' '), CMD_DEFAULT);
               process_output(d);
               do_fsave(ch, path.toStdString().c_str(), CMD_DEFAULT);
@@ -438,19 +436,19 @@ int main(int argc, char **argv)
       process_output(d);
     }
     /*
-        multimap<int32_t, QString> hp_leaders;
+        std::multimap<int32_t, QString> hp_leaders;
         for (auto& ch : DC::getInstance()->character_list)
         {
           if (IS_PC(ch))
           {
-            hp_leaders.insert(pair<int32_t,QString>(ch->max_hit, ch->name));
+            hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, ch->getNameC()));
           }
         }
 
-        queue<pair<int32_t,QString>> top_hp_leaders;
+        std::queue<std::pair<int32_t,QString>> top_hp_leaders;
         for (auto& l : hp_leaders)
         {
-          //// cerr <<  l.first << " " << l.second << endl;
+          //// std::cerr <<  l.first << " " << l.second << std::endl;
           top_hp_leaders.push(l);
           if (top_hp_leaders.size() > 5)
           {
@@ -461,14 +459,14 @@ int main(int argc, char **argv)
         unsigned int placement = 0;
         while (top_hp_leaders.size() > 0)
         {
-          // cerr <<  top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
+          // std::cerr <<  top_hp_leaders.front().first << " " << top_hp_leaders.front().second << std::endl;
           leaderboard.setHP(placement++, top_hp_leaders.front().second, top_hp_leaders.front().first);
           top_hp_leaders.pop();
         }
     */
 
     // leaderboard.check_offline();
-    // // cerr <<  DC::getInstance()->character_list.size() << endl;
+    // // std::cerr <<  DC::getInstance()->character_list.size() << std::endl;
     // do_leaderboard(ch, "", CMD_DEFAULT);
     // process_output(d);
 
@@ -497,7 +495,7 @@ int main(int argc, char **argv)
       Object *obj;
       if (load_char_obj(d, argv[1]) == false)
       {
-        // cerr << "Unable to load " << argv[1] << endl;
+        // std::cerr << "Unable to load " << argv[1] << std::endl;
         exit(1);
       }
       else
@@ -538,8 +536,8 @@ int main(int argc, char **argv)
 
   return 0;
 }
-//      // cerr <<  "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
-//      // cerr <<  "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
+//      // std::cerr <<  "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << std::endl;
+//      // std::cerr <<  "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << std::endl;
 
 template <typename T>
 class DebugNumber

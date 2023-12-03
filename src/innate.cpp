@@ -109,7 +109,7 @@ int do_innate(Character *ch, char *arg, int cmd)
 	  send_to_char("You cannot use that yet.\r\n",ch);
 	  return eFAILURE;
 	}
-	if (GET_POS(ch) == POSITION_SLEEPING && 
+	if (GET_POS(ch) == position_t::SLEEPING && 
 		i != 1)
 	{
 		send_to_char("In your dreams, or what?\r\n",ch);

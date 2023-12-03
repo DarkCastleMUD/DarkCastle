@@ -48,7 +48,7 @@ void DC::removeDead(void)
 
 void DC::handleShooting(void)
 {
-	unordered_set<Character *> remove_list;
+	std::unordered_set<Character *> remove_list;
 
 	for (const auto &ch : shooting_list)
 	{

@@ -28,8 +28,6 @@ extern "C"
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 // Externs
 extern void skip_spaces(char **string);
 extern struct help_index_element_new *new_help_table;
@@ -91,9 +89,9 @@ int levenshtein(const char *s, const char *t)
         cost = 0;
       else
         cost = 1;
-      d[i][j] = min(min(d[i - 1][j] + 1,
-                        d[i][j - 1] + 1),
-                    d[i - 1][j - 1] + cost);
+      d[i][j] = std::min(std::min(d[i - 1][j] + 1,
+                                  d[i][j - 1] + 1),
+                         d[i - 1][j - 1] + cost);
     }
 
   return d[m][n];
@@ -143,8 +141,8 @@ int do_new_help(Character *ch, char *argument, int cmd)
     int h;
     unsigned int l;
     unsigned int argSize = strlen(argument);
-    multimap<unsigned int, char *, ltstr> ltable;
-    multimap<unsigned int, char *, ltstr>::iterator cur;
+    std::multimap<unsigned int, char *, ltstr> ltable;
+    std::multimap<unsigned int, char *, ltstr>::iterator cur;
 
     int level = ch->getLevel() == 0 ? 1 : ch->getLevel();
 
@@ -158,31 +156,31 @@ int do_new_help(Character *ch, char *argument, int cmd)
       if (new_help_table[h].keyword1)
       {
         l = levenshtein(argument, new_help_table[h].keyword1);
-        ltable.insert(pair<int, char *>(l, new_help_table[h].keyword1));
+        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword1));
       }
 
       if (new_help_table[h].keyword2)
       {
         l = levenshtein(argument, new_help_table[h].keyword2);
-        ltable.insert(pair<int, char *>(l, new_help_table[h].keyword2));
+        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword2));
       }
 
       if (new_help_table[h].keyword3)
       {
         l = levenshtein(argument, new_help_table[h].keyword3);
-        ltable.insert(pair<int, char *>(l, new_help_table[h].keyword3));
+        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword3));
       }
 
       if (new_help_table[h].keyword4)
       {
         l = levenshtein(argument, new_help_table[h].keyword4);
-        ltable.insert(pair<int, char *>(l, new_help_table[h].keyword4));
+        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword4));
       }
 
       if (new_help_table[h].keyword5)
       {
         l = levenshtein(argument, new_help_table[h].keyword5);
-        ltable.insert(pair<int, char *>(l, new_help_table[h].keyword5));
+        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword5));
       }
     }
 
@@ -190,7 +188,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
     {
     }
 
-    vector<char *> results;
+    std::vector<char *> results;
     for (cur = ltable.begin(); cur != ltable.end(); cur++)
     {
       if (find(results.begin(), results.end(), (*cur).second) == results.end())
@@ -725,7 +723,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!has_skill(ch, COMMAND_HEDIT))
+  if (!ch->has_skill(COMMAND_HEDIT))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -980,17 +978,17 @@ void save_help(Character *ch)
   fclose(f);
 }
 
-void help_string_to_file(FILE *f, char *string)
+void help_string_to_file(FILE *f, char *str)
 {
-  char *newbuf = new char[strlen(string) + 1];
-  strcpy(newbuf, string);
+  char *newbuf = new char[strlen(str) + 1];
+  strcpy(newbuf, str);
 
   // remove all \r's
   for (char *curr = newbuf; *curr != '\0'; curr++)
   {
     if (*curr == '\r')
     {
-      for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
+      for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the std::string 1 left
         *blah = *(blah + 1);
       curr--; // (to check for \r\r cases)
     }

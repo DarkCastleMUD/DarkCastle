@@ -22,9 +22,9 @@ one liner quest shit
 #include "room.h"
 #include "inventory.h"
 
-using namespace std;
 
-typedef vector<quest_info *> quest_list_t;
+
+typedef std::vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
 char *valid_fields[] = {
@@ -218,7 +218,7 @@ void list_quests(Character *ch, int lownum, int highnum)
 
       if (quest->number <= highnum && quest->number >= lownum)
       {
-         // Create a format string based on a space offset that takes color codes into account
+         // Create a format std::string based on a space offset that takes color codes into account
          snprintf(buffer, MAX_STRING_LENGTH,
                   "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
                   35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
@@ -420,7 +420,7 @@ int show_one_complete_quest(Character *ch, struct quest_info *quest, int count)
 int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
 {
    char buffer[MAX_STRING_LENGTH];
-   // Create a format string based on a space offset that takes color codes into account
+   // Create a format std::string based on a space offset that takes color codes into account
    snprintf(buffer, MAX_STRING_LENGTH,
             "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
             quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));

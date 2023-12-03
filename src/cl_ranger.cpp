@@ -34,7 +34,6 @@
 #include "move.h"
 #include "corpse.h"
 
-
 extern class Object *object_list;
 extern int rev_dir[];
 
@@ -80,7 +79,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
   char buf[MAX_INPUT_LENGTH];
   void stop_follower(Character * ch, int cmd);
 
-  if (!has_skill(ch, SKILL_FREE_ANIMAL))
+  if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
     send_to_char("Try learning HOW to free an animal first.\r\n", ch);
     return eFAILURE;
@@ -138,14 +137,14 @@ int do_tame(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!canPerform(ch, SKILL_TAME, "Try learning HOW to tame first.\r\n"))
+  if (!ch->canPerform(SKILL_TAME, "Try learning HOW to tame first.\r\n"))
   {
     return eFAILURE;
   }
 
   one_argument(arg, buf);
 
-  if (!(victim = get_char_room_vis(ch, buf)))
+  if (!(victim = ch->get_char_room_vis(buf)))
   {
     send_to_char("No one here by that name!\n\r", ch);
     return eFAILURE;
@@ -188,12 +187,12 @@ int do_tame(Character *ch, char *arg, int cmd)
             break;
          }
          if (vict) {
-      if (vict->in_room == ch->in_room && vict->position > POSITION_SLEEPING)
+      if (vict->in_room == ch->in_room && vict->position > position_t::SLEEPING)
         do_say(vict, "Hey... but what about ME!?", CMD_DEFAULT);
              remove_memory(vict, 'h');
       if (vict->master) {
              stop_follower(vict, BROKE_CHARM);
-             add_memory(vict, GET_NAME(ch), 'h');
+             vict->add_memory( GET_NAME(ch), 'h');
       }
          }*/
   }
@@ -245,7 +244,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_track(Character *ch, char *argument, int cmd)
+command_return_t Character::do_track(QStringList arguments, int cmd)
 {
   int x, y;
   int retval, how_deep, learned;
@@ -254,129 +253,128 @@ int do_track(Character *ch, char *argument, int cmd)
   char sex[20];
   char condition[60];
   char weight[40];
-  char victim[MAX_INPUT_LENGTH];
+
   Character *quarry;
   Character *tmp_ch = nullptr; // For checking room stuff
   room_track_data *pScent = 0;
-  void swap_hate_memory(Character * ch);
 
-  one_argument(argument, victim);
+  QString victim = arguments.value(0);
 
-  learned = how_deep = ((has_skill(ch, SKILL_TRACK) / 10) + 1);
+  learned = how_deep = ((has_skill(SKILL_TRACK) / 10) + 1);
 
-  if (ch->getLevel() >= IMMORTAL)
+  if (this->getLevel() >= IMMORTAL)
     how_deep = 50;
 
-  quarry = get_char_room_vis(ch, victim);
+  quarry = get_char_room_vis(victim);
 
-  if (ch->hunting)
+  if (!hunting.isEmpty())
   {
-    if (get_char_room_vis(ch, ch->hunting))
+    if (get_char_room_vis(hunting))
     {
-      ansi_color(RED, ch);
-      ansi_color(BOLD, ch);
-      send_to_char("You have found your target!\n\r", ch);
-      ansi_color(NTEXT, ch);
+      ansi_color(RED, this);
+      ansi_color(BOLD, this);
+      send_to_char("You have found your target!\n\r", this);
+      ansi_color(NTEXT, this);
 
-      //      remove_memory(ch, 't');
+      //      remove_memory(this, 't');
       return eSUCCESS;
     }
   }
 
   else if (quarry)
   {
-    send_to_char("There's one right here ;)\n\r", ch);
-    //  remove_memory(ch, 't');
+    send_to_char("There's one right here ;)\n\r", this);
+    //  remove_memory(this, 't');
     return eSUCCESS;
   }
 
-  if (*victim && IS_PC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && ch->getLevel() < ANGEL)
+  if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
   {
-    send_to_char("Only a ranger could track someone by name.\r\n", ch);
+    send_to_char("Only a ranger could track someone by name.\r\n", this);
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_TRACK))
+  if (!charge_moves(SKILL_TRACK))
     return eSUCCESS;
 
-  act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  send_to_char("You search for signs of your quarry...\n\r\n\r", ch);
+  act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
+  send_to_char("You search for signs of your quarry...\n\r\n\r", this);
 
   if (learned)
-    skill_increase_check(ch, SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
+    skill_increase_check(this, SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
 
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_STUPID))
+  if (IS_MOB(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
   {
-    send_to_char("Being stupid, you cannot find any..\r\n", ch);
+    send_to_char("Being stupid, you cannot find any..\r\n", this);
     return eFAILURE;
   }
 
-  if (DC::getInstance()->world[ch->in_room].nTracks < 1)
+  if (DC::getInstance()->world[this->in_room].nTracks < 1)
   {
-    if (ch->hunting)
+    if (!hunting.isEmpty())
     {
-      ansi_color(RED, ch);
-      ansi_color(BOLD, ch);
-      send_to_char("You have lost the trail.\r\n", ch);
-      ansi_color(NTEXT, ch);
-      // remove_memory(ch, 't');
+      ansi_color(RED, this);
+      ansi_color(BOLD, this);
+      send_to_char("You have lost the trail.\r\n", this);
+      ansi_color(NTEXT, this);
+      // remove_memory(this, 't');
     }
     else
-      send_to_char("There are no distinct scents here.\r\n", ch);
+      send_to_char("There are no distinct scents here.\r\n", this);
     return eFAILURE;
   }
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     how_deep = 10;
 
-  if (*victim)
+  if (!victim.isEmpty())
   {
     for (x = 1; x <= how_deep; x++)
     {
 
-      if ((x > DC::getInstance()->world[ch->in_room].nTracks) ||
-          !(pScent = DC::getInstance()->world[ch->in_room].TrackItem(x)))
+      if ((x > DC::getInstance()->world[this->in_room].nTracks) ||
+          !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
       {
-        if (ch->hunting)
+        if (!hunting.isEmpty())
         {
-          ansi_color(RED, ch);
-          ansi_color(BOLD, ch);
-          send_to_char("You have lost the trail.\r\n", ch);
-          ansi_color(NTEXT, ch);
+          ansi_color(RED, this);
+          ansi_color(BOLD, this);
+          send_to_char("You have lost the trail.\r\n", this);
+          ansi_color(NTEXT, this);
         }
         else
-          send_to_char("You can't find any traces of such a scent.\r\n", ch);
-        //         remove_memory(ch, 't');
-        if (IS_NPC(ch))
-          swap_hate_memory(ch);
+          send_to_char("You can't find any traces of such a scent.\r\n", this);
+        //         remove_memory(this, 't');
+        if (IS_NPC(this))
+          swap_hate_memory();
         return eFAILURE;
       }
 
       if (isname(victim, pScent->trackee))
       {
         y = pScent->direction;
-        add_memory(ch, pScent->trackee, 't');
-        ansi_color(RED, ch);
-        ansi_color(BOLD, ch);
-        csendf(ch, "You sense traces of your quarry to the %s.\r\n",
+        this->add_memory(pScent->trackee, 't');
+        ansi_color(RED, this);
+        ansi_color(BOLD, this);
+        csendf(this, "You sense traces of your quarry to the %s.\r\n",
                dirs[y]);
-        ansi_color(NTEXT, ch);
+        ansi_color(NTEXT, this);
 
-        if (IS_NPC(ch))
+        if (IS_NPC(this))
         {
           // temp disable tracking mobs into town
-          if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(ch, y)->to_room].zone).isTown() == false && !DC::isSet(DC::getInstance()->world[EXIT(ch, y)->to_room].room_flags, NO_TRACK))
+          if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !DC::isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
-            ch->mobdata->last_direction = y;
-            retval = do_move(ch, "", (y + 1));
+            this->mobdata->last_direction = y;
+            retval = do_move(this, "", (y + 1));
             if (DC::isSet(retval, eCH_DIED))
               return retval;
           }
 
-          if (!ch->hunting)
+          if (hunting.isEmpty())
             return eFAILURE;
 
           // Here's the deal: if the mob can't see the character in
@@ -386,63 +384,63 @@ int do_track(Character *ch, char *argument, int cmd)
           // by, say, a thief.  I'll let he who wrote it fix that.
           // Morc 28 July 96
 
-          if ((tmp_ch = get_char(ch->hunting)) == 0)
+          if ((tmp_ch = get_char(hunting)) == 0)
             return eFAILURE;
-          if (!(get_char_room_vis(ch, ch->hunting)))
+          if (!(get_char_room_vis(hunting)))
           {
-            if (tmp_ch->in_room == ch->in_room)
+            if (tmp_ch->in_room == this->in_room)
             {
               // The mob can't see him
-              act("$n says 'Damn, must have lost $M!'", ch, 0, tmp_ch,
+              act("$n says 'Damn, must have lost $M!'", this, 0, tmp_ch,
                   TO_ROOM, 0);
-              //                    remove_memory(ch, 't');
+              //                    remove_memory(this, 't');
             }
             return eFAILURE;
           }
 
-          if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          if (!DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
-                ch, 0, 0, TO_ROOM, 0);
+                this, 0, 0, TO_ROOM, 0);
             retval = eSUCCESS;
             if (tmp_ch)
             {
-              retval = mprog_attack_trigger(ch, tmp_ch);
+              retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (ch && ch->fighting) || !ch->hunting)
+            if (SOMEONE_DIED(retval) || (this && this->fighting) || !!hunting.isEmpty())
               return retval;
             else
-              return do_hit(ch, ch->hunting, 0);
+              return do_hit(hunting.split(' '));
           }
           else
             act("$n says 'You can't stay here forever.'",
-                ch, 0, 0, TO_ROOM, 0);
+                this, 0, 0, TO_ROOM, 0);
         } // if IS_NPC
 
         return eSUCCESS;
       } // if isname
     }   // for
 
-    if (ch->hunting)
+    if (!hunting.isEmpty())
     {
-      ansi_color(RED, ch);
-      ansi_color(BOLD, ch);
-      send_to_char("You have lost the trail.\r\n", ch);
-      ansi_color(NTEXT, ch);
+      ansi_color(RED, this);
+      ansi_color(BOLD, this);
+      send_to_char("You have lost the trail.\r\n", this);
+      ansi_color(NTEXT, this);
     }
     else
-      send_to_char("You can't find any traces of such a scent.\r\n", ch);
+      send_to_char("You can't find any traces of such a scent.\r\n", this);
 
-    //    remove_memory(ch, 't');
+    //    remove_memory(this, 't');
     return eFAILURE;
   } // if *victim
 
   for (x = 1; x <= how_deep; x++)
   {
-    if ((x > DC::getInstance()->world[ch->in_room].nTracks) || !(pScent = DC::getInstance()->world[ch->in_room].TrackItem(x)))
+    if ((x > DC::getInstance()->world[this->in_room].nTracks) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
     {
       if (x == 1)
-        send_to_char("There are no distinct smells here.\r\n", ch);
+        send_to_char("There are no distinct smells here.\r\n", this);
       break;
     }
 
@@ -498,7 +496,7 @@ int do_track(Character *ch, char *argument, int cmd)
       strcpy(sex, "");
 
     if (x == 1)
-      send_to_char("Freshest scents first...\r\n", ch);
+      send_to_char("Freshest scents first...\r\n", this);
 
     sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
             weight,
@@ -506,76 +504,38 @@ int do_track(Character *ch, char *argument, int cmd)
             sex,
             race,
             dirs[y]);
-    send_to_char(buf, ch);
+    send_to_char(buf, this);
   }
   return eSUCCESS;
 }
 
-int do_ambush(Character *ch, char *arg, int cmd)
+command_return_t Character::do_ambush(QStringList arguments, int cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-
-  if (!canPerform(ch, SKILL_AMBUSH))
+  if (!canPerform(SKILL_AMBUSH))
   {
-    send_to_char("You don't know how to ambush people!\r\n", ch);
+    sendln("You don't know how to ambush people!");
     return eFAILURE;
   }
 
-  one_argument(arg, arg);
+  QString arg1 = arguments.value(0);
 
-  if (!*arg)
+  if (arg1.isEmpty())
   {
-    sprintf(buf, "You will ambush %s on sight.\r\n", ch->ambush ? ch->ambush : "no one");
-    send_to_char(buf, ch);
+    sendln(QString("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
     return eSUCCESS;
   }
 
-  if (!(ch->ambush))
+  if (ambush == arg1)
   {
-    sprintf(buf, "You will now ambush %s on sight.\r\n", arg);
-    send_to_char(buf, ch);
-    ch->ambush = str_dup(arg);
+    ambush.clear();
+    sendln(QString("You will no longer ambush %1 on sight.").arg(arg1));
     return eSUCCESS;
   }
 
-  if (!str_cmp(arg, ch->ambush))
-  {
-    sprintf(buf, "You will no longer ambush %s on sight.\r\n", arg);
-    send_to_char(buf, ch);
-    dc_free(ch->ambush);
-    ch->ambush = nullptr;
-    return eSUCCESS;
-  }
-
-  sprintf(buf, "You will now ambush %s on sight.\r\n", arg);
-
-  // TODO - remove this later after I've watched for Bushmaster to do it a few times
-  if (strlen(buf) > MAX_INPUT_LENGTH)
-    logf(OVERSEER, LogChannels::LOG_BUG, "%s just tried to crash the mud with a huge ambush string (%s)",
-         GET_NAME(ch), arg);
-
-  send_to_char(buf, ch);
-  dc_free(ch->ambush);
-  ch->ambush = str_dup(arg);
+  ambush = arg1;
+  sendln(QString("You will now ambush %1 on sight.").arg(arg1));
   return eSUCCESS;
 }
-
-/*
-SECT_INSIDE           0
-SECT_CITY             1
-SECT_FIELD            2
-SECT_FOREST           3
-SECT_HILLS            4
-SECT_MOUNTAIN         5
-SECT_WATER_SWIM       6
-SECT_WATER_NOSWIM     7
-SECT_NO_LOW           8
-SECT_NO_HIGH          9
-SECT_DESERT          10
-underwater
-swamp
-air
-*/
 
 int pick_one(int a, int b)
 {
@@ -762,7 +722,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   if (!charge_moves(ch, SKILL_FORAGE))
     return eSUCCESS;
 
-  learned = has_skill(ch, SKILL_FORAGE);
+  learned = ch->has_skill(SKILL_FORAGE);
   if (!learned)
   {
     send_to_char("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.\r\n", ch);
@@ -847,7 +807,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-/* this is sent the arrow char string, and return the arrow type.
+/* this is sent the arrow char std::string, and return the arrow type.
    also, checks level to make sure char is high enough
    return 0 for failure */
 
@@ -860,13 +820,13 @@ int parse_arrow(Character *ch, char *arrow)
   while (*arrow == ' ')
     arrow++;
 
-  if ((arrow[0] == 'f') && has_skill(ch, SKILL_FIRE_ARROW))
+  if ((arrow[0] == 'f') && ch->has_skill(SKILL_FIRE_ARROW))
     return 1;
-  else if ((arrow[0] == 'i') && has_skill(ch, SKILL_ICE_ARROW))
+  else if ((arrow[0] == 'i') && ch->has_skill(SKILL_ICE_ARROW))
     return 2;
-  else if ((arrow[0] == 't') && has_skill(ch, SKILL_TEMPEST_ARROW))
+  else if ((arrow[0] == 't') && ch->has_skill(SKILL_TEMPEST_ARROW))
     return 3;
-  else if ((arrow[0] == 'g') && has_skill(ch, SKILL_GRANITE_ARROW))
+  else if ((arrow[0] == 'g') && ch->has_skill(SKILL_GRANITE_ARROW))
     return 4;
 
   return 0;
@@ -989,7 +949,7 @@ int mob_arrow_response(Character *ch, Character *victim,
    * Not impossible, but harder
    */
 
-  add_memory(victim, GET_NAME(ch), 'h');
+  victim->add_memory(GET_NAME(ch), 'h');
 
   /* don't want the mob leaving a fight its already in */
   if (victim->fighting)
@@ -1131,7 +1091,7 @@ int do_arrow_damage(Character *ch, Character *victim,
   inform_victim(ch, victim, dam);
 
   if(victim->getHP() > 0)
-     GET_POS(victim) = POSITION_STANDING;
+     victim->setStanding();
 
 // This is a cut & paste from fight.C cause I can't think of a better way to do it
 
@@ -1163,7 +1123,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   *direct = '\0';
   *arrow = '\0';
 
-  if (!canPerform(ch, SKILL_ARCHERY))
+  if (!ch->canPerform(SKILL_ARCHERY))
   {
     send_to_char(
         "You've no idea how those pointy things with strings and feathers work.\r\n",
@@ -1183,7 +1143,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
   /*
-   if(GET_POS(ch) == POSITION_FIGHTING)
+   if(GET_POS(ch) == position_t::FIGHTING)
    {
    send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
    return eFAILURE;
@@ -1338,7 +1298,7 @@ int do_fire(Character *ch, char *arg, int cmd)
                          ch);
             return eFAILURE;
           }
-          victim = get_char_room_vis(ch, target);
+          victim = ch->get_char_room_vis(target);
         }
       }
 
@@ -1364,7 +1324,7 @@ int do_fire(Character *ch, char *arg, int cmd)
                          ch);
             return eFAILURE;
           }
-          victim = get_char_room_vis(ch, target);
+          victim = ch->get_char_room_vis(target);
         }
       }
 
@@ -1390,16 +1350,16 @@ int do_fire(Character *ch, char *arg, int cmd)
                          ch);
             return eFAILURE;
           }
-          victim = get_char_room_vis(ch, target);
+          victim = ch->get_char_room_vis(target);
         }
       }
       /* put char back */
       char_from_room(ch, false);
       char_to_room(ch, cur_room);
     }
-    if (!victim && has_skill(ch, SKILL_ARCHERY) > 80)
+    if (!victim && ch->has_skill(SKILL_ARCHERY) > 80)
     {
-      if ((victim = get_char_room_vis(ch, target)))
+      if ((victim = ch->get_char_room_vis(target)))
         dir = -1;
     }
     else if (dir < 0)
@@ -1621,7 +1581,7 @@ int do_fire(Character *ch, char *arg, int cmd)
                 found->short_description, dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_ROOM, 0);
       }
-      GET_POS(victim) = POSITION_STANDING;
+      victim->setStanding();
 
       if (IS_NPC(victim))
         retval = mob_arrow_response(ch, victim, dir);
@@ -1687,7 +1647,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW,
                         0);
         skill_increase_check(ch, SKILL_FIRE_ARROW,
-                             has_skill(ch, SKILL_FIRE_ARROW),
+                             ch->has_skill(SKILL_FIRE_ARROW),
                              get_difficulty(SKILL_FIRE_ARROW));
         enchantmentused = true;
         break;
@@ -1700,7 +1660,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         send_damage("The stray ice shards impale $n for | damage!",
                     victim, 0, 0, buffer, "The stray ice shards impale $n!",
                     TO_ROOM);
-        if (number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4)
+        if (number(1, 100) < ch->has_skill(SKILL_ICE_ARROW) / 4)
         {
           act("Your body slows down for a second!", ch, 0, victim,
               TO_VICT, 0);
@@ -1710,7 +1670,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         }
         retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
         skill_increase_check(ch, SKILL_ICE_ARROW,
-                             has_skill(ch, SKILL_ICE_ARROW),
+                             ch->has_skill(SKILL_ICE_ARROW),
                              get_difficulty(SKILL_ICE_ARROW));
         enchantmentused = true;
         break;
@@ -1730,7 +1690,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         retval = damage(ch, victim, dam, TYPE_ENERGY,
                         SKILL_TEMPEST_ARROW, 0);
         skill_increase_check(ch, SKILL_TEMPEST_ARROW,
-                             has_skill(ch, SKILL_TEMPEST_ARROW),
+                             ch->has_skill(SKILL_TEMPEST_ARROW),
                              get_difficulty(SKILL_TEMPEST_ARROW));
         enchantmentused = true;
         break;
@@ -1747,19 +1707,19 @@ int do_fire(Character *ch, char *arg, int cmd)
             victim, 0, 0, buffer,
             "The magical stones surrounding the arrow smack hard into $n.",
             TO_ROOM);
-        if (number(1, 100) < has_skill(ch, SKILL_GRANITE_ARROW) / 4)
+        if (number(1, 100) < ch->has_skill(SKILL_GRANITE_ARROW) / 4)
         {
           act("The stones knock you flat on your ass!", ch, 0, victim,
               TO_VICT, 0);
           act("The stones knock $n flat on $s ass!", victim, 0, 0,
               TO_ROOM, 0);
-          GET_POS(victim) = POSITION_SITTING;
+          victim->setSitting();
           WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
         retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
                         0);
         skill_increase_check(ch, SKILL_GRANITE_ARROW,
-                             has_skill(ch, SKILL_GRANITE_ARROW),
+                             ch->has_skill(SKILL_GRANITE_ARROW),
                              get_difficulty(SKILL_GRANITE_ARROW));
         enchantmentused = true;
         break;
@@ -1773,9 +1733,9 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   DC::getInstance()->shooting_list.insert(ch);
 
-  if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
+  if (ch->has_skill(SKILL_ARCHERY) < 51 || enchantmentused)
     ch->shotsthisround += DC::PULSE_VIOLENCE;
-  else if (has_skill(ch, SKILL_ARCHERY) < 86)
+  else if (ch->has_skill(SKILL_ARCHERY) < 86)
     ch->shotsthisround += DC::PULSE_VIOLENCE / 2;
   else
     ch->shotsthisround += 3;
@@ -1802,7 +1762,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
     if(IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
        learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_MIND_DELVE))) {
+    else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
        send_to_char("You try to think like a chipmunk and go nuts.\r\n", ch);
        return eFAILURE;
     }
@@ -1811,7 +1771,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
   */
 
-  target = get_char_room_vis(ch, arg);
+  target = ch->get_char_room_vis(arg);
 
   if (ch->getLevel() < target->getLevel())
   {
@@ -1827,9 +1787,8 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   }
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
-  sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
-          ch->mobdata->hatred ? ch->mobdata->hatred : "Noone!");
-  send_to_char(buf, ch);
+  ch->sendln(QString("%1 seems to hate... %2.").arg(GET_SHORT(target)).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
+
   if (ch->master)
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
             GET_SHORT(ch->master));
@@ -1859,7 +1818,7 @@ int do_natural_selection(Character *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
-  int learned = has_skill(ch, SKILL_NAT_SELECT);
+  int learned = ch->has_skill(SKILL_NAT_SELECT);
   if (IS_NPC(ch) || !learned)
   {
     send_to_char("You don't know how to use this to your advantage.\r\n", ch);

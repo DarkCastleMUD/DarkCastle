@@ -15,8 +15,6 @@
 
 #include "character.h"
 
-using namespace std;
-
 void rebuild_rnum_references(int startAt, int type);
 void mprog_driver(char *com_list, Character *mob,
                   Character *actor, class Object *obj,
@@ -84,16 +82,16 @@ class SelfPurge
 public:
   SelfPurge(void);
   SelfPurge(bool);
-  void setOwner(Character *, string);
+  void setOwner(Character *, std::string);
   explicit operator bool(void) const;
-  string getFunction(void) const;
+  std::string getFunction(void) const;
   bool getState(void) const;
   Character *getOwner(void) const { return owner; }
 
 private:
   bool state = {};
   Character *owner = {};
-  string function = {};
+  std::string function = {};
 };
 
 template <>
@@ -117,17 +115,17 @@ extern selfpurge_t selfpurge;
 
 struct race_data
 {
-  char *singular_name;   /* Dwarf, Elf, etc.     */
-  string lowercase_name; /* dwarf, elf, etc.     */
-  char *plural_name;     /* dwarves, elves, etc. */
-  bool playable;         /* Can a player play as this race? */
-  int32_t body_parts;    /* bitvector for body parts       */
-  int32_t immune;        /* bitvector for immunities       */
-  int32_t resist;        /* bitvector for resistances      */
-  int32_t suscept;       /* bitvector for susceptibilities */
-  int32_t hate_fear;     /* bitvector for hate/fear        */
-  int32_t friendly;      /* bitvector for friendliness     */
-  int min_weight;        /* min weight */
+  char *singular_name;        /* Dwarf, Elf, etc.     */
+  std::string lowercase_name; /* dwarf, elf, etc.     */
+  char *plural_name;          /* dwarves, elves, etc. */
+  bool playable;              /* Can a player play as this race? */
+  int32_t body_parts;         /* bitvector for body parts       */
+  int32_t immune;             /* bitvector for immunities       */
+  int32_t resist;             /* bitvector for resistances      */
+  int32_t suscept;            /* bitvector for susceptibilities */
+  int32_t hate_fear;          /* bitvector for hate/fear        */
+  int32_t friendly;           /* bitvector for friendliness     */
+  int min_weight;             /* min weight */
   int max_weight;
 
   int min_height;

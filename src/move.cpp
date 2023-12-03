@@ -130,10 +130,7 @@ void record_track_data(Character *ch, int cmd)
 	newScent->next = nullptr;	  // just in case
 	newScent->previous = nullptr; // just in case
 
-	if (IS_NPC(ch))
-		newScent->trackee = GET_NAME(ch);
-	else
-		newScent->trackee = str_hsh(GET_NAME(ch));
+	newScent->trackee = ch->getName();
 
 	DC::getInstance()->world[ch->in_room].AddTrackItem(newScent);
 
@@ -152,7 +149,7 @@ void record_track_data(Character *ch, int cmd)
 //   } else {
 //      act("$n slips on the muddy terrain and goes down.", ch, 0, 0, TO_ROOM, 0);
 //      act("Your feet slide out from underneath you in the mud.", ch, 0, 0, TO_CHAR, 0);
-//      GET_POS(ch) = POSITION_SITTING;
+//      ch->setSitting();
 //   }
 //}
 
@@ -178,7 +175,7 @@ int do_unstable(Character *ch)
 
 	act("$n looses his footing on the unstable ground.", ch, 0, 0, TO_ROOM, 0);
 	act("You fall flat on your ass.", ch, 0, 0, TO_CHAR, 0);
-	GET_POS(ch) = POSITION_SITTING;
+	ch->setSitting();
 
 	sprintf(death_log, "%s slipped to death in room %d.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number);
 	retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, "You feel your back snap painfully and all goes dark...",
@@ -360,7 +357,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		need_movement = 1;
 	else
 	{
-		if ((learned = has_skill(ch, SKILL_NATURES_LORE)))
+		if ((learned = ch->has_skill(SKILL_NATURES_LORE)))
 		{
 
 			if (learned > 90)
@@ -619,7 +616,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		return eFAILURE;
 
 	int a = 0;
-	if ((a = has_skill(ch, SKILL_VIGOR)) && number(1, 101) < a / 10)
+	if ((a = ch->has_skill(SKILL_VIGOR)) && number(1, 101) < a / 10)
 		need_movement /= 2; // No skill improvement here. Too easy.
 
 	if (GET_MOVE(ch) < need_movement && IS_PC(ch))
@@ -647,7 +644,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	}
 
 	if (ch->getLevel() < IMMORTAL && IS_PC(ch))
-		GET_MOVE(ch) -= need_movement;
+		ch->decrementMove(need_movement);
 
 	// Everyone
 	if (!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED(ch, AFF_FOREST_MELD))
@@ -725,27 +722,27 @@ int do_simple_move(Character *ch, int cmd, int following)
 		Character *chaser = ch->fighting;
 		if (IS_NPC(ch))
 		{
-			add_memory(ch, GET_NAME(chaser), 'f');
+			ch->add_memory(GET_NAME(chaser), 'f');
 			remove_memory(ch, 'h');
 		}
-		if (IS_NPC(chaser) && chaser->hunting == 0)
+		if (IS_NPC(chaser) && chaser->hunting.isEmpty())
 		{
 			level_diff_t level_difference = ch->getLevel() - chaser->getLevel() / 2;
 			if (level_difference >= 0 || ch->getLevel() >= 50)
 			{
-				add_memory(chaser, GET_NAME(ch), 't');
+				chaser->add_memory(GET_NAME(ch), 't');
 				struct timer_data *timer;
 #ifdef LEAK_CHECK
 				timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
 #else
 				timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 #endif
-				timer->arg1.hunting = chaser->hunting;
+				timer->var_arg1 = chaser->hunting;
 				timer->arg2 = (void *)chaser;
 				timer->function = clear_hunt;
 				timer->next = timer_list;
 				timer_list = timer;
-				timer->timeleft = (ch->getLevel() / 4) * 60;
+				timer->timeleft = (ch->getLevel() / 4.0) * 60.0;
 			}
 		}
 		if (chaser->fighting == ch)
@@ -754,7 +751,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		// This might be a bad idea...cause track calls move, which calls track, which...
 		if (IS_NPC(chaser))
 		{
-			retval = do_track(chaser, chaser->mobdata->hatred, CMD_DEFAULT);
+			retval = chaser->do_track(chaser->mobdata->hated.split(' '));
 			if (SOMEONE_DIED(retval))
 				return retval;
 		}
@@ -822,7 +819,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	 do_muddy(ch);
 	 }
 	 */
-	if ((GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
+	if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
 		for (Character *tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
 		{
 			if (IS_PC(tmp_ch))
@@ -930,9 +927,9 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 			send_to_char("You struggle to maintain control.\r\n", ch->master);
 			/*
 			 if (GET_KI(ch->master) < 5) {
-			 add_memory(ch, GET_NAME(ch->master), 'h');
+			 ch->add_memory(GET_NAME(ch->master), 'h');
 			 stop_follower(ch, BROKE_CHARM);
-			 //add_memory(ch, GET_NAME(ch->master), 'h');
+			 //ch->add_memory(GET_NAME(ch->master), 'h');
 			 do_say(ch, "Hey! You tricked me!", CMD_DEFAULT);
 			 send_to_char("You lose control.\r\n",ch->master);
 			 }
@@ -970,7 +967,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		for (k = ch->followers; k; k = next_dude)
 		{ // no following a fleer
 			next_dude = k->next;
-			if ((was_in == k->follower->in_room) && ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING)))
+			if ((was_in == k->follower->in_room) && ((is_retreat && GET_POS(k->follower) > position_t::RESTING) || (GET_POS(k->follower) >= position_t::STANDING)))
 			{
 				if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
 				{
@@ -1322,11 +1319,11 @@ int ambush(Character *ch)
 	{
 		next_i = i->next_in_room;
 
-		if (i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
+		if (i == ch || i->ambush.isEmpty() || !CAN_SEE(i, ch) || i->fighting)
 			continue;
 
-		if (GET_POS(i) <= POSITION_RESTING ||
-			GET_POS(i) == POSITION_FIGHTING ||
+		if (GET_POS(i) <= position_t::RESTING ||
+			GET_POS(i) == position_t::FIGHTING ||
 			IS_AFFECTED(i, AFF_PARALYSIS) ||
 			(DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
 			 !IS_AFFECTED(ch, AFF_CANTQUIT)))
@@ -1336,7 +1333,7 @@ int ambush(Character *ch)
 		if (isname(i->ambush, GET_NAME(ch)))
 		{
 
-			if (!canPerform(i, SKILL_AMBUSH))
+			if (!i->canPerform(SKILL_AMBUSH))
 			{
 				continue;
 			}

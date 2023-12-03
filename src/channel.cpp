@@ -28,29 +28,27 @@
 #include "db.h"
 #include "returnvals.h"
 
-using namespace std;
-
 class channel_msg
 {
 public:
   channel_msg(const Character *sender, const int32_t type, const char *msg)
-      : type(type), msg(string(msg))
+      : type(type), msg(std::string(msg))
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const Character *sender, const int32_t type, const string &msg)
+  channel_msg(const Character *sender, const int32_t type, const std::string &msg)
       : type(type), msg(msg)
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  string get_msg(const int receiver_level)
+  std::string get_msg(const int receiver_level)
   {
-    stringstream output;
-    string sender;
+    std::stringstream output;
+    std::string sender;
 
     if (receiver_level < wizinvis)
     {
@@ -87,33 +85,33 @@ public:
   {
     if (sender)
     {
-      name = string(GET_SHORT(sender));
+      name = std::string(GET_SHORT(sender));
     }
     else
     {
-      name = string("Unknown");
+      name = std::string("Unknown");
       logf(IMMORTAL, LogChannels::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type, msg.c_str());
     }
   }
 
 private:
-  string name;
+  std::string name;
   int32_t wizinvis;
   int32_t type;
-  string msg;
+  std::string msg;
 };
 
-queue<channel_msg> gossip_history;
-queue<QString> auction_history;
-queue<QString> newbie_history;
-queue<QString> trivia_history;
+std::queue<channel_msg> gossip_history;
+std::queue<QString> auction_history;
+std::queue<QString> newbie_history;
+std::queue<QString> trivia_history;
 
 extern struct index_data *obj_index;
 
-command_return_t do_say(Character *ch, string argument, int cmd)
+command_return_t do_say(Character *ch, std::string argument, int cmd)
 {
   int i;
-  string buf;
+  std::string buf;
   int retval;
   extern bool MOBtrigger;
 
@@ -182,9 +180,9 @@ command_return_t do_say(Character *ch, string argument, int cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-command_return_t do_psay(Character *ch, string argument, int cmd)
+command_return_t do_psay(Character *ch, std::string argument, int cmd)
 {
-  string vict = {}, message = {}, buf = {};
+  std::string vict = {}, message = {}, buf = {};
   Character *victim = nullptr;
   extern bool MOBtrigger;
 
@@ -208,7 +206,7 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
       return eFAILURE;
     }
 
-  tie(vict, message) = half_chop(argument);
+  std::tie(vict, message) = half_chop(argument);
 
   if (vict.empty() || message.empty())
   {
@@ -216,13 +214,13 @@ command_return_t do_psay(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!(victim = get_char_room_vis(ch, vict)))
+  if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
     csendf(ch, "You see noone that goes by '%s' here.\r\n", vict);
     return eSUCCESS;
   }
 
-  string messageStr = message;
+  std::string messageStr = message;
   if (IS_IMMORTAL(ch))
   {
     messageStr = remove_all_codes(messageStr);
@@ -332,7 +330,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) == POSITION_SLEEPING)
+  if (GET_POS(ch) == position_t::SLEEPING)
   {
     send_to_char("You're asleep.  Dream or something....\r\n", ch);
     return eSUCCESS;
@@ -364,7 +362,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (!(*argument))
   {
-    queue<channel_msg> msgs = gossip_history;
+    std::queue<channel_msg> msgs = gossip_history;
     send_to_char("Here are the last 10 gossips:\n\r", ch);
     while (!msgs.empty())
     {
@@ -374,13 +372,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
   }
   else
   {
-    GET_MOVE(ch) -= 5;
-    if (GET_MOVE(ch) < 0)
-    {
-      send_to_char("You're too out of breath!\n\r", ch);
-      GET_MOVE(ch) += 5;
-      return eSUCCESS;
-    }
+    ch->decrementMove(5);
 
     channel_msg msg(ch, LogChannels::CHANNEL_GOSSIP, argument);
 
@@ -464,7 +456,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    queue<QString> tmp = auction_history;
+    std::queue<QString> tmp = auction_history;
     send_to_char("Here are the last 10 auctions:\n\r", this);
     while (!tmp.empty())
     {
@@ -474,13 +466,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
   }
   else
   {
-    GET_MOVE(this) -= 5;
-    if (GET_MOVE(this) < 0)
-    {
-      send_to_char("You're too out of breath!\n\r", this);
-      GET_MOVE(this) += 5;
-      return eSUCCESS;
-    }
+    decrementMove(5);
 
     QString buf1;
     if (IS_NPC(this))
@@ -650,7 +636,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
   if (!(*argument))
   {
     {
-      queue<QString> tmp = trivia_history;
+      std::queue<QString> tmp = trivia_history;
       send_to_char("Here are the last 10 messages:\n\r", ch);
       while (!tmp.empty())
       {
@@ -661,13 +647,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  GET_MOVE(ch) -= 5;
-  if (GET_MOVE(ch) < 0)
-  {
-    send_to_char("You're too out of breath!\n\r", ch);
-    GET_MOVE(ch) += 5;
-    return eSUCCESS;
-  }
+  ch->decrementMove(5);
 
   if (ch->getLevel() >= 102)
   {
@@ -710,7 +690,7 @@ int do_dream(Character *ch, char *argument, int cmd)
   class Connection *i = nullptr;
   int ctr = 0;
 
-  if ((GET_POS(ch) != POSITION_SLEEPING) && (ch->getLevel() < MIN_GOD))
+  if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
   {
     send_to_char("How are you going to dream if you're awake?\n\r", ch);
     return eSUCCESS;
@@ -769,7 +749,7 @@ int do_dream(Character *ch, char *argument, int cmd)
           (!i->connected) &&
           !is_ignoring(i->character, ch) &&
           (DC::isSet(i->character->misc, LogChannels::CHANNEL_DREAM)) &&
-          ((GET_POS(i->character) == POSITION_SLEEPING) ||
+          ((GET_POS(i->character) == position_t::SLEEPING) ||
            (i->character->getLevel() >= MIN_GOD)))
         send_to_char(buf1, i->character);
     }
@@ -777,7 +757,7 @@ int do_dream(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tellhistory(Character *ch, string argument, int cmd)
+command_return_t do_tellhistory(Character *ch, std::string argument, int cmd)
 {
   if (ch == nullptr)
   {
@@ -789,8 +769,8 @@ command_return_t do_tellhistory(Character *ch, string argument, int cmd)
     return eFAILURE;
   }
 
-  string arg1, remainder;
-  tie(arg1, remainder) = half_chop(argument);
+  std::string arg1, remainder;
+  std::tie(arg1, remainder) = half_chop(argument);
 
   if (arg1 == "timestamp")
   {
@@ -871,7 +851,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     }
     cmd = CMD_DEFAULT;
   }
-  else if (!(vict = get_active_pc_vis(this, name)))
+  else if (!(vict = get_active_pc_vis(name)))
   {
     vict = get_pc_vis(this, name);
     if ((vict != nullptr) && vict->getLevel() >= IMMORTAL)
@@ -911,7 +891,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   }
   if (this == vict)
     send_to_char("You try to tell yourself something.\r\n", this);
-  else if ((GET_POS(vict) == POSITION_SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
+  else if ((GET_POS(vict) == position_t::SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
     act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
   {
@@ -954,7 +934,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
       send_to_char(buf, this);
     }
-    else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
+    else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
     {
       if (IS_MOB(vict))
       {
@@ -981,7 +961,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
         logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
     }
-    else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
+    else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
              level_ >= SERAPH)
     {
       send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
@@ -1024,12 +1004,12 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_reply(Character *ch, string argument, int cmd)
+command_return_t do_reply(Character *ch, std::string argument, int cmd)
 {
-  string buf = {};
+  std::string buf = {};
   Character *vict = nullptr;
 
-  if (IS_MOB(ch) || ch->player->last_tell.empty())
+  if (IS_MOB(ch) || ch->player->last_tell.isEmpty())
   {
     send_to_char("You have noone to reply to.\r\n", ch);
     return eSUCCESS;
@@ -1050,7 +1030,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
     send_to_char("Reply what?\n\r", ch);
     if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
     {
-      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.c_str()));
+      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.toStdString().c_str()));
     }
     else
     {
@@ -1060,7 +1040,7 @@ command_return_t do_reply(Character *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  buf = fmt::format("{} {}", ch->player->last_tell.c_str(), argument);
+  buf = fmt::format("{} {}", ch->player->last_tell.toStdString().c_str(), argument);
   ch->do_tell(QString(buf.c_str()).split(' '), CMD_TELL_REPLY);
   return eSUCCESS;
 }
@@ -1083,7 +1063,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
 
   if (!*name || !*message)
     send_to_char("Who do you want to whisper to.. and what??\n\r", ch);
-  else if (!(vict = get_char_room_vis(ch, name)))
+  else if (!(vict = ch->get_char_room_vis(name)))
     send_to_char("No-one by that name here..\r\n", ch);
   else if (vict == ch)
   {
@@ -1130,7 +1110,7 @@ int do_ask(Character *ch, char *argument, int cmd)
 
   if (!*name || !*message)
     send_to_char("Who do you want to ask something, and what??\n\r", ch);
-  else if (!(vict = get_char_room_vis(ch, name)))
+  else if (!(vict = ch->get_char_room_vis(name)))
     send_to_char("No-one by that name here.\r\n", ch);
   else if (vict == ch)
   {
@@ -1300,7 +1280,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
   if (!(*argument))
   {
-    queue<QString> tmp = newbie_history;
+    std::queue<QString> tmp = newbie_history;
     send_to_char("Here are the last 10 messages:\n\r", ch);
     while (!tmp.empty())
     {
@@ -1310,12 +1290,9 @@ int do_newbie(Character *ch, char *argument, int cmd)
   }
   else
   {
-    GET_MOVE(ch) -= 5;
-    if (GET_MOVE(ch) < 0)
+    if (!ch->decrementMove(5))
     {
-      send_to_char("You're too out of breath!\n\r", ch);
-      GET_MOVE(ch) += 5;
-      return eSUCCESS;
+      return eFAILURE;
     }
     sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);

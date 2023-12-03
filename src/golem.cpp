@@ -5,7 +5,7 @@
 */
 #include <string.h>
 
-using namespace std;
+
 
 #include "character.h"
 #include "structs.h"
@@ -34,12 +34,6 @@ void advance_golem_level(Character *golem);
 // save.cpp
 int store_worn_eq(Character *ch, FILE *fpsave);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
-
-// limits.cpp
-extern int hit_gain(Character *ch);
-extern int mana_gain(Character *ch);
-extern int ki_gain(Character *ch);
-extern int move_gain(Character *ch, int extra);
 
 struct golem_data
 { // This is how a golem looks.
@@ -164,7 +158,7 @@ void save_golem_data(Character *ch)
   if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
     logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
@@ -199,8 +193,8 @@ void save_charmie_data(Character *ch)
       continue;
     }
 
-    // logf(IMMORTAL, LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->name);
-    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->name[0], ch->name, 0);
+    // logf(IMMORTAL, LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
+    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
     if (!(fpfile = fopen(file, "w")))
     {
       logf(ANGEL, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
@@ -228,7 +222,7 @@ void set_golem(Character *golem, int golemtype)
 { // Set the basics.
   GET_RACE(golem) = RACE_GOLEM;
   golem->short_desc = str_hsh(golem_list[golemtype].short_desc);
-  golem->name = str_hsh(golem_list[golemtype].name);
+  golem->setName(golem_list[golemtype].name);
   golem->long_desc = str_hsh(golem_list[golemtype].long_desc);
   golem->description = str_hsh(golem_list[golemtype].description);
   golem->title = 0;
@@ -251,9 +245,10 @@ void set_golem(Character *golem, int golemtype)
   golem->mobdata->damsizedice = golem_list[golemtype].roll2;
   golem->setGold(0);
   golem->plat = 0;
-  golem->move = golem->max_move = golem->mana = golem->max_mana = 100;
+  golem->max_move = golem->mana = golem->max_mana = 100;
+  golem->setMove(golem->max_move);
   golem->mobdata->last_room = 0;
-  golem->position = POSITION_STANDING;
+  golem->setStanding();
   golem->immune = golem->suscept = golem->resist = 0;
   golem->c_class = 0;
   golem->height = 255; // Was 350, but it can't fit in a byte
@@ -269,7 +264,7 @@ void load_golem_data(Character *ch, int golemtype)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = clone_mobile(real_mobile(8));
@@ -372,7 +367,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   int64_t exp_needed;
 
   uint32_t immune = 0, suscept = 0, resist = 0;
-  string isrString;
+  std::string isrString;
 
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
   if (ch->getLevel() + 19 > 60)
@@ -408,8 +403,8 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
           GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
           GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
-          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch),
-          mana_gain(ch), move_gain(ch, 0), ki_gain(ch), GET_AGE(ch),
+          GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), ch->hit_gain_lookup(),
+          ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
           GET_ALIGNMENT(ch));
 
   send_to_char(buf, master);
@@ -443,7 +438,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Immunity", isrString.c_str(), scratch);
         send_to_char(buf, master);
-        isrString = string();
+        isrString = std::string();
         if (++level == 4)
           level = 0;
       }
@@ -460,7 +455,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Susceptibility", isrString.c_str(), scratch);
         send_to_char(buf, master);
-        isrString = string();
+        isrString = std::string();
         if (++level == 4)
           level = 0;
       }
@@ -477,7 +472,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Resistibility", isrString.c_str(), scratch);
         send_to_char(buf, master);
-        isrString = string();
+        isrString = std::string();
         if (++level == 4)
           level = 0;
       }

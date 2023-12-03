@@ -75,10 +75,10 @@ struct vault_items_data
 struct sorted_vault
 {
   // This stores the quantity of each item found in a vault
-  map<string, pair<Object *, uint32_t>> vault_content_qty{};
+  std::map<std::string, std::pair<Object *, uint32_t>> vault_content_qty{};
 
   // This stores the order in which vault items are found
-  vector<string> vault_contents{};
+  std::vector<std::string> vault_contents{};
 
   unsigned int weight{};
 };

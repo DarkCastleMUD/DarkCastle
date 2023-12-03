@@ -68,7 +68,7 @@ void add_to_who(char *strAdd)
 void clear_who_buffer()
 {
   if (gWhoBuffer)
-    *gWhoBuffer = '\0';  // kill the string
+    *gWhoBuffer = '\0';  // kill the std::string
   gWhoBufferCurSize = 0; // update the size
 }
 
@@ -236,7 +236,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
                   "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
-                  i->name,
+                  i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
                   IS_MOB(i) ? 0 : i->player->totalpkills,
@@ -245,7 +245,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
         else
           sprintf(tempbuffer,
                   "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
-                  i->name,
+                  i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   IS_MOB(i) ? 0 : i->player->totalpkills,
                   IS_MOB(i) ? 0 : i->player->pdeathslogin,
@@ -333,14 +333,14 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       auto is_abbreviation = [&](auto fullname)
       { return is_abbrev(oneword, fullname); };
 
-      auto it = std::find_if(begin(class_names), end(class_names), is_abbreviation);
+      auto it = std::find_if(std::begin(class_names), std::end(class_names), is_abbreviation);
       if (it != std::end(class_names))
       {
         class_found = *it;
       }
       else
       {
-        it = std::find_if(begin(race_names), end(race_names), is_abbreviation);
+        it = std::find_if(std::begin(race_names), std::end(race_names), is_abbreviation);
         if (it != std::end(race_names))
         {
           race_found = *it;
@@ -418,7 +418,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       continue;
     }
 
-    // Skip string based checks if our name matches
+    // Skip std::string based checks if our name matches
     if (!charcheck || !is_abbrev(charname, GET_NAME(i)))
     {
       if (!class_found.isEmpty() && i->getClassName() != class_found && !charmatchistrue)
@@ -647,13 +647,13 @@ int do_where(Character *ch, char *argument, int cmd)
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, DC::getInstance()->world[d->character->in_room].name,
-                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->name));
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()));
         }
         else
         {
           csendf(ch, "%-20s - %s$R [%d]\n\r",
-                 d->character->name, DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+                 d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
         }
       }
     } // for
@@ -667,18 +667,18 @@ int do_where(Character *ch, char *argument, int cmd)
       {
         if (d->original)
         { // If switched
-          if (is_abbrev(buf, d->original->name))
+          if (is_abbrev(buf, d->original->getName()))
           {
-            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, DC::getInstance()->world[d->character->in_room].name,
-                   DC::getInstance()->world[d->character->in_room].number, fname(d->character->name));
+            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+                   DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
           }
         }
         else
         {
-          if (is_abbrev(buf, d->character->name))
+          if (is_abbrev(buf, d->character->getNameC()))
           {
             csendf(ch, "%-20s - %s$R [%d]\n\r",
-                   d->character->name, DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+                   d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
           }
         }
       }
@@ -697,7 +697,7 @@ int do_where(Character *ch, char *argument, int cmd)
           CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
-          csendf(ch, "%-20s - %s$R\n\r", d->character->name,
+          csendf(ch, "%-20s - %s$R\n\r", d->character->getNameC(),
                  DC::getInstance()->world[d->character->in_room].name);
       }
     }

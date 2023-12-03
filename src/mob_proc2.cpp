@@ -35,7 +35,7 @@
 #include "inventory.h"
 #include "corpse.h"
 
-using namespace std;
+
 
 extern class Object *object_list;
 extern struct index_data *obj_index;
@@ -511,7 +511,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 
 char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 {
-	string buf = {}, buf2 = {}, buf3 = {};
+	std::string buf = {}, buf2 = {}, buf3 = {};
 	size_t length = {};
 
 	if (platinum)

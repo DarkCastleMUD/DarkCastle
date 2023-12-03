@@ -69,7 +69,6 @@ extern const char *drinks[];
 extern const char *portal_bits[];
 extern const char *player_bits[];
 extern const char *combat_bits[];
-extern const char *position_types[];
 extern const char *connected_types[];
 extern const char *mob_types[];
 extern const char *exit_bits[];

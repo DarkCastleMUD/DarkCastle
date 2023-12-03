@@ -106,22 +106,9 @@ bool is_wearing(Character *ch, Object *item)
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
 // puts it in a static char buffer, and returns it.
-char *fname(char *namelist)
+QString fname(QString namelist)
 {
-	static char holder[30];
-	char *point;
-
-	for (point = holder; isalpha(*namelist); namelist++, point++)
-		*point = *namelist;
-
-	// we seem to use this alot, and 30 chars isn't a whole lot.....
-	// let's just put this here for the heck of it -pir 2/28/01
-	if (point > (holder + 29))
-		logentry("point overran holder in fname (handler.c)", ANGEL, LogChannels::LOG_BUG);
-
-	*point = '\0';
-
-	return (holder);
+	return namelist.split(' ').value(0);
 }
 
 // TODO - figure out how this is different from isname() and comment why
@@ -148,6 +135,13 @@ int isname2(const char *str, const char *namel)
 	return 0;
 }
 
+// TODO - figure out how this is different from isname() and comment why
+// we need it.  Neither of them are case-sensitive....
+int isname2(QString str, QString namel)
+{
+	return isname2(str.toStdString().c_str(), namel.toStdString().c_str());
+}
+
 int isname(QString arg, QStringList namelist)
 {
 	for (const auto &name : namelist)
@@ -171,17 +165,17 @@ int isname(QString arg, const char *namelist)
 	return isname(arg.toStdString().c_str(), namelist);
 }
 
-int isname(string arg, string namelist)
+int isname(std::string arg, std::string namelist)
 {
 	return isname(arg.c_str(), namelist.c_str());
 }
 
-int isname(string arg, const char *namelist)
+int isname(std::string arg, const char *namelist)
 {
 	return isname(arg.c_str(), namelist);
 }
 
-int isname(const char *arg, string namelist)
+int isname(const char *arg, std::string namelist)
 {
 	return isname(arg, namelist.c_str());
 }
@@ -209,8 +203,8 @@ int isname(const char *arg, joining_t &namelist)
 int isname(const char *str, const char *namelist)
 {
 #if 0
-	string haystack(namelist);
-	if (haystack.find(str) != string::npos) {
+	std::string haystack(namelist);
+	if (haystack.find(str) != std::string::npos) {
 		return 1;
 	}
 
@@ -1652,9 +1646,9 @@ void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_ty
 	if (af->location >= 1000)
 		return; // Skill aff;
 #ifdef LEAK_CHECK
-	affected_alloc = new (nothrow) affected_type;
+	affected_alloc = new (std::nothrow) affected_type;
 #else
-	affected_alloc = new (nothrow) affected_type;
+	affected_alloc = new (std::nothrow) affected_type;
 	// affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
 #endif
 
@@ -1701,7 +1695,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		if (hjp->next != af)
 		{
 			logentry("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LogChannels::LOG_BUG);
-			sprintf(buf, "Problem With: %s    Affect type: %d", ch->name, af->type);
+			sprintf(buf, "Problem With: %s    Affect type: %d", ch->getNameC(), af->type);
 			logentry(buf, ANGEL, LogChannels::LOG_BUG);
 			return;
 		}
@@ -1943,7 +1937,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		if (ch->master)
 		{
 			if (!(flags & SUPPRESS_CONSEQUENCES) && GET_CLASS(ch->master) != CLASS_RANGER)
-				add_memory(ch, GET_NAME(ch->master), 'h');
+				ch->add_memory(ch->master->getName(), 'h');
 			stop_follower(ch, BROKE_CHARM);
 		}
 		break;
@@ -2119,7 +2113,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 					act("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, TO_CHAR, 0);
 				}
 				if (!(flags & SUPPRESS_CONSEQUENCES))
-					add_memory(ch, GET_NAME(ch->master), 'h');
+					ch->add_memory(ch->master->getName(), 'h');
 				stop_follower(ch, BROKE_CHARM_LILITH);
 			}
 		}
@@ -2161,18 +2155,23 @@ void affect_from_char(Character *ch, int skill, int flags)
  * Return if a char is affected by a spell (SPELL_XXX), nullptr indicates
  * not affected.
  */
-affected_type *affected_by_spell(Character *ch, int skill)
+affected_type *Character::affected_by_spell(uint32_t skill)
 {
 	struct affected_type *curr;
 
 	if (skill < 0) // all affect types are unsigned
 		return nullptr;
 
-	for (curr = ch->affected; curr; curr = curr->next)
-		if (curr->type == (unsigned)skill)
+	for (curr = affected; curr; curr = curr->next)
+		if (curr->type == skill)
 			return curr;
 
 	return nullptr;
+}
+
+affected_type *affected_by_spell(Character *ch, uint32_t skill)
+{
+	return ch->affected_by_spell(skill);
 }
 
 affected_type *affected_by_random(Character *ch)
@@ -2314,7 +2313,7 @@ bool is_hiding(Character *ch, Character *vict)
 	if (IS_NPC(ch))
 		return (number(1, 101) > 70);
 
-	if (!has_skill(ch, SKILL_HIDE))
+	if (!ch->has_skill(SKILL_HIDE))
 		return false;
 	if (ch->in_room != vict->in_room)
 		return skill_success(ch, vict, SKILL_HIDE);
@@ -2346,7 +2345,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	DC::getInstance()->world[room].light += ch->glow_factor;
 	int a, i;
-	if (IS_PC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
+	if (IS_PC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = ch->has_skill(SKILL_HIDE)))
 	{
 		for (i = 0; i < MAX_HIDE; i++)
 			ch->player->hiding_from[i] = nullptr;
@@ -2374,7 +2373,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 			{
 				if (temp->player->hiding_from[i] == nullptr || temp->player->hiding_from[i] == ch)
 				{
-					if (number(1, 101) > has_skill(temp, SKILL_HIDE))
+					if (number(1, 101) > temp->has_skill(SKILL_HIDE))
 					{
 						temp->player->hiding_from[i] = ch;
 						temp->player->hide[i] = false;
@@ -2696,7 +2695,7 @@ int get_number(QString &name)
 	return number;
 }
 
-int get_number(string &name)
+int get_number(std::string &name)
 {
 	size_t pos = name.find(".");
 	if (pos == name.npos)
@@ -2704,11 +2703,11 @@ int get_number(string &name)
 		return 1;
 	}
 
-	string number_str = name.substr(0, pos);
+	std::string number_str = name.substr(0, pos);
 
 	try
 	{
-		string str_str = name.substr(pos + 1);
+		std::string str_str = name.substr(pos + 1);
 		name = str_str;
 		return stoi(number_str);
 	}
@@ -2729,9 +2728,9 @@ int get_number(char **name)
 	{
 		*ppos++ = '\0';
 		// at this point, ppos points to the name only, and there is a
-		// \0 between the number and the name as they appear in the string.
+		// \0 between the number and the name as they appear in the std::string.
 		strcpy(number, *name);
-		// now number contains the number as a string
+		// now number contains the number as a std::string
 		strncpy(buffer, ppos, MAX_INPUT_LENGTH - 1);
 		buffer[MAX_INPUT_LENGTH - 1] = 0;
 		strcpy(*name, buffer);
@@ -2877,11 +2876,11 @@ Character *get_char_room(char *name, int room, bool careful)
 }
 
 /* search all over the world for a char, and return a pointer if found */
-Character *get_char(string name)
+Character *get_char(QString name)
 {
 	Character *partial_match = nullptr;
 	int j = 0, number = 0;
-	string tmpname = {}, tmp = {};
+	QString tmpname = {}, tmp = {};
 
 	tmpname = name;
 	tmp = tmpname;
@@ -2896,7 +2895,7 @@ Character *get_char(string name)
 		{
 			if (isname(tmp, GET_NAME(i)))
 			return true;
-			else if (isname2(tmp.c_str(), GET_NAME(i)))
+			else if (isname2(tmp.toStdString().c_str(), GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -3786,10 +3785,9 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 
 	// make sure their ambush target is free'd
-	if (ch->ambush)
+	if (!ch->ambush.isEmpty())
 	{
-		dc_free(ch->ambush);
-		ch->ambush = nullptr;
+		ch->ambush.clear();
 	}
 
 	// I'm guarding someone.  Remove myself from their guarding list
@@ -3899,8 +3897,8 @@ void extract_char(Character *ch, bool pull, Trace t)
 		auto &death_list = DC::getInstance()->death_list;
 		if (death_list.contains(ch))
 		{
-			stringstream ss;
-			ss << "extract_char: " << t << endl;
+			std::stringstream ss;
+			ss << "extract_char: " << t << std::endl;
 			logf(IMMORTAL, LogChannels::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
 			produce_coredump(ch);
 		}
@@ -3922,14 +3920,14 @@ void extract_char(Character *ch, bool pull, Trace t)
  *
  * Remember that this function can return nullptr!
  */
-Character *get_rand_other_char_room_vis(Character *ch)
+Character *Character::get_rand_other_char_room_vis(void)
 {
 	Character *vict = nullptr;
 	int count = 0;
 
 	// Count the number of players in room
-	for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-		if (CAN_SEE(ch, vict) && ch != vict)
+	for (vict = DC::getInstance()->world[in_room].people; vict; vict = vict->next_in_room)
+		if (CAN_SEE(this, vict) && this != vict)
 			count++;
 
 	if (!count) // no players
@@ -3939,9 +3937,9 @@ Character *get_rand_other_char_room_vis(Character *ch)
 	count = number(1, count);
 
 	// Find the "count" player and return them
-	for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+	for (vict = DC::getInstance()->world[in_room].people; vict; vict = vict->next_in_room)
 	{
-		if (CAN_SEE(ch, vict) && ch != vict)
+		if (CAN_SEE(this, vict) && this != vict)
 		{
 			if (count > 1)
 			{
@@ -3978,11 +3976,11 @@ void lastseen_targeted(Character *ch, Character *victim)
 		return;
 
 	if (ch->player->lastseen == 0)
-		ch->player->lastseen = new multimap<int, pair<timeval, timeval>>;
+		ch->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
 	int nr = victim->mobdata->nr;
 
-	multimap<int, pair<timeval, timeval>>::iterator i;
+	std::multimap<int, std::pair<timeval, timeval>>::iterator i;
 	i = ch->player->lastseen->find(nr);
 
 	timeval tv;
@@ -4000,58 +3998,57 @@ void lastseen_targeted(Character *ch, Character *victim)
 	return;
 }
 
-Character *get_char_room_vis(Character *ch, string name)
+Character *Character::get_char_room_vis(QString name)
 {
-	return get_char_room_vis(ch, name.c_str());
-}
+	Character *i{};
+	Character *partial_match{};
+	Character *rnd{};
+	int j{};
 
-Character *get_char_room_vis(Character *ch, const char *name)
-{
-	Character *i;
-	Character *partial_match;
-	Character *rnd;
-	int j, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp;
-
-	if (IS_AFFECTED(ch, AFF_BLACKJACK))
+	if (IS_AFFECTED(this, AFF_BLACKJACK))
 	{
-		struct affected_type *af = affected_by_spell(ch, SKILL_JAB);
+		struct affected_type *af = affected_by_spell(SKILL_JAB);
 		if (af)
 		{
 			if (af->modifier == 1)
 			{
-				rnd = get_rand_other_char_room_vis(ch);
+				rnd = get_rand_other_char_room_vis();
 				if (rnd)
 				{
 					// Added get_rand.. check above 'cause ch->fighting would get set to nullptr.
-					send_to_char("You're so dizzy you don't know who you're hitting.\r\n", ch);
-					ch->fighting = rnd;
-					return ch->fighting;
+					sendln("You're so dizzy you don't know who you're hitting.");
+					fighting = rnd;
+					return fighting;
 				}
 			}
 		}
 	}
 
 	partial_match = 0;
+	quint64 number{};
+	if (name.contains("."))
+	{
+		bool ok = false;
+		number = name.split('.').value(0).toULongLong(&ok);
+		if (!ok)
+		{
+			return 0;
+		}
+		name = name.split('.').value(1);
+	}
 
-	strcpy(tmpname, name);
-	tmp = tmpname;
-	if ((number = get_number(&tmp)) < 0)
-		return (0);
-
-	for (i = DC::getInstance()->world[ch->in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
+	for (i = DC::getInstance()->world[in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
 	{
 		if (number == 0 && IS_NPC(i))
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isname(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
-				lastseen_targeted(ch, i);
+				lastseen_targeted(this, i);
 				return (i);
 			}
-			else if (isname2(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			else if (isname2(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
 				if (partial_match)
 				{
@@ -4064,19 +4061,24 @@ Character *get_char_room_vis(Character *ch, const char *name)
 		}
 		else
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isname(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
 				j++;
 				if (j == number)
 				{
-					lastseen_targeted(ch, i);
+					lastseen_targeted(this, i);
 					return (i);
 				}
 			}
 		}
 	}
-	lastseen_targeted(ch, partial_match);
+	lastseen_targeted(this, partial_match);
 	return (partial_match);
+}
+
+Character *get_char_room_vis(Character *ch, QString name)
+{
+	return ch->get_char_room_vis(name);
 }
 
 Character *get_mob_room_vis(Character *ch, char *name)
@@ -4249,7 +4251,7 @@ Character *get_mob_vnum(int vnum)
 	}
 	return nullptr;
 }
-Character *get_char_vis(Character *ch, const string &name)
+Character *get_char_vis(Character *ch, const std::string &name)
 {
 	return get_char_vis(ch, name.c_str());
 }
@@ -4264,7 +4266,7 @@ Character *get_char_vis(Character *ch, const char *name)
 	char *tmp;
 
 	/* check location */
-	if ((i = get_char_room_vis(ch, name)) != 0)
+	if ((i = ch->get_char_room_vis(name)) != 0)
 		return (i);
 
 	partial_match = 0;
@@ -4436,7 +4438,7 @@ Object *Character::getVisibleObject(QString name)
 	return get_obj_vis(this, name.toStdString());
 }
 
-Character *get_pc_vis(Character *ch, string name)
+Character *get_pc_vis(Character *ch, std::string name)
 {
 	return get_pc_vis(ch, name.c_str());
 }
@@ -4498,12 +4500,7 @@ Character *get_pc_vis_exact(Character *ch, const char *name)
 	return 0;
 }
 
-Character *get_active_pc_vis(Character *ch, QString name)
-{
-	return get_active_pc_vis(ch, name.toStdString().c_str());
-}
-
-Character *get_active_pc_vis(Character *ch, const char *name)
+Character *Character::get_active_pc_vis(QString name)
 {
 	Character *i;
 	Character *partial_match;
@@ -4516,10 +4513,10 @@ Character *get_active_pc_vis(Character *ch, const char *name)
 		if (!d->character || !GET_NAME(d->character))
 			continue;
 		i = d->character;
-		if ((d->connected) || (!CAN_SEE(ch, i)))
+		if ((d->connected) || (!CAN_SEE(this, i)))
 			continue;
 
-		if (CAN_SEE(ch, i))
+		if (CAN_SEE(this, i))
 		{
 			if (isname(name, GET_NAME(i)))
 				return (i);
@@ -4577,7 +4574,7 @@ class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *lis
 	return (0);
 }
 
-class Object *get_obj_vis(Character *ch, string name, bool loc)
+class Object *get_obj_vis(Character *ch, std::string name, bool loc)
 {
 	/*search the entire world for an object, and return a pointer  */
 	return get_obj_vis(ch, name.c_str(), loc);
@@ -4677,8 +4674,8 @@ class Object *create_money(int amount)
 
 /* Generic Find, designed to find any object/character                    */
 /* Calling :                                                              */
-/*  *arg     is the sting containing the string to be searched for.       */
-/*           This string doesn't have to be a single word, the routine    */
+/*  *arg     is the sting containing the std::string to be searched for.       */
+/*           This std::string doesn't have to be a single word, the routine    */
 /*           extracts the next word itself.                               */
 /*  bitv..   All those bits that you want to "search through".            */
 /*           Bit found will be result of the function                     */
@@ -4722,7 +4719,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 
 	if (DC::isSet(bitvector, FIND_CHAR_ROOM))
 	{ /* Find person in room */
-		*tar_ch = get_char_room_vis(ch, name);
+		*tar_ch = ch->get_char_room_vis(name);
 		if (*tar_ch)
 		{
 			if (verbose)
@@ -4731,9 +4728,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				{
 					csendf(ch, "You find %s in this room.\r\n", (*tar_ch)->short_desc);
 				}
-				else if ((*tar_ch)->name)
+				else if (!(*tar_ch)->getName().isEmpty())
 				{
-					csendf(ch, "You find %s in this room.\r\n", (*tar_ch)->name);
+					ch->sendln(QString("You find %1 in this room.").arg((*tar_ch)->getName()));
 				}
 				else
 				{
@@ -4755,9 +4752,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				{
 					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_ch)->short_desc);
 				}
-				else if ((*tar_ch)->name)
+				else if (!(*tar_ch)->getName().isEmpty())
 				{
-					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_ch)->name);
+					ch->sendln(QString("You find %1 somewhere in the world.").arg((*tar_ch)->getName()));
 				}
 				else
 				{
@@ -4877,44 +4874,29 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 // Return a "somewhat" random person from the mobs hate list
 // For now, just return the first one.  You can use "swap_hate_memory"
 // to get a new one from 'get_random_hate'
-char *get_random_hate(Character *ch)
+QString Character::get_random_hate(void)
 {
-	char buf[128];
-	char *name = nullptr;
-
-	if (!IS_MOB(ch))
-		return nullptr;
-
-	if (!ch->mobdata->hatred)
-		return nullptr;
-
-	if (!strstr(ch->mobdata->hatred, " "))
-		return (ch->mobdata->hatred);
-
-	one_argument(ch->mobdata->hatred, buf);
-
-	name = str_hsh(buf);
-
-	return name; // This is okay, since it's a str_hsh
+	QStringList hated_characters = mobdata->hated.split(' ');
+	auto index = number(0LL, hated_characters.size() - 1);
+	return hated_characters.value(index);
 }
 
 // Take the first name on the list, and swap it to the end.
-void swap_hate_memory(Character *ch)
+void Character::swap_hate_memory(void)
 {
-	char *curr;
-	char temp[32];
-	char buf[MAX_STRING_LENGTH];
-
-	if (!IS_MOB(ch))
+	if (!isNPC())
 		return;
 
-	if (!(curr = strstr(ch->mobdata->hatred, " ")))
+	if (!mobdata->hated.contains(' '))
 		return;
 
-	*curr = '\0';
-	strcpy(temp, ch->mobdata->hatred);
-	sprintf(buf, "%s %s", curr + 1, ch->mobdata->hatred);
-	strcpy(ch->mobdata->hatred, buf);
+	QStringList hated_list = mobdata->hated.split(' ');
+	if (hated_list.size() >= 2)
+	{
+		hated_list.push_back(hated_list.front());
+		hated_list.pop_front();
+		mobdata->hated = hated_list.join(' ');
+	}
 }
 
 int hates_someone(Character *ch)
@@ -4922,7 +4904,7 @@ int hates_someone(Character *ch)
 	if (!IS_MOB(ch))
 		return 0;
 
-	return (ch->mobdata->hatred != nullptr);
+	return (ch->mobdata->hated != nullptr);
 }
 
 int fears_someone(Character *ch)
@@ -4946,50 +4928,22 @@ void remove_memory(Character *ch, char type, Character *vict)
 
 	if (type == 'h')
 	{
-		if (!ch->mobdata->hatred)
+		if (ch->mobdata->hated.isEmpty())
 			return;
-		if (!isname(GET_NAME(vict), ch->mobdata->hatred))
+		if (!isname(GET_NAME(vict), ch->mobdata->hated))
 			return;
-		if (strstr(ch->mobdata->hatred, " "))
-		{
-#ifdef LEAK_CHECK
-			temp = (char *)calloc((strlen(ch->mobdata->hatred) - strlen(GET_NAME(vict))), sizeof(char));
-#else
-			temp = (char *)dc_alloc((strlen(ch->mobdata->hatred) - strlen(GET_NAME(vict))), sizeof(char));
-#endif
-			curr = strstr(ch->mobdata->hatred, GET_NAME(vict));
-			if (curr == ch->mobdata->hatred)
-			{
-				// This has to work, cause we checked it on our first if statement
-				curr = strstr(curr, " ");
-				strcpy(temp, curr + 1);
-				dc_free(ch->mobdata->hatred);
-				ch->mobdata->hatred = temp;
-				return;
-			}
-			// This works because we made sure curr is not the first item in array
-			// We're turning the 'space' into an end
-			*(curr - 1) = '\0';
-			strcpy(temp, ch->mobdata->hatred);
-			// If there is anything else after the one we removed, slap it (and space) in
-			if ((curr = strstr(curr, " ")))
-				strcat(temp, curr);
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = temp;
-		}
-		else
-		{
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = nullptr;
-		}
+
+		auto hated_list = ch->mobdata->hated.split(' ');
+		hated_list.removeAll(vict->getName());
+		ch->mobdata->hated = hated_list.join(' ').trimmed();
 	}
 
 	//  if(type == 'h')
-	//    ch->mobdata->hatred = 0;
+	//    ch->mobdata->hated = 0;
 
 	// these two are str_hsh'd, so just null them out
 	if (type == 'f')
-		ch->mobdata->fears = 0;
+		ch->mobdata->fears = nullptr;
 }
 
 void room_mobs_only_hate(Character *ch)
@@ -5001,7 +4955,7 @@ void room_mobs_only_hate(Character *ch)
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
 				(vict != ch) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) {
 			remove_memory(vict, 'h');
-			add_memory(vict, GET_NAME(ch), 'h');
+			vict->add_memory( GET_NAME(ch), 'h');
 		} });
 }
 
@@ -5013,77 +4967,80 @@ void remove_memory(Character *ch, char type)
 	if (!IS_MOB(ch))
 		return;
 
-	if (type == 'h' && ch->mobdata->hatred)
+	if (type == 'h' && !ch->mobdata->hated.isEmpty())
 	{
-		dc_free(ch->mobdata->hatred);
-		ch->mobdata->hatred = nullptr;
+		ch->mobdata->hated.clear();
+		ch->mobdata->hated = nullptr;
 	}
 
 	if (type == 'f')
 		ch->mobdata->fears = 0;
 }
 
-void add_memory(Character *ch, char *victim, char type)
+void Character::add_memory(QString victim_name, char type)
 {
-	char *buf = nullptr;
-
-	if (!IS_MOB(ch))
-		return;
-
 	// pets don't know to hate people
-	if (IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR))
+	if (!isNPC() || IS_AFFECTED(this, AFF_CHARM) || IS_AFFECTED(this, AFF_FAMILIAR))
+	{
 		return;
+	}
 
 	if (type == 'h')
 	{
-		if (!ch->mobdata->hatred)
-			ch->mobdata->hatred = str_dup(victim);
+		if (!mobdata->hated.isEmpty())
+		{
+			mobdata->hated = victim_name;
+		}
 		else
 		{
 			// Don't put same name twice
-			if (isname(victim, ch->mobdata->hatred))
+			if (isname(victim_name, this->mobdata->hated))
+			{
 				return;
+			}
 
-				// name 1 + name 2 + a space + terminator
-#ifdef LEAK_CHECK
-			buf = (char *)calloc((strlen(ch->mobdata->hatred) + strlen(victim) + 2), sizeof(char));
-#else
-			buf = (char *)dc_alloc((strlen(ch->mobdata->hatred) + strlen(victim) + 2), sizeof(char));
-#endif
-			sprintf(buf, "%s %s", ch->mobdata->hatred, victim);
-			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = buf;
+			// name 1 + name 2 + a space + terminator
+			this->mobdata->hated = QString("%1 %2").arg(mobdata->hated).arg(victim_name);
 		}
 	}
 	else if (type == 'f')
-		ch->mobdata->fears = str_hsh(victim);
+	{
+		mobdata->fears = strdup(victim_name.toStdString().c_str());
+	}
 	else if (type == 't')
-		ch->hunting = str_dup(victim);
+	{
+		hunting = victim_name;
+	}
 }
 
 // function for charging moves, to make it easier to have skills that impact ALL(such as vigor)
 bool charge_moves(Character *ch, int skill, double modifier)
 {
+	return ch->charge_moves(skill, modifier);
+}
+
+bool Character::charge_moves(int skill, double modifier)
+{
 	int i = 0;
 	int amt = skill_cost.find(skill)->second * modifier;
 	int reduce = 0;
 
-	if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, nullptr, SKILL_VIGOR))
+	if ((i = has_skill(SKILL_VIGOR)) && skill_success(nullptr, SKILL_VIGOR))
 	{
 		reduce = number(i / 8, i / 4); // 12-25 @ max skill
 		amt = (amt * reduce) / 100;
 	}
 
-	if (GET_MOVE(ch) < amt)
+	if (getMove() < amt)
 	{
-		send_to_char("You do not have enough movement to do this!\r\n", ch);
+		sendln("You do not have enough movement to do this!");
 		return false;
 	}
-	GET_MOVE(ch) -= amt;
+	decrementMove(amt);
 	return true;
 }
 
-MatchType add_matching_results(skill_results_t &results, const string &name, const string &key, uint64_t value)
+MatchType add_matching_results(skill_results_t &results, const std::string &name, const std::string &key, uint64_t value)
 {
 	auto match = str_n_nosp_cmp_begin(name, key);
 	// If this is an exact match we want only a single result
@@ -5100,7 +5057,7 @@ MatchType add_matching_results(skill_results_t &results, const string &name, con
 	return match;
 }
 
-skill_results_t find_skills_by_name(string name)
+skill_results_t find_skills_by_name(std::string name)
 {
 	skill_results_t results = {};
 

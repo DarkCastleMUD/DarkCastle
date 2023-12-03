@@ -76,7 +76,7 @@ void mobile_activity(void)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &ch : character_list)
   {
-    if (isDead(ch) || isNowhere(ch))
+    if (ch->isDead() || isNowhere(ch))
     {
       continue;
     }
@@ -122,7 +122,7 @@ void mobile_activity(void)
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
       PerfTimers["mprog"].stop();
 
-      if (!DC::isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || isDead(ch) || isNowhere(ch))
+      if (!DC::isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || isNowhere(ch))
         continue;
     }
 
@@ -145,14 +145,14 @@ void mobile_activity(void)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
-        if (DC::isSet(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
+        if (DC::isSet(retval, eCH_DIED) || ch->isDead() || isNowhere(ch))
         {
           continue;
         }
       }
 
       retval = mprog_arandom_trigger(ch);
-      if (DC::isSet(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
+      if (DC::isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || isNowhere(ch))
       {
         continue;
       }
@@ -175,10 +175,10 @@ void mobile_activity(void)
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
-        if (DC::isSet(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
+        if (DC::isSet(retval, eCH_DIED) || ch->isDead() || isNowhere(ch))
           break; // break so we can continue with the next mob
       }
-      if (DC::isSet(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
+      if (DC::isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || isNowhere(ch))
         continue; // move on to next mob, this one is dead
 
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
@@ -236,7 +236,7 @@ void mobile_activity(void)
     PerfTimers["scavenge"].stop();
 
     /* Wander */
-    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && GET_POS(ch) == POSITION_STANDING)
+    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && GET_POS(ch) == position_t::STANDING)
     {
       door = number(0, 30);
       if (door <= 5 && CAN_GO(ch, door))
@@ -264,8 +264,8 @@ void mobile_activity(void)
       }
     }
 
-    // check hatred
-    if ((ch->mobdata->hatred != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
+    // check hated
+    if ((ch->mobdata->hated != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
       send_to_char("You're hating.\r\n", ch);
       Character *next_blah;
@@ -281,7 +281,7 @@ void mobile_activity(void)
         if (!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
-        if (isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
+        if (isname(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
         {
           if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
           {
@@ -311,22 +311,22 @@ void mobile_activity(void)
 
       if (!ISSET(ch->mobdata->actflags, ACT_STUPID))
       {
-        if (GET_POS(ch) > POSITION_SITTING)
+        if (GET_POS(ch) > position_t::SITTING)
         {
-          if (!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting)
+          if (!IS_AFFECTED(ch, AFF_BLIND) && !ch->hunting.isEmpty())
           {
-            retval = do_track(ch, ch->hunting, CMD_DEFAULT);
+            retval = ch->do_track(QString(ch->hunting).split(' '));
             if (SOMEONE_DIED(retval))
               continue;
           }
         }
-        else if (GET_POS(ch) < POSITION_FIGHTING)
+        else if (GET_POS(ch) < position_t::FIGHTING)
         {
           do_stand(ch, "", CMD_DEFAULT);
           continue;
         }
       }
-    } //  end FIRST hatred IF statement
+    } //  end FIRST hated IF statement
 
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
@@ -396,9 +396,9 @@ void mobile_activity(void)
 
     if (!ch->fighting)
       if (ch->mobdata->fears)
-        if (get_char_room_vis(ch, ch->mobdata->fears))
+        if (ch->get_char_room_vis(ch->mobdata->fears))
         {
-          if (ch->mobdata->hatred != nullptr)
+          if (ch->mobdata->hated != nullptr)
             remove_memory(ch, 'h');
           act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
           do_flee(ch, "", 0);
@@ -421,7 +421,7 @@ void mobile_activity(void)
           tmp_bitv = GET_BITV(tmp_ch);
 
           if (ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
-              (!ch->mobdata->hatred || !isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) &&
+              (ch->mobdata->hated.isEmpty() || !isname(GET_NAME(tmp_ch), ch->mobdata->hated)) &&
               tmp_ch->fighting &&
               CAN_SEE(ch, tmp_ch) &&
               (DC::isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
@@ -965,8 +965,8 @@ void clear_hunt(varg_t arg1, Character *arg2, void *arg3)
   {
     if (curr == arg2)
     {
-      dc_free(arg1.hunting);
-      arg2->hunting = nullptr;
+      arg2->hunting.clear();
+      break;
     }
   }
 }

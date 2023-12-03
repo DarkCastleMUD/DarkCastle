@@ -46,7 +46,7 @@ public:
 
   TokenList(const char *);
   ~TokenList();
-  string Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags);
+  std::string Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags);
 
 private:
   //--
@@ -65,7 +65,7 @@ private:
   //--
   Token *head;    // Head of the list
   Token *current; // Current token
-  string interp;  // Interpreted tokens
+  std::string interp;  // Interpreted tokens
 
 };     // end of TokenList class
 #endif /* TOKEN_H_ */

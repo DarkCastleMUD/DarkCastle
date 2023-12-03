@@ -28,7 +28,6 @@ extern "C"
 #include "const.h"
 // Externs
 
-
 // Locals
 class Path *mPathList = nullptr;
 
@@ -97,7 +96,7 @@ char *Path::determineRoute(Character *ch, int from, int to)
 
 void Path::resetPath()
 {
-  for (map<int, int>::iterator iter = begin(); iter != end(); iter++)
+  for (std::map<int, int>::iterator iter = begin(); iter != end(); iter++)
     (*iter).second = 1000;
 }
 
@@ -283,7 +282,7 @@ int do_listPathsByZone(Character *ch, char *argument, int cmd)
   class Path *p;
   bool found = false;
   for (p = mPathList; p; p = p->next)
-    for (map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
+    for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       if ((*iter).first >= low && (*iter).first <= high)
       {
         csendf(ch, "Path '%s' connects to this zone.\r\n", p->name);
@@ -480,7 +479,7 @@ int do_pathpath(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int find_closest_path(int from, int steps, char *buf, map<int, int> z)
+int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
 {
   if (steps > 5)
     return 0;
@@ -516,7 +515,7 @@ int Path::connectRoom(class Path *z)
 {
   struct path_data *pa;
 
-  for (map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
+  for (std::map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
     for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;
@@ -536,7 +535,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   }
   else
   {
-    map<int, int> z;
+    std::map<int, int> z;
     from = find_closest_path(from, 1, &buf[0], z);
     if (from && DC::getInstance()->world[from].paths)
       csendf(ch, "Starting from path %s.\r\n", DC::getInstance()->world[from].paths->p->name);
@@ -549,7 +548,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   }
   else
   {
-    map<int, int> z;
+    std::map<int, int> z;
     to = find_closest_path(to, 1, &buf[0], z);
     if (to && DC::getInstance()->world[to].paths)
       csendf(ch, "Ending in path %s.\r\n", DC::getInstance()->world[to].paths->p->name);
@@ -602,7 +601,7 @@ int do_findpath(Character *ch, char *argument, int cmd)
 {
   Path *p;
   for (p = mPathList; p; p = p->next)
-    for (map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
+    for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       csendf(ch, "Hmm: %d\r\n", (*iter).first);
   return eSUCCESS;
   /*  argument = one_argument(argument, arg1);
@@ -621,7 +620,7 @@ void save_paths()
   for (p = mPathList; p; p = p->next)
   {
     // Save pathname
-    for (map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
+    for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       ; // Save room #, iter.first()
   }
 }

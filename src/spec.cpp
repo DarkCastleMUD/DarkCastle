@@ -84,7 +84,7 @@ int do_spec(Character *ch, char *argument, int cmd)
     }
     for (int i = 0; i < 10; i++)
     { // Free up skills tied to the specilization.
-      queue<skill_t> skills_to_delete = {};
+      std::queue<skill_t> skills_to_delete = {};
       for (const auto &curr : ch->skills)
       {
         if (curr.first == spec_list[ch->spec].skills[i])

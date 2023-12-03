@@ -40,14 +40,14 @@ namespace Combinables {
     int size(void);
     int find(recipe);
   private:
-    static map<recipe, int32_t> recipes;
+    static std::map<recipe, int32_t> recipes;
     struct loadError {};
     static const char RECIPES_FILENAME[];
     static bool initialized;
   };
 
   const char Brew::RECIPES_FILENAME[] = "brewables.dat";
-  map<Brew::recipe, int> Brew::recipes;
+  std::map<Brew::recipe, int> Brew::recipes;
   bool Brew::initialized = false;
 
   // I feel just wrong doing this, but it's the easiest way at the moment
@@ -94,14 +94,14 @@ namespace Combinables {
     int size(void);
     int find(recipe);
   private:
-    static map<recipe, int32_t> recipes;
+    static std::map<recipe, int32_t> recipes;
     struct loadError {};
     static const char RECIPES_FILENAME[];
     static bool initialized;
   };
 
   const char Scribe::RECIPES_FILENAME[] = "scribe.dat";
-  map<Scribe::recipe, int> Scribe::recipes;
+  std::map<Scribe::recipe, int> Scribe::recipes;
   bool Scribe::initialized = false;
 }
 

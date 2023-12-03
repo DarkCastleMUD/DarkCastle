@@ -146,7 +146,7 @@ struct RESERVATION_DATA
   std::map<std::string, BOARD_INFO>::iterator board;
 };
 
-// map to hold callback information for writing
+// std::map to hold callback information for writing
 std::map<Character *, RESERVATION_DATA *> wait_for_write;
 
 /*
@@ -687,7 +687,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
 This function acts as a callback from edit_new
 function call new_add_string()
 It notifies us when the user is done writing the post
-and we can copy the string to the board
+and we can copy the std::string to the board
 */
 void new_edit_board_unlock_board(Character *ch, int abort)
 {
@@ -713,7 +713,7 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   delete reserve;
 }
 
-void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO>::iterator board)
+void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   char buf[MAX_STRING_LENGTH];
   time_t timep; // clock time
@@ -860,13 +860,13 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   return eSUCCESS;
 }
 
-string remove_slashr(string unformatted)
+std::string remove_slashr(std::string unformatted)
 {
   if (unformatted.empty())
     return "";
 
-  string write_me = unformatted;
-  string::iterator slashr;
+  std::string write_me = unformatted;
+  std::string::iterator slashr;
 
   for (slashr = write_me.end(); slashr != write_me.begin(); slashr--)
     if (*slashr == '\r')
@@ -877,11 +877,11 @@ string remove_slashr(string unformatted)
   return write_me;
 }
 
-void board_save_board(std::map<string, BOARD_INFO>::iterator board)
+void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
 {
 
   FILE *the_file;
-  string write_me;
+  std::string write_me;
   unsigned int ind;
 
   the_file = fopen(board->second.save_file.c_str(), "w");
@@ -912,10 +912,10 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board)
   return;
 }
 
-string check_returns(string in_str)
+std::string check_returns(std::string in_str)
 {
-  string check_me = in_str;
-  string::iterator checker;
+  std::string check_me = in_str;
+  std::string::iterator checker;
   for (checker = check_me.begin(); checker != check_me.end(); checker++)
     if (*checker == '\n')
     {

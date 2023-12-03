@@ -32,8 +32,6 @@ extern "C"
 #include <string.h>
 }
 
-using namespace std;
-
 #include <sys/types.h>
 #include <cstdio>
 #include <cstdlib>
@@ -151,7 +149,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
-          victim->name, mob_index[victim->mobdata->nr].virt);
+          victim->getNameC(), mob_index[victim->mobdata->nr].virt);
   send_to_char(buf, ch);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -174,7 +172,7 @@ void mpstat(Character *ch, Character *victim)
     send_to_char("$R ", ch);
     sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
     send_to_char(buf, ch);
-    ch->sendRaw(string(mprg->comlist) + "\r\n");
+    ch->sendRaw(std::string(mprg->comlist) + "\r\n");
   }
 }
 
@@ -238,7 +236,7 @@ int do_mpkill(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
+  if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     prog_error(ch, "MpKill - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -256,7 +254,7 @@ int do_mpkill(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (ch->position == POSITION_FIGHTING)
+  if (ch->isFighting())
   {
     prog_error(ch, "MpKill - Already fighting");
     return eFAILURE | eINTERNAL_ERROR;
@@ -284,13 +282,13 @@ int do_mphit(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
+  if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     prog_error(ch, "MpHit - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (GET_POS(victim) == POSITION_DEAD)
+  if (GET_POS(victim) == position_t::DEAD)
   {
     prog_error(ch, "MpHit - Victim already dead.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -332,7 +330,7 @@ int do_mpaddlag(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
+  if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     prog_error(ch, "MpAddlag - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -684,7 +682,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+    // logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -930,7 +928,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
       if (d->connected == Connection::states::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {
         char buf[MAX_STRING_LENGTH];
-        sprintf(buf, "%s %s", d->character->name, arg2);
+        sprintf(buf, "%s %s", d->character->getNameC(), arg2);
         do_mptransfer(ch, buf, cmd);
       }
     }
@@ -1026,7 +1024,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
   {
     Character *victim;
 
-    if ((victim = get_char_room_vis(ch, arg)) == nullptr)
+    if ((victim = ch->get_char_room_vis(arg)) == nullptr)
     {
       prog_error(ch, "Mpforce - No such victim.");
       return eFAILURE | eINTERNAL_ERROR;
@@ -1045,7 +1043,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
       else
       {
         prog_error(ch, "Tried to MOBProg force %s to '%s'.",
-                   GET_NAME(victim), argument);
+                   victim->getNameC(), argument);
       }
     }
   }
@@ -1169,16 +1167,16 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
 
   const char *skillname = get_skill_name(skillnum);
 
-  if (has_skill(victim, skillnum))
+  if (victim->has_skill(skillnum))
   {
     csendf(victim, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
     return eFAILURE;
   }
 
-  class_skill_defines *skilllist = get_skill_list(victim);
+  class_skill_defines *skilllist = victim->get_skill_list();
   if (!skilllist)
   {
-    prog_error(ch, "Mpteachskill - %s had no skill list?", GET_NAME(victim));
+    prog_error(ch, "Mpteachskill - %s had no skill list?", victim->getNameC());
     return eFAILURE; // no skills to train
   }
 
@@ -1493,7 +1491,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
       }
       else if (!str_cmp(temp, "move"))
       {
-        data = &GET_MOVE(victim);
+        data = victim->getMovePtr();
       }
       else
       {
@@ -1563,7 +1561,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
       else if (!str_cmp(temp, "ki"))
         data = &GET_KI(victim);
       else if (!str_cmp(temp, "move"))
-        data = &GET_MOVE(victim);
+        data = victim->getMovePtr();
       else
       {
         prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
@@ -1793,7 +1791,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
   char second[MAX_INPUT_LENGTH];
 
   argument = one_argument(argument, first);
-  if (string(first) == "all")
+  if (std::string(first) == "all")
   {
     argument = one_argument(argument, second);
 
@@ -1966,7 +1964,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
       prog_error(ch, "Mppeace - Vict not found.");
       return eFAILURE;
     }
-    if (IS_MOB(vict) && vict->mobdata->hatred != nullptr)
+    if (IS_MOB(vict) && vict->mobdata->hated != nullptr)
       remove_memory(vict, 'h');
     if (vict->fighting != nullptr)
       stop_fighting(vict);
@@ -1974,7 +1972,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
   }
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
+    if (IS_MOB(rch) && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);

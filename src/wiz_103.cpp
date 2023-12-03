@@ -78,7 +78,7 @@ int do_boot(Character *ch, char *arg, int cmd)
         "by $N.",
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
-    sprintf(name, "%s has booted %s.", GET_NAME(ch), GET_NAME(victim));
+    sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
     logentry(name, ch->getLevel(), LogChannels::LOG_GOD);
 
     if (!strcmp(type, "boot"))
@@ -201,17 +201,17 @@ int do_disconnect(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fsave(Character *ch, string argument, int cmd)
+int do_fsave(Character *ch, std::string argument, int cmd)
 {
   Character *vict = {};
-  string name = {}, buf = {};
+  std::string name = {}, buf = {};
 
   if (IS_NPC(ch))
   {
     return eFAILURE;
   }
 
-  tie(name, argument) = half_chop(argument);
+  std::tie(name, argument) = half_chop(argument);
   if (name.empty())
   {
     send_to_char("Who do you wish to force to save?\r\n", ch);
@@ -301,7 +301,7 @@ int do_peace(Character *ch, char *argument, int cmd)
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
+    if (IS_MOB(rch) && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);

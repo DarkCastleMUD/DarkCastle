@@ -34,7 +34,7 @@ extern "C"
 #include <algorithm>
 #include <fmt/format.h>
 
-using namespace std;
+
 
 extern Object *object_list;
 
@@ -180,7 +180,7 @@ void nextturn(struct table_data *tbl)
    }
 }
 
-void send_to_table(const string msg, struct table_data *tbl, struct player_data *plrSilent = nullptr)
+void send_to_table(QString msg, struct table_data *tbl, struct player_data *plrSilent = nullptr)
 {
    //  struct player_data *plr;
    /*  for (plr = tbl->plr ; plr ; plr = plr->next)
@@ -188,7 +188,9 @@ void send_to_table(const string msg, struct table_data *tbl, struct player_data 
         send_to_char(msg,plr->ch);
      */
    if (tbl->obj->in_room)
+   {
       send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
+   }
 }
 
 bool charExists(Character *ch)
@@ -224,9 +226,9 @@ bool verify(struct player_data *plr)
    {
       if (result != character_list.end())
       {
-         string buf;
+         std::string buf;
          buf = fmt::format("{} folds as {} leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
-         send_to_table(buf, plr->table);
+         send_to_table(buf.c_str(), plr->table);
          send_to_char("Your hand is folded as you leave the room.\r\n", plr->ch);
       }
       free_player(plr);
@@ -767,7 +769,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
 
 void check_blackjacks(struct table_data *tbl)
 {
-   string buf;
+   std::string buf;
    struct player_data *plr, *next;
    if (hand_strength(tbl) == 21)
    {
@@ -793,7 +795,7 @@ void check_blackjacks(struct table_data *tbl)
           hand_strength(tbl) != 21)
       {
          buf = fmt::format("{} blackjacks!\r\n", GET_NAME(plr->ch));
-         send_to_table(buf, tbl, plr);
+         send_to_table(buf.c_str(), tbl, plr);
          send_to_char("$BYou BLACKJACK!$R\r\n", plr->ch);
          buf = fmt::format("The dealer gives you {} {} coins.\r\n", (int)(plr->bet * 2.5), plr->table->gold ? "gold" : "platinum");
 
@@ -1050,7 +1052,7 @@ int hand_number(struct player_data *plr)
    }
    return i;
 }
-void blackjack_prompt(Character *ch, string &prompt, bool ascii)
+void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
 {
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)

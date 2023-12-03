@@ -6,7 +6,7 @@
 
 #include <map>
 #include "character.h"
-using namespace std;
+
 
 /*			 PATHFINDING 				*/
 /*			 PATHFINDING 				*/
@@ -18,7 +18,7 @@ struct path_data
   int num;
 };
 
-class Path : public map<int, int>
+class Path : public std::map<int, int>
 {
 private:
   bool findRoom(int from, int to, int steps, int leaststeps, char *buf);

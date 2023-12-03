@@ -417,7 +417,7 @@ void load_corpses(void)
 				temp->obj_flags.wear_flags = t[1];
 				temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
 				temp->obj_flags.cost = t[3];
-				size_t alloc_num_affects = max(0, t[4]);
+				size_t alloc_num_affects = std::max(0, t[4]);
 
 				temp->affected = (obj_affected_type *)calloc(alloc_num_affects, sizeof(obj_affected_type));
 
@@ -616,7 +616,7 @@ char *fread_string_new(FILE *fl, char *error)
 					error);
 			exit(1);
 		}
-		/* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
+		/* If there is a '~', end the std::string; else put an "\r\n" over the '\n'. */
 		if ((point = strchr(tmp, '~')) != nullptr)
 		{
 			*point = '\0';
@@ -634,7 +634,7 @@ char *fread_string_new(FILE *fl, char *error)
 
 		if (length + templength >= MAX_STRING_LENGTH)
 		{
-			perror("SYSERR: fread_string_new: string too large (db.c)");
+			perror("SYSERR: fread_string_new: std::string too large (db.c)");
 			perror(error);
 			exit(1);
 		}
@@ -645,7 +645,7 @@ char *fread_string_new(FILE *fl, char *error)
 		}
 	} while (!done);
 
-	/* allocate space for the new string and copy it */
+	/* allocate space for the new std::string and copy it */
 	if (strlen(buf) > 0)
 	{
 		CREATE(rslt, char, length + 1);

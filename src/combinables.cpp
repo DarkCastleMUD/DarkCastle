@@ -32,7 +32,6 @@
 #include "const.h"
 #include "guild.h"
 
-using namespace std;
 using namespace Combinables;
 
 extern struct index_data *obj_index;
@@ -124,7 +123,7 @@ struct thief_poison_data poison_vial_combat_data[] =
 
 int do_poisonmaking(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_TRADE_POISON);
+  int learned = ch->has_skill(SKILL_TRADE_POISON);
 
   if (ch->getLevel() > IMMORTAL)
     learned = 500;
@@ -283,7 +282,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
     return -2;
   }
 
-  vector<int> current;
+  std::vector<int> current;
 
   // take all the items in our container and put them in an array by vnum
   for (Object *j = container->contains; j; j = j->next_content)
@@ -294,7 +293,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 
   sort(current.begin(), current.end());
 
-  vector<int> valid;
+  std::vector<int> valid;
 
   // loop through the valid combinations, and try to find a match
   for (int i = 0; data[i].result != -1; i++)
@@ -409,7 +408,7 @@ int do_brew(Character *ch, char *argument, int cmd)
   affected_type af;
   Brew b;
 
-  int learned = has_skill(ch, SKILL_BREW);
+  int learned = ch->has_skill(SKILL_BREW);
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
@@ -663,7 +662,7 @@ int do_brew(Character *ch, char *argument, int cmd)
     }
 
     // Put it all together into the new name
-    stringstream potionname, potionshort, potionlong;
+    std::stringstream potionname, potionshort, potionlong;
     potionname << "potion " << container_key << " " << liquid_key;
     potionshort << "a " << container_key << " " << liquid_key << " " << potion_color << " potion";
     potionlong << "a " << container_key << " " << liquid_key << " " << potion_color << " potion lies here.";
@@ -715,7 +714,7 @@ Brew::~Brew()
 
 void Brew::load(void)
 {
-  ifstream ifs(RECIPES_FILENAME, ios_base::in);
+  std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
     logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
@@ -739,7 +738,7 @@ void Brew::load(void)
       // Don't insert empty entries
       if (r.container && r.liquid && r.herb && spell)
       {
-        recipes.insert(make_pair(r, spell));
+        recipes.insert(std::make_pair(r, spell));
       }
     }
   }
@@ -751,7 +750,7 @@ void Brew::load(void)
 
 void Brew::save(void)
 {
-  ofstream ofs(RECIPES_FILENAME, ios_base::trunc);
+  std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
     logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
@@ -760,13 +759,13 @@ void Brew::save(void)
 
   try
   {
-    for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
+    for (std::map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
     {
-      pair<recipe, int> p = *iter;
+      std::pair<recipe, int> p = *iter;
       recipe r = p.first;
       int spell = p.second;
 
-      ofs << r.herb << " " << r.liquid << " " << r.container << " " << spell << endl;
+      ofs << r.herb << " " << r.liquid << " " << r.container << " " << spell << std::endl;
     }
   }
   catch (...)
@@ -786,7 +785,7 @@ void Brew::list(Character *ch)
   }
 
   send_to_char("[# ] [herb #] [liquid] [container] Spell Name\n\r\n\r", ch);
-  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
@@ -853,7 +852,7 @@ int Brew::add(Character *ch, char *argument)
   }
 
   recipe r = {herb_vnum, liquid_type, container_vnum};
-  recipes.insert(make_pair(r, spell));
+  recipes.insert(std::make_pair(r, spell));
 
   send_to_char("New brew recipe added.\r\n", ch);
 
@@ -876,7 +875,7 @@ int Brew::remove(Character *ch, char *argument)
   int i = 0;
   int target = atoi(argument);
 
-  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     if (++i == target)
     {
@@ -900,7 +899,7 @@ int Brew::find(Brew::recipe r)
 {
   int spell = 0;
 
-  map<recipe, int>::iterator result = recipes.find(r);
+  std::map<recipe, int>::iterator result = recipes.find(r);
   if (result != recipes.end())
   {
     spell = result->second;
@@ -916,7 +915,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
   affected_type af;
   Scribe s;
 
-  int learned = has_skill(ch, SKILL_SCRIBE);
+  int learned = ch->has_skill(SKILL_SCRIBE);
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
@@ -1141,7 +1140,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     args = one_argument(args, paper_key);
 
     // Put it all together into the new name
-    stringstream scrollname, scrollshort, scrolllong;
+    std::stringstream scrollname, scrollshort, scrolllong;
     scrollname << "scroll " << paper_key << " " << dust_key << " " << pen_key << " " << ink_key;
     scrollshort << "a " << paper_key << " $B" << dust_key << "$R scroll " << pen_key << " in " << ink_key << " ink";
     scrolllong << "a " << paper_key << " " << dust_key << " scroll " << pen_key << " in " << ink_key << "ink lies here";
@@ -1180,7 +1179,7 @@ Scribe::~Scribe()
 
 void Scribe::load(void)
 {
-  ifstream ifs(RECIPES_FILENAME, ios_base::in);
+  std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
     logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
@@ -1205,7 +1204,7 @@ void Scribe::load(void)
       // Don't insert empty entries
       if (r.ink && r.dust && r.pen && r.paper && spell)
       {
-        recipes.insert(make_pair(r, spell));
+        recipes.insert(std::make_pair(r, spell));
       }
     }
   }
@@ -1217,7 +1216,7 @@ void Scribe::load(void)
 
 void Scribe::save(void)
 {
-  ofstream ofs(RECIPES_FILENAME, ios_base::trunc);
+  std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
     logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
@@ -1226,13 +1225,13 @@ void Scribe::save(void)
 
   try
   {
-    for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
+    for (std::map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter)
     {
-      pair<recipe, int> p = *iter;
+      std::pair<recipe, int> p = *iter;
       recipe r = p.first;
       int spell = p.second;
 
-      ofs << r.ink << " " << r.dust << " " << r.pen << " " << r.paper << " " << spell << endl;
+      ofs << r.ink << " " << r.dust << " " << r.pen << " " << r.paper << " " << spell << std::endl;
     }
   }
   catch (...)
@@ -1252,7 +1251,7 @@ void Scribe::list(Character *ch)
   }
 
   send_to_char("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n\r\n\r", ch);
-  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
@@ -1320,7 +1319,7 @@ int Scribe::add(Character *ch, char *argument)
   }
 
   recipe r = {ink_vnum, dust_vnum, pen_vnum, paper_vnum};
-  recipes.insert(make_pair(r, spell));
+  recipes.insert(std::make_pair(r, spell));
 
   send_to_char("New scribe recipe added.\r\n", ch);
 
@@ -1343,7 +1342,7 @@ int Scribe::remove(Character *ch, char *argument)
   int i = 0;
   int target = atoi(argument);
 
-  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
+  for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     if (++i == target)
     {
@@ -1367,7 +1366,7 @@ int Scribe::find(Scribe::recipe r)
 {
   int spell = 0;
 
-  map<recipe, int>::iterator result = recipes.find(r);
+  std::map<recipe, int>::iterator result = recipes.find(r);
   if (result != recipes.end())
   {
     spell = result->second;

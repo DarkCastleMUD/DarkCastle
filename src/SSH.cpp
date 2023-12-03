@@ -9,7 +9,7 @@
 namespace SSH
 {
 
-  using namespace std;
+  
 
   SSH::SSH(QObject *parent) : QObject(parent)
   {

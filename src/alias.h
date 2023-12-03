@@ -9,7 +9,7 @@
 struct char_player_alias
 {
     char *keyword;                   /* Keyword for aliases   */
-    char *command;                   /* Actual command string */
+    char *command;                   /* Actual command std::string */
     struct char_player_alias * next; // Next alias
 };
 

@@ -15,7 +15,7 @@
 #include "game_portal.h"
 #include "const.h"
 
-using namespace std;
+
 
 int get_number(char **name);
 
@@ -24,7 +24,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   //  try
   // {
   char buf[MAX_STRING_LENGTH];
-  string output = "";
+  std::string output = "";
   struct room_direction_data *curExits;
   int curZone = GET_ZONE(ch);
   int curRoom = ch->in_room;
@@ -165,7 +165,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
   class Object *k;
   int j, nIndex = 0;
 
-  if (!has_skill(ch, COMMAND_PURLOIN))
+  if (!ch->has_skill( COMMAND_PURLOIN))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -173,7 +173,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
 
   one_argument(argument, bufName);
 
-  // if the string is nullptr, return.  Else assign pBuf to point to it.
+  // if the std::string is nullptr, return.  Else assign pBuf to point to it.
   if (*(pBuf = bufName) == '\0')
   {
     send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
@@ -298,7 +298,7 @@ int do_set(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!has_skill(ch, COMMAND_SET))
+  if (!ch->has_skill( COMMAND_SET))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;

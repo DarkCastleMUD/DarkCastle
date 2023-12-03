@@ -62,8 +62,8 @@ int do_report(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && argument != nullptr)
   {
-    string arg1, remainder_args;
-    tie(arg1, remainder_args) = half_chop(string(argument));
+    std::string arg1, remainder_args;
+    std::tie(arg1, remainder_args) = half_chop(std::string(argument));
     if (arg1 == "help")
     {
       csendf(ch, "report       - Reports hps, mana, moves and ki. (default)\n\r");
@@ -223,7 +223,7 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
       continue;
     if (!i->connected && i->character->getLevel() >= god_level)
     {
-      if (IS_MOB(i->character) || DC::isSet(i->character->player->toggles, Player::PLR_ANSI))
+      if (i->character->isNPC() || DC::isSet(i->character->player->toggles, Player::PLR_ANSI))
         send_to_char(buf1, i->character);
       else
         send_to_char(buf, i->character);
@@ -374,7 +374,7 @@ int do_channel(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_ignore(Character *ch, string args, int cmd)
+command_return_t do_ignore(Character *ch, std::string args, int cmd)
 {
   if (ch == nullptr)
   {
@@ -395,8 +395,8 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
       return eSUCCESS;
     }
 
-    // convert ignoring map into "char1 char2 char3" format
-    string ignoreString = {};
+    // convert ignoring std::map into "char1 char2 char3" format
+    std::string ignoreString = {};
     for (const auto &ignore : ch->player->ignoring)
     {
       if (ignore.second.ignore)
@@ -416,8 +416,8 @@ command_return_t do_ignore(Character *ch, string args, int cmd)
     return eSUCCESS;
   }
 
-  string arg1 = {}, remainder_args = {};
-  tie(arg1, remainder_args) = half_chop(args);
+  std::string arg1 = {}, remainder_args = {};
+  std::tie(arg1, remainder_args) = half_chop(args);
   if (arg1.empty())
   {
     ch->send("Ignore who?\r\n");
@@ -457,9 +457,9 @@ int is_ignoring(const Character *const ch, const Character *const i)
 
   // Since it didn't match the whole name, see if it matches one of
   // the name keywords used for a mob name
-  string names = GET_NAME(i);
-  string name1 = {}, remainder_names = {};
-  tie(name1, remainder_names) = half_chop(names);
+  std::string names = GET_NAME(i);
+  std::string name1 = {}, remainder_names = {};
+  std::tie(name1, remainder_names) = half_chop(names);
   while (name1.empty() == false)
   {
     if (ch->player->ignoring.contains(name1))
@@ -467,7 +467,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
       return true;
     }
 
-    tie(name1, remainder_names) = half_chop(remainder_names);
+    std::tie(name1, remainder_names) = half_chop(remainder_names);
   }
 
   return false;
@@ -587,7 +587,7 @@ int do_insult(Character *ch, char *argument, int cmd)
 
   if (*arg)
   {
-    if (!(victim = get_char_room_vis(ch, arg)))
+    if (!(victim = ch->get_char_room_vis( arg)))
     {
       send_to_char("Can't hear you!\n\r", ch);
     }

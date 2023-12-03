@@ -78,369 +78,369 @@ int say_spell(Character *ch, int si, int room = 0);
 extern struct index_data *mob_index;
 
 #if (0)
-uint8_t beats;            /* Waiting time after spell     */
-uint8_t minimum_position; /* Position for caster          */
-uint8_t min_usesmana;     /* Mana used                    */
-int16_t targets;          /* Legal targets                */
-SPELL_FUN *spell_pointer; /* Function to call             */
+uint8_t beats;               /* Waiting time after spell     */
+position_t minimum_position; /* Position for caster          */
+uint8_t min_usesmana;        /* Mana used                    */
+int16_t targets;             /* Legal targets                */
+SPELL_FUN *spell_pointer;    /* Function to call             */
 int16_t difficulty;
 #endif
 
 struct spell_info_type spell_info[] =
     {
-        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, 0, 0, 0, 0},
+        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, 0},
 
-        {/* 01 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_armor, SKILL_INCREASE_MEDIUM},
+        {/* 01 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_armor, SKILL_INCREASE_MEDIUM},
 
-        {/* 02 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 35, TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_teleport, SKILL_INCREASE_HARD},
+        {/* 02 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 35, TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_teleport, SKILL_INCREASE_HARD},
 
-        {/* 03 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 6, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, cast_bless, SKILL_INCREASE_MEDIUM},
+        {/* 03 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 6, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, cast_bless, SKILL_INCREASE_MEDIUM},
 
-        {/* 04 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blindness, SKILL_INCREASE_HARD},
+        {/* 04 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blindness, SKILL_INCREASE_HARD},
 
-        {/* 05 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_burning_hands, SKILL_INCREASE_MEDIUM},
+        {/* 05 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_burning_hands, SKILL_INCREASE_MEDIUM},
 
-        {/* 06 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_iridescent_aura, SKILL_INCREASE_MEDIUM},
+        {/* 06 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_iridescent_aura, SKILL_INCREASE_MEDIUM},
 
-        {/* 07 */ /* 18, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, 0, 0, 0, 0, 0},
+        {/* 07 */ /* 18, position_t::STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 08 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_chill_touch, SKILL_INCREASE_HARD},
+        {/* 08 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_chill_touch, SKILL_INCREASE_HARD},
 
-        {/* 09 */ /* 3*DC::PULSE_TIMER, POSITION_STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, 0, 0, 0, 0, 0},
+        {/* 09 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 10 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD},
+        {/* 10 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD},
 
-        {/* 11 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM},
+        {/* 11 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM},
 
-        {/* 12 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM},
+        {/* 12 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM},
 
-        {/* 13 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 5, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM},
+        {/* 13 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 5, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM},
 
-        {/* 14 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM},
+        {/* 14 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM},
 
-        {/* 15 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_critic, SKILL_INCREASE_MEDIUM},
+        {/* 15 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_critic, SKILL_INCREASE_MEDIUM},
 
-        {/* 16 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_light, SKILL_INCREASE_EASY},
+        {/* 16 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_light, SKILL_INCREASE_EASY},
 
-        {/* 17 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_curse, SKILL_INCREASE_HARD},
+        {/* 17 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_curse, SKILL_INCREASE_HARD},
 
-        {/* 18 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_evil, SKILL_INCREASE_EASY},
+        {/* 18 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_evil, SKILL_INCREASE_EASY},
 
-        {/* 19 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_invisibility, SKILL_INCREASE_MEDIUM},
+        {/* 19 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_invisibility, SKILL_INCREASE_MEDIUM},
 
-        {/* 20 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 6, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_magic, SKILL_INCREASE_EASY},
+        {/* 20 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 6, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_magic, SKILL_INCREASE_EASY},
 
-        {/* 21 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_detect_poison, SKILL_INCREASE_EASY},
+        {/* 21 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_detect_poison, SKILL_INCREASE_EASY},
 
-        {/* 22 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_ROOM, cast_dispel_evil, SKILL_INCREASE_MEDIUM},
+        {/* 22 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_ROOM, cast_dispel_evil, SKILL_INCREASE_MEDIUM},
 
-        {/* 23 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 25, TAR_IGNORE, cast_earthquake, SKILL_INCREASE_HARD},
+        {/* 23 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 25, TAR_IGNORE, cast_earthquake, SKILL_INCREASE_HARD},
 
-        {/* 24 */ 6 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_enchant_weapon, SKILL_INCREASE_MEDIUM},
+        {/* 24 */ 6 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_OBJ_INV | TAR_OBJ_EQUIP, cast_enchant_weapon, SKILL_INCREASE_MEDIUM},
 
-        {/* 25 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_energy_drain, SKILL_INCREASE_HARD},
+        {/* 25 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_energy_drain, SKILL_INCREASE_HARD},
 
-        {/* 26 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 25, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_fireball, SKILL_INCREASE_HARD},
+        {/* 26 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 25, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_fireball, SKILL_INCREASE_HARD},
 
-        {/* 27 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_harm, SKILL_INCREASE_HARD},
+        {/* 27 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_harm, SKILL_INCREASE_HARD},
 
-        {/* 28 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_heal, SKILL_INCREASE_HARD},
+        {/* 28 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_heal, SKILL_INCREASE_HARD},
 
-        {/* 29 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 7, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP | TAR_SELF_DEFAULT, cast_invisibility, SKILL_INCREASE_MEDIUM},
+        {/* 29 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 7, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP | TAR_SELF_DEFAULT, cast_invisibility, SKILL_INCREASE_MEDIUM},
 
-        {/* 30 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 17, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_lightning_bolt, SKILL_INCREASE_HARD},
+        {/* 30 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 17, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_lightning_bolt, SKILL_INCREASE_HARD},
 
-        {/* 31 */ 0, POSITION_STANDING, 20, TAR_IGNORE, cast_locate_object, SKILL_INCREASE_HARD},
+        {/* 31 */ 0, position_t::STANDING, 20, TAR_IGNORE, cast_locate_object, SKILL_INCREASE_HARD},
 
-        {/* 32 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_magic_missile, SKILL_INCREASE_MEDIUM},
+        {/* 32 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_magic_missile, SKILL_INCREASE_MEDIUM},
 
-        {/* 33 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_poison, SKILL_INCREASE_HARD},
+        {/* 33 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_poison, SKILL_INCREASE_HARD},
 
-        {/* 34 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_protection_from_evil, SKILL_INCREASE_MEDIUM},
+        {/* 34 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_protection_from_evil, SKILL_INCREASE_MEDIUM},
 
-        {/* 35 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM},
+        {/* 35 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM},
 
-        {/* 36 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 60, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_sanctuary, SKILL_INCREASE_HARD},
+        {/* 36 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 60, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_sanctuary, SKILL_INCREASE_HARD},
 
-        {/* 37 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_shocking_grasp, SKILL_INCREASE_MEDIUM},
+        {/* 37 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_shocking_grasp, SKILL_INCREASE_MEDIUM},
 
-        {/* 38 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD},
+        {/* 38 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD},
 
-        {/* 39 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_strength, SKILL_INCREASE_MEDIUM},
+        {/* 39 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_strength, SKILL_INCREASE_MEDIUM},
 
-        {/* 40 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 50, TAR_CHAR_WORLD | TAR_SELF_NONO, cast_summon, SKILL_INCREASE_HARD},
+        {/* 40 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 50, TAR_CHAR_WORLD | TAR_SELF_NONO, cast_summon, SKILL_INCREASE_HARD},
 
-        {/* 41 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 5, TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY},
+        {/* 41 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 5, TAR_CHAR_ROOM | TAR_OBJ_ROOM | TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY},
 
-        {/* 42 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM},
+        {/* 42 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM},
 
-        {/* 43 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM},
+        {/* 43 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM},
 
-        {/* 44 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY},
+        {/* 44 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY},
 
-        {/* 45 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM},
+        {/* 45 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM},
 
-        {/* 46 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 30, TAR_IGNORE, cast_lighted_path, SKILL_INCREASE_HARD},
+        {/* 46 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_IGNORE, cast_lighted_path, SKILL_INCREASE_HARD},
 
-        {/* 47 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_acid, SKILL_INCREASE_HARD},
+        {/* 47 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_acid, SKILL_INCREASE_HARD},
 
-        {/* 48 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 35, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sun_ray, SKILL_INCREASE_HARD},
+        {/* 48 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 35, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sun_ray, SKILL_INCREASE_HARD},
 
-        {/* 49 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_rapid_mend, SKILL_INCREASE_HARD},
+        {/* 49 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_rapid_mend, SKILL_INCREASE_HARD},
 
-        {/* 50 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD},
+        {/* 50 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD},
 
-        {/* 51 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 22, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_water_breathing, SKILL_INCREASE_EASY},
+        {/* 51 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 22, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_water_breathing, SKILL_INCREASE_EASY},
 
-        {/* 52 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_IGNORE, cast_globe_of_darkness, SKILL_INCREASE_HARD},
+        {/* 52 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_IGNORE, cast_globe_of_darkness, SKILL_INCREASE_HARD},
 
-        {/* 53 */ 0, POSITION_STANDING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_identify, SKILL_INCREASE_EASY},
+        {/* 53 */ 0, position_t::STANDING, 12, TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_identify, SKILL_INCREASE_EASY},
 
-        {/* 54 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 75, TAR_OBJ_ROOM, cast_animate_dead, SKILL_INCREASE_MEDIUM},
+        {/* 54 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 75, TAR_OBJ_ROOM, cast_animate_dead, SKILL_INCREASE_MEDIUM},
 
-        {/* 55 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 17, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_fear, SKILL_INCREASE_HARD},
+        {/* 55 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 17, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_fear, SKILL_INCREASE_HARD},
 
-        {/* 56 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_fly, SKILL_INCREASE_MEDIUM},
+        {/* 56 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_fly, SKILL_INCREASE_MEDIUM},
 
-        {/* 57 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 7, TAR_NONE_OK | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_cont_light, SKILL_INCREASE_EASY},
+        {/* 57 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 7, TAR_NONE_OK | TAR_OBJ_INV | TAR_OBJ_ROOM, cast_cont_light, SKILL_INCREASE_EASY},
 
-        {/* 58 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_know_alignment, SKILL_INCREASE_EASY},
+        {/* 58 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_know_alignment, SKILL_INCREASE_EASY},
 
-        {/* 59 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 30, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD},
+        {/* 59 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 30, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD},
 
-        {/* 60 */ 6 * DC::PULSE_TIMER, POSITION_STANDING, 150, TAR_IGNORE, cast_conjure_elemental, SKILL_INCREASE_MEDIUM},
+        {/* 60 */ 6 * DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_conjure_elemental, SKILL_INCREASE_MEDIUM},
 
-        {/* 61 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_serious, SKILL_INCREASE_EASY},
+        {/* 61 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_cure_serious, SKILL_INCREASE_EASY},
 
-        {/* 62 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 12, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_light, SKILL_INCREASE_EASY},
+        {/* 62 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 12, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_light, SKILL_INCREASE_EASY},
 
-        {/* 63 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 24, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_critical, SKILL_INCREASE_MEDIUM},
+        {/* 63 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 24, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_critical, SKILL_INCREASE_MEDIUM},
 
-        {/* 64 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 18, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_serious, SKILL_INCREASE_EASY},
+        {/* 64 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 18, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_cause_serious, SKILL_INCREASE_EASY},
 
-        {/* 65 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_flamestrike, SKILL_INCREASE_HARD},
+        {/* 65 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_flamestrike, SKILL_INCREASE_HARD},
 
-        {/* 66 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_stone_skin, SKILL_INCREASE_HARD},
+        {/* 66 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_stone_skin, SKILL_INCREASE_HARD},
 
-        {/* 67 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_shield, SKILL_INCREASE_MEDIUM},
+        {/* 67 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_shield, SKILL_INCREASE_MEDIUM},
 
-        {/* 68 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT, cast_weaken, SKILL_INCREASE_HARD},
+        {/* 68 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT, cast_weaken, SKILL_INCREASE_HARD},
 
-        {/* 69 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM},
+        {/* 69 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM},
 
-        {/* 70 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_acid_blast, SKILL_INCREASE_HARD},
+        {/* 70 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_acid_blast, SKILL_INCREASE_HARD},
 
-        {/* 71 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 55, TAR_CHAR_WORLD, cast_portal, SKILL_INCREASE_HARD},
+        {/* 71 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 55, TAR_CHAR_WORLD, cast_portal, SKILL_INCREASE_HARD},
 
-        {/* 72 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 7, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_infravision, SKILL_INCREASE_EASY},
+        {/* 72 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 7, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_infravision, SKILL_INCREASE_EASY},
 
-        {/* 73 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_refresh, SKILL_INCREASE_EASY},
+        {/* 73 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_refresh, SKILL_INCREASE_EASY},
 
-        {/* 74 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_haste, SKILL_INCREASE_MEDIUM},
+        {/* 74 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_haste, SKILL_INCREASE_MEDIUM},
 
-        {/* 75 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_ROOM, cast_dispel_good, SKILL_INCREASE_MEDIUM},
+        {/* 75 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO | TAR_OBJ_ROOM, cast_dispel_good, SKILL_INCREASE_MEDIUM},
 
-        {/* 76 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 80, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_hellstream, SKILL_INCREASE_HARD},
+        {/* 76 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 80, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_hellstream, SKILL_INCREASE_HARD},
 
-        {/* 77 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 60, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_power_heal, SKILL_INCREASE_HARD},
+        {/* 77 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 60, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_power_heal, SKILL_INCREASE_HARD},
 
-        {/* 78 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_full_heal, SKILL_INCREASE_HARD},
+        {/* 78 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_full_heal, SKILL_INCREASE_HARD},
 
-        {/* 79 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 55, TAR_IGNORE, cast_firestorm, SKILL_INCREASE_HARD},
+        {/* 79 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 55, TAR_IGNORE, cast_firestorm, SKILL_INCREASE_HARD},
 
-        {/* 80 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_power_harm, SKILL_INCREASE_HARD},
+        {/* 80 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_power_harm, SKILL_INCREASE_HARD},
 
-        {/* 81 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_good, SKILL_INCREASE_EASY},
+        {/* 81 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_detect_good, SKILL_INCREASE_EASY},
 
-        {/* 82 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_vampiric_touch, SKILL_INCREASE_HARD},
+        {/* 82 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_vampiric_touch, SKILL_INCREASE_HARD},
 
-        {/* 83 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM},
+        {/* 83 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM},
 
-        {/* 84 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_paralyze, SKILL_INCREASE_HARD},
+        {/* 84 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_paralyze, SKILL_INCREASE_HARD},
 
-        {/* 85 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM},
+        {/* 85 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM},
 
-        {/* 86 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 160, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM},
+        {/* 86 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 160, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM},
 
-        {/* 87 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_meteor_swarm, SKILL_INCREASE_HARD},
+        {/* 87 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_meteor_swarm, SKILL_INCREASE_HARD},
 
-        {/* 88 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye, SKILL_INCREASE_HARD},
+        {/* 88 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye, SKILL_INCREASE_HARD},
 
-        {/* 89 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_true_sight, SKILL_INCREASE_HARD},
+        {/* 89 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_true_sight, SKILL_INCREASE_HARD},
 
-        {/* 90 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 0, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_mana, 0},
+        {/* 90 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 0, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_mana, 0},
 
-        {/* 91 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM},
+        {/* 91 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM},
 
-        {/* 92 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 30, TAR_IGNORE, cast_heroes_feast, SKILL_INCREASE_EASY},
+        {/* 92 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_IGNORE, cast_heroes_feast, SKILL_INCREASE_EASY},
 
-        {/* 93 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 100, TAR_IGNORE, cast_heal_spray, SKILL_INCREASE_MEDIUM},
+        {/* 93 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 100, TAR_IGNORE, cast_heal_spray, SKILL_INCREASE_MEDIUM},
 
-        {/* 94 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 180, TAR_IGNORE, cast_group_sanc, SKILL_INCREASE_HARD},
+        {/* 94 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 180, TAR_IGNORE, cast_group_sanc, SKILL_INCREASE_HARD},
 
-        {/* 95 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 80, TAR_IGNORE, cast_group_recall, SKILL_INCREASE_MEDIUM},
+        {/* 95 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 80, TAR_IGNORE, cast_group_recall, SKILL_INCREASE_MEDIUM},
 
-        {/* 96 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 40, TAR_IGNORE, cast_group_fly, SKILL_INCREASE_MEDIUM},
+        {/* 96 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 40, TAR_IGNORE, cast_group_fly, SKILL_INCREASE_MEDIUM},
 
-        {/* 97 */ /* 24, POSITION_STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, 0, 0, 0, 0, 0},
+        {/* 97 */ /* 24, position_t::STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 98 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_fire, SKILL_INCREASE_HARD},
+        {/* 98 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_fire, SKILL_INCREASE_HARD},
 
-        {/* 99 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_cold, SKILL_INCREASE_HARD},
+        {/* 99 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_cold, SKILL_INCREASE_HARD},
 
-        {/* 100 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 8, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_bee_sting, SKILL_INCREASE_MEDIUM},
+        {/* 100 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 8, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_bee_sting, SKILL_INCREASE_MEDIUM},
 
-        {/* 101 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 25, TAR_IGNORE, cast_bee_swarm, SKILL_INCREASE_HARD},
+        {/* 101 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 25, TAR_IGNORE, cast_bee_swarm, SKILL_INCREASE_HARD},
 
-        {/* 102 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_creeping_death, SKILL_INCREASE_HARD},
+        {/* 102 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_creeping_death, SKILL_INCREASE_HARD},
 
-        {/* 103 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_barkskin, SKILL_INCREASE_HARD},
+        {/* 103 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_barkskin, SKILL_INCREASE_HARD},
 
-        {/* 104 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_herb_lore, SKILL_INCREASE_HARD},
+        {/* 104 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_herb_lore, SKILL_INCREASE_HARD},
 
-        {/* 105 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 75, TAR_IGNORE, cast_call_follower, SKILL_INCREASE_MEDIUM},
+        {/* 105 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 75, TAR_IGNORE, cast_call_follower, SKILL_INCREASE_MEDIUM},
 
-        {/* 106 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_entangle, SKILL_INCREASE_HARD},
+        {/* 106 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_entangle, SKILL_INCREASE_HARD},
 
-        {/* 107 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_eyes_of_the_owl, SKILL_INCREASE_EASY},
+        {/* 107 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_eyes_of_the_owl, SKILL_INCREASE_EASY},
 
-        {/* 108 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_feline_agility, SKILL_INCREASE_MEDIUM},
+        {/* 108 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_feline_agility, SKILL_INCREASE_MEDIUM},
 
-        {/* 109 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_forest_meld, SKILL_INCREASE_HARD},
+        {/* 109 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_forest_meld, SKILL_INCREASE_HARD},
 
-        {/* 110 */ /* 3*DC::PULSE_TIMER, POSITION_STANDING, 150, TAR_IGNORE, cast_companion */ 0, 0, 0, 0, 0, 0},
+        {/* 110 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_companion */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 111 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_drown, SKILL_INCREASE_HARD},
+        {/* 111 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_drown, SKILL_INCREASE_HARD},
 
-        {/* 112 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 25, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_howl, SKILL_INCREASE_HARD},
+        {/* 112 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 25, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_howl, SKILL_INCREASE_HARD},
 
-        {/* 113 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_souldrain, SKILL_INCREASE_MEDIUM},
+        {/* 113 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_souldrain, SKILL_INCREASE_MEDIUM},
 
-        {/* 114 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 18, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sparks, 0},
+        {/* 114 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 18, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_sparks, 0},
 
-        {/* 115 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_camouflague, SKILL_INCREASE_HARD},
+        {/* 115 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_camouflague, SKILL_INCREASE_HARD},
 
-        {/* 116 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_farsight, SKILL_INCREASE_HARD},
+        {/* 116 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_farsight, SKILL_INCREASE_HARD},
 
-        {/* 117 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_freefloat, SKILL_INCREASE_HARD},
+        {/* 117 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_freefloat, SKILL_INCREASE_HARD},
 
-        {/* 118 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_insomnia, SKILL_INCREASE_HARD},
+        {/* 118 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_insomnia, SKILL_INCREASE_HARD},
 
-        {/* 119 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_shadowslip, SKILL_INCREASE_HARD},
+        {/* 119 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_shadowslip, SKILL_INCREASE_HARD},
 
-        {/* 120 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_energy, SKILL_INCREASE_HARD},
+        {/* 120 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_energy, SKILL_INCREASE_HARD},
 
-        {/* 121 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_staunchblood, SKILL_INCREASE_HARD},
+        {/* 121 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_staunchblood, SKILL_INCREASE_HARD},
 
-        {/* 122 */ 6 * DC::PULSE_TIMER, POSITION_STANDING, 250, TAR_IGNORE, cast_create_golem, SKILL_INCREASE_EASY},
+        {/* 122 */ 6 * DC::PULSE_TIMER, position_t::STANDING, 250, TAR_IGNORE, cast_create_golem, SKILL_INCREASE_EASY},
 
-        {/* 123 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect, SKILL_INCREASE_HARD},
+        {/* 123 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 60, TAR_IGNORE, spell_reflect, SKILL_INCREASE_HARD},
 
-        {/* 124 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 22, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_SELF_NONO, cast_dispel_minor, SKILL_INCREASE_MEDIUM},
+        {/* 124 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 22, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_SELF_NONO, cast_dispel_minor, SKILL_INCREASE_MEDIUM},
 
-        {/* 125 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 25, TAR_IGNORE, spell_release_golem, SKILL_INCREASE_MEDIUM},
+        {/* 125 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 25, TAR_IGNORE, spell_release_golem, SKILL_INCREASE_MEDIUM},
 
-        {/* 126 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 30, TAR_IGNORE, spell_beacon, SKILL_INCREASE_MEDIUM},
+        {/* 126 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 30, TAR_IGNORE, spell_beacon, SKILL_INCREASE_MEDIUM},
 
-        {/* 127 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 40, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stone_shield, SKILL_INCREASE_HARD},
+        {/* 127 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stone_shield, SKILL_INCREASE_HARD},
 
-        {/* 128 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 55, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD},
+        {/* 128 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 55, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD},
 
-        {/* 129 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD},
+        {/* 129 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD},
 
-        {/* 130 */ /* 3*DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, 0, 0, 0, 0, 0},
+        {/* 130 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 131 */ /* 3*DC::PULSE_TIMER, POSITION_STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, 0, 0, 0, 0, 0},
+        {/* 131 */ /* 3*DC::PULSE_TIMER, position_t::STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, position_t::DEAD, 0, 0, 0, 0},
 
-        {/* 132 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
+        {/* 132 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
 
-        {/* 133 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 65, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD},
+        {/* 133 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 65, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD},
 
-        {/* 134 */ (uint8_t)(2.25 * DC::PULSE_TIMER), POSITION_FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY},
+        {/* 134 */ (uint8_t)(2.25 * DC::PULSE_TIMER), position_t::FIGHTING, 10, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY},
 
-        {/* 135 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_debility, SKILL_INCREASE_MEDIUM},
+        {/* 135 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_debility, SKILL_INCREASE_MEDIUM},
 
-        {/* 136 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 30, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_attrition, SKILL_INCREASE_MEDIUM},
+        {/* 136 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 30, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_attrition, SKILL_INCREASE_MEDIUM},
 
-        {/* 137 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY},
+        {/* 137 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 120, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY},
 
-        {/* 138 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY},
+        {/* 138 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY},
 
-        {/* 139 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 5, TAR_IGNORE, cast_dismiss_familiar, SKILL_INCREASE_MEDIUM},
+        {/* 139 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 5, TAR_IGNORE, cast_dismiss_familiar, SKILL_INCREASE_MEDIUM},
 
-        {/* 140 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 15, TAR_IGNORE, cast_dismiss_corpse, SKILL_INCREASE_MEDIUM},
+        {/* 140 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_IGNORE, cast_dismiss_corpse, SKILL_INCREASE_MEDIUM},
 
-        {/* 141 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 30, TAR_IGNORE, cast_blessed_halo, SKILL_INCREASE_MEDIUM},
+        {/* 141 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 30, TAR_IGNORE, cast_blessed_halo, SKILL_INCREASE_MEDIUM},
 
-        {/* 142 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 40, TAR_IGNORE, cast_visage_of_hate, SKILL_INCREASE_MEDIUM},
+        {/* 142 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_IGNORE, cast_visage_of_hate, SKILL_INCREASE_MEDIUM},
 
-        {/* 143 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_protection_from_good, SKILL_INCREASE_MEDIUM},
+        {/* 143 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_protection_from_good, SKILL_INCREASE_MEDIUM},
 
-        {/* 144 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_oaken_fortitude, SKILL_INCREASE_MEDIUM},
+        {/* 144 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 12, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_oaken_fortitude, SKILL_INCREASE_MEDIUM},
 
-        {/* 145 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_frostshield, SKILL_INCREASE_MEDIUM},
+        {/* 145 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_frostshield, SKILL_INCREASE_MEDIUM},
 
-        {/* 146 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stability, SKILL_INCREASE_MEDIUM},
+        {/* 146 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stability, SKILL_INCREASE_MEDIUM},
 
-        {/* 147 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 147 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 148*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 148*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 149*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_solidity, SKILL_INCREASE_MEDIUM},
+        {/* 149*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_solidity, SKILL_INCREASE_MEDIUM},
 
-        {/* 150*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 150*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 151*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 151*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 152*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 152*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 153*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
+        {/* 153*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
 
-        {/* 154*/ 3 * DC::PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
+        {/* 154*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
 
-        {/* 155 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD},
+        {/* 155 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD},
 
-        {/* 156 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 30, TAR_CHAR_WORLD, cast_eagle_eye, SKILL_INCREASE_HARD},
+        {/* 156 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_WORLD, cast_eagle_eye, SKILL_INCREASE_HARD},
 
-        {/* 157 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 35, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_call_lightning, SKILL_INCREASE_HARD},
+        {/* 157 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 35, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_call_lightning, SKILL_INCREASE_HARD},
 
-        {/* 158 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_divine_fury, SKILL_INCREASE_HARD},
+        {/* 158 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 45, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_divine_fury, SKILL_INCREASE_HARD},
 
-        {/* 159 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD},
+        {/* 159 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD},
 
-        {/* 160 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM},
+        {/* 160 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM},
 
-        {/* 161 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM},
+        {/* 161 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM},
 
-        {/* 162 */ 3 * DC::PULSE_TIMER, POSITION_STUNNED, 200, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY},
+        {/* 162 */ 3 * DC::PULSE_TIMER, position_t::STUNNED, 200, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY},
 
-        {/* 163 */ 4 * DC::PULSE_TIMER, POSITION_FIGHTING, 75, TAR_IGNORE, cast_wrath_of_god, SKILL_INCREASE_HARD},
+        {/* 163 */ 4 * DC::PULSE_TIMER, position_t::FIGHTING, 75, TAR_IGNORE, cast_wrath_of_god, SKILL_INCREASE_HARD},
 
-        {/* 164 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 100, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_atonement, SKILL_INCREASE_EASY},
+        {/* 164 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 100, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_atonement, SKILL_INCREASE_EASY},
 
-        {/* 165 */ 4 * DC::PULSE_TIMER, POSITION_FIGHTING, 150, TAR_IGNORE, cast_silence, SKILL_INCREASE_HARD},
+        {/* 165 */ 4 * DC::PULSE_TIMER, position_t::FIGHTING, 150, TAR_IGNORE, cast_silence, SKILL_INCREASE_HARD},
 
-        {/* 166 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 180, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_immunity, SKILL_INCREASE_HARD},
+        {/* 166 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 180, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_immunity, SKILL_INCREASE_HARD},
 
-        {/* 167 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 150, TAR_CHAR_ROOM, cast_boneshield, SKILL_INCREASE_HARD},
+        {/* 167 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 150, TAR_CHAR_ROOM, cast_boneshield, SKILL_INCREASE_HARD},
 
-        {/* 168 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 100, TAR_CHAR_ROOM | TAR_SELF_NONO, cast_channel, SKILL_INCREASE_HARD},
+        {/* 168 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 100, TAR_CHAR_ROOM | TAR_SELF_NONO, cast_channel, SKILL_INCREASE_HARD},
 
-        {/* 169 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 15, TAR_IGNORE, cast_release_elemental, SKILL_INCREASE_MEDIUM},
+        {/* 169 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_IGNORE, cast_release_elemental, SKILL_INCREASE_MEDIUM},
 
-        {/* 170 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 50, TAR_CHAR_ROOM | TAR_FIGHT_VICT, cast_wild_magic, SKILL_INCREASE_HARD},
+        {/* 170 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 50, TAR_CHAR_ROOM | TAR_FIGHT_VICT, cast_wild_magic, SKILL_INCREASE_HARD},
 
-        {/* 171 */ 3 * DC::PULSE_TIMER, POSITION_FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD},
+        {/* 171 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD},
 
-        {/* 172 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD},
+        {/* 172 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD},
 
-        {/* 173 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD},
+        {/* 173 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::STANDING, 80, TAR_CHAR_ROOM | TAR_SELF_DEFAULT | TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD},
 
-        {/* 174 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD},
+        {/* 174 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD},
 
-        {/* 175 */ (uint8_t)(4.5 * DC::PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD},
-        {/* 176 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM},
-        {/* 177 */ 3 * DC::PULSE_TIMER, POSITION_STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY}};
+        {/* 175 */ (uint8_t)(4.5 * DC::PULSE_TIMER), position_t::FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD},
+        {/* 176 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM},
+        {/* 177 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY}};
 
 struct skill_stuff skill_info[] =
     {
@@ -892,14 +892,11 @@ const char *spells[] =
         "ethereal focus",
         "\n"};
 
-bool canPerform(Character *const &ch, const int_fast32_t &skillType,
-                string failMessage)
+bool Character::canPerform(const int_fast32_t &skillType, QString failMessage)
 {
-  if (IS_PC(ch) && has_skill(ch, skillType) == 0 && ch->getLevel() < ARCHANGEL)
+  if (isPlayer() && !has_skill(skillType) && getLevel() < ARCHANGEL)
   {
-    send_to_char(
-        failMessage.c_str(),
-        ch);
+    send(failMessage);
     return false;
   }
 
@@ -1496,7 +1493,7 @@ int do_release(Character *ch, char *argument, int cmd)
   bool printed = false;
   argument = skip_spaces(argument);
   bool done = false;
-  int learned = has_skill(ch, SKILL_RELEASE);
+  int learned = ch->has_skill(SKILL_RELEASE);
 
   if (!learned)
   {
@@ -1533,7 +1530,7 @@ int do_release(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (ch->move < 25)
+    if (ch->getMove() < 25)
     {
       send_to_char("You don't have enough moves.\r\n", ch);
       return eFAILURE;
@@ -1565,12 +1562,14 @@ int do_release(Character *ch, char *argument, int cmd)
               "$n fails to release the magic surrounding $m and is left momentarily dazed.",
               ch, 0, 0, TO_ROOM, INVIS_NULL);
           WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
-          ch->move -= 10;
+          ch->decrementMove(10);
           return eFAILURE;
         }
 
       if (!done)
-        ch->move -= 25;
+      {
+        ch->decrementMove(25);
+      }
       send_to_char("You release the spell.\r\n", ch);
       char buffer[255];
       int aftype = aff->type;
@@ -1607,7 +1606,6 @@ int stat_mod[] = {
     0, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1,
     0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7,
     7, 8, 9, 10};
-extern int skillmax(Character *ch, int skill, int eh);
 
 int get_difficulty(int skillnum)
 {
@@ -1625,7 +1623,7 @@ int get_difficulty(int skillnum)
   return 0;
 }
 
-bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
+bool Character::skill_success(Character *victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
@@ -1716,38 +1714,37 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   }
   int i = 0, learned = 0;
 
-  if (!IS_MOB(ch))
+  if (!isNPC())
   {
-    i = learned = has_skill(ch, skillnum);
-    if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE)
+    i = learned = has_skill(skillnum);
+    if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE)
     {
-      learned = affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
-      send_to_char("got here", ch);
+      learned = affected_by_spell(SKILL_DEFENDERS_STANCE)->modifier;
     }
     else if (!learned)
       return false;
   }
   else
   {
-    if (ch->getLevel() < 30)
+    if (getLevel() < 30)
       i = 30;
-    else if (ch->getLevel() < 50)
+    else if (getLevel() < 50)
       i = 40;
-    else if (ch->getLevel() < 70)
+    else if (getLevel() < 70)
       i = 60;
-    else if (ch->getLevel() < 90)
+    else if (getLevel() < 90)
       i = 70;
     else
       i = 75;
   }
   if (stat != attribute_t::UNDEFINED && victim)
   {
-    auto max_level_percent = ch->getLevel() / 60.0;
+    auto max_level_percent = getLevel() / 60.0;
     i -= stat_mod[get_stat(victim, stat)] * max_level_percent; // less impact on low levels..
   }
   i += mod;
 
-  if (IS_PC(ch))
+  if (isPlayer())
     i = 50 + i / 2;
 
   if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DUAL_WIELD)
@@ -1758,8 +1755,8 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
   if (skillnum == SKILL_IMBUE)
     i = MIN(90, i); // max 90% success rate for imbue
 
-  i = skillmax(ch, skillnum, i);
-  if (IS_AFFECTED(ch, AFF_FOCUS) &&
+  i = skillmax(skillnum, i);
+  if (IS_AFFECTED(this, AFF_FOCUS) &&
       ((skillnum >= SKILL_SONG_BASE &&
         skillnum <= SKILL_SONG_MAX) ||
        (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET + MAX_KI_LIST))))
@@ -1771,19 +1768,24 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
     if (i > o) o = i+1;
   */
 
-  if (i > number(1, 100) || ch->getLevel() >= IMMORTAL)
+  if (i > number(1, 100) || getLevel() >= IMMORTAL)
   {
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && (GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING)))
-      skill_increase_check(ch, skillnum, learned, a + 500);
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+      skill_increase_check(this, skillnum, learned, a + 500);
     return true; // Success
   }
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && (GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING)))
-      skill_increase_check(ch, skillnum, learned, a);
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+      skill_increase_check(this, skillnum, learned, a);
     return false; // Failure
   }
+}
+
+bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
+{
+  return ch->skill_success(victim, skillnum, mod);
 }
 
 void set_conc_loss(Character *ch, int spl)
@@ -1942,16 +1944,16 @@ int do_cast(Character *ch, char *argument, int cmd)
     {
       switch (GET_POS(ch))
       {
-      case POSITION_SLEEPING:
+      case position_t::SLEEPING:
         send_to_char("You dream about great magical powers.\r\n", ch);
         break;
-      case POSITION_RESTING:
+      case position_t::RESTING:
         send_to_char("You can't concentrate enough while resting.\r\n", ch);
         break;
-      case POSITION_SITTING:
+      case position_t::SITTING:
         send_to_char("You can't do this sitting!\n\r", ch);
         break;
-      case POSITION_FIGHTING:
+      case position_t::FIGHTING:
         send_to_char("Impossible! You can't concentrate enough!\n\r", ch);
         break;
       default:
@@ -1963,7 +1965,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     {
       if (!IS_MOB(ch))
       {
-        if (!(learned = has_skill(ch, spl)))
+        if (!(learned = ch->has_skill(spl)))
         {
           if (ch->getLevel() < 101)
           {
@@ -1992,7 +1994,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       int oldroom = 0;
       int dir = -1;
       bool group_spell = false;
-      if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
+      if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
       { // Oh the special cases of spellcraft.
 
         name[0] = '\0';
@@ -2042,8 +2044,8 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
           // will cause spellcraft to increase possibly
-          if ((has_skill(ch, SPELL_LIGHTNING_BOLT) < 71) ||
-              (has_skill(ch, SKILL_SPELLCRAFT) < 21))
+          if ((ch->has_skill(SPELL_LIGHTNING_BOLT) < 71) ||
+              (ch->has_skill(SKILL_SPELLCRAFT) < 21))
           {
             send_to_char("You don't know how.\r\n", ch);
             return eFAILURE;
@@ -2057,7 +2059,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             send_to_char("Error code: 57A. Report this to an immortal, along with what you typed and where.\r\n", ch);
             return eFAILURE;
           }
-          if (!(tar_char = get_char_room_vis(ch, name)))
+          if (!(tar_char = ch->get_char_room_vis(name)))
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2113,7 +2115,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       } // end spell immunity
       int fil = 0;
       float rel = 1;
-      int fillvl = has_skill(ch, SKILL_ELEMENTAL_FILTER);
+      int fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
       if (cmd == CMD_FILTER && fillvl)
       {
         if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM ||
@@ -2202,13 +2204,13 @@ int do_cast(Character *ch, char *argument, int cmd)
         {
           if (DC::isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
           {
-            if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
+            if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
               target_ok = true;
-            if (!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE))
+            if (!str_cmp(name, "group") && ch->has_skill(SKILL_COMMUNE))
             {
-              if ((has_skill(ch, SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_RESIST_MAGIC || spl == SPELL_PROTECT_FROM_GOOD)) || (has_skill(ch, SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_REMOVE_POISON || spl == SPELL_REMOVE_BLIND || spl == SPELL_IRIDESCENT_AURA)) || (has_skill(ch, SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_REMOVE_PARALYSIS || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_SENSE_LIFE || spl == SPELL_CURE_LIGHT))
+              if ((ch->has_skill(SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_RESIST_MAGIC || spl == SPELL_PROTECT_FROM_GOOD)) || (ch->has_skill(SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_REMOVE_POISON || spl == SPELL_REMOVE_BLIND || spl == SPELL_IRIDESCENT_AURA)) || (ch->has_skill(SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_REMOVE_PARALYSIS || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_SENSE_LIFE || spl == SPELL_CURE_LIGHT))
               {
-                skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
+                skill_increase_check(ch, SKILL_COMMUNE, ch->has_skill(SKILL_COMMUNE), SKILL_INCREASE_HARD);
                 target_ok = true;
                 group_spell = true;
                 tar_char = ch;
@@ -3100,35 +3102,35 @@ int spl_lvl(int lev)
 // search through a character's list to see if they have a particular skill
 // if so, return their level of knowledge
 // if not, return 0
-int has_skill(Character *ch, skill_t skill)
+int Character::has_skill(skill_t skill)
 {
   class Object *o;
   int bonus = 0;
 
-  if (IS_MOB(ch))
+  if (isNPC())
     return 0;
 
-  if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
-    return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
+  if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
+    return affected_by_spell(SKILL_DEFENDERS_STANCE)->modifier;
 
-  if (affected_by_spell(ch, SPELL_VILLAINY) && (skill == SPELL_VILLAINY))
+  if (affected_by_spell(SPELL_VILLAINY) && (skill == SPELL_VILLAINY))
   {
     bonus = 0;
   }
-  else if (affected_by_spell(ch, SPELL_VILLAINY))
-    bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
-  if (affected_by_spell(ch, SPELL_HEROISM) && (skill == SPELL_HEROISM))
+  else if (affected_by_spell(SPELL_VILLAINY))
+    bonus += affected_by_spell(SPELL_VILLAINY)->modifier / 5;
+  if (affected_by_spell(SPELL_HEROISM) && (skill == SPELL_HEROISM))
   {
     bonus = 0;
   }
-  else if (affected_by_spell(ch, SPELL_HEROISM))
-    bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
+  else if (affected_by_spell(SPELL_HEROISM))
+    bonus += affected_by_spell(SPELL_HEROISM)->modifier / 5;
 
-  if (ch->skills.contains(skill))
+  if (this->skills.contains(skill))
   {
-    const auto &curr = ch->skills[skill];
+    const auto &curr = this->skills[skill];
 
-    for (o = ch->player->skillchange; o; o = o->next_skill)
+    for (o = this->player->skillchange; o; o = o->next_skill)
     {
       int a;
       for (a = 0; a < o->num_affects; a++)
@@ -3145,4 +3147,9 @@ int has_skill(Character *ch, skill_t skill)
   }
 
   return 0;
+}
+
+int has_skill(Character *ch, skill_t skill)
+{
+  return ch->has_skill(skill);
 }

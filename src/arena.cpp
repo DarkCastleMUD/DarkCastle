@@ -25,7 +25,6 @@
 #include "returnvals.h"
 #include "levels.h"
 
-
 struct _arena arena;
 
 int do_arena(Character *ch, char *argument, int cmd)
@@ -33,7 +32,7 @@ int do_arena(Character *ch, char *argument, int cmd)
   char arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], buf[256];
   int low, high;
 
-  if (!has_skill(ch, COMMAND_ARENA))
+  if (!ch->has_skill( COMMAND_ARENA))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -192,10 +191,10 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(ch) == POSITION_SLEEPING)
+  if (GET_POS(ch) == position_t::SLEEPING)
   {
     affect_from_char(ch, INTERNAL_SLEEPING);
-    do_wake(ch, "", CMD_DEFAULT);
+    ch->wake();
   }
 
   arena.cur_num++;
@@ -209,7 +208,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   /* remove combat-related bits */
   ch->combat = 0;
 
-  GET_MOVE(ch) = GET_MAX_MOVE(ch);
+  ch->setMove(GET_MAX_MOVE(ch));
   GET_MANA(ch) = GET_MAX_MANA(ch);
   ch->fillHP();
   GET_KI(ch) = GET_MAX_KI(ch);

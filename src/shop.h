@@ -48,6 +48,6 @@ struct reroll_t
   } state = {};
 };
 
-extern map<string, reroll_t> reroll_sessions;
+extern std::map<std::string, reroll_t> reroll_sessions;
 
 #endif

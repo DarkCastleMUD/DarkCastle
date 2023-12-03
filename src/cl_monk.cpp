@@ -29,69 +29,86 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   int dam;
   int retval;
   time_t time_raw_format;
-  struct tm * ptr_time;
+  struct tm *ptr_time;
 
-  if (!canPerform(ch, SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n")) {
+  if (!ch->canPerform(SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n"))
+  {
     return eFAILURE;
   }
 
   int hands = 0;
-  if(ch->equipment[WIELD])          hands++;
-  if(ch->equipment[SECOND_WIELD])   hands++;
-  if(ch->equipment[HOLD])           hands++;
-  if(ch->equipment[HOLD2])          hands++;
-  if(ch->equipment[WEAR_SHIELD])    hands++;
-  if(ch->equipment[WEAR_LIGHT])     hands++;
+  if (ch->equipment[WIELD])
+    hands++;
+  if (ch->equipment[SECOND_WIELD])
+    hands++;
+  if (ch->equipment[HOLD])
+    hands++;
+  if (ch->equipment[HOLD2])
+    hands++;
+  if (ch->equipment[WEAR_SHIELD])
+    hands++;
+  if (ch->equipment[WEAR_LIGHT])
+    hands++;
 
-  if(hands > 1) {
-    send_to_char ("You need a free hand to eagleclaw someone.\r\n", ch);
+  if (hands > 1)
+  {
+    send_to_char("You need a free hand to eagleclaw someone.\r\n", ch);
     return eFAILURE;
   }
 
   one_argument(argument, name);
 
-  if (!(victim = get_char_room_vis(ch, name))) {
+  if (!(victim = ch->get_char_room_vis(name)))
+  {
     if (ch->fighting)
       victim = ch->fighting;
-    else {
+    else
+    {
       send_to_char("You raise your hand in a claw and make strange bird noises.\r\n", ch);
       return eFAILURE;
-      }
+    }
   }
 
-  if (victim == ch) {
+  if (victim == ch)
+  {
     send_to_char("You lower your claw-shaped hand and scratch yourself gently.\r\n", ch);
     return eFAILURE;
   }
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) {
-        send_to_char("Clawing a bladeshielded opponent would be suicide!\n\r", ch);
-        return eFAILURE;
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  {
+    send_to_char("Clawing a bladeshielded opponent would be suicide!\n\r", ch);
+    return eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_EAGLE_CLAW)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_EAGLE_CLAW))
+    return eSUCCESS;
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
-  if (!skill_success(ch,victim, SKILL_EAGLE_CLAW))
+  if (!skill_success(ch, victim, SKILL_EAGLE_CLAW))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-  else 
+  else
   {
-    // 1% bingo chance 
-    if (number(1, 100) == 1 && victim->getLevel() < IMMORTAL) {
-      time ( &time_raw_format );
-      ptr_time = localtime ( &time_raw_format );
-      if( 11 == ptr_time->tm_mon ) {
+    // 1% bingo chance
+    if (number(1, 100) == 1 && victim->getLevel() < IMMORTAL)
+    {
+      time(&time_raw_format);
+      ptr_time = localtime(&time_raw_format);
+      if (11 == ptr_time->tm_mon)
+      {
         do_say(victim, "Laaaaaaast Christmas, I gave you my....", CMD_DEFAULT);
       }
       act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);
       act("You slide your fingers between $N's ribs and give $S's left ventricle a tickle with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
       dam = 9999999;
-    } else {
+    }
+    else
+    {
       dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, ch->getLevel()) + 100;
     }
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
@@ -100,93 +117,110 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-
 int do_quivering_palm(Character *ch, char *argument, int cmd)
 {
-  
+
   struct affected_type af;
   Character *victim;
   char name[256];
   int dam, retval;
   int duration = 100;
 
-	if (!canPerform(ch, SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n")) {
+  if (!ch->canPerform(SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n"))
+  {
     return eFAILURE;
   }
 
-  if(affected_by_spell(ch, SKILL_QUIVERING_PALM)) {
-     send_to_char("You can't perform such an ancient power more than "
-                  "once a day!\n\r", ch);
-     return eFAILURE;
+  if (affected_by_spell(ch, SKILL_QUIVERING_PALM))
+  {
+    send_to_char("You can't perform such an ancient power more than "
+                 "once a day!\n\r",
+                 ch);
+    return eFAILURE;
   }
 
   int hands = 0;
-  if(ch->equipment[WIELD])          hands++;
-  if(ch->equipment[SECOND_WIELD])   hands++;
-  if(ch->equipment[WEAR_SHIELD])    hands++;
+  if (ch->equipment[WIELD])
+    hands++;
+  if (ch->equipment[SECOND_WIELD])
+    hands++;
+  if (ch->equipment[WEAR_SHIELD])
+    hands++;
 
-  if(hands > 1) {
-    send_to_char ("You need at least one hand free to perform this!\n\r", ch);
+  if (hands > 1)
+  {
+    send_to_char("You need at least one hand free to perform this!\n\r", ch);
     return eFAILURE;
   }
 
   one_argument(argument, name);
 
-  if(!(victim = get_char_room_vis(ch, name))) {
-    if(ch->fighting)
+  if (!(victim = ch->get_char_room_vis(name)))
+  {
+    if (ch->fighting)
       victim = ch->fighting;
-    else {
+    else
+    {
       send_to_char("Quivering palm whom?\n\r", ch);
       return eFAILURE;
     }
   }
 
-  if(victim == ch) {
+  if (victim == ch)
+  {
     send_to_char("Masturbate on your own time.\r\n", ch);
     return eFAILURE;
   }
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) {
-        send_to_char("Palming a bladeshielded opponent would be suicide!\n\r", ch);
-        return eFAILURE;
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  {
+    send_to_char("Palming a bladeshielded opponent would be suicide!\n\r", ch);
+    return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI)) {
+  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
+  {
     send_to_char("You find yourself unable to focus your energy here.\r\n", ch);
     return eFAILURE;
   }
 
-  if(GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL) {
+  if (GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL)
+  {
     send_to_char("You don't possess enough ki!\r\n", ch);
     return eFAILURE;
   }
 
-  if(!can_attack(ch) || !can_be_attacked(ch, victim))
-     return eFAILURE;
+  if (!can_attack(ch) || !can_be_attacked(ch, victim))
+    return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_QUIVERING_PALM)) return eSUCCESS;
-	   
+  if (!charge_moves(ch, SKILL_QUIVERING_PALM))
+    return eSUCCESS;
+
   GET_KI(ch) -= 40;
 
-  if(!skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
+  if (!skill_success(ch, victim, SKILL_QUIVERING_PALM))
+  {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
     duration = 6;
   }
-  else {
-    dam = victim->getHP() /2;
-    if (dam < 500) dam = 500;
-    if (dam > 2000) dam = 2000;
+  else
+  {
+    dam = victim->getHP() / 2;
+    if (dam < 500)
+      dam = 500;
+    if (dam > 2000)
+      dam = 2000;
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
     duration = 12;
   }
-  WAIT_STATE(ch, DC::PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   af.type = SKILL_QUIVERING_PALM;
   af.duration = duration;
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  
+
   return retval;
 }
 
@@ -196,234 +230,266 @@ int do_stun(Character *ch, char *argument, int cmd)
   char name[256];
   int retval;
 
-  if (!canPerform(ch, SKILL_STUN, "Your lack of knowledge is stunning...\r\n")) {
+  if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))
+  {
     return eFAILURE;
   }
   if (ch->getHP() < 25)
   {
-    send_to_char("You can't muster the energy for such an attack.\r\n",ch);
+    send_to_char("You can't muster the energy for such an attack.\r\n", ch);
     return eFAILURE;
   }
   one_argument(argument, name);
-  
-  if (name[0] != '\0')
-    victim = get_char_room_vis( ch, name );
-  else
-     victim = ch->fighting;
 
-  if(victim == nullptr) { 
-    send_to_char( "Stun whom?\n\r", ch );
+  if (name[0] != '\0')
+    victim = ch->get_char_room_vis(name);
+  else
+    victim = ch->fighting;
+
+  if (victim == nullptr)
+  {
+    send_to_char("Stun whom?\n\r", ch);
     return eFAILURE;
   }
 
-  if(victim == ch) {
+  if (victim == ch)
+  {
     send_to_char("Aren't we funny today...\r\n", ch);
     return eFAILURE;
   }
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2)) {
-      send_to_char("Stunning a bladeshielded opponent would be suicide!\n\r", ch);
-      return eFAILURE;
-  }
-
-  if (ch->getLevel() < IMMORTAL && IS_PC(victim) && victim->getLevel() >= IMMORTAL) {
-     act_return ar = act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-
-     ar = act("Due to immortal magic, $N shakes off $n's attempt to immobilize them.",ch, nullptr, victim, TO_ROOM, NOTVICT);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-
-     ar = act("$n's stun reflects back to them!",ch, nullptr, victim, TO_ROOM, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-
-     ar = act("Due to immortal magic, $N shakes off your attempt to immobilize them.",ch, nullptr, victim, TO_CHAR, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-
-     ar = act("Your stun is reflected back to yourself!",ch, nullptr, nullptr, TO_CHAR, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-
-     victim = ch;
-  }
-
-  if(victim->getLevel() == IMPLEMENTER) {
-    send_to_char("You gotta be kidding!\n\r",ch);
+  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  {
+    send_to_char("Stunning a bladeshielded opponent would be suicide!\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (ch->getLevel() < IMMORTAL && IS_PC(victim) && victim->getLevel() >= IMMORTAL)
+  {
+    act_return ar = act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+
+    ar = act("Due to immortal magic, $N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+
+    ar = act("$n's stun reflects back to them!", ch, nullptr, victim, TO_ROOM, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+
+    ar = act("Due to immortal magic, $N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+
+    ar = act("Your stun is reflected back to yourself!", ch, nullptr, nullptr, TO_CHAR, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+
+    victim = ch;
+  }
+
+  if (victim->getLevel() == IMPLEMENTER)
+  {
+    send_to_char("You gotta be kidding!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     send_to_char("You cannot pick just one of them to stun!\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if(!can_attack(ch) || !can_be_attacked(ch, victim))
+  if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_STUN)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_STUN))
+    return eSUCCESS;
 
-  if (DC::isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
+  if (DC::isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
   {
-     act_return ar = act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
+    act_return ar = act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
 
-     ar = act("$N shakes off $n's attempt to immobilize them.",ch, nullptr, victim, TO_ROOM, NOTVICT);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
+    ar = act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
 
-     ar = act("$N shakes off your attempt to immobilize them.",ch, nullptr, victim, TO_CHAR, 0);
-     retval = ar.retval;
-     if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-         return retval;
-     }
-	return eSUCCESS;     
+    ar = act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, 0);
+    retval = ar.retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
+    }
+    return eSUCCESS;
   }
-  if((!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING)
-     || do_frostshield(ch, victim)) 
+  if ((!skill_success(ch, victim, SKILL_STUN) && GET_POS(victim) != position_t::SLEEPING) || do_frostshield(ch, victim))
   {
-    act_return ar = act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, TO_VICT , 0);
+    act_return ar = act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-        return retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
     }
 
-    ar = act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, nullptr, victim, TO_CHAR , 0);
+    ar = act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, nullptr, victim, TO_CHAR, 0);
     retval = ar.retval;
-    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-        return retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
     }
 
-    ar = act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, nullptr, victim, TO_ROOM, NOTVICT );
+    ar = act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     retval = ar.retval;
-    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-        return retval;
+    if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+    {
+      return retval;
     }
 
-    if(has_skill(ch,SKILL_STUN) > 35 && !number(0, 7)) {
-       send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
-       WAIT_STATE(ch, DC::PULSE_VIOLENCE*3);
+    if (ch->has_skill(SKILL_STUN) > 35 && !number(0, 7))
+    {
+      send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     }
-    else WAIT_STATE(ch, DC::PULSE_VIOLENCE*4);
-    retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
+    else
+      WAIT_STATE(ch, DC::PULSE_VIOLENCE * 4);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
   }
-  else 
+  else
   {
     set_fighting(victim, ch);
-    WAIT_STATE(ch, DC::PULSE_VIOLENCE*5);
+    WAIT_STATE(ch, DC::PULSE_VIOLENCE * 5);
 
-    if(DC::isSet(victim->combat, COMBAT_STUNNED) ||
-       DC::isSet(victim->combat, COMBAT_STUNNED2))
+    if (DC::isSet(victim->combat, COMBAT_STUNNED) ||
+        DC::isSet(victim->combat, COMBAT_STUNNED2))
     {
-       act_return ar = act("$n delivers another HARD BLOW to your solar plexus!", ch, nullptr, victim, TO_VICT , 0);
-       retval = ar.retval;
-       if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-           return retval;
-       }
+      act_return ar = act("$n delivers another HARD BLOW to your solar plexus!", ch, nullptr, victim, TO_VICT, 0);
+      retval = ar.retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
+      }
 
-       ar = act("You deliver another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_CHAR , 0);
-       retval = ar.retval;
-       if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-           return retval;
-       }
+      ar = act("You deliver another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_CHAR, 0);
+      retval = ar.retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
+      }
 
-       ar = act("$n delivers another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_ROOM, NOTVICT );
-       retval = ar.retval;
-       if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-           return retval;
-       }
+      ar = act("$n delivers another HARD BLOW into $N's solar plexus!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      retval = ar.retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
+      }
 
-       if(number(0, 1))
-       {
-          send_to_char("The hit knocks the sense back into you!\r\n", victim);
-          act_return ar = act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
-          retval = ar.retval;
-          if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-              return retval;
-          }
+      if (number(0, 1))
+      {
+        send_to_char("The hit knocks the sense back into you!\r\n", victim);
+        act_return ar = act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
+        retval = ar.retval;
+        if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+        {
+          return retval;
+        }
 
-          REMOVE_BIT(victim->combat, COMBAT_STUNNED);
-          REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
-       }
-       return damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
+        REMOVE_BIT(victim->combat, COMBAT_STUNNED);
+        REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
+      }
+      return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
     }
 
     act_return ar;
-    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
-             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
+        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    {
       ar = act("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, TO_CHAR, 0);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
 
       ar = act("Your heightened battlesense sees $n's stun coming from a mile away and you easily block it.", ch, 0, victim, TO_VICT, 0);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
 
       ar = act("$N's heightened battlesense sees $n's stun coming from a mile away and $N easily blocks it.", ch, 0, victim, TO_ROOM, NOTVICT);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
-
-    } else {
-      ar = act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, nullptr, victim, TO_VICT , 0);
+    }
+    else
+    {
+      ar = act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, nullptr, victim, TO_VICT, 0);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
 
-      ar = act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_CHAR , 0);
+      ar = act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_CHAR, 0);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
 
-      ar = act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_ROOM, NOTVICT );
+      ar = act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, nullptr, victim, TO_ROOM, NOTVICT);
       retval = ar.retval;
-      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED)) {
-          return retval;
+      if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))
+      {
+        return retval;
       }
 
-      WAIT_STATE(victim, DC::PULSE_VIOLENCE*2);
-      if(GET_POS(victim) > POSITION_STUNNED)
-        GET_POS(victim) = POSITION_STUNNED;
+      WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
+      if (GET_POS(victim) > position_t::STUNNED)
+        victim->setStunned();
+      ;
       SET_BIT(victim->combat, COMBAT_STUNNED);
     }
-    retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   return retval;
 }

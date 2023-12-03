@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <iostream>
 
-using namespace std;
+
 
 struct TimeVal {
 	TimeVal(time_t sec = 0, suseconds_t usec = 0);
@@ -48,12 +48,12 @@ private:
 	TimeVal diff_avg;
 	uint_fast64_t stopCount;
 	uint_fast64_t totalTime;
-	friend ostream & operator<< (ostream &, Timer t);
+	friend std::ostream & operator<< (std::ostream &, Timer t);
 };
 
-extern map<string, Timer> PerfTimers;
+extern std::map<std::string, Timer> PerfTimers;
 
-ostream& operator<<(ostream &out, Timer t);
-ostream& operator<<(ostream &out, TimeVal tv);
+std::ostream& operator<<(std::ostream &out, Timer t);
+std::ostream& operator<<(std::ostream &out, TimeVal tv);
 
 #endif /* TIMER_H_ */

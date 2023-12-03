@@ -41,7 +41,7 @@ extern int rev_dir[];
 /* procedures related to get */
 void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, int cmd)
 {
-  string buffer;
+  std::string buffer;
 
   if (!sub_object || sub_object->carried_by != ch)
   {
@@ -854,7 +854,7 @@ int do_get(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
-        if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+        if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
         {
           obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains, true);
           blindlag = true;
@@ -1511,7 +1511,7 @@ int do_put(Character *ch, char *argument, int cmd)
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
-                       ch->name,
+                       ch->getNameC(),
                        obj_object->short_description,
                        obj_index[obj_object->item_number].virt,
                        sub_object->short_description,
@@ -1522,7 +1522,7 @@ int do_put(Character *ch, char *argument, int cmd)
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-                       ch->name,
+                       ch->getNameC(),
                        obj_object->short_description,
                        obj_index[obj_object->item_number].virt,
                        sub_object->short_description,
@@ -1660,7 +1660,7 @@ int do_give(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!(vict = get_char_room_vis(ch, vict_name)))
+    if (!(vict = ch->get_char_room_vis( vict_name)))
     {
       send_to_char("To whom?\r\n", ch);
       return eFAILURE;
@@ -1758,7 +1758,7 @@ int do_give(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (!(vict = get_char_room_vis(ch, vict_name)))
+    if (!(vict = ch->get_char_room_vis( vict_name)))
     {
       send_to_char("No one by that name around here.\r\n", ch);
       return eFAILURE;
@@ -1974,7 +1974,7 @@ class Object *bring_type_to_front(Character *ch, int item_type)
   class Object *item_carried = nullptr;
   class Object *container_item = nullptr;
 
-  queue<Object *> container_queue;
+  std::queue<Object *> container_queue;
 
   for (item_carried = ch->carrying; item_carried; item_carried = item_carried->next_content)
   {
@@ -2199,7 +2199,7 @@ bool is_bracing(Character *bracee, struct room_direction_data *exit)
     return false;
 
   // has to be standing
-  if (GET_POS(bracee) < POSITION_STANDING)
+  if (GET_POS(bracee) < position_t::STANDING)
     return false;
 
   // if neither the spot bracee is at, nor remote spot, is equal to teh exit
@@ -2258,7 +2258,7 @@ int do_open(Character *ch, char *argument, int cmd)
         if (EXIT(ch, door)->bracee->in_room == ch->in_room)
         {
           csendf(ch, "%s is holding the %s shut.\r\n",
-                 EXIT(ch, door)->bracee->name, fname(EXIT(ch, door)->keyword));
+                 EXIT(ch, door)->bracee->getNameC(), fname(EXIT(ch, door)->keyword));
           csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as %s attempts to force their way through.\r\n",
                  fname(EXIT(ch, door)->keyword), ch);
         }
@@ -2642,7 +2642,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 {
   char buffer[MAX_STRING_LENGTH];
 
-  if (!has_skill(ch, SKILL_PALM) && IS_PC(ch))
+  if (!ch->has_skill( SKILL_PALM) && IS_PC(ch))
   {
     send_to_char("You aren't THAT slick there, pal.\r\n", ch);
     return eFAILURE;

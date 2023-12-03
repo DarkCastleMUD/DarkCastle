@@ -196,7 +196,7 @@ int do_news(Character *ch, char *argument, int cmd)
 int do_addnews(Character *ch, char *argument, int cmd)
 {
 
-  if (!has_skill(ch, COMMAND_ADDNEWS))
+  if (!ch->has_skill(COMMAND_ADDNEWS))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;

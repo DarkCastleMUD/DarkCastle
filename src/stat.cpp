@@ -22,8 +22,6 @@
 #include "returnvals.h"
 #include "interp.h"
 
-using namespace std;
-
 /******************* Area start **************************************/
 enum SortState
 {
@@ -43,9 +41,9 @@ struct AreaStats
 	zone_t area;
 	int64_t xps;
 	int64_t gold;
-	vector<MobKills> mobKills;
+	std::vector<MobKills> mobKills;
 };
-typedef map<zone_t, AreaStats> area_stats_t;
+typedef std::map<zone_t, AreaStats> area_stats_t;
 
 class AreaData
 {
@@ -78,12 +76,12 @@ bool CompareAreaGoldStats(AreaStats first, AreaStats second)
 
 void AreaData::SortAreaData(Character *ch, SortState state)
 {
-	list<AreaStats> lAreaStats;
+	std::list<AreaStats> lAreaStats;
 	area_stats_t::iterator it;
 	AreaStats aStats;
 	char buf[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
-	string output_buf;
+	std::string output_buf;
 	int i = 0;
 
 	for (it = areaStats.begin(); it != areaStats.end(); it++)
@@ -97,7 +95,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 	if (state == SORT_XP)
 	{
 		lAreaStats.sort(CompareAreaXPStats);
-		for (list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
+		for (std::list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
 		{
 			i++;
 			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())), "%s",
@@ -110,7 +108,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
 	if (state == SORT_GOLD)
 	{
 		lAreaStats.sort(CompareAreaGoldStats);
-		for (list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
+		for (std::list<AreaStats>::iterator lit = lAreaStats.begin(); lit != lAreaStats.end(); lit++)
 		{
 			i++;
 			snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).name.toStdString().c_str())), "%s",
@@ -127,8 +125,8 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 {
 
 	char buf[MAX_STRING_LENGTH];
-	string output_buf;
-	vector<MobKills>::iterator mobs;
+	std::string output_buf;
+	std::vector<MobKills>::iterator mobs;
 	Character *get_mob_vnum(int vnum);
 	Character *tmpchar;
 
@@ -172,7 +170,7 @@ void AreaData::DisplayAreaData(Character *ch)
 void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
 {
 	MobKills mobObj;
-	vector<MobKills>::iterator mobs;
+	std::vector<MobKills>::iterator mobs;
 
 	if (areaStats.end() == areaStats.find(zone))
 	{

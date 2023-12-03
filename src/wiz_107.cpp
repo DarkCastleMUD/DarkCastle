@@ -63,7 +63,7 @@ int do_pview(Character *ch, char *argument, int cmd)
 {
   char name[200];
   Character *victim;
-  string tprompt;
+  std::string tprompt;
 
   argument = one_argument(argument, name);
 
@@ -87,89 +87,91 @@ int do_pview(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_snoop(Character *ch, char *argument, int cmd)
+command_return_t Character::do_snoop(QStringList arguments, int cmd)
 {
-  char arg[MAX_STRING_LENGTH];
   Character *victim;
-  char buf[100];
 
-  if (!ch->desc)
+  if (!this->desc)
     return eFAILURE;
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
   {
-    send_to_char("Did you ever try this before?", ch);
+    send_to_char("Did you ever try this before?", this);
     return eFAILURE;
   }
 
-  if (!has_skill(ch, COMMAND_SNOOP))
+  if (!has_skill(COMMAND_SNOOP))
   {
-    send_to_char("Huh?\r\n", ch);
+    send_to_char("Huh?\r\n", this);
     return eFAILURE;
   }
 
-  one_argument(argument, arg);
+  QString arg1 = arguments.value(0);
 
-  if (!*arg)
+  if (arg1.isEmpty())
   {
-    send_to_char("Snoop whom ?\n\r", ch);
+    send_to_char("Snoop whom?\n\r", this);
     return eFAILURE;
   }
 
-  if (!(victim = get_active_pc_vis(ch, arg)))
+  if (!(victim = get_active_pc_vis(arg1)))
   {
     send_to_char("Your victim is either not available or "
                  "linkdead.\r\n",
-                 ch);
-    send_to_char("(You can only snoop a link-active pc.)\n\r", ch);
+                 this);
+    send_to_char("(You can only snoop a link-active pc.)\n\r", this);
     return eFAILURE;
   }
-  if ((victim->getLevel() > ch->getLevel()) && (GET_NAME(ch) != GET_NAME(victim)))
+  if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
-    send_to_char("Can't do that. That mob is higher than you!\n\r", ch);
-    sprintf(buf, "%s tried to snoop a higher mob\n\r", GET_NAME(ch));
-    logentry(buf, OVERSEER, LogChannels::LOG_GOD);
+    send_to_char("Can't do that. That mob is higher than you!\n\r", this);
+    logentry(QString("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, LogChannels::LOG_GOD);
     return eFAILURE;
   }
 
-  if (victim == ch)
+  if (victim == this)
   {
-    send_to_char("Ok, you just snoop yourself.\r\n", ch);
-    if (ch->desc->snooping)
+    send_to_char("Ok, you just snoop yourself.\r\n", this);
+    if (this->desc->snooping)
     {
-      ch->desc->snooping->snoop_by = 0;
-      ch->desc->snooping = 0;
+      this->desc->snooping->snoop_by = 0;
+      this->desc->snooping = 0;
     }
-    sprintf(buf, "%s snoops themself.", GET_NAME(ch));
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(QString("%1 snoops themself.").arg(getName()), this->getLevel(), LogChannels::LOG_GOD);
     return eSUCCESS;
+  }
+
+  if (victim->getLevel() == IMPLEMENTER)
+  {
+    sendln("What are you!? Crazy! You can't snoop an Imp.");
+    victim->sendln(QString("%1 failed snooping you.").arg(getName()));
+    return eFAILURE;
   }
 
   if (victim->desc->snoop_by)
   {
-    send_to_char("Busy already. \n\r", ch);
-    return eFAILURE;
-
-    if (victim->getLevel() == IMPLEMENTER)
+    if (victim->desc->snoop_by->character)
     {
-      send_to_char("What are you!? Crazy! You can't snoop an Imp.\r\n", ch);
+      sendln(QString("%1 is snooping them already.").arg(victim->desc->snoop_by->character->getName()));
     }
-    sprintf(buf, "%s failed snooping you. \n\r", GET_NAME(ch));
-    send_to_char(buf, victim);
+    else
+    {
+      sendln(QString("Descriptor #%1 is snooping them already.").arg(victim->desc->snoop_by->descriptor));
+    }
+
     return eFAILURE;
   }
 
   /* It's power trip time again, eh? */
 
-  send_to_char("Ok. \n\r", ch);
+  sendln("Ok.");
 
-  if (ch->desc->snooping)
-    ch->desc->snooping->snoop_by = 0;
+  if (this->desc->snooping)
+    this->desc->snooping->snoop_by = nullptr;
 
-  ch->desc->snooping = victim->desc;
-  victim->desc->snoop_by = ch->desc;
-  sprintf(buf, "%s snoops %s.", GET_NAME(ch), GET_NAME(victim));
-  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+  this->desc->snooping = victim->desc;
+  victim->desc->snoop_by = this->desc;
+  logentry(QString("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -213,7 +215,7 @@ int do_send(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(vict = get_active_pc_vis(ch, name)))
+  if (!(vict = ch->get_active_pc_vis(name)))
   {
     send_to_char("Noone by that name here.\r\n", ch);
     return eFAILURE;

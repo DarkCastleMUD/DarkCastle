@@ -89,7 +89,7 @@ int do_log(Character *ch, char *argument, int cmd)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
-  if (IS_MOB(ch) || !has_skill(ch, COMMAND_LOG))
+  if (IS_MOB(ch) || !ch->has_skill( COMMAND_LOG))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -138,7 +138,7 @@ int do_showbits(Character *ch, char *argument, int cmd)
     {
       if (IS_NPC(victim))
         continue;
-      sprintf(buf, "0.%s", GET_NAME(victim));
+      sprintf(buf, "0.%s", victim->getNameC());
       do_showbits(ch, buf, cmd);
     }
     return eSUCCESS;
@@ -149,7 +149,7 @@ int do_showbits(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  csendf(ch, "Player: %s\n\r", GET_NAME(victim));
+  csendf(ch, "Player: %s\n\r", victim->getNameC());
 
   if (DC::isSet(victim->combat, COMBAT_SHOCKED))
     send_to_char("COMBAT_SHOCKED\n\r", ch);
@@ -233,13 +233,13 @@ int do_showbits(Character *ch, char *argument, int cmd)
 
 int do_debug(Character *ch, char *args, int cmd)
 {
-  string arg1, arg2, arg3;
-  string remainder;
+  std::string arg1, arg2, arg3;
+  std::string remainder;
 
-  tie(arg1, remainder) = half_chop(args);
+  std::tie(arg1, remainder) = half_chop(args);
   if (arg1 == "perf")
   {
-    tie(arg2, remainder) = half_chop(remainder);
+    std::tie(arg2, remainder) = half_chop(remainder);
     if (arg2 == "list")
     {
       for (const auto &pt : PerfTimers)
@@ -249,12 +249,12 @@ int do_debug(Character *ch, char *args, int cmd)
     }
     else if (arg2 == "show")
     {
-      tie(arg3, remainder) = half_chop(remainder);
+      std::tie(arg3, remainder) = half_chop(remainder);
       if (arg3 == "all")
       {
         for (const auto &pt : PerfTimers)
         {
-          string key = pt.first;
+          std::string key = pt.first;
           Timer t = pt.second;
           csendf(ch, "%15s: "
                      "cur:%lus %luμs"
@@ -270,10 +270,10 @@ int do_debug(Character *ch, char *args, int cmd)
       }
       else if (arg3 != "")
       {
-        map<string, Timer>::iterator i = PerfTimers.find(arg3);
+        std::map<std::string, Timer>::iterator i = PerfTimers.find(arg3);
         if (i != PerfTimers.end())
         {
-          string key = i->first;
+          std::string key = i->first;
           Timer t = i->second;
           csendf(ch, "%15s: "
                      "cur:%lus %luμs"
@@ -299,7 +299,7 @@ int do_debug(Character *ch, char *args, int cmd)
   }
   else if (arg1 == "charmie")
   {
-    tie(arg2, remainder) = half_chop(remainder);
+    std::tie(arg2, remainder) = half_chop(remainder);
     if (remainder == "previous")
     {
       ch->load_charmie_equipment(QString(arg2.c_str()), true);
@@ -311,7 +311,7 @@ int do_debug(Character *ch, char *args, int cmd)
   }
   else if (arg1 == "player")
   {
-    tie(arg2, remainder) = half_chop(remainder);
+    std::tie(arg2, remainder) = half_chop(remainder);
     auto victim = get_pc(arg2.c_str());
     if (!victim)
     {
@@ -324,7 +324,7 @@ int do_debug(Character *ch, char *args, int cmd)
   }
   else if (arg1 == "mobile")
   {
-    tie(arg2, remainder) = half_chop(remainder);
+    std::tie(arg2, remainder) = half_chop(remainder);
     auto match = QRegularExpression("^v{0,1}([0-9]+)$").match(arg2.c_str());
 
     if (match.hasMatch())
@@ -435,7 +435,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
   send_to_char("Done.\r\n", ch);
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
-          GET_NAME(ch), GET_NAME(victim), flag);
+          GET_NAME(ch), victim->getNameC(), flag);
   logentry(log_buf, ch->getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
@@ -525,7 +525,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
       "list",
       "save",
       "\n"};
-  if (!has_skill(ch, COMMAND_SQEDIT))
+  if (!ch->has_skill( COMMAND_SQEDIT))
   {
     send_to_char("You are unable to do so.\r\n", ch);
     return eFAILURE;
@@ -975,8 +975,7 @@ int do_listproc(Character *ch, char *argument, int a)
       break;
     if (mob)
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot,
-              i, ((Character *)mob_index[real_mobile(i)].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Character *)mob_index[real_mobile(i)].item)->getNameC());
     }
     else
     {

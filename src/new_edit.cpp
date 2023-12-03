@@ -20,7 +20,7 @@
 #include <string>
 #include <fmt/format.h>
 
-using namespace std;
+
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(Character *ch, int abort);
@@ -35,7 +35,7 @@ void parse_action(int command, char *str, class Connection *d)
    int j = 0;
    int i, line_low, line_high;
    char *s, *t, temp, buf[32768], buf2[32768];
-   string sbuffer;
+   std::string sbuffer;
 
    switch (command)
    {
@@ -104,19 +104,19 @@ void parse_action(int command, char *str, class Connection *d)
       s = strtok(nullptr, "'");
       if (s == nullptr)
       {
-         SEND_TO_Q("Target string must be enclosed in single quotes.\r\n", d);
+         SEND_TO_Q("Target std::string must be enclosed in single quotes.\r\n", d);
          return;
       }
       t = strtok(nullptr, "'");
       if (t == nullptr)
       {
-         SEND_TO_Q("No replacement string.\r\n", d);
+         SEND_TO_Q("No replacement std::string.\r\n", d);
          return;
       }
       t = strtok(nullptr, "'");
       if (t == nullptr)
       {
-         SEND_TO_Q("Replacement string must be enclosed in single quotes.\r\n", d);
+         SEND_TO_Q("Replacement std::string must be enclosed in single quotes.\r\n", d);
          return;
       }
       total_len = ((strlen(t) - strlen(s)) + strlen(*d->strnew));
@@ -136,7 +136,7 @@ void parse_action(int command, char *str, class Connection *d)
          }
          else
          {
-            SEND_TO_Q("ERROR: Replacement string causes buffer overflow, aborted replace.\r\n", d);
+            SEND_TO_Q("ERROR: Replacement std::string causes buffer overflow, aborted replace.\r\n", d);
          }
       }
       else
@@ -499,10 +499,10 @@ void parse_action(int command, char *str, class Connection *d)
    }
 }
 
-/* string manipulation fucntion originally by Darren Wilson */
+/* std::string manipulation fucntion originally by Darren Wilson */
 /* (wilson@shark.cc.cc.ca.us) improved and bug fixed by Chris (zero@cnw.com) */
 /* completely re-written again by M. Scott 10/15/96 (scottm@workcommn.net), */
-/* substitute appearances of 'pattern' with 'replacement' in string */
+/* substitute appearances of 'pattern' with 'replacement' in std::string */
 /* and return the # of replacements */
 int replace_str(char **string, char *pattern, char *replacement, int rep_all,
                 int max_size)

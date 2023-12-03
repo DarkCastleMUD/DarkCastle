@@ -101,7 +101,7 @@ int do_maxes(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
   GET_CLASS(ch) = i;
-  if ((classskill = get_skill_list(ch)) == nullptr)
+  if ((classskill = ch->get_skill_list()) == nullptr)
     return eFAILURE;
   GET_CLASS(ch) = oclass;
   // Same problem with races... get_max_stat(ch, attribute_t::STRENGTH
@@ -133,14 +133,14 @@ int do_maxes(Character *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-command_return_t do_bestow(Character *ch, string arg, int cmd)
+command_return_t do_bestow(Character *ch, std::string arg, int cmd)
 {
   Character *vict = nullptr;
-  string buf;
-  string command;
+  std::string buf;
+  std::string command;
   int i;
 
-  tie(arg, command) = half_chop(arg);
+  std::tie(arg, command) = half_chop(arg);
 
   if (arg.empty())
   {
@@ -166,7 +166,7 @@ command_return_t do_bestow(Character *ch, string arg, int cmd)
     {
       if (bestowable_god_commands[i].testcmd == false)
       {
-        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---"));
+        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, vict->has_skill( bestowable_god_commands[i].num) ? "YES" : "---"));
       }
     }
 
@@ -178,7 +178,7 @@ command_return_t do_bestow(Character *ch, string arg, int cmd)
     {
       if (bestowable_god_commands[i].testcmd == true)
       {
-        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---"));
+        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, vict->has_skill( bestowable_god_commands[i].num) ? "YES" : "---"));
       }
     }
 
@@ -196,7 +196,7 @@ command_return_t do_bestow(Character *ch, string arg, int cmd)
   }
 
   // if has
-  if (has_skill(vict, bestowable_god_commands[i].num))
+  if (vict->has_skill( bestowable_god_commands[i].num))
   {
     ch->send(fmt::format("{} already has that command.\r\n", GET_NAME(vict)));
     return eSUCCESS;
@@ -347,7 +347,7 @@ int do_chpwd(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)GET_NAME(victim)), PASSWORD_LEN);
+  strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
   victim->player->pwd[PASSWORD_LEN] = '\0';
 
   send_to_char("Ok.\r\n", ch);
@@ -439,7 +439,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       GET_PLATINUM(victim) -= 500;
       send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QString("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QString("500 platinum removed from %1 for rename.").arg(GET_NAME(victim)), level_, LogChannels::LOG_GOD);
+      logentry(QString("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
     }
   }
 
@@ -466,7 +466,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
         DC::isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp(victim->equipment[iWear]->name);
-      qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+      qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
@@ -482,7 +482,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
         if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp(obj->name);
-          qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+          qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
@@ -500,7 +500,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = QString("%1").arg(obj->name);
-      qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+      qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
@@ -516,7 +516,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
         if (DC::isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = QString("%1").arg(obj2->name);
-          qsizetype x = tmp.length() - strlen(GET_NAME(victim)) - 1;
+          qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
@@ -531,19 +531,19 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
 
   auto clan = GET_CLAN(victim);
   auto rights = plr_rights(victim);
-  do_outcast(victim, GET_NAME(victim), CMD_DEFAULT);
+  victim->do_outcast(victim->getName().split(' '));
 
-  do_fsave(this, GET_NAME(victim), CMD_DEFAULT);
+  do_fsave(this, victim->getNameC(), CMD_DEFAULT);
 
   // Copy the pfile
   QString buffer;
   if (DC::getInstance()->cf.bport == false)
   {
-    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
   system(buffer.toStdString().c_str());
@@ -553,11 +553,11 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   // Only copy golems if they exist
   for (unsigned i = 0; i < MAX_GOLEMS; i++)
   {
-    QString src_filename = QString("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(i);
+    QString src_filename = QString("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
     if (0 == stat(src_filename.toStdString().c_str(), &buf))
     {
       // Make backup
-      QString dst_filename = QString("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->name[0]).arg(GET_NAME(victim)).arg(i);
+      QString dst_filename = QString("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
       QString command = QString("cp -f %1 %2").arg(src_filename).arg(dst_filename);
       system(command.toStdString().c_str());
 
@@ -568,14 +568,14 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     }
   }
 
-  buffer = QString("%1 renamed to %2.").arg(GET_NAME(victim)).arg(newname);
+  buffer = QString("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
   logentry(buffer, level_, LogChannels::LOG_GOD);
 
   // handle the renames
-  AuctionHandleRenames(this, GET_NAME(victim), newname);
+  AuctionHandleRenames(this, victim->getNameC(), newname);
 
   // Get rid of the existing one
-  do_zap(this, GET_NAME(victim), 10);
+  do_zap(victim->getName().split(' '), 10);
 
   // load the new guy
   do_linkload(newname.split(' '), CMD_DEFAULT);
@@ -594,7 +594,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     clan_data *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(GET_NAME(victim), this->clan)))
+    if ((pmember = get_member(victim->getNameC(), this->clan)))
       pmember->member_rights = rights;
     add_totem_stats(victim);
   }
@@ -609,7 +609,7 @@ int do_install(Character *ch, char *arg, int cmd)
   int range = 0, type_ok = 0, numrooms = 0;
   int ret;
 
-  /*  if(!has_skill(ch, COMMAND_INSTALL)) {
+  /*  if(!ch->has_skill( COMMAND_INSTALL)) {
           send_to_char("Huh?\r\n", ch);
           return eFAILURE;
     }
@@ -717,7 +717,7 @@ int do_range(Character *ch, char *arg, int cmd)
     extern world_file_list_item *   mob_file_list;
     extern world_file_list_item *   obj_file_list;
   */
-  if (!has_skill(ch, COMMAND_RANGE))
+  if (!ch->has_skill( COMMAND_RANGE))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -773,7 +773,7 @@ int do_range(Character *ch, char *arg, int cmd)
     case 'm':
       victim->player->buildMLowVnum = low;
       victim->player->buildMHighVnum = high;
-      sprintf(message, "%s M range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+      sprintf(message, "%s M range set to %d-%d.\r\n", victim->getNameC(), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
       send_to_char(message, victim);
@@ -781,7 +781,7 @@ int do_range(Character *ch, char *arg, int cmd)
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
-      sprintf(message, "%s O range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+      sprintf(message, "%s O range set to %d-%d.\r\n", victim->getNameC(), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
       send_to_char(message, victim);
@@ -789,7 +789,7 @@ int do_range(Character *ch, char *arg, int cmd)
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
-      sprintf(message, "%s R range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+      sprintf(message, "%s R range set to %d-%d.\r\n", victim->getNameC(), low, high);
       send_to_char(message, ch);
       sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
       send_to_char(message, victim);
@@ -803,7 +803,7 @@ int do_range(Character *ch, char *arg, int cmd)
   {
     victim->player->buildLowVnum = victim->player->buildOLowVnum = victim->player->buildMLowVnum = low;
     victim->player->buildHighVnum = victim->player->buildOHighVnum = victim->player->buildMHighVnum = high;
-    sprintf(message, "%s range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+    sprintf(message, "%s range set to %d-%d.\r\n", victim->getNameC(), low, high);
     send_to_char(message, ch);
     sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
     send_to_char(message, victim);
@@ -958,7 +958,7 @@ int do_testhit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void write_array_csv(const char *const *array, ofstream &fout)
+void write_array_csv(const char *const *array, std::ofstream &fout)
 {
   int index = 0;
   const char *ptr = array[index];
@@ -969,7 +969,7 @@ void write_array_csv(const char *const *array, ofstream &fout)
   }
 }
 
-void write_array_csv(QStringList names, ofstream &fout)
+void write_array_csv(QStringList names, std::ofstream &fout)
 {
   for (const auto &entry : names)
   {
@@ -991,12 +991,12 @@ int do_export(Character *ch, char *args, int cmdnum)
     return eFAILURE;
   }
 
-  ofstream fout;
-  fout.exceptions(ofstream::failbit | ofstream::badbit);
+  std::ofstream fout;
+  fout.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
   try
   {
-    fout.open(filename, ios_base::out);
+    fout.open(filename, std::ios_base::out);
 
     fout << "vnum,name,short_description,description,action_description,type,";
     fout << "size,value[0],value[1],value[2],value[3],level,weight,cost,";
@@ -1006,7 +1006,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     write_array_csv(Object::extra_bits, fout);
     write_array_csv(Object::more_obj_bits, fout);
 
-    fout << "affects" << endl;
+    fout << "affects" << std::endl;
 
     while (curr)
     {
@@ -1019,9 +1019,9 @@ int do_export(Character *ch, char *args, int cmdnum)
 
     fout.close();
   }
-  catch (ofstream::failure &e)
+  catch (std::ofstream::failure &e)
   {
-    stringstream errormsg;
+    std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
     logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
   }
@@ -1031,7 +1031,7 @@ int do_export(Character *ch, char *args, int cmdnum)
   return eSUCCESS;
 }
 
-command_return_t do_world(Character *ch, string args, int cmd)
+command_return_t do_world(Character *ch, std::string args, int cmd)
 {
 
   if (args == "rename")

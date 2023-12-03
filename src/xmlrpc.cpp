@@ -12,7 +12,7 @@
 #include <crypt.h>
 #endif
 
-using namespace std;
+
 using namespace XmlRpc;
 
 class common {
@@ -81,7 +81,7 @@ public:
 
     // Remove \r characters from web input
     unsigned int index = 0;
-    while((index = contents.find('\r', index)) != string::npos) {
+    while((index = contents.find('\r', index)) != std::string::npos) {
 	contents.erase(index, 1);
     }
 
@@ -109,11 +109,11 @@ public:
 	  ch->desc->strnew = 0;
 	  send_to_char("Entry submitted.\r\n", ch);
 	} else {
-	  string str_result = *(ch->desc->strnew);
+	  std::string str_result = *(ch->desc->strnew);
 
 	  // Remove \r characters before sending this to the web form
 	  index = 0;
-	  while((index = str_result.find('\r', index)) != string::npos) {
+	  while((index = str_result.find('\r', index)) != std::string::npos) {
 	      str_result.erase(index, 1);
 	  }
 	  result = str_result.c_str();
@@ -177,7 +177,7 @@ XmlRpcServer *xmlrpc_init(int xmlrpc_port)
 
   while (!s->bindAndListen(xmlrpc_port)) {
     xmlrpc_port++;
-    // cerr <<  "Trying port " << xmlrpc_port << endl;
+    // std::cerr <<  "Trying port " << xmlrpc_port << std::endl;
   }
 
   return s;

@@ -470,7 +470,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
         {
             if (d->character == nullptr)
                 continue;
-            if (d->character->name == nullptr)
+            if (d->character->getNameC() == nullptr)
                 continue;
         }
         if (d->character)
@@ -485,7 +485,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
 
         if (!searchkey.isEmpty())
         {
-            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->name != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
+            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->getNameC() != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
             {
                 continue;
             }
@@ -649,4 +649,31 @@ void Character::setLevel(level_t level)
         produce_coredump();
         logentry(QString("Warning: setLevel(%1).").arg(level_));
     }
+}
+
+bool Character::isPlayer(void)
+{
+    return !isNPC() && player;
+}
+
+bool Character::isNPC(void)
+{
+    return DC::isSet(misc, MISC_IS_MOB);
+}
+
+move_t Character::move_limit(void)
+{
+    move_t max;
+
+    if (isPlayer())
+        /* HERE SHOULD BE CON CALCULATIONS INSTEAD */
+        max = (max_move) + graf(age().year, 50, 70, 160, 120, 100, 40, 20);
+    else
+        max = max_move;
+
+    /* Class/Level calculations */
+
+    /* Skill/Spell calculations */
+
+    return max;
 }

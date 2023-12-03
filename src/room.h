@@ -126,7 +126,7 @@ struct room_track_data
     int direction;
     int sex;
     int condition;
-    char *trackee;
+    QString trackee;
 
     room_track_data *next;
     room_track_data *previous;

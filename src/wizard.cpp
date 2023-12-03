@@ -152,7 +152,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
 {
   Object *obj = nullptr;
   obj_list_t obj_list = {};
-  string buf;
+  std::string buf;
 
   if (cnt == 0)
   {
@@ -299,19 +299,19 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (k->fighting ? GET_NAME(k->fighting) : "Nobody"),
           (races[(int)(GET_RACE(k))].singular_name),
-          k->getHP(), hit_limit(k), hit_gain(k),
+          k->getHP(), hit_limit(k), k->hit_gain_lookup(),
           /* end of fourth line */
 
           (k->master ? GET_NAME(k->master) : "Nobody"),
-          buf2, /* this is for the class string, the sprinttype above inits it. */
-          GET_MANA(k), mana_limit(k), mana_gain(k));
+          buf2, /* this is for the class std::string, the sprinttype above inits it. */
+          GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
   /* end of the first sprintf */
 
   send_to_char(buf, ch); // this sends to char, now we can overwrite buf
 
   if (IS_MOB(k))
   {
-    sprintf(buf2, "%s", (k->mobdata->hatred ? k->mobdata->hatred : "NOBODY"));
+    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
   }
   else
@@ -327,7 +327,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
           buf2, // who the mob hates
           k->getLevel(),
-          GET_MOVE(k), move_limit(k), move_gain(k, 0),
+          GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
           /* end of first line */
 
           buf3, // who the mob fears, if anyone
@@ -335,7 +335,7 @@ void boro_mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k),
           /* end of second line */
 
-          (k->hunting ? k->hunting : "NOBODY"),
+          (k->hunting.isEmpty() ? "NOBODY" : k->hunting.toStdString().c_str()),
           GET_WEIGHT(k),
           k->alignment);
 
@@ -392,9 +392,10 @@ void boro_mob_stat(Character *ch, Character *k)
   /* end of fourth sprintf */
   send_to_char(buf, ch);
 
-  sprinttype(GET_POS(k), position_types, buf2);
+  sprinttype(GET_POS(k), Character::position_types, buf2);
+
   if (IS_NPC(k))
-    sprinttype((k->mobdata->default_pos), position_types, buf3);
+    sprinttype((k->mobdata->default_pos), Character::position_types, buf3);
   else
     strcpy(buf3, "PC");
 
@@ -487,7 +488,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
-            age(k).year, age(k).month, age(k).day, age(k).hours);
+            k->age().year, k->age().month, k->age().day, k->age().hours);
     send_to_char(buf, ch);
   }
 
@@ -649,7 +650,7 @@ void mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
-            age(k).year, age(k).month, age(k).day, age(k).hours);
+            k->age().year, k->age().month, k->age().day, k->age().hours);
     send_to_char(buf, ch);
   }
   if (IS_NPC(k))
@@ -694,9 +695,9 @@ void mob_stat(Character *ch, Character *k)
   send_to_char(buf, ch);
 
   sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
-          GET_MANA(k), mana_limit(k), mana_gain(k),
-          k->getHP(), hit_limit(k), hit_gain(k),
-          GET_MOVE(k), move_limit(k), move_gain(k, 0),
+          GET_MANA(k), mana_limit(k), k->mana_gain_lookup(),
+          k->getHP(), hit_limit(k), k->hit_gain_lookup(),
+          GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
           GET_KI(k), ki_limit(k));
   send_to_char(buf, ch);
 
@@ -711,8 +712,7 @@ void mob_stat(Character *ch, Character *k)
     send_to_char(buf, ch);
   }
 
-  sprinttype(GET_POS(k), position_types, buf2);
-  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", buf2,
+  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", k->getPositionQString().toStdString().c_str(),
           ((k->fighting) ? GET_NAME(k->fighting)
                          : "Nobody"));
   if (k->desc)
@@ -726,8 +726,7 @@ void mob_stat(Character *ch, Character *k)
   if (IS_NPC(k))
   {
     strcpy(buf, "$3Default position$R: ");
-    sprinttype((k->mobdata->default_pos), position_types, buf2);
-    strcat(buf, buf2);
+    strcat(buf, Character::position_to_string(k->mobdata->default_pos).toStdString().c_str());
     send_to_char(buf, ch);
   }
 
@@ -813,13 +812,13 @@ void mob_stat(Character *ch, Character *k)
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   send_to_char(buf, ch);
 
-  sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting) ? k->hunting : "NOBODY"));
+  sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
   send_to_char(buf, ch);
 
   if (IS_MOB(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
-            ((k->mobdata->hatred) ? k->mobdata->hatred : "NOBODY"));
+            (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Fears$R: '%s'\n\r",
@@ -1039,7 +1038,7 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, buf2);
   }
   strcat(buf, "  $3In object$R: ");
-  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name)));
+  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name).toStdString().c_str()));
   strcat(buf, "  $3Carried by$R: ");
   strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
   strcat(buf, "\n\r");
@@ -1310,7 +1309,7 @@ void obj_stat(Character *ch, class Object *j)
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
-    strcat(buf, fname(j2->name));
+    strcat(buf, fname(j2->name).toStdString().c_str());
     strcat(buf, "\n\r");
     found = true;
   }
@@ -1390,7 +1389,7 @@ void do_start(Character *ch)
 
   ch->fillHPLimit();
   GET_MANA(ch) = mana_limit(ch);
-  GET_MOVE(ch) = move_limit(ch);
+  ch->setMove(ch->move_limit());
 
   GET_COND(ch, THIRST) = 24;
   GET_COND(ch, FULL) = 24;
@@ -1400,7 +1399,7 @@ void do_start(Character *ch)
   ch->player->time.logon = time(0);
 }
 
-command_return_t do_repop(Character *ch, string arguments, int cmd)
+command_return_t do_repop(Character *ch, std::string arguments, int cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1408,20 +1407,20 @@ command_return_t do_repop(Character *ch, string arguments, int cmd)
     return eFAILURE;
   }
 
-  string arg1;
-  tie(arg1, arguments) = half_chop(arguments);
+  std::string arg1;
+  std::tie(arg1, arguments) = half_chop(arguments);
 
   if (arg1 == "full")
   {
     send_to_char("Performing full zone reset!\n\r", ch);
-    string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
+    std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     send_to_char("Resetting this entire zone!\n\r", ch);
-    string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
+    std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
@@ -1449,7 +1448,7 @@ int do_clear(Character *ch, char *argument, int cmd)
       produce_coredump(tmp_victim);
       continue;
     }
-    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1535,7 +1534,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
   void update_pos(Character * victim);
 
-  if (!has_skill(ch, COMMAND_RESTORE))
+  if (!ch->has_skill(COMMAND_RESTORE))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -1555,7 +1554,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
     GET_MANA(victim) = GET_MAX_MANA(victim);
     victim->fillHP();
-    GET_MOVE(victim) = GET_MAX_MOVE(victim);
+    victim->setMove(GET_MAX_MOVE(victim));
     GET_KI(victim) = GET_MAX_KI(victim);
 
     if (victim->getLevel() >= IMMORTAL)
@@ -1572,7 +1571,7 @@ int do_restore(Character *ch, char *argument, int cmd)
       }
     }
 
-    sprintf(buf, "%s restored %s.", GET_NAME(ch), GET_NAME(victim));
+    sprintf(buf, "%s restored %s.", GET_NAME(ch), victim->getNameC());
     logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
     update_pos(victim);
@@ -1604,7 +1603,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
         GET_MANA(victim) = GET_MAX_MANA(victim);
         victim->fillHP();
-        GET_MOVE(victim) = GET_MAX_MOVE(victim);
+        victim->setMove(GET_MAX_MOVE(victim));
         GET_KI(victim) = GET_MAX_KI(victim);
 
         if (victim->getLevel() >= IMMORTAL)
@@ -1958,7 +1957,7 @@ void pick_up_item(Character *ch, class Object *obj)
         hunt_items_list = in;
       int vnum = obj_index[obj->item_number].virt;
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-              obj->short_description, i->mobname, ch->name);
+              obj->short_description, i->mobname, ch->getNameC());
       send_info(buf);
       struct hunt_data *h = i->hunt;
       class Object *oitem = nullptr, *citem;
@@ -2070,7 +2069,7 @@ void pulse_hunts()
 
 int do_showhunt(Character *ch, char *arg, int cmd)
 {
-  string buf;
+  std::string buf;
   struct hunt_data *h;
   struct hunt_items *hi;
 
@@ -2121,12 +2120,12 @@ int do_huntstart(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER
   twitCurl twitterObj;
-  string authUrl, replyMsg;
-  string myOAuthAccessTokenKey("");
-  string myOAuthAccessTokenSecret("");
-  string userName("");
-  string passWord("");
-  string message("");
+  std::string authUrl, replyMsg;
+  std::string myOAuthAccessTokenKey("");
+  std::string myOAuthAccessTokenSecret("");
+  std::string userName("");
+  std::string passWord("");
+  std::string message("");
 
   userName = "username";
   passWord = "password";
@@ -2134,11 +2133,11 @@ int do_huntstart(Character *ch, char *argument, int cmd)
   twitterObj.setTwitterUsername(userName);
   twitterObj.setTwitterPassword(passWord);
 
-  twitterObj.getOAuth().setConsumerKey(string("xyz"));
-  twitterObj.getOAuth().setConsumerSecret(string("xyz"));
+  twitterObj.getOAuth().setConsumerKey(std::string("xyz"));
+  twitterObj.getOAuth().setConsumerSecret(std::string("xyz"));
 
-  twitterObj.getOAuth().setOAuthTokenKey(string("xyz-xyz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(string("xyz"));
+  twitterObj.getOAuth().setOAuthTokenKey(std::string("xyz-xyz"));
+  twitterObj.getOAuth().setOAuthTokenSecret(std::string("xyz"));
 
   if (twitterObj.accountVerifyCredGet())
   {
@@ -2202,7 +2201,7 @@ int do_huntstart(Character *ch, char *argument, int cmd)
   send_info(buf);
 
 #ifdef TWITTER
-  string holding[3] = {
+  std::string holding[3] = {
       "Get your ass to MAHS... err, DC.  There's a hunt!",
       "You may be wondering why I've gathered you here today.  There's a hunt!",
       "Aussie Aussie Aussie! Oi Oi Hunt!!"};

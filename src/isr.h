@@ -33,7 +33,7 @@
 #define ISR_FEAR           1<<23
 #define ISR_MAX		   23
 
-// if you add an ISR, add the string to get_isr_string in utility.cpp
+// if you add an ISR, add the std::string to get_isr_string in utility.cpp
 
 
 #define SAVE_TYPE_FIRE     0

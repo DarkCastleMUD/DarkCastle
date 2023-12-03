@@ -959,35 +959,37 @@ int do_stand(Character *ch, char *argument, int cmd)
 {
   switch (GET_POS(ch))
   {
-  case POSITION_STANDING:
+  case position_t::STANDING:
   {
     act("You are already standing.", ch, 0, 0, TO_CHAR, 0);
   }
   break;
-  case POSITION_SITTING:
+  case position_t::SITTING:
   {
     act("You stand up.", ch, 0, 0, TO_CHAR, 0);
     act("$n clambers on $s feet.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     if (ch->fighting)
       ch->setPOSFighting();
     else
-      GET_POS(ch) = POSITION_STANDING;
+      ch->setStanding();
+    ;
   }
   break;
-  case POSITION_RESTING:
+  case position_t::RESTING:
   {
     act("You stop resting, and stand up.", ch, 0, 0, TO_CHAR, 0);
     act("$n stops resting, and clambers on $s feet.",
         ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_STANDING;
+    ch->setStanding();
+    ;
   }
   break;
-  case POSITION_SLEEPING:
+  case position_t::SLEEPING:
   {
     act("You have to wake up first!", ch, 0, 0, TO_CHAR, 0);
   }
   break;
-  case POSITION_FIGHTING:
+  case position_t::FIGHTING:
   {
     act("Do you not consider fighting as standing?",
         ch, 0, 0, TO_CHAR, 0);
@@ -997,7 +999,8 @@ int do_stand(Character *ch, char *argument, int cmd)
   {
     act("You stop floating around, and put your feet on the ground.", ch, 0, 0, TO_CHAR, 0);
     act("$n stops floating around, and puts $s feet on the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_STANDING;
+    ch->setStanding();
+    ;
   }
   break;
   }
@@ -1015,31 +1018,31 @@ int do_sit(Character *ch, char *argument, int cmd)
 
   switch (GET_POS(ch))
   {
-  case POSITION_STANDING:
+  case position_t::STANDING:
   {
     act("You sit down.", ch, 0, 0, TO_CHAR, 0);
     act("$n sits down.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
   }
   break;
-  case POSITION_SITTING:
+  case position_t::SITTING:
   {
     send_to_char("You're sitting already.\r\n", ch);
   }
   break;
-  case POSITION_RESTING:
+  case position_t::RESTING:
   {
     act("You stop resting, and sit up.", ch, 0, 0, TO_CHAR, 0);
     act("$n stops resting.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
   }
   break;
-  case POSITION_SLEEPING:
+  case position_t::SLEEPING:
   {
     act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
   }
   break;
-  case POSITION_FIGHTING:
+  case position_t::FIGHTING:
   {
     act("Sit down while fighting? are you MAD?",
         ch, 0, 0, TO_CHAR, 0);
@@ -1051,7 +1054,7 @@ int do_sit(Character *ch, char *argument, int cmd)
         ch, 0, 0, TO_CHAR, 0);
     act("$n stops floating around, and sits down.",
         ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
   }
   break;
   }
@@ -1069,32 +1072,32 @@ int do_rest(Character *ch, char *argument, int cmd)
 
   switch (GET_POS(ch))
   {
-  case POSITION_STANDING:
+  case position_t::STANDING:
   {
     act("You sit down and rest your tired bones.",
         ch, 0, 0, TO_CHAR, 0);
     act("$n sits down and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_RESTING;
+    ch->setResting();
   }
   break;
-  case POSITION_SITTING:
+  case position_t::SITTING:
   {
     act("You rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
     act("$n rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_RESTING;
+    ch->setResting();
   }
   break;
-  case POSITION_RESTING:
+  case position_t::RESTING:
   {
     act("You are already resting.", ch, 0, 0, TO_CHAR, 0);
   }
   break;
-  case POSITION_SLEEPING:
+  case position_t::SLEEPING:
   {
     act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
   }
   break;
-  case POSITION_FIGHTING:
+  case position_t::FIGHTING:
   {
     act("Rest while fighting? are you MAD?", ch, 0, 0, TO_CHAR, 0);
   }
@@ -1103,7 +1106,7 @@ int do_rest(Character *ch, char *argument, int cmd)
   {
     act("You stop floating around, and stop to rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
     act("$n stops floating around, and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
   }
   break;
   }
@@ -1130,29 +1133,29 @@ int do_sleep(Character *ch, char *argument, int cmd)
     }
 
   if ((paf = affected_by_spell(ch, SPELL_SLEEP)) &&
-      paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
+      paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
     paf->modifier = 0;
 
   switch (GET_POS(ch))
   {
-  case POSITION_STANDING:
+  case position_t::STANDING:
     send_to_char("You lie down and go to sleep.\r\n", ch);
     act("$n lies down and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SLEEPING;
+    ch->setSleeping();
     break;
-  case POSITION_SITTING:
-  case POSITION_RESTING:
+  case position_t::SITTING:
+  case position_t::RESTING:
     send_to_char("You lay back and go to sleep.\r\n", ch);
     act("$n lies back and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SLEEPING;
+    ch->setSleeping();
     break;
-  case POSITION_SLEEPING:
+  case position_t::SLEEPING:
   {
     send_to_char("You are already sound asleep.\r\n", ch);
     return eFAILURE; // so we don't set INTERNAL_SLEEPING
   }
   break;
-  case POSITION_FIGHTING:
+  case position_t::FIGHTING:
   {
     send_to_char("Sleep while fighting? Are you MAD?\n\r", ch);
     return eFAILURE; // so we don't set INTERNAL_SLEEPING
@@ -1162,7 +1165,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
   {
     act("You stop floating around, and lie down to sleep.", ch, 0, 0, TO_CHAR, 0);
     act("$n stops floating around, and lie down to sleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    GET_POS(ch) = POSITION_SLEEPING;
+    ch->setSleeping();
   }
   break;
   }
@@ -1178,108 +1181,110 @@ int do_sleep(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wake(Character *ch, char *argument, int cmd)
+command_return_t Character::wake(Character *victim)
 {
-  Character *tmp_char;
-  char arg[MAX_STRING_LENGTH];
-  struct affected_type *af;
-
-  one_argument(argument, arg);
-  if (*arg)
+  if (!isSleeping())
   {
-    if (GET_POS(ch) == POSITION_SLEEPING)
+    sendln("You are already awake...");
+    return eFAILURE;
+  }
+
+  auto af = affected_by_spell(SPELL_SLEEP);
+  if (af && af->modifier == 1)
+  {
+    sendln("You can't wake up!");
+    return eFAILURE;
+  }
+
+  sendln("You wake, and stand up.");
+  act("$n awakens.", this, 0, 0, TO_ROOM, 0);
+  setStanding();
+}
+
+command_return_t Character::do_wake(QStringList arguments, int cmd)
+{
+  Character *tmp_char{};
+
+  QString arg1 = arguments.value(0);
+  if (!arg1.isEmpty())
+  {
+    if (isSleeping())
     {
-      act("You can't wake people up if you are asleep yourself!", ch, 0, 0, TO_CHAR, 0);
+      act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
     }
     else
     {
-      tmp_char = get_char_room_vis(ch, arg);
+      tmp_char = get_char_room_vis(arg1);
       if (tmp_char)
       {
-        if (tmp_char == ch)
+        if (tmp_char == this)
         {
-          act("If you want to wake yourself up, just type 'wake'", ch, 0, 0, TO_CHAR, 0);
+          act("If you want to wake yourself up, just type 'wake'", this, 0, 0, TO_CHAR, 0);
         }
         else
         {
-          if (GET_POS(ch) == POSITION_FIGHTING)
+          if (GET_POS(this) == position_t::FIGHTING)
           {
-            if (GET_POS(tmp_char) == POSITION_SLEEPING)
+            if (GET_POS(tmp_char) == position_t::SLEEPING)
             {
-              if (number(1, 100) > GET_DEX(ch))
+              if (number(1, 100) > GET_DEX(this))
               {
-                act("You cannot meneuver yourself over to $M!", ch, 0, tmp_char, TO_CHAR, 0);
+                act("You cannot meneuver yourself over to $M!", this, 0, tmp_char, TO_CHAR, 0);
                 act("$n tries to move the flow of battle towards $N but is unable.",
-                    ch, 0, tmp_char, TO_ROOM, 0);
+                    this, 0, tmp_char, TO_ROOM, 0);
                 return eSUCCESS;
               }
-              if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1)
+              auto af = tmp_char->affected_by_spell(SPELL_SLEEP);
+              if (af && af->modifier == 1)
               {
-                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
+                act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
               }
               else
               {
-                act("You manage to give $M a swift kick in the ribs.", ch, 0, tmp_char, TO_CHAR, 0);
-                GET_POS(tmp_char) = POSITION_SITTING;
-                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
-                act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", ch, 0, tmp_char, TO_VICT, 0);
+                act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
+                tmp_char->setSitting();
+                act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+                act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
                 affect_from_char(tmp_char, INTERNAL_SLEEPING);
               }
             }
             else
             {
-              act("$N is already awake.", ch, 0, tmp_char, TO_CHAR, 0);
+              act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
             }
           }
           else
           {
-            if (GET_POS(tmp_char) == POSITION_SLEEPING)
+            if (GET_POS(tmp_char) == position_t::SLEEPING)
             {
-              if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1)
+              auto af = tmp_char->affected_by_spell(SPELL_SLEEP);
+              if (af && af->modifier == 1)
               {
-                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
+                act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
               }
               else
               {
-                act("You wake $M up.", ch, 0, tmp_char, TO_CHAR, 0);
-                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
-                GET_POS(tmp_char) = POSITION_SITTING;
-                act("You are awakened by $n.", ch, 0, tmp_char, TO_VICT, 0);
+                act("You wake $M up.", this, 0, tmp_char, TO_CHAR, 0);
+                act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+                tmp_char->setSitting();
+                act("You are awakened by $n.", this, 0, tmp_char, TO_VICT, 0);
                 affect_from_char(tmp_char, INTERNAL_SLEEPING);
               }
             }
             else
             {
-              act("$N is already awake.", ch, 0, tmp_char, TO_CHAR, 0);
+              act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
             }
           }
         }
       }
       else
       {
-        send_to_char("You do not see that person here.\r\n", ch);
+        send_to_char("You do not see that person here.\r\n", this);
       }
     }
   }
-  else
-  {
-    if (GET_POS(ch) > POSITION_SLEEPING)
-      send_to_char("You are already awake...\r\n", ch);
-    else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1)
-    {
-      send_to_char("You can't wake up!\n\r", ch);
-      //        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
-      //            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
-    }
-    else
-    {
-      //            else {
-      send_to_char("You wake, and stand up.\r\n", ch);
-      act("$n awakens.", ch, 0, 0, TO_ROOM, 0);
-      GET_POS(ch) = POSITION_STANDING;
-      //          }
-    }
-  }
+
   return eSUCCESS;
 }
 
@@ -1293,7 +1298,7 @@ int do_tag(Character *ch, char *argument, int cmd)
 
   one_argument(name, argument);
 
-  if (!*name || !(victim = get_char_room_vis(ch, name)))
+  if (!*name || !(victim = ch->get_char_room_vis( name)))
   {
     send_to_char("Tag who?\r\n", ch);
     return eFAILURE;

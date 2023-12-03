@@ -26,7 +26,7 @@
 #include "spells.h"
 #include "returnvals.h"
 
-using namespace std;
+
 
 extern bool MOBtrigger;
 
@@ -35,7 +35,7 @@ act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t 
   return act(str.toStdString().c_str(), ch, obj, vict_obj, destination, flags);
 }
 
-act_return act(const string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
@@ -113,7 +113,7 @@ act_return act(
         {
           continue;
         }
-        if (tmp_char->position > POSITION_SLEEPING || DC::isSet(flags, ASLEEP))
+        if (tmp_char->getPosition() > position_t::SLEEPING || DC::isSet(flags, ASLEEP))
         {
           if (!DC::isSet(flags, BARDSONG) || tmp_char->player == nullptr || !DC::isSet(tmp_char->player->toggles, Player::PLR_BARD_SONG))
           {
@@ -189,7 +189,7 @@ void send_message(const char *str, Character *to)
   SEND_TO_Q(str, to->desc);
 }
 
-void send_message(string str, Character *to)
+void send_message(std::string str, Character *to)
 {
   return send_message(str.c_str(), to);
 }

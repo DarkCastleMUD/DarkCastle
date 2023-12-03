@@ -17,13 +17,14 @@
 #ifndef INTERP_H_
 #define INTERP_H_
 
+#include "common.h"
 #include "character.h"
 #include "returnvals.h"
 
 class Character;
 
 char *remove_trailing_spaces(char *arg);
-int command_interpreter(Character *ch, string argument, bool procced = 0);
+int command_interpreter(Character *ch, std::string argument, bool procced = 0);
 int search_block(const char *arg, const char **l, bool exact);
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
@@ -32,20 +33,20 @@ const char *one_argument(const char *argument, char *first_arg);
 char *one_argument_long(char *argument, char *first_arg);
 char *one_argumentnolow(char *argument, char *first_arg);
 int fill_word(char *argument);
-void half_chop(const char *string, char *arg1, char *arg2);
-tuple<string, string> last_argument(string arguments);
-tuple<string, string> half_chop(string arguments, const char token = ' ');
-tuple<string, string> half_chop(const char *c_arg, const char token = ' ');
-tuple<QString, QString> half_chop(QString arguments, const char token = ' ');
-void chop_half(char *string, char *arg1, char *arg2);
-void nanny(class Connection *d, string arg = "");
+void half_chop(const char *str, char *arg1, char *arg2);
+std::tuple<std::string, std::string> last_argument(std::string arguments);
+std::tuple<std::string, std::string> half_chop(std::string arguments, const char token = ' ');
+std::tuple<std::string, std::string> half_chop(const char *c_arg, const char token = ' ');
+std::tuple<QString, QString> half_chop(QString arguments, const char token = ' ');
+void chop_half(char *str, char *arg1, char *arg2);
+void nanny(class Connection *d, std::string arg = "");
 bool is_abbrev(QString abbrev, QString word);
-// bool is_abbrev(const string &abbrev, const string &word);
+// bool is_abbrev(const std::string &abbrev, const std::string &word);
 // bool is_abbrev(const char *arg1, const char *arg2);
 int len_cmp(const char *s1, const char *s2);
 void add_command_lag(Character *ch, int cmdnum, int lag);
-string ltrim(string str);
-string rtrim(string str);
+std::string ltrim(std::string str);
+std::string rtrim(std::string str);
 
 const auto CMD_NORTH = 1;
 const auto CMD_EAST = 2;
@@ -154,25 +155,16 @@ const auto CMD_GAZE = 1820;
 typedef int DO_FUN(Character *ch, char *argument, int cmd);
 typedef int command_return_t;
 
-enum class CommandType
-{
-    all,
-    players_only,
-    non_players_only,
-    immortals_only,
-    implementors_only
-};
-
 struct command_info
 {
-    char *command_name;                                                              /* Name of ths command             */
-    int (*command_pointer)(Character *ch, char *argument, int cmd);                  /* Function that does it            */
-    command_return_t (*command_pointer2)(Character *ch, string argument, int cmd);   /* Function that does it            */
-    command_return_t (Character::*command_pointer3)(QStringList arguments, int cmd); /* Function that does it            */
-    uint8_t minimum_position;                                                        /* Position commander must be in    */
-    uint8_t minimum_level;                                                           /* Minimum level needed             */
-    int command_number;                                                              /* Passed to function as argument   */
-    int flags;                                                                       // what flags the skills has
+    char *command_name;                                                                 /* Name of ths command             */
+    int (*command_pointer)(Character *ch, char *argument, int cmd);                     /* Function that does it            */
+    command_return_t (*command_pointer2)(Character *ch, std::string argument, int cmd); /* Function that does it            */
+    command_return_t (Character::*command_pointer3)(QStringList arguments, int cmd);    /* Function that does it            */
+    position_t minimum_position;                                                        /* Position commander must be in    */
+    uint8_t minimum_level;                                                              /* Minimum level needed             */
+    int command_number;                                                                 /* Passed to function as argument   */
+    int flags;                                                                          // what flags the skills has
     uint8_t toggle_hide;
     CommandType type;
 };
@@ -212,7 +204,7 @@ command_return_t do_areastats(Character *ch, char *argument, int cmd);
 command_return_t do_awaymsgs(Character *ch, char *argument, int cmd);
 command_return_t do_alias(Character *ch, char *argument, int cmd);
 command_return_t do_archive(Character *ch, char *argument, int cmd);
-command_return_t do_autojoin(Character *ch, string argument, int cmd);
+command_return_t do_autojoin(Character *ch, std::string argument, int cmd);
 command_return_t do_unban(Character *ch, char *argument, int cmd);
 command_return_t do_ambush(Character *ch, char *argument, int cmd);
 command_return_t do_appraise(Character *ch, char *argument, int cmd);
@@ -224,7 +216,6 @@ command_return_t do_arena(Character *ch, char *argument, int cmd);
 command_return_t do_ask(Character *ch, char *argument, int cmd);
 command_return_t do_at(Character *ch, char *argument, int cmd);
 command_return_t do_auction(Character *ch, char *argument, int cmd);
-command_return_t do_backstab(Character *ch, char *argument, int cmd);
 command_return_t do_ban(Character *ch, char *argument, int cmd);
 command_return_t do_bandwidth(Character *ch, char *argument, int cmd);
 command_return_t do_bash(Character *ch, char *argument, int cmd);
@@ -235,7 +226,7 @@ command_return_t do_beacon(Character *ch, char *argument, int cmd);
 command_return_t do_beep(Character *ch, char *argument, int cmd);
 command_return_t do_behead(Character *ch, char *argument, int cmd);
 command_return_t do_berserk(Character *ch, char *argument, int cmd);
-command_return_t do_bestow(Character *ch, string argument, int cmd);
+command_return_t do_bestow(Character *ch, std::string argument, int cmd);
 command_return_t do_bladeshield(Character *ch, char *argument, int cmd);
 command_return_t do_bloodfury(Character *ch, char *argument, int cmd);
 command_return_t do_boot(Character *ch, char *argument, int cmd);
@@ -306,11 +297,11 @@ command_return_t do_flee(Character *ch, char *argument, int cmd);
 command_return_t do_focused_repelance(Character *ch, char *argument, int cmd);
 command_return_t do_follow(Character *ch, char *argument, int cmd);
 command_return_t do_forage(Character *ch, char *argument, int cmd);
-command_return_t do_force(Character *ch, string argument, int cmd);
+command_return_t do_force(Character *ch, std::string argument, int cmd);
 command_return_t do_found(Character *ch, char *argument, int cmd);
 command_return_t do_free_animal(Character *ch, char *argument, int cmd);
 command_return_t do_freeze(Character *ch, char *argument, int cmd);
-command_return_t do_fsave(Character *ch, string argument, int cmd);
+command_return_t do_fsave(Character *ch, std::string argument, int cmd);
 command_return_t do_get(Character *ch, char *argument, int cmd);
 command_return_t do_give(Character *ch, char *argument, int cmd);
 command_return_t do_global(Character *ch, char *argument, int cmd);
@@ -332,13 +323,12 @@ command_return_t do_mortal_help(Character *ch, char *argument, int cmd);
 command_return_t do_new_help(Character *ch, char *argument, int cmd);
 command_return_t do_hide(Character *ch, char *argument, int cmd);
 command_return_t do_highfive(Character *ch, char *argument, int cmd);
-command_return_t do_hit(Character *ch, char *argument, int cmd);
 command_return_t do_hitall(Character *ch, char *argument, int cmd);
 command_return_t do_holylite(Character *ch, char *argument, int cmd);
 command_return_t do_home(Character *ch, char *argument, int cmd);
 command_return_t do_idea(Character *ch, char *argument, int cmd);
 command_return_t do_identify(Character *ch, char *argument, int cmd);
-command_return_t do_ignore(Character *ch, string argument, int cmd);
+command_return_t do_ignore(Character *ch, std::string argument, int cmd);
 command_return_t do_imotd(Character *ch, char *argument, int cmd);
 command_return_t do_imbue(Character *ch, char *argument, int cmd);
 command_return_t do_incognito(Character *ch, char *argument, int cmd);
@@ -349,7 +339,6 @@ command_return_t do_innate(Character *ch, char *argument, int cmd);
 command_return_t do_instazone(Character *ch, char *argument, int cmd);
 command_return_t do_insult(Character *ch, char *argument, int cmd);
 command_return_t do_inventory(Character *ch, char *argument, int cmd);
-command_return_t do_join(Character *ch, char *argument, int cmd);
 command_return_t do_joinarena(Character *ch, char *argument, int cmd);
 command_return_t do_ki(Character *ch, char *argument, int cmd);
 command_return_t do_kick(Character *ch, char *argument, int cmd);
@@ -380,7 +369,6 @@ command_return_t do_opstat(Character *ch, char *argument, int cmd);
 command_return_t do_lock(Character *ch, char *argument, int cmd);
 command_return_t do_log(Character *ch, char *argument, int cmd);
 command_return_t do_look(Character *ch, char *argument, int cmd);
-command_return_t do_botcheck(Character *ch, char *argument, int cmd);
 command_return_t do_make_camp(Character *ch, char *argument, int cmd);
 command_return_t do_matrixinfo(Character *ch, char *argument, int cmd);
 command_return_t do_maxes(Character *ch, char *argument, int cmd);
@@ -437,7 +425,6 @@ command_return_t do_open(Character *ch, char *argument, int cmd);
 command_return_t do_order(Character *ch, char *argument, int cmd);
 command_return_t do_orchestrate(Character *ch, char *argument, int cmd);
 command_return_t do_osave(Character *ch, char *argument, int cmd);
-command_return_t do_outcast(Character *ch, char *argument, int cmd);
 command_return_t do_pardon(Character *ch, char *argument, int cmd);
 command_return_t do_pathpath(Character *ch, char *argument, int cmd);
 command_return_t do_peace(Character *ch, char *argument, int cmd);
@@ -457,7 +444,7 @@ command_return_t do_promote(Character *ch, char *argument, int cmd);
 command_return_t do_prompt(Character *ch, char *argument, int cmd);
 command_return_t do_lastprompt(Character *ch, char *argument, int cmd);
 command_return_t do_processes(Character *ch, char *argument, int cmd);
-command_return_t do_psay(Character *ch, string argument, int cmd);
+command_return_t do_psay(Character *ch, std::string argument, int cmd);
 // command_return_t do_pshopedit (Character *ch, char *argument, int cmd);
 command_return_t do_pview(Character *ch, char *argument, int cmd);
 command_return_t do_punish(Character *ch, char *argument, int cmd);
@@ -480,10 +467,9 @@ command_return_t do_redirect(Character *ch, char *argument, int cmd);
 command_return_t do_redit(Character *ch, char *argument, int cmd);
 command_return_t do_remove(Character *ch, char *argument, int cmd);
 command_return_t do_rent(Character *ch, char *argument, int cmd);
-command_return_t do_reply(Character *ch, string argument, int cmd);
-command_return_t do_repop(Character *ch, string argument, int cmd);
+command_return_t do_reply(Character *ch, std::string argument, int cmd);
+command_return_t do_repop(Character *ch, std::string argument, int cmd);
 command_return_t do_report(Character *ch, char *argument, int cmd);
-command_return_t do_rescue(Character *ch, char *argument, int cmd);
 command_return_t do_rest(Character *ch, char *argument, int cmd);
 command_return_t do_restore(Character *ch, char *argument, int cmd);
 command_return_t do_retreat(Character *ch, char *argument, int cmd);
@@ -492,7 +478,7 @@ command_return_t do_revoke(Character *ch, char *argument, int cmd);
 command_return_t do_rsave(Character *ch, char *argument, int cmd);
 command_return_t do_rstat(Character *ch, char *argument, int cmd);
 command_return_t do_sacrifice(Character *ch, char *argument, int cmd);
-command_return_t do_say(Character *ch, string argument, int cmd = CMD_SAY);
+command_return_t do_say(Character *ch, std::string argument, int cmd = CMD_SAY);
 command_return_t do_scan(Character *ch, char *argument, int cmd);
 command_return_t do_score(Character *ch, char *argument, int cmd);
 command_return_t do_scribe(Character *ch, char *argument, int cmd);
@@ -520,7 +506,6 @@ command_return_t do_sleep(Character *ch, char *argument, int cmd);
 command_return_t do_slip(Character *ch, char *argument, int cmd);
 command_return_t do_smite(Character *ch, char *argument, int cmd);
 command_return_t do_sneak(Character *ch, char *argument, int cmd);
-command_return_t do_snoop(Character *ch, char *argument, int cmd);
 command_return_t do_spells(Character *ch, char *argument, int cmd);
 command_return_t do_sqedit(Character *ch, char *argument, int cmd);
 command_return_t do_stalk(Character *ch, char *argument, int cmd);
@@ -537,7 +522,7 @@ command_return_t do_tactics(Character *ch, char *argument, int cmd);
 command_return_t do_tame(Character *ch, char *argument, int cmd);
 command_return_t do_taste(Character *ch, char *argument, int cmd);
 command_return_t do_teleport(Character *ch, char *argument, int cmd);
-command_return_t do_tellhistory(Character *ch, string argument, int cmd);
+command_return_t do_tellhistory(Character *ch, std::string argument, int cmd);
 command_return_t do_testhand(Character *ch, char *argument, int cmd);
 command_return_t do_testhit(Character *ch, char *argument, int cmd);
 command_return_t do_testport(Character *ch, char *argument, int cmd);
@@ -546,8 +531,7 @@ command_return_t do_thunder(Character *ch, char *argument, int cmd);
 command_return_t do_tick(Character *ch, char *argument, int cmd);
 command_return_t do_time(Character *ch, char *argument, int cmd);
 command_return_t do_title(Character *ch, char *argument, int cmd);
-command_return_t do_track(Character *ch, char *argument, int cmd);
-command_return_t do_transfer(Character *ch, string argument, int cmd = CMD_DEFAULT);
+command_return_t do_transfer(Character *ch, std::string argument, int cmd = CMD_DEFAULT);
 command_return_t do_triage(Character *ch, char *argument, int cmd);
 command_return_t do_trip(Character *ch, char *argument, int cmd);
 command_return_t do_trivia(Character *ch, char *argument, int cmd);
@@ -561,7 +545,6 @@ command_return_t do_vend(Character *ch, char *argument, int cmd);
 command_return_t do_version(Character *ch, char *argument, int cmd);
 command_return_t do_visible(Character *ch, char *argument, int cmd);
 command_return_t do_vitalstrike(Character *ch, char *argument, int cmd);
-command_return_t do_wake(Character *ch, char *argument, int cmd);
 command_return_t do_wear(Character *ch, char *argument, int cmd);
 command_return_t do_weather(Character *ch, char *argument, int cmd);
 command_return_t do_where(Character *ch, char *argument, int cmd);
@@ -572,15 +555,14 @@ command_return_t do_whogroup(Character *ch, char *argument, int cmd);
 command_return_t do_whosolo(Character *ch, char *argument, int cmd);
 command_return_t do_wield(Character *ch, char *argument, int cmd);
 command_return_t do_fakelog(Character *ch, char *argument, int cmd);
-command_return_t do_wiz(Character *ch, string argument, int cmd);
+command_return_t do_wiz(Character *ch, std::string argument, int cmd);
 command_return_t do_wizhelp(Character *ch, char *argument, int cmd);
 command_return_t do_wizinvis(Character *ch, char *argument, int cmd);
 command_return_t do_wizlist(Character *ch, char *argument, int cmd);
 command_return_t do_wizlock(Character *ch, char *argument, int cmd);
-command_return_t do_world(Character *ch, string args, int cmd);
+command_return_t do_world(Character *ch, std::string args, int cmd);
 command_return_t do_write_skillquest(Character *ch, char *argument, int cmd);
 command_return_t do_write(Character *ch, char *argument, int cmd);
-command_return_t do_zap(Character *ch, char *argument, int cmd);
 command_return_t do_zedit(Character *ch, char *argument, int cmd);
 command_return_t do_zoneexits(Character *ch, char *argument, int cmd);
 command_return_t do_editor(Character *ch, char *argument, int cmd);

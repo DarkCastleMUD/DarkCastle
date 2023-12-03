@@ -29,13 +29,13 @@ extern "C"
 #include "levels.h"
 #include "mobile.h"
 
-using namespace std;
+
 
 room_t IMM_PIRAHNA_ROOM = 25;
 
-map<int, int> fill_skill_cost()
+std::map<int, int> fill_skill_cost()
 {
-    map<int, int> skill_cost_map;
+    std::map<int, int> skill_cost_map;
     skill_cost_map[SKILL_KICK] = 5;
     skill_cost_map[SKILL_TRIP] = 7;
     skill_cost_map[SKILL_RESCUE] = 10;
@@ -99,9 +99,9 @@ map<int, int> fill_skill_cost()
     return skill_cost_map;
 }
 
-map<int, int> fill_scribe_recipes()
+std::map<int, int> fill_scribe_recipes()
 {
-    map<int, int> tmp_scribe_recipes;
+    std::map<int, int> tmp_scribe_recipes;
     tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CREATE_FOOD;
     tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CREATE_WATER;
     tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CONT_LIGHT;
@@ -157,11 +157,11 @@ map<int, int> fill_scribe_recipes()
     return tmp_scribe_recipes;
 }
 
-map<int, int> scribe_recipes = fill_scribe_recipes();
+std::map<int, int> scribe_recipes = fill_scribe_recipes();
 
-map<int, int> fill_scribe_ingredients()
+std::map<int, int> fill_scribe_ingredients()
 {
-    map<int, int> tmp_scribe_ingredients;
+    std::map<int, int> tmp_scribe_ingredients;
     tmp_scribe_ingredients[0] = RARE1_PAPER;
     tmp_scribe_ingredients[0] = RARE2_PAPER;
     tmp_scribe_ingredients[0] = RARE3_PAPER;
@@ -186,141 +186,141 @@ map<int, int> fill_scribe_ingredients()
     return tmp_scribe_ingredients;
 }
 
-map<int, int> scribe_ingredients = fill_scribe_ingredients();
+std::map<int, int> scribe_ingredients = fill_scribe_ingredients();
 
-vector<profession> fill_professions(void)
+std::vector<profession> fill_professions(void)
 {
-    vector<profession> tmp_professions;
+    std::vector<profession> tmp_professions;
 
     profession p;
-    p.name = string("legionnaire");
-    p.Name = string("Legionnaire");
+    p.name = std::string("legionnaire");
+    p.Name = std::string("Legionnaire");
     p.c_class = CLASS_WARRIOR;
     p.skillno = SKILL_LEGIONNAIRE;
     tmp_professions.push_back(p);
 
-    p.name = string("gladiator");
-    p.Name = string("Gladiator");
+    p.name = std::string("gladiator");
+    p.Name = std::string("Gladiator");
     p.c_class = CLASS_WARRIOR;
     p.skillno = SKILL_GLADIATOR;
     tmp_professions.push_back(p);
 
-    p.name = string("battlerager");
-    p.Name = string("Battlerager");
+    p.name = std::string("battlerager");
+    p.Name = std::string("Battlerager");
     p.c_class = CLASS_BARBARIAN;
     p.skillno = SKILL_BATTLERAGER;
     tmp_professions.push_back(p);
 
-    p.name = string("chieftan");
-    p.Name = string("Chieftan");
+    p.name = std::string("chieftan");
+    p.Name = std::string("Chieftan");
     p.c_class = CLASS_BARBARIAN;
     p.skillno = SKILL_CHIEFTAN;
     tmp_professions.push_back(p);
 
-    p.name = string("pilferer");
-    p.Name = string("Pilferer");
+    p.name = std::string("pilferer");
+    p.Name = std::string("Pilferer");
     p.c_class = CLASS_THIEF;
     p.skillno = SKILL_PILFERER;
     tmp_professions.push_back(p);
 
-    p.name = string("assassin");
-    p.Name = string("Assassin");
+    p.name = std::string("assassin");
+    p.Name = std::string("Assassin");
     p.c_class = CLASS_THIEF;
     p.skillno = SKILL_ASSASSIN;
     tmp_professions.push_back(p);
 
-    p.name = string("warmage");
-    p.Name = string("Warmage");
+    p.name = std::string("warmage");
+    p.Name = std::string("Warmage");
     p.c_class = CLASS_MAGE;
     p.skillno = SKILL_WARMAGE;
     tmp_professions.push_back(p);
 
-    p.name = string("spellbinder");
-    p.Name = string("Spellbinder");
+    p.name = std::string("spellbinder");
+    p.Name = std::string("Spellbinder");
     p.c_class = CLASS_MAGE;
     p.skillno = SKILL_SPELLBINDER;
     tmp_professions.push_back(p);
 
-    p.name = string("zealot");
-    p.Name = string("Zealot");
+    p.name = std::string("zealot");
+    p.Name = std::string("Zealot");
     p.c_class = CLASS_CLERIC;
     p.skillno = SKILL_ZEALOT;
     tmp_professions.push_back(p);
 
-    p.name = string("ritualist");
-    p.Name = string("Ritualist");
+    p.name = std::string("ritualist");
+    p.Name = std::string("Ritualist");
     p.c_class = CLASS_CLERIC;
     p.skillno = SKILL_RITUALIST;
     tmp_professions.push_back(p);
 
-    p.name = string("elementalist");
-    p.Name = string("Elementalist");
+    p.name = std::string("elementalist");
+    p.Name = std::string("Elementalist");
     p.c_class = CLASS_DRUID;
     p.skillno = SKILL_ELEMENTALIST;
     tmp_professions.push_back(p);
 
-    p.name = string("shapeshifter");
-    p.Name = string("Shapeshifter");
+    p.name = std::string("shapeshifter");
+    p.Name = std::string("Shapeshifter");
     p.c_class = CLASS_DRUID;
     p.skillno = SKILL_SHAPESHIFTER;
     tmp_professions.push_back(p);
 
-    p.name = string("cultist");
-    p.Name = string("Cultist");
+    p.name = std::string("cultist");
+    p.Name = std::string("Cultist");
     p.c_class = CLASS_ANTI_PAL;
     p.skillno = SKILL_CULTIST;
     tmp_professions.push_back(p);
 
-    p.name = string("reaver");
-    p.Name = string("Reaver");
+    p.name = std::string("reaver");
+    p.Name = std::string("Reaver");
     p.c_class = CLASS_ANTI_PAL;
     p.skillno = SKILL_REAVER;
     tmp_professions.push_back(p);
 
-    p.name = string("templar");
-    p.Name = string("Templar");
+    p.name = std::string("templar");
+    p.Name = std::string("Templar");
     p.c_class = CLASS_PALADIN;
     p.skillno = SKILL_TEMPLAR;
     tmp_professions.push_back(p);
 
-    p.name = string("inquisitor");
-    p.Name = string("Inquisitor");
+    p.name = std::string("inquisitor");
+    p.Name = std::string("Inquisitor");
     p.c_class = CLASS_PALADIN;
     p.skillno = SKILL_INQUISITOR;
     tmp_professions.push_back(p);
 
-    p.name = string("scout");
-    p.Name = string("Scout");
+    p.name = std::string("scout");
+    p.Name = std::string("Scout");
     p.c_class = CLASS_RANGER;
     p.skillno = SKILL_SCOUT;
     tmp_professions.push_back(p);
 
-    p.name = string("tracker");
-    p.Name = string("Tracker");
+    p.name = std::string("tracker");
+    p.Name = std::string("Tracker");
     p.c_class = CLASS_RANGER;
     p.skillno = SKILL_TRACKER;
     tmp_professions.push_back(p);
 
-    p.name = string("sensei");
-    p.Name = string("Sensei");
+    p.name = std::string("sensei");
+    p.Name = std::string("Sensei");
     p.c_class = CLASS_MONK;
     p.skillno = SKILL_SENSEI;
     tmp_professions.push_back(p);
 
-    p.name = string("spiritualist");
-    p.Name = string("Spiritualist");
+    p.name = std::string("spiritualist");
+    p.Name = std::string("Spiritualist");
     p.c_class = CLASS_MONK;
     p.skillno = SKILL_SPIRITUALIST;
     tmp_professions.push_back(p);
 
-    p.name = string("troubadour");
-    p.Name = string("Troubadour");
+    p.name = std::string("troubadour");
+    p.Name = std::string("Troubadour");
     p.c_class = CLASS_BARD;
     p.skillno = SKILL_TROUBADOUR;
     tmp_professions.push_back(p);
 
-    p.name = string("minstrel");
-    p.Name = string("Minstrel");
+    p.name = std::string("minstrel");
+    p.Name = std::string("Minstrel");
     p.c_class = CLASS_BARD;
     p.skillno = SKILL_MINISTREL;
     tmp_professions.push_back(p);
@@ -328,7 +328,7 @@ vector<profession> fill_professions(void)
     return tmp_professions;
 }
 
-vector<profession> professions = fill_professions();
+std::vector<profession> professions = fill_professions();
 
 // Obj proc types
 char *obj_types[] = {
@@ -863,9 +863,9 @@ const char *zone_modes[] =
         "Always_Repop",
         "\n"};
 
-vector<string> get_cont_names()
+std::vector<std::string> get_cont_names()
 {
-    vector<string> tmp;
+    std::vector<std::string> tmp;
     tmp.push_back("");
     tmp.push_back("Undefined");
     tmp.push_back("Sorpigal");
@@ -879,7 +879,7 @@ vector<string> get_cont_names()
     return tmp;
 }
 
-vector<string> continent_names = get_cont_names();
+std::vector<std::string> continent_names = get_cont_names();
 
 // new obj flags
 const QStringList Object::extra_bits =
@@ -2206,7 +2206,7 @@ const char *isr_bits[] =
 
 // Mortally wounded and Incapacitated are no longer used.
 // Dead is used in fight.C but should never been seen by a player
-const char *position_types[] =
+const QStringList Character::position_types =
     {
         "Dead",
         "Mortally wounded",
@@ -2216,8 +2216,7 @@ const char *position_types[] =
         "Resting",
         "Sitting",
         "Fighting",
-        "Standing",
-        "\n"};
+        "Standing"};
 
 const char *connected_types[] =
     {
@@ -3664,7 +3663,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
         {"opstat", COMMAND_OPSTAT, false},
         {"opedit", COMMAND_OPEDIT, false},
         {"force", COMMAND_FORCE, false},
-        {"string", COMMAND_STRING, false},
+        {"std::string", COMMAND_STRING, false},
         {"stat", COMMAND_STAT, false},
         {"sqsave", COMMAND_SQSAVE, false},
         {"find", COMMAND_FIND, false},

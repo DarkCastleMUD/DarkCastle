@@ -64,16 +64,12 @@
 #include "CommandStack.h"
 #include "SSH.h"
 
-using namespace std;
-
 struct multiplayer
 {
   QHostAddress host;
-  char *name1;
-  char *name2;
+  QString name1;
+  QString name2;
 };
-
-using namespace std;
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
@@ -101,8 +97,8 @@ extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
 
-extern string last_char_name;
-extern string last_processed_cmd;
+extern std::string last_char_name;
+extern std::string last_processed_cmd;
 extern struct index_data *obj_index;
 
 void check_champion_and_website_who_list(void);
@@ -145,16 +141,16 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
-string generate_prompt(Character *ch);
-// string generate_prompt(Character *ch);
-string get_from_q(queue<string> &input_queue);
+std::string generate_prompt(Character *ch);
+// std::string generate_prompt(Character *ch);
+std::string get_from_q(std::queue<std::string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
 int process_output(class Connection *t);
 int process_input(class Connection *t);
 void flush_queues(class Connection *d);
 int perform_subst(class Connection *t, char *orig, char *subst);
-string perform_alias(class Connection *d, string orig);
+std::string perform_alias(class Connection *d, std::string orig);
 void check_idle_passwords(void);
 void init_heartbeat();
 void heartbeat();
@@ -325,14 +321,14 @@ int write_hotboot_file(char **new_argv)
 // links to the mud.
 int load_hotboot_descs()
 {
-  string chr = {};
+  std::string chr = {};
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   int desc = {};
   class Connection *d = nullptr;
   DC *dc = dynamic_cast<DC *>(DC::instance());
-  ifstream ifs;
+  std::ifstream ifs;
 
-  ifs.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
+  ifs.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
 
   try
   {
@@ -357,7 +353,7 @@ int load_hotboot_descs()
         ifs >> chr;
         ifs >> host;
       }
-      catch (ifstream::failure::runtime_error)
+      catch (std::ifstream::failure::runtime_error)
       {
         break;
       }
@@ -371,7 +367,7 @@ int load_hotboot_descs()
       d->prompt_mode = 1;
       d->output = {};
       //    *d->output                 = '\0';
-      d->input = queue<string>();
+      d->input = std::queue<std::string>();
       d->output = chr; // store it for later
       d->login_time = time(0);
 
@@ -665,7 +661,7 @@ int DC::init_socket(in_port_t port)
 // used in game_loop.  It has to be global so that "close_socket" can increment
 // it if we are closing the socket that is next to be processed.
 class Connection *next_d;
-stringstream timingDebugStr;
+std::stringstream timingDebugStr;
 uint64_t pulseavg = 0;
 
 /*
@@ -701,7 +697,7 @@ void DC::game_loop(void)
 
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
-  string comm = {};
+  std::string comm = {};
   char buf[128] = {};
   class Connection *d = {};
   int maxdesc = {};
@@ -821,7 +817,7 @@ void DC::game_loop(void)
 
       comm = get_from_q(d->input);
 #ifdef DEBUG_INPUT
-      // cerr << "Got command [" << comm << "] from the d->input queue" << endl;
+      // std::cerr << "Got command [" << comm << "] from the d->input queue" << std::endl;
 #endif
       /* reset the idle timer & pull char back from void if necessary */
       d->wait = 1;
@@ -1359,10 +1355,10 @@ char *cond_colorcodes[] = {
     BOLD GREY,
 };
 
-string calc_name(Character *ch, bool colour = false)
+std::string calc_name(Character *ch, bool colour = false)
 {
   int percent;
-  string name;
+  std::string name;
 
   if (ch->getHP() == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
@@ -1388,7 +1384,7 @@ string calc_name(Character *ch, bool colour = false)
   }
 
   if (IS_PC(ch))
-    name += ch->name;
+    name += ch->getNameC();
   else
     name += ch->short_desc;
 
@@ -1430,9 +1426,9 @@ char *calc_condition(Character *ch, bool colour = false)
     return cond_txt[7];
 }
 
-void make_prompt(class Connection *d, string &prompt)
+void make_prompt(class Connection *d, std::string &prompt)
 {
-  string buf = {};
+  std::string buf = {};
   if (!d->character)
   {
     return;
@@ -1498,7 +1494,7 @@ Character *get_charmie(Character *ch)
   return nullptr;
 }
 
-string generate_prompt(Character *ch)
+std::string generate_prompt(Character *ch)
 {
   Character *charmie = nullptr;
   char *source = nullptr;
@@ -1941,27 +1937,27 @@ string generate_prompt(Character *ch)
   *pro = ' ';
   *(pro + 1) = '\0';
 
-  string buffer = prompt;
+  std::string buffer = prompt;
   delete[] prompt;
   return buffer;
 }
 
-void write_to_q(const string txt, queue<string> &input_queue)
+void write_to_q(const std::string txt, std::queue<std::string> &input_queue)
 {
 #ifdef DEBUG_INPUT
-  // cerr << "Writing to queue '" << txt << "'" << endl;
+  // std::cerr << "Writing to queue '" << txt << "'" << std::endl;
 #endif
   input_queue.push(txt);
 }
 
-string get_from_q(queue<string> &input_queue)
+std::string get_from_q(std::queue<std::string> &input_queue)
 {
   if (input_queue.empty())
   {
-    return string();
+    return std::string();
   }
 
-  string dest = input_queue.front();
+  std::string dest = input_queue.front();
   input_queue.pop();
 
   return dest;
@@ -1971,7 +1967,7 @@ string get_from_q(queue<string> &input_queue)
 void flush_queues(class Connection *d)
 {
   int dummy;
-  string buf2 = {};
+  std::string buf2 = {};
 
   while (!get_from_q(d->input).empty())
     ;
@@ -1993,7 +1989,7 @@ void free_buff_pool_from_memory()
   }
 }
 
-void scramble_text(string &txt)
+void scramble_text(std::string &txt)
 {
   for (auto &curr : txt)
   {
@@ -2029,7 +2025,7 @@ void write_to_output(const char *txt, class Connection *t)
   }
 }
 
-void write_to_output(string txt, class Connection *t)
+void write_to_output(std::string txt, class Connection *t)
 {
   if (!txt.empty())
   {
@@ -2141,7 +2137,7 @@ int new_descriptor(int s)
 
 int process_output(class Connection *t)
 {
-  string i = {};
+  std::string i = {};
   static int result;
 
   /* we may need this \r\n for later -- see below */
@@ -2181,7 +2177,7 @@ int process_output(class Connection *t)
   return result;
 }
 
-int write_to_descriptor(int desc, string txt)
+int write_to_descriptor(int desc, std::string txt)
 {
   int total, bytes_written;
 
@@ -2268,7 +2264,7 @@ void process_iac(Connection *t)
           break;
 
         default:
-          // cerr << "Unrecognized telnet option " << hex << static_cast<int>(c) << endl;
+          // std::cerr << "Unrecognized telnet option " << hex << static_cast<int>(c) << std::endl;
           prev = 0;
           break;
         }
@@ -2277,22 +2273,22 @@ void process_iac(Connection *t)
       {
         if (c == '\x1')
         {
-          // cerr << "Telnet client requests to turn on server-side echo" << endl;
+          // std::cerr << "Telnet client requests to turn on server-side echo" << std::endl;
           t->server_size_echo = true;
         }
         else if (c == '\x3')
         {
-          // cerr << "Telnet client requests server to suppress sending go-ahead" << endl;
+          // std::cerr << "Telnet client requests server to suppress sending go-ahead" << std::endl;
         }
         else
         {
-          // cerr << "Unrecognized do option " << hex << static_cast<int>(c) << endl;
+          // std::cerr << "Unrecognized do option " << hex << static_cast<int>(c) << std::endl;
         }
         prev = 0;
       }
       else
       {
-        // cerr << "Unrecognized telnet code " << hex << static_cast<int>(c) << endl;
+        // std::cerr << "Unrecognized telnet code " << hex << static_cast<int>(c) << std::endl;
         prev = 0;
       }
     }
@@ -2300,7 +2296,7 @@ void process_iac(Connection *t)
   }
 }
 
-string removeUnprintable(string input)
+std::string removeUnprintable(std::string input)
 {
   size_t found_pos = input.npos;
   do
@@ -2333,7 +2329,7 @@ string removeUnprintable(string input)
   return input;
 }
 
-string makePrintable(string input)
+std::string makePrintable(std::string input)
 {
   size_t found_pos = input.npos;
   do
@@ -2369,7 +2365,7 @@ string makePrintable(string input)
   return input;
 }
 
-string remove_all_codes(string input)
+std::string remove_all_codes(std::string input)
 {
   size_t pos = 0, found_pos = 0, skip = 0;
   while ((found_pos = input.find("$", pos)) != input.npos)
@@ -2393,9 +2389,9 @@ string remove_all_codes(string input)
   return input;
 }
 
-string remove_non_color_codes(string input)
+std::string remove_non_color_codes(std::string input)
 {
-  string output = {};
+  std::string output = {};
   size_t pos = 0, found_pos = 0;
 
   try
@@ -2491,14 +2487,14 @@ int process_input(class Connection *t)
 
       return -1;
     }
-    string buffer = c_buffer;
+    std::string buffer = c_buffer;
     t->inbuf += buffer;
 
     // Search for telnet control codes
     process_iac(t);
     if (t->server_size_echo)
     {
-      string new_buffer;
+      std::string new_buffer;
       for (const auto &c : buffer)
       {
         if ((c >= ' ' && c <= '~'))
@@ -2509,15 +2505,15 @@ int process_input(class Connection *t)
         {
           if (t->inbuf.size() == 1)
           {
-            // // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // std::cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
             t->inbuf.erase(t->inbuf.end() - 1, t->inbuf.end());
-            // // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // std::cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
           }
           if (t->inbuf.size() >= 2)
           {
-            // // cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // std::cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
             t->inbuf.erase(t->inbuf.end() - 2, t->inbuf.end());
-            // // cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            // // std::cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
             new_buffer += "\b \b";
           }
         }
@@ -2559,16 +2555,16 @@ int process_input(class Connection *t)
     }
 
 #ifdef DEBUG_INPUT
-    // cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
-    << "(" << t->inbuf.length() << ")" << endl;
+    // std::cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
+    << "(" << t->inbuf.length() << ")" << std::endl;
 #endif
-    string buffer = t->inbuf.substr(0, eoc_pos);
+    std::string buffer = t->inbuf.substr(0, eoc_pos);
     t->inbuf.erase(0, eoc_pos + erase);
 #ifdef DEBUG_INPUT
-    // cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
-    << "(" << t->inbuf.length() << ")" << endl;
-    // cerr << "buffer [" << makePrintable(buffer) << "]"
-    << "(" << buffer.length() << ")" << endl;
+    // std::cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
+    << "(" << t->inbuf.length() << ")" << std::endl;
+    // std::cerr << "buffer [" << makePrintable(buffer) << "]"
+    << "(" << buffer.length() << ")" << std::endl;
 #endif
 
     if (t->character == nullptr || t->character->getLevel() < IMMORTAL)
@@ -2585,7 +2581,7 @@ int process_input(class Connection *t)
         pipe_pos = buffer.find('|');
         if (pipe_pos != buffer.npos)
         {
-          string new_buffer = buffer.substr(0, pipe_pos);
+          std::string new_buffer = buffer.substr(0, pipe_pos);
           write_to_q(new_buffer, t->input);
 
           buffer.erase(0, pipe_pos + 1);
@@ -2639,7 +2635,7 @@ int process_input(class Connection *t)
 
       if ((space_left <= 0) && (ptr < nl_pos))
       {
-        string buffer;
+        std::string buffer;
 
         buffer = fmt::format("Line too long.  Truncated to:\r\n{}\r\n", tmp);
         if (write_to_descriptor(t->descriptor, buffer) < 0)
@@ -2696,8 +2692,8 @@ int process_input(class Connection *t)
 
 /*
  * perform substitution for the '^..^' csh-esque syntax
- * orig is the orig string (i.e. the one being modified.
- * subst contains the substition string, i.e. "^telm^tell"
+ * orig is the orig std::string (i.e. the one being modified.
+ * subst contains the substition std::string, i.e. "^telm^tell"
  */
 int perform_subst(class Connection *t, char *orig, char *subst)
 {
@@ -2706,7 +2702,7 @@ int perform_subst(class Connection *t, char *orig, char *subst)
   char *first, *second, *strpos;
 
   /*
-   * first is the position of the beginning of the first string (the one
+   * first is the position of the beginning of the first std::string (the one
    * to be replaced
    */
   first = subst + 1;
@@ -2718,31 +2714,31 @@ int perform_subst(class Connection *t, char *orig, char *subst)
     return 1;
   }
   /* terminate "first" at the position of the '^' and make 'second' point
-   * to the beginning of the second string */
+   * to the beginning of the second std::string */
   *(second++) = '\0';
 
-  /* now, see if the contents of the first string appear in the original */
+  /* now, see if the contents of the first std::string appear in the original */
   if (!(strpos = strstr(orig, first)))
   {
     SEND_TO_Q("Invalid substitution.\r\n", t);
     return 1;
   }
-  /* now, we construct the new string for output. */
+  /* now, we construct the new std::string for output. */
 
-  /* first, everything in the original, up to the string to be replaced */
+  /* first, everything in the original, up to the std::string to be replaced */
   strncpy(new_subst, orig, (strpos - orig));
   new_subst[(strpos - orig)] = '\0';
 
-  /* now, the replacement string */
+  /* now, the replacement std::string */
   strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
-  /* now, if there's anything left in the original after the string to
+  /* now, if there's anything left in the original after the std::string to
    * replaced, copy that too. */
   if (((strpos - orig) + strlen(first)) < strlen(orig))
     strncat(new_subst, strpos + strlen(first),
             (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
 
-  /* terminate the string in case of an overflow from strncat */
+  /* terminate the std::string in case of an overflow from strncat */
   new_subst[MAX_INPUT_LENGTH - 1] = '\0';
   strcpy(subst, new_subst);
 
@@ -3054,7 +3050,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
   if (signal == SIGHUP)
   {
     char **new_argv = nullptr;
-    string buf = "Hot reboot by SIGHUP.\r\n";
+    std::string buf = "Hot reboot by SIGHUP.\r\n";
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(buf.data());
@@ -3118,7 +3114,7 @@ void send_to_char_regardless(QString messg, Character *ch)
   }
 }
 
-void send_to_char_regardless(string messg, Character *ch)
+void send_to_char_regardless(std::string messg, Character *ch)
 {
   if (ch->desc && !messg.empty())
   {
@@ -3200,7 +3196,7 @@ void check_for_awaymsgs(Character *ch)
 
 void send_to_char(const char *mesg, Character *ch)
 {
-  send_to_char(string(mesg), ch);
+  send_to_char(std::string(mesg), ch);
 }
 
 void send_to_char(QString messg, Character *ch)
@@ -3208,7 +3204,7 @@ void send_to_char(QString messg, Character *ch)
   send_to_char(messg.toStdString(), ch);
 }
 
-void send_to_char(string messg, Character *ch)
+void send_to_char(std::string messg, Character *ch)
 {
   if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.empty())
     mprog_act_trigger(messg, ch, 0, 0, 0);
@@ -3279,7 +3275,7 @@ void send_info(QString messg)
   send_info(messg.toStdString().c_str());
 }
 
-void send_info(string messg)
+void send_info(std::string messg)
 {
   send_info(messg.c_str());
 }
@@ -3325,7 +3321,7 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(string messg, int room, bool awakeonly, Character *nta)
+void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
 {
   Character *i = nullptr;
 
@@ -3337,10 +3333,10 @@ void send_to_room(string messg, int room, bool awakeonly, Character *nta)
   {
     return;
   }
-  if (!messg.empty())
+  if (!messg.isEmpty())
     for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
-        if (!awakeonly || GET_POS(i) > POSITION_SLEEPING)
+        if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
           SEND_TO_Q(messg, i->desc);
 }
 
@@ -3356,11 +3352,11 @@ int is_busy(Character *ch)
   return (0);
 }
 
-string perform_alias(class Connection *d, string orig)
+std::string perform_alias(class Connection *d, std::string orig)
 {
-  string first_arg, remainder, new_buf;
+  std::string first_arg, remainder, new_buf;
   // ptr = any_one_arg(orig, first_arg);
-  tie(first_arg, remainder) = half_chop(orig);
+  std::tie(first_arg, remainder) = half_chop(orig);
   struct char_player_alias *x = nullptr;
   int lengthpre;
   int lengthpost;
@@ -3378,7 +3374,7 @@ string perform_alias(class Connection *d, string orig)
     {
       if (x->keyword == first_arg)
       {
-        new_buf = string(x->command);
+        new_buf = std::string(x->command);
         new_buf += " " + remainder;
         return new_buf;
       }
@@ -3426,7 +3422,7 @@ void warn_if_duplicate_ip(Character *ch)
   char buf[256];
   int highlev = 51;
 
-  list<multiplayer> multi_list;
+  std::list<multiplayer> multi_list;
 
   for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -3458,7 +3454,7 @@ void warn_if_duplicate_ip(Character *ch)
     }
   }
 
-  for (list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
+  for (std::list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
     logf(108, LogChannels::LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host.toString().toStdString().c_str(), (*i).name1, (*i).name2);
   }

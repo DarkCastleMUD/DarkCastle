@@ -23,10 +23,10 @@
 #include "spells.h"
 #include "const.h"
 
-using namespace std;
 
-queue<string> imm_history;
-queue<string> imp_history;
+
+std::queue<std::string> imm_history;
+std::queue<std::string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
@@ -76,7 +76,7 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
         if (*bestowable_god_commands[i].name == '\n') // someone forgot to update it
           continue;
 
-        if (!has_skill(ch, bestowable_god_commands[i].num))
+        if (!ch->has_skill(bestowable_god_commands[i].num))
           continue;
 
         if (bestowable_god_commands[i].testcmd == false)
@@ -184,7 +184,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       loc_nr = zone.getRealBottom();
     }
 
-    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name.toStdString()))));
+    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(std::string(DC::getInstance()->zones.value(zone_key).name.toStdString()))));
 
     if (loc_nr > top_of_world || loc_nr < 0)
     {
@@ -387,7 +387,7 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (!*inout)
   {
-    send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
+    send_to_char("Usage:\n\rpoof [i|o] <std::string>\n\r", ch);
     send_to_char("\n\rCurrent poof in is:\n\r", ch);
     send_to_char(ch->player->poofin, ch);
     send_to_char("\n\r", ch);
@@ -399,7 +399,7 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
+    send_to_char("Usage:\n\rpoof [i|o] <std::string>\n\r", ch);
     return eFAILURE;
   }
 
@@ -672,9 +672,9 @@ int do_nohassle(Character *ch, char *argument, int cmd)
 
 // cmd == CMD_DEFAULT - imm
 // cmd == 8 - /
-command_return_t do_wiz(Character *ch, string argument, int cmd)
+command_return_t do_wiz(Character *ch, std::string argument, int cmd)
 {
-  string buf1 = {};
+  std::string buf1 = {};
   Connection *i = nullptr;
 
   if (IS_NPC(ch))
@@ -682,7 +682,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
     return eFAILURE;
   }
 
-  if (cmd == CMD_IMPCHAN && !has_skill(ch, COMMAND_IMP_CHAN))
+  if (cmd == CMD_IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -693,7 +693,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
 
   if (argument.empty())
   {
-    queue<string> tmp;
+    std::queue<std::string> tmp;
     if (cmd == CMD_IMMORT)
     {
       tmp = imm_history;
@@ -745,7 +745,7 @@ command_return_t do_wiz(Character *ch, string argument, int cmd)
     {
       if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && IS_PC(i->character))
       {
-        if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
+        if (cmd == CMD_IMPCHAN && !i->character->has_skill(COMMAND_IMP_CHAN))
           continue;
 
         if (STATE(i) == Connection::states::PLAYING)

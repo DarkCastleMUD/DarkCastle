@@ -30,15 +30,6 @@ extern "C"
 #include "clan.h" // clan right
 #include "inventory.h"
 
-enum class vault_search_type
-{
-  UNDEFINED,
-  KEYWORD,
-  LEVEL,
-  MIN_LEVEL,
-  MAX_LEVEL
-};
-
 class vault_search_parameter
 {
 public:
@@ -326,7 +317,7 @@ int do_vault(Character *ch, char *argument, int cmd)
         // Clan leader or a clan member with the vaultlog right can view log.
         if ((clan->leader && !strcmp(clan->leader, GET_NAME(ch))) || has_right(ch, CLAN_RIGHTS_VAULTLOG))
         {
-          stringstream clanName;
+          std::stringstream clanName;
 
           clanName << "clan" << clan->number;
           sprintf(arg1, "%s", clanName.str().c_str());
@@ -1467,7 +1458,7 @@ void vault_get(Character *ch, QString object, QString owner)
 
       for (int j = 0; j < items->count; j++, i++)
       {
-        strncpy(obj_list[i], fname(obj->name), sizeof(obj_list[i]));
+        strncpy(obj_list[i], fname(obj->getName()).toStdString().c_str(), sizeof(obj_list[i]));
         if (i > 49)
         {
           ch->send("You can only take out 50 items at a time.\r\n");
@@ -2268,7 +2259,7 @@ Character *find_owner(QString name)
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
                                {
-	  if (ch->name == nullptr)
+	  if (ch->getNameC() == nullptr)
     {
 		  produce_coredump(); //Trying to track down bug that causes mob->name to be nullptr
 	  }
@@ -2304,8 +2295,8 @@ void vault_log(Character *ch, char *owner)
 
   snprintf(fname, 256, "../vaults/%c/%s.vault.log", *owner, owner);
 
-  ifstream fin(fname);
-  stringstream buffer;
+  std::ifstream fin(fname);
+  std::stringstream buffer;
   buffer << buf;
   buffer << fin.rdbuf();
 
@@ -2549,10 +2540,10 @@ int vault_search(Character *ch, const char *args)
   int objects_found = 0;
   QString arg1{};
   QString arguments{args};
-  list<vault_search_parameter>::iterator p;
+  std::list<vault_search_parameter>::iterator p;
   bool nomatch;
 
-  tie(arg1, arguments) = half_chop(arguments);
+  std::tie(arg1, arguments) = half_chop(arguments);
 
   if (arg1.isEmpty())
   {
@@ -2560,7 +2551,7 @@ int vault_search(Character *ch, const char *args)
     return eFAILURE;
   }
 
-  list<vault_search_parameter> search;
+  std::list<vault_search_parameter> search;
   vault_search_parameter parameter;
 
   // parse our arguments and setup a list of the things we want to search for
@@ -2568,7 +2559,7 @@ int vault_search(Character *ch, const char *args)
   {
     if (arg1 == "keyword")
     {
-      tie(arg1, arguments) = half_chop(arguments);
+      std::tie(arg1, arguments) = half_chop(arguments);
       if (arg1.isEmpty())
       {
         send_to_char("Missing keyword parameter.\r\n\r\n", ch);
@@ -2586,7 +2577,7 @@ int vault_search(Character *ch, const char *args)
     }
     else if (arg1 == "level")
     {
-      tie(arg1, arguments) = half_chop(arguments);
+      std::tie(arg1, arguments) = half_chop(arguments);
       if (arg1.isEmpty())
       {
         send_to_char("Missing level parameter.\r\n\r\n", ch);
@@ -2655,7 +2646,7 @@ int vault_search(Character *ch, const char *args)
       vault_search_usage(ch);
       return eFAILURE;
     }
-    tie(arg1, arguments) = half_chop(arguments);
+    std::tie(arg1, arguments) = half_chop(arguments);
   } while (!arg1.isEmpty());
 
   // now that we know what we're looking for, let's search through all the vaults to find it

@@ -116,27 +116,26 @@ typedef QList<QString> hints_t;
 #include "Database.h"
 
 class Connection;
-using namespace std;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
 void close_file(std::FILE *fp);
 using unique_file_t = std::unique_ptr<std::FILE, decltype(&close_file)>;
 
-typedef set<Character *> character_list_t;
-typedef set<class Object *> obj_list_t;
-typedef set<int> client_descriptor_list_t;
-typedef set<int> server_descriptor_list_t;
-typedef vector<in_port_t> port_list_t;
-typedef set<Character *>::iterator character_list_i;
-typedef set<int>::iterator client_descriptor_list_i;
-typedef set<int>::iterator server_descriptor_list_i;
-typedef vector<in_port_t>::iterator port_list_i;
-typedef unordered_map<Character *, Trace> death_list_t;
-typedef unordered_map<Character *, Trace> free_list_t;
+typedef std::set<Character *> character_list_t;
+typedef std::set<class Object *> obj_list_t;
+typedef std::set<int> client_descriptor_list_t;
+typedef std::set<int> server_descriptor_list_t;
+typedef std::vector<in_port_t> port_list_t;
+typedef std::set<Character *>::iterator character_list_i;
+typedef std::set<int>::iterator client_descriptor_list_i;
+typedef std::set<int>::iterator server_descriptor_list_i;
+typedef std::vector<in_port_t>::iterator port_list_i;
+typedef std::unordered_map<Character *, Trace> death_list_t;
+typedef std::unordered_map<Character *, Trace> free_list_t;
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 typedef uint64_t gold_t;
-typedef map<vnum_t, special_function> special_function_list_t;
+typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
 
@@ -194,7 +193,7 @@ public:
   death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
-  unordered_set<Character *> shooting_list;
+  std::unordered_set<Character *> shooting_list;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;
@@ -269,7 +268,7 @@ private:
   int init_socket(in_port_t port);
 };
 
-extern vector<string> continent_names;
+extern std::vector<std::string> continent_names;
 
 extern class Object *object_list;
 extern struct spell_info_type spell_info[];
@@ -284,7 +283,6 @@ union varg_t
   struct table_data *table;
   struct machine_data *machine;
   struct wheel_data *wheel;
-  char *hunting;
 };
 
 typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
@@ -294,6 +292,7 @@ struct timer_data
   int timeleft;
   struct timer_data *next;
   varg_t arg1;
+  QVariant var_arg1;
   void *arg2;
   void *arg3;
   TIMER_FUNC *function;
@@ -303,7 +302,7 @@ void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
 typedef int command_return_t;
 typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
-typedef command_return_t (*command_gen2_t)(Character *ch, string argument, int cmd);
+typedef command_return_t (*command_gen2_t)(Character *ch, std::string argument, int cmd);
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
 typedef int (*command_special_t)(Character *ch, int cmd, char *arg);
 

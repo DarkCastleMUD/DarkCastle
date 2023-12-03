@@ -426,12 +426,12 @@ int dawnsword(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     act("$n whispers a quiet prayer and a searing blast of white light suddenly blinds you!", ch, 0, v, TO_VICT, 0);
     af.type = SPELL_BLINDNESS;
     af.location = APPLY_HITROLL;
-    af.modifier = has_skill(v, SKILL_BLINDFIGHTING) ? skill_success(v, 0, SKILL_BLINDFIGHTING) ? -10 : -20 : -20;
+    af.modifier = v->has_skill(SKILL_BLINDFIGHTING) ? skill_success(v, 0, SKILL_BLINDFIGHTING) ? -10 : -20 : -20;
     af.duration = 2;
     af.bitvector = AFF_BLIND;
     affect_to_char(v, &af);
     af.location = APPLY_AC;
-    af.modifier = has_skill(v, SKILL_BLINDFIGHTING) ? skill_success(v, 0, SKILL_BLINDFIGHTING) ? 20 : 40 : 40;
+    af.modifier = v->has_skill(SKILL_BLINDFIGHTING) ? skill_success(v, 0, SKILL_BLINDFIGHTING) ? 20 : 40 : 40;
     affect_to_char(v, &af);
   }
 
@@ -476,10 +476,10 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
       }
     }
     else
+    {
       send_to_char("Your feet feel lighter.\r\n", tmp_char);
-    GET_MOVE(tmp_char) += heal;
-    if (GET_MOVE(tmp_char) > GET_MAX_MOVE(tmp_char))
-      GET_MOVE(tmp_char) = GET_MAX_MOVE(tmp_char);
+    }
+    tmp_char->incrementMove(heal);
   }
 
   return eSUCCESS;
@@ -498,7 +498,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
   if (str_cmp(arg1, "ateni"))
     return eFAILURE;
   Character *victim;
-  if (!(victim = get_char_room_vis(ch, arg2)))
+  if (!(victim = ch->get_char_room_vis( arg2)))
   {
     send_to_char("Noone here by that name.\r\n", ch);
     return eSUCCESS;
@@ -803,7 +803,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   /* balance */
   if (cmd == CMD_BALANCE)
   {
-    ch->send(fmt::format(locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
     return eSUCCESS;
   }
 
@@ -834,7 +834,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
     }
     ch->removeGold(x);
     GET_BANK(ch) += x;
-    ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
     ch->save();
     return eSUCCESS;
   }
@@ -853,7 +853,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
   return eSUCCESS;
 }
@@ -870,7 +870,7 @@ int casino_atm(Character *ch, class Object *obj, int cmd, const char *arg,
   /* balance */
   if (cmd == CMD_BALANCE)
   {
-    ch->send(fmt::format(locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
     return eSUCCESS;
   }
 
@@ -895,7 +895,7 @@ int casino_atm(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
   return eSUCCESS;
 }
@@ -1048,7 +1048,7 @@ int hellmouth_thing(Character *ch, class Object *obj, int cmd, const char *arg,
     GET_KI(invoker) = 0;
   invoker->setHP(invoker->getHP() / 2);
   GET_MANA(invoker) /= 2;
-  GET_MOVE(invoker) /= 2;
+  invoker->setMove(invoker->getMove() / 2.0);
   //  do_look(invoker, "", CMD_DEFAULT);
   //   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
   //                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
@@ -1315,7 +1315,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (!(victim = get_char_room_vis(ch, vict)))
+  if (!(victim = ch->get_char_room_vis( vict)))
   {
     if (ch->fighting)
     {
@@ -1555,7 +1555,7 @@ int dancevest(Character *ch, class Object *obj, int cmd, const char *arg,
   send_to_char("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!\r\n", ch);
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
-    if (GET_POS(v) != POSITION_STANDING)
+    if (GET_POS(v) != position_t::STANDING)
     {
       continue;
     }
@@ -1669,13 +1669,13 @@ int eliara_non_combat(Character *ch, class Object *obj, int cmd, const char *arg
   if (!ch)
     return eFAILURE;
 
-  if (cmd == CMD_REMOVE && GET_POS(ch) == POSITION_FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->item_number == real_object(30627))
+  if (cmd == CMD_REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->item_number == real_object(30627))
   {
     send_to_char("Eliara refuses to allow you to remove equipment during battle!\r\n", ch);
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
 
   remove_eliara(ch);
@@ -2264,7 +2264,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   send_to_char("You quietly whisper 'sbiadirsivia' into your hands.\r\n", ch);
 
-  if (!(victim = get_char_room_vis(ch, junk)))
+  if (!(victim = ch->get_char_room_vis( junk)))
   {
     send_to_char("The box somehow seems......confused.\r\n", ch);
   }
@@ -2483,7 +2483,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
           produce_coredump(tmp_victim);
           continue;
         }
-        if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == DC::NOWHERE)
+        if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
         {
           continue;
         }
@@ -3369,14 +3369,14 @@ int glove_combat_procs(Character *ch, class Object *obj, int cmd, char *arg,
   return eFAILURE;
 }
 
-vector<string> sword_non_combat;
-vector<string> sword_class_specific_combat;
-vector<string> sword_combat;
+std::vector<std::string> sword_non_combat;
+std::vector<std::string> sword_class_specific_combat;
+std::vector<std::string> sword_combat;
 
 void do_talking_init()
 {
 
-  string buf;
+  std::string buf;
 
   /* GENERIC NONCOMBAT MESSAGE */
   buf = "Who wrote such crappy dialogue for me? Pirahna?";
@@ -3630,10 +3630,10 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (obj->obj_flags.value[0] == 0)
   {
-    vector<string> tmp;
-    string buf;
+    std::vector<std::string> tmp;
+    std::string buf;
 
-    if (GET_POS(vict) == POSITION_FIGHTING)
+    if (GET_POS(vict) == position_t::FIGHTING)
     {
       tmp = sword_combat;
       if (IS_NPC(vict->fighting) && vict->fighting->getLevel() > 99)
@@ -3698,7 +3698,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     else
     {
       tmp = sword_non_combat;
-      if (GET_POS(vict) == POSITION_SLEEPING)
+      if (GET_POS(vict) == position_t::SLEEPING)
       {
         buf = "Hey... someone steal me already... this guy sucks...";
         tmp.push_back(buf);
@@ -3867,7 +3867,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     char target[MAX_INPUT_LENGTH];
     half_chop(arg, obj, target);
     Character *give_vict;
-    if (!(give_vict = get_char_room_vis(ch, target)))
+    if (!(give_vict = ch->get_char_room_vis( target)))
       return eFAILURE; // Not giving to char/mob, so ok
     if (IS_MOB(give_vict))
     {
@@ -4163,7 +4163,7 @@ int godload_wailka(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
   Character *vict;
-  if ((vict = get_char_room_vis(ch, arg2)) == nullptr)
+  if ((vict = ch->get_char_room_vis( arg2)) == nullptr)
   {
     send_to_char("You need to tell the item who.\r\n", ch);
     return eSUCCESS;
@@ -4571,7 +4571,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
   //      send_to_char("Which glyph?\n\r", ch);
   if (ch->spellcraftglyph == 7)
   {
-    if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !has_skill(ch, SKILL_SPELLCRAFT))
+    if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !ch->has_skill(SKILL_SPELLCRAFT))
     {
       send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
       send_to_char("A beam of light hits you in the head!\n\rYou have learned spellcraft!\n\r", ch);
@@ -4694,7 +4694,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
 
   update_pos(victim);
 
-  if (GET_POS(victim) == POSITION_DEAD)
+  if (GET_POS(victim) == position_t::DEAD)
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
@@ -4747,7 +4747,7 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
 
   update_pos(victim);
 
-  if (GET_POS(victim) == POSITION_DEAD)
+  if (GET_POS(victim) == position_t::DEAD)
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
@@ -4776,7 +4776,7 @@ int godload_hydratail(Character *ch, class Object *obj, int cmd, const char *arg
   int damtype = 0;
   char dammsg[MAX_STRING_LENGTH];
   int dam = number(50, 100);
-  string damtypeStr;
+  std::string damtypeStr;
   sprintf(dammsg, "$B%d$R", dam);
 
   switch (number(1, 4))
@@ -4800,8 +4800,8 @@ int godload_hydratail(Character *ch, class Object *obj, int cmd, const char *arg
   }
   Character *victim = ch->fighting;
 
-  stringstream strwithdam;
-  stringstream strwithoutdam;
+  std::stringstream strwithdam;
+  std::stringstream strwithoutdam;
 
   strwithdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you for | damage!";
   strwithoutdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you!";

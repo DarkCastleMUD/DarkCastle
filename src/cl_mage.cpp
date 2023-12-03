@@ -26,9 +26,9 @@ extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 int spellcraft(Character *ch, int spell)
 {
-  int a = has_skill(ch, SKILL_SPELLCRAFT);
+  int a = ch->has_skill( SKILL_SPELLCRAFT);
   if (!a) return false;
-  if (has_skill(ch, spell) < 71) return false;
+  if (ch->has_skill( spell) < 71) return false;
   if (spell == SPELL_MAGIC_MISSILE)
   {
     if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
@@ -89,7 +89,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
   struct affected_type af;
   int duration = 40;
 
-  if(!canPerform(ch, SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n")) {
+  if(!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n")) {
     return eFAILURE;
   }
 
@@ -104,7 +104,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
          ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("Your mind cannot handle the strain!\r\n", ch);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE*2);
-    duration = 20 - (has_skill(ch, SKILL_FOCUSED_REPELANCE) / 10);
+    duration = 20 - (ch->has_skill( SKILL_FOCUSED_REPELANCE) / 10);
   }
   else 
   {
@@ -113,7 +113,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
     send_to_char("Your mystical vision is clear, your senses of the arcane sharpened.  " 
                  "No mortal can break through _your_ magical barrier.\r\n", ch);
     SET_BIT(ch->combat, COMBAT_REPELANCE);
-    duration = 40 - (has_skill(ch, SKILL_FOCUSED_REPELANCE)/10);
+    duration = 40 - (ch->has_skill( SKILL_FOCUSED_REPELANCE)/10);
   }
 
   af.type      = SKILL_FOCUSED_REPELANCE;
@@ -131,7 +131,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
 int do_imbue(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int lvl = has_skill(ch, SKILL_IMBUE);
+  int lvl = ch->has_skill( SKILL_IMBUE);
   int charges = 0, manacost = 0;
   Object *wand;
   struct affected_type af;
@@ -315,8 +315,8 @@ int check_ethereal_focus(Character *ch, int trigger_type)
 
 
     // If for some reason the caster is busy, the spell fails. 
-    if(  GET_POS(i) <= POSITION_RESTING || 
-         GET_POS(i) == POSITION_FIGHTING || i->fighting ||
+    if(  GET_POS(i) <= position_t::RESTING || 
+         GET_POS(i) == position_t::FIGHTING || i->fighting ||
          IS_AFFECTED(i, AFF_PARALYSIS) ||
          ( DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !IS_AFFECTED(ch, AFF_CANTQUIT) )
       )
@@ -351,7 +351,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
 
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
-      if(ally == ch || ally == i || ally->fighting || GET_POS(ally) != POSITION_STANDING ||
+      if(ally == ch || ally == i || ally->fighting || GET_POS(ally) != position_t::STANDING ||
          ( IS_PC(ally) && !ally->desc ) // linkdead groupies won't help
         )
         continue;

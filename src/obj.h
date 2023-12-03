@@ -21,7 +21,7 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 
-using namespace std;
+
 
 /* The following defs are for Object  */
 
@@ -232,12 +232,6 @@ struct obj_affected_type
 class Object
 {
 public:
-    static const QStringList wear_bits;
-    static const QStringList size_bits;
-    static const QStringList more_obj_bits;
-    static const QStringList extra_bits;
-    static const QStringList apply_types;
-
     enum class portal_types_t
     {
         Player = 0,
@@ -253,6 +247,12 @@ public:
         No_Enter = 1 << 1
     };
 
+    static const QStringList wear_bits;
+    static const QStringList size_bits;
+    static const QStringList more_obj_bits;
+    static const QStringList extra_bits;
+    static const QStringList apply_types;
+
     int32_t item_number = {};     /* Where in data-base               */
     room_t in_room = {};          /* In what room -1 when conta/carr  */
     int vroom = {};               /* for corpse saving */
@@ -260,7 +260,10 @@ public:
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    char *name = {};                              /* Title of object :get etc.        */
+    char *name = {}; /* Title of object :get etc.        */
+    const char *getNameC(void) { return name; }
+    QString getName(void) { return name; }
+
     char *description = {};                       /* When in room                     */
     char *short_description = {};                 /* when worn/carry/in cont.         */
     char *action_description = {};                /* What to write when used          */

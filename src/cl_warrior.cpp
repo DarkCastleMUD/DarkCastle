@@ -29,7 +29,7 @@
 #include "const.h"
 #include "move.h"
 
-using namespace std;
+
 
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
@@ -46,7 +46,7 @@ int do_kick(Character *ch, char *argument, int cmd)
   int dam;
   int retval;
 
-  if (!canPerform(ch, SKILL_KICK))
+  if (!ch->canPerform(SKILL_KICK))
   {
     send_to_char("You will have to study from a master before you can use this.\r\n", ch);
     return eFAILURE;
@@ -54,7 +54,7 @@ int do_kick(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  if (!(victim = ch->get_char_room_vis(name)))
   {
     if (ch->fighting)
     {
@@ -105,7 +105,7 @@ int do_kick(Character *ch, char *argument, int cmd)
       dam = 0;
     }
     else
-      dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (has_skill(ch, SKILL_KICK));
+      dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (ch->has_skill(SKILL_KICK));
     retval = damage(ch, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
     if (SOMEONE_DIED(retval))
       return retval;
@@ -137,7 +137,7 @@ int do_kick(Character *ch, char *argument, int cmd)
     }
     else
     {
-      dam = (GET_DEX(ch) * 2) + (GET_STR(ch)) + (has_skill(ch, SKILL_KICK) / 2);
+      dam = (GET_DEX(ch) * 2) + (GET_STR(ch)) + (ch->has_skill(SKILL_KICK) / 2);
       retval = damage(ch, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
     }
     if (SOMEONE_DIED(retval))
@@ -167,7 +167,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   int retval;
   int failchance = 25;
 
-  if (!canPerform(ch, SKILL_DEATHSTROKE))
+  if (!ch->canPerform(SKILL_DEATHSTROKE))
   {
     send_to_char("You have no idea how to deathstroke.\r\n", ch);
     return eFAILURE;
@@ -175,7 +175,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  if (!(victim = ch->get_char_room_vis(name)))
   {
     if (ch->fighting)
     {
@@ -200,7 +200,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(victim) > POSITION_SITTING)
+  if (GET_POS(victim) > position_t::SITTING)
   {
     send_to_char("Your opponent isn't in a vulnerable enough position!\r\n", ch);
     return eFAILURE;
@@ -218,7 +218,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_DEATHSTROKE))
     return eSUCCESS;
 
-  int i = has_skill(ch, SKILL_DEATHSTROKE);
+  int i = ch->has_skill(SKILL_DEATHSTROKE);
   if (i > 40)
     failchance -= 5;
   if (i > 60)
@@ -253,7 +253,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
       dam /= 2;
     ch->removeHP(dam);
     update_pos(ch);
-    if (GET_POS(ch) == POSITION_DEAD)
+    if (GET_POS(ch) == position_t::DEAD)
     {
       fight_kill(ch, ch, TYPE_CHOOSE, 0);
       return eSUCCESS | eCH_DIED;
@@ -288,7 +288,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
   if (is_stunned(ch))
     return eFAILURE;
 
-  if (!canPerform(ch, SKILL_RETREAT))
+  if (!ch->canPerform(SKILL_RETREAT))
   {
     send_to_char("You dunno how...better flee instead.\r\n", ch);
     return eFAILURE;
@@ -335,7 +335,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
     act("You try to retreat, but pay a heavy price for your hesitancy.\r\n"
         "You fall to the ground!",
         ch, 0, 0, TO_CHAR, INVIS_NULL);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return eFAILURE;
   }
@@ -380,7 +380,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
 int do_hitall(Character *ch, char *argument, int cmd)
 {
-  if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !has_skill(ch, SKILL_HITALL))
+  if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
     send_to_char("You better learn how to first...\r\n", ch);
     return eFAILURE;
@@ -452,7 +452,7 @@ int do_bash(Character *ch, char *argument, int cmd)
   if (IS_AFFECTED(ch, AFF_CHARM))
     return eFAILURE;
 
-  if (!canPerform(ch, SKILL_BASH, "You don't know how to bash!\r\n"))
+  if (!ch->canPerform(SKILL_BASH, "You don't know how to bash!\r\n"))
   {
     return eFAILURE;
   }
@@ -465,7 +465,7 @@ int do_bash(Character *ch, char *argument, int cmd)
   }
 
   if (*name)
-    victim = get_char_room_vis(ch, name);
+    victim = ch->get_char_room_vis(name);
   else
     victim = ch->fighting;
 
@@ -578,7 +578,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_BASH, modifier))
   {
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
     SET_BIT(ch->combat, COMBAT_BASH1);
     retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
   }
@@ -594,7 +594,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     }
     else
     {
-      GET_POS(victim) = POSITION_SITTING;
+      victim->setSitting();
       SET_BIT(victim->combat, COMBAT_BASH1);
       retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH, 0);
     }
@@ -629,12 +629,12 @@ int do_redirect(Character *ch, char *argument, int cmd)
   Character *victim;
   char name[256];
 
-  if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
+  if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
     return eFAILURE;
 
   one_argument(argument, name);
 
-  victim = get_char_room_vis(ch, name);
+  victim = ch->get_char_room_vis(name);
 
   if (victim == nullptr)
   {
@@ -700,7 +700,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
   int is_fighting_mob(Character * ch);
 
-  if (!canPerform(ch, SKILL_DISARM))
+  if (!ch->canPerform(SKILL_DISARM))
   {
     send_to_char("You dunno how.\r\n", ch);
     return eFAILURE;
@@ -713,7 +713,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
   }
 
   one_argument(argument, name);
-  victim = get_char_room_vis(ch, name);
+  victim = ch->get_char_room_vis(name);
   if (victim == nullptr)
     victim = ch->fighting;
 
@@ -816,74 +816,72 @@ int do_disarm(Character *ch, char *argument, int cmd)
 | NON-OFFENSIVE commands.  Below here are commands that should -not-
 |   require the victim to retaliate.
 */
-int do_rescue(Character *ch, char *argument, int cmd)
+int Character::do_rescue(QStringList arguments, int cmd)
 {
-  Character *victim, *tmp_ch;
-  char victim_name[240];
+  Character *victim{}, *tmp_ch{};
+  QString victim_name = arguments.value(0);
 
-  one_argument(argument, victim_name);
-
-  if (!canPerform(ch, SKILL_RESCUE))
+  if (!canPerform(SKILL_RESCUE))
   {
-    send_to_char("You've got alot to learn before you try to be a bodyguard.\r\n", ch);
+    sendln("You've got alot to learn before you try to be a bodyguard.");
     return eFAILURE;
   }
 
-  if (!(victim = get_char_room_vis(ch, victim_name)))
+  if (!(victim = get_char_room_vis(victim_name)))
   {
-    send_to_char("Whom do you want to rescue?\n\r", ch);
+    sendln("Whom do you want to rescue?");
     return eFAILURE;
   }
 
-  if (victim == ch)
+  if (victim == this)
   {
-    send_to_char("What about fleeing instead?\n\r", ch);
+    sendln("What about fleeing instead?");
     return eFAILURE;
   }
 
-  if (IS_PC(ch) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
+  if (IS_PC(this) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
   {
-    send_to_char("Doesn't need your help!\n\r", ch);
+    sendln("Doesn't need your help!");
     return eFAILURE;
   }
 
-  if (ch->fighting == victim)
+  if (fighting == victim)
   {
-    send_to_char("How can you rescue someone you are trying to kill?\n\r", ch);
+    sendln("How can you rescue someone you are trying to kill?");
     return eFAILURE;
   }
 
-  if (!can_be_attacked(ch, victim->fighting))
+  if (!can_be_attacked(this, victim->fighting))
   {
-    send_to_char("You cannot complete the rescue!\n\r", ch);
+    sendln("You cannot complete the rescue!");
     return eFAILURE;
   }
 
-  for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch &&
-                                                              (tmp_ch->fighting != victim);
+  for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch &&
+                                                          (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
 
   if (!tmp_ch)
   {
-    act("But nobody is fighting $M?", ch, 0, victim, TO_CHAR, 0);
+    act("But nobody is fighting $M?", this, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_RESCUE))
+  if (!charge_moves(SKILL_RESCUE))
     return eSUCCESS;
 
-  if (!skill_success(ch, victim, SKILL_RESCUE))
+  if (!skill_success(victim, SKILL_RESCUE))
   {
-    send_to_char("You fail the rescue.\r\n", ch);
+    sendln("You fail the rescue.");
     return eFAILURE;
   }
 
-  send_to_char("Banzai! To the rescue...\r\n", ch);
-  act("You are rescued by $N, you are confused!", victim, 0, ch, TO_CHAR, 0);
-  act("$n heroically rescues $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+  sendln("Banzai! To the rescue...");
+  act("You are rescued by $N, you are confused!", victim, 0, this, TO_CHAR, 0);
+  act("$n heroically rescues $N.", this, 0, victim, TO_ROOM, NOTVICT);
 
-  int tempwait = GET_WAIT(ch);
+  int tempwait = GET_WAIT(this);
   int tempvictwait = GET_WAIT(victim);
 
   if (victim->fighting == tmp_ch)
@@ -898,11 +896,11 @@ int do_rescue(Character *ch, char *argument, int cmd)
    * so rescuing an NPC who is fighting a PC does not result in
    * the other guy getting killer flag
    */
-  if (!ch->fighting)
-    set_fighting(ch, tmp_ch);
-  set_fighting(tmp_ch, ch);
+  if (!fighting)
+    set_fighting(this, tmp_ch);
+  set_fighting(tmp_ch, this);
 
-  WAIT_STATE(ch, MAX(DC::PULSE_VIOLENCE * 2, tempwait));
+  WAIT_STATE(this, MAX(DC::PULSE_VIOLENCE * 2, tempwait));
   WAIT_STATE(victim, MAX(DC::PULSE_VIOLENCE * 2, tempvictwait));
   return eSUCCESS;
 }
@@ -912,7 +910,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
   struct affected_type af;
   int duration = 12;
 
-  if (!canPerform(ch, SKILL_BLADESHIELD))
+  if (!ch->canPerform(SKILL_BLADESHIELD))
   {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
@@ -990,7 +988,7 @@ int handle_any_guard(Character *ch)
 
   if (ch->fighting && can_be_attacked(guard, ch->fighting) && skill_success(guard, ch, SKILL_GUARD))
   {
-    do_rescue(guard, GET_NAME(ch), CMD_DEFAULT);
+    guard->do_rescue(ch->getName().split(' '));
     if (ch->fighting)
       return true;
     else
@@ -1078,7 +1076,7 @@ int do_guard(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
 
-  if (!IS_MOB(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE)))
+  if (!IS_MOB(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
     send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
     return eFAILURE;
@@ -1088,7 +1086,7 @@ int do_guard(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(victim = get_char_room_vis(ch, name)))
+  if (!(victim = ch->get_char_room_vis(name)))
   {
     send_to_char("Some bodyguard you are.  That person isn't even here!\n\r", ch);
     return eFAILURE;
@@ -1127,7 +1125,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (!canPerform(ch, SKILL_TACTICS))
+  if (!ch->canPerform(SKILL_TACTICS))
   {
     send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
     return eFAILURE;
@@ -1168,7 +1166,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
     send_to_char("You take command coordinating the group's attacks.\r\n", ch);
 
     af.type = SKILL_TACTICS_TIMER;
-    af.duration = 1 + has_skill(ch, SKILL_TACTICS) / 10;
+    af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
     af.modifier = 0;
     af.location = 0;
     af.bitvector = -1;
@@ -1186,8 +1184,8 @@ int do_tactics(Character *ch, char *argument, int cmd)
 
       act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
       af.type = SKILL_TACTICS;
-      af.duration = 1 + has_skill(ch, SKILL_TACTICS) / 10;
-      af.modifier = 1 + has_skill(ch, SKILL_TACTICS) / 20;
+      af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
+      af.modifier = 1 + ch->has_skill(SKILL_TACTICS) / 20;
       af.location = APPLY_HITROLL;
       af.bitvector = -1;
       affect_to_char(tmp_char, &af);
@@ -1203,7 +1201,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
 int do_make_camp(Character *ch, char *argument, int cmd)
 {
   Character *i, *next_i;
-  int learned = has_skill(ch, SKILL_MAKE_CAMP);
+  int learned = ch->has_skill(SKILL_MAKE_CAMP);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1307,7 +1305,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
 
 int do_triage(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_TRIAGE);
+  int learned = ch->has_skill(SKILL_TRIAGE);
   struct affected_type af;
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
@@ -1328,13 +1326,11 @@ int do_triage(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_MOVE(ch) - skill_cost.find(SKILL_TRIAGE)->second < 0)
+  if (!ch->decrementMove(skill_cost.find(SKILL_TRIAGE)->second, "You're too tired to use this skill."))
   {
-    send_to_char("You're too tired to use this skill.\r\n", ch);
     return eFAILURE;
   }
 
-  GET_MOVE(ch) -= skill_cost.find(SKILL_TRIAGE)->second;
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
   af.type = SKILL_TRIAGE_TIMER;
@@ -1366,7 +1362,7 @@ int do_triage(Character *ch, char *argument, int cmd)
 
 int do_battlesense(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_BATTLESENSE);
+  int learned = ch->has_skill(SKILL_BATTLESENSE);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1408,7 +1404,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 {
   Character *vict = nullptr;
   char name[MAX_STRING_LENGTH];
-  int learned = has_skill(ch, SKILL_SMITE);
+  int learned = ch->has_skill(SKILL_SMITE);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1431,7 +1427,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   one_argument(argument, name);
 
   if (*argument)
-    if (!(vict = get_char_room_vis(ch, name)))
+    if (!(vict = ch->get_char_room_vis(name)))
     {
       send_to_char("Smite whom?\n\r", ch);
       return eFAILURE;
@@ -1492,7 +1488,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 
 int do_leadership(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_LEADERSHIP);
+  int learned = ch->has_skill(SKILL_LEADERSHIP);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1551,7 +1547,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
 
 int do_perseverance(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_PERSEVERANCE);
+  int learned = ch->has_skill(SKILL_PERSEVERANCE);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1592,7 +1588,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
 int do_defenders_stance(Character *ch, char *argument, int cmd)
 {
   Character *vict = nullptr;
-  int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
+  int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
@@ -1615,7 +1611,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
     act("You attempt to brace yourself to defend against $N's onslaught but stumble and fall!", ch, 0, vict, TO_CHAR, 0);
     act("$n attempts to brace $mself to defend against your onslaught but stumbles and falls!", ch, 0, vict, TO_VICT, 0);
     act("$n attempts to brace $mself to defend against $N's onslaught but stumbles and falls!", ch, 0, vict, TO_ROOM, NOTVICT);
-    GET_POS(ch) = POSITION_SITTING;
+    ch->setSitting();
   }
   else
   {
@@ -1636,7 +1632,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
 
 int do_onslaught(Character *ch, char *argument, int cmd)
 {
-  int learned = has_skill(ch, SKILL_ONSLAUGHT);
+  int learned = ch->has_skill(SKILL_ONSLAUGHT);
   struct affected_type af;
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)

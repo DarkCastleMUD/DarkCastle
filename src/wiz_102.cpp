@@ -45,8 +45,6 @@
 #include "const.h"
 #include "newedit.h"
 
-using namespace std;
-
 command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone, bool stats = false);
 
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
@@ -188,7 +186,7 @@ int do_check(Character *ch, char *arg, int cmd)
     sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
     send_to_char(buf, ch);
 
-    /* ctime adds a \n to the string it returns! */
+    /* ctime adds a \n to the std::string it returns! */
     const time_t tBuffer = vict->player->time.logon;
     +sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
     send_to_char(buf, ch);
@@ -236,7 +234,7 @@ int do_find(Character *ch, char *arg, int cmd)
 
   if (IS_NPC(ch))
     return eFAILURE;
-  if (!has_skill(ch, COMMAND_FIND))
+  if (!ch->has_skill(COMMAND_FIND))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -304,7 +302,7 @@ int do_stat(Character *ch, char *arg, int cmd)
       "mobile",
       "object",
       "character"};
-  if (!has_skill(ch, COMMAND_STAT))
+  if (!ch->has_skill(COMMAND_STAT))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -412,13 +410,13 @@ int do_mpstat(Character *ch, char *arg, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!has_skill(ch, COMMAND_MPSTAT))
+  if (!ch->has_skill(COMMAND_MPSTAT))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
   }
 
-  //  int has_range = has_skill(ch, COMMAND_RANGE);
+  //  int has_range = ch->has_skill( COMMAND_RANGE);
 
   one_argument(arg, name);
 
@@ -1358,11 +1356,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
 int do_sedit(Character *ch, char *argument, int cmd)
 {
-  string buf;
-  string select;
-  string target;
-  string text;
-  string value;
+  std::string buf;
+  std::string select;
+  std::string target;
+  std::string text;
+  std::string value;
   Character *vict = nullptr;
   char_skill_data *skill = nullptr;
   char_skill_data *lastskill = nullptr;
@@ -1378,14 +1376,14 @@ int do_sedit(Character *ch, char *argument, int cmd)
       "list",
       "\n"};
 
-  if (!has_skill(ch, COMMAND_SEDIT))
+  if (!ch->has_skill(COMMAND_SEDIT))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
   }
 
-  tie(target, text) = half_chop(argument);
-  tie(select, text) = half_chop(text);
+  std::tie(target, text) = half_chop(argument);
+  std::tie(select, text) = half_chop(text);
   // at this point target is the character's name
   // select is the field, and text is any args
 
@@ -1421,7 +1419,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
 
   if (field == 2)
   {
-    tie(value, text) = last_argument(text);
+    std::tie(value, text) = last_argument(text);
   }
 
   if (field == 0 || field == 1 || field == 2)
@@ -1462,7 +1460,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (has_skill(vict, skillnum))
+    if (vict->has_skill(skillnum))
     {
       ch->send(fmt::format("'{}' already has '{}'.\r\n", GET_NAME(vict), text));
       return eFAILURE;
@@ -1507,7 +1505,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
                "This will set the character's skill to amount.\r\n");
       return eFAILURE;
     }
-    if (!(learned = has_skill(vict, skillnum)))
+    if (!(learned = vict->has_skill(skillnum)))
     {
       ch->send(fmt::format("'{}' does not have skill '{}'.\r\n", GET_NAME(vict), text));
       return eFAILURE;
@@ -2072,7 +2070,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     try
     {
-      vnum = stoull(buf);
+      vnum = std::stoull(buf);
     }
     catch (...)
     {
@@ -2491,7 +2489,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
         return eFAILURE;
       }
          */
-    /*if (!has_skill(ch, COMMAND_RANGE))
+    /*if (!ch->has_skill( COMMAND_RANGE))
     {
       send_to_char("You cannot create items.\r\n",ch);
       return eFAILURE;
@@ -3181,7 +3179,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           ch);
       return eFAILURE;
     }
-    ((Character *)mob_index[mob_num].item)->name = str_hsh(buf4);
+    ((Character *)mob_index[mob_num].item)->setName(buf4);
     sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
     send_to_char(buf, ch);
   }
@@ -3418,9 +3416,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
           "$3Current$R: ",
           ch);
-      sprintf(buf, "%s\n",
-              position_types[((Character *)mob_index[mob_num].item)->position]);
-      send_to_char(buf, ch);
+      ch->sendln(QString("%1").arg(((Character *)mob_index[mob_num].item)->getPositionQString()));
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
                    "  2 = Sitting\r\n"
@@ -3434,25 +3430,25 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
+
+    auto victim = ((Character *)mob_index[mob_num].item);
     switch (intval)
     {
     case 1:
-      intval = POSITION_STANDING;
+      victim->setStanding();
       break;
     case 2:
-      intval = POSITION_SITTING;
+      victim->setSitting();
       break;
     case 3:
-      intval = POSITION_RESTING;
+      victim->setResting();
       break;
     case 4:
-      intval = POSITION_SLEEPING;
+      victim->setSleeping();
       break;
     }
-    ((Character *)mob_index[mob_num].item)->position = intval;
-    sprintf(buf, "Mob default position set to %s.\r\n",
-            position_types[intval]);
-    send_to_char(buf, ch);
+
+    ch->sendln(QString("Mob default position set to %1.").arg(victim->getPositionQString()));
   }
   break;
 
@@ -3465,9 +3461,8 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
           "$3Current$R: ",
           ch);
-      sprintf(buf, "%s\n",
-              position_types[((Character *)mob_index[mob_num].item)->mobdata->default_pos]);
-      send_to_char(buf, ch);
+      ch->sendln(QString("%1").arg(Character::position_to_string(((Character *)mob_index[mob_num].item)->mobdata->default_pos)));
+
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
                    "  2 = Sitting\r\n"
@@ -3481,24 +3476,25 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;
     }
+
+    auto victim = ((Character *)mob_index[mob_num].item);
+    auto mobdata = victim->mobdata;
     switch (intval)
     {
     case 1:
-      intval = POSITION_STANDING;
+      mobdata->default_pos = position_t::STANDING;
       break;
     case 2:
-      intval = POSITION_SITTING;
+      mobdata->default_pos = position_t::SITTING;
       break;
     case 3:
-      intval = POSITION_RESTING;
+      mobdata->default_pos = position_t::RESTING;
       break;
     case 4:
-      intval = POSITION_SLEEPING;
+      mobdata->default_pos = position_t::SLEEPING;
       break;
     }
-    ((Character *)mob_index[mob_num].item)->mobdata->default_pos = intval;
-    sprintf(buf, "Mob default position set to %s.\r\n",
-            position_types[intval]);
+    sprintf(buf, "Mob default position set to %s.\r\n", Character::position_to_string(mobdata->default_pos));
     send_to_char(buf, ch);
   }
   break;
@@ -4146,7 +4142,7 @@ int do_medit(Character *ch, char *argument, int cmd)
 
 int do_redit(Character *ch, char *argument, int cmd)
 {
-  string buf, remainder_args;
+  std::string buf, remainder_args;
   int x, a, b, c, d = 0;
   struct extra_descr_data *extra;
   struct extra_descr_data *ext;
@@ -4179,8 +4175,8 @@ int do_redit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  string arg1;
-  tie(arg1, remainder_args) = half_chop(string(argument));
+  std::string arg1;
+  std::tie(arg1, remainder_args) = half_chop(std::string(argument));
   if (arg1.empty())
   {
     send_to_char("The field must be one of the following:\n\r", ch);
@@ -4236,7 +4232,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   {
     if (!remainder_args.empty())
     {
-      string description = remainder_args + "\n\r";
+      std::string description = remainder_args + "\n\r";
       dc_free(DC::getInstance()->world[ch->in_room].description);
       DC::getInstance()->world[ch->in_room].description = str_dup(description.c_str());
       send_to_char("Ok.\r\n", ch);
@@ -4274,12 +4270,12 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    string arg2;
-    tie(arg2, remainder_args) = half_chop(remainder_args);
+    std::string arg2;
+    std::tie(arg2, remainder_args) = half_chop(remainder_args);
     if (arg2 == "delete")
     {
-      string direction;
-      tie(direction, remainder_args) = half_chop(remainder_args);
+      std::string direction;
+      std::tie(direction, remainder_args) = half_chop(remainder_args);
       for (x = 0; x <= 6; x++)
       {
         if (is_abbrev(direction.c_str(), dirs[x]))
@@ -4349,8 +4345,8 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    string arg3;
-    tie(arg3, remainder_args) = half_chop(remainder_args);
+    std::string arg3;
+    std::tie(arg3, remainder_args) = half_chop(remainder_args);
     try
     {
       d = stoi(arg3);
@@ -4363,8 +4359,8 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     if (!remainder_args.empty())
     {
-      string arg4;
-      tie(arg4, remainder_args) = half_chop(remainder_args);
+      std::string arg4;
+      std::tie(arg4, remainder_args) = half_chop(remainder_args);
       try
       {
         a = stoi(arg4);
@@ -4379,8 +4375,8 @@ int do_redit(Character *ch, char *argument, int cmd)
         return eFAILURE;
       }
 
-      string arg5;
-      tie(arg5, remainder_args) = half_chop(remainder_args);
+      std::string arg5;
+      std::tie(arg5, remainder_args) = half_chop(remainder_args);
       try
       {
         b = stoi(arg5);
@@ -4493,19 +4489,19 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    string arg2;
-    tie(arg2, remainder_args) = half_chop(remainder_args);
+    std::string arg2;
+    std::tie(arg2, remainder_args) = half_chop(remainder_args);
 
     if (arg2 == "delete")
     {
-      string arg3;
-      tie(arg3, remainder_args) = half_chop(remainder_args);
+      std::string arg3;
+      std::tie(arg3, remainder_args) = half_chop(remainder_args);
 
       bool deleted = false;
       extra_descr_data *prev = nullptr;
       for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
       {
-        if (arg3 == string(extra->keyword))
+        if (arg3 == std::string(extra->keyword))
         {
           if (prev == nullptr)
           {
@@ -4560,7 +4556,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
         break;
       }
-      else if (arg2 == string(extra->keyword))
+      else if (arg2 == std::string(extra->keyword))
       {
         // A pre-existing extra description was found
         csendf(ch, "Modifying extra description for keyword '%s'.\r\n", arg2.c_str());
@@ -4591,8 +4587,8 @@ int do_redit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    string arg3;
-    tie(arg3, remainder_args) = half_chop(remainder_args);
+    std::string arg3;
+    std::tie(arg3, remainder_args) = half_chop(remainder_args);
     for (x = 0; x <= 6; x++)
     {
       if (x == 6)
@@ -4933,7 +4929,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
+    std::cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << std::endl;
     return eFAILURE;
   }
 
@@ -5125,7 +5121,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   return eFAILURE;
 
   // Remember if you change this that it uses string_to_file which now appends a ~\n to the end
-  // of the string.  This command does NOT take that into consideration currently.
+  // of the std::string.  This command does NOT take that into consideration currently.
 
   /*    if(!GET_RANGE(ch)) {
    send_to_char("You don't have a zone assigned to you!\n\r", ch);
@@ -5169,7 +5165,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   }
 
   fprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
-  sprintf(buf, "%s's Area.", ch->name);
+  sprintf(buf, "%s's Area.", ch->getNameC());
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
   fprintf(fl, "%d 30 2\n", high);
@@ -5463,7 +5459,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
 
   send_to_char("Room flags: ", ch);
   sprintbit((int32_t)rm->room_flags, room_bits, buf);
-  string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
+  std::string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
   send_to_char(buffer.c_str(), ch);
 
   send_to_char("Description:\n\r", ch);
@@ -5586,10 +5582,9 @@ int do_possess(Character *ch, char *argument, int cmd)
         if (ch->desc->snoop_by)
         {
           send_to_char("Whoa! Almost got caught snooping!\n", ch->desc->snoop_by->character);
-          sprintf(buf, "Your victim is now trying to possess: %s\n", victim->name);
+          sprintf(buf, "Your victim is now trying to possess: %s\n", victim->getNameC());
           send_to_char(buf, ch->desc->snoop_by->character);
-          do_snoop(ch->desc->snoop_by->character,
-                   ch->desc->snoop_by->character->name, 0);
+          ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->getName().split(' '));
         }
         else
         {
@@ -5607,7 +5602,7 @@ int do_possess(Character *ch, char *argument, int cmd)
       else
       {
         send_to_char("Ok.\r\n", ch);
-        sprintf(buf, "%s possessed %s", GET_NAME(ch), GET_NAME(victim));
+        sprintf(buf, "%s possessed %s", GET_NAME(ch), victim->getNameC());
         logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;
@@ -5701,7 +5696,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
 
   if (!*buf)
   {
-    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
+    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
     return eFAILURE;
   }
 
@@ -5726,7 +5721,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
 
   if (!*buf2)
   {
-    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
+    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
     return eFAILURE;
   }
 
@@ -5746,7 +5741,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
+  send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
   return eFAILURE;
 }
 

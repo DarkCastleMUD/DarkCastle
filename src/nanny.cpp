@@ -54,8 +54,6 @@ extern "C"
 #include "guild.h"
 #include <string>
 
-using namespace std;
-
 #define STATE(d) ((d)->connected)
 
 void AuctionHandleDelete(QString name);
@@ -89,19 +87,19 @@ int _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
 void update_wizlist(Character *ch);
 void isr_set(Character *ch);
-bool check_reconnect(class Connection *d, char *name, bool fReconnect);
-bool check_playing(class Connection *d, char *name);
+bool check_reconnect(class Connection *d, QString name, bool fReconnect);
+bool check_playing(class Connection *d, QString name);
 void check_hw(Character *ch);
 char *str_str(char *first, char *second);
 bool apply_race_attributes(Character *ch, int race = 0);
 bool check_race_attributes(Character *ch, int race = 0);
-bool handle_get_race(Connection *d, string arg);
+bool handle_get_race(Connection *d, std::string arg);
 void show_question_race(Connection *d);
 void show_question_class(Connection *d);
-bool handle_get_class(Connection *d, string arg);
+bool handle_get_class(Connection *d, std::string arg);
 int is_clss_race_compat(Character *ch, int clss);
 void show_question_stats(Connection *d);
-bool handle_get_stats(Connection *d, string arg);
+bool handle_get_stats(Connection *d, std::string arg);
 
 int is_race_eligible(Character *ch, int race)
 {
@@ -424,7 +422,7 @@ void do_on_login_stuff(Character *ch)
    {
       GET_AC(ch) -= (ch->getLevel() * 2);
    }
-   GET_AC(ch) -= has_skill(ch, SKILL_COMBAT_MASTERY) / 2;
+   GET_AC(ch) -= ch->has_skill(SKILL_COMBAT_MASTERY) / 2;
 
    GET_AC(ch) -= GET_AC_METAS(ch);
 
@@ -577,50 +575,50 @@ void do_on_login_stuff(Character *ch)
       ch->skills.erase(SPELL_KNOW_ALIGNMENT);
    }
    // Remove pick if they're no longer allowed to have it.
-   if (GET_CLASS(ch) == CLASS_THIEF && ch->getLevel() < 22 && has_skill(ch, SKILL_PICK_LOCK))
+   if (GET_CLASS(ch) == CLASS_THIEF && ch->getLevel() < 22 && ch->has_skill(SKILL_PICK_LOCK))
    {
       ch->skills.erase(SKILL_PICK_LOCK);
    }
-   if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_HIDE))
+   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_HIDE))
    {
       ch->skills.erase(SKILL_HIDE);
    }
    // Remove listsongs
-   if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_LIST_SONGS))
+   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_LIST_SONGS))
    {
       ch->skills.erase(SKILL_SONG_LIST_SONGS);
    }
    // Replace shieldblock on barbs
-   if (GET_CLASS(ch) == CLASS_BARBARIAN && has_skill(ch, SKILL_SHIELDBLOCK))
+   if (GET_CLASS(ch) == CLASS_BARBARIAN && ch->has_skill(SKILL_SHIELDBLOCK))
    {
       ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
    }
    // Replace eagle-eye on druids
-   if (GET_CLASS(ch) == CLASS_DRUID && has_skill(ch, SPELL_EAGLE_EYE))
+   if (GET_CLASS(ch) == CLASS_DRUID && ch->has_skill(SPELL_EAGLE_EYE))
    {
       ch->swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
    }
    // Replace crushing on bards
-   if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_CRUSHING_WEAPONS))
+   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_CRUSHING_WEAPONS))
    {
       ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
    }
    // Replace crushing on thieves
-   if (GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_CRUSHING_WEAPONS))
+   if (GET_CLASS(ch) == CLASS_THIEF && ch->has_skill(SKILL_CRUSHING_WEAPONS))
    {
       ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
    }
    // Replace firestorm on antis
-   if (GET_CLASS(ch) == CLASS_ANTI_PAL && has_skill(ch, SPELL_FIRESTORM))
+   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch->has_skill(SPELL_FIRESTORM))
    {
       ch->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
    }
 
-   class_skill_defines *c_skills = get_skill_list(ch);
+   class_skill_defines *c_skills = ch->get_skill_list();
 
    if (IS_MORTAL(ch))
    {
-      queue<skill_t> skills_to_delete = {};
+      std::queue<skill_t> skills_to_delete = {};
       for (const auto &curr : ch->skills)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
@@ -637,9 +635,9 @@ void do_on_login_stuff(Character *ch)
       }
    }
 
-   barb_magic_resist(ch, 0, has_skill(ch, SKILL_MAGIC_RESIST));
+   barb_magic_resist(ch, 0, ch->has_skill(SKILL_MAGIC_RESIST));
    /* meta reimbursement */
-   if (!has_skill(ch, META_REIMB))
+   if (!ch->has_skill(META_REIMB))
    {
       learn_skill(ch, META_REIMB, 1, 100);
       extern int64_t new_meta_platinum_cost(int start, int end);
@@ -823,10 +821,10 @@ void set_hw(Character *ch)
 }
 
 // Deal with sockets that haven't logged in yet.
-void nanny(class Connection *d, string arg)
+void nanny(class Connection *d, std::string arg)
 {
    char buf[MAX_STRING_LENGTH];
-   stringstream str_tmp;
+   std::stringstream str_tmp;
    char tmp_name[20];
    char *password;
    bool fOld;
@@ -973,9 +971,9 @@ void nanny(class Connection *d, string arg)
       ch = d->character;
 
       // This is needed for "check_reconnect"  we free it later during load_char_obj
-      // TODO - this is memoryleaking ch->name.  Check if ch->name is not there before
+      // TODO - this is memoryleaking ch->getNameC().  Check if ch->getNameC() is not there before
       // doing it to fix it.  (No time to verify this now, so i'll do it later)
-      GET_NAME(ch) = str_dup(tmp_name);
+      ch->setName(str_dup(tmp_name));
 
       // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
       // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
@@ -1036,7 +1034,7 @@ void nanny(class Connection *d, string arg)
          }
       }
 
-      if (string(crypt(arg.c_str(), password)) != password)
+      if (std::string(crypt(arg.c_str(), password)) != password)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
@@ -1065,9 +1063,9 @@ void nanny(class Connection *d, string arg)
          return;
       }
 
-      check_playing(d, GET_NAME(ch));
+      check_playing(d, ch->getName());
 
-      if (check_reconnect(d, GET_NAME(ch), true))
+      if (check_reconnect(d, ch->getName(), true))
          return;
 
       buffer = QString("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
@@ -1145,8 +1143,7 @@ void nanny(class Connection *d, string arg)
          SEND_TO_Q("Ok, what IS it, then? ", d);
          telnet_ga(d);
          // TODO - double check this to make sure we're free'ing properly
-         delete GET_NAME(ch);
-         GET_NAME(ch) = nullptr;
+         ch->setName("");
          delete d->character;
          d->character = nullptr;
          STATE(d) = Connection::states::GET_NAME;
@@ -1169,7 +1166,7 @@ void nanny(class Connection *d, string arg)
          return;
       }
 
-      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
+      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
       ch->player->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
@@ -1179,7 +1176,7 @@ void nanny(class Connection *d, string arg)
    case Connection::states::CONFIRM_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+      if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -1890,18 +1887,18 @@ void nanny(class Connection *d, string arg)
    case Connection::states::DELETE_CHAR:
       if (arg == "ERASE ME")
       {
-         sprintf(buf, "%s just deleted themself.", d->character->name);
+         sprintf(buf, "%s just deleted themself.", d->character->getNameC());
          logentry(buf, IMMORTAL, LogChannels::LOG_MORTAL);
 
-         AuctionHandleDelete(d->character->name);
+         AuctionHandleDelete(d->character->getName());
          // To remove the vault from memory
-         remove_familiars(d->character->name, SELFDELETED);
-         remove_vault(d->character->name, SELFDELETED);
+         remove_familiars(d->character->getName(), SELFDELETED);
+         remove_vault(d->character->getName(), SELFDELETED);
          if (d->character->clan)
          {
             remove_clan_member(d->character->clan, d->character);
          }
-         remove_character(d->character->name, SELFDELETED);
+         remove_character(d->character->getName(), SELFDELETED);
 
          d->character->setLevel(1);
          update_wizlist(d->character);
@@ -1918,7 +1915,7 @@ void nanny(class Connection *d, string arg)
 
    case Connection::states::CONFIRM_PASSWORD_CHANGE:
       SEND_TO_Q("\n\r", d);
-      if (string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
+      if (std::string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
       {
          SEND_TO_Q("Enter a new password: ", d);
          telnet_ga(d);
@@ -1942,7 +1939,7 @@ void nanny(class Connection *d, string arg)
          telnet_ga(d);
          return;
       }
-      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
+      strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
       ch->player->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
@@ -1952,7 +1949,7 @@ void nanny(class Connection *d, string arg)
    case Connection::states::CONFIRM_RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+      if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -2047,7 +2044,7 @@ bool check_deny(class Connection *d, char *name)
 }
 
 // Look for link-dead player to reconnect.
-bool check_reconnect(class Connection *d, char *name, bool fReconnect)
+bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 {
    const auto &character_list = DC::getInstance()->character_list;
    for (const auto &tmp_ch : character_list)
@@ -2076,11 +2073,9 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
          tmp_ch->desc = d;
          tmp_ch->timer = 0;
          send_to_char("Reconnecting.\r\n", tmp_ch);
-         char log_buf[MAX_STRING_LENGTH] = {};
-         sprintf(log_buf, "%s@%s has reconnected.",
-                 GET_NAME(tmp_ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
-         act("$n has reconnected and is ready to kick ass.", tmp_ch, 0,
-             0, TO_ROOM, INVIS_NULL);
+
+         QString log_buf = QString("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
+         act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
 
          if (tmp_ch->getLevel() < IMMORTAL)
          {
@@ -2107,7 +2102,7 @@ bool check_reconnect(class Connection *d, char *name, bool fReconnect)
 /*
  * Check if already playing (on an open descriptor.)
  */
-bool check_playing(class Connection *d, char *name)
+bool check_playing(class Connection *d, QString name)
 {
    class Connection *dold, *next_d;
    Character *compare = 0;
@@ -2122,12 +2117,12 @@ bool check_playing(class Connection *d, char *name)
       compare = ((dold->original != 0) ? dold->original : dold->character);
 
       // If this is the case we fail our precondition to str_cmp
-      if (name == 0)
+      if (name.isEmpty())
          continue;
       if (GET_NAME(compare) == 0)
          continue;
 
-      if (str_cmp(name, GET_NAME(compare)))
+      if (name != GET_NAME(compare))
          continue;
 
       if (STATE(dold) == Connection::states::GET_NAME)
@@ -2208,7 +2203,7 @@ void update_characters()
       }
       if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON)))
       {
-         logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+         logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
          REMBIT(i->affected_by, AFF_POISON);
       }
 
@@ -2280,8 +2275,7 @@ void update_characters()
          af.bitvector = -1;
          affect_to_char(i, &af);
 
-         GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
-         GET_MOVE(i) = MIN(GET_MOVE(i), GET_MAX_MOVE(i));
+         i->incrementMove(5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration));
       }
    }
 }
@@ -2554,7 +2548,7 @@ void show_question_race(Connection *d)
    }
 
    Character *ch = d->character;
-   string buffer, races_buffer;
+   std::string buffer, races_buffer;
    buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
    buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
    for (int race = 1; race <= 9; race++)
@@ -2572,12 +2566,12 @@ void show_question_race(Connection *d)
       }
       undo_race_saves(ch);
    }
-   buffer += "Type 1-" + to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
+   buffer += "Type 1-" + std::to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
    SEND_TO_Q(buffer.c_str(), d);
    telnet_ga(d);
 }
 
-bool handle_get_race(Connection *d, string arg)
+bool handle_get_race(Connection *d, std::string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
@@ -2622,7 +2616,7 @@ void show_question_class(Connection *d)
    }
 
    Character *ch = d->character;
-   string buffer, classes_buffer;
+   std::string buffer, classes_buffer;
    buffer += "\r\n   Class$R\r\n";
    int clss;
    for (clss = 1; clss <= CLASS_MAX_PROD; clss++)
@@ -2636,7 +2630,7 @@ void show_question_class(Connection *d)
          else
          {
             buffer += fmt::format("{:2}. {:11}\r\n", clss, pc_clss_types[clss]);
-            classes_buffer += string(pc_clss_types3[clss]);
+            classes_buffer += std::string(pc_clss_types3[clss]);
             if (clss < CLASS_MAX_PROD)
             {
                classes_buffer += ",";
@@ -2646,12 +2640,12 @@ void show_question_class(Connection *d)
    }
 
    buffer += "Type 'back' to go back and pick a different race.\r\n";
-   buffer += "Type '1-" + to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
+   buffer += "Type '1-" + std::to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
    SEND_TO_Q(buffer.c_str(), d);
    telnet_ga(d);
 }
 
-bool handle_get_class(Connection *d, string arg)
+bool handle_get_class(Connection *d, std::string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
@@ -2668,7 +2662,7 @@ bool handle_get_class(Connection *d, string arg)
 
    for (unsigned clss = 1; clss <= CLASS_MAX_PROD; clss++)
    {
-      if (string(pc_clss_types[clss]) == string(arg) || string(pc_clss_types3[clss]) == string(arg))
+      if (std::string(pc_clss_types[clss]) == std::string(arg) || std::string(pc_clss_types3[clss]) == std::string(arg))
       {
          if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
          {
@@ -2756,7 +2750,7 @@ void show_question_stats(Connection *d)
    Character *ch = d->character;
    unsigned race = GET_RACE(ch);
    unsigned clss = GET_CLASS(ch);
-   string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
+   std::string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
    buffer += fmt::format("Class: {}\r\n", classes[clss].name);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
    buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\r\n");
@@ -2831,7 +2825,7 @@ void show_question_stats(Connection *d)
    telnet_ga(d);
 }
 
-bool handle_get_stats(Connection *d, string arg)
+bool handle_get_stats(Connection *d, std::string arg)
 {
    if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
    {

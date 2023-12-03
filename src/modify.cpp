@@ -37,7 +37,6 @@ extern "C"
 #include "db.h"
 #include <string>
 #include <iostream>
-using namespace std;
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
 #define REBOOT_AT 10 /* 0-23, time of optional reboot if -e lib/reboot */
@@ -217,10 +216,17 @@ int do_string(Character *ch, char *arg, int cmd)
 				send_to_char("You can't change that field for players.", ch);
 				return 1;
 			}
+
+			ch->sendln("This is broken.");
+			logentry("do_string: broken");
+			/*
+			TODO
 			if (IS_NPC(mob))
-				ch->desc->hashstr = &GET_NAME(mob);
+				ch->desc->hashstr = mob->getNameCPtr();
 			else
-				ch->desc->strnew = &GET_NAME(mob);
+				ch->desc->strnew = mob->getNameCPtr();
+			*/
+
 			if (IS_PC(mob))
 				send_to_char("WARNING: You have changed the name of a player.\r\n", ch);
 			break;
@@ -661,21 +667,21 @@ void page_string(class Connection *d, const char *str, int keep_internal)
 		return;
 	}
 
-	string print_me = str;
-	string tmp;
+	std::string print_me = str;
+	std::string tmp;
 	size_t pagebreak;
 
 	while (!print_me.empty())
 	{
 		pagebreak = print_me.find_first_of('\n', 3800); // find the first endline after 3800 chars
 
-		if (string::npos == pagebreak)
+		if (std::string::npos == pagebreak)
 			pagebreak = print_me.size(); // if one doesn't exist (string < 3800) just set to max string length
 		else if (print_me.at(pagebreak) == '\r')
 			pagebreak++; // if its a \r, go 1 greater.
 
 		tmp = print_me.substr(0, pagebreak);
-		print_me = print_me.substr(pagebreak, string::npos);
+		print_me = print_me.substr(pagebreak, std::string::npos);
 
 		// if they don't want things paginated
 		send_to_char(tmp.c_str(), d->character);

@@ -20,14 +20,14 @@
 #include "handler.h"
 #include "const.h"
 
-extern vector<profession> professions;
+extern std::vector<profession> professions;
 
 int get_max(Character *ch, int skill);
 int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 
 int do_practice(Character *ch, char *arg, int cmd)
 {
-  /* Call "guild" with a null string for an argument.
+  /* Call "guild" with a null std::string for an argument.
      This displays the character's skills. */
 
   if (arg[0] != '\0')
@@ -44,7 +44,7 @@ int do_practice(Character *ch, char *arg, int cmd)
 int do_profession(Character *ch, char *args, int cmdnum)
 {
   // Command is enabled by giving someone the profession skill
-  if (!has_skill(ch, SKILL_PROFESSION))
+  if (!ch->has_skill( SKILL_PROFESSION))
   {
     send_to_char("Huh?\n\r", ch);
     return eFAILURE;
@@ -67,7 +67,7 @@ int do_profession(Character *ch, char *args, int cmdnum)
     // Show list of available professions based on player's class type
     csendf(ch, "As a %s you can pick from the following professions:\n\r", pc_clss_types3[GET_CLASS(ch)]);
 
-    for (vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
+    for (std::vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
@@ -85,9 +85,9 @@ int do_profession(Character *ch, char *args, int cmdnum)
   }
 
   bool found = false;
-  for (vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
+  for (std::vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
   {
-    if ((*i).name == string(arg1))
+    if ((*i).name == std::string(arg1))
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
@@ -230,11 +230,11 @@ int search_skills(const char *arg, class_skill_defines *list_skills)
   return -1;
 }
 
-class_skill_defines *get_skill_list(Character *ch)
+class_skill_defines *Character::get_skill_list(void)
 {
   class_skill_defines *skilllist = nullptr;
 
-  switch (GET_CLASS(ch))
+  switch (GET_CLASS(this))
   {
   case CLASS_THIEF:
     skilllist = t_skills;
@@ -273,6 +273,11 @@ class_skill_defines *get_skill_list(Character *ch)
     break;
   }
   return skilllist;
+}
+
+class_skill_defines *get_skill_list(Character *ch)
+{
+  return ch->get_skill_list();
 }
 
 char *attrstring(int attr)
@@ -451,24 +456,41 @@ char *attrname(int clss, int attr)
   }
 }
 
-int skillmax(Character *ch, int skill, int eh)
+int Character::skillmax(int skill, int eh)
 {
-  class_skill_defines *skilllist = get_skill_list(ch);
-  if (IS_NPC(ch))
+  if (isNPC())
+  {
     return eh;
+  }
+
+  class_skill_defines *skilllist = get_skill_list();
   if (!skilllist)
+  {
     skilllist = g_skills;
+  }
+
   int i = search_skills2(skill, skilllist);
   if (i == -1 && skilllist != g_skills)
   {
     skilllist = g_skills;
     i = search_skills2(skill, g_skills);
   }
+
   if (i == -1)
+  {
     return eh;
+  }
+
   if (skilllist[i].maximum < i)
+  {
     return skilllist[i].maximum;
+  }
   return eh;
+}
+
+int skillmax(Character *ch, int skill, int eh)
+{
+  return ch->skillmax(skill, eh);
 }
 
 char charthing(Character *ch, int known, int skill, int maximum)
@@ -486,7 +508,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
   char buf[MAX_STRING_LENGTH];
   for (int i = 0; *skilllist[i].skillname != '\n'; i++)
   {
-    known = has_skill(ch, skilllist[i].skillnum);
+    known = ch->has_skill( skilllist[i].skillnum);
     if (!known && ch->getLevel() < skilllist[i].levelavailable)
       continue;
 
@@ -659,7 +681,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) == POSITION_SLEEPING)
+  if (GET_POS(ch) == position_t::SLEEPING)
   {
     send_to_char("You cannot practice in your sleep.\r\n", ch);
     return eSUCCESS;
@@ -678,7 +700,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   }
 
   x = skilllist[skillnumber].skillnum;
-  known = has_skill(ch, x);
+  known = ch->has_skill( x);
 
   // we can only train them if they already know it, or if we're the trainer for that skill
   if (!known)
@@ -886,7 +908,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
         skl = SKILL_SONG_HYPNOTIC_HARMONY;
         break;
       }
-      if (!has_skill(ch, skl))
+      if (!ch->has_skill( skl))
       {
         send_to_char("You need to learn your Quest Skill before you can progress further.\r\n", ch);
         return eSUCCESS;
@@ -1088,7 +1110,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
       //     do_say(invoker,"Just \"buy questskill\" to obtain it.",9);
       return eSUCCESS;
     }
-    if (has_skill(ch, skl))
+    if (ch->has_skill( skl))
     {
       do_say(invoker, "I cannot teach you anything further.", 9);
       return eSUCCESS;
@@ -1125,7 +1147,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("You can practice any of these skills:\n\r", ch);
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
     {
-      int known = has_skill(ch, g_skills[i].skillnum);
+      int known = ch->has_skill( g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
       sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
@@ -1152,7 +1174,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("You do not seem to be able to practice now.\r\n", ch);
     return eSUCCESS;
   }
-  learned = has_skill(ch, g_skills[number].skillnum);
+  learned = ch->has_skill( g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
@@ -1171,7 +1193,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
 
   learn_skill(ch, g_skills[number].skillnum, percent, g_skills[number].maximum);
-  learned = has_skill(ch, g_skills[number].skillnum);
+  learned = ch->has_skill( g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
@@ -1292,7 +1314,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  learned = has_skill(ch, skill);
+  learned = ch->has_skill( skill);
 
   // If we don't know the skill yet then we can't learn it any more
   if (learned < 1)
@@ -1416,7 +1438,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
 
   // increase the skill by one
   learn_skill(ch, skill, 1, get_max(ch, skill));
-  learned = has_skill(ch, skill);
+  learned = ch->has_skill( skill);
   csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(ch, skill));
 }
 
@@ -1490,7 +1512,7 @@ void check_maxes(Character *ch)
 
     percent = (int)percent;
 
-    if (has_skill(ch, skilllist[i].skillnum) > percent)
+    if (ch->has_skill( skilllist[i].skillnum) > percent)
     {
       if (ch->skills.contains(skilllist[i].skillnum))
       {
@@ -1512,7 +1534,7 @@ void check_maxes(Character *ch)
 
     percent = (int)percent;
 
-    if (has_skill(ch, skilllist[i].skillnum) > percent)
+    if (ch->has_skill( skilllist[i].skillnum) > percent)
     {
       if (ch->skills.contains(skilllist[i].skillnum))
       {

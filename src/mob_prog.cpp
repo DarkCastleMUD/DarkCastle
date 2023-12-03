@@ -59,7 +59,7 @@
 #include "DC.h"
 #include "Trace.h"
 
-using namespace std;
+
 
 // Extern variables
 
@@ -98,13 +98,13 @@ SelfPurge::operator bool() const
 	return state;
 }
 
-void SelfPurge::setOwner(Character *c, string m)
+void SelfPurge::setOwner(Character *c, std::string m)
 {
 	owner = c;
 	function = m;
 }
 
-string SelfPurge::getFunction(void) const
+std::string SelfPurge::getFunction(void) const
 {
 	return function;
 }
@@ -148,9 +148,9 @@ int mprog_process_cmnd(char *cmnd, Character *mob,
  * Local function code and brief comments.
  */
 
-/* Used to get sequential lines of a multi line string (separated by "\n\r")
+/* Used to get sequential lines of a multi line std::string (separated by "\n\r")
  * Thus its like one_argument(), but a trifle different. It is destructive
- * to the multi line string argument, and thus clist must not be shared.
+ * to the multi line std::string argument, and thus clist must not be shared.
  */
 char *mprog_next_command(char *clist)
 {
@@ -181,7 +181,7 @@ char *mprog_next_command(char *clist)
 }
 
 /* These two functions do the basic evaluation of ifcheck operators.
- *  It is important to note that the string operations are not what
+ *  It is important to note that the std::string operations are not what
  *  you probably expect.  Equality is exact and division is substring.
  *  remember that lhs has been stripped of leading space, but can
  *  still have trailing spaces so be careful when editing since:
@@ -636,7 +636,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else
 			{
-				int16_t ageint = age(target).year;
+				int16_t ageint = target->age().year;
 				intval = &ageint;
 			}
 		}
@@ -659,19 +659,23 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (otarget->carried_by)
 			{
-				stringval = &otarget->carried_by->name;
+				// TODO BROKEN
+				// stringval = &otarget->carried_by->getName().
 			}
 			else if (otarget->equipped_by)
 			{
-				stringval = &otarget->equipped_by->name;
+				// TODO BROKEN
+				// stringval = &otarget->equipped_by->name;
 			}
 			else if (otarget->in_obj && otarget->in_obj->carried_by)
 			{
-				stringval = &otarget->in_obj->carried_by->name;
+				// TODO BROKEN
+				// stringval = &otarget->in_obj->carried_by->name;
 			}
 			else if (otarget->in_obj && otarget->in_obj->equipped_by)
 			{
-				stringval = &otarget->in_obj->equipped_by->name;
+				// TODO BROKEN
+				// stringval = &otarget->in_obj->equipped_by->name;
 			}
 			else
 				stringval = nullptr;
@@ -856,7 +860,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 						 mob_index[mob->mobdata->nr].virt);
 					tError = true;
 				}
-				int16_t sklint = has_skill(target, skl);
+				int16_t sklint = target->has_skill(skl);
 				intval = &sklint;
 			}
 		}
@@ -1040,7 +1044,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				uintval = (uint32_t *)&target->move;
+				uintval = (uint32_t *)target->getMovePtr();
 		}
 		break;
 	case 'n':
@@ -1056,7 +1060,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 					tError = true;
 			}
 			else
-				stringval = &target->name;
+			{
+				// TODO BROKEN
+				// stringval = &target->name;
+			}
 		}
 		break;
 	case 'o':
@@ -1081,7 +1088,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				intval = (int16_t *)&target->position;
+				intval = (int16_t *)target->getPositionPtr();
 		}
 		else if (!str_cmp(right, "practices"))
 		{
@@ -1387,7 +1394,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 
 enum mprog_ifs
 {
-	eRAND = 1, // start this at 1, map returns 0 if not found
+	eRAND = 1, // start this at 1, std::map returns 0 if not found
 	eRAND1K,
 	eAMTITEMS,
 	eNUMPCS,
@@ -1762,7 +1769,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int count = 0;
 
 		const auto &character_list = DC::getInstance()->character_list;
-		count = count_if(character_list.begin(), character_list.end(),
+		count = std::count_if(character_list.begin(), character_list.end(),
 						 [&target](Character *vch)
 						 {
 							 if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobdata->nr].virt == target)
@@ -3316,12 +3323,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 	switch (ch)
 	{
 	case 'i':
-		one_argument(mob->name, t);
+		one_argument(mob->getNameC(), t);
 		break;
 	case 'z':
 		if (mob->beacon)
 		{
-			one_argument(((Character *)mob->beacon)->name, t);
+			one_argument(((Character *)mob->beacon)->getNameC(), t);
 			break;
 		}
 		strcpy(t, "error");
@@ -3337,7 +3344,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		break;
 	case 'x':
 		if (mob->beacon && ((Character *)mob->beacon)->fighting)
-			one_argument(((Character *)mob->beacon)->fighting->name, t);
+			one_argument(((Character *)mob->beacon)->fighting->getNameC(), t);
 		else
 			strcpy(t, "error");
 		*t = UPPER(*t);
@@ -3347,7 +3354,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		{
 			// Mobs can see them no matter what.  Use "cansee()" if you don't want that
 			//	   if ( CAN_SEE( mob,actor ) )
-			one_argument(actor->name, t);
+			one_argument(actor->getNameC(), t);
 			if (IS_PC(actor))
 				*t = UPPER(*t);
 		}
@@ -3362,7 +3369,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 					strcpy(t, actor->short_desc);
 				else
 				{
-					strcpy(t, actor->name);
+					strcpy(t, actor->getNameC());
 					strcat(t, " ");
 					strcat(t, actor->title);
 				}
@@ -3376,7 +3383,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		if (vict)
 		{
 			if (CAN_SEE(mob, vict))
-				one_argument(vict->name, t);
+				one_argument(vict->getNameC(), t);
 			if (IS_PC(vict))
 				*t = UPPER(*t);
 		}
@@ -3391,7 +3398,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 					strcpy(t, vict->short_desc);
 				else
 				{
-					strcpy(t, vict->name);
+					strcpy(t, vict->getNameC());
 					strcat(t, " ");
 					strcat(t, vict->title);
 				}
@@ -3405,7 +3412,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		if (actor && actor->fighting)
 		{
 			if (CAN_SEE(mob, actor->fighting))
-				one_argument(actor->fighting->name, t);
+				one_argument(actor->fighting->getNameC(), t);
 			if (IS_PC(actor->fighting))
 				*t = UPPER(*t);
 		}
@@ -3419,7 +3426,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 					strcpy(t, actor->fighting->short_desc);
 				else
 				{
-					strcpy(t, actor->fighting->name);
+					strcpy(t, actor->fighting->getNameC());
 					strcat(t, " ");
 					strcat(t, actor->fighting->title);
 				}
@@ -3430,7 +3437,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		if (mob && mob->fighting)
 		{
 			if (CAN_SEE(mob, mob->fighting))
-				one_argument(mob->fighting->name, t);
+				one_argument(mob->fighting->getNameC(), t);
 			if (IS_PC(mob->fighting))
 				*t = UPPER(*t);
 		}
@@ -3444,7 +3451,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 					strcpy(t, mob->fighting->short_desc);
 				else
 				{
-					strcpy(t, mob->fighting->name);
+					strcpy(t, mob->fighting->getNameC());
 					strcat(t, " ");
 					strcat(t, mob->fighting->title);
 				}
@@ -3455,7 +3462,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		if (rndm)
 		{
 			if (CAN_SEE(mob, rndm))
-				one_argument(rndm->name, t);
+				one_argument(rndm->getNameC(), t);
 			if (IS_PC(rndm))
 				*t = UPPER(*t);
 		}
@@ -3472,7 +3479,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 				}
 				else
 				{
-					strcpy(t, rndm->name);
+					strcpy(t, rndm->getNameC());
 					strcat(t, " ");
 					strcat(t, rndm->title);
 				}
@@ -4134,7 +4141,7 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-int mprog_act_trigger(string buf, Character *mob, Character *ch,
+int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
 					  Object *obj, void *vo)
 {
 
@@ -4433,7 +4440,7 @@ int mprog_random_trigger(Character *mob)
 
 int mprog_load_trigger(Character *mob)
 {
-	if (!mob || isDead(mob) || isNowhere(mob))
+	if (!mob || mob->isDead() || isNowhere(mob))
 	{
 		return eFAILURE;
 	}
@@ -4446,7 +4453,7 @@ int mprog_load_trigger(Character *mob)
 
 int mprog_arandom_trigger(Character *mob)
 {
-	if (!mob || isDead(mob) || isNowhere(mob))
+	if (!mob || mob->isDead() || isNowhere(mob))
 	{
 		return eFAILURE;
 	}
@@ -4458,12 +4465,12 @@ int mprog_arandom_trigger(Character *mob)
 
 int mprog_can_see_trigger(Character *ch, Character *mob)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
 
-	if (!mob || isDead(mob) || isNowhere(mob))
+	if (!mob || mob->isDead() || isNowhere(mob))
 	{
 		return eFAILURE;
 	}
@@ -4477,7 +4484,7 @@ int mprog_can_see_trigger(Character *ch, Character *mob)
 
 int mprog_speech_trigger(const char *txt, Character *mob)
 {
-	if (!mob || isDead(mob) || isNowhere(mob))
+	if (!mob || mob->isDead() || isNowhere(mob))
 	{
 		return eFAILURE;
 	}
@@ -4498,7 +4505,7 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 
 int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
 {
-	if (!mob || isDead(mob) || isNowhere(mob))
+	if (!mob || mob->isDead() || isNowhere(mob))
 	{
 		return eFAILURE;
 	}
@@ -4707,7 +4714,7 @@ Character *initiate_oproc(Character *ch, Object *obj)
 			buf[i] = '\0';
 			break;
 		}
-	temp->name = str_hsh(buf);
+	temp->setName(buf);
 
 	SET_BIT(temp->misc, MISC_IS_OBJ);
 	temp->objdata = obj;
@@ -4739,7 +4746,7 @@ void end_oproc(Character *ch, Trace trace)
 
 int oprog_can_see_trigger(Character *ch, Object *item)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -4759,7 +4766,7 @@ int oprog_can_see_trigger(Character *ch, Object *item)
 
 int oprog_speech_trigger(const char *txt, Character *ch)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -4864,7 +4871,7 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 
 int oprog_act_trigger(const char *txt, Character *ch)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -4918,7 +4925,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 int oprog_greet_trigger(Character *ch)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -5019,7 +5026,7 @@ int oprog_load_trigger(Character *ch)
 
 int oprog_weapon_trigger(Character *ch, Object *item)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -5041,7 +5048,7 @@ int oprog_weapon_trigger(Character *ch, Object *item)
 
 int oprog_armour_trigger(Character *ch, Object *item)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
@@ -5063,7 +5070,7 @@ int oprog_armour_trigger(Character *ch, Object *item)
 
 int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 {
-	if (!ch || isDead(ch) || isNowhere(ch))
+	if (!ch || ch->isDead() || isNowhere(ch))
 	{
 		return eFAILURE;
 	}

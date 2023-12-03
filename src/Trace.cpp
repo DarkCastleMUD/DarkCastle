@@ -1,8 +1,8 @@
 #include "Trace.h"
 
-using namespace std;
 
-Trace::Trace(const string source)
+
+Trace::Trace(const std::string source)
 {
     tracks.push_back(source);
 }
@@ -12,19 +12,19 @@ Trace::~Trace()
     tracks.pop_back();
 }
 
-vector<string>& Trace::getTracks()
+std::vector<std::string>& Trace::getTracks()
 {
     return tracks;
 }
 
-void Trace::addTrack(string source)
+void Trace::addTrack(std::string source)
 {
     tracks.push_back(source);
 }
 
 std::ostream& operator<<(std::ostream &out, Trace& t)
 {
-    vector<string> tracks = t.getTracks();
+    std::vector<std::string> tracks = t.getTracks();
     for (auto& track : tracks)
     {
         out << track << " ";

@@ -11,7 +11,7 @@ struct social_messg
 {
     char *name = {};
     int hide = {};
-    int min_victim_position = {}; /* Position of victim */
+    position_t min_victim_position = {}; /* Position of victim */
 
     /* No argument was supplied */
     char *char_no_arg = {};

@@ -23,8 +23,6 @@
 #include "const.h"
 #include "corpse.h"
 
-using namespace std;
-
 int count_rooms(int start, int end)
 {
 	if (start < 0 || end < 0 || start > 1000000 || end > 1000000)
@@ -34,7 +32,7 @@ int count_rooms(int start, int end)
 
 	if (start > end)
 	{
-		swap<int>(start, end);
+		std::swap<int>(start, end);
 	}
 
 	int count = 0;
@@ -137,12 +135,12 @@ int do_load(Character *ch, char *arg, int cmd)
 	if (IS_NPC(ch))
 		return eFAILURE;
 
-	if (!has_skill(ch, COMMAND_LOAD) && cmd == CMD_DEFAULT)
+	if (!ch->has_skill(COMMAND_LOAD) && cmd == CMD_DEFAULT)
 	{
 		send_to_char("Huh?\r\n", ch);
 		return eFAILURE;
 	}
-	if (!has_skill(ch, COMMAND_PRIZE) && cmd == CMD_PRIZE)
+	if (!ch->has_skill(COMMAND_PRIZE) && cmd == CMD_PRIZE)
 	{
 		send_to_char("Huh?\r\n", ch);
 		return eFAILURE;
@@ -342,7 +340,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 
 	if (*name)
 	{ /* argument supplied. destroy single object or char */
-		if ((vict = get_char_room_vis(ch, name)) && (ch->getLevel() > G_POWER))
+		if ((vict = ch->get_char_room_vis(name)) && (ch->getLevel() > G_POWER))
 		{
 			if (IS_PC(vict) && (ch->getLevel() <= vict->getLevel()))
 			{
@@ -440,7 +438,7 @@ int Zone::show_info(Character *ch)
 {
 	char buf[MAX_STRING_LENGTH];
 
-	string continent_name;
+	std::string continent_name;
 	if (continent && (unsigned)continent < continent_names.size())
 		continent_name = continent_names.at(continent);
 
@@ -509,14 +507,14 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	for (int j = start; (j < start + num_to_show) && j < zone.cmd.size(); j++)
 	{
 		time_t last = zone.cmd[j]->last;
-		string lastStr = "never";
+		std::string lastStr = "never";
 		if (last)
 		{
 			lastStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(last));
 		}
 
 		time_t lastSuccess = zone.cmd[j]->lastSuccess;
-		string lastSuccessStr = "never";
+		std::string lastSuccessStr = "never";
 		if (lastSuccess)
 		{
 			lastSuccessStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(lastSuccess));
@@ -810,7 +808,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 	// argument = one_argument(argument,name);
 
-	int has_range = has_skill(ch, COMMAND_RANGE);
+	int has_range = ch->has_skill(COMMAND_RANGE);
 
 	if (!*type)
 	{
@@ -918,8 +916,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_mobile(i)) < 0)
 					continue;
 
-				if (isname(name,
-						   ((Character *)(mob_index[nr].item))->name))
+				if (isname(name, ((Character *)(mob_index[nr].item))->getNameC()))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
@@ -1803,7 +1800,7 @@ int do_show(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-command_return_t do_transfer(Character *ch, string arguments, int cmd)
+command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 {
 	if (IS_NPC(ch) || ch == nullptr)
 	{
@@ -1816,8 +1813,8 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 		return eFAILURE;
 	}
 
-	string arg1;
-	tie(arg1, arguments) = half_chop(arguments);
+	std::string arg1;
+	std::tie(arg1, arguments) = half_chop(arguments);
 	if (arg1.empty())
 	{
 		ch->send("Usage: transfer <name>\r\n");
@@ -1837,7 +1834,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 			if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
 			{
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-				ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+				ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1864,7 +1861,7 @@ command_return_t do_transfer(Character *ch, string arguments, int cmd)
 	}
 
 	act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-	ch->send(fmt::format("Moving {} from {} to {}.\r\n", GET_NAME(victim), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+	ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
 	move_char(victim, destination_room);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1960,7 +1957,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 	}
 
 	act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-	csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
+	csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
 		   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 	move_char(victim, target);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
@@ -1999,7 +1996,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 		act("$n disappears in a mushroom cloud.",
 			victim, 0, 0, TO_ROOM, 0);
 		target = ch->in_room;
-		csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
+		csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
 			   DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
 		move_char(victim, target);
 		act("$n arrives from a puff of smoke.",
@@ -2111,7 +2108,7 @@ int do_opstat(Character *ch, char *argument, int cmd)
 	}
 	one_argument(argument, buf);
 
-	if (!has_skill(ch, COMMAND_OPSTAT))
+	if (!ch->has_skill(COMMAND_OPSTAT))
 	{
 		send_to_char("Huh?\r\n", ch);
 		return eFAILURE;

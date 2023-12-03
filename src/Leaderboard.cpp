@@ -22,7 +22,7 @@ extern "C"
 #include "interp.h"
 #include "returnvals.h"
 
-using namespace std;
+
 
 Leaderboard::Leaderboard()
 {
@@ -522,7 +522,7 @@ void Leaderboard::check(void)
 		port1 = DC::getInstance()->cf.ports[0];
 	}
 
-	stringstream ssbuffer;
+	std::stringstream ssbuffer;
 	ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
 	write_file(ssbuffer);
 
@@ -1058,7 +1058,7 @@ void Leaderboard::check_offline(void)
 		port1 = DC::getInstance()->cf.ports[0];
 	}
 
-	stringstream ssbuffer;
+	std::stringstream ssbuffer;
 	ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
 	write_file(ssbuffer);
 
@@ -1394,8 +1394,8 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 
 	if (IS_PC(ch) && ch->getLevel() >= IMPLEMENTER)
 	{
-		string arg1, remainder;
-		tie(arg1, remainder) = half_chop(argument);
+		std::string arg1, remainder;
+		std::tie(arg1, remainder) = half_chop(argument);
 		if (arg1 == "suspend")
 		{
 			if (DC::getInstance()->cf.leaderboard_check == "suspend")
@@ -2068,7 +2068,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 	}
 }
 
-void Leaderboard::setHP(unsigned int placement, string name, int value)
+void Leaderboard::setHP(unsigned int placement, std::string name, int value)
 {
 	hpactive[placement] = value;
 	hpactivename[placement] = name.data();

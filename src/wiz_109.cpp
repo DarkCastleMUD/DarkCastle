@@ -140,14 +140,14 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
 
   if (!DC::isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QString("%1 is now a guide.\r\n").arg(GET_NAME(victim)));
+    send(QString("%1 is now a guide.\r\n").arg(victim->getNameC()));
     send_to_char("You have been selected to be a DC Guide!\r\n", victim);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QString("%1 is no longer a guide.\r\n").arg(GET_NAME(victim)));
+    send(QString("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
     send_to_char("You have been removed as a DC guide.\r\n", victim);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -234,7 +234,7 @@ int do_advance(Character *ch, char *argument, int cmd)
 
     victim->fillHPLimit();
     GET_MANA(victim) = mana_limit(victim);
-    GET_MOVE(victim) = move_limit(victim);
+    victim->setMove(victim->move_limit());
 
     advance_level(victim, 0);
     redo_hitpoints(victim);
@@ -251,7 +251,7 @@ int do_advance(Character *ch, char *argument, int cmd)
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
-          GET_NAME(victim), new_newlevel);
+          victim->getNameC(), new_newlevel);
   logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
   if (victim->getLevel() == 0)
@@ -267,85 +267,85 @@ int do_advance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_zap(Character *ch, char *argument, int cmd)
+command_return_t Character::do_zap(QStringList arguments, int cmd)
 {
-  Character *victim;
-  int room;
-  char name[100], buf[500];
+  Character *victim{};
+  int room{};
 
   void remove_clan_member(int clannumber, Character *ch);
 
-  one_argument(argument, name);
+  QString name = arguments.value(0);
 
-  if (!(*name))
+  if (name.isEmpty())
   {
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
                  "lower than you.\r\n",
-                 ch);
+                 this);
     return eFAILURE;
   }
 
-  victim = get_pc_vis(ch, name);
+  victim = get_pc_vis(this, name);
 
   if (victim)
   {
-    if (IS_PC(victim) && (ch->getLevel() < victim->getLevel()))
+    if (IS_PC(victim) && (this->getLevel() < victim->getLevel()))
     {
-      act("$n casts a massive lightning bolt at you.", ch, 0, victim,
+      act("$n casts a massive lightning bolt at you.", this, 0, victim,
           TO_VICT, 0);
-      act("$n casts a massive lightning bolt at $N.", ch, 0, victim,
+      act("$n casts a massive lightning bolt at $N.", this, 0, victim,
           TO_ROOM, NOTVICT);
       return eFAILURE;
     }
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
-      send_to_char("Get stuffed.\r\n", ch);
+      send_to_char("Get stuffed.\r\n", this);
       return eFAILURE;
     }
 
     if (IS_PC(victim))
     {
-      sprintf(buf, "A massive bolt of lightning arcs down from the "
-                   "heavens, striking you\n\rbetween the eyes. You have "
-                   "been utterly destroyed by %s.\r\n",
-              GET_SHORT(ch));
-      send_to_char(buf, victim);
+      victim->sendln(QString("A massive bolt of lightning arcs down from the "
+                             "heavens, striking you\n\rbetween the eyes. You have "
+                             "been utterly destroyed by %1.")
+                         .arg(GET_SHORT(this)));
     }
 
     room = victim->in_room;
 
-    sprintf(buf, "A massive bolt of lightning arcs down from the heavens,"
-                 " striking\n\r%s between the eyes.\n\r  %s has been utterly"
-                 " destroyed by %s.\r\n",
-            GET_NAME(victim), GET_SHORT(victim),
-            GET_SHORT(ch));
+    QString buf = QString("A massive bolt of lightning arcs down from the heavens,"
+                          " striking\r\n%1 between the eyes.\r\n  %2 has been utterly"
+                          " destroyed by %3.\r\n")
+                      .arg(victim->getName())
+                      .arg(GET_SHORT(victim))
+                      .arg(GET_SHORT(this));
 
-    remove_familiars(victim->name, ZAPPED);
+    remove_familiars(victim->getNameC(), ZAPPED);
     if (cmd == CMD_DEFAULT) // cmd9 = someone typed it. 10 = rename.
-      remove_vault(victim->name, ZAPPED);
+      remove_vault(victim->getNameC(), ZAPPED);
 
     victim->setLevel(1);
     update_wizlist(victim);
 
-    if (ch->clan)
-      remove_clan_member(ch->clan, ch);
+    if (this->clan)
+      remove_clan_member(this->clan, this);
 
-    AuctionHandleDelete(GET_NAME(victim));
-    snprintf(buf, 500, "%s has deleted %s.\r\n", ch->name, victim->name);
+    AuctionHandleDelete(victim->getNameC());
 
     do_quit(victim, "", 666);
-    remove_character(victim->name, ZAPPED);
+    remove_character(victim->getName(), ZAPPED);
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(QString("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, LogChannels::LOG_GOD);
   }
 
   else
+  {
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
                  "lower than you.\r\n",
-                 ch);
+                 this);
+  }
 
   return eFAILURE;
 }
@@ -384,7 +384,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (!has_skill(this, COMMAND_SHUTDOWN))
+  if (!has_skill(COMMAND_SHUTDOWN))
   {
     send_to_char("Huh?\r\n", this);
     return eFAILURE;
@@ -421,14 +421,14 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     {
       if (IS_PC(victim))
       {
-        vector<Character *> followers = victim->getFollowers();
+        std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
-              send(QString("Player %1 has charmie %2 with equipment.\r\n").arg(GET_NAME(victim)).arg(GET_NAME(follower)));
+              send(QString("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -493,14 +493,14 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     {
       if (IS_PC(victim))
       {
-        vector<Character *> followers = victim->getFollowers();
+        std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
-              send(QString("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(GET_NAME(victim)).arg(GET_NAME(follower)));
+              send(QString("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -515,7 +515,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
 
 command_return_t Character::do_shutdow(QStringList arguments, int cmd)
 {
-  if (!has_skill(this, COMMAND_SHUTDOWN))
+  if (!has_skill(COMMAND_SHUTDOWN))
   {
     send_to_char("Huh?\r\n", this);
     return eFAILURE;
@@ -536,7 +536,7 @@ int do_testport(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch) || !has_skill(ch, COMMAND_TESTPORT))
+  if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTPORT))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -592,7 +592,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch) || !has_skill(ch, COMMAND_TESTUSER))
+  if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTUSER))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -642,7 +642,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  logf(110, LogChannels::LOG_GOD, "testuser: %s initiated %s", ch->name, command);
+  logf(110, LogChannels::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
 
   if (system(command))
   {
@@ -692,11 +692,11 @@ int do_skilledit(Character *ch, char *argument, int cmd)
   {
     if (victim->skills.empty())
     {
-      ch->send(fmt::format("{} has no skills.\r\n", GET_NAME(victim)));
+      ch->send(fmt::format("{} has no skills.\r\n", victim->getNameC()));
       return eSUCCESS;
     }
 
-    ch->send(fmt::format("Skills for {}:\r\n", GET_NAME(victim)));
+    ch->send(fmt::format("Skills for {}:\r\n", victim->getNameC()));
     for (const auto &curr : ch->skills)
     {
       ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));

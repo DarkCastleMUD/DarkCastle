@@ -53,8 +53,6 @@
 #include "const.h"
 #include "vault.h"
 
-using namespace std;
-
 /* extern variables */
 
 extern class Object *object_list;
@@ -74,13 +72,8 @@ extern int max_who;
 
 /* extern functions */
 
-struct time_info_data age(Character *ch);
 void page_string(class Connection *d, const char *str, int keep_internal);
 clan_data *get_clan(Character *);
-extern int hit_gain(Character *ch, int position);
-extern int mana_gain(Character *ch);
-extern int ki_gain(Character *ch);
-extern int move_gain(Character *ch, int extra);
 extern int getRealSpellDamage(Character *ch);
 
 /* intern functions */
@@ -426,7 +419,7 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
 
 void show_spells(Character *i, Character *ch)
 {
-   string strbuf;
+   std::string strbuf;
 
    if (IS_AFFECTED(i, AFF_SANCTUARY))
    {
@@ -485,9 +478,9 @@ void show_spells(Character *i, Character *ch)
    if (!strbuf.empty())
    {
       if (IS_MOB(i))
-         strbuf = string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\r\n";
+         strbuf = std::string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\r\n";
       else
-         strbuf = string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\r\n";
+         strbuf = std::string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\r\n";
 
       send_to_char(strbuf.c_str(), ch);
    }
@@ -495,7 +488,7 @@ void show_spells(Character *i, Character *ch)
 
 void show_char_to_char(Character *i, Character *ch, int mode)
 {
-   string buffer;
+   std::string buffer;
    int j, found, percent;
    class Object *tmp_obj;
    char buf2[MAX_STRING_LENGTH];
@@ -566,25 +559,25 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
          switch (GET_POS(i))
          {
-         case POSITION_STUNNED:
+         case position_t::STUNNED:
             buffer.append(" is on the ground, stunned.");
             break;
-         case POSITION_DEAD:
+         case position_t::DEAD:
             buffer.append(" is lying here, dead.");
             break;
-         case POSITION_STANDING:
+         case position_t::STANDING:
             buffer.append(" is here.");
             break;
-         case POSITION_SITTING:
+         case position_t::SITTING:
             buffer.append(" is sitting here.");
             break;
-         case POSITION_RESTING:
+         case position_t::RESTING:
             buffer.append(" is resting here.");
             break;
-         case POSITION_SLEEPING:
+         case position_t::SLEEPING:
             buffer.append(" is sleeping here.");
             break;
-         case POSITION_FIGHTING:
+         case position_t::FIGHTING:
             if (i->fighting)
             {
                buffer.append(" is here, fighting ");
@@ -617,7 +610,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
          if (IS_AFFECTED(i, AFF_INVISIBLE))
             buffer.append(" $1(invisible) ");
-         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80) || ch->getLevel() > IMMORTAL || ARE_GROUPED(i, ch)))
+         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && ch->has_skill(SPELL_true_SIGHT) > 80) || ch->getLevel() > IMMORTAL || ARE_GROUPED(i, ch)))
             buffer.append(" $4(hidden) ");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
             buffer.append(" $B$4(red halo) ");
@@ -644,7 +637,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             buffer = "";
          }
 
-         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80)
+         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_true_SIGHT) && ch->has_skill(SPELL_true_SIGHT) > 80)
             buffer.append(" $4(hidden) $3");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
             buffer.append(" $B$4(red halo)$3 ");
@@ -776,21 +769,19 @@ void show_char_to_char(Character *i, Character *ch, int mode)
    }
 }
 
-int do_botcheck(Character *ch, char *argument, int cmd)
+command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 {
-   Character *victim;
-   char name[MAX_STRING_LENGTH];
-   argument = one_argument(argument, name);
-   if (!*name)
+   QString name = arguments.value(0);
+   if (name.isEmpty())
    {
-      send_to_char("botcheck <player> or all\n\r\n\r", ch);
+      send_to_char("botcheck <player> or all\n\r\n\r", this);
       return eFAILURE;
    }
 
-   string name2 = "0." + string(name);
-   victim = get_char(name2.c_str());
+   QString name2 = "0." + name;
+   Character *victim = get_char(name2);
 
-   if (victim == nullptr && name != nullptr && !strcmp(name, "all"))
+   if (!victim && name == "all")
    {
       Connection *d;
       Character *i;
@@ -801,48 +792,48 @@ int do_botcheck(Character *ch, char *argument, int cmd)
             continue;
          if (!(i = d->original))
             i = d->character;
-         if (!CAN_SEE(ch, i))
+         if (!CAN_SEE(this, i))
             continue;
-         csendf(ch, "\n\r%s\n\r", GET_NAME(i));
-         send_to_char("----------\n\r", ch);
-         do_botcheck(ch, GET_NAME(i), CMD_DEFAULT);
+         sendln(QString("\n\r%1").arg(i->getName()));
+         sendln("----------");
+         do_botcheck(i->getName().split(' '));
       }
       return eSUCCESS;
    }
 
    if (victim == nullptr)
    {
-      csendf(ch, "Unable to find %s.\r\n", name);
+      sendln(QString("Unable to find %1.").arg(name));
       return eFAILURE;
    }
 
-   if (victim->getLevel() > ch->getLevel())
+   if (victim->getLevel() > this->getLevel())
    {
-      send_to_char("Unable to show information.\r\n", ch);
-      csendf(ch, "%s is a higher level than you.\r\n", GET_NAME(victim));
+      send_to_char("Unable to show information.\r\n", this);
+      csendf(this, "%s is a higher level than you.\r\n", victim->getNameC());
       return eFAILURE;
    }
 
    if (IS_NPC(victim))
    {
-      send_to_char("Unable to show information.\r\n", ch);
-      csendf(ch, "%s is a mob.\r\n", GET_NAME(victim));
+      send_to_char("Unable to show information.\r\n", this);
+      csendf(this, "%s is a mob.\r\n", victim->getNameC());
       return eFAILURE;
    }
 
    if (victim->player->lastseen == 0)
-      victim->player->lastseen = new multimap<int, pair<timeval, timeval>>;
+      victim->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
    if (victim->player->lastseen->size() == 0)
    {
-      csendf(ch, "%s has not seen any mobs recently.\r\n", GET_NAME(victim));
+      csendf(this, "%s has not seen any mobs recently.\r\n", victim->getNameC());
       return eFAILURE;
    }
 
    int nr, ms;
    timeval seen, targeted;
    double ts1, ts2;
-   for (multimap<int, pair<timeval, timeval>>::iterator i = victim->player->lastseen->begin(); i != victim->player->lastseen->end(); ++i)
+   for (std::multimap<int, std::pair<timeval, timeval>>::iterator i = victim->player->lastseen->begin(); i != victim->player->lastseen->end(); ++i)
    {
       nr = (*i).first;
       seen = (*i).second.first;
@@ -862,7 +853,7 @@ int do_botcheck(Character *ch, char *argument, int cmd)
 
       if (nr >= 0)
       {
-         csendf(ch, "[%4dms] [%5d] [%s]\n\r", ms, mob_index[nr].virt,
+         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, mob_index[nr].virt,
                 ((Character *)(mob_index[nr].item))->short_desc);
       }
    }
@@ -874,7 +865,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
 {
    bool clear_lastseen = false;
    Character *i;
-   int known = has_skill(ch, SKILL_BLINDFIGHTING);
+   int known = ch->has_skill(SKILL_BLINDFIGHTING);
    timeval tv, tv_zero = {0, 0};
 
    for (i = list; i; i = i->next_in_room)
@@ -891,7 +882,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
          if (IS_PC(ch) && IS_NPC(i))
          {
             if (ch->player->lastseen == 0)
-               ch->player->lastseen = new multimap<int, pair<timeval, timeval>>;
+               ch->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
             if (clear_lastseen == false)
             {
@@ -900,7 +891,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
             }
 
             gettimeofday(&tv, nullptr);
-            ch->player->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
+            ch->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(ch->in_room))
@@ -1327,9 +1318,9 @@ int do_look(Character *ch, char *argument, int cmd)
    int weight_in(class Object * obj);
    if (!ch->desc)
       return 1;
-   if (GET_POS(ch) < POSITION_SLEEPING)
+   if (GET_POS(ch) < position_t::SLEEPING)
       send_to_char("You can't see anything but stars!\n\r", ch);
-   else if (GET_POS(ch) == POSITION_SLEEPING)
+   else if (GET_POS(ch) == position_t::SLEEPING)
       send_to_char("You can't see anything, you're sleeping!\n\r", ch);
    else if (check_blind(ch))
    {
@@ -1817,8 +1808,8 @@ int do_look(Character *ch, char *argument, int cmd)
          else
             send_to_char("None.", ch);
          send_to_char("\n\r", ch);
-         if (IS_PC(ch) && ch->hunting)
-            do_track(ch, ch->hunting, 10);
+         if (IS_PC(ch) && !ch->hunting.isEmpty())
+            ch->do_track(QString(ch->hunting).split(' '), 10);
       }
          ch->in_room = original_loc;
          break;
@@ -1950,7 +1941,7 @@ int do_score(Character *ch, char *argument, int cmd)
 
    int64_t exp_needed;
    uint32_t immune = 0, suscept = 0, resist = 0;
-   string isrString;
+   std::string isrString;
    // int i;
 
    sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
@@ -1981,8 +1972,8 @@ int do_score(Character *ch, char *argument, int cmd)
            GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
            GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
            GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch), GET_MAX_KI(ch),
-           GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), hit_gain(ch, 777),
-           mana_gain(ch), move_gain(ch, 777), ki_gain(ch), GET_AGE(ch),
+           GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
+           ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
            GET_ALIGNMENT(ch));
    send_to_char(buf, ch);
 
@@ -2035,7 +2026,7 @@ int do_score(Character *ch, char *argument, int cmd)
                     scratch, "Immunity", isrString.c_str(), scratch);
             send_to_char(buf, ch);
             found = true;
-            isrString = string();
+            isrString = std::string();
             if (++level == 4)
                level = 0;
          }
@@ -2053,7 +2044,7 @@ int do_score(Character *ch, char *argument, int cmd)
                     scratch, "Susceptibility", isrString.c_str(), scratch);
             send_to_char(buf, ch);
             found = true;
-            isrString = string();
+            isrString = std::string();
             if (++level == 4)
                level = 0;
          }
@@ -2071,7 +2062,7 @@ int do_score(Character *ch, char *argument, int cmd)
                     scratch, "Resistibility", isrString.c_str(), scratch);
             send_to_char(buf, ch);
             found = true;
-            isrString = string();
+            isrString = std::string();
             if (++level == 4)
                level = 0;
          }
@@ -2174,7 +2165,7 @@ int do_score(Character *ch, char *argument, int cmd)
          if (!aff_name) // not one we want displayed
             continue;
 
-         string fading;
+         std::string fading;
          if (IS_AFFECTED(ch, AFF_DETECT_MAGIC))
          {
             if (aff->duration < 3)
@@ -2183,7 +2174,7 @@ int do_score(Character *ch, char *argument, int cmd)
             }
          }
 
-         string modified = apply_types[(int)aff->location];
+         std::string modified = apply_types[(int)aff->location];
          if (modifyOutput)
          {
             if (affected_by_spell(ch, SKILL_NAT_SELECT))
@@ -2388,7 +2379,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    extern struct weather_data weather_info;
    char buf[256];
 
-   if (GET_POS(ch) <= POSITION_SLEEPING)
+   if (GET_POS(ch) <= position_t::SLEEPING)
    {
       send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\r\n", ch);
       return eSUCCESS;
@@ -2737,7 +2728,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
          if (searchnum != i->mobdata->nr)
             continue;
       }
-      else if (!(isname(name, i->name)))
+      else if (!(isname(name, i->getName())))
          continue;
 
       if (i->in_room == DC::NOWHERE)
@@ -2858,7 +2849,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
    one_argument(argument, name);
 
-   if (!(victim = get_char_room_vis(ch, name)))
+   if (!(victim = ch->get_char_room_vis(name)))
    {
       send_to_char("Who was that you're scoping out?\n\r", ch);
       return eFAILURE;
@@ -2870,13 +2861,10 @@ int do_consider(Character *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (GET_MOVE(ch) < 5)
+   if (!ch->decrementMove(5, "You are too tired to consider much of anything at the moment."))
    {
-      send_to_char("You are too tired to consider much of anything at the moment.\r\n", ch);
       return eFAILURE;
    }
-
-   GET_MOVE(ch) -= 5;
 
    if (!skill_success(ch, nullptr, SKILL_CONSIDER))
    {
@@ -2884,7 +2872,7 @@ int do_consider(Character *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   Learned = has_skill(ch, SKILL_CONSIDER);
+   Learned = ch->has_skill(SKILL_CONSIDER);
 
    if (Learned > 20)
    {
@@ -3075,7 +3063,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
          percent -= mod;
 
-         if (GET_POS(victim) <= POSITION_SLEEPING)
+         if (GET_POS(victim) <= position_t::SLEEPING)
             percent = 100;
          if (victim->getLevel() > IMMORTAL)
             percent = 0;
@@ -3178,10 +3166,9 @@ int do_scan(Character *ch, char *argument, int cmd)
            "\n",
        };
 
-   if (GET_MOVE(ch) < 2)
+   if (!ch->decrementMove(2, "You are to tired to scan right now."))
    {
-      send_to_char("You are to tired to scan right now.\r\n", ch);
-      return eSUCCESS;
+      return eFAILURE;
    }
 
    act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
@@ -3296,7 +3283,7 @@ int do_scan(Character *ch, char *argument, int cmd)
          ch->in_room = was_in;
       }
    }
-   GET_MOVE(ch) -= 2;
+
    return eSUCCESS;
 }
 
@@ -3376,9 +3363,9 @@ command_return_t Character::do_experience(QStringList arguments, int cmd)
 void check_champion_and_website_who_list()
 {
    Object *obj;
-   stringstream buf, buf2;
+   std::stringstream buf, buf2;
    int addminute = 0;
-   string name;
+   std::string name;
 
    const auto &character_list = DC::getInstance()->character_list;
    for (const auto &ch : character_list)
@@ -3386,7 +3373,7 @@ void check_champion_and_website_who_list()
 
       if (IS_PC(ch) && ch->desc && ch->player && ch->player->wizinvis <= 0)
       {
-         buf << GET_SHORT(ch) << endl;
+         buf << GET_SHORT(ch) << std::endl;
       }
 
       if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
@@ -3401,7 +3388,7 @@ void check_champion_and_website_who_list()
       }
    }
 
-   buf << "endminutenobodywillhavethisnameever" << endl;
+   buf << "endminutenobodywillhavethisnameever" << std::endl;
    addminute++;
 
    if (!(obj = get_obj_num(real_object(CHAMPION_ITEM))))
@@ -3416,32 +3403,32 @@ void check_champion_and_website_who_list()
       }
    }
 
-   ifstream fl(LOCAL_WHO_FILE);
+   std::ifstream fl(LOCAL_WHO_FILE);
 
    while (getline(fl, name))
    {
       if (addminute <= 9)
-         buf << name << endl;
+         buf << name << std::endl;
       else
-         buf2 << name << endl;
+         buf2 << name << std::endl;
       if (name == "endminutenobodywillhavethisnameever")
          addminute++;
    }
 
    fl.close();
 
-   ofstream flo(LOCAL_WHO_FILE);
+   std::ofstream flo(LOCAL_WHO_FILE);
    flo << buf.str();
    flo.close();
 
-   ofstream flwo(WEB_WHO_FILE);
+   std::ofstream flwo(WEB_WHO_FILE);
    flwo << buf2.str();
    flwo.close();
 }
 
 int do_sector(Character *ch, char *arg, int cmd)
 {
-   string art = "a";
+   std::string art = "a";
 
    if (ch->desc && ch->in_room)
    {
@@ -4516,8 +4503,8 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       }
    }
 
-   if (count_if(sl.begin(), sl.end(), [](Search search_item)
-                { return (search_item.getType() == Search::types::O_NAME); }))
+   if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
+                     { return (search_item.getType() == Search::types::O_NAME); }))
    {
       header += QString(" [%1]").arg("Keywords", -max_keyword_size);
    }
@@ -4527,8 +4514,8 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       header += QString(" [%1]").arg("Location", 19);
    }
 
-   if (true || count_if(sl.begin(), sl.end(), [](Search search_item)
-                        { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
+   if (true || std::count_if(sl.begin(), sl.end(), [](Search search_item)
+                             { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
    {
       header += QString(" [%1]").arg(QString("Short Description"), -max_short_description_size);
    }
@@ -4562,8 +4549,8 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       }
       QString custom_columns;
 
-      if (count_if(sl.begin(), sl.end(), [](Search search_item)
-                   { return (search_item.getType() == Search::types::O_NAME); }))
+      if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
+                        { return (search_item.getType() == Search::types::O_NAME); }))
       {
          custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
       }
@@ -4590,10 +4577,10 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       // For now short description is always shown
       if (true ||
-          count_if(sl.begin(), sl.end(), [](Search search_item)
-                   { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
+          std::count_if(sl.begin(), sl.end(), [](Search search_item)
+                        { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
       {
-         // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
+         // Because the color codes make the std::string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
          custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
       }
 

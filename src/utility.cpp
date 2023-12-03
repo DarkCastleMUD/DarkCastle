@@ -69,8 +69,6 @@
 #include "DC.h"
 #include "const.h"
 
-using namespace std;
-
 #ifndef GZIP
 #define GZIP "gzip"
 #endif
@@ -149,7 +147,7 @@ char *str_dup0(const char *str)
   return str_dup(str);
 }
 
-// duplicate a string with it's own memory
+// duplicate a std::string with it's own memory
 char *str_dup(const char *str)
 {
   char *str_new = 0;
@@ -238,7 +236,7 @@ int str_cmp(const char *arg1, const char *arg2)
   return 0;
 }
 
-string space_to_underscore(string str)
+std::string space_to_underscore(std::string str)
 {
   for_each(str.begin(), str.end(), [](auto c)
            {
@@ -295,7 +293,7 @@ int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
   return retval;
 }
 
-MatchType str_n_nosp_cmp_begin(string arg1, string arg2)
+MatchType str_n_nosp_cmp_begin(std::string arg1, std::string arg2)
 {
   auto tmp_arg1 = space_to_underscore(arg1);
   auto tmp_arg2 = space_to_underscore(arg2);
@@ -330,12 +328,12 @@ FILE *clan_log = 0;
 FILE *objects_log = 0;
 FILE *quest_log = 0;
 
-// writes a string to the log
+// writes a std::string to the log
 void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict)
 {
   FILE **f = 0;
   int stream = 1;
-  stringstream logpath;
+  std::stringstream logpath;
   DC *dc = dynamic_cast<DC *>(DC::instance());
   DC::config &cf = dc->cf;
 
@@ -399,9 +397,9 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     break;
   case LogChannels::LOG_PLAYER:
     f = &player_log;
-    if (vict && vict->name)
+    if (vict && !vict->getName().isEmpty())
     {
-      logpath << PLAYER_DIR << vict->name;
+      logpath << PLAYER_DIR << vict->getName().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
         fprintf(stderr, "Unable to open player log '%s'.\n", logpath.str().c_str());
@@ -472,11 +470,11 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
   {
     if (cf.stderr_timestamp == true)
     {
-      cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << endl;
+      std::cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
     else
     {
-      cerr << QString("%1:%2").arg(type).arg(str).toStdString() << endl;
+      std::cerr << QString("%1:%2").arg(type).arg(str).toStdString() << std::endl;
     }
   }
 
@@ -517,7 +515,7 @@ void sprintbit(uint value[], const char *names[], char *result)
 std::string sprintbit(uint value[], const char *names[])
 {
   int i;
-  string result;
+  std::string result;
 
   for (i = 0; *names[i] != '\n'; i++)
   {
@@ -651,7 +649,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 {
   int32_t nr;
 
-  string result = {};
+  std::string result = {};
 
   if (vektor < 0)
   {
@@ -693,13 +691,12 @@ std::string sprintbit(uint32_t vektor, const char *names[])
   return result;
 }
 
-void sprinttype(int type, QStringList names, char *result)
+void sprinttype(uint64_t type, QStringList names, char *result)
 {
-  if (result == nullptr)
+  if (result)
   {
-    return;
+    strcpy(result, names.value(type, "Undefined").toStdString().c_str());
   }
-  strcpy(result, names.value(type, "Undefined").toStdString().c_str());
 }
 
 QString sprinttype(uint64_t type, QStringList names)
@@ -707,19 +704,7 @@ QString sprinttype(uint64_t type, QStringList names)
   return names.value(type, "Undefined");
 }
 
-void sprinttype(int type, const char *names[], char *result)
-{
-  int nr;
-
-  for (nr = 0; *names[nr] != '\n'; nr++)
-    ;
-  if (type > -1 && type < nr)
-    strcpy(result, names[type]);
-  else
-    strcpy(result, "Undefined");
-}
-
-string sprinttype(int type, const char *names[])
+std::string sprinttype(int type, const char *names[])
 {
   int nr;
 
@@ -731,12 +716,7 @@ string sprinttype(int type, const char *names[])
     return "Undefined";
 }
 
-void sprinttype(uint64_t type, item_types_t names, char *result)
-{
-  strcpy(result, names.value(type, "Undefined").toStdString().c_str());
-}
-
-string sprinttype(int type, item_types_t names)
+std::string sprinttype(int type, item_types_t names)
 {
   return names.value(type, "Undefined").toStdString();
 }
@@ -784,22 +764,22 @@ struct time_info_data mud_time_passed(time_t t2, time_t t1)
   return now;
 }
 
-struct time_info_data age(Character *ch)
+struct time_info_data Character::age(void)
 {
   struct time_info_data player_age;
 
   // TODO - make this return some sensible value for mobs
-  if (IS_MOB(ch))
+  if (isNPC())
   {
     player_age.year = 5;
     return player_age;
   }
 
-  time_t birth = ch->player->time.birth;
+  time_t birth = player->time.birth;
   player_age = mud_time_passed(time(0), birth);
 
   player_age.year += 17; /* All players start at 17 */
-  player_age.year += GET_AGE_METAS(ch);
+  player_age.year += GET_AGE_METAS(this);
 
   return player_age;
 }
@@ -824,7 +804,7 @@ void util_archive(const char *char_name, Character *caller)
   int i;
 
   // Ok, ok, we'll do some sanity checking on the
-  // string to make sure that it has no meta chars in
+  // std::string to make sure that it has no meta chars in
   // it.  Grumble. -Morc
   for (i = 0; (unsigned)i < strlen(char_name); i++)
   {
@@ -1240,7 +1220,7 @@ int do_order(Character *ch, char *argument, int cmd)
 
   if (!*name || !*message)
     send_to_char("Order who to do what?\n\r", ch);
-  else if (!(victim = get_char_room_vis(ch, name)) &&
+  else if (!(victim = ch->get_char_room_vis(name)) &&
            str_cmp("follower", name) && str_cmp("followers", name))
     send_to_char("That person isn't here.\r\n", ch);
   else if (ch == victim)
@@ -1448,8 +1428,8 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   }
   else
   {
-    name = arguments.at(0);
-    victim = get_char_room_vis(this, name.toStdString());
+    name = arguments.value(0);
+    victim = get_char_room_vis(name);
     if (victim == nullptr)
     {
       send_to_char("Whom do you want to recall?\n\r", this);
@@ -1458,7 +1438,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(QString("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(GET_NAME(victim)));
+      send(QString("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
       return eFAILURE;
     }
   }
@@ -1492,7 +1472,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF))
+  if (victim->affected_by_spell(FUCK_PTHIEF) || victim->affected_by_spell(FUCK_GTHIEF))
   {
     send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\r\n", victim);
     return eFAILURE;
@@ -1677,13 +1657,13 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_POS(ch) == POSITION_FIGHTING && cmd != 666)
+    if (GET_POS(ch) == position_t::FIGHTING && cmd != 666)
     {
       send_to_char("No way! You are fighting.\r\n", ch);
       return eFAILURE;
     }
 
-    if (GET_POS(ch) < POSITION_STUNNED)
+    if (GET_POS(ch) < position_t::STUNNED)
     {
       send_to_char("You're not DEAD yet.\r\n", ch);
       return eFAILURE;
@@ -1986,9 +1966,9 @@ const char *get_skill_name(int skillnum)
   return nullptr;
 }
 
-string double_dollars(string source)
+std::string double_dollars(std::string source)
 {
-  string destination = {};
+  std::string destination = {};
 
   for (const auto &ch : source)
   {
@@ -2002,7 +1982,7 @@ string double_dollars(string source)
     }
   }
 
-  // cerr << source << " becomes " << destination << endl;
+  // std::cerr << source << " becomes " << destination << std::endl;
   return destination;
 }
 
@@ -2021,7 +2001,7 @@ void double_dollars(char *destination, char *source)
   *destination = '\0';
 }
 
-// convert char string to int
+// convert char std::string to int
 // return true if successful, false if error
 // also check to make sure it's in the valid range
 bool check_range_valid_and_convert(uint64_t &value, QString buf, uint64_t begin, uint64_t end)
@@ -2088,7 +2068,7 @@ bool check_range_valid_and_convert(int32_t &value, QString buf, int32_t begin, i
   return true;
 }
 
-// convert char string to int
+// convert char std::string to int
 // return true if successful, false if error
 bool check_valid_and_convert(int &value, char *buf)
 {
@@ -2100,7 +2080,7 @@ bool check_valid_and_convert(int &value, char *buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint value[])
 {
   bool found = false;
 
@@ -2116,8 +2096,8 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
       break;
     }
 
-    string arg1;
-    tie(arg1, remainder_args) = half_chop(remainder_args);
+    std::string arg1;
+    std::tie(arg1, remainder_args) = half_chop(remainder_args);
     if (arg1.empty())
     {
       break;
@@ -2186,11 +2166,11 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint value[])
 {
-  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
 
 // calls below uint32_t version
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint16_t &value)
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint16_t &value)
 {
   int found = false;
 
@@ -2206,8 +2186,8 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
       break;
     }
 
-    string arg1;
-    tie(arg1, remainder_args) = half_chop(remainder_args);
+    std::string arg1;
+    std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
     if (arg1.empty())
     {
@@ -2243,14 +2223,14 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint16_t &value)
 {
-  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
 
-// Assumes bits is array of strings, ending with a "\n" string
+// Assumes bits is array of strings, ending with a "\n" std::string
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint32_t &value)
 {
   bool found = false;
 
@@ -2264,8 +2244,8 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
       break;
     }
 
-    string arg1;
-    tie(arg1, remainder_args) = half_chop(remainder_args);
+    std::string arg1;
+    std::tie(arg1, remainder_args) = half_chop(remainder_args);
 
     if (arg1.empty())
     {
@@ -2302,7 +2282,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, Charac
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint32_t &value)
 {
-  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
+  return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
 
 void check_timer()
@@ -2467,19 +2447,19 @@ char *pluralize(int qty, char *ending)
   }
 }
 
-void remove_character(char *name, BACKUP_TYPE backup)
+void remove_character(QString name, BACKUP_TYPE backup)
 {
   char src_filename[256];
   char dst_dir[256] = {0};
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == nullptr)
+  if (name.isEmpty())
   {
     return;
   }
 
-  name[0] = UPPER(name[0]);
+  name[0] = name[0].toUpper();
 
   switch (backup)
   {
@@ -2495,18 +2475,17 @@ void remove_character(char *name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LogChannels::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup,
-         name);
+    logf(108, LogChannels::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name);
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name);
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2524,11 +2503,11 @@ void remove_character(char *name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name);
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name);
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2545,19 +2524,19 @@ void remove_character(char *name, BACKUP_TYPE backup)
   }
 }
 
-void remove_familiars(char *name, BACKUP_TYPE backup)
+void remove_familiars(QString name, BACKUP_TYPE backup)
 {
   char src_filename[256];
   char dst_dir[256] = {0};
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == nullptr)
+  if (name.isEmpty())
   {
     return;
   }
 
-  name[0] = UPPER(name[0]);
+  name[0] = name[0].toUpper();
 
   switch (backup)
   {
@@ -2573,8 +2552,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.",
-         backup, name);
+    logf(108, LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name);
     break;
   }
 
@@ -2759,8 +2737,8 @@ void unique_scan(Character *victim)
   class Object *i = nullptr;
   class Object *j = nullptr;
   int k;
-  map<int, int> virtnums;
-  queue<Object *> found_items;
+  std::map<int, int> virtnums;
+  std::queue<Object *> found_items;
 
   for (k = 0; k < MAX_WEAR; k++)
   {
@@ -2817,7 +2795,7 @@ void unique_scan(Character *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, LogChannels::LOG_WARNINGS, "Player %s has duplicate unique items.", GET_NAME(victim));
+    logf(IMMORTAL, LogChannels::LOG_WARNINGS, "Player %s has duplicate unique items.", victim->getNameC());
     while (!found_items.empty())
     {
       logf(IMMORTAL, LogChannels::LOG_WARNINGS, "%s", found_items.front()->short_description);
@@ -2828,7 +2806,7 @@ void unique_scan(Character *victim)
   return;
 }
 
-string replaceString(string message, string find, string replace)
+std::string replaceString(std::string message, std::string find, std::string replace)
 {
   size_t j;
 
@@ -2840,7 +2818,7 @@ string replaceString(string message, string find, string replace)
     return message;
 
   size_t find_length = find.length();
-  for (; (j = message.find(find)) != string::npos;)
+  for (; (j = message.find(find)) != std::string::npos;)
   {
     message.replace(j, find_length, replace);
   }
@@ -2909,20 +2887,20 @@ bool champion_can_go(int room)
 splitstring
 This function does NOT ignore empty strings unless you tell it to.
 example:
-splitstring("string  with 2 spaces", " ")
+splitstring("std::string  with 2 spaces", " ")
 returns:
-"string"
+"std::string"
 ""
 "with"
 "2"
 "spaces"
 
 If you do not want this behavior, include a third argument as true.
-splitstring("string  with 2 spaces", " ", true)
+splitstring("std::string  with 2 spaces", " ", true)
 */
-vector<string> splitstring(string splitme, string delims, bool ignore_empty)
+std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty)
 {
-  vector<std::string> result;
+  std::vector<std::string> result;
   unsigned int splitter;
   while ((splitter = splitme.find_first_of(delims)) != splitme.npos)
   {
@@ -2946,9 +2924,9 @@ returns:
 If you do not want this behavior, include a third argument as true.
 joinstring(somevectorofstrings, ",", true)
 */
-string joinstring(vector<string> joinme, string delims, bool ignore_empty)
+std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty)
 {
-  string result;
+  std::string result;
   unsigned int i = 0;
   unsigned int joined = 0;
   for (i = 0; i < joinme.size(); i++)
@@ -3001,7 +2979,7 @@ const char *find_profession(int c_class, uint8_t profession)
   // TODO Fix
   return "Unknown";
 
-  map<uint8_t, string> profession_list = professions[c_class];
+  std::map<uint8_t, std::string> profession_list = professions[c_class];
 
   if (profession == 0)
   {
@@ -3017,11 +2995,11 @@ const char *find_profession(int c_class, uint8_t profession)
   }
 }
 
-string get_isr_string(uint32_t isr, int8_t loc)
+std::string get_isr_string(uint32_t isr, int8_t loc)
 {
   if (!DC::isSet(isr, 1 << loc))
   {
-    return string();
+    return std::string();
   }
 
   switch (loc)
@@ -3079,17 +3057,12 @@ string get_isr_string(uint32_t isr, int8_t loc)
   }
 }
 
-bool isDead(Character *ch)
-{
-  return (ch && ch->position == POSITION_DEAD);
-}
-
 bool isNowhere(Character *ch)
 {
   return (ch && ch->in_room == DC::NOWHERE);
 }
 
-bool file_exists(string filename)
+bool file_exists(std::string filename)
 {
   struct stat buffer;
 
@@ -3106,7 +3079,7 @@ bool file_exists(QString filename)
   return QFile(filename).exists();
 }
 
-bool char_file_exists(string name)
+bool char_file_exists(std::string name)
 {
   if (all_of(name.begin(), name.end(), [](char i)
              { return isalpha(i); }) == 0)
@@ -3114,7 +3087,7 @@ bool char_file_exists(string name)
     return false;
   }
 
-  string filename;
+  std::string filename;
 
   if (DC::getInstance()->cf.bport)
   {
@@ -3130,9 +3103,9 @@ bool char_file_exists(string name)
 
 void Character::setPOSFighting(void)
 {
-  if (position != POSITION_FIGHTING)
+  if (!isFighting())
   {
-    position = POSITION_FIGHTING;
+    setFighting();
 
     first_damage = time(nullptr);
     damages = 0;
@@ -3143,7 +3116,7 @@ void Character::setPOSFighting(void)
 
 void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
-  string buffer;
+  std::string buffer;
   if (this->player == nullptr)
   {
     return;

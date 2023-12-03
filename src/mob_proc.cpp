@@ -285,7 +285,7 @@ int sc_golem(Character *ch, class Object *obj, int cmd, const char *arg,
       cast_meteor_swarm,
       cast_bee_sting,
       cast_cure_critic};
-  if (!(owner = ch->master) || !(has_skill(ch->master, SKILL_SPELLCRAFT) > 80))
+  if (!(owner = ch->master) || !(ch->master->has_skill(SKILL_SPELLCRAFT) > 80))
     return eFAILURE;
   int i = number(0, 4);
   SPELL_FUN *func = iron ? iron_list[i] : stone_list[i];
@@ -306,7 +306,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) < POSITION_FIGHTING)
+  if (GET_POS(ch) < position_t::FIGHTING)
     return eFAILURE;
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return eFAILURE;
@@ -321,7 +321,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   // Deathstroke my opponent whenever possible
-  if (ch->getLevel() > 39 && GET_POS(vict) < POSITION_FIGHTING)
+  if (ch->getLevel() > 39 && GET_POS(vict) < position_t::FIGHTING)
   {
     MOB_WAIT_STATE(ch) = 2;
     return do_deathstroke(ch, "", CMD_DEFAULT);
@@ -360,7 +360,7 @@ int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   Character *vict;
 
-  if ((GET_POS(ch) != POSITION_FIGHTING) || (!ch->fighting))
+  if ((GET_POS(ch) != position_t::FIGHTING) || (!ch->fighting))
   {
     return eFAILURE;
   }
@@ -408,7 +408,7 @@ int active_grandmaster(Character *ch, class Object *obj, int command, const char
 {
   Character *vict;
   /* Find a dude to do evil things upon ! */
-  if ((GET_POS(ch) != POSITION_FIGHTING))
+  if ((GET_POS(ch) != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -705,7 +705,7 @@ int white_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -728,7 +728,7 @@ int black_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -750,7 +750,7 @@ int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -770,7 +770,7 @@ int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -799,7 +799,7 @@ int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -1120,7 +1120,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
 }
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
-vector<string> ChainSayText =
+std::vector<std::string> ChainSayText =
     {
         "Can i lick your stamps?",
         "Want to buy a some cheap godload equipment?",
@@ -1909,7 +1909,7 @@ int chain_gossips(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
   x = number((quint64)0, (quint64)ChainSayText.size());
 
-  string message;
+  std::string message;
   try
   {
     message = ChainSayText.at(x);
@@ -2003,10 +2003,10 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) == POSITION_FIGHTING)
+  if (GET_POS(ch) == position_t::FIGHTING)
     return eFAILURE;
 
-  if (!ch->mobdata->hatred)
+  if (ch->mobdata->hated.isEmpty())
     return eFAILURE;
 
   if (ch->fighting)
@@ -2158,7 +2158,7 @@ int bee(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (ch->fighting &&
@@ -2274,8 +2274,8 @@ int pet_shops(Character *ch, int cmd, char *arg)
     /* people were using this to steal plats from people transing in meta */
     if (/* *pet_name */ 0)
     {
-      sprintf(buf, "%s %s", pet->name, pet_name);
-      pet->name = str_hsh(buf);
+      sprintf(buf, "%s %s", pet->getNameC(), pet_name);
+      pet->setName(buf);
 
       sprintf(buf, "%sA small sign on a chain around the neck "
                    "says 'My Name is %s'\n\r",
@@ -2309,10 +2309,10 @@ int newbie_zone_guard(Character *ch, class Object *obj, int cmd, const char *arg
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if ((ch->getLevel() > 10                            /* mud school */
+  if ((ch->getLevel() > 10                           /* mud school */
        && ch->in_room == real_room(257) && cmd == 1) /* north */
       ||
-      (ch->getLevel() > 20                             /* newbie caves */
+      (ch->getLevel() > 20                            /* newbie caves */
        && ch->in_room == real_room(6400) && cmd == 6) /* down */
   )
 
@@ -2354,7 +2354,7 @@ int hellstreamer(Character *ch, class Object *obj, int cmd, const char *arg,
   // int percent;
   /* Find a dude to do evil things upon ! */
 
-  if ((GET_POS(ch) != POSITION_FIGHTING))
+  if ((GET_POS(ch) != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2517,9 +2517,9 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
 
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) < POSITION_FIGHTING)
+  if (GET_POS(ch) < position_t::FIGHTING)
     return eFAILURE;
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
   if (!ch->fighting)
     return eFAILURE;
@@ -2531,7 +2531,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
   if (!vict)
     return eFAILURE;
 
-  if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > POSITION_SITTING)
+  if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
   {
     retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
     if (DC::isSet(retval, eCH_DIED))
@@ -2541,7 +2541,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
     act("$n sends you sprawling.", ch, nullptr, vict, TO_VICT, 0);
     act("$n sends $N sprawling with a powerful bash.", ch, nullptr, vict, TO_ROOM, NOTVICT);
 
-    GET_POS(vict) = POSITION_SITTING;
+    vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH1);
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
 
@@ -2602,7 +2602,7 @@ int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (ch->fighting &&
@@ -2663,7 +2663,7 @@ int panicprisoner(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   /* check for a guard */
-  if ((vict = get_char_room_vis(ch, "guard")))
+  if ((vict = ch->get_char_room_vis("guard")))
   {
     if (number(0, 1))
       do_say(ch, "Run!  It's the fuzz!", CMD_DEFAULT);
@@ -2703,7 +2703,7 @@ int bounder(Character *ch, class Object *obj, int cmd, const char *arg,
 
   /* Find a dude to do evil things upon ! */
 
-  if ((GET_POS(ch) != POSITION_FIGHTING))
+  if ((GET_POS(ch) != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2733,7 +2733,7 @@ int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
   Character *vict;
   // int percent;
 
-  if ((GET_POS(ch) != POSITION_FIGHTING))
+  if ((GET_POS(ch) != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2777,9 +2777,9 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) < POSITION_FIGHTING)
+  if (GET_POS(ch) < position_t::FIGHTING)
     return eFAILURE;
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
   if (!ch->fighting)
     return eFAILURE;
@@ -2825,7 +2825,7 @@ int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != POSITION_FIGHTING)
+  if (GET_POS(ch) != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -3044,7 +3044,7 @@ int kogiro_combat(Character *ch, class Object *obj, int cmd, const char *arg,
     vict = find_random_player_in_room(ch);
     stop_fighting(vict);
     stop_fighting(ch);
-    return do_backstab(ch, GET_NAME(vict), CMD_DEFAULT);
+    return ch->do_backstab(vict->getName().split(' '));
     break;
 
   case 2:
@@ -3309,7 +3309,7 @@ int druid_elemental(Character *ch, class Object *obj,
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
   if (!ch->fighting)
   {
@@ -3332,14 +3332,14 @@ int mage_golem(Character *ch, class Object *obj, int cmd,
     return eFAILURE;
 
   if (ch->master->fighting && IS_NPC(ch->master->fighting))
-    do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
+    ch->do_join(ch->master->getName().split(' '));
 
   return eFAILURE;
 }
 
 int gremlinthing(Character *ch)
 {
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
 
   if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
@@ -3375,7 +3375,7 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
   if (!ch->fighting)
   {
@@ -3389,7 +3389,7 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
 
     if (ch->master->fighting)
     { // help him!
-      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
+      ch->do_join(ch->master->getName().split(' '));
       return eFAILURE;
     }
 
@@ -3432,7 +3432,7 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char 
   }
 
   // do nothing unless doing nothing :)
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -3447,7 +3447,7 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char 
 
     if (ch->master->fighting)
     { // help him!
-      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
+      ch->do_join(ch->master->getName().split(' '));
       return eFAILURE;
     }
 
@@ -3520,7 +3520,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
     }
 
     // do nothing unless doing nothing :)
-    if (GET_POS(ch) < POSITION_STANDING)
+    if (GET_POS(ch) < position_t::STANDING)
       return eFAILURE;
 
     if (!ch->fighting)
@@ -3535,7 +3535,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
 
       if (ch->master->fighting)
       { // help him!
-        do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
+        ch->do_join(ch->master->getName().split(' '));
         return eFAILURE;
       }
 
@@ -3566,7 +3566,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const
   }
 
   // do nothing unless doing nothing :)
-  if (GET_POS(ch) < POSITION_STANDING)
+  if (GET_POS(ch) < position_t::STANDING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -3581,7 +3581,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const
 
     if (ch->master->fighting)
     { // help him!
-      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
+      ch->do_join(ch->master->getName().split(' '));
       return eFAILURE;
     }
 

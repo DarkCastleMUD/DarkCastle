@@ -93,26 +93,9 @@ int32_t hit_limit(Character *ch)
 	int max;
 
 	if (IS_PC(ch))
-		max = (ch->max_hit) + (graf(age(ch).year, 2, 4, 17, 14, 8, 4, 3));
+		max = (ch->max_hit) + (graf(ch->age().year, 2, 4, 17, 14, 8, 4, 3));
 	else
 		max = (ch->max_hit);
-
-	/* Class/Level calculations */
-
-	/* Skill/Spell calculations */
-
-	return (max);
-}
-
-int32_t move_limit(Character *ch)
-{
-	int max;
-
-	if (IS_PC(ch))
-		/* HERE SHOULD BE CON CALCULATIONS INSTEAD */
-		max = (ch->max_move) + graf(age(ch).year, 50, 70, 160, 120, 100, 40, 20);
-	else
-		max = ch->max_move;
 
 	/* Class/Level calculations */
 
@@ -124,28 +107,28 @@ int32_t move_limit(Character *ch)
 const int mana_regens[] = {0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0};
 
 /* manapoint gain pr. game hour */
-int mana_gain(Character *ch)
+int Character::mana_gain_lookup(void)
 {
 	int gain = 0;
 	int divisor = 1;
 	int modifier;
 
-	if (IS_NPC(ch))
-		gain = ch->getLevel();
+	if (IS_NPC(this))
+		gain = this->getLevel();
 	else
 	{
-		//    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
+		//    gain = graf(age().year, 2,3,4,6,7,8,9);
 
-		gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-		switch (GET_POS(ch))
+		gain = (int)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
+		switch (GET_POS(this))
 		{
-		case POSITION_SLEEPING:
+		case position_t::SLEEPING:
 			divisor = 1;
 			break;
-		case POSITION_RESTING:
+		case position_t::RESTING:
 			divisor = 2;
 			break;
-		case POSITION_SITTING:
+		case position_t::SITTING:
 			divisor = 2;
 			break;
 		default:
@@ -153,84 +136,76 @@ int mana_gain(Character *ch)
 			break;
 		}
 
-		if (GET_CLASS(ch) == CLASS_MAGIC_USER ||
-			GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+		if (GET_CLASS(this) == CLASS_MAGIC_USER ||
+			GET_CLASS(this) == CLASS_ANTI_PAL || GET_CLASS(this) == CLASS_RANGER)
 		{
-			if (GET_INT(ch) < 0)
+			if (GET_INT(this) < 0)
 				modifier = int_app[0].mana_regen;
 			else
-				modifier = int_app[GET_INT(ch)].mana_regen;
+				modifier = int_app[GET_INT(this)].mana_regen;
 
-			modifier += GET_INT(ch);
+			modifier += GET_INT(this);
 		}
 		else
 		{
-			modifier = wis_app[GET_WIS(ch)].mana_regen;
-			modifier += GET_WIS(ch);
+			modifier = wis_app[GET_WIS(this)].mana_regen;
+			modifier += GET_WIS(this);
 		}
 		gain += modifier;
 	}
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
 		gain >>= 2;
 	gain /= 4;
 	gain /= divisor;
-	gain += MIN(age(ch).year, 100) / 5;
-	if (ch->getLevel() < 50)
+	gain += MIN(age().year, 100) / 5;
+	if (this->getLevel() < 50)
 
-		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
-	if (ch->mana_regen > 0)
-		gain += ch->mana_regen;
-	if (ch->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+	if (this->mana_regen > 0)
+		gain += this->mana_regen;
+	if (this->in_room >= 0)
+		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.25);
 
-	if (ch->mana_regen < 0)
-		gain += ch->mana_regen;
+	if (this->mana_regen < 0)
+		gain += this->mana_regen;
 	return MAX(1, gain);
 }
 
 const int hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 
-/* Hitpoint gain pr. game hour */
-int hit_gain(Character *ch, int position)
+int Character::hit_gain(position_t position, bool improve)
 {
-
 	int gain = 1;
 	struct affected_type *af;
 	int divisor = 1;
-	int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
-	bool improve = true;
-	if (position == 777)
-	{
-		improve = false;
-		position = GET_POS(ch);
-	}
+	int learned = has_skill(SKILL_ENHANCED_REGEN);
 	/* Neat and fast */
-	if (IS_NPC(ch))
+	if (IS_NPC(this))
 	{
-		if (ch->fighting)
-			gain = (GET_MAX_HIT(ch) / 24);
+		if (this->fighting)
+			gain = (GET_MAX_HIT(this) / 24);
 		else
-			gain = (GET_MAX_HIT(ch) / 6);
+			gain = (GET_MAX_HIT(this) / 6);
 	}
 	/* PC's */
 	else
 	{
-		gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] / 100);
+		gain = (int)(this->max_hit * (float)hit_regens[GET_CLASS(this)] / 100);
 
 		/* Position calculations    */
 
 		switch (position)
 		{
-		case POSITION_SLEEPING:
+		case position_t::SLEEPING:
 			divisor = 1;
 			break;
-		case POSITION_RESTING:
+		case position_t::RESTING:
 			divisor = 2;
 			break;
-		case POSITION_SITTING:
+		case position_t::SITTING:
 			divisor = 2;
 			break;
 		default:
@@ -241,117 +216,111 @@ int hit_gain(Character *ch, int position)
 		if (gain < 1)
 			gain = 1;
 
-		if ((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
+		if ((af = affected_by_spell(SPELL_RAPID_MEND)))
 			gain += af->modifier;
 
 		// con multiplier modifier 15 = 1.0  30 = 1.45 (.03 increments)
-		/*    if(GET_CON(ch) > 15)
-		 gain = (int)(gain * ((float)1+ (.03 * (GET_CON(ch) - 15.0))));
+		/*    if(GET_CON(this) > 15)
+		 gain = (int)(gain * ((float)1+ (.03 * (GET_CON(this) - 15.0))));
 
-		 if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID)
+		 if(GET_CLASS(this) == CLASS_MAGIC_USER || GET_CLASS(this) == CLASS_CLERIC || GET_CLASS(this) == CLASS_DRUID)
 		 gain = (int)((float)gain * 0.7);*/
 
-		if (GET_CON(ch) < 0)
+		if (GET_CON(this) < 0)
 			gain += con_app[0].hp_regen;
 		else
-			gain += con_app[GET_CON(ch)].hp_regen;
+			gain += con_app[GET_CON(this)].hp_regen;
 
-		gain += GET_CON(ch);
+		gain += GET_CON(this);
 	}
-	if (ISSET(ch->affected_by, AFF_REGENERATION))
+	if (ISSET(this->affected_by, AFF_REGENERATION))
 		gain += (gain / 2);
 
-	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
+	if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 5;
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
 		gain >>= 2;
 
 	gain /= 4;
-	//  gain -= MIN(age(ch).year,100) / 10;
+	//  gain -= MIN(age().year,100) / 10;
 
 	gain /= divisor;
-	if (ch->hit_regen > 0)
-		gain += ch->hit_regen;
-	if (ch->getLevel() < 50)
-		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
+	if (this->hit_regen > 0)
+		gain += this->hit_regen;
+	if (this->getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
-	if (ch->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+	if (this->in_room >= 0)
+		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.5);
-	if (ch->hit_regen < 0)
-		gain += ch->hit_regen;
+	if (this->hit_regen < 0)
+		gain += this->hit_regen;
 	return MAX(1, gain);
 }
 
-int hit_gain(Character *ch)
-{
-	return hit_gain(ch, GET_POS(ch));
-}
-
-int move_gain(Character *ch, int extra)
+int Character::move_gain_lookup(int extra)
 /* move gain pr. game hour */
 {
 	int gain;
 	int divisor = 100000;
-	int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
+	int learned = has_skill(SKILL_ENHANCED_REGEN);
 	struct affected_type *af;
 	bool improve = true;
 	if (extra == 777)
 		improve = false;
 
-	if (IS_NPC(ch))
+	if (isNPC())
 	{
-		return (ch->getLevel());
-		/* Neat and fast */
+		return getLevel();
 	}
 	else
 	{
-		//	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
-		gain = (int)(ch->max_move * 0.15);
+		//	gain = graf(ch->age().year, 4,5,6,7,4,3,2);
+		gain = (int)(max_move * 0.15);
 		//	gain /= 2;
-		switch (GET_POS(ch))
+		switch (getPosition())
 		{
-		case POSITION_SLEEPING:
+		case position_t::SLEEPING:
 			divisor = 1;
 			break;
-		case POSITION_RESTING:
+		case position_t::RESTING:
 			divisor = 2;
 			break;
 		default:
 			divisor = 3;
 			break;
 		}
-		gain += GET_DEX(ch);
+		gain += GET_DEX(this);
 
-		if (GET_CON(ch) < 0)
+		if (GET_CON(this) < 0)
 			gain += con_app[0].move_regen;
 		else
-			gain += con_app[GET_CON(ch)].move_regen;
+			gain += con_app[GET_CON(this)].move_regen;
 
-		if ((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
+		if ((af = affected_by_spell(SPELL_RAPID_MEND)))
 			gain += (int)(af->modifier * 1.5);
 	}
 
-	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && ch->getLevel() < 60)
+	if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
 		gain >>= 2;
 	gain /= divisor;
-	gain -= MIN(100, age(ch).year) / 10;
+	gain -= MIN(100, this->age().year) / 10;
 
-	if (ch->move_regen > 0)
-		gain += ch->move_regen;
+	if (this->move_regen > 0)
+		gain += this->move_regen;
 
-	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
+	if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 10;
 
-	if (ch->getLevel() < 50)
-		gain = (int)((float)gain * (2.0 - (float)ch->getLevel() / 50.0));
+	if (this->getLevel() < 50)
+		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
-	if (ch->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
+	if (this->in_room >= 0)
+		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.5);
-	if (ch->move_regen < 0)
-		gain += ch->move_regen;
+	if (this->move_regen < 0)
+		gain += this->move_regen;
 
 	return MAX(1, gain);
 }
@@ -603,7 +572,7 @@ void advance_level(Character *ch, int is_conversion)
 
 	ch->fillHP();
 	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
+	ch->setMove(GET_MAX_MOVE(ch));
 	GET_KI(ch) = GET_MAX_KI(ch);
 
 	if (ch->getLevel() > IMMORTAL)
@@ -775,7 +744,7 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
@@ -791,7 +760,7 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
@@ -822,7 +791,7 @@ void point_update(void)
 
 		int a;
 		Character *temp;
-		if (IS_PC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
+		if (IS_PC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = i->has_skill(SKILL_HIDE)))
 		{
 			int o;
 			for (o = 0; o < MAX_HIDE; o++)
@@ -848,14 +817,14 @@ void point_update(void)
 		}
 
 		// only heal linkalive's and mobs
-		if (GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc))
+		if (GET_POS(i) > position_t::DEAD && (IS_NPC(i) || i->desc))
 		{
-			i->setHP(MIN(i->getHP() + hit_gain(i), hit_limit(i)));
+			i->setHP(MIN(i->getHP() + i->hit_gain(), hit_limit(i)));
 
-			GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
+			GET_MANA(i) = MIN(GET_MANA(i) + i->mana_gain_lookup(), mana_limit(i));
 
-			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i, 0), move_limit(i));
-			GET_KI(i) = MIN(GET_KI(i) + ki_gain(i), ki_limit(i));
+			i->setMove(MIN(GET_MOVE(i) + i->move_gain_lookup(), i->move_limit()));
+			GET_KI(i) = MIN(GET_KI(i) + i->ki_gain_lookup(), ki_limit(i));
 		}
 		else if (!IS_MOB(i) && i->getLevel() < 1 && !i->desc)
 		{
@@ -1058,7 +1027,7 @@ void prepare_character_for_sixty(Character *ch)
 			skl = SKILL_SONG_HYPNOTIC_HARMONY;
 			break;
 		}
-		if (has_skill(ch, skl) && !DC::isSet(ch->player->toggles, Player::PLR_50PLUS))
+		if (ch->has_skill(skl) && !DC::isSet(ch->player->toggles, Player::PLR_50PLUS))
 		{
 			SET_BIT(ch->player->toggles, Player::PLR_50PLUS);
 			int i = (ch->exp / 100000000) * 500000;

@@ -22,107 +22,105 @@ extern "C"
 #include "interp.h" // len_cmp
 #include "returnvals.h"
 
-
-
 // storage of socials
 struct social_messg *soc_mess_list; // head of social array
 int32_t num_socials;                // number of actual socials (50 = 0-49)
 int32_t social_array_size;          // size of actual array (since we allocate in chunks)
 
-struct social_messg *find_social(string arg);
+struct social_messg *find_social(QString arg);
 
-int check_social(Character *ch, string pcomm, int length)
+command_return_t Character::check_social(QString pcomm, int length)
 {
-  string arg = {}, buf = {};
+  QString arg = {}, buf = {};
   struct social_messg *action = {};
   Character *vict = {};
 
-  tie(pcomm, arg) = half_chop(pcomm);
+  std::tie(pcomm, arg) = half_chop(pcomm);
 
   if (!(action = find_social(pcomm)))
   {
     return SOCIAL_false;
   }
 
-  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_NOEMOTE))
+  if (isPlayer() && DC::isSet(player->punish, PUNISH_NOEMOTE))
   {
-    send_to_char("You are anti-social!\n\r", ch);
+    send_to_char("You are anti-social!\n\r", this);
     return SOCIAL_true;
   }
 
-  switch (GET_POS(ch))
+  switch (GET_POS(this))
   {
-  case POSITION_DEAD:
-    send_to_char("Lie still; you are DEAD.\r\n", ch);
+  case position_t::DEAD:
+    send_to_char("Lie still; you are DEAD.\r\n", this);
     return SOCIAL_true;
 
-  case POSITION_STUNNED:
-    send_to_char("You are too stunned to do that.\r\n", ch);
+  case position_t::STUNNED:
+    send_to_char("You are too stunned to do that.\r\n", this);
     return SOCIAL_true;
 
-  case POSITION_SLEEPING:
-    send_to_char("In your dreams, or what?\n\r", ch);
+  case position_t::SLEEPING:
+    send_to_char("In your dreams, or what?\n\r", this);
     return SOCIAL_true;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", this);
     return SOCIAL_true;
   }
 
   if (action->char_found)
   {
-    tie(buf, arg) = half_chop(arg);
+    std::tie(buf, arg) = half_chop(arg);
   }
   else
   {
     buf = {};
   }
 
-  if (buf.empty())
+  if (buf.isEmpty())
   {
     if (action->char_no_arg)
     {
-      act(action->char_no_arg, ch, 0, 0, TO_CHAR, 0);
+      act(action->char_no_arg, this, 0, 0, TO_CHAR, 0);
     }
 
     if (action->others_no_arg)
     {
-      act(action->others_no_arg, ch, 0, 0, TO_ROOM, (action->hide) ? INVIS_NULL : 0);
+      act(action->others_no_arg, this, 0, 0, TO_ROOM, (action->hide) ? INVIS_NULL : 0);
     }
     return SOCIAL_true_WITH_NOISE;
   }
 
-  if (!(vict = get_char_room_vis(ch, buf)))
+  if (!(vict = get_char_room_vis(buf)))
   {
     if (action->not_found)
     {
-      act(action->not_found, ch, 0, 0, TO_CHAR, 0);
+      act(action->not_found, this, 0, 0, TO_CHAR, 0);
     }
   }
-  else if (vict == ch)
+  else if (vict == this)
   {
     if (action->char_auto)
-      act(action->char_auto, ch, 0, 0, TO_CHAR, 0);
+      act(action->char_auto, this, 0, 0, TO_CHAR, 0);
     if (action->others_auto)
-      act(action->others_auto, ch, 0, 0, TO_ROOM,
+      act(action->others_auto, this, 0, 0, TO_ROOM,
           (action->hide) ? INVIS_NULL : 0);
   }
   else if (GET_POS(vict) < action->min_victim_position)
   {
     act("$N is not in a proper position for that.",
-        ch, 0, vict, TO_CHAR, 0);
+        this, 0, vict, TO_CHAR, 0);
   }
   else
   {
     if (action->char_found)
-      act(action->char_found, ch, 0, vict, TO_CHAR, 0);
+      act(action->char_found, this, 0, vict, TO_CHAR, 0);
     if (action->others_found)
-      act(action->others_found, ch, 0, vict, TO_ROOM,
+      act(action->others_found, this, 0, vict, TO_ROOM,
           NOTVICT | ((action->hide) ? INVIS_NULL : 0));
     if (action->vict_found)
-      act(action->vict_found, ch, 0, vict, TO_VICT,
+      act(action->vict_found, this, 0, vict, TO_VICT,
           (action->hide) ? INVIS_NULL : 0);
   }
 
@@ -166,7 +164,7 @@ int read_social_from_file(int32_t num_social, FILE *fl)
   // read strings that will always be there
   soc_mess_list[num_social].name = str_dup(tmp);
   soc_mess_list[num_social].hide = hide;
-  soc_mess_list[num_social].min_victim_position = min_pos;
+  soc_mess_list[num_social].min_victim_position = static_cast<decltype(soc_mess_list[num_social].min_victim_position)>(min_pos);
   soc_mess_list[num_social].char_no_arg = fread_social_string(fl);
   soc_mess_list[num_social].others_no_arg = fread_social_string(fl);
   soc_mess_list[num_social].char_found = fread_social_string(fl);
@@ -269,13 +267,13 @@ void boot_social_messages(void)
   fclose(fl);
 }
 
-struct social_messg *find_social(string arg)
+struct social_messg *find_social(QString arg)
 {
   // now uses a linear search
   int i;
 
   for (i = 1; i < num_socials; i++)
-    if (!compare_social_search((void *)arg.c_str(), (void *)&soc_mess_list[i]))
+    if (!compare_social_search((void *)arg.toStdString().c_str(), (void *)&soc_mess_list[i]))
       return &soc_mess_list[i];
 
   return nullptr;

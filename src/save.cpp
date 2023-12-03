@@ -47,8 +47,6 @@
 extern Database db;
 #endif
 
-using namespace std;
-
 extern struct index_data *obj_index;
 
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
@@ -141,7 +139,7 @@ char *fread_alias_string(FILE *fpsave)
   {
     if (tmp_size > MAX_INPUT_LENGTH)
     {
-      /* flush this string and continue on with the next */
+      /* std::flush this std::string and continue on with the next */
       while (fgetc(fpsave))
         ;
     }
@@ -417,7 +415,7 @@ void read_Player(Character *ch, FILE *fpsave)
 
   fread(i->pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   i->alias = read_char_aliases(fpsave);
-  if (has_skill(ch, NEW_SAVE))
+  if (ch->has_skill(NEW_SAVE))
     fread_to_tilde(fpsave);
   fread(&(i->rdeaths), sizeof(i->rdeaths), 1, fpsave);
   fread(&(i->pdeaths), sizeof(i->pdeaths), 1, fpsave);
@@ -551,7 +549,7 @@ void read_Player(Character *ch, FILE *fpsave)
     char *var_string = fread_var_string(fpsave);
     if (var_string != nullptr)
     {
-      string name = var_string;
+      std::string name = var_string;
       if (name.empty() == false)
       {
         ignore_entry ie = {true, 0};
@@ -625,13 +623,13 @@ int store_worn_eq(Character *ch, FILE *fpsave)
 
 int Character::char_to_store_variable_data(FILE *fpsave)
 {
-  fwrite_var_string(this->name, fpsave);
+  fwrite_var_string(this->getName(), fpsave);
   fwrite_var_string(this->short_desc, fpsave);
   fwrite_var_string(this->long_desc, fpsave);
   fwrite_var_string(this->description, fpsave);
   fwrite_var_string(this->title, fpsave);
 
-  if (!has_skill(this, NEW_SAVE)) // New save.
+  if (!has_skill(NEW_SAVE)) // New save.
     learn_skill(this, NEW_SAVE, 1, 100);
 
   for (const auto &skill : this->skills)
@@ -718,7 +716,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 {
   char typeflag[4];
 
-  this->name = fread_var_string(fpsave);
+  this->setName(fread_var_string(fpsave));
   this->short_desc = fread_var_string(fpsave);
   this->long_desc = fread_var_string(fpsave);
   this->description = fread_var_string(fpsave);
@@ -742,7 +740,7 @@ int Character::store_to_char_variable_data(FILE *fpsave)
     this->affected = nullptr;
     for (int16_t i = 0; i < aff_count; i++)
     {
-      affected_type *af = new (nothrow) affected_type;
+      affected_type *af = new (std::nothrow) affected_type;
       af->duration_type = 0;
       af->next = this->affected;
       this->affected = af;
@@ -874,19 +872,19 @@ void save_char_obj(Character *ch)
     return;
   }
 
-  if (ch->name == nullptr)
+  if (ch->getName().isEmpty())
   {
-    ch->name = strdup("Unknown");
+    ch->setName("Unknown");
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::getInstance()->cf.bport)
   {
-    sprintf(name, "%s/%c/%s", BSAVE_DIR, ch->name[0], ch->name);
+    sprintf(name, "%s/%c/%s", BSAVE_DIR, ch->getNameC()[0], ch->getNameC());
   }
   else
   {
-    sprintf(name, "%s/%c/%s", SAVE_DIR, ch->name[0], ch->name);
+    sprintf(name, "%s/%c/%s", SAVE_DIR, ch->getNameC()[0], ch->getNameC());
   }
 
   sprintf(strsave, "%s.back", name);
@@ -1027,8 +1025,7 @@ bool load_char_obj(class Connection *d, QString name)
   // stored names only matter for mobs
   if (!IS_MOB(ch))
   {
-    dc_free(GET_NAME(ch));
-    GET_NAME(ch) = str_dup(name.toStdString().c_str());
+    ch->setName(name);
   }
 
   while (!feof(fpsave))
@@ -1599,7 +1596,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   GET_RAW_MANA(ch) = st->raw_mana;
 
   // since move and ki don't get "redone" with stat bonuses we need to set the max here
-  GET_MOVE(ch) = st->move;
+  ch->setMove(st->move);
   ch->max_move = GET_RAW_MOVE(ch) = st->raw_move;
   GET_KI(ch) = st->ki;
   GET_RAW_KI(ch) = st->raw_ki;

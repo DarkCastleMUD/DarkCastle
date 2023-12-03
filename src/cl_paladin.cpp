@@ -40,12 +40,12 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
 
   one_argument(argument, victim_name);
 
-  if (!canPerform(ch, SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\r\n"))
+  if (!ch->canPerform(SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\r\n"))
   {
     return eFAILURE;
   }
 
-  if (!(victim = get_char_room_vis(ch, victim_name)))
+  if (!(victim = ch->get_char_room_vis( victim_name)))
   {
     victim = ch->fighting;
     if (!victim)
@@ -95,7 +95,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     if (DC::isSet(retval, eVICT_DIED) && !DC::isSet(retval, eCH_DIED))
     {
-      if (has_skill(ch, SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
+      if (ch->has_skill( SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
         char dammsg[MAX_STRING_LENGTH];
         int amount = ch->getLevel() * 10;
@@ -133,12 +133,12 @@ int do_layhands(Character *ch, char *argument, int cmd)
   int duration = 24;
   one_argument(argument, victim_name);
 
-  if (!canPerform(ch, SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n"))
+  if (!ch->canPerform(SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n"))
   {
     return eFAILURE;
   }
 
-  if (!(victim = get_char_room_vis(ch, victim_name)))
+  if (!(victim = ch->get_char_room_vis( victim_name)))
   {
     send_to_char("Whom do you want to layhands on?\n\r", ch);
     return eFAILURE;
@@ -178,7 +178,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
   else
   {
     char dammsg[MAX_STRING_LENGTH];
-    int amount = 500 + (has_skill(ch, SKILL_LAY_HANDS) * 10);
+    int amount = 500 + (ch->has_skill( SKILL_LAY_HANDS) * 10);
     if (amount + victim->getHP() > GET_MAX_HIT(victim))
       amount = GET_MAX_HIT(victim) - victim->getHP();
     victim->addHP(amount);
@@ -212,7 +212,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
 
-  if (!canPerform(ch, SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n"))
+  if (!ch->canPerform(SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n"))
   {
     return eFAILURE;
   }
@@ -223,7 +223,7 @@ int do_behead(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(vict = get_char_room_vis(ch, buf)))
+  if (!(vict = ch->get_char_room_vis( buf)))
   {
     if (ch->fighting)
       vict = ch->fighting;
@@ -257,7 +257,7 @@ int do_behead(Character *ch, char *argument, int cmd)
     return retval;
   }
 
-  int skill_level = has_skill(ch, SKILL_BEHEAD);
+  int skill_level = ch->has_skill( SKILL_BEHEAD);
   modifier = 50.0 + skill_level / 2.0 + GET_ALIGNMENT(ch) / 100.0;
   modifier /= 100.0; // range .15-1.0
 
@@ -271,8 +271,8 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (enemy_hp < 0.3) // covered is 0.3
   {
-    chance += (has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
-    // csendf(ch, "BEHEAD chance increased by %d\r\n", has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
+    chance += (ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
+    // csendf(ch, "BEHEAD chance increased by %d\r\n", ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
   }
   else
     chance >>= 1; // halving the chance if less than covered (nerf)

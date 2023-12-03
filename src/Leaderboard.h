@@ -13,8 +13,6 @@
 #include <string>
 #include "character.h"
 
-using namespace std;
-
 class Leaderboard
 {
 public:
@@ -28,7 +26,7 @@ public:
 	void write_file(const char filename[]);
 	int pdscore(Character *ch);
 	void rename(QString oldname, QString newname);
-	void setHP(unsigned int placement, string name, int value);
+	void setHP(unsigned int placement, std::string name, int value);
 	int scan(Character *ch);
 
 private:

@@ -42,8 +42,6 @@ uint64_t i = UINT64_MAX;
 #include "Trace.h"
 #include "clan.h"
 
-using namespace std;
-
 extern index_data *obj_index;
 
 void addtimer(struct timer_data *timer);
@@ -390,7 +388,7 @@ void save_clans(void)
     port1 = DC::getInstance()->cf.ports[0];
   }
 
-  stringstream ssbuffer;
+  std::stringstream ssbuffer;
   ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
   if (!(fl = fopen(ssbuffer.str().c_str(), "w")))
   {
@@ -470,33 +468,35 @@ void assign_clan_rooms()
           SET_BIT(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 }
 
-struct clan_member_data *get_member(char *strName, int nClanId)
+struct clan_member_data *get_member(QString strName, int nClanId)
 {
   clan_data *theClan = nullptr;
 
-  if (!(theClan = get_clan(nClanId)) || !strName)
+  if (!(theClan = get_clan(nClanId)) || strName.isEmpty())
     return nullptr;
 
   struct clan_member_data *pcurr = theClan->members;
 
-  while (pcurr && strcmp(pcurr->member_name, strName))
+  while (pcurr && strName != pcurr->member_name)
     pcurr = pcurr->next;
 
   return pcurr;
 }
 
-int is_in_clan(clan_data *theClan, Character *ch)
+bool is_in_clan(clan_data *theClan, Character *ch)
 {
   struct clan_member_data *pcurr = theClan->members;
 
   while (pcurr)
   {
-    if (!strcmp(pcurr->member_name, GET_NAME(ch)))
-      return 1;
+    if (pcurr->member_name == ch->getName())
+    {
+      return true;
+    }
     pcurr = pcurr->next;
   }
 
-  return 0;
+  return false;
 }
 
 void remove_clan_member(int clannumber, Character *ch)
@@ -516,7 +516,7 @@ void remove_clan_member(clan_data *theClan, Character *ch)
 
   pcurr = theClan->members;
 
-  while (pcurr && strcmp(pcurr->member_name, GET_NAME(ch)))
+  while (pcurr && pcurr->member_name != ch->getName())
   {
     plast = pcurr;
     pcurr = pcurr->next;
@@ -577,7 +577,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
     return;
   }
 
-  if (!*new_new_member->member_name)
+  if (new_new_member->member_name.isEmpty())
   {
     logentry("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
     return;
@@ -592,7 +592,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   pcurr = theClan->members;
 
-  while (pcurr && (0 > (result = strcmp(pcurr->member_name, new_new_member->member_name))))
+  while (pcurr && pcurr->member_name != new_new_member->member_name)
   {
     plast = pcurr;
     pcurr = pcurr->next;
@@ -657,8 +657,6 @@ void add_clan(clan_data *new_new_clan)
 
 void free_member(struct clan_member_data *member)
 {
-  dc_free(member->member_name);
-  dc_free(member->unused4);
   dc_free(member);
 }
 
@@ -1002,7 +1000,7 @@ int do_accept(Character *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
-  if (!(victim = get_char_room_vis(ch, buf)))
+  if (!(victim = ch->get_char_room_vis(buf)))
   {
     send_to_char("You can't accept someone into your clan who isn't here!\n\r", ch);
     return eFAILURE;
@@ -1027,7 +1025,7 @@ int do_accept(Character *ch, char *arg, int cmd)
   send_to_char("Your clan now has a new member.\r\n", ch);
   send_to_char(buf, victim);
 
-  sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
+  sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
   logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
 
   add_totem_stats(victim);
@@ -1035,46 +1033,42 @@ int do_accept(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_outcast(Character *ch, char *arg, int cmd)
+command_return_t Character::do_outcast(QStringList arguments, int cmd)
 {
-  Character *victim;
-  clan_data *clan;
-  class Connection d;
-  char buf[MAX_STRING_LENGTH], tmp_buf[MAX_STRING_LENGTH];
-  bool connected = true;
-
-  while (isspace(*arg))
-    arg++;
-
-  if (!*arg)
+  clan_data *clanPtr = get_clan(this);
+  if (!clanPtr)
   {
-    send_to_char("Cast who out of your clan?\n\r", ch);
+    sendln("You are not a member of any clan!");
     return eFAILURE;
   }
 
-  if (!ch->clan || !(clan = get_clan(ch)))
+  if (arguments.isEmpty())
   {
-    send_to_char("You aren't the member of any clan!\n\r", ch);
+    sendln("Cast who out of your clan?");
     return eFAILURE;
   }
 
-  one_argument(arg, buf);
-
-  buf[0] = UPPER(buf[0]);
-  if (!(victim = get_char(buf)))
+  QString arg1 = arguments.value(0).trimmed().toLower();
+  if (!arg1.isEmpty())
   {
+    arg1 = arg1[0].toUpper();
+  }
 
-    // must be done to clear out "d" before it is used
-    d = {};
-
-    if (!(load_char_obj(&d, buf)))
+  Character *victim = get_char(arg1);
+  bool victim_connected = false;
+  Connection d = {};
+  if (!victim)
+  {
+    if (!(load_char_obj(&d, arg1)))
     {
-
-      sprintf(tmp_buf, "../archive/%s.gz", buf);
-      if (file_exists(tmp_buf))
-        send_to_char("Character is archived.\r\n", ch);
+      if (file_exists(QString("../archive/%1.gz").arg(arg1)))
+      {
+        sendln("Character is archived.");
+      }
       else
-        send_to_char("Unable to outcast, type the entire name.\r\n", ch);
+      {
+        sendln("Unable to outcast, type the entire name.");
+      }
       return eFAILURE;
     }
 
@@ -1083,44 +1077,41 @@ int do_outcast(Character *ch, char *arg, int cmd)
 
     victim->hometown = START_ROOM;
     victim->in_room = START_ROOM;
-    connected = false;
+    victim_connected = false;
   }
 
   if (!victim->clan)
   {
-    send_to_char("This person isn't in a clan in the first place...\r\n", ch);
+    send_to_char("This person isn't in a clan in the first place...\r\n", this);
     return eFAILURE;
   }
 
-  if (strcmp(clan->leader, GET_NAME(ch)) &&
-      victim != ch &&
-      !has_right(ch, CLAN_RIGHTS_OUTCAST))
+  if (strcmp(clanPtr->leader, getNameC()) && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
   {
-    send_to_char("You don't have the right to outcast people from your clan!\n\r", ch);
+    send_to_char("You don't have the right to outcast people from your clan!\n\r", this);
     return eFAILURE;
   }
 
-  if (!strcmp(clan->leader, GET_NAME(victim)))
+  if (!strcmp(clanPtr->leader, victim->getNameC()))
   {
-    send_to_char("You can't outcast the clan leader!\n\r", ch);
+    send_to_char("You can't outcast the clan leader!\n\r", this);
     return eFAILURE;
   }
 
-  if (victim == ch)
+  if (victim == this)
   {
-    sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
-    logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
-    send_to_char("You quit your clan.\r\n", ch);
+    logentry(QString("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
+    send_to_char("You quit your clan.\r\n", this);
     remove_totem_stats(victim);
     victim->clan = 0;
-    remove_clan_member(clan, ch);
+    remove_clan_member(clan, this);
     save_clans();
     return eSUCCESS;
   }
 
-  if (victim->clan != ch->clan)
+  if (victim->clan != this->clan)
   {
-    send_to_char("That person isn't in your clan!\r\n", ch);
+    send_to_char("That person isn't in your clan!\r\n", this);
     return eFAILURE;
   }
 
@@ -1128,16 +1119,13 @@ int do_outcast(Character *ch, char *arg, int cmd)
   victim->clan = 0;
   remove_clan_member(clan, victim);
   save_clans();
-  sprintf(buf, "You cast %s out of your clan.\r\n", GET_NAME(victim));
-  send_to_char(buf, ch);
-  sprintf(buf, "You are cast out of %s.\r\n", clan->name);
-  send_to_char(buf, victim);
+  sendln(QString("You cast %1 out of your clan.").arg(victim->getName()));
+  victim->sendln(QString("You are cast out of %1.").arg(clanPtr->name));
 
-  sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
-  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
+  logentry(QString("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
 
   victim->save(666);
-  if (!connected)
+  if (!victim_connected)
     free_char(victim, Trace("do_outcast"));
 
   return eSUCCESS;
@@ -1172,7 +1160,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
-  if (!(victim = get_char_room_vis(ch, buf)))
+  if (!(victim = ch->get_char_room_vis(buf)))
   {
     send_to_char("You can't cpromote someone who isn't here!\n\r",
                  ch);
@@ -1194,7 +1182,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
   }
   if (clan->leader)
     dc_free(clan->leader);
-  clan->leader = str_dup(GET_NAME(victim));
+  clan->leader = str_dup(victim->getNameC());
 
   save_clans();
 
@@ -1202,7 +1190,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
   send_to_char("Your clan now has a new leader.\r\n", ch);
   send_to_char(buf, victim);
 
-  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
+  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
   logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
   return eSUCCESS;
 }
@@ -1573,7 +1561,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    queue<string> tmp = get_clan(ch)->ctell_history;
+    std::queue<std::string> tmp = get_clan(ch)->ctell_history;
     if (tmp.empty())
     {
       send_to_char("No one has said anything lately.\r\n", ch);
@@ -1636,7 +1624,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 void do_clan_list(Character *ch)
 {
   clan_data *clan = 0;
-  string buf, buf2;
+  std::string buf, buf2;
 
   if (ch->getLevel() > 103)
   {
@@ -2568,10 +2556,10 @@ void clan_data::log(QString log_entry)
 
 void show_clan_log(Character *ch)
 {
-  string s;
-  ifstream fin;
-  stringstream fname;
-  stack<string> logstack;
+  std::string s;
+  std::ifstream fin;
+  std::stringstream fname;
+  std::stack<std::string> logstack;
 
   fname << "../lib/clans/clan" << ch->clan << ".log";
 
@@ -2587,7 +2575,7 @@ void show_clan_log(Character *ch)
   }
   fin.close();
 
-  stringstream buffer;
+  std::stringstream buffer;
   buffer << "The following are your clan's most recent 5 pages of log entries:\n\r";
   int line = 1;
   while (logstack.size())
@@ -2632,7 +2620,7 @@ int do_clans(Character *ch, char *arg, int cmd)
       int bit = -1;
       struct clan_member_data *pmember = nullptr;
 
-      if (!(pmember = get_member(ch->name, ch->clan)))
+      if (!(pmember = get_member(ch->getNameC(), ch->clan)))
       {
         send_to_char("You don't seem to be in a clan.\r\n", ch);
         return eSUCCESS;
@@ -2833,7 +2821,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(this, FUCK_GTHIEF))
+  if (affected_by_spell(FUCK_GTHIEF))
   {
     send("Launder your money elsewhere, thief!\r\n");
     return eFAILURE;
@@ -2879,7 +2867,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
   }
 
   send(QString("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
-  QString log_entry = QString("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name).arg(dep).arg(coin);
+  QString log_entry = QString("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name_).arg(dep).arg(coin);
   clan_data *clan = get_clan(this->clan);
   if (clan != nullptr)
   {
@@ -2936,11 +2924,11 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
   char buf[MAX_INPUT_LENGTH];
   if (wdraw == 1)
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", ch->name);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", ch->getNameC());
   }
   else
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", ch->name, wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", ch->getNameC(), wdraw);
   }
   clan_data *clan = get_clan(ch);
   if (clan != nullptr)
@@ -2969,8 +2957,8 @@ int do_cbalance(Character *ch, char *arg, int cmd)
     send_to_char("You don't have the right to see your clan's account.\r\n", ch);
     return eFAILURE;
   }
-  stringstream ss;
-  ss.imbue(locale("en_US"));
+  std::stringstream ss;
+  ss.imbue(std::locale("en_US"));
   ss << get_clan(ch)->getBalance();
   csendf(ch, "Your clan has %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
   return eSUCCESS;
@@ -3078,8 +3066,8 @@ int count_plrs(int zone, int clan)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
-  int i = count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
-                   {
+  int i = std::count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
+                        {
       if (IS_PC(tmpch) && DC::getInstance()->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
 	  tmpch->getLevel() < 100 && tmpch->getLevel() > 10)
       return true;
@@ -3223,14 +3211,14 @@ int online_clan_members(int clan)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
-  int i = count_if(character_list.begin(), character_list.end(),
-                   [&clan](Character *const &Tmpch)
-                   {
-                     if (IS_PC(Tmpch) && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
-                       return true;
-                     else
-                       return false;
-                   });
+  int i = std::count_if(character_list.begin(), character_list.end(),
+                        [&clan](Character *const &Tmpch)
+                        {
+                          if (IS_PC(Tmpch) && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
+                            return true;
+                          else
+                            return false;
+                        });
 
   return i;
 }
@@ -3426,7 +3414,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-    if (!affected_by_spell(this, SKILL_CLANAREA_CHALLENGE))
+    if (!affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
       send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\r\n", this);
       return eFAILURE;
@@ -3447,7 +3435,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   }
   else if (arg == "claim")
   {
-    if (affected_by_spell(this, SKILL_CLANAREA_CLAIM))
+    if (affected_by_spell(SKILL_CLANAREA_CLAIM))
     {
       send_to_char("You need to wait before you can attempt to claim an area.\r\n", this);
       return eFAILURE;
@@ -3578,7 +3566,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   }
   else if (arg == "challenge")
   {
-    if (affected_by_spell(this, SKILL_CLANAREA_CHALLENGE))
+    if (affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
       send_to_char("You need to wait before you can attempt to challenge an area.\r\n", this);
       return eFAILURE;
