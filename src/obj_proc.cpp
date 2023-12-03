@@ -43,8 +43,6 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern class Object *object_list;
 
-extern Character *initiate_oproc(Character *ch, Object *obj);
-
 extern struct mprog_throw_type *g_mprog_throw_list;
 
 // TODO - go over emoting object stuff and make sure it's as efficient as we can get it
@@ -498,7 +496,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
   if (str_cmp(arg1, "ateni"))
     return eFAILURE;
   Character *victim;
-  if (!(victim = ch->get_char_room_vis( arg2)))
+  if (!(victim = ch->get_char_room_vis(arg2)))
   {
     send_to_char("Noone here by that name.\r\n", ch);
     return eSUCCESS;
@@ -1315,7 +1313,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (!(victim = ch->get_char_room_vis( vict)))
+  if (!(victim = ch->get_char_room_vis(vict)))
   {
     if (ch->fighting)
     {
@@ -1562,7 +1560,7 @@ int dancevest(Character *ch, class Object *obj, int cmd, const char *arg,
     send_to_char("As phantom music swells around you, you are helpless to resist.  You must obey.\r\n", v);
     char tmp_command[32];
     strcpy(tmp_command, command_list[number(0, 9)]);
-    command_interpreter(v, tmp_command);
+    v->command_interpreter(tmp_command);
   }
   obj->obj_flags.timer = 48;
   return eSUCCESS;
@@ -2264,7 +2262,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   send_to_char("You quietly whisper 'sbiadirsivia' into your hands.\r\n", ch);
 
-  if (!(victim = ch->get_char_room_vis( junk)))
+  if (!(victim = ch->get_char_room_vis(junk)))
   {
     send_to_char("The box somehow seems......confused.\r\n", ch);
   }
@@ -3271,7 +3269,7 @@ int random_dir_boots(Character *ch, class Object *obj, int cmd, const char *arg,
 
   strcpy(dothis, dirs[number(0, 5)]);
 
-  return command_interpreter(obj->equipped_by, dothis);
+  return obj->equipped_by->command_interpreter(dothis);
 }
 
 // WARNING - uses obj_flags.value[3] to store stuff
@@ -3867,7 +3865,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     char target[MAX_INPUT_LENGTH];
     half_chop(arg, obj, target);
     Character *give_vict;
-    if (!(give_vict = ch->get_char_room_vis( target)))
+    if (!(give_vict = ch->get_char_room_vis(target)))
       return eFAILURE; // Not giving to char/mob, so ok
     if (IS_MOB(give_vict))
     {
@@ -4163,7 +4161,7 @@ int godload_wailka(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
   Character *vict;
-  if ((vict = ch->get_char_room_vis( arg2)) == nullptr)
+  if ((vict = ch->get_char_room_vis(arg2)) == nullptr)
   {
     send_to_char("You need to tell the item who.\r\n", ch);
     return eSUCCESS;

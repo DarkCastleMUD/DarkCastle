@@ -1245,7 +1245,7 @@ int do_order(Character *ch, char *argument, int cmd)
       else
       {
         send_to_char("Ok.\r\n", ch);
-        command_interpreter(victim, message);
+        victim->command_interpreter(message);
       }
     }
     else
@@ -1263,7 +1263,7 @@ int do_order(Character *ch, char *argument, int cmd)
             if (IS_AFFECTED(k->follower, AFF_CHARM))
             {
               found = true;
-              retval = command_interpreter(k->follower, message);
+              retval = k->follower->command_interpreter(message);
               if (DC::isSet(retval, eCH_DIED))
                 break; // k is no longer valid if it was a mob(always), get out now
             }
@@ -3157,28 +3157,53 @@ bool str_prefix(const char *astr, const char *bstr)
   return false;
 }
 
+bool str_prefix(QString astr, QString bstr)
+{
+  if (astr.isEmpty())
+  {
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null astr.", 0);
+    return true;
+  }
+
+  if (bstr.isEmpty())
+  {
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    return true;
+  }
+
+  auto astr_i = astr.begin();
+  auto bstr_i = bstr.begin();
+  for (; astr_i != astr.end() && bstr_i != bstr.end(); astr_i++, bstr_i++)
+  {
+    if (astr_i->toLower() != bstr_i->toLower())
+      return true;
+  }
+
+  return false;
+}
+
 /*
  * Compare strings, case insensitive, for match anywhere.
  * Returns true is astr not part of bstr.
  *   (compatibility with historical functions).
  */
 
-bool str_infix(const char *astr, const char *bstr)
+bool str_infix(QString astr, QString bstr)
 {
   int sstr1;
   int sstr2;
   int ichar;
-  char c0;
 
-  if ((c0 = LOWER(astr[0])) == '\0')
+  if (astr.isEmpty())
     return false;
 
-  sstr1 = strlen(astr);
-  sstr2 = strlen(bstr);
+  QChar c0 = astr.at(0);
+  sstr1 = astr.length();
+  sstr2 = bstr.length();
 
   for (ichar = 0; ichar <= sstr2 - sstr1; ichar++)
   {
-    if (c0 == LOWER(bstr[ichar]) && !str_prefix(astr, bstr + ichar))
+    if (c0 == bstr[ichar].toLower() && !str_prefix(astr, bstr.sliced(ichar)))
       return false;
   }
 

@@ -21,8 +21,6 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 
-
-
 /* The following defs are for Object  */
 
 /* For 'type_flag' */
@@ -261,7 +259,7 @@ public:
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
     char *name = {}; /* Title of object :get etc.        */
-    const char *getNameC(void) { return name; }
+    inline const char *getNameC(void) { return name; }
     QString getName(void) { return name; }
 
     char *description = {};                       /* When in room                     */

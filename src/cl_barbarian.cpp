@@ -936,7 +936,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
-  retval = special(ch, dir, "");
+  retval = ch->special("", dir);
   if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
     return retval;
   SETBIT(ch->affected_by, AFF_RUSH_CD);

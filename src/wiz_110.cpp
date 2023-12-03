@@ -133,82 +133,75 @@ int do_maxes(Character *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-command_return_t do_bestow(Character *ch, std::string arg, int cmd)
+command_return_t Character::do_bestow(QStringList arguments, int cmd)
 {
-  Character *vict = nullptr;
-  std::string buf;
-  std::string command;
-  int i;
+  QString name = arguments.value(0);
+  QString command = arguments.value(1);
 
-  std::tie(arg, command) = half_chop(arg);
-
-  if (arg.empty())
+  if (name.isEmpty())
   {
     send_to_char("Bestow gives a god command to a god.\r\n"
                  "Syntax:  bestow <god> <command>\r\n"
                  "Just 'bestow <god>' will list all available commands for that god.\r\n",
-                 ch);
+                 this);
     return eSUCCESS;
   }
 
-  if (!(vict = get_pc_vis(ch, arg.c_str())))
+  Character *victim = get_pc_vis(this, name);
+  if (!victim)
   {
-    ch->send(fmt::format("You don't see anyone named '{}'.\r\n", arg));
+    this->sendln(QString("You don't see anyone named '%1'.").arg(name));
     return eSUCCESS;
   }
 
-  if (command.empty())
+  if (command.isEmpty())
   {
     send_to_char("Command                Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
-                 ch);
-    for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+                 this);
+    for (const auto &bgc : DC::bestowable_god_commands)
     {
-      if (bestowable_god_commands[i].testcmd == false)
+      if (!bgc.testcmd)
       {
-        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, vict->has_skill( bestowable_god_commands[i].num) ? "YES" : "---"));
+        this->sendln(QString("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
-    send_to_char("\r\n", ch);
+    send_to_char("\r\n", this);
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
-                 ch);
-    for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+                 this);
+    for (const auto &bgc : DC::bestowable_god_commands)
     {
-      if (bestowable_god_commands[i].testcmd == true)
+      if (bgc.testcmd)
       {
-        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, vict->has_skill( bestowable_god_commands[i].num) ? "YES" : "---"));
+        this->sendln(QString("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
     return eSUCCESS;
   }
 
-  for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
-    if (bestowable_god_commands[i].name == command)
-      break;
+  auto bc = get_bestow_command(command);
 
-  if (*bestowable_god_commands[i].name == '\n')
+  if (!bc.has_value())
   {
-    ch->send(fmt::format("There is no god command named '{}'.\r\n", command));
+    this->sendln(QString("There is no god command named '%1'.").arg(command));
     return eSUCCESS;
   }
 
   // if has
-  if (vict->has_skill( bestowable_god_commands[i].num))
+  if (victim->has_skill(bc->num))
   {
-    ch->send(fmt::format("{} already has that command.\r\n", GET_NAME(vict)));
+    this->sendln(QString("%1 already has that command.").arg(victim->getName()));
     return eSUCCESS;
   }
 
   // give it
-  learn_skill(vict, bestowable_god_commands[i].num, 1, 1);
-  buf = fmt::format("{} has been bestowed {} by {}.", GET_NAME(vict), bestowable_god_commands[i].name, GET_NAME(ch));
-  logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
-
-  ch->send(fmt::format("{} has been bestowed {}.\r\n", GET_NAME(vict), bestowable_god_commands[i].name));
-  ch->send(fmt::format("{} has bestowed {} upon you.\r\n", GET_NAME(ch), bestowable_god_commands[i].name));
+  learn_skill(victim, bc->num, 1, 1);
+  logentry(QString("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), LogChannels::LOG_GOD);
+  this->sendln(QString("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
+  this->sendln(QString("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
   return eSUCCESS;
 }
 
@@ -254,33 +247,33 @@ int do_revoke(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
-    if (!strcmp(bestowable_god_commands[i].name, command))
+  for (i = 0; i < DC::bestowable_god_commands.size(); i++)
+    if (DC::bestowable_god_commands[i].name == command)
       break;
 
-  if (*bestowable_god_commands[i].name == '\n')
+  if (i == DC::bestowable_god_commands.size())
   {
     sprintf(buf, "There is no god command named '%s'.\r\n", command);
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
-  if (vict->skills.contains(bestowable_god_commands[i].num) == false)
+  if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    sprintf(buf, "%s does not have %s.\r\n", GET_NAME(vict), bestowable_god_commands[i].name);
+    sprintf(buf, "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name);
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
-  vict->skills.erase(bestowable_god_commands[i].num);
+  vict->skills.erase(DC::bestowable_god_commands[i].num);
   sprintf(buf, "%s has had %s revoked.\r\n", GET_NAME(vict),
-          bestowable_god_commands[i].name);
+          DC::bestowable_god_commands[i].name);
   send_to_char(buf, ch);
   sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict),
-          bestowable_god_commands[i].name, GET_NAME(ch));
+          DC::bestowable_god_commands[i].name, GET_NAME(ch));
   logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch),
-          bestowable_god_commands[i].name);
+          DC::bestowable_god_commands[i].name);
   send_to_char(buf, vict);
   return eSUCCESS;
 }
@@ -717,7 +710,7 @@ int do_range(Character *ch, char *arg, int cmd)
     extern world_file_list_item *   mob_file_list;
     extern world_file_list_item *   obj_file_list;
   */
-  if (!ch->has_skill( COMMAND_RANGE))
+  if (!ch->has_skill(COMMAND_RANGE))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;

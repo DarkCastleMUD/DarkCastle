@@ -297,3 +297,17 @@ void close_file(std::FILE *fp)
 		std::fclose(fp);
 	}
 }
+
+auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>
+{
+	// auto it = std::find_if(begin(DC::bestowable_god_commands), end(DC::bestowable_god_commands));
+
+	for (const auto &bgc : DC::bestowable_god_commands)
+	{
+		if (bgc.name == command_name)
+		{
+			return bgc;
+		}
+	}
+	return std::unexpected(search_error::not_found);
+}

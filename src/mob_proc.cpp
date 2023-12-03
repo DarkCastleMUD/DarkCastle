@@ -2219,7 +2219,7 @@ int apiary_worker(Character *ch, class Object *obj, int cmd, const char *arg,
  *  Special procedures for shops                                      *
  *********************************************************************/
 
-int pet_shops(Character *ch, int cmd, char *arg)
+int pet_shops(Character *ch, int cmd, char const *arg)
 {
   char buf[MAX_STRING_LENGTH], pet_name[256];
   int pet_room;

@@ -319,6 +319,11 @@ bool Character::validateName(QString name)
     return true;
 }
 
+inline const char *Character::getNameC(void) const
+{
+    return str_hsh(name_.toStdString().c_str());
+}
+
 void Connection::send(QString txt)
 {
     /* if there's no descriptor, don't worry about output */

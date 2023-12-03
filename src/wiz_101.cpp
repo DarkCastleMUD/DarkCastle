@@ -6,6 +6,7 @@
 #include <string>
 
 #include <fmt/format.h>
+#include <expected>
 
 #include "wizard.h"
 #include "utility.h"
@@ -23,8 +24,6 @@
 #include "spells.h"
 #include "const.h"
 
-
-
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;
 
@@ -37,7 +36,7 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
-  int cmd, i;
+  int cmd;
   int no = 6;
   int no2 = 6;
   int no3 = 6;
@@ -66,20 +65,17 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   for (v = ch->getLevel(); v > 100; v--)
     for (cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++)
     {
-      if (cmd_info[cmd].minimum_level == GIFTED_COMMAND &&
-          v == ch->getLevel())
+      if (cmd_info[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
       {
-        for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
-          if (!strcmp(bestowable_god_commands[i].name, cmd_info[cmd].command_name))
-            break;
+        auto bestow_command = get_bestow_command(cmd_info[cmd].command_name);
 
-        if (*bestowable_god_commands[i].name == '\n') // someone forgot to update it
+        if (!bestow_command.has_value()) // someone forgot to update it
           continue;
 
-        if (!ch->has_skill(bestowable_god_commands[i].num))
+        if (!ch->has_skill(bestow_command->num))
           continue;
 
-        if (bestowable_god_commands[i].testcmd == false)
+        if (bestow_command->testcmd == false)
         {
           sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
           if ((no2) % 5 == 0)
@@ -100,8 +96,7 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
         continue;
 
       // ignore these 2 duplicates of other commands
-      if (!strcmp(cmd_info[cmd].command_name, "colours") ||
-          !strcmp(cmd_info[cmd].command_name, ";"))
+      if (cmd_info[cmd].command_name == "colours" || cmd_info[cmd].command_name == ";")
         continue;
 
       sprintf(buf + strlen(buf), "[%2d]%-11s",
@@ -538,7 +533,7 @@ int do_at(Character *ch, char *argument, int cmd)
 
   original_loc = ch->in_room;
   move_char(ch, location, false);
-  int retval = command_interpreter(ch, command);
+  int retval = ch->command_interpreter(command);
 
   /* check if the guy's still there */
   for (target_mob = DC::getInstance()->world[location].people; target_mob; target_mob =

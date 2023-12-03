@@ -59,8 +59,6 @@
 #include "DC.h"
 #include "Trace.h"
 
-
-
 // Extern variables
 
 extern struct index_data *mob_index;
@@ -128,7 +126,8 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-int mprog_seval(Character *ch, char *lhs, char *opr, char *rhs);
+int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs);
+
 int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
 int mprog_do_ifchck(char *ifchck, Character *mob,
 					Character *actor, Object *obj,
@@ -187,7 +186,7 @@ char *mprog_next_command(char *clist)
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-int mprog_seval(Character *ch, char *lhs, char *opr, char *rhs)
+int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs)
 {
 	if (!lhs || !rhs)
 		return false;
@@ -204,6 +203,26 @@ int mprog_seval(Character *ch, char *lhs, char *opr, char *rhs)
 
 	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
 	return 0;
+}
+
+bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
+{
+	if (lhs.isEmpty() || rhs.isEmpty())
+		return false;
+
+	if (opr == "==")
+		return lhs == rhs;
+	if (opr == "!=")
+		return lhs != rhs;
+	if (opr == "/")
+		return !str_infix(rhs, lhs);
+	if (opr == "!/")
+		return str_infix(rhs, lhs);
+
+	prog_error(this, "Improper MOBprog operator");
+
+	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	return false;
 }
 
 /*
@@ -489,10 +508,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				buf[i - 3] = *(left + i);
 			}
 			for (; mobTempVar; mobTempVar = mobTempVar->next)
-				if (!str_cmp(buf, mobTempVar->name))
+				if (!str_cmp(buf, mobTempVar->name.toStdString().c_str()))
 					break;
 			if (mobTempVar)
-				strcpy(buf, mobTempVar->data);
+				strcpy(buf, mobTempVar->data.toStdString().c_str());
 
 			if (buf[0] != '\0')
 			{
@@ -1252,7 +1271,8 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			}
 			else
 			{
-				targetTemp = getTemp(target, half);
+				// TODO BROKEN
+				// targetTemp = target->getTemp(half);
 			}
 
 			stringval = &targetTemp;
@@ -1639,10 +1659,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			buf1[i - 3] = arg[i];
 		}
 		for (; eh; eh = eh->next)
-			if (!str_cmp(buf1, eh->name))
+			if (eh->name == buf1)
 				break;
 		if (eh)
-			strcpy(arg, eh->data);
+			strcpy(arg, eh->data.toStdString().c_str());
 	}
 
 	if (!is_number(arg) && !(arg[0] == '$') && traditional)
@@ -1697,7 +1717,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		if (lvalb)
 			return mprog_veval((int)*lvalb, opr, atoi(val));
 		if (lvalstr)
-			return mprog_seval(mob, *lvalstr, opr, val);
+			return mob->mprog_seval(*lvalstr, opr, val);
 	}
 	else
 	{
@@ -1712,7 +1732,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
 		{
 			if (rvalstr && lvalstr)
-				return mprog_seval(mob, *lvalstr, opr, *rvalstr);
+				return mob->mprog_seval(*lvalstr, opr, *rvalstr);
 			// The rest fit in an int64_t, so let's just use that.
 			if (rvalstr)
 				rval = atoi(*rvalstr);
@@ -1770,17 +1790,17 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 		const auto &character_list = DC::getInstance()->character_list;
 		count = std::count_if(character_list.begin(), character_list.end(),
-						 [&target](Character *vch)
-						 {
-							 if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobdata->nr].virt == target)
-							 {
-								 return true;
-							 }
-							 else
-							 {
-								 return false;
-							 }
-						 });
+							  [&target](Character *vch)
+							  {
+								  if (IS_NPC(vch) && vch->in_room != DC::NOWHERE && mob_index[vch->mobdata->nr].virt == target)
+								  {
+									  return true;
+								  }
+								  else
+								  {
+									  return false;
+								  }
+							  });
 
 		return mprog_veval(count, opr, atoi(val));
 	}
@@ -2809,7 +2829,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
 
 		if (fvict)
-			return mprog_seval(mob, getTemp(fvict, buf4), opr, val);
+			return mob->mprog_seval(fvict->getTemp(buf4), opr, val);
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
@@ -2817,25 +2837,25 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'z':
 			if (mob->beacon)
 			{
-				return mprog_seval(mob, getTemp(((Character *)mob->beacon), buf4), opr, val);
+				return mob->mprog_seval(((Character *)mob->beacon)->getTemp(buf4), opr, val);
 			}
 			else
 				return -1;
 		case 'i':
-			return mprog_seval(mob, getTemp(mob, buf4), opr, val);
+			return mob->mprog_seval(mob->getTemp(buf4), opr, val);
 		case 'n':
 			if (actor)
-				return mprog_seval(mob, getTemp(actor, buf4), opr, val);
+				return mob->mprog_seval(actor->getTemp(buf4), opr, val);
 			else
 				return -1;
 		case 't':
 			if (vict)
-				return mprog_seval(mob, getTemp(vict, buf4), opr, val);
+				return mob->mprog_seval(vict->getTemp(buf4), opr, val);
 			else
 				return -1;
 		case 'r':
 			if (rndm)
-				return mprog_seval(mob, getTemp(rndm, buf4), opr, val);
+				return mob->mprog_seval(rndm->getTemp(buf4), opr, val);
 			else
 				return -1;
 		case 'o':
@@ -3320,10 +3340,18 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 	Object *v_obj = (Object *)vo;
 
 	*t = '\0';
+
+	auto q = mob->getName();
+	qDebug() << q;
+	auto s = q.toStdString();
+	qDebug() << s;
+	auto mob_nameC = s.c_str();
+	qDebug() << mob_nameC;
+
 	switch (ch)
 	{
 	case 'i':
-		one_argument(mob->getNameC(), t);
+		one_argument(mob_nameC, t);
 		break;
 	case 'z':
 		if (mob->beacon)
@@ -3811,13 +3839,13 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 				{
 					struct tempvariable *eh = who->tempVariable;
 					for (; eh; eh = eh->next)
-						if (!str_cmp(tmp, eh->name))
+						if (eh->name == tmp)
 							break;
 					if (eh)
 					{
-						strcpy(tmp, eh->data);
-						if (eh->data && *eh->data)
-							*eh->data = UPPER(*eh->data);
+						strcpy(tmp, eh->data.toStdString().c_str());
+						if (!eh->data.isEmpty())
+							eh->data[0] = eh->data[0].toUpper();
 					}
 					else
 						continue; // Doesn't have the variable.
@@ -3836,7 +3864,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 	//  if(strlen(buf) > MAX_INPUT_LENGTH-1)
 	//    logf(IMMORTAL, LogChannels::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
 
-	return command_interpreter(mob, buf, true);
+	return mob->command_interpreter(buf, true);
 }
 
 bool objExists(Object *obj)
@@ -3993,7 +4021,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
  */
 // Returns true if match
 // false if no match
-int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
+int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 						 Object *obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
@@ -4029,14 +4057,14 @@ int mprog_wordlist_check(const char *arg, Character *mob, Character *actor,
 			if (!reverse)
 				strcpy(temp1, mprg->arglist);
 			else
-				strcpy(temp1, arg);
+				strcpy(temp1, arg.toStdString().c_str());
 
 			list = temp1;
 			for (i = 0; i < (signed)strlen(list); i++)
 				list[i] = LOWER(list[i]);
 
 			if (!reverse)
-				strcpy(temp2, arg);
+				strcpy(temp2, arg.toStdString().c_str());
 			else
 				strcpy(temp2, mprg->arglist);
 
@@ -4545,12 +4573,11 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 						struct tempvariable *eh;
 						for (eh = mob->tempVariable; eh; eh = eh->next)
 						{
-							if (!str_cmp(eh->name, "throw"))
+							if (eh->name == "throw")
 								break;
 						}
 						if (eh)
 						{
-							dc_free(eh->data);
 							eh->data = var;
 						}
 						else
@@ -5068,9 +5095,9 @@ int oprog_armour_trigger(Character *ch, Object *item)
 	return mprog_cur_result;
 }
 
-int oprog_command_trigger(const char *txt, Character *ch, char *arg)
+command_return_t Character::oprog_command_trigger(QString command, QString arguments)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere(this))
 	{
 		return eFAILURE;
 	}
@@ -5078,21 +5105,20 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 	Character *vmob = nullptr;
 	Object *item = nullptr;
 	mprog_cur_result = eFAILURE;
-	char buf[MAX_STRING_LENGTH] = {0};
-	if (ch->in_room >= 0)
+	QString buf;
+	if (in_room >= 0)
 	{
-		for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
+		for (item = DC::getInstance()->world[in_room].contents; item; item = item->next_content)
 		{
 			if (obj_index[item->item_number].progtypes & COMMAND_PROG)
 			{
-				if (arg && *arg)
+				if (!arguments.isEmpty())
 				{
-					sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-					do_mpsettemp(ch, &buf[0], CMD_OTHER);
+					do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 				}
 
-				vmob = initiate_oproc(ch, item);
-				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
+				vmob = initiate_oproc(this, item);
+				if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
 					return mprog_cur_result;
@@ -5102,17 +5128,16 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 		}
 	}
 
-	for (item = ch->carrying; item; item = item->next_content)
+	for (item = carrying; item; item = item->next_content)
 	{
 		if (obj_index[item->item_number].progtypes & COMMAND_PROG)
 		{
-			if (arg && *arg)
+			if (!arguments.isEmpty())
 			{
-				sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-				do_mpsettemp(ch, &buf[0], CMD_OTHER);
+				do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 			}
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
+			vmob = initiate_oproc(this, item);
+			if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 			{
 				end_oproc(vmob);
 				return mprog_cur_result;
@@ -5123,18 +5148,17 @@ int oprog_command_trigger(const char *txt, Character *ch, char *arg)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 	{
-		if (ch->equipment[i])
+		if (equipment[i])
 		{
-			if (obj_index[ch->equipment[i]->item_number].progtypes & COMMAND_PROG)
+			if (obj_index[equipment[i]->item_number].progtypes & COMMAND_PROG)
 			{
-				if (arg && *arg)
+				if (!arguments.isEmpty())
 				{
-					sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-					do_mpsettemp(ch, &buf[0], CMD_OTHER);
+					do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 				}
 
-				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
+				vmob = initiate_oproc(this, equipment[i]);
+				if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
 					return mprog_cur_result;

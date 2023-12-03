@@ -4,6 +4,7 @@
 #define LEVELS_H_
 
 #include "structs.h"
+#include <QString>
 
 #define MORTAL 60
 /* #define GLADIATOR */
@@ -40,12 +41,5 @@ const uint64_t IMPLEMENTER = 110;
 #define MIN_GOD IMMORTAL
 
 #define PIRAHNA_FAKE_LVL 102
-
-struct bestowable_god_commands_type
-{
-  char *name;   // name of command
-  int16_t num;  // ID # of command
-  bool testcmd; // true = test command, false = normal command
-};
 
 #endif

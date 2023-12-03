@@ -542,7 +542,6 @@ void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
-int special(Character *ch, int cmd, char *arg);
 int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
 bool load_char_obj(class Connection *d, QString name);
@@ -621,7 +620,7 @@ int _parse_name(const char *arg, char *name);
 void mob_suprised_sayings(Character *ch, Character *aggressor);
 
 // MOBProgs prototypes
-int mprog_wordlist_check(const char *arg, Character *mob,
+int mprog_wordlist_check(QString arg, Character *mob,
                          Character *actor, Object *object,
                          void *vo, int type, bool reverse = false);
 void mprog_percent_check(Character *mob, Character *actor,
@@ -668,7 +667,8 @@ void make_prompt(class Connection *d, std::string &prompt);
 std::string remove_all_codes(std::string input);
 void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
-bool str_infix(const char *astr, const char *bstr);
+bool str_infix(QString astr, QString bstr);
+Character *initiate_oproc(Character *ch, Object *obj);
 
 extern const char menu[];
 

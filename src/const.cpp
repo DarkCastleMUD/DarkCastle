@@ -29,8 +29,6 @@ extern "C"
 #include "levels.h"
 #include "mobile.h"
 
-
-
 room_t IMM_PIRAHNA_ROOM = 25;
 
 std::map<int, int> fill_skill_cost()
@@ -3642,7 +3640,7 @@ const char *reserved[] = {
     "dawn reuse timer",
     "durendal resue timer"};
 
-bestowable_god_commands_type bestowable_god_commands[] =
+QList<bestowable_god_commands_type> DC::bestowable_god_commands =
     {
         {"impchan", COMMAND_IMP_CHAN, false},
         {"snoop", COMMAND_SNOOP, false},

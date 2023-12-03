@@ -5972,9 +5972,7 @@ void free_char(Character *ch, Trace trace)
 		for (temp = ch->tempVariable; temp; temp = tmp)
 		{
 			tmp = temp->next;
-			dc_free(temp->name);
-			dc_free(temp->data);
-			dc_free(temp);
+			delete temp;
 		}
 	}
 	SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off

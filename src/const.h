@@ -4,7 +4,6 @@
 #include "character.h"
 #include "DC.h"
 
-extern bestowable_god_commands_type bestowable_god_commands[];
 extern const char *dirs[];
 extern struct race_data races[];
 extern const char *spells[];

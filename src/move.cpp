@@ -995,7 +995,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 				strcpy(tempcommand, dirs[cmd]);
 				if (k->follower->fighting)
 					stop_fighting(k->follower);
-				command_interpreter(k->follower, tempcommand);
+				k->follower->command_interpreter(tempcommand);
 			}
 			else
 			{

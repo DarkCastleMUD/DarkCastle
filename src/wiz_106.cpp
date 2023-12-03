@@ -15,8 +15,6 @@
 
 #include <fmt/format.h>
 
-
-
 int do_plats(Character *ch, char *argument, int cmd)
 {
   Character *i;
@@ -65,7 +63,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
     return eFAILURE;
   }
 
-  if (!ch->has_skill( COMMAND_FORCE) && cmd != CMD_FORCE)
+  if (!ch->has_skill(COMMAND_FORCE) && cmd != CMD_FORCE)
   {
     ch->send("Huh?\r\n");
     return eFAILURE;
@@ -106,7 +104,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
         }
         buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
                           GET_NAME(vict), to_force);
-        command_interpreter(vict, to_force);
+        vict->command_interpreter(to_force.c_str());
         logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
       }
     }
@@ -134,7 +132,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
             buf = fmt::format("$n has forced you to '{}'.", to_force);
             act(buf, ch, 0, vict, TO_VICT, 0);
           }
-          command_interpreter(vict, to_force);
+          vict->command_interpreter(to_force.c_str());
         }
       }
     }
@@ -300,14 +298,14 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_special_t function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, command_special_t function, QString arguments = "", int cmd = CMD_DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
   {
     if (function)
     {
-      new_rc = function(ch, cmd, arguments);
+      new_rc = (*ch.*(function))(arguments, cmd);
     }
     ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
@@ -354,9 +352,9 @@ command_return_t test_casino(Character *ch)
   ch->setGold(0);
 
   // These are special code procedures that should be on the objects in this room
-  run_check(ch, &max_rc, special, "", CMD_BALANCE);
-  run_check(ch, &max_rc, special, "", CMD_WITHDRAW);
-  run_check(ch, &max_rc, special, "1000000", CMD_WITHDRAW);
+  run_check(ch, &max_rc, &Character::special, "", CMD_BALANCE);
+  run_check(ch, &max_rc, &Character::special, "", CMD_WITHDRAW);
+  run_check(ch, &max_rc, &Character::special, "1000000", CMD_WITHDRAW);
 
   run_check(ch, &max_rc, do_move, "", CMD_NORTH);
 
@@ -366,45 +364,45 @@ command_return_t test_casino(Character *ch)
   auto original_random = DC::getInstance()->random_;
   DC::getInstance()->random_ = QRandomGenerator(1);
 
-  run_check(ch, &max_rc, special, "", CMD_BET);
-  run_check(ch, &max_rc, special, "-1", CMD_BET);
-  run_check(ch, &max_rc, special, "0", CMD_BET);
-  run_check(ch, &max_rc, special, "1", CMD_BET);
-  run_check(ch, &max_rc, special, "1000001", CMD_BET);
-  run_check(ch, &max_rc, special, "100000111111111111111111111111111111111", CMD_BET);
-  run_check(ch, &max_rc, special, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", CMD_BET);
-  run_check(ch, &max_rc, special, "500", CMD_BET);
-  run_check(ch, &max_rc, special, "500", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "-1", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "0", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "1", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "1000001", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "100000111111111111111111111111111111111", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "500", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "500", CMD_BET);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, special, "", CMD_HIT);
+  run_check(ch, &max_rc, &Character::special, "", CMD_HIT);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, special, "", CMD_STAY);
+  run_check(ch, &max_rc, &Character::special, "", CMD_STAY);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
 
   check_timer();
   check_timer();

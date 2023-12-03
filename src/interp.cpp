@@ -55,13 +55,6 @@ int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-
-// globals to store last command that was done.
-// this is used for debugging.  We output it in case of a crash
-// to the log files.  (char name is so long, in case it was a mob)
-std::string last_processed_cmd = {};
-std::string last_char_name = {};
-int last_char_room = {};
 unsigned int cmd_size = 0;
 
 void update_wizlist(Character *ch);
@@ -400,7 +393,7 @@ struct command_info cmd_info[] =
         {"thunder", do_thunder, nullptr, nullptr, position_t::DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"wizlock", do_wizlock, nullptr, nullptr, position_t::DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"processes", do_processes, nullptr, nullptr, position_t::DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"bestow", nullptr, do_bestow, nullptr, position_t::DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"bestow", nullptr, nullptr, &Character::do_bestow, position_t::DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"oclone", do_oclone, nullptr, nullptr, position_t::DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mclone", do_mclone, nullptr, nullptr, position_t::DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"huntclear", do_huntclear, nullptr, nullptr, position_t::DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -563,7 +556,7 @@ struct command_info cmd_info[] =
         {"mpforce", do_mpforce, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mppeace", do_mppeace, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mpsetalign", do_mpsetalign, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"mpsettemp", do_mpsettemp, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"mpsettemp", nullptr, nullptr, &Character::do_mpsettemp, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mpxpreward", do_mpxpreward, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mpteachskill", do_mpteachskill, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mpdamage", do_mpdamage, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -628,7 +621,7 @@ void add_command_to_radix(struct command_info *cmd)
   // on whether whichway is positive or negative.
   for (curr = cmd_radix; curr; curr = next)
   {
-    if ((whichway = strcmp(cmd->command_name, curr->command->command_name)) < 0)
+    if ((whichway = cmd->command_name != curr->command->command_name) < 0)
       next = curr->left;
     else
       next = curr->right;
@@ -650,16 +643,20 @@ void add_command_to_radix(struct command_info *cmd)
     temp->right = curr;
 }
 
-int len_cmp(const char *s1, const char *s2)
+int len_cmp(QString s1, QString s2)
 {
-  for (; *s1 && *s1 != ' '; s1++, s2++)
-    if (*s1 != *s2)
-      return *s1 - *s2;
+  for (auto i1 = s1.begin(), i2 = s2.begin(); i1 != s1.end() && i2 != s2.end() && *i1 != ' '; i1++, i2++)
+  {
+    if (*i1 != *i2)
+    {
+      return i1->toLatin1() - i2->toLatin1();
+    }
+  }
 
   return 0;
 }
 
-struct command_info *find_cmd_in_radix(const char *arg)
+struct command_info *find_cmd_in_radix(QString arg)
 {
   struct cmd_hash_info *curr;
   struct cmd_hash_info *next;
@@ -694,7 +691,7 @@ int do_imotd(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int command_interpreter(Character *ch, std::string pcomm, bool procced)
+command_return_t Character::command_interpreter(QString pcomm, bool procced)
 {
   CommandStack cstack;
 
@@ -703,159 +700,150 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      if (ch != nullptr && pcomm.empty() == false && GET_NAME(ch) != nullptr)
-      {
-        logentry(QString("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(GET_NAME(ch)).arg(pcomm.c_str()), IMMORTAL, LogChannels::LOG_BUG);
-      }
-      else
-      {
-        logentry(QString("CommandStack::depth %1 exceeds CommandStack::max_depth %2").arg(cstack.getDepth()).arg(cstack.getMax()), IMMORTAL, LogChannels::LOG_BUG);
-      }
+      logentry(QString("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, LogChannels::LOG_BUG);
     }
     return eFAILURE;
   }
-
-  int look_at;
-  int retval;
-  struct command_info *found = 0;
+  int retval{};
+  struct command_info *found{};
   QString buf;
 
   // Handle logged players.
-  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_LOG))
+  if (isPlayer() && DC::isSet(player->punish, PUNISH_LOG))
   {
-    buf = QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str());
-    logentry(buf, 110, LogChannels::LOG_PLAYER, ch);
+    logentry(QString("Log %1: %2").arg(getName()).arg(pcomm), 110, LogChannels::LOG_PLAYER);
   }
 
   // Implement freeze command.
-  if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_FREEZE) && pcomm != "quit")
+  if (isPlayer() && DC::isSet(player->punish, PUNISH_FREEZE) && pcomm != "quit")
   {
-    send_to_char("You've been frozen by an immortal.\r\n", ch);
+    sendln("You've been frozen by an immortal.");
     return eSUCCESS;
   }
-  if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  if (IS_AFFECTED(this, AFF_PRIMAL_FURY))
   {
-    send_to_char("SOMEMESSAGE\r\n", ch);
+    sendln("Your primal fury prevents this.");
     return eSUCCESS;
   }
 
   // Berserk checks
-  if (DC::isSet(ch->combat, COMBAT_BERSERK))
+  if (DC::isSet(combat, COMBAT_BERSERK))
   {
-    if (ch->fighting)
+    if (fighting)
     {
-      send_to_char("You've gone BERSERK! Beat them down, Beat them!! Rrrrrraaaaaagghh!!\r\n", ch);
+      sendln("You've gone BERSERK! Beat them down, Beat them!! Rrrrrraaaaaagghh!!");
       return eSUCCESS;
     }
-    REMOVE_BIT(ch->combat, COMBAT_BERSERK);
-    act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
-    act("You settle down.", ch, 0, 0, TO_CHAR, 0);
-    GET_AC(ch) -= 30;
+    REMOVE_BIT(combat, COMBAT_BERSERK);
+    act("$n settles down.", this, 0, 0, TO_ROOM, 0);
+    act("You settle down.", this, 0, 0, TO_CHAR, 0);
+    GET_AC(this) -= 30;
   }
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-  if (ch == nullptr || ch->desc == nullptr || ch->desc->connected != Connection::states::EDITING)
+  if (desc == nullptr || desc->connected != Connection::states::EDITING)
   {
-    pcomm = ltrim(pcomm);
+    pcomm = pcomm.trimmed();
   }
 
   // MOBprogram commands weeded out
-  if (pcomm.size() >= 2 && tolower(pcomm[0]) == 'm' && tolower(pcomm[1]) == 'p')
+  if (desc && pcomm.startsWith("mp", Qt::CaseInsensitive))
   {
-    if (ch->desc)
-    {
-      send_to_char("Huh?\r\n", ch);
-      return eSUCCESS;
-    }
+    sendln("Huh?");
+    return eSUCCESS;
   }
 
-  for (look_at = 0; pcomm[look_at] > ' '; look_at++)
-    pcomm[look_at] = LOWER(pcomm[look_at]);
+  auto pcomm_list = pcomm.split(' ');
+  auto command = pcomm_list.value(0).toLower();
+  pcomm_list.pop_front();
+  auto command_arguments = pcomm_list.join(' ');
 
-  if (look_at == 0)
+  if (command.isEmpty())
+  {
     return eFAILURE;
+  }
 
   // if we got this far, we're going to play with the command, so put
   // it into the debugging globals
-  last_processed_cmd = pcomm;
-  last_char_name = GET_NAME(ch);
-  last_char_room = ch->in_room;
+  DC::getInstance()->last_processed_cmd = pcomm;
+  DC::getInstance()->last_char_name = getName();
+  DC::getInstance()->last_char_room = in_room;
 
-  if (!pcomm.empty())
+  if (!pcomm.isEmpty())
   {
-    retval = oprog_command_trigger(pcomm.c_str(), ch, &pcomm[look_at]);
+    retval = oprog_command_trigger(command, command_arguments);
     if (SOMEONE_DIED(retval) || DC::isSet(retval, eEXTRA_VALUE))
       return retval;
   }
 
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
-  if ((found = find_cmd_in_radix(pcomm.c_str())))
+  if ((found = find_cmd_in_radix(pcomm)))
   {
-    if (ch->getLevel() >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))
+    if (getLevel() >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))
     {
       if (found->minimum_level == GIFTED_COMMAND)
       {
 
-        // search bestowable_god_commands for the command skill number to lookup with has_skill
+        // search DC::bestowable_god_commands for the command skill number to lookup with has_skill
         int command_skill = 0;
-        for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+        for (int i = 0; DC::bestowable_god_commands[i].num != -1; i++)
         {
-          if (std::string(bestowable_god_commands[i].name) == std::string(found->command_name))
+          if (DC::bestowable_god_commands[i].name == found->command_name)
           {
-            command_skill = bestowable_god_commands[i].num;
+            command_skill = DC::bestowable_god_commands[i].num;
             break;
           }
         }
 
-        if (command_skill == 0 || IS_NPC(ch) || !ch->has_skill(command_skill))
+        if (command_skill == 0 || IS_NPC(this) || !this->has_skill(command_skill))
         {
-          send_to_char("Huh?\r\n", ch);
+          send_to_char("Huh?\r\n", this);
 
           if (command_skill == 0)
           {
-            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
+            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within DC::bestowable_god_commands", found->command_name);
           }
           return eFAILURE;
         }
       }
 
       // Paralysis stops everything but ...
-      if (IS_AFFECTED(ch, AFF_PARALYSIS) &&
+      if (IS_AFFECTED(this, AFF_PARALYSIS) &&
           found->command_number != CMD_GTELL && // gtell
           found->command_number != CMD_CTELL    // ctell
       )
       {
-        send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
+        send_to_char("You've been paralyzed and are unable to move.\r\n", this);
         return eSUCCESS;
       }
       // Character not in position for command?
-      if (GET_POS(ch) == position_t::FIGHTING && !ch->fighting)
-        ch->setStanding();
+      if (GET_POS(this) == position_t::FIGHTING && !this->fighting)
+        this->setStanding();
       ;
       // fix for thin air thing
-      if (GET_POS(ch) < found->minimum_position)
+      if (GET_POS(this) < found->minimum_position)
       {
-        switch (GET_POS(ch))
+        switch (GET_POS(this))
         {
         case position_t::DEAD:
-          send_to_char("Lie still; you are DEAD.\r\n", ch);
+          send_to_char("Lie still; you are DEAD.\r\n", this);
           break;
         case position_t::STUNNED:
-          send_to_char("You are too stunned to do that.\r\n", ch);
+          send_to_char("You are too stunned to do that.\r\n", this);
           break;
         case position_t::SLEEPING:
-          send_to_char("In your dreams, or what?\r\n", ch);
+          send_to_char("In your dreams, or what?\r\n", this);
           break;
         case position_t::RESTING:
-          send_to_char("Nah... You feel too relaxed...\r\n", ch);
+          send_to_char("Nah... You feel too relaxed...\r\n", this);
           break;
         case position_t::SITTING:
-          send_to_char("Maybe you should stand up first?\r\n", ch);
+          send_to_char("Maybe you should stand up first?\r\n", this);
           break;
         case position_t::FIGHTING:
-          send_to_char("No way!  You are still fighting!\r\n", ch);
+          send_to_char("No way!  You are still fighting!\r\n", this);
           break;
         }
         return eSUCCESS;
@@ -863,25 +851,25 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
 
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
-        if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !DC::isSet(found->flags, COM_CHARMIE_OK))
-          return do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
-      if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-          ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, COM_CHARMIE_OK))
+        if ((IS_AFFECTED(this, AFF_FAMILIAR) || IS_AFFECTED(this, AFF_CHARM)) && !DC::isSet(found->flags, COM_CHARMIE_OK))
+          return do_say(this, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
+      if (IS_NPC(this) && this->desc && this->desc->original &&
+          this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, COM_CHARMIE_OK))
       {
-        send_to_char("The spirit cannot perform that action.\r\n", ch);
+        send_to_char("The spirit cannot perform that action.\r\n", this);
         return eFAILURE;
       }
       /*
-      if (IS_AFFECTED(ch, AFF_HIDE)) {
+      if (IS_AFFECTED(this, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
-          REMBIT(ch->affected_by, AFF_HIDE);
+          REMBIT(this->affected_by, AFF_HIDE);
           sprintf(buf, "You emerge from your hidden position...\r\n");
-          act(buf, ch, 0, 0, TO_CHAR, 0);
+          act(buf, this, 0, 0, TO_CHAR, 0);
           }
-        if ((found->toggle_hide > 1) && (number(1, ch->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
-          REMBIT(ch->affected_by, AFF_HIDE);
+        if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
+          REMBIT(this->affected_by, AFF_HIDE);
           sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
-          act(buf, ch, 0, 0, TO_CHAR, 0);
+          act(buf, this, 0, 0, TO_CHAR, 0);
           }
         }
       */
@@ -889,55 +877,55 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
       // Last resort for debugging...if you know it's a mortal.
       // -Sadus
       char DEBUGbuf[MAX_STRING_LENGTH];
-      sprintf(DEBUGbuf, "%s: %s", GET_NAME(ch), pcomm);
+      sprintf(DEBUGbuf, "%s: %s", GET_NAME(this), pcomm);
       log (DEBUGbuf, 0, LogChannels::LOG_MISC);
       */
-      if (!can_use_command(ch, found->command_number))
+      if (!can_use_command(this, found->command_number))
       {
-        send_to_char("You are still recovering from your last attempt.\r\n", ch);
+        send_to_char("You are still recovering from your last attempt.\r\n", this);
         return eSUCCESS;
       }
 
-      if (IS_PC(ch))
+      if (IS_PC(this))
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (ch->getLevel() >= 100 || (ch->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(ch->player->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(this->player->punish, PUNISH_LOG) == false)
         {
-          logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
+          logentry(QString("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LogChannels::LOG_PLAYER, this);
         }
       }
 
       // We're going to execute, check for usable special proc.
-      retval = special(ch, found->command_number, &pcomm[look_at]);
+      retval = special(command_arguments, found->command_number);
       if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
         return retval;
 
       switch (found->type)
       {
       case CommandType::all:
-        if (ch == nullptr)
+        if (this == nullptr)
         {
           return eFAILURE;
         }
         break;
 
       case CommandType::players_only:
-        if (ch == nullptr || ch->player == nullptr)
+        if (this == nullptr || this->player == nullptr)
         {
           return eFAILURE;
         }
         break;
 
       case CommandType::non_players_only:
-        if (ch == nullptr || ch->mobdata == nullptr)
+        if (this == nullptr || this->mobdata == nullptr)
         {
           return eFAILURE;
         }
         break;
 
       case CommandType::immortals_only:
-        if (ch == nullptr || ch->player == nullptr || ch->getLevel() < IMMORTAL)
+        if (this == nullptr || this->player == nullptr || this->getLevel() < IMMORTAL)
         {
           return eFAILURE;
         }
@@ -945,14 +933,14 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
         break;
 
       case CommandType::implementors_only:
-        if (ch == nullptr || ch->player == nullptr || ch->getLevel() < IMP_ONLY)
+        if (this == nullptr || this->player == nullptr || this->getLevel() < IMP_ONLY)
         {
           return eFAILURE;
         }
         break;
 
       default:
-        if (ch == nullptr)
+        if (this == nullptr)
         {
           return eFAILURE;
         }
@@ -962,15 +950,17 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
       // Normal dispatch
       if (found->command_pointer)
       {
-        retval = (*(found->command_pointer))(ch, &pcomm[look_at], found->command_number);
+        auto c = strdup(command_arguments.toStdString().c_str());
+        retval = (*(found->command_pointer))(this, c, found->command_number);
+        free(c);
       }
       else if (found->command_pointer2)
       {
-        retval = (*(found->command_pointer2))(ch, &pcomm[look_at], found->command_number);
+        retval = (*(found->command_pointer2))(this, command_arguments.toStdString(), found->command_number);
       }
       else if (found->command_pointer3)
       {
-        QString command = QString(&pcomm[look_at]).trimmed();
+        QString command = command_arguments.trimmed();
         QStringList arguments;
 
         // This code splits command by spaces and doublequotes
@@ -996,13 +986,13 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
 
         arguments.append(command.split(' ', Qt::SkipEmptyParts));
 
-        retval = (*ch.*(found->command_pointer3))(arguments, found->command_number);
+        retval = (*this.*(found->command_pointer3))(arguments, found->command_number);
       }
 
       // Next bit for the DUI client, they needed it.
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
-        ch->send(fmt::format("{}{}", BOLD, NTEXT));
+        this->send(fmt::format("{}{}", BOLD, NTEXT));
       }
       // This call is here to prevent gcc from tail-chaining the
       // previous call, which screws up the debugger call stack.
@@ -1014,22 +1004,22 @@ int command_interpreter(Character *ch, std::string pcomm, bool procced)
   } // end if((found = find_cmd_in_radix(pcomm)))
 
   // If we're at this point, Paralyze stops everything so get out.
-  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+  if (IS_AFFECTED(this, AFF_PARALYSIS))
   {
-    send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
+    send_to_char("You've been paralyzed and are unable to move.\r\n", this);
     return eSUCCESS;
   }
   // Check social table
-  if ((retval = ch->check_social(pcomm.c_str(), look_at)))
+  if ((retval = this->check_social(command)))
   {
     if (SOCIAL_true_WITH_NOISE == retval)
-      return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
+      return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
     else
       return eSUCCESS;
   }
 
   // Unknown command (or char too low level)
-  send_to_char("Huh?\r\n", ch);
+  send_to_char("Huh?\r\n", this);
   return eSUCCESS;
 }
 
@@ -1622,7 +1612,7 @@ void chop_half(char *str, char *arg1, char *arg2)
   arg2[i] = '\0';
 }
 
-int special(Character *ch, int cmd, char *arg)
+command_return_t Character::special(QString arguments, int cmd)
 {
   class Object *i;
   Character *k;
@@ -1630,47 +1620,47 @@ int special(Character *ch, int cmd, char *arg)
   int retval;
 
   /* special in room? */
-  if (DC::getInstance()->world[ch->in_room].funct)
+  if (DC::getInstance()->world[in_room].funct)
   {
-    if ((retval = (*DC::getInstance()->world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
+    if ((retval = (*DC::getInstance()->world[in_room].funct)(this, cmd, arguments.toStdString().c_str())) != eFAILURE)
       return retval;
   }
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (ch->equipment[j] && ch->equipment[j]->item_number >= 0)
-      if (obj_index[ch->equipment[j]->item_number].non_combat_func)
+    if (equipment[j] && this->equipment[j]->item_number >= 0)
+      if (obj_index[this->equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*obj_index[ch->equipment[j]->item_number].non_combat_func)(ch, ch->equipment[j], cmd, arg, ch));
+        retval = ((*obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
         if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
 
   /* special in inventory? */
-  for (i = ch->carrying; i; i = i->next_content)
+  for (i = carrying; i; i = i->next_content)
     if (i->item_number >= 0)
       if (obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
+        retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
 
   /* special in mobile present? */
-  for (k = DC::getInstance()->world[ch->in_room].people; k; k = k->next_in_room)
+  for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
   {
     if (IS_MOB(k))
     {
       if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
-        retval = clan_guard(ch, 0, cmd, arg, k);
+        retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
         if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
       else if (mob_index[k->mobdata->nr].non_combat_func)
       {
-        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
-                                                               cmd, arg, k));
+        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(this, 0,
+                                                               cmd, arguments.toStdString().c_str(), k));
         if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1678,11 +1668,11 @@ int special(Character *ch, int cmd, char *arg)
   }
 
   /* special in object present? */
-  for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
+  for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
       if (obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
+        retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
           return retval;
       }

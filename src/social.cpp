@@ -29,7 +29,7 @@ int32_t social_array_size;          // size of actual array (since we allocate i
 
 struct social_messg *find_social(QString arg);
 
-command_return_t Character::check_social(QString pcomm, int length)
+command_return_t Character::check_social(QString pcomm)
 {
   QString arg = {}, buf = {};
   struct social_messg *action = {};

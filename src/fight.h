@@ -91,7 +91,6 @@ Character *get_highest_level_killer(Character *leader, Character *killer);
 int32_t count_xp_eligibles(Character *leader, Character *killer, int32_t highest_level, int32_t *total_levels);
 int64_t scale_char_xp(Character *ch, Character *killer, Character *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
 void remove_active_potato(Character *vict);
-int check_pursuit(Character *ch, Character *victim, char *dircommand);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead

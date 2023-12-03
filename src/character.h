@@ -115,8 +115,8 @@ typedef std::map<skill_t, struct char_skill_data> skill_list_t;
 struct tempvariable
 {
     struct tempvariable *next;
-    char *name;
-    char *data;
+    QString name;
+    QString data;
     int16_t save; // save or not
 };
 
@@ -456,9 +456,16 @@ public:
 
     class Connection *desc = nullptr; // nullptr normally for mobs
 
-    const char *getNameC(void) const { return name_.toStdString().c_str(); }
-    QString getName(void) { return name_; }
-    void setName(QString new_name) { name_ = new_name; }
+    inline const char *getNameC(void) const;
+
+    inline QString getName(void)
+    {
+        return name_;
+    }
+    void setName(QString new_name)
+    {
+        name_ = new_name;
+    }
 
     char *short_desc = nullptr;  // Action 'X hits you.'
     char *long_desc = nullptr;   // For 'look room'
@@ -468,18 +475,42 @@ public:
     sex_t sex = {};
 
     int8_t c_class = {};
-    auto getClass(void) const { return c_class; }
-    void setClass(auto new_class) { c_class = new_class; }
-    QString class_to_string(class_t class_nr) const { return Character::class_names.value(class_nr); }
-    QString getClassName(void) const { return class_to_string(c_class); }
+    auto getClass(void) const
+    {
+        return c_class;
+    }
+    void setClass(auto new_class)
+    {
+        c_class = new_class;
+    }
+    QString class_to_string(class_t class_nr) const
+    {
+        return Character::class_names.value(class_nr);
+    }
+    QString getClassName(void) const
+    {
+        return class_to_string(c_class);
+    }
 
     int8_t race = {};
-    auto getRace(void) const { return race; }
-    void setRace(auto new_race) { race = new_race; }
-    QString getRaceName(void) const { return race_names.value(race); }
+    auto getRace(void) const
+    {
+        return race;
+    }
+    void setRace(auto new_race)
+    {
+        race = new_race;
+    }
+    QString getRaceName(void) const
+    {
+        return race_names.value(race);
+    }
 
     level_t getLevel(void) const;
-    level_t *getLevelPtr(void) { return &level_; }
+    level_t *getLevelPtr(void)
+    {
+        return &level_;
+    }
     void setLevel(level_t level);
     void incrementLevel(level_t level_change = 1)
     {
@@ -500,30 +531,81 @@ public:
         }
     }
 
-    bool isDead(void) const { return position_ == position_t::DEAD; }
-    void setDead(void) { position_ = position_t::DEAD; }
+    bool isDead(void) const
+    {
+        return position_ == position_t::DEAD;
+    }
+    void setDead(void)
+    {
+        position_ = position_t::DEAD;
+    }
 
-    bool isStunned(void) const { return position_ == position_t::STUNNED; }
-    void setStunned(void) { position_ = position_t::STUNNED; }
+    bool isStunned(void) const
+    {
+        return position_ == position_t::STUNNED;
+    }
+    void setStunned(void)
+    {
+        position_ = position_t::STUNNED;
+    }
 
-    bool isSleeping(void) const { return position_ == position_t::SLEEPING; }
-    void setSleeping(void) { position_ = position_t::SLEEPING; }
+    bool isSleeping(void) const
+    {
+        return position_ == position_t::SLEEPING;
+    }
+    void setSleeping(void)
+    {
+        position_ = position_t::SLEEPING;
+    }
 
-    bool isResting(void) const { return position_ == position_t::RESTING; }
-    void setResting(void) { position_ = position_t::RESTING; }
+    bool isResting(void) const
+    {
+        return position_ == position_t::RESTING;
+    }
+    void setResting(void)
+    {
+        position_ = position_t::RESTING;
+    }
 
-    bool isSitting(void) const { return position_ == position_t::SITTING; }
-    void setSitting(void) { position_ = position_t::SITTING; }
+    bool isSitting(void) const
+    {
+        return position_ == position_t::SITTING;
+    }
+    void setSitting(void)
+    {
+        position_ = position_t::SITTING;
+    }
 
-    bool isFighting(void) const { return position_ == position_t::FIGHTING; }
-    void setFighting(void) { position_ = position_t::FIGHTING; }
+    bool isFighting(void) const
+    {
+        return position_ == position_t::FIGHTING;
+    }
+    void setFighting(void)
+    {
+        position_ = position_t::FIGHTING;
+    }
 
-    bool isStanding(void) const { return position_ == position_t::STANDING; }
-    void setStanding(void) { position_ = position_t::STANDING; }
+    bool isStanding(void) const
+    {
+        return position_ == position_t::STANDING;
+    }
+    void setStanding(void)
+    {
+        position_ = position_t::STANDING;
+    }
 
-    void setPosition(position_t position) { position_ = position; }
-    position_t getPosition(void) { return position_; }
-    position_t *getPositionPtr(void) { return &position_; }
+    void setPosition(position_t position)
+    {
+        position_ = position;
+    }
+    position_t getPosition(void)
+    {
+        return position_;
+    }
+    position_t *getPositionPtr(void)
+    {
+        return &position_;
+    }
 
     int8_t str = {};
     int8_t raw_str = {};
@@ -565,9 +647,18 @@ public:
     int32_t raw_hit = {}; /* before con bonus                        */
 
     move_t move_limit(void);
-    move_t getMove(void) { return move_; }
-    move_t *getMovePtr(void) { return &move_; }
-    void setMove(move_t new_move) { move_ = new_move; }
+    move_t getMove(void)
+    {
+        return move_;
+    }
+    move_t *getMovePtr(void)
+    {
+        return &move_;
+    }
+    void setMove(move_t new_move)
+    {
+        move_ = new_move;
+    }
     bool incrementMove(move_t move_change = 1)
     {
         if (move_ <= INT64_MAX - move_change)
@@ -695,8 +786,14 @@ public:
 #endif
     int spec = {};
 
-    bool getDebug(void) const { return debug_; }
-    void setDebug(bool state) { debug_ = state; }
+    bool getDebug(void) const
+    {
+        return debug_;
+    }
+    void setDebug(bool state)
+    {
+        debug_ = state;
+    }
 
     struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
     time_t first_damage = {};
@@ -759,10 +856,19 @@ public:
     command_return_t do_hit(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_ambush(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_botcheck(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_mpsettemp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_bestow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t check_pursuit(Character *victim, QString dircommand);
     command_return_t save(int cmd = CMD_DEFAULT);
     command_return_t wake(Character *victim = nullptr);
-    command_return_t check_social(QString pcomm, int length);
+    command_return_t check_social(QString pcomm);
+    command_return_t command_interpreter(QString argument, bool procced = 0);
+    command_return_t oprog_command_trigger(QString command, QString arguments);
+    command_return_t special(QString arg, int cmd = CMD_DEFAULT);
+    bool mprog_seval(QString lhs, QString opr, QString rhs);
+    QString getTemp(QString name);
     bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
+
     QString get_random_hate(void);
     Character *getVisiblePlayer(QString name);
     Character *getVisibleCharacter(QString name);
@@ -780,7 +886,10 @@ public:
     void send(const char *buffer);
     void send(std::string buffer);
     void send(QString buffer);
-    void sendln(QString buffer = "") { send(buffer + "\r\n"); }
+    void sendln(QString buffer = "")
+    {
+        send(buffer + "\r\n");
+    }
     command_return_t tell(Character *, QString);
     void sendRaw(std::string);
     std::vector<Character *> getFollowers(void);

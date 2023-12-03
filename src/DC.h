@@ -88,6 +88,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <map>
+#include <expected>
 
 #include <QSharedPointer>
 #include <QCoreApplication>
@@ -139,10 +140,24 @@ typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
 
+enum class search_error
+{
+  invalid_input,
+  not_found
+};
+
 class World
 {
 public:
   Room &operator[](room_t room_key);
+};
+
+class bestowable_god_commands_type
+{
+public:
+  QString name{}; // name of command
+  int16_t num{};  // ID # of command
+  bool testcmd{}; // true = test command, false = normal command
 };
 
 class DC_EXPORT DC : public QCoreApplication
@@ -185,6 +200,7 @@ public:
   static const QString HINTS_FILE_NAME;
   static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
+  static QList<bestowable_god_commands_type> bestowable_god_commands;
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
@@ -254,6 +270,10 @@ public:
   QMap<uint64_t, Shop> shop_index;
   CVoteData DCVote;
 
+  QString last_processed_cmd = {};
+  QString last_char_name = {};
+  room_t last_char_room = {};
+
 private:
   static const QString build_version_;
   static const QString build_time_;
@@ -304,6 +324,8 @@ typedef int command_return_t;
 typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
 typedef command_return_t (*command_gen2_t)(Character *ch, std::string argument, int cmd);
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
-typedef int (*command_special_t)(Character *ch, int cmd, char *arg);
+typedef command_return_t (Character::*command_special_t)(QString arguments, int cmd);
+
+auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
 
 #endif

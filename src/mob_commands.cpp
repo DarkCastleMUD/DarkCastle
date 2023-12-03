@@ -841,7 +841,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
   original = ch->in_room;
   char_from_room(ch, false); // Don't stop all fighting
   char_to_room(ch, location);
-  result = command_interpreter(ch, argument);
+  result = ch->command_interpreter(QString(argument));
 
   if (DC::isSet(result, eCH_DIED))
     return result;
@@ -1016,7 +1016,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 
       if (vch->getLevel() < IMMORTAL && CAN_SEE(ch, vch))
       {
-        command_interpreter(vch, argument);
+        vch->command_interpreter(QString(argument));
       }
     }
   }
@@ -1039,7 +1039,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
     if (CAN_SEE(ch, victim))
     {
       if (victim->getLevel() < IMMORTAL)
-        command_interpreter(victim, argument);
+        victim->command_interpreter(QString(argument));
       else
       {
         prog_error(ch, "Tried to MOBProg force %s to '%s'.",
@@ -1222,57 +1222,54 @@ int determine_attack_type(char *attacktype)
   return 0;
 }
 
-char *getTemp(Character *ch, char *name)
+QString Character::getTemp(QString name)
 {
   struct tempvariable *eh;
-  for (eh = ch->tempVariable; eh; eh = eh->next)
-    if (!str_cmp(eh->name, name))
+  for (eh = tempVariable; eh; eh = eh->next)
+    if (eh->name == name)
       return eh->data;
   return nullptr;
 }
 
-int do_mpsettemp(Character *ch, char *argument, int cmd)
+command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  char temp[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  char arg3[MAX_INPUT_LENGTH];
   Character *victim;
-  if (IS_PC(ch) && cmd != CMD_OTHER)
+  if (IS_PC(this) && cmd != CMD_OTHER)
   {
-    send_to_char("Huh?\r\n", ch);
+    send_to_char("Huh?\r\n", this);
     return eFAILURE;
   }
-  argument = one_argument(argument, arg);
-  argument = one_argument(argument, temp);
-  argument = one_argument(argument, arg2);
-  argument = one_argument(argument, arg3);
+
+  QString arg = arguments.value(0);
+  QString temp = arguments.value(1);
+  QString arg2 = arguments.value(2);
+  QString arg3 = arguments.value(3);
   if (arg[0] == '\0' || temp[0] == '\0' || arg2[0] == '\0')
   {
-    if (IS_NPC(ch))
+    if (IS_NPC(this))
     {
-      int num = mob_index[ch->mobdata->nr].virt;
-      sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
-      logf(104, LogChannels::LOG_BUG, arg);
+      int num = mob_index[this->mobdata->nr].virt;
+
+      logentry(QString("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
     return eFAILURE;
   }
-  victim = get_char_room(arg, ch->in_room);
+  victim = get_char_room(arg, this->in_room);
   int type = 0;
   if (!victim)
   {
-    if (!str_cmp(arg, "allpc"))
+    if (arg == "allpc")
       type = 1;
-    else if (!str_cmp(arg, "allmob"))
+    else if (arg == "allmob")
       type = 2;
-    else if (!str_cmp(arg, "all"))
+    else if (arg == "all")
       type = 3;
   }
 
   if (!victim && type == 0)
     return eFAILURE;
   if (!victim)
-    victim = DC::getInstance()->world[ch->in_room].people;
+    victim = DC::getInstance()->world[this->in_room].people;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1284,29 +1281,22 @@ int do_mpsettemp(Character *ch, char *argument, int cmd)
     struct tempvariable *eh;
     for (eh = victim->tempVariable; eh; eh = eh->next)
     {
-      if (!str_cmp(eh->name, temp))
+      if (eh->name == temp)
         break;
     }
     if (eh)
     {
-      dc_free(eh->data);
-      eh->data = str_dup(arg2);
+      eh->data = arg2;
     }
     else
     {
-#ifdef LEAK_CHECK
-      eh = (struct tempvariable *)
-          calloc(1, sizeof(struct tempvariable));
-#else
-      eh = (struct tempvariable *)
-          dc_alloc(1, sizeof(struct tempvariable));
-#endif
+      eh = new tempvariable;
 
-      eh->data = str_dup(arg2);
-      eh->name = str_dup(temp);
+      eh->data = arg2;
+      eh->name = temp;
       eh->next = victim->tempVariable;
       victim->tempVariable = eh;
-      if (arg3[0] != '\0' && !str_cmp(arg3, "save"))
+      if (arg3 == "save")
         eh->save = 1;
       else
         eh->save = 0;

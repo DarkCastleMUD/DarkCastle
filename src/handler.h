@@ -23,8 +23,6 @@
 #include "comm.h"
 #include "Trace.h"
 
-
-
 /* handling the affected-structures */
 void affect_total(Character *ch);
 void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
@@ -79,7 +77,9 @@ void extract_obj(class Object *obj);
 
 /* ******* characters ********* */
 
-Character *get_char_room(char *name, int room, bool careful = false);
+Character *get_char_room(QString name, room_t room, bool careful = false);
+Character *get_char_room(const char *name, room_t room, bool careful = false);
+
 Character *get_char_num(int nr);
 Character *get_char(QString name);
 Character *get_mob(char *name);

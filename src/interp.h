@@ -24,7 +24,6 @@
 class Character;
 
 char *remove_trailing_spaces(char *arg);
-int command_interpreter(Character *ch, std::string argument, bool procced = 0);
 int search_block(const char *arg, const char **l, bool exact);
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
@@ -157,12 +156,12 @@ typedef int command_return_t;
 
 struct command_info
 {
-    char *command_name;                                                                 /* Name of ths command             */
+    QString command_name;                                                               /* Name of ths command             */
     int (*command_pointer)(Character *ch, char *argument, int cmd);                     /* Function that does it            */
     command_return_t (*command_pointer2)(Character *ch, std::string argument, int cmd); /* Function that does it            */
     command_return_t (Character::*command_pointer3)(QStringList arguments, int cmd);    /* Function that does it            */
     position_t minimum_position;                                                        /* Position commander must be in    */
-    uint8_t minimum_level;                                                              /* Minimum level needed             */
+    level_t minimum_level;                                                              /* Minimum level needed             */
     int command_number;                                                                 /* Passed to function as argument   */
     int flags;                                                                          // what flags the skills has
     uint8_t toggle_hide;
@@ -397,7 +396,6 @@ command_return_t do_mppeace(Character *ch, char *argument, int cmd);
 command_return_t do_mppurge(Character *ch, char *argument, int cmd);
 command_return_t do_mpteachskill(Character *ch, char *argument, int cmd);
 command_return_t do_mpsetalign(Character *ch, char *argument, int cmd);
-command_return_t do_mpsettemp(Character *ch, char *argument, int cmd);
 command_return_t do_mpthrow(Character *ch, char *argument, int cmd);
 command_return_t do_mpothrow(Character *ch, char *argument, int cmd);
 command_return_t do_mptransfer(Character *ch, char *argument, int cmd);

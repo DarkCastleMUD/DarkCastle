@@ -517,7 +517,7 @@ void check_maxes(Character *ch);
 #define COMMAND_REMORT 648
 #define COMMAND_TESTHIT 649
 #define COMMAND_TESTUSER 650
-// make sure up you update bestowable_god_commands_type bestowable_god_commands[]
+// make sure up you update bestowable_god_commands_type DC::bestowable_god_commands[]
 // if you modify this command list any
 
 #define SKILL_TRADE_BASE 700

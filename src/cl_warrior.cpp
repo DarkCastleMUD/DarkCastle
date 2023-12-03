@@ -29,8 +29,6 @@
 #include "const.h"
 #include "move.h"
 
-
-
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
@@ -347,7 +345,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
     send_to_char("You try to beat a hasty retreat....\r\n", ch);
 
     // check for any spec procs
-    retval = special(ch, attempt + 1, "");
+    retval = ch->special("", attempt + 1);
     if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
       return retval;
 

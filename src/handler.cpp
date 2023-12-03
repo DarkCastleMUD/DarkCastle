@@ -2825,9 +2825,8 @@ class Object *get_obj_num(int nr)
 
 	return (0);
 }
-
 /* search a room for a char, and return a pointer if found..  */
-Character *get_char_room(char *name, int room, bool careful)
+Character *get_char_room(const char *name, room_t room, bool careful)
 {
 	Character *i;
 	Character *partial_match;
@@ -2873,6 +2872,18 @@ Character *get_char_room(char *name, int room, bool careful)
 	}
 
 	return (partial_match);
+}
+
+Character *get_char_room(QString name, room_t room, bool careful)
+{
+	auto nameC = strdup(name.toStdString().c_str());
+	if (!nameC)
+	{
+		return nullptr;
+	}
+	auto ch = get_char_room(nameC, room, careful);
+	free(nameC);
+	return ch;
 }
 
 /* search all over the world for a char, and return a pointer if found */

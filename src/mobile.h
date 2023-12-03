@@ -23,8 +23,6 @@ char *mprog_next_command(char *clist);
 
 bool charExists(Character *ch);
 
-char *getTemp(Character *ch, char *name);
-
 #define BASE_STAT 0
 
 // #define NOTHING      0

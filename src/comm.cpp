@@ -97,8 +97,6 @@ extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
 
-extern std::string last_char_name;
-extern std::string last_processed_cmd;
 extern struct index_data *obj_index;
 
 void check_champion_and_website_who_list(void);
@@ -848,11 +846,11 @@ void DC::game_loop(void)
         // ->snooping before you check snooping->char:P
         if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
         {
-          command_interpreter(d->snooping->character, comm.substr(1));
+          d->snooping->character->command_interpreter(comm.substr(1).c_str());
         }
         else
         {
-          command_interpreter(d->character, comm); /* send it to interpreter */
+          d->character->command_interpreter(comm.c_str()); /* send it to interpreter */
         }
         PerfTimers["command"].stop();
 
@@ -2895,13 +2893,7 @@ void checkpointing(int sig)
 
 void report_debug_logging()
 {
-  extern int last_char_room;
-
-  logentry("Last cmd:", ANGEL, LogChannels::LOG_BUG);
-  logentry(QString::fromStdString(last_processed_cmd), ANGEL, LogChannels::LOG_BUG);
-  logentry("Owner's Name:", ANGEL, LogChannels::LOG_BUG);
-  logentry(QString::fromStdString(last_char_name), ANGEL, LogChannels::LOG_BUG);
-  logf(ANGEL, LogChannels::LOG_BUG, "Last room: %d", last_char_room);
+  logentry(QString("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, LogChannels::LOG_BUG);
 }
 
 void crash_hotboot()

@@ -7577,12 +7577,11 @@ int do_flee(Character *ch, char *argument, int cmd)
         ch->setStanding();
         ;
 
-        char tempcommand[32] = {0};
+        QString tempcommand = dirs[attempt];
 
-        strncpy(tempcommand, dirs[attempt], 31);
         // we do this so that any spec procs overriding movement can take effect
         SET_BIT(ch->combat, COMBAT_FLEEING);
-        retval = command_interpreter(ch, tempcommand);
+        retval = ch->command_interpreter(tempcommand);
         // so that a player doesn't keep the flag afte rdying
         if (IS_PC(ch))
           REMOVE_BIT(ch->combat, COMBAT_FLEEING);
@@ -7597,7 +7596,7 @@ int do_flee(Character *ch, char *argument, int cmd)
           // Since the move stops the fight between ch and ch->fighting we have to check_pursuit
           // against it separate than the combat_list loop
           if (cmd == CMD_FLEE)
-            check_pursuit(last_fighting, ch, tempcommand);
+            last_fighting->check_pursuit(ch, tempcommand);
 
           // They got away.  Stop fighting for everyone not in the new room from fighting
           for (chTemp = combat_list; chTemp; chTemp = loop_ch)
@@ -7607,7 +7606,7 @@ int do_flee(Character *ch, char *argument, int cmd)
             {
               stop_fighting(chTemp);
               if (cmd == CMD_FLEE)
-                check_pursuit(chTemp, ch, tempcommand);
+                chTemp->check_pursuit(ch, tempcommand);
             }
           } // for
 
@@ -7631,38 +7630,38 @@ int do_flee(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int check_pursuit(Character *ch, Character *victim, char *dircommand)
+command_return_t Character::check_pursuit(Character *victim, QString dircommand)
 {
   // Handle pursuit skill
-  if (ch == 0 || victim == 0 || IS_NPC(ch) || !affected_by_spell(ch, SKILL_PURSUIT))
+  if (victim == 0 || IS_NPC(this) || !affected_by_spell(SKILL_PURSUIT))
     return eFAILURE;
 
-  int pursuit = ch->has_skill(SKILL_PURSUIT);
+  int pursuit = this->has_skill(SKILL_PURSUIT);
   if (number(1, 100) > pursuit)
   {
     // failure
-    act("$N fled quickly before you were able to pursue $m!", ch, 0, victim, TO_CHAR, 0);
-    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
+    act("$N fled quickly before you were able to pursue $m!", this, 0, victim, TO_CHAR, 0);
+    WAIT_STATE(this, DC::PULSE_VIOLENCE);
   }
   else
   {
     // succeeded
     stop_fighting(victim);
-    if (!charge_moves(ch, SKILL_PURSUIT))
+    if (!charge_moves(SKILL_PURSUIT))
       return eFAILURE;
 
-    act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", ch, 0, victim, TO_CHAR, 0);
-    act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", ch, 0, victim, TO_ROOM, NOTVICT);
+    act("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, TO_CHAR, 0);
+    act("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, TO_ROOM, NOTVICT);
 
-    int retval = command_interpreter(ch, dircommand);
+    int retval = this->command_interpreter(dircommand);
     if (DC::isSet(retval, eCH_DIED))
       return eSUCCESS;
 
-    act("Spotting $N nearby, you rush in towards $m and furiously attack!", ch, 0, victim, TO_CHAR, 0);
-    act("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", ch, 0, victim, TO_VICT, 0);
-    act("$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", ch, 0, victim, TO_ROOM, NOTVICT);
-    attack(ch, victim, TYPE_UNDEFINED);
-    WAIT_STATE(ch, DC::PULSE_VIOLENCE);
+    act("Spotting $N nearby, you rush in towards $m and furiously attack!", this, 0, victim, TO_CHAR, 0);
+    act("$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", this, 0, victim, TO_VICT, 0);
+    act("$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", this, 0, victim, TO_ROOM, NOTVICT);
+    attack(this, victim, TYPE_UNDEFINED);
+    WAIT_STATE(this, DC::PULSE_VIOLENCE);
   }
 
   return eSUCCESS;

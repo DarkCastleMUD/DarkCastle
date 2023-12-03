@@ -302,7 +302,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 	if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && ch->getLevel() < IMMORTAL)
 	{
-		ch->check_social("sing", 0); // do the social:)
+		ch->check_social("sing");
 		return eSUCCESS;
 	}
 
@@ -3196,7 +3196,7 @@ void make_person_dance(Character *ch)
 
 	strcpy(dothis, dances[number(0, numdances)]);
 
-	command_interpreter(ch, dothis);
+	ch->command_interpreter(dothis);
 }
 
 int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)

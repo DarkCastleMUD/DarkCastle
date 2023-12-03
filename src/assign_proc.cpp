@@ -18,10 +18,8 @@
 #include "player.h"
 #include "utility.h"
 
-typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument,
-                     Character *owner);
-typedef int ROOM_PROC(Character *ch, int cmd, char *arg);
-
+typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
+typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -41,7 +39,7 @@ void DC::assign_mobiles(void)
 {
   assign_non_combat_procs();
   assign_combat_procs();
-  
+
   boot_the_shops();
   logf(IMMORTAL, LogChannels::LOG_WORLD, "Booting player shops.");
   boot_player_shops();

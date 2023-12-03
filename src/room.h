@@ -155,7 +155,7 @@ public:
     uint32_t temp_room_flags = {};                  // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light = {};                             // Light factor of room
 
-    int (*funct)(Character *, int, char *) = {}; // special procedure
+    int (*funct)(Character *, int, const char *) = {}; // special procedure
 
     class Object *contents = {}; // List of items in room
     Character *people = nullptr; // List of NPC / PC in room

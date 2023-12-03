@@ -1,26 +1,11 @@
-execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE BUILD_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${BUILD_VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${BUILD_VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-([0-9]+).*" "\\1" VERSION_PATCH "${BUILD_VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-[0-9]+\\-g(.*)" "\\1" VERSION_SHA1 "${BUILD_VERSION}")
-message("${BUILD_VERSION}")
-message("Build timestamp: ${BUILD_TIME}")
-message("Major: ${VERSION_MAJOR}")
-message("Minor: ${VERSION_MINOR}")
-message("Patch: ${VERSION_PATCH}")
-message("SHA1: ${VERSION_SHA1}")
-
 cmake_minimum_required(VERSION 3.14)
-project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -w")
-#set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
+#set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Og")
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -O3 -fsanitize=address")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${BUILD_VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR RPM)
 set(CPACK_THREADS 0)
@@ -29,9 +14,24 @@ set(CPACK_STRIP_FILES FALSE)
 set(CPACK_RPM_INSTALL_WITH_EXEC ON)
 set(CPACK_RPM_PACKAGE_RELOCATABLE ON)
 set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
-set(CPACK_RPM_PACKAGE_REQUIRES qt6-sql-postgresql)
+set(CPACK_RPM_PACKAGE_REQUIRES qt6-sql-postgresql qt6-sql-sqlite)
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/bin/qt.conf)
+execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE BUILD_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${BUILD_VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${BUILD_VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-([0-9]+).*" "\\1" VERSION_PATCH "${BUILD_VERSION}")
+string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\-[0-9]+\\-g(.*)" "\\1" VERSION_SHA1 "${BUILD_VERSION}")
+message("${CMAKE_BUILD_TYPE}")
+message("${CMAKE_GENERATOR}")
+message("${BUILD_VERSION}")
+message("Build timestamp: ${BUILD_TIME}")
+message("Major: ${VERSION_MAJOR}")
+message("Minor: ${VERSION_MINOR}")
+message("Patch: ${VERSION_PATCH}")
+message("SHA1: ${VERSION_SHA1}")
 
+project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
@@ -198,14 +198,25 @@ add_library(DC SHARED
     wizard.h
     Zone.h
 )
+
+target_compile_definitions(DC PRIVATE
+  $<$<CONFIG:Debug>:testttt>
+)
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt_add_executable(dcastle dcastle.cpp)
+target_compile_definitions(dcastle PRIVATE
+  $<$<CONFIG:Debug>:DEBUG_BUILD>
+)
 target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
 
 qt_add_executable(debug debug.cpp)
+target_compile_definitions(debug PRIVATE
+  $<$<CONFIG:Debug>:DEBUG_BUILD>
+)
 target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
+
 
 install (TARGETS dcastle debug
 BUNDLE DESTINATION .
