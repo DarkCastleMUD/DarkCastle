@@ -456,7 +456,7 @@ public:
 
     class Connection *desc = nullptr; // nullptr normally for mobs
 
-    inline const char *getNameC(void) const;
+    const char *getNameC(void) const;
 
     inline QString getName(void)
     {
@@ -677,7 +677,7 @@ public:
             return false;
         }
     }
-    bool decrementMove(move_t move_change = 1, QString message = "You're too out of breath!")
+    bool decrementMove(move_t move_change = 1, QString message = QString("You're too out of breath!"))
     {
         if (move_ >= move_change)
         {
@@ -865,6 +865,7 @@ public:
     command_return_t command_interpreter(QString argument, bool procced = 0);
     command_return_t oprog_command_trigger(QString command, QString arguments);
     command_return_t special(QString arg, int cmd = CMD_DEFAULT);
+    void add_command_lag(int cmdnum, int lag);
     bool mprog_seval(QString lhs, QString opr, QString rhs);
     QString getTemp(QString name);
     bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
@@ -886,9 +887,10 @@ public:
     void send(const char *buffer);
     void send(std::string buffer);
     void send(QString buffer);
-    void sendln(QString buffer = "")
+    void sendln(QString buffer = {})
     {
-        send(buffer + "\r\n");
+        buffer = buffer.append("\r\n");
+        send(buffer);
     }
     command_return_t tell(Character *, QString);
     void sendRaw(std::string);
@@ -957,6 +959,7 @@ public:
     Character *get_active_pc_vis(QString name);
     void add_memory(QString victim_name, char type);
     void swap_hate_memory(void);
+    bool can_use_command(int cmdnum);
 
     static const QStringList class_names;
     static const QStringList race_names;

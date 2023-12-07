@@ -34,6 +34,7 @@
 #include "guild.h"
 #include "const.h"
 #include "vault.h"
+#include "Command.h"
 
 void AuctionHandleRenames(Character *ch, QString old_name, QString new_name);
 
@@ -850,13 +851,11 @@ int do_metastat(Character *ch, char *argument, int cmd)
 
   buf[0] = '\0';
   unsigned int i = 1, l = 0;
-  extern struct command_info cmd_info[];
-  extern unsigned int cmd_size;
-  for (; i < cmd_size; i++)
+  for (auto i = 0; i < Command::cmd_info.length(); i++)
   {
     if ((l++ % 10) == 0)
       sprintf(buf, "%s\r\n", buf);
-    sprintf(buf, "%s%d ", buf, cmd_info[i].command_number);
+    sprintf(buf, "%s%d ", buf, Command::cmd_info[i].command_number);
   }
   send_to_char(buf, ch);
   return eSUCCESS;

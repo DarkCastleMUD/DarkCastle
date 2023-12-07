@@ -472,10 +472,9 @@ void DC::init_game(void)
   void free_zones_from_memory();
   void free_shops_from_memory();
   void free_emoting_objects_from_memory();
-  void free_command_radix_nodes(struct cmd_hash_info * curr);
+  void free_command_radix_nodes(cmd_hash_info * curr);
   void free_ban_list_from_memory();
   void free_buff_pool_from_memory();
-  extern cmd_hash_info *cmd_radix;
 #endif
 
   FILE *fp;
@@ -580,7 +579,7 @@ void DC::init_game(void)
   logentry("Freeing game portals from memory.", 0, LogChannels::LOG_MISC);
   free_game_portals_from_memory();
   logentry("Freeing command radix from memory.", 0, LogChannels::LOG_MISC);
-  free_command_radix_nodes(cmd_radix);
+  free_command_radix_nodes(cmd_radix_);
   logentry("Freeing ban list from memory.", 0, LogChannels::LOG_MISC);
   free_ban_list_from_memory();
   logentry("Freeing the bufpool.", 0, LogChannels::LOG_MISC);

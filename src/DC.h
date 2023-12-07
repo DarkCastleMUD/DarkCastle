@@ -99,7 +99,6 @@
 #include "DC_global.h"
 
 typedef uint64_t vnum_t;
-typedef quint64 level_t;
 typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
@@ -115,6 +114,7 @@ typedef QList<QString> hints_t;
 #include "Shops.h"
 #include "room.h"
 #include "Database.h"
+#include "interp.h"
 
 class Connection;
 
@@ -140,12 +140,6 @@ typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
 
-enum class search_error
-{
-  invalid_input,
-  not_found
-};
-
 class World
 {
 public:
@@ -160,6 +154,14 @@ public:
   bool testcmd{}; // true = test command, false = normal command
 };
 
+class command_lag
+{
+public:
+  command_lag *next;
+  class Character *ch;
+  int cmd_number;
+  int lag;
+};
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -265,6 +267,8 @@ public:
   bool isAllowedHost(QHostAddress host);
   Database getDatabase(void) { return database_; }
   Database db(void) { return database_; }
+  command_lag *getCommandLag(void) const { return command_lag_list_; }
+  void setCommandLag(command_lag *cl) { command_lag_list_ = cl; }
 
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
@@ -282,6 +286,7 @@ private:
   Shops shops_;
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
   Database database_;
+  command_lag *command_lag_list_{};
 
   void game_loop_init(void);
   void game_loop(void);
@@ -320,11 +325,6 @@ struct timer_data
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
-typedef int command_return_t;
-typedef int (*command_gen1_t)(Character *ch, char *argument, int cmd);
-typedef command_return_t (*command_gen2_t)(Character *ch, std::string argument, int cmd);
-typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
-typedef command_return_t (Character::*command_special_t)(QString arguments, int cmd);
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
 

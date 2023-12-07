@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "common.h"
 #include "structs.h" // uint8_t
 #include "character.h"
 

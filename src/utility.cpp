@@ -3265,3 +3265,16 @@ void Character::upSkill(skill_t skillnum, int learned)
   skills[skillnum].skillnum = skillnum;
   skills[skillnum].learned += learned;
 }
+
+int len_cmp(QString s1, QString s2)
+{
+  for (auto i1 = s1.begin(), i2 = s2.begin(); i1 != s1.end() && i2 != s2.end() && *i1 != ' '; i1++, i2++)
+  {
+    if (*i1 != *i2)
+    {
+      return i1->toLatin1() - i2->toLatin1();
+    }
+  }
+
+  return 0;
+}

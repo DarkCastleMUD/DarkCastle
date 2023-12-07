@@ -59,6 +59,7 @@ int load_debug = 0;
 #include "vault.h"
 #include "const.h"
 #include "wizard.h"
+#include "Command.h"
 
 int load_new_help(FILE *fl, int reload, Character *ch);
 void load_vaults();
@@ -483,8 +484,6 @@ void DC::boot_db(void)
 {
 	int help_rec_count = 0;
 
-	void add_commands_to_radix(void);
-
 	reset_time();
 
 	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
@@ -594,7 +593,7 @@ void DC::boot_db(void)
 	boot_social_messages();
 
 	logentry("Adding commands to radix", 0, LogChannels::LOG_MISC);
-	add_commands_to_radix();
+	Command::add_commands_to_radix();
 
 	logentry("Processing game portals...", 0, LogChannels::LOG_MISC);
 	load_game_portals();

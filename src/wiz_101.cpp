@@ -23,6 +23,7 @@
 #include "returnvals.h"
 #include "spells.h"
 #include "const.h"
+#include "Command.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;
@@ -31,7 +32,6 @@ std::queue<std::string> imp_history;
 
 int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 {
-  extern struct command_info cmd_info[];
 
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -61,13 +61,14 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   }
   send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
+  const auto dc = DC::getInstance();
   int v;
   for (v = ch->getLevel(); v > 100; v--)
-    for (cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++)
+    for (cmd = 0; !Command::cmd_info[cmd].command_name.isEmpty(); cmd++)
     {
-      if (cmd_info[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
+      if (Command::cmd_info[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
       {
-        auto bestow_command = get_bestow_command(cmd_info[cmd].command_name);
+        auto bestow_command = get_bestow_command(Command::cmd_info[cmd].command_name);
 
         if (!bestow_command.has_value()) // someone forgot to update it
           continue;
@@ -77,14 +78,14 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 
         if (bestow_command->testcmd == false)
         {
-          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
+          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", Command::cmd_info[cmd].command_name);
           if ((no2) % 5 == 0)
             strcat(buf2, "\n\r");
           no2++;
         }
         else
         {
-          sprintf(buf3 + strlen(buf3), "[TST]%-11s", cmd_info[cmd].command_name);
+          sprintf(buf3 + strlen(buf3), "[TST]%-11s", Command::cmd_info[cmd].command_name);
           if ((no3) % 5 == 0)
             strcat(buf3, "\n\r");
           no3++;
@@ -92,16 +93,16 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 
         continue;
       }
-      if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND)
+      if (Command::cmd_info[cmd].minimum_level != v || Command::cmd_info[cmd].minimum_level == GIFTED_COMMAND)
         continue;
 
       // ignore these 2 duplicates of other commands
-      if (cmd_info[cmd].command_name == "colours" || cmd_info[cmd].command_name == ";")
+      if (Command::cmd_info[cmd].command_name == "colours" || Command::cmd_info[cmd].command_name == ";")
         continue;
 
       sprintf(buf + strlen(buf), "[%2d]%-11s",
-              cmd_info[cmd].minimum_level,
-              cmd_info[cmd].command_name);
+              Command::cmd_info[cmd].minimum_level,
+              Command::cmd_info[cmd].command_name);
 
       if ((no) % 5 == 0)
         strcat(buf, "\n\r");

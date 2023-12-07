@@ -4,8 +4,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Og")
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -O3 -fsanitize=address")
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w")
+#  -fsanitize=address
+#  -Wdangling-reference -g3 -Og
+# -Wdangling-gsl for clang
+#set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -O3")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${BUILD_VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR RPM)
 set(CPACK_THREADS 0)
@@ -59,6 +62,7 @@ add_library(DC SHARED
     cl_warrior.cpp
     combinables.cpp
     CommandStack.cpp
+    Command.cpp
     comm.cpp
     const.cpp
     corpse.cpp
@@ -139,6 +143,7 @@ add_library(DC SHARED
     combinables.h
     CommandStack.h
     comm.h
+    Command.h
     common.h
     connect.h
     const.h

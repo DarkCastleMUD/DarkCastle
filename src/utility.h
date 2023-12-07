@@ -784,5 +784,7 @@ T number(T from, T to)
 }
 
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
+int len_cmp(const char *s1, const char *s2);
+int len_cmp(QString s1, QString s2);
 
 #endif /* UTILITY_H_ */

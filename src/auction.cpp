@@ -1921,7 +1921,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1939,7 +1939,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1956,7 +1956,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1977,7 +1977,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1993,7 +1993,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -2013,7 +2013,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
         TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
-      add_command_lag(ch, cmd, DC::PULSE_VIOLENCE);
+      ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
     }

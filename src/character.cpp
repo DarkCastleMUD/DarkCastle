@@ -319,7 +319,7 @@ bool Character::validateName(QString name)
     return true;
 }
 
-inline const char *Character::getNameC(void) const
+const char *Character::getNameC(void) const
 {
     return str_hsh(name_.toStdString().c_str());
 }
