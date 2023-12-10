@@ -784,17 +784,9 @@ void update_bard_singing()
 			i->songs.erase(j);
 			--j;
 			return false;
-		} else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || DC::isSet(i->combat, COMBAT_STUNNED)
-						|| DC::isSet(i->combat, COMBAT_STUNNED2) || DC::isSet(i->combat, COMBAT_SHOCKED) || DC::isSet(i->combat, COMBAT_SHOCKED2)
-						|| (DC::isSet(i->combat, COMBAT_BASH1) || DC::isSet(i->combat, COMBAT_BASH2)))
-				&& ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE
-						|| (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE)) {
+		}
+		else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || DC::isSet(i->combat, COMBAT_STUNNED) || DC::isSet(i->combat, COMBAT_STUNNED2) || DC::isSet(i->combat, COMBAT_SHOCKED) || DC::isSet(i->combat, COMBAT_SHOCKED2) || (DC::isSet(i->combat, COMBAT_BASH1) || DC::isSet(i->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
+		{
 			send_to_char("You can't keep singing in this position!\r\n", i);
 			(*j).song_timer = 0;
 			if ((song_info[(*j).song_number].intrp_pointer)) {
@@ -811,11 +803,9 @@ void update_bard_singing()
 			i->songs.erase(j);
 			--j;
 			return false;
-		} else if ((*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE
-				|| (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE
-				|| (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE
-				|| (*j).song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE
-				|| (*j).song_number == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE || j != i->songs.begin()) {
+		}
+		else if ((*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE || j != i->songs.begin())
+		{
 			if ((!i->equipment[HOLD] || GET_ITEM_TYPE(i->equipment[HOLD]) != ITEM_INSTRUMENT)
 					&& (!i->equipment[HOLD2] || GET_ITEM_TYPE(i->equipment[HOLD2]) != ITEM_INSTRUMENT)) {
 				send_to_char("Without an instrument, your song dies away.\r\n", i);
@@ -836,7 +826,6 @@ void update_bard_singing()
 				return false;
 			}
 		}
-
 	}
 
 	if ((*j).song_timer > 1) {

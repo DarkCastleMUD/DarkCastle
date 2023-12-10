@@ -855,7 +855,7 @@ int do_metastat(Character *ch, char *argument, int cmd)
   {
     if ((l++ % 10) == 0)
       sprintf(buf, "%s\r\n", buf);
-    sprintf(buf, "%s%d ", buf, Commands::commands[i].command_number);
+    sprintf(buf, "%s%d ", buf, Commands::commands[i].getNumber());
   }
   send_to_char(buf, ch);
   return eSUCCESS;

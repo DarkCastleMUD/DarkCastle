@@ -808,6 +808,7 @@ public:
     command_return_t do_experience(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_split(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_zsave(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_wizhelp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_goto(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_save(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_search(QStringList arguments = {}, int cmd = CMD_DEFAULT);

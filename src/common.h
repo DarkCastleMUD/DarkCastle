@@ -524,7 +524,6 @@ command_return_t do_whosolo(Character *ch, char *argument, int cmd);
 command_return_t do_wield(Character *ch, char *argument, int cmd);
 command_return_t do_fakelog(Character *ch, char *argument, int cmd);
 command_return_t do_wiz(Character *ch, std::string argument, int cmd);
-command_return_t do_wizhelp(Character *ch, char *argument, int cmd);
 command_return_t do_wizinvis(Character *ch, char *argument, int cmd);
 command_return_t do_wizlist(Character *ch, char *argument, int cmd);
 command_return_t do_wizlock(Character *ch, char *argument, int cmd);

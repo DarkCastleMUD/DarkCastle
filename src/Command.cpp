@@ -440,7 +440,7 @@ const QList<Command> Commands::commands =
         {"nohassle", do_nohassle, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"wizinvis", do_wizinvis, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"poof", do_poof, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"wizhelp", do_wizhelp, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"wizhelp", nullptr, nullptr, &Character::do_wizhelp, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"imotd", do_imotd, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mhelp", do_mortal_help, nullptr, nullptr, position_t::DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testhand", do_testhand, nullptr, nullptr, position_t::DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},

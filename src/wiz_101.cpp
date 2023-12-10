@@ -30,94 +30,91 @@ std::queue<std::string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
-int do_wizhelp(Character *ch, char *argument, int cmd_arg)
+command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
 {
-
-  char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  char buf3[MAX_STRING_LENGTH];
-  int cmd;
-  int no = 6;
-  int no2 = 6;
-  int no3 = 6;
-
-  if (IS_NPC(ch))
-    return eFAILURE;
-
-  buf[0] = '\0';
-  buf2[0] = '\0';
-  buf3[0] = '\0';
-
-  if (argument && *argument)
+  if (isNPC() || isMortal())
   {
-    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-    argument = one_argument(argument, arg);
-    one_argument(argument, arg2);
-    sprintf(buf, "Arg1: %s\n", arg);
-    send_to_char(buf, ch);
-    sprintf(buf, "Arg2: %s\n", arg2);
-    send_to_char(buf, ch);
-    return eSUCCESS;
+    return eFAILURE;
   }
-  send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
   const auto dc = DC::getInstance();
-  int v;
-  for (v = ch->getLevel(); v > 100; v--)
-    for (cmd = 0; !Commands::commands[cmd].getName().isEmpty(); cmd++)
+  QString buffer, bestow_buffer, test_buffer;
+  uint64_t column{}, bestow_column{}, test_column{};
+  for (level_t v = 101; v <= getLevel(); ++v)
+  {
+    for (qsizetype cmd = 0; cmd < Commands::commands.length(); cmd++)
     {
-      if (Commands::commands[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
+      auto command = Commands::commands[cmd];
+      if (command.getMinimumLevel() == GIFTED_COMMAND && v == getLevel())
       {
-        auto bestow_command = get_bestow_command(Commands::commands[cmd].getName());
+        auto bestow_command = get_bestow_command(command.getName());
 
-        if (!bestow_command.has_value()) // someone forgot to update it
+        if (!bestow_command.has_value())
+        {
           continue;
+        }
 
-        if (!ch->has_skill(bestow_command->num))
+        if (!has_skill(bestow_command->num))
+        {
           continue;
+        }
 
         if (bestow_command->testcmd == false)
         {
-          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", Commands::commands[cmd].getName());
-          if ((no2) % 5 == 0)
-            strcat(buf2, "\n\r");
-          no2++;
+          bestow_buffer.append(QString("[GFT]%1").arg(command.getName(), -11));
+          if (++bestow_column % 5 == 0)
+          {
+            bestow_buffer.append("\r\n");
+          }
         }
         else
         {
-          sprintf(buf3 + strlen(buf3), "[TST]%-11s", Commands::commands[cmd].getName());
-          if ((no3) % 5 == 0)
-            strcat(buf3, "\n\r");
-          no3++;
+          test_buffer.append(QString("[TST]%1").arg(command.getName(), -11));
+          if (++test_column % 5 == 0)
+          {
+            test_buffer.append("\n\r");
+          }
         }
 
         continue;
       }
-      if (Commands::commands[cmd].minimum_level != v || Commands::commands[cmd].minimum_level == GIFTED_COMMAND)
+      if (command.getMinimumLevel() != v || command.getMinimumLevel() == GIFTED_COMMAND)
+      {
         continue;
+      }
 
-      // ignore these 2 duplicates of other commands
-      if (Commands::commands[cmd].getName() == "colours" || Commands::commands[cmd].getName() == ";")
-        continue;
+      buffer.append(QString("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.getName(), -11));
 
-      sprintf(buf + strlen(buf), "[%2d]%-11s",
-              Commands::commands[cmd].minimum_level,
-              Commands::commands[cmd].getName());
-
-      if ((no) % 5 == 0)
-        strcat(buf, "\n\r");
-      no++;
+      if (++column % 5 == 0)
+      {
+        buffer.append("\r\n");
+      }
     }
+  }
 
-  strcat(buf, "\n\r\n\r"
-              "Here are the godly powers that have been gifted to you:\n\r\n\r");
-  strcat(buf, buf2);
-  strcat(buf, "\r\n");
-  strcat(buf, "Here are the godly test powers that have been gifted to you:\n\r\n\r");
-  strcat(buf, buf3);
-  strcat(buf, "\r\n");
+  // Add an extra \r\n to a section if we haven't already done so
+  if (column % 5 == 0)
+  {
+    buffer.append("\r\n");
+  }
+  if (bestow_column % 5 != 0)
+  {
+    bestow_buffer.append("\r\n");
+  }
+  if (test_column % 5 != 0)
+  {
+    test_buffer.append("\r\n");
+  }
 
-  send_to_char(buf, ch);
+  sendln("Commands based on your level:");
+  sendln(buffer);
+  sendln();
+  sendln("Bestowed commands:");
+  sendln(bestow_buffer);
+  sendln();
+  sendln("Test commands:");
+  sendln(test_buffer);
+  sendln();
   return eSUCCESS;
 }
 

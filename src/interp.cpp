@@ -178,9 +178,9 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   auto found = Commands::find_cmd_in_radix(command);
   if (found.has_value())
   {
-    if (getLevel() >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))
+    if (getLevel() >= found->getMinimumLevel() && (found->getFunction1() != nullptr || found->getFunction2() != nullptr || found->getFunction3() != nullptr))
     {
-      if (found->minimum_level == GIFTED_COMMAND)
+      if (found->getMinimumLevel() == GIFTED_COMMAND)
       {
 
         // search DC::bestowable_god_commands for the command skill number to lookup with has_skill
@@ -208,8 +208,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // Paralysis stops everything but ...
       if (IS_AFFECTED(this, AFF_PARALYSIS) &&
-          found->command_number != CMD_GTELL && // gtell
-          found->command_number != CMD_CTELL    // ctell
+          found->getNumber() != CMD_GTELL && // gtell
+          found->getNumber() != CMD_CTELL    // ctell
       )
       {
         send_to_char("You've been paralyzed and are unable to move.\r\n", this);
@@ -220,7 +220,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         this->setStanding();
       ;
       // fix for thin air thing
-      if (GET_POS(this) < found->minimum_position)
+      if (GET_POS(this) < found->getMinimumPosition())
       {
         switch (GET_POS(this))
         {
@@ -281,7 +281,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       sprintf(DEBUGbuf, "%s: %s", GET_NAME(this), pcomm);
       log (DEBUGbuf, 0, LogChannels::LOG_MISC);
       */
-      if (!can_use_command(found->command_number))
+      if (!can_use_command(found->getNumber()))
       {
         send_to_char("You are still recovering from your last attempt.\r\n", this);
         return eSUCCESS;
@@ -291,18 +291,18 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(this->player->punish, PUNISH_LOG) == false)
+        if (found->getNumber() != CMD_GTELL && found->getNumber() != CMD_CTELL && found->getNumber() != CMD_SAY && found->getNumber() != CMD_TELL && found->getNumber() != CMD_WHISPER && found->getNumber() != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(this->player->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LogChannels::LOG_PLAYER, this);
         }
       }
 
       // We're going to execute, check for usable special proc.
-      retval = special(command_arguments, found->command_number);
+      retval = special(command_arguments, found->getNumber());
       if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
         return retval;
 
-      switch (found->type)
+      switch (found->getType())
       {
       case CommandType::all:
         if (this == nullptr)
@@ -349,17 +349,17 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       }
 
       // Normal dispatch
-      if (found->command_pointer)
+      if (found->getFunction1())
       {
         auto c = strdup(command_arguments.toStdString().c_str());
-        retval = (*(found->command_pointer))(this, c, found->command_number);
+        retval = (*(found->getFunction1()))(this, c, found->getNumber());
         free(c);
       }
-      else if (found->command_pointer2)
+      else if (found->getFunction2())
       {
-        retval = (*(found->command_pointer2))(this, command_arguments.toStdString(), found->command_number);
+        retval = (*(found->getFunction2()))(this, command_arguments.toStdString(), found->getNumber());
       }
-      else if (found->command_pointer3)
+      else if (found->getFunction3())
       {
         QString command = command_arguments.trimmed();
         QStringList arguments;
@@ -387,7 +387,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
         arguments.append(command.split(' ', Qt::SkipEmptyParts));
 
-        retval = (*this.*(found->command_pointer3))(arguments, found->command_number);
+        retval = (*this.*(found->getFunction3()))(arguments, found->getNumber());
       }
 
       // Next bit for the DUI client, they needed it.
