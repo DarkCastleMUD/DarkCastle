@@ -3143,7 +3143,6 @@ void handle_automatic_mob_hitpoints(Character *mob)
 
 	auto old_base = base;
 	base *= 1.5;
-	qDebug() << old_base << "vs" << base;
 
 	mob->raw_hit = base;
 	mob->hit = base;

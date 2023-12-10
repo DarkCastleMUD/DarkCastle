@@ -880,7 +880,6 @@ void testing_load_vaults(void)
       case 'A':
         qDebugQTextStreamLine(vault_file_stream, "load_vaults, before type A vault_file_stream >> value");
         vault_file_stream >> value >> Qt::ws;
-        qDebug() << "value = " << value;
 
         if (!value.isEmpty() && !stat(QString("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value).toStdString().c_str(), &statbuf))
         {

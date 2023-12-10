@@ -3342,11 +3342,8 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 	*t = '\0';
 
 	auto q = mob->getName();
-	qDebug() << q;
 	auto s = q.toStdString();
-	qDebug() << s;
 	auto mob_nameC = s.c_str();
-	qDebug() << mob_nameC;
 
 	switch (ch)
 	{
