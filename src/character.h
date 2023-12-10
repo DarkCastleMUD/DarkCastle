@@ -682,6 +682,7 @@ public:
         if (move_ >= move_change)
         {
             move_ -= move_change;
+            return true;
         }
         else
         {
@@ -690,8 +691,8 @@ public:
             {
                 sendln(message);
             }
-            return false;
         }
+        return false;
     }
 
     int32_t raw_move = {};
