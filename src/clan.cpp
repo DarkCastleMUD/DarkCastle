@@ -600,7 +600,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (result == 0)
   { // found um, get out
-    logentry("Tried to add already existing clan member.  Possible memory leak.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QString("Tried to add already existing clan member '%1'.  Possible memory leak.").arg(new_new_member->member_name), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
