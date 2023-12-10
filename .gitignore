@@ -4,6 +4,7 @@ scripts/*.o
 src/libdcastle.a
 src/.sconsign.dblite
 src/*~
+src/buildinfo.h
 *~
 lib/corpse.save
 lib/onlinewho.txt
@@ -12,10 +13,6 @@ lib/objects/*.last
 lib/wizlist.txt
 lib/mobs/*.last
 lib/special.txt
-src/debug
-src/dcastle.stable
-src/dcastle.master
-src/Makefile
-src/version.h
 build/
 lib/wizlist.txt
+

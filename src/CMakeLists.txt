@@ -35,7 +35,7 @@ message("Patch: ${VERSION_PATCH}")
 message("SHA1: ${VERSION_SHA1}")
 
 project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
-configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
+configure_file(buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/buildinfo.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 add_library(DC SHARED
@@ -118,6 +118,7 @@ add_library(DC SHARED
     Trace.cpp
     utility.cpp
     vault.cpp
+    Version.cpp
     weather.cpp
     who.cpp
     wiz_101.cpp
@@ -137,6 +138,7 @@ add_library(DC SHARED
     alias.h
     arena.h
     bandwidth.h
+    buildinfo.h
     character.h
     clan.h
     class.h
@@ -198,7 +200,7 @@ add_library(DC SHARED
     Trace.h
     utility.h
     vault.h
-    version.h
+    Version.h
     weather.h
     wizard.h
     Zone.h

@@ -279,8 +279,6 @@ public:
   room_t last_char_room = {};
 
 private:
-  static const QString build_version_;
-  static const QString build_time_;
   struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
   hints_t hints_;
   Shops shops_;
