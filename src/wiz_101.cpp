@@ -64,11 +64,11 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
   const auto dc = DC::getInstance();
   int v;
   for (v = ch->getLevel(); v > 100; v--)
-    for (cmd = 0; !Command::cmd_info[cmd].command_name.isEmpty(); cmd++)
+    for (cmd = 0; !Commands::commands[cmd].command_name.isEmpty(); cmd++)
     {
-      if (Command::cmd_info[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
+      if (Commands::commands[cmd].minimum_level == GIFTED_COMMAND && v == ch->getLevel())
       {
-        auto bestow_command = get_bestow_command(Command::cmd_info[cmd].command_name);
+        auto bestow_command = get_bestow_command(Commands::commands[cmd].command_name);
 
         if (!bestow_command.has_value()) // someone forgot to update it
           continue;
@@ -78,14 +78,14 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 
         if (bestow_command->testcmd == false)
         {
-          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", Command::cmd_info[cmd].command_name);
+          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", Commands::commands[cmd].command_name);
           if ((no2) % 5 == 0)
             strcat(buf2, "\n\r");
           no2++;
         }
         else
         {
-          sprintf(buf3 + strlen(buf3), "[TST]%-11s", Command::cmd_info[cmd].command_name);
+          sprintf(buf3 + strlen(buf3), "[TST]%-11s", Commands::commands[cmd].command_name);
           if ((no3) % 5 == 0)
             strcat(buf3, "\n\r");
           no3++;
@@ -93,16 +93,16 @@ int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 
         continue;
       }
-      if (Command::cmd_info[cmd].minimum_level != v || Command::cmd_info[cmd].minimum_level == GIFTED_COMMAND)
+      if (Commands::commands[cmd].minimum_level != v || Commands::commands[cmd].minimum_level == GIFTED_COMMAND)
         continue;
 
       // ignore these 2 duplicates of other commands
-      if (Command::cmd_info[cmd].command_name == "colours" || Command::cmd_info[cmd].command_name == ";")
+      if (Commands::commands[cmd].command_name == "colours" || Commands::commands[cmd].command_name == ";")
         continue;
 
       sprintf(buf + strlen(buf), "[%2d]%-11s",
-              Command::cmd_info[cmd].minimum_level,
-              Command::cmd_info[cmd].command_name);
+              Commands::commands[cmd].minimum_level,
+              Commands::commands[cmd].command_name);
 
       if ((no) % 5 == 0)
         strcat(buf, "\n\r");

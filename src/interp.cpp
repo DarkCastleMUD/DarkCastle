@@ -175,7 +175,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
-  auto found = Command::find_cmd_in_radix(command);
+  auto found = Commands::find_cmd_in_radix(command);
   if (found.has_value())
   {
     if (getLevel() >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr || found->command_pointer3 != nullptr))

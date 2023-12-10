@@ -14,10 +14,10 @@ enum class CommandType
     implementors_only
 };
 
-class command_info
+class Command
 {
 public:
-    command_info(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {}, level_t min_lvl = {}, int nr = {}, int flag = {}, uint8_t tog_hid = {}, CommandType typ = {})
+    Command(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {}, level_t min_lvl = {}, int nr = {}, int flag = {}, uint8_t tog_hid = {}, CommandType typ = {})
         : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position({}), minimum_level({}), command_number(CMD_DEFAULT), toggle_hide(0), type({}), allow_charmie_(false) {}
 
     bool isCharmieAllowed(void)
@@ -44,20 +44,20 @@ class cmd_hash_info
 public:
     cmd_hash_info(void)
         : left(nullptr), right(nullptr) {}
-    command_info command;
+    Command command;
     cmd_hash_info *left{};
     cmd_hash_info *right{};
 };
 
-class Command
+class Commands
 {
 public:
-    static void add_command_to_radix(command_info cmd);
+    static void add_command_to_radix(Command cmd);
     static void add_commands_to_radix(void);
-    static auto find_cmd_in_radix(QString arg) -> std::expected<command_info, search_error>;
+    static auto find_cmd_in_radix(QString arg) -> std::expected<Command, search_error>;
     void free_command_radix_nodes(cmd_hash_info *curr);
 
-    static const QList<command_info> cmd_info;
+    static const QList<Command> commands;
 
 private:
     static cmd_hash_info *cmd_radix_;

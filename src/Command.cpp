@@ -18,7 +18,7 @@
 // The command number should be CMD_DEFAULT for any user command that is not used
 // in a spec_proc.  If it is, then it should be a number that is not
 // already in use.
-const QList<command_info> Command::cmd_info =
+const QList<Command> Commands::commands =
     {
         // Movement commands
         {"north", do_move, nullptr, nullptr, position_t::STANDING, 0, CMD_NORTH, true, 1, CommandType::all},
@@ -506,25 +506,25 @@ const QList<command_info> Command::cmd_info =
         // End of the line
         {"", nullptr, nullptr, &Character::generic_command, position_t::DEAD, 0, CMD_DEFAULT, true, 0}};
 
-cmd_hash_info *Command::cmd_radix_ = nullptr;
+cmd_hash_info *Commands::cmd_radix_ = nullptr;
 
-void Command::add_commands_to_radix(void)
+void Commands::add_commands_to_radix(void)
 {
-    if (cmd_info.isEmpty())
+    if (commands.isEmpty())
     {
         return;
     }
 
     cmd_radix_ = new cmd_hash_info;
-    cmd_radix_->command = cmd_info.value(0);
+    cmd_radix_->command = commands.value(0);
 
-    for (qsizetype x = 1; x < cmd_info.size(); x++)
+    for (qsizetype x = 1; x < commands.size(); x++)
     {
-        add_command_to_radix(cmd_info.value(x));
+        add_command_to_radix(commands.value(x));
     }
 }
 
-void Command::free_command_radix_nodes(cmd_hash_info *curr)
+void Commands::free_command_radix_nodes(cmd_hash_info *curr)
 {
     if (curr->left)
         free_command_radix_nodes(curr->left);
@@ -533,7 +533,7 @@ void Command::free_command_radix_nodes(cmd_hash_info *curr)
     dc_free(curr);
 }
 
-void Command::add_command_to_radix(command_info cmd)
+void Commands::add_command_to_radix(Command cmd)
 {
     cmd_hash_info *curr = nullptr;
     cmd_hash_info *temp = nullptr;
@@ -561,7 +561,7 @@ void Command::add_command_to_radix(command_info cmd)
         temp->right = curr;
 }
 
-auto Command::find_cmd_in_radix(QString arg) -> std::expected<command_info, search_error>
+auto Commands::find_cmd_in_radix(QString arg) -> std::expected<Command, search_error>
 {
     cmd_hash_info *curr{};
     cmd_hash_info *next{};
