@@ -408,7 +408,7 @@ struct spell_info_type spell_info[] =
 
         {/* 159 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD},
 
-        {/* 160 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM},
+        {/* 160 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM},
 
         {/* 161 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 10, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM},
 
