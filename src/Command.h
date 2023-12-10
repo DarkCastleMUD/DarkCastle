@@ -18,7 +18,7 @@ class Command
 {
 public:
     Command(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {}, level_t min_lvl = {}, int nr = {}, int flag = {}, uint8_t tog_hid = {}, CommandType typ = {})
-        : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position({}), minimum_level({}), command_number(CMD_DEFAULT), toggle_hide(0), type({}), allow_charmie_(false) {}
+        : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position(position_t()), minimum_level(level_t()), command_number(CMD_DEFAULT), toggle_hide(0), type(CommandType()), allow_charmie_(false) {}
 
     bool isCharmieAllowed(void)
     {
