@@ -431,6 +431,8 @@ char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
 void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
+void buglog(QString message);
+void misclog(QString message);
 void logf(int level, LogChannels type, const char *arg, ...);
 void logf(int level, LogChannels type, QString arg);
 int send_to_gods(QString message, uint64_t god_level, LogChannels type);

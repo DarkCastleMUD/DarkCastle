@@ -488,6 +488,16 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     send_to_gods(str, god_level, type);
 }
 
+void buglog(QString message)
+{
+  logentry(message, IMMORTAL, LOG_BUG);
+}
+
+void misclog(QString message)
+{
+  logentry(message, IMMORTAL, LOG_MISC);
+}
+
 // function for new SETBIT et al. commands
 // leading space until all calling functions cleaned up
 void sprintbit(uint value[], const char *names[], char *result)
