@@ -200,7 +200,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
           if (command_skill == 0)
           {
-            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within DC::bestowable_god_commands", found->getName());
+            buglog(QString("command_interpreter: Unable to find command [%1].").arg(found->getName()));
           }
           return eFAILURE;
         }
