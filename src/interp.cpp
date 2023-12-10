@@ -248,10 +248,14 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
-        if ((IS_AFFECTED(this, AFF_FAMILIAR) || IS_AFFECTED(this, AFF_CHARM)) && !DC::isSet(found->flags, Command::COM_CHARMIE_OK))
+      {
+        if ((IS_AFFECTED(this, AFF_FAMILIAR) || IS_AFFECTED(this, AFF_CHARM)) && !found->isNPCAllowed())
+        {
           return do_say(this, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
-      if (IS_NPC(this) && this->desc && this->desc->original &&
-          this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !DC::isSet(found->flags, Command::COM_CHARMIE_OK))
+        }
+      }
+
+      if (IS_NPC(this) && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isNPCAllowed())
       {
         send_to_char("The spirit cannot perform that action.\r\n", this);
         return eFAILURE;

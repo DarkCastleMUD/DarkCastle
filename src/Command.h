@@ -18,7 +18,12 @@ class command_info
 {
 public:
     command_info(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {}, level_t min_lvl = {}, int nr = {}, int flag = {}, uint8_t tog_hid = {}, CommandType typ = {})
-        : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position({}), minimum_level({}), command_number(CMD_DEFAULT), flags(0), toggle_hide(0), type({}) {}
+        : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position({}), minimum_level({}), command_number(CMD_DEFAULT), toggle_hide(0), type({}), allow_NPC_(false) {}
+
+    bool isNPCAllowed(void)
+    {
+        return allow_NPC_ == true;
+    }
     QString command_name;                                                               /* Name of ths command             */
     int (*command_pointer)(class Character *ch, char *argument, int cmd);               /* Function that does it            */
     command_return_t (*command_pointer2)(Character *ch, std::string argument, int cmd); /* Function that does it            */
@@ -26,9 +31,12 @@ public:
     position_t minimum_position;                                                        /* Position commander must be in    */
     level_t minimum_level;                                                              /* Minimum level needed             */
     int command_number;                                                                 /* Passed to function as argument   */
-    int flags;                                                                          // what flags the skills has
+
     uint8_t toggle_hide;
     CommandType type;
+
+private:
+    bool allow_NPC_;
 };
 
 class cmd_hash_info
@@ -50,8 +58,9 @@ public:
     void free_command_radix_nodes(cmd_hash_info *curr);
 
     static const QList<command_info> cmd_info;
+
+private:
     static cmd_hash_info *cmd_radix_;
-    static const uint8_t COM_CHARMIE_OK = 1U;
 };
 
 #endif
