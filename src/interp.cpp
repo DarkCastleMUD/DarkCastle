@@ -187,7 +187,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         int command_skill = 0;
         for (int i = 0; DC::bestowable_god_commands[i].num != -1; i++)
         {
-          if (DC::bestowable_god_commands[i].name == found->command_name)
+          if (DC::bestowable_god_commands[i].name == found->getName())
           {
             command_skill = DC::bestowable_god_commands[i].num;
             break;
@@ -200,7 +200,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
           if (command_skill == 0)
           {
-            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within DC::bestowable_god_commands", found->command_name);
+            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within DC::bestowable_god_commands", found->getName());
           }
           return eFAILURE;
         }

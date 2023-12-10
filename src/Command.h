@@ -20,11 +20,14 @@ public:
     Command(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {}, level_t min_lvl = {}, int nr = {}, int flag = {}, uint8_t tog_hid = {}, CommandType typ = {})
         : command_pointer(nullptr), command_pointer2(nullptr), command_pointer3(nullptr), minimum_position(position_t()), minimum_level(level_t()), command_number(CMD_DEFAULT), toggle_hide(0), type(CommandType()), allow_charmie_(false) {}
 
+    [[nodiscard]] inline QString getName(void) const { return name_; }
+    void setName(QString name) { name_ = name; }
+
     bool isCharmieAllowed(void)
     {
         return allow_charmie_ == true;
     }
-    QString command_name;                                                               /* Name of ths command             */
+
     int (*command_pointer)(class Character *ch, char *argument, int cmd);               /* Function that does it            */
     command_return_t (*command_pointer2)(Character *ch, std::string argument, int cmd); /* Function that does it            */
     command_return_t (Character::*command_pointer3)(QStringList arguments, int cmd);    /* Function that does it            */
@@ -36,6 +39,7 @@ public:
     CommandType type;
 
 private:
+    QString name_;
     bool allow_charmie_;
 };
 

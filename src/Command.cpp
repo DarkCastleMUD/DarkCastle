@@ -520,6 +520,8 @@ void Commands::add_commands_to_radix(void)
 
     for (qsizetype x = 1; x < commands.size(); x++)
     {
+
+        qDebug() << "------>" << commands.value(x).getName() << x << commands.size();
         add_command_to_radix(commands.value(x));
     }
 }
@@ -545,7 +547,7 @@ void Commands::add_command_to_radix(Command cmd)
     // on whether whichway is positive or negative.
     for (curr = cmd_radix_; curr; curr = next)
     {
-        if ((whichway = cmd.command_name.compare(curr->command.command_name)) < 0)
+        if ((whichway = cmd.getName().compare(curr->command.getName())) < 0)
             next = curr->left;
         else
             next = curr->right;
@@ -569,8 +571,8 @@ auto Commands::find_cmd_in_radix(QString arg) -> std::expected<Command, search_e
 
     for (curr = cmd_radix_; curr; curr = next)
     {
-        qDebug() << "Comparing" << arg << "vs" << curr->command.command_name << len_cmp(arg, curr->command.command_name);
-        if ((whichway = len_cmp(arg, curr->command.command_name)) == 0)
+        qDebug() << "Comparing" << arg << "vs" << curr->command.getName() << len_cmp(arg, curr->command.getName());
+        if ((whichway = len_cmp(arg, curr->command.getName())) == 0)
             return curr->command;
         if (whichway < 0)
             next = curr->left;
