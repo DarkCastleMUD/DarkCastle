@@ -1837,7 +1837,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       send_to_char(buf, ch);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
       send_to_char(buf, ch);
@@ -1898,7 +1898,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       send_to_char(buf, ch);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
       send_to_char(buf, ch);
@@ -1936,7 +1936,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       send_to_char(buf, ch);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert(num, select, 1, obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
               obj->num_affects);
@@ -1977,8 +1977,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       send_to_char(buf, ch);
       return eFAILURE;
     }
-    if (!check_range_valid_and_convert(num, select, 1,
-                                       obj->num_affects))
+    if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
               obj->num_affects);
@@ -4048,8 +4047,8 @@ int do_medit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!check_range_valid_and_convert(intval, buf4, MOB_TYPE_FIRST,
-                                       MOB_TYPE_LAST))
+    if (!check_range_valid_and_convert<decltype(intval)>(intval, buf4, MOB_TYPE_FIRST,
+                                                         MOB_TYPE_LAST))
     {
       send_to_char("Value out of valid range.\r\n", ch);
       return eFAILURE;

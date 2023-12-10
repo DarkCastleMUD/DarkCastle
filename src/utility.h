@@ -592,17 +592,41 @@ void colorCharSend(char *s, Character *ch);
 void send_to_char_regardless(QString messg, Character *ch);
 void send_to_char_regardless(std::string messg, Character *ch);
 int csendf(Character *ch, const char *arg, ...);
-bool check_range_valid_and_convert(uint64_t &value, QString buf, uint64_t begin, uint64_t end);
-bool check_range_valid_and_convert(int64_t &value, QString buf, int64_t begin, int64_t end);
-bool check_range_valid_and_convert(uint32_t &value, QString buf, uint32_t begin, uint32_t end);
-bool check_range_valid_and_convert(int32_t &value, QString buf, int32_t begin, int32_t end);
-/*
-TODO
-bool check_range_valid_and_convert(uint16_t &value, QString buf, uint16_t begin, uint16_t end);
-bool check_range_valid_and_convert(int16_t &value, QString buf, int begin, int end);
-bool check_range_valid_and_convert(uint8_t &value, QString buf, int begin, int end);
-bool check_range_valid_and_convert(int8_t &value, QString buf, int begin, int end);
-*/
+
+template <typename T>
+bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
+{
+   bool ok = false;
+
+   if (std::is_unsigned<T>::value)
+   {
+      value = buf.toULongLong(&ok);
+   }
+   else if (std::is_signed<T>::value)
+   {
+      value = buf.toLongLong(&ok);
+   }
+
+   if (!ok)
+   {
+      value = 0;
+      return false;
+   }
+
+   if (value < begin)
+   {
+      value = begin;
+      return false;
+   }
+
+   if (value > end)
+   {
+      value = end;
+      return false;
+   }
+
+   return true;
+}
 
 bool check_valid_and_convert(int &value, char *buf);
 void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t value[]);
