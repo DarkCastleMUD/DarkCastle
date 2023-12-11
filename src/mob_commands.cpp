@@ -2120,10 +2120,11 @@ char *expand_data(Character *ch, char *orig)
     int16_t *lvali = nullptr;
     uint32_t *lvalui = nullptr;
     char **lvalstr = nullptr;
+    QString lvalqstr;
     int64_t *lvali64 = nullptr;
     uint64_t *lvalui64 = nullptr;
     int8_t *lvalb = nullptr;
-    translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
+    translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
     if (!lvali && !lvalui && !lvalb)
     {
@@ -2197,10 +2198,11 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   int16_t *lvali = nullptr;
   uint32_t *lvalui = nullptr;
   char **lvalstr = nullptr;
+  QString lvalqstr;
   int64_t *lvali64 = nullptr;
   uint64_t *lvalui64 = nullptr;
   int8_t *lvalb = nullptr;
-  translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
+  translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
   vict = activeTarget;
   if (!vict)

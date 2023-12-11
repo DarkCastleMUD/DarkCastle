@@ -165,7 +165,7 @@ struct mob_matrix_data
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
                      char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb, Character *mob, Character *actor,
-                     Object *obj, void *vo, Character *rndm);
+                     Object *obj, void *vo, Character *rndm, QString &valqstr);
 
 void save_golem_data(Character *ch);
 void save_charmie_data(Character *ch);

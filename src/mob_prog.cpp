@@ -314,7 +314,7 @@ bool istank(Character *ch)
 void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 					 uint32_t **valui, char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb,
 					 Character *mob, Character *actor, Object *obj, void *vo,
-					 Character *rndm)
+					 Character *rndm, QString &valqstr)
 {
 	/*
 	 $n.age
@@ -336,10 +336,6 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	{
 		mobTempVar = mob->tempVariable;
 	}
-
-	// Used to store return pointer from getTemp(). Do not use more than
-	// once in this function.
-	char *targetTemp = 0;
 
 	activeTarget = nullptr;
 	char *tmp, half[MAX_INPUT_LENGTH];
@@ -678,23 +674,19 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				tError = true;
 			else if (otarget->carried_by)
 			{
-				// TODO BROKEN
-				// stringval = &otarget->carried_by->getName().
+				valqstr = otarget->carried_by->getName();
 			}
 			else if (otarget->equipped_by)
 			{
-				// TODO BROKEN
-				// stringval = &otarget->equipped_by->name;
+				valqstr = otarget->equipped_by->getName();
 			}
 			else if (otarget->in_obj && otarget->in_obj->carried_by)
 			{
-				// TODO BROKEN
-				// stringval = &otarget->in_obj->carried_by->name;
+				valqstr = otarget->in_obj->carried_by->getName();
 			}
 			else if (otarget->in_obj && otarget->in_obj->equipped_by)
 			{
-				// TODO BROKEN
-				// stringval = &otarget->in_obj->equipped_by->name;
+				valqstr = otarget->in_obj->equipped_by->getName();
 			}
 			else
 				stringval = nullptr;
@@ -1080,8 +1072,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			}
 			else
 			{
-				// TODO BROKEN
-				// stringval = &target->name;
+				valqstr = target->getName();
 			}
 		}
 		break;
@@ -1271,11 +1262,8 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			}
 			else
 			{
-				// TODO BROKEN
-				// targetTemp = target->getTemp(half);
+				valqstr = target->getTemp(half);
 			}
-
-			stringval = &targetTemp;
 		}
 		else if (!str_cmp(right, "title"))
 		{
@@ -1690,19 +1678,18 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 	int16_t *lvali = nullptr;
 	uint32_t *lvalui = nullptr;
 	char **lvalstr = nullptr;
+	QString lvalqstr;
 	int64_t *lvali64 = nullptr;
 	uint64_t *lvalui64 = nullptr;
 	int8_t *lvalb = nullptr;
 	//  int type = 0;
 
 	if (!traditional)
-		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb,
-						mob, actor, obj, vo, rndm);
+		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
 	else
 		// switch order of traditional so it'd be $n(ispc), to conform with
 		// new ifchecks
-		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb,
-						mob, actor, obj, vo, rndm);
+		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
 
 	if (val2[0] == '\0')
 	{
@@ -1718,16 +1705,19 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			return mprog_veval((int)*lvalb, opr, atoi(val));
 		if (lvalstr)
 			return mob->mprog_seval(*lvalstr, opr, val);
+		if (!lvalqstr.isEmpty())
+			return mob->mprog_seval(lvalqstr, opr, val);
 	}
 	else
 	{
 		int16_t *rvali = nullptr;
 		uint32_t *rvalui = nullptr;
 		char **rvalstr = nullptr;
+		QString rvalqstr;
 		int64_t *rvali64 = nullptr;
 		uint64_t *rvalui64 = nullptr;
 		int8_t *rvalb = nullptr;
-		translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm);
+		translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm, rvalqstr);
 		int64_t rval = 0;
 		if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
 		{
@@ -3784,6 +3774,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 			int16_t *lvali = 0;
 			uint32_t *lvalui = 0;
 			char **lvalstr = 0;
+			QString lvalqstr;
 			int64_t *lvali64 = 0;
 			uint64_t *lvalui64 = 0;
 			int8_t *lvalb = 0;
@@ -3792,7 +3783,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 			left[1] = *str;
 			left[2] = '\0';
 			str = one_argument(str + 2, right);
-			translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm);
+			translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
 			char buf[MAX_STRING_LENGTH];
 			buf[0] = '\0';
 			if (lvali)
