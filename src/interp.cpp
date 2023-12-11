@@ -116,7 +116,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     sendln("You've been frozen by an immortal.");
     return eSUCCESS;
   }
-  if (IS_AFFECTED(this, AFF_PRIMAL_FURY))
+  if (IS_AFFECTED(this, AFF_PRIMAL_FURY) && pcomm != "quit")
   {
     sendln("Your primal fury prevents this.");
     return eSUCCESS;
