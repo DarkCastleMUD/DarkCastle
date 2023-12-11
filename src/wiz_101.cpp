@@ -42,9 +42,8 @@ command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
   uint64_t column{}, bestow_column{}, test_column{};
   for (level_t v = 101; v <= getLevel(); ++v)
   {
-    for (qsizetype cmd = 0; cmd < Commands::commands.length(); cmd++)
+    for (const auto &command : DC::getInstance()->CMD_.commands_)
     {
-      auto command = Commands::commands[cmd];
       if (command.getMinimumLevel() == GIFTED_COMMAND && v == getLevel())
       {
         auto bestow_command = get_bestow_command(command.getName());

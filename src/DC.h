@@ -115,6 +115,7 @@ typedef QList<QString> hints_t;
 #include "room.h"
 #include "Database.h"
 #include "interp.h"
+#include "Command.h"
 
 class Connection;
 
@@ -277,6 +278,7 @@ public:
   QString last_processed_cmd = {};
   QString last_char_name = {};
   room_t last_char_room = {};
+  Commands CMD_;
 
 private:
   struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};

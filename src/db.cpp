@@ -592,9 +592,6 @@ void DC::boot_db(void)
 	logentry("Loading socials.", 0, LogChannels::LOG_MISC);
 	boot_social_messages();
 
-	logentry("Adding commands to radix", 0, LogChannels::LOG_MISC);
-	Commands::add_commands_to_radix();
-
 	logentry("Processing game portals...", 0, LogChannels::LOG_MISC);
 	load_game_portals();
 

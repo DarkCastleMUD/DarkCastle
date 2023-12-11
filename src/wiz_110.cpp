@@ -851,11 +851,11 @@ int do_metastat(Character *ch, char *argument, int cmd)
 
   buf[0] = '\0';
   unsigned int i = 1, l = 0;
-  for (auto i = 0; i < Commands::commands.length(); i++)
+  for (auto i = 0; i < Commands::commands_.length(); i++)
   {
     if ((l++ % 10) == 0)
       sprintf(buf, "%s\r\n", buf);
-    sprintf(buf, "%s%d ", buf, Commands::commands[i].getNumber());
+    sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
   }
   send_to_char(buf, ch);
   return eSUCCESS;

@@ -18,7 +18,7 @@
 // The command number should be CMD_DEFAULT for any user command that is not used
 // in a spec_proc.  If it is, then it should be a number that is not
 // already in use.
-const QList<Command> Commands::commands =
+const QList<Command> Commands::commands_ =
     {
         // Movement commands
         {"north", do_move, nullptr, nullptr, position_t::STANDING, 0, CMD_NORTH, true, 1, CommandType::all},
@@ -506,76 +506,25 @@ const QList<Command> Commands::commands =
         // End of the line
         {"", nullptr, nullptr, &Character::generic_command, position_t::DEAD, 0, CMD_DEFAULT, true, 0}};
 
-cmd_hash_info *Commands::cmd_radix_ = nullptr;
-
-void Commands::add_commands_to_radix(void)
+void Commands::add(Command cmd)
 {
-    if (commands.isEmpty())
-    {
-        return;
-    }
-
-    cmd_radix_ = new cmd_hash_info;
-    cmd_radix_->command = commands.value(0);
-
-    for (qsizetype x = 1; x < commands.size(); x++)
-    {
-        add_command_to_radix(commands.value(x));
-    }
+    map_[cmd.getName()] = cmd;
 }
 
-void Commands::free_command_radix_nodes(cmd_hash_info *curr)
+auto Commands::find(QString arg) -> std::expected<Command, search_error>
 {
-    if (curr->left)
-        free_command_radix_nodes(curr->left);
-    if (curr->right)
-        free_command_radix_nodes(curr->right);
-    dc_free(curr);
-}
-
-void Commands::add_command_to_radix(Command cmd)
-{
-    cmd_hash_info *curr = nullptr;
-    cmd_hash_info *temp = nullptr;
-    cmd_hash_info *next = nullptr;
-    int whichway = 0;
-
-    // At the end of this loop, temp will contain the parent of
-    // the new node.  Whether it is the left or right node depends
-    // on whether whichway is positive or negative.
-    for (curr = cmd_radix_; curr; curr = next)
+    if (map_.contains(arg))
     {
-        if ((whichway = cmd.getName().compare(curr->command.getName())) < 0)
-            next = curr->left;
-        else
-            next = curr->right;
-        temp = curr;
-    }
-
-    curr = new cmd_hash_info;
-    curr->command = cmd;
-
-    if (whichway < 0)
-        temp->left = curr;
-    else
-        temp->right = curr;
-}
-
-auto Commands::find_cmd_in_radix(QString arg) -> std::expected<Command, search_error>
-{
-    cmd_hash_info *curr{};
-    cmd_hash_info *next{};
-    int whichway{};
-
-    for (curr = cmd_radix_; curr; curr = next)
-    {
-        if ((whichway = len_cmp(arg, curr->command.getName())) == 0)
-            return curr->command;
-        if (whichway < 0)
-            next = curr->left;
-        else
-            next = curr->right;
+        return map_.value(arg);
     }
 
     return std::unexpected(search_error::not_found);
+}
+
+Commands::Commands(void)
+{
+    for (const auto &command : commands_)
+    {
+        add(command.getName());
+    }
 }

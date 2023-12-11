@@ -3,6 +3,7 @@
 
 #include <expected>
 #include <QList>
+#include <QMap>
 #include "common.h"
 
 enum class CommandType
@@ -17,10 +18,14 @@ enum class CommandType
 class Command
 {
 public:
-    Command(QString name = {}, command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {}, position_t min_pos = {},
-            level_t min_lvl = {}, int nr = CMD_DEFAULT, bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
-        : name_(name), command_pointer_(ptr1), command_pointer2_(ptr2), command_pointer3_(ptr3), minimum_position_(min_pos),
-          minimum_level_(min_lvl), command_number_(nr), allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type) {}
+    Command(QString name = {},
+            command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {},
+            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+            bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
+        : name_(name),
+          command_pointer_(ptr1), command_pointer2_(ptr2), command_pointer3_(ptr3),
+          minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+          allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type) {}
 
     [[nodiscard]] inline QString getName(void) const { return name_; }
     void setName(const QString name) { name_ = name; }
@@ -74,15 +79,11 @@ public:
 class Commands
 {
 public:
-    static void add_command_to_radix(Command cmd);
-    static void add_commands_to_radix(void);
-    static auto find_cmd_in_radix(QString arg) -> std::expected<Command, search_error>;
-    void free_command_radix_nodes(cmd_hash_info *curr);
-
-    static const QList<Command> commands;
-
-private:
-    static cmd_hash_info *cmd_radix_;
+    Commands(void);
+    void add(Command cmd);
+    auto find(QString arg) -> std::expected<Command, search_error>;
+    const static QList<Command> commands_;
+    QMap<QString, Command> map_;
 };
 
 #endif

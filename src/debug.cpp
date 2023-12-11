@@ -218,6 +218,11 @@ int main(int argc, char **argv)
 {
   DC debug(argc, argv);
 
+  auto found = DC::getInstance()->CMD_.find("shutdown");
+  qDebug() << found.has_value();
+  found = DC::getInstance()->CMD_.find("shutdow");
+  qDebug() << found.has_value();
+
   debug.db().table("shops").column("name", "text").column("name2", "bigint");
 
   exit(1);
