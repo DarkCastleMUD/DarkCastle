@@ -3,21 +3,12 @@
 #include "levels.h"
 #include "common.h"
 
-// **DEFINE LIST FOUND IN interp.h**
+QMap<QString, Command> Commands::map_ = {};
 
-// Temp removal to perfect system. 1/25/06 Eas
-// WARNING WARNING WARNING WARNING WARNING
-// The command list was modified to account for toggle_hide.
 // The last integer will affect a char being removed from hide when they perform the command.
 // 0  - char will always become visibile.
 // 1  - char will not become visible when using this command.
 // 2+ - char has a greater chance of breaking hide as this increases.
-// These numbers are overruled by the act() STAYHIDE flag.
-// Eas 1/21/06
-//
-// The command number should be CMD_DEFAULT for any user command that is not used
-// in a spec_proc.  If it is, then it should be a number that is not
-// already in use.
 const QList<Command> Commands::commands_ =
     {
         // Movement commands
@@ -506,11 +497,6 @@ const QList<Command> Commands::commands_ =
         // End of the line
         {"", nullptr, nullptr, &Character::generic_command, position_t::DEAD, 0, CMD_DEFAULT, true, 0}};
 
-void Commands::add(Command cmd)
-{
-    map_[cmd.getName()] = cmd;
-}
-
 auto Commands::find(QString arg) -> std::expected<Command, search_error>
 {
     if (map_.contains(arg))
@@ -525,6 +511,15 @@ Commands::Commands(void)
 {
     for (const auto &command : commands_)
     {
-        add(command.getName());
+        map_[command.getName()] = command;
+        for (qsizetype position = 1; position < command.getName().length(); position++)
+        {
+            auto keyword = command.getName();
+            keyword.truncate(position);
+            if (!map_.contains(keyword))
+            {
+                map_[keyword] = command;
+            }
+        }
     }
 }

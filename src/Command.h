@@ -18,14 +18,15 @@ enum class CommandType
 class Command
 {
 public:
-    Command(QString name = {},
-            command_gen1_t ptr1 = {}, command_gen2_t ptr2 = {}, command_gen3_t ptr3 = {},
-            position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
-            bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
-        : name_(name),
-          command_pointer_(ptr1), command_pointer2_(ptr2), command_pointer3_(ptr3),
-          minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
-          allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type) {}
+    /*
+        Command(QString name = QString(),
+                command_gen1_t ptr1 = nullptr, command_gen2_t ptr2 = nullptr, command_gen3_t ptr3 = nullptr,
+                position_t min_pos = {}, level_t min_lvl = {}, int nr = CMD_DEFAULT,
+                bool allow_charmie = false, uint8_t toggle_hide = {}, CommandType type = {})
+            : name_(name),
+              command_pointer_(ptr1), command_pointer2_(ptr2), command_pointer3_(ptr3),
+              minimum_position_(min_pos), minimum_level_(min_lvl), command_number_(nr),
+              allow_charmie_(allow_charmie), toggle_hide_(toggle_hide), type_(type) {}*/
 
     [[nodiscard]] inline QString getName(void) const { return name_; }
     void setName(const QString name) { name_ = name; }
@@ -53,29 +54,22 @@ public:
     [[nodiscard]] inline CommandType getType(void) const { return type_; }
     void setType(const CommandType type) { type_ = type; }
 
-private:
     QString name_;
-    int (*command_pointer_)(class Character *ch, char *argument, int cmd);               /* Function that does it            */
-    command_return_t (*command_pointer2_)(Character *ch, std::string argument, int cmd); /* Function that does it            */
-    command_return_t (Character::*command_pointer3_)(QStringList arguments, int cmd);    /* Function that does it            */
-    position_t minimum_position_;                                                        /* Position commander must be in    */
-    level_t minimum_level_;                                                              /* Minimum level needed             */
-    int command_number_;                                                                 /* Passed to function as argument   */
+
+    // int (*command_pointer_)(class Character *ch, char *argument, int cmd);               /* Function that does it            */
+    // command_return_t (*command_pointer2_)(Character *ch, std::string argument, int cmd); /* Function that does it            */
+    // command_return_t (Character::*command_pointer3_)(QStringList arguments, int cmd);    /* Function that does it            */
+
+    command_gen1_t command_pointer_;
+    command_gen2_t command_pointer2_;
+    command_gen3_t command_pointer3_;
+    position_t minimum_position_; /* Position commander must be in    */
+    level_t minimum_level_;       /* Minimum level needed             */
+    int command_number_;          /* Passed to function as argument   */
     bool allow_charmie_;
     uint8_t toggle_hide_;
     CommandType type_;
 };
-
-class cmd_hash_info
-{
-public:
-    cmd_hash_info(void)
-        : left(nullptr), right(nullptr) {}
-    Command command;
-    cmd_hash_info *left{};
-    cmd_hash_info *right{};
-};
-
 class Commands
 {
 public:
@@ -83,7 +77,7 @@ public:
     void add(Command cmd);
     auto find(QString arg) -> std::expected<Command, search_error>;
     const static QList<Command> commands_;
-    QMap<QString, Command> map_;
+    static QMap<QString, Command> map_;
 };
 
 #endif

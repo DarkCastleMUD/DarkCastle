@@ -472,7 +472,6 @@ void DC::init_game(void)
   void free_zones_from_memory();
   void free_shops_from_memory();
   void free_emoting_objects_from_memory();
-  void free_command_radix_nodes(cmd_hash_info * curr);
   void free_ban_list_from_memory();
   void free_buff_pool_from_memory();
 #endif

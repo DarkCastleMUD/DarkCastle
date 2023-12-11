@@ -173,8 +173,6 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       return retval;
   }
 
-  // Look for command in command table.
-  // Old method used a linear search. *yuck* (Sadus)
   auto found = DC::getInstance()->CMD_.find(command);
   if (found.has_value())
   {
