@@ -547,48 +547,48 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
       extern struct song_info_type song_info[];
-      csendf(ch, "Ki:   $B%3d$R ", song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski);
+      ch->send(QString("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski,3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
       extern struct ki_info_type ki_info[];
-      csendf(ch, "Ki:   $B%3d$R ", ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski);
+      ch->send(QString("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski,3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {
-      csendf(ch, "Move: $B%3d$R ", 2);
+      ch->send(QString("Move: $B%1$R ").arg(2,3));
     }
     else if (skilllist[i].skillnum == 320) // switch
     {
-      csendf(ch, "Move: $B%3d$R ", 4);
+      ch->send(QString("Move: $B%1$R ").arg(4,3));
     }
     else if (skilllist[i].skillnum == 319) // consider
     {
-      csendf(ch, "Move: $B%3d$R ", 5);
+      ch->send(QString("Move: $B%1$R ").arg(5,3));
     }
     else if (skilllist[i].skillnum == 368) // release
     {
-      csendf(ch, "Move: $B%3d$R ", 25);
+      ch->send(QString("Move: $B%1$R ").arg(25,3));
     }
     else if (skilllist[i].skillnum == 380) // fire arrows
     {
-      csendf(ch, "Mana: $B%3d$R ", 30);
+      ch->send(QString("Mana: $B%1$R ").arg(30,3));
     }
     else if (skilllist[i].skillnum == 381) // ice arrows
     {
-      csendf(ch, "Mana: $B%3d$R ", 20);
+      ch->send(QString("Mana: $B%1$R ").arg(20,3));
     }
     else if (skilllist[i].skillnum == 382) // tempest arrows
     {
-      csendf(ch, "Mana: $B%3d$R ", 10);
+      ch->send(QString("Mana: $B%1$R ").arg(10,3));
     }
     else if (skilllist[i].skillnum == 383) // granite arrows
     {
-      csendf(ch, "Mana: $B%3d$R ", 40);
+      ch->send(QString("Mana: $B%1$R ").arg(40,3));
     }
     else if (skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
     {
-      csendf(ch, "Move: $B%3d$R ", skill_cost.find(skilllist[i].skillnum)->second);
+      ch->send(QString("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second,3));
     }
     else
       ch->send("          ");

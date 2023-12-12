@@ -22,8 +22,6 @@ one liner quest shit
 #include "room.h"
 #include "inventory.h"
 
-
-
 typedef std::vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
@@ -413,7 +411,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
 int show_one_complete_quest(Character *ch, struct quest_info *quest, int count)
 {
-   csendf(ch, " $B$2Name:$7 %-35s $2Reward:$7 %-5d$R\n\r", quest->name, quest->reward);
+   ch->send(QString(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n\r").arg(quest->name, -35).arg(quest->reward, -5));
    return ++count;
 }
 
