@@ -7837,7 +7837,7 @@ void Character::send(const char *buffer)
 
 void Character::send(std::string buffer)
 {
-  this->send(buffer);
+  send_to_char(buffer, this);
 }
 
 void Character::send(QString buffer)
