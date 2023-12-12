@@ -88,7 +88,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
   arg = one_argument(arg, buf);
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isname(buf, GET_NAME(k->follower)))
+    if (IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
     {
       victim = k->follower;
       break;
@@ -353,7 +353,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
         return eFAILURE;
       }
 
-      if (isname(victim, pScent->trackee))
+      if (isexact(victim, pScent->trackee))
       {
         y = pScent->direction;
         this->add_memory(pScent->trackee, 't');
@@ -1394,7 +1394,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   for (; where < MAX_WEAR; where++)
   {
     if (ch->equipment[where])
-      if (IS_CONTAINER(ch->equipment[where]) && isname("quiver", ch->equipment[where]->name))
+      if (IS_CONTAINER(ch->equipment[where]) && isexact("quiver", ch->equipment[where]->name))
       {
         found = find_arrow(ch->equipment[where]);
         if (found)
@@ -1589,7 +1589,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         for (corpse = object_list; corpse; corpse = next)
         {
           next = corpse->next;
-          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isname(GET_NAME(ch), GET_OBJ_NAME(corpse)))
+          if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(GET_NAME(ch), GET_OBJ_NAME(corpse)))
           {
             obj_from_room(corpse);
             obj_to_room(corpse, cur_room);

@@ -595,7 +595,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 
   if (!select.isEmpty() && !last.isEmpty() && cmd >= 0)
   {
-    if (isname(select, "type"))
+    if (isexact(select, "type"))
     {
       char result = last.at(0).toUpper().toLatin1();
 
@@ -624,7 +624,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         break;
       }
     }
-    else if (isname(select, "if"))
+    else if (isexact(select, "if"))
     {
       switch (last.at(0).toLatin1())
       {
@@ -676,7 +676,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         return eFAILURE;
       }
     }
-    else if (isname(select, "comment"))
+    else if (isexact(select, "comment"))
     {
       //      This is str_hsh'd, don't delete it
       //      if(zone.cmd[cmd]->comment)
@@ -706,7 +706,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       uint_fast8_t argument_number = 0;
       decltype(zone.cmd[cmd]->arg1) original_value = 0, new_value = 0;
       QString change_type;
-      if (isname(select, "1"))
+      if (isexact(select, "1"))
       {
         argument_number = 1;
         switch (zone.cmd[cmd]->command)
@@ -736,7 +736,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         zone.cmd[cmd]->arg1 = j;
         new_value = i;
       }
-      else if (isname(select, "2"))
+      else if (isexact(select, "2"))
       {
         argument_number = 2;
         switch (zone.cmd[cmd]->command)
@@ -765,7 +765,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         zone.cmd[cmd]->arg2 = i;
         new_value = zone.cmd[cmd]->arg2;
       }
-      else if (isname(select, "3"))
+      else if (isexact(select, "3"))
       {
         argument_number = 3;
         switch (zone.cmd[cmd]->command)
@@ -861,7 +861,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   }
 
   QString text = arguments.at(0);
-  if (isname(text, "new"))
+  if (isexact(text, "new"))
   {
     zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
     ch->send(QString("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
@@ -4787,7 +4787,7 @@ int do_rdelete(Character *ch, char *arg, int cmd)
         ch->sendln("There is nothing there to remove.");
         return eFAILURE;
       }
-      if (isname(buf2, i->keyword))
+      if (isexact(buf2, i->keyword))
         break;
     }
 

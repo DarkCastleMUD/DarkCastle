@@ -1160,7 +1160,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name))
+	if (isexact("only", portal->name) && !isexact(GET_NAME(sesame), portal->name))
 	{
 		ch->sendln("The portal fades when you draw near, then shimmers as you withdraw.");
 		return eFAILURE;
@@ -1330,7 +1330,7 @@ int ambush(Character *ch)
 			continue;
 		if (!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
 			continue;
-		if (isname(i->ambush, GET_NAME(ch)))
+		if (isexact(i->ambush, GET_NAME(ch)))
 		{
 
 			if (!i->canPerform(SKILL_AMBUSH))

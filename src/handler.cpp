@@ -111,9 +111,7 @@ QString fname(QString namelist)
 	return namelist.split(' ').value(0);
 }
 
-// TODO - figure out how this is different from isname() and comment why
-// we need it.  Neither of them are case-sensitive....
-int isname2(const char *str, const char *namel)
+int isprefix(const char *str, const char *namel)
 {
 	const char *s = namel;
 
@@ -135,14 +133,14 @@ int isname2(const char *str, const char *namel)
 	return 0;
 }
 
-// TODO - figure out how this is different from isname() and comment why
+// TODO - figure out how this is different from isexact() and comment why
 // we need it.  Neither of them are case-sensitive....
-int isname2(QString str, QString namel)
+int isprefix(QString str, QString namel)
 {
-	return isname2(str.toStdString().c_str(), namel.toStdString().c_str());
+	return isprefix(str.toStdString().c_str(), namel.toStdString().c_str());
 }
 
-int isname(QString arg, QStringList namelist)
+int isexact(QString arg, QStringList namelist)
 {
 	for (const auto &name : namelist)
 	{
@@ -155,32 +153,32 @@ int isname(QString arg, QStringList namelist)
 	return false;
 }
 
-int isname(QString arg, QString namelist)
+int isexact(QString arg, QString namelist)
 {
-	return isname(arg.toStdString().c_str(), namelist.toStdString().c_str());
+	return isexact(arg.toStdString().c_str(), namelist.toStdString().c_str());
 }
 
-int isname(QString arg, const char *namelist)
+int isexact(QString arg, const char *namelist)
 {
-	return isname(arg.toStdString().c_str(), namelist);
+	return isexact(arg.toStdString().c_str(), namelist);
 }
 
-int isname(std::string arg, std::string namelist)
+int isexact(std::string arg, std::string namelist)
 {
-	return isname(arg.c_str(), namelist.c_str());
+	return isexact(arg.c_str(), namelist.c_str());
 }
 
-int isname(std::string arg, const char *namelist)
+int isexact(std::string arg, const char *namelist)
 {
-	return isname(arg.c_str(), namelist);
+	return isexact(arg.c_str(), namelist);
 }
 
-int isname(const char *arg, std::string namelist)
+int isexact(const char *arg, std::string namelist)
 {
-	return isname(arg, namelist.c_str());
+	return isexact(arg, namelist.c_str());
 }
 
-int isname(const char *arg, joining_t &namelist)
+int isexact(const char *arg, joining_t &namelist)
 {
 	for (joining_t::const_iterator i = namelist.begin(); i != namelist.end(); ++i)
 	{
@@ -200,7 +198,7 @@ int isname(const char *arg, joining_t &namelist)
 | Side Effects: None
 | Returns: One if it's in the namelist, zero otherwise
 */
-int isname(const char *str, const char *namelist)
+int isexact(const char *str, const char *namelist)
 {
 #if 0
 	std::string haystack(namelist);
@@ -2761,7 +2759,7 @@ class Object *get_obj_in_list(char *name, class Object *list)
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isname(tmp, i->name))
+		if (isexact(tmp, i->name))
 		{
 			if (j == number)
 				return i;
@@ -2797,7 +2795,7 @@ class Object *get_obj(char *name)
 		return (0);
 
 	for (i = object_list, j = 1; i && (j <= number); i = i->next)
-		if (isname(tmp, i->name))
+		if (isexact(tmp, i->name))
 		{
 			if (j == number)
 				return (i);
@@ -2847,9 +2845,9 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isname(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && mob_index[i->mobdata->nr].virt == 12))
+			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && mob_index[i->mobdata->nr].virt == 12))
 				return (i);
-			else if (isname2(tmp, GET_NAME(i)))
+			else if (isprefix(tmp, GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -2862,7 +2860,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 		}
 		else
 		{
-			if (isname(tmp, GET_NAME(i)))
+			if (isexact(tmp, GET_NAME(i)))
 			{
 				j++;
 				if (j == number)
@@ -2904,9 +2902,9 @@ Character *get_char(QString name)
 		if (number == 0 && IS_NPC(i)) return false;
 		if (number == 1 || number == 0)
 		{
-			if (isname(tmp, GET_NAME(i)))
+			if (isexact(tmp, GET_NAME(i)))
 			return true;
-			else if (isname2(tmp.toStdString().c_str(), GET_NAME(i)))
+			else if (isprefix(tmp.toStdString().c_str(), GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -2919,7 +2917,7 @@ Character *get_char(QString name)
 		}
 		else
 		{
-			if(isname(tmp, GET_NAME(i)))
+			if(isexact(tmp, GET_NAME(i)))
 			{
 				j++;
 				if(j == number)
@@ -2945,7 +2943,7 @@ Character *get_mob(char *name)
 		if(!IS_MOB(i)) {
 			return false;
 		}
-		if (isname(name, GET_NAME(i))) {
+		if (isexact(name, GET_NAME(i))) {
 			return true;
 		}
 		return false; });
@@ -4054,12 +4052,12 @@ Character *Character::get_char_room_vis(QString name)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isname(name, GET_NAME(i)) && CAN_SEE(this, i))
+			if (isexact(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
 				lastseen_targeted(this, i);
 				return (i);
 			}
-			else if (isname2(name, GET_NAME(i)) && CAN_SEE(this, i))
+			else if (isprefix(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
 				if (partial_match)
 				{
@@ -4072,7 +4070,7 @@ Character *Character::get_char_room_vis(QString name)
 		}
 		else
 		{
-			if (isname(name, GET_NAME(i)) && CAN_SEE(this, i))
+			if (isexact(name, GET_NAME(i)) && CAN_SEE(this, i))
 			{
 				j++;
 				if (j == number)
@@ -4114,9 +4112,9 @@ Character *get_mob_room_vis(Character *ch, char *name)
 
 		if (number == 1)
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isexact(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 				return (i);
-			else if (isname2(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			else if (isprefix(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 			{
 				if (partial_match)
 				{
@@ -4129,7 +4127,7 @@ Character *get_mob_room_vis(Character *ch, char *name)
 		}
 		else
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isexact(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 			{
 				if (j == number)
 					return (i);
@@ -4146,7 +4144,7 @@ Character *get_pc_room_vis_exact(Character *ch, const char *name)
 
 	for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
 	{
-		if (isname(name, GET_NAME(i)) && CAN_SEE(ch, i) && IS_PC(i))
+		if (isexact(name, GET_NAME(i)) && CAN_SEE(ch, i) && IS_PC(i))
 			return (i);
 	}
 	return nullptr;
@@ -4176,9 +4174,9 @@ Character *get_mob_vis(Character *ch, char *name)
 						  {
 		if (number == 1)
 		{
-			if (isname(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
+			if (isexact(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
 			return true;
-			else if (isname2(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
+			else if (isprefix(tmp, GET_NAME(i))&& IS_NPC(i) && CAN_SEE(ch,i))
 			{
 				if (partial_match)
 				{
@@ -4191,7 +4189,7 @@ Character *get_mob_vis(Character *ch, char *name)
 		}
 		else
 		{
-			if(isname(tmp, GET_NAME(i)) && IS_NPC(i) && CAN_SEE(ch, i))
+			if(isexact(tmp, GET_NAME(i)) && IS_NPC(i) && CAN_SEE(ch, i))
 			{
 				if(j == number)
 				return true;
@@ -4302,9 +4300,9 @@ Character *get_char_vis(Character *ch, const char *name)
 
 		if (number == 1 || number == 0)
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isexact(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 			return true;
-			else if (isname2(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			else if (isprefix(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 			{
 				if (partial_match)
 				{
@@ -4317,7 +4315,7 @@ Character *get_char_vis(Character *ch, const char *name)
 		}
 		else
 		{
-			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
+			if (isexact(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
 			{
 				j++;
 				if (j == number)
@@ -4339,7 +4337,7 @@ Character *get_pc(QString name)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
-		if(IS_PC(i) && isname(name, GET_NAME(i)))
+		if(IS_PC(i) && isexact(name, GET_NAME(i)))
 		return true;
 
 		return false; });
@@ -4365,9 +4363,9 @@ Character *get_active_pc(QString name)
 		if (!(i = d->character) || d->connected)
 			continue;
 
-		if (isname(name, i->getName()))
+		if (isexact(name, i->getName()))
 			return (i);
-		else if (isname2(name.toStdString().c_str(), i->getName().toStdString().c_str()))
+		else if (isprefix(name.toStdString().c_str(), i->getName().toStdString().c_str()))
 		{
 			if (partial_match)
 			{
@@ -4396,9 +4394,9 @@ get_active_pc(const char *name)
 		if (!(i = d->character) || d->connected)
 			continue;
 
-		if (isname(name, GET_NAME(i)))
+		if (isexact(name, GET_NAME(i)))
 			return (i);
-		else if (isname2(name, GET_NAME(i)))
+		else if (isprefix(name, GET_NAME(i)))
 		{
 			if (partial_match)
 			{
@@ -4425,7 +4423,7 @@ Character *get_all_pc(char *name)
 			continue;
 		}
 
-		if (isname(name, GET_NAME(i)))
+		if (isexact(name, GET_NAME(i)))
 		{
 			return i;
 		}
@@ -4468,9 +4466,9 @@ Character *get_pc_vis(Character *ch, const char *name)
 						  {
 		if(IS_PC(i) && CAN_SEE(ch, i))
 		{
-			if (isname(name, GET_NAME(i)))
+			if (isexact(name, GET_NAME(i)))
 			return true;
-			else if (isname2(name, GET_NAME(i)))
+			else if (isprefix(name, GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -4529,9 +4527,9 @@ Character *Character::get_active_pc_vis(QString name)
 
 		if (CAN_SEE(this, i))
 		{
-			if (isname(name, GET_NAME(i)))
+			if (isexact(name, GET_NAME(i)))
 				return (i);
-			else if (isname2(name, GET_NAME(i)))
+			else if (isprefix(name, GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -4575,7 +4573,7 @@ class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *lis
 		return (0);
 
 	for (i = list, j = 1; i && (j <= number); i = i->next_content)
-		if (isname(tmp, i->name))
+		if (isexact(tmp, i->name))
 			if (CAN_SEE_OBJ(ch, i, blindfighting))
 			{
 				if (j == number)
@@ -4622,7 +4620,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		if (loc && DC::isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			ch->getLevel() < 101)
 			continue;
-		if (isname(tmp, i->name))
+		if (isexact(tmp, i->name))
 			if (CAN_SEE_OBJ(ch, i))
 			{
 				if (j == number)
@@ -4804,7 +4802,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 	{
 		for (found = false, i = 0; i < MAX_WEAR && !found; i++)
 		{
-			if (ch->equipment[i] && isname(name, ch->equipment[i]->name) && CAN_SEE_OBJ(ch, ch->equipment[i]))
+			if (ch->equipment[i] && isexact(name, ch->equipment[i]->name) && CAN_SEE_OBJ(ch, ch->equipment[i]))
 			{
 				*tar_obj = ch->equipment[i];
 				found = true;
@@ -4941,7 +4939,7 @@ void remove_memory(Character *ch, char type, Character *vict)
 	{
 		if (ch->mobdata->hated.isEmpty())
 			return;
-		if (!isname(GET_NAME(vict), ch->mobdata->hated))
+		if (!isexact(GET_NAME(vict), ch->mobdata->hated))
 			return;
 
 		auto hated_list = ch->mobdata->hated.split(' ');
@@ -5005,7 +5003,7 @@ void Character::add_memory(QString victim_name, char type)
 		else
 		{
 			// Don't put same name twice
-			if (isname(victim_name, this->mobdata->hated))
+			if (isexact(victim_name, this->mobdata->hated))
 			{
 				return;
 			}

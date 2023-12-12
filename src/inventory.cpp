@@ -87,7 +87,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     buffer = fmt::format("{}_consent", GET_NAME(ch));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if ((cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !isname(buffer, sub_object->name))
+      if ((cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -115,9 +115,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer, sub_object->name))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name))
     {
-      if (cmd == CMD_LOOT && isname("lootable", sub_object->name))
+      if (cmd == CMD_LOOT && isexact("lootable", sub_object->name))
       {
         struct affected_type pthiefaf;
 
@@ -199,7 +199,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
   }
   if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-      isname("pc", sub_object->name))
+      isexact("pc", sub_object->name))
     ch->save(666);
 
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
@@ -233,10 +233,10 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
                obj_object->obj_flags.value[0]);
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
-    //           !isname("pc",sub_object->name) && ch->clan
+    //           !isexact("pc",sub_object->name) && ch->clan
     //            && get_clan(ch)->tax && !DC::isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     if (((sub_object && sub_object->obj_flags.value[3] == 1 &&
-          !isname("pc", sub_object->name)) ||
+          !isexact("pc", sub_object->name)) ||
          !sub_object) &&
         ch->clan && get_clan(ch)->tax && !DC::isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
@@ -421,7 +421,7 @@ int do_get(Character *ch, char *argument, int cmd)
       next_obj = obj_object->next_content;
 
       /* IF all.obj, only get those named "obj" */
-      if (alldot && !isname(allbuf, obj_object->name))
+      if (alldot && !isexact(allbuf, obj_object->name))
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
@@ -449,21 +449,21 @@ int do_get(Character *ch, char *argument, int cmd)
       }
 
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+          !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
         continue;
       }
 
       // PC corpse
-      if ((obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name)) || isname("thiefcorpse", obj_object->name))
+      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->name)) || isexact("thiefcorpse", obj_object->name))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isname("thiefcorpse", obj_object->name) &&
-             !isname(GET_NAME(ch), obj_object->name)) ||
-            isname(GET_NAME(ch), obj_object->name) || ch->getLevel() >= OVERSEER)
+        if ((isexact("thiefcorpse", obj_object->name) &&
+             !isexact(GET_NAME(ch), obj_object->name)) ||
+            isexact(GET_NAME(ch), obj_object->name) || ch->getLevel() >= OVERSEER)
           has_consent = true;
-        if (!has_consent && !isname(GET_NAME(ch), obj_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), obj_object->name))
         {
           if (ch->getLevel() < OVERSEER)
           {
@@ -543,12 +543,12 @@ int do_get(Character *ch, char *argument, int cmd)
     {
       if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
           obj_object->obj_flags.value[3] == 1 &&
-          isname("pc", obj_object->name))
+          isexact("pc", obj_object->name))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if (isname(GET_NAME(ch), obj_object->name))
+        if (isexact(GET_NAME(ch), obj_object->name))
           has_consent = true;
-        if (!has_consent && !isname(GET_NAME(ch), obj_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), obj_object->name))
         {
           send_to_char("You don't have consent to take the "
                        "corpse.\r\n",
@@ -559,7 +559,7 @@ int do_get(Character *ch, char *argument, int cmd)
       }
 
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+          !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
       }
@@ -647,13 +647,13 @@ int do_get(Character *ch, char *argument, int cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isname("pc", sub_object->name)) ||
-           isname("thiefcorpse", sub_object->name)))
+            isexact("pc", sub_object->name)) ||
+           isexact("thiefcorpse", sub_object->name)))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
-        if ((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name) || ch->getLevel() > 105)
+        if ((isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name)) || isexact(buffer, sub_object->name) || ch->getLevel() > 105)
           has_consent = true;
-        if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), sub_object->name))
         {
           ch->sendln("You don't have consent to touch the corpse.");
           return eFAILURE;
@@ -690,7 +690,7 @@ int do_get(Character *ch, char *argument, int cmd)
        }*/
           //		}
           /* IF all.obj, only get those named "obj" */
-          if (alldot && !isname(allbuf, obj_object->name))
+          if (alldot && !isexact(allbuf, obj_object->name))
           {
             continue;
           }
@@ -703,7 +703,7 @@ int do_get(Character *ch, char *argument, int cmd)
           }
 
           if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
+              !isexact(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
           {
             ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
             continue;
@@ -731,7 +731,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   // the other of the corpse, has_consent will be false.
                   if (ch->getLevel() < IMMORTAL)
                   {
-                    if (isname(obj_object->name, "thiefcorpse"))
+                    if (isexact(obj_object->name, "thiefcorpse"))
                     {
                       ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
                       extract_obj(obj_object);
@@ -827,16 +827,16 @@ int do_get(Character *ch, char *argument, int cmd)
     {
       if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
           ((sub_object->obj_flags.value[3] == 1 &&
-            isname("pc", sub_object->name)) ||
-           isname("thiefcorpse", sub_object->name)))
+            isexact("pc", sub_object->name)) ||
+           isexact("thiefcorpse", sub_object->name)))
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-        if ((cmd != CMD_LOOT && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name))) || isname(buffer, sub_object->name))
+        if ((cmd != CMD_LOOT && (isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name))) || isexact(buffer, sub_object->name))
           has_consent = true;
-        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !DC::isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !DC::isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
-        if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
+        if (!has_consent && !isexact(GET_NAME(ch), sub_object->name))
         {
           send_to_char("You don't have consent to touch the "
                        "corpse.\r\n",
@@ -892,7 +892,7 @@ int do_get(Character *ch, char *argument, int cmd)
               // the other of the corpse, has_consent will be false.
               if (ch->getLevel() < IMMORTAL)
               {
-                if (isname("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isname("lootable", sub_object->name)))
+                if (isexact("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isexact("lootable", sub_object->name)))
                 {
                   ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
@@ -909,7 +909,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   fail = true;
                   sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-                  if ((cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !isname(buffer, sub_object->name))
+                  if ((cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
                   {
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
                     struct affected_type pthiefaf;
@@ -1038,13 +1038,13 @@ int do_consent(Character *ch, char *arg, int cmd)
     if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || !obj->name)
       continue;
 
-    if (!isname(GET_NAME(ch), obj->name))
+    if (!isexact(GET_NAME(ch), obj->name))
       // corpse isn't owned by the consenting player
       continue;
 
     // check to see if this player is already consented for the corpse
     sprintf(buf2, "%s_consent", buf);
-    if (isname(buf2, obj->name))
+    if (isexact(buf2, obj->name))
       // keep looking; there might be other corpses not yet consented
       continue;
 
@@ -1175,7 +1175,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       {
         next_obj = tmp_object->next_content;
 
-        if (alldot[0] != '\0' && !isname(alldot, tmp_object->name))
+        if (alldot[0] != '\0' && !isexact(alldot, tmp_object->name))
           continue;
 
         if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -1327,7 +1327,7 @@ void do_putalldot(Character *ch, char *name, char *target, int cmd)
       found = true;
       do_put(ch, buf, cmd);
     }
-    else if (isname(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
+    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
     {
       sprintf(buf, "%s %s", name, target);
       buf[99] = 0;
@@ -1586,7 +1586,7 @@ void do_givealldot(Character *ch, char *name, char *target, int cmd)
       found = true;
       do_give(ch, buf, cmd);
     }
-    else if (isname(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
+    else if (isexact(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object))
     {
       sprintf(buf, "%s %s", name, target);
       buf[99] = 0;
@@ -2156,7 +2156,7 @@ int find_door(Character *ch, char *type, char *dir)
 
     if (EXIT(ch, door))
       if (EXIT(ch, door)->keyword)
-        if (isname(type, EXIT(ch, door)->keyword))
+        if (isexact(type, EXIT(ch, door)->keyword))
           return (door);
         else
         {
@@ -2174,7 +2174,7 @@ int find_door(Character *ch, char *type, char *dir)
     for (door = 0; door <= 5; door++)
       if (EXIT(ch, door))
         if (EXIT(ch, door)->keyword)
-          if (isname(type, EXIT(ch, door)->keyword))
+          if (isexact(type, EXIT(ch, door)->keyword))
             return (door);
 
     return (-1);
@@ -2677,7 +2677,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     sprintf(buffer, "%s_consent", GET_NAME(ch));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if (isname("lootable", sub_object->name) && !isname(buffer, sub_object->name))
+      if (isexact("lootable", sub_object->name) && !isexact(buffer, sub_object->name))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -2700,9 +2700,9 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer, sub_object->name))
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name))
     {
-      if (isname("lootable", sub_object->name))
+      if (isexact("lootable", sub_object->name))
       {
         struct affected_type pthiefaf;
 

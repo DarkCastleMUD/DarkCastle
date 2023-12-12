@@ -165,7 +165,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			if ((num = real_object(x)) < 0)
 				continue;
 
-			if (isname("prize", ((class Object *)(obj_index[num].item))->name))
+			if (isexact("prize", ((class Object *)(obj_index[num].item))->name))
 			{
 				cnt++;
 				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(obj_index[num].item))->short_description);
@@ -268,7 +268,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
 			}
-			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->name))
+			else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(obj_index[number].item))->name))
 			{
 				ch->sendln("This command can only load prize items.");
 				return eFAILURE;
@@ -314,7 +314,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
 		}
-		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->name))
+		else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(obj_index[num].item))->name))
 		{
 			ch->sendln("This command can only load prize items.");
 			return eFAILURE;
@@ -912,7 +912,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_mobile(i)) < 0)
 					continue;
 
-				if (isname(name, ((Character *)(mob_index[nr].item))->getNameC()))
+				if (isexact(name, ((Character *)(mob_index[nr].item))->getNameC()))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
@@ -1016,7 +1016,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_object(i)) < 0)
 					continue;
 
-				if (isname(name,
+				if (isexact(name,
 						   ((class Object *)(obj_index[nr].item))->name))
 				{
 					count++;
@@ -1833,7 +1833,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 	}
 	source_room = victim->in_room;
 
-	if (DC::getInstance()->world[destination_room].number == IMM_PIRAHNA_ROOM && !isname(GET_NAME(ch), "Pirahna"))
+	if (DC::getInstance()->world[destination_room].number == IMM_PIRAHNA_ROOM && !isexact(GET_NAME(ch), "Pirahna"))
 	{
 		ch->sendln("Damn! That is rude! This ain't your place. :P");
 		return eFAILURE;

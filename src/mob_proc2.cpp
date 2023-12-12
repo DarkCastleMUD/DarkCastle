@@ -429,7 +429,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 				continue;
 
-			if (!isname("pc", obj->name) || (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)))
+			if (!isexact("pc", obj->name) || (!isexact(GET_NAME(ch), obj->name) && !isexact(buf, obj->name)))
 				continue;
 
 			if (obj->in_room == ch->in_room)
@@ -477,7 +477,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 			continue;
 
-		if (!isname("pc", obj->name) || (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)) || ++x < which)
+		if (!isexact("pc", obj->name) || (!isexact(GET_NAME(ch), obj->name) && !isexact(buf, obj->name)) || ++x < which)
 			continue;
 
 		if (!obj->contains) // skip empty corpses

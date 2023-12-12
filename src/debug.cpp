@@ -218,13 +218,16 @@ int main(int argc, char **argv)
 {
   DC debug(argc, argv);
 
+  char namelist[] = "chief enforcer bob";
+  qDebug() << isexact("enf", namelist) << ispartial("enf", namelist);
+
   exit(1);
 
-  debug.db().table("shops").column("name", "text").column("name2", "bigint");
+  // debug.db().table("shops").column("name", "text").column("name2", "bigint");
 
-  exit(1);
+  // exit(1);
 
-  testStrings();
+  // testStrings();
 
   QString orig_cwd, dclib;
   if (getenv("DCLIB"))
@@ -277,7 +280,7 @@ int main(int argc, char **argv)
 
   d = new Connection;
   Character *ch = new Character;
-  ch->setName("DebugIMP");
+  ch->setName("Debugimp");
   ch->player = new Player;
 
   ch->desc = d;
@@ -286,77 +289,89 @@ int main(int argc, char **argv)
   d->character = ch;
   d->output = {};
   do_stand(ch, "", CMD_DEFAULT);
+  process_output(d);
   char_to_room(ch, 3001);
-  ch->do_toggle({"pager"}, CMD_DEFAULT);
-  ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  ch->do_toggle({}, CMD_DEFAULT);
-  // do_goto(ch, "23", CMD_DEFAULT);
-  do_look(ch, "", CMD_LOOK);
+  process_output(d);
+  // ch->do_toggle({"pager"}, CMD_DEFAULT);
+  // ch->do_toggle({"ansi"}, CMD_DEFAULT);
+  // ch->do_toggle({}, CMD_DEFAULT);
+  //  do_goto(ch, "23", CMD_DEFAULT);
+  // do_score(ch, "", CMD_DEFAULT);
+  // process_output(d);
+
+  // do_load(ch, "m 23", CMD_DEFAULT);
+  // process_output(d);
+  do_look(ch, "debugimp", CMD_LOOK);
   process_output(d);
 
-  qDebug("\n");
+  ch->do_bestow({"debugimp", "load"});
+  process_output(d);
 
-  qsizetype size_bits = 8 * sizeof(ch->player->toggles);
-  const char *data = reinterpret_cast<const char *>(&ch->player->toggles);
-  QBitArray ba;
-  if (data)
-  {
-    ba = QBitArray::fromBits(data, size_bits);
-  }
+  exit(EXIT_SUCCESS);
+  /*
+    qDebug("\n");
 
-  qDebug() << ch->player->toggles;
-  const uint32_t *nr = reinterpret_cast<const uint32_t *>(ba.bits());
-  qDebug() << *nr;
-  qDebug() << ba;
-
-  QSqlDatabase db = QSqlDatabase::database();
-  if (!db.isValid())
-  {
-    db.close();
-    db = QSqlDatabase::addDatabase("QPSQL");
-    // db.setHostName("localhost");
-    // db.setDatabaseName("dcastle");
-    // db.setUserName("dcastle");
-    db.open();
-  }
-
-  if (!db.isValid())
-  {
-    qDebug("Database error");
-    exit(1);
-  }
-
-  QSqlTableModel model{&debug, db};
-  model.setEditStrategy(QSqlTableModel::EditStrategy::OnFieldChange);
-  model.setTable("player_configurations");
-  model.select();
-  int row = model.rowCount();
-  qDebug() << "Rows: " << row;
-  model.insertRows(row, 1);
-  qDebug() << QVariant(ba);
-  int field_index = model.fieldIndex("testbit");
-  bool success = model.setData(model.index(row, field_index), ba.toUInt32(QSysInfo::ByteOrder));
-  if (!success)
-  {
-    qDebug("Failed to setData\n");
-    qDebug() << model.lastError();
-    exit(1);
-  }
-  if (!model.submitAll())
-  {
-    qDebug("Failed to submitAll");
-    qDebug() << model.lastError();
-    exit(1);
-  }
-
-  if (model.rowCount() > 0)
-  {
-    for (int row = 0; row < model.rowCount(); row++)
+    qsizetype size_bits = 8 * sizeof(ch->player->toggles);
+    const char *data = reinterpret_cast<const char *>(&ch->player->toggles);
+    QBitArray ba;
+    if (data)
     {
-      QSqlRecord rec = model.record(row);
-      qDebug() << rec.field("testbit");
+      ba = QBitArray::fromBits(data, size_bits);
     }
-  }
+
+    qDebug() << ch->player->toggles;
+    const uint32_t *nr = reinterpret_cast<const uint32_t *>(ba.bits());
+    qDebug() << *nr;
+    qDebug() << ba;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isValid())
+    {
+      db.close();
+      db = QSqlDatabase::addDatabase("QPSQL");
+      // db.setHostName("localhost");
+      // db.setDatabaseName("dcastle");
+      // db.setUserName("dcastle");
+      db.open();
+    }
+
+    if (!db.isValid())
+    {
+      qDebug("Database error");
+      exit(1);
+    }
+
+    QSqlTableModel model{&debug, db};
+    model.setEditStrategy(QSqlTableModel::EditStrategy::OnFieldChange);
+    model.setTable("player_configurations");
+    model.select();
+    int row = model.rowCount();
+    qDebug() << "Rows: " << row;
+    model.insertRows(row, 1);
+    qDebug() << QVariant(ba);
+    int field_index = model.fieldIndex("testbit");
+    bool success = model.setData(model.index(row, field_index), ba.toUInt32(QSysInfo::ByteOrder));
+    if (!success)
+    {
+      qDebug("Failed to setData\n");
+      qDebug() << model.lastError();
+      exit(1);
+    }
+    if (!model.submitAll())
+    {
+      qDebug("Failed to submitAll");
+      qDebug() << model.lastError();
+      exit(1);
+    }
+
+    if (model.rowCount() > 0)
+    {
+      for (int row = 0; row < model.rowCount(); row++)
+      {
+        QSqlRecord rec = model.record(row);
+        qDebug() << rec.field("testbit");
+      }
+    }*/
 
   if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {

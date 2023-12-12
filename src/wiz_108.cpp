@@ -194,7 +194,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
 
   for (k = object_list, j = 1; k && (j <= nIndex); k = k->next)
   {
-    if (!(isname(pBuf, k->name)))
+    if (!(isexact(pBuf, k->name)))
       continue;
     if (!CAN_SEE_OBJ(ch, k))
       continue;
@@ -703,7 +703,7 @@ int do_set(Character *ch, char *argument, int cmd)
         ch->sendln("No such race.");
         return eFAILURE;
       }
-      if (isname(races[x].singular_name, buf))
+      if (isexact(races[x].singular_name, buf))
       {
         GET_RACE(vict) = x;
         vict->immune = races[(int)GET_RACE(vict)].immune;

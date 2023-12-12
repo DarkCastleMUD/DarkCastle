@@ -3034,7 +3034,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     //
     if (IS_OBJ_STAT(i, ITEM_NOSEE))
     {
-      if (isname(tmp, i->name))
+      if (isexact(tmp, i->name))
       {
         skipped_nosee++;
       }
@@ -3043,7 +3043,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
     if (DC::isSet(i->obj_flags.more_flags, ITEM_NOLOCATE))
     {
-      if (isname(tmp, i->name))
+      if (isexact(tmp, i->name))
       {
         skipped_nolocate++;
       }
@@ -3077,7 +3077,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     if (owner && owner->player && is_in_game(owner) &&
         (owner->player->wizinvis > ch->getLevel()))
     {
-      if (isname(tmp, i->name))
+      if (isexact(tmp, i->name))
       {
         skipped_other++;
       }
@@ -3087,7 +3087,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     // Skip objs in god rooms
     if (room >= 1 && room <= 47)
     {
-      if (isname(tmp, i->name))
+      if (isexact(tmp, i->name))
       {
         skipped_god++;
       }
@@ -3095,7 +3095,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     }
 
     buf[0] = 0;
-    if (isname(tmp, i->name))
+    if (isexact(tmp, i->name))
     {
       if (i->carried_by)
       {
@@ -5260,7 +5260,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 
   // check to see if its an eligible corpse
   if ((GET_ITEM_TYPE(corpse) != ITEM_CONTAINER) ||
-      !corpse->obj_flags.value[3] || isname("pc", corpse->name))
+      !corpse->obj_flags.value[3] || isexact("pc", corpse->name))
   {
     act("$p shudders for a second, then lies still.", ch, corpse, 0,
         TO_CHAR, 0);
@@ -12251,7 +12251,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
 
   // make sure it isn't already a golem
 
-  if (isname("golem", victim->getNameC()))
+  if (isexact("golem", victim->getNameC()))
   {
     ch->sendln("Isn't that already a golem?");
     GET_MANA(ch) += 50;

@@ -568,7 +568,7 @@ int do_disband(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (isname(name, "all"))
+  if (isexact(name, "all"))
   {
     k = ch;
     sprintf(buf, "You disband your group: %s", k->group_name);

@@ -166,7 +166,7 @@ class Object *get_object_in_equip_vis(Character *ch,
    for ((*j) = 0, k = 1; ((*j) < MAX_WEAR) && (k <= num); (*j)++)
       if (equipment[(*j)])
          if (CAN_SEE_OBJ(ch, equipment[(*j)], blindfighting))
-            if (isname(tmp, equipment[(*j)]->name))
+            if (isexact(tmp, equipment[(*j)]->name))
             {
                if (k == num)
                   return (equipment[(*j)]);
@@ -181,7 +181,7 @@ char *find_ex_description(char *word, struct extra_descr_data *list)
    struct extra_descr_data *i;
 
    for (i = list; i; i = i->next)
-      if (isname(word, i->keyword))
+      if (isexact(word, i->keyword))
          return (i->description);
 
    return (0);
@@ -2603,7 +2603,7 @@ int do_olocate(Character *ch, char *name, int cmd)
          if (k->item_number != searchnum)
             continue;
       }
-      else if (!(isname(name, k->name)))
+      else if (!(isexact(name, k->name)))
          continue;
 
       if (!CAN_SEE_OBJ(ch, k))
@@ -2727,7 +2727,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
          if (searchnum != i->mobdata->nr)
             continue;
       }
-      else if (!(isname(name, i->getName())))
+      else if (!(isexact(name, i->getName())))
          continue;
 
       if (i->in_room == DC::NOWHERE)
@@ -3625,7 +3625,7 @@ bool Search::operator==(const Object *obj)
    switch (type_)
    {
    case O_NAME:
-      if (o_name_ == obj->name || isname(o_name_, obj->name))
+      if (o_name_ == obj->name || isexact(o_name_, obj->name))
       {
          return true;
       }

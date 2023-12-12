@@ -277,11 +277,11 @@ int do_quaff(Character *ch, char *argument, int cmd)
     temp = ch->equipment[HOLD];
     equipped = true;
     pos = HOLD;
-    if ((temp == 0) || !isname(buf, temp->name))
+    if ((temp == 0) || !isexact(buf, temp->name))
     {
       temp = ch->equipment[HOLD2];
       pos = HOLD2;
-      if ((temp == 0) || !isname(buf, temp->name))
+      if ((temp == 0) || !isexact(buf, temp->name))
       {
         equipped = false;
         pos = -2;
@@ -381,11 +381,11 @@ int do_recite(Character *ch, char *argument, int cmd)
     scroll = ch->equipment[HOLD];
     equipped = true;
     pos = HOLD;
-    if ((scroll == 0) || !isname(buf, scroll->name))
+    if ((scroll == 0) || !isexact(buf, scroll->name))
     {
       scroll = ch->equipment[HOLD2];
       pos = HOLD2;
-      if ((scroll == 0) || !isname(buf, scroll->name))
+      if ((scroll == 0) || !isexact(buf, scroll->name))
       {
         act("You do not have that item.", ch, 0, 0, TO_CHAR, 0);
         return eFAILURE;
@@ -725,13 +725,13 @@ int do_use(Character *ch, char *argument, int cmd)
 
   argument = one_argument(argument, buf);
 
-  if ((ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->name)) &&
-      (ch->equipment[HOLD2] == 0 || !isname(buf, ch->equipment[HOLD2]->name)))
+  if ((ch->equipment[HOLD] == 0 || !isexact(buf, ch->equipment[HOLD]->name)) &&
+      (ch->equipment[HOLD2] == 0 || !isexact(buf, ch->equipment[HOLD2]->name)))
   {
     act("You must be holding an item in order to to use it.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->name))
+  if (ch->equipment[HOLD] && isexact(buf, ch->equipment[HOLD]->name))
     stick = ch->equipment[HOLD];
   else
     stick = ch->equipment[HOLD2];
@@ -1671,7 +1671,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     }*/
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      !isname(GET_NAME(ch), obj->name) && ch->getLevel() < IMPLEMENTER)
+      !isexact(GET_NAME(ch), obj->name) && ch->getLevel() < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;

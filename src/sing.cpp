@@ -1981,7 +1981,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 		ch->sendln("You can't shatter that!");
 		return eFAILURE;
 	}
-	if (!isname("pcportal", obj->name))
+	if (!isexact("pcportal", obj->name))
 	{
 		ch->sendln("The portal resists your song.");
 		return eFAILURE;

@@ -688,7 +688,7 @@ int do_skilledit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (isname(type, "list"))
+  if (isexact(type, "list"))
   {
     if (victim->skills.empty())
     {
@@ -702,10 +702,10 @@ int do_skilledit(Character *ch, char *argument, int cmd)
       ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
     }
   }
-  else if (isname(type, "add"))
+  else if (isexact(type, "add"))
   {
   }
-  else if (isname(type, "delete"))
+  else if (isexact(type, "delete"))
   {
   }
   else

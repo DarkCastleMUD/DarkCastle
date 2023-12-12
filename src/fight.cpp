@@ -148,7 +148,7 @@ int check_autojoiners(Character *ch, int skill = 0)
       continue;
     if (tmp->player == nullptr || tmp->player->joining.empty())
       continue;
-    if (!isname(GET_NAME(ch), tmp->player->joining))
+    if (!isexact(GET_NAME(ch), tmp->player->joining))
       continue;
     if (IS_AFFECTED(tmp, AFF_INSANE))
       continue;
@@ -183,8 +183,8 @@ int check_joincharmie(Character *ch, int skill = 0)
     return eFAILURE;
   if (!tmp->player || tmp->player->joining.empty())
     return eFAILURE;
-  if (!isname("follower", tmp->player->joining) &&
-      !isname("followers", tmp->player->joining))
+  if (!isexact("follower", tmp->player->joining) &&
+      !isexact("followers", tmp->player->joining))
     return eFAILURE;
   if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
     return eFAILURE;

@@ -640,7 +640,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
-  if (!isname(arg1, obj->name) && cmd == CMD_LOOK)
+  if (!isexact(arg1, obj->name) && cmd == CMD_LOOK)
     return eFAILURE;
 
   switch (cmd)

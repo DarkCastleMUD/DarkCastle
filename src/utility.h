@@ -511,15 +511,17 @@ const char *get_skill_name(int skillnum);
 void gain_exp_regardless(Character *ch, int gain);
 void advance_level(Character *ch, int is_conversion);
 int close_socket(class Connection *d);
-int isname(std::string arg, std::string namelist);
-int isname(std::string arg, const char *namelist);
-int isname(QString arg, const char *namelist);
-int isname(QString arg, QString namelist);
-int isname2(QString str, QString namel);
-int isname(QString arg, QStringList namelist);
-int isname(const char *arg, const char *namelist);
-int isname(const char *arg, std::string namelist);
-int isname(const char *arg, joining_t &namelist);
+
+int isexact(std::string arg, std::string namelist);
+int isexact(std::string arg, const char *namelist);
+int isexact(QString arg, const char *namelist);
+int isexact(QString arg, QString namelist);
+int isexact(QString arg, QStringList namelist);
+int isexact(const char *arg, const char *namelist);
+int isexact(const char *arg, std::string namelist);
+int isexact(const char *arg, joining_t &namelist);
+
+int isprefix(QString str, QString namel);
 void page_string(class Connection *d, const char *str,
                  int keep_internal);
 void gain_exp(Character *ch, int64_t gain);

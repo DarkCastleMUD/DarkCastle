@@ -918,7 +918,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
     }
-    if (IS_NPC(victim) && isname("prize", obj->name))
+    if (IS_NPC(victim) && isexact("prize", obj->name))
     {
       ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
       return eFAILURE;
@@ -1059,7 +1059,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     for (eq_pos = 0; (eq_pos < MAX_WEAR); eq_pos++)
     {
       if (victim->equipment[eq_pos] &&
-          (isname(obj_name, victim->equipment[eq_pos]->name)) &&
+          (isexact(obj_name, victim->equipment[eq_pos]->name)) &&
           CAN_SEE_OBJ(ch, victim->equipment[eq_pos]))
       {
         obj = victim->equipment[eq_pos];

@@ -1912,15 +1912,15 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
           return eSUCCESS;
         }
 
-        if (isname("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            isname("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
+        if (isexact("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
+            isexact("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
             DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
+        if (isexact("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
             obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3128)
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");

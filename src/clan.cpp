@@ -1152,7 +1152,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!isname(clan->leader, GET_NAME(ch)))
+  if (!isexact(clan->leader, GET_NAME(ch)))
   {
     ch->sendln("You aren't the leader of your clan!");
     return eFAILURE;
@@ -1946,7 +1946,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
       ch->sendln("$3Syntax$R: clans delete <clannumber> dElEtE");
       return;
     }
-    if (!isname(last, "dElEtE"))
+    if (!isexact(last, "dElEtE"))
     {
       ch->sendln("You MUST end the line with 'dElEtE' to delete the clan.");
       return;

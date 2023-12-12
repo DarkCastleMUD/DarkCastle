@@ -766,7 +766,7 @@ void update_wizlist(Character *ch)
 		}
 		else
 		{
-			if (isname(wizlist[x].name, GET_NAME(ch)))
+			if (isexact(wizlist[x].name, GET_NAME(ch)))
 			{
 				wizlist[x].level = ch->getLevel();
 				break;
@@ -6470,7 +6470,7 @@ int obj_in_index(char *name, int index)
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
 					   ((class Object *)(obj_index[i].item));
 		 i++)
-		if (isname(name, ((class Object *)(obj_index[i].item))->name))
+		if (isexact(name, ((class Object *)(obj_index[i].item))->name))
 		{
 			if (j == index)
 				return i;
@@ -6487,7 +6487,7 @@ int mob_in_index(char *name, int index)
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
 					   ((Character *)(mob_index[i].item));
 		 i++)
-		if (isname(name, GET_NAME(((Character *)(mob_index[i].item)))))
+		if (isexact(name, GET_NAME(((Character *)(mob_index[i].item)))))
 		{
 			if (j == index)
 				return i;

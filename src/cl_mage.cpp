@@ -168,10 +168,10 @@ int do_imbue(Character *ch, char *argument, int cmd)
   if(!(wand = get_obj_in_list_vis(ch, buf, ch->carrying))) 
   {
     wand = ch->equipment[HOLD];
-    if((wand == 0) || !isname(buf, wand->name)) 
+    if((wand == 0) || !isexact(buf, wand->name)) 
     {
       wand = ch->equipment[HOLD2];
-      if((wand == 0) || !isname(buf, wand->name)) 
+      if((wand == 0) || !isexact(buf, wand->name)) 
       {
         ch->sendln("You do not have that wand.");
         return eFAILURE;

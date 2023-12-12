@@ -365,7 +365,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left](Character *const &tmp)
 				{
-					if (isname(left, GET_NAME(tmp)))
+					if (isexact(left, GET_NAME(tmp)))
 					{
 						target = tmp;
 						return true;
@@ -384,7 +384,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		find_if(character_list.begin(), character_list.end(),
 				[&target, &left, &mob](Character *const &tmp)
 				{
-					if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
+					if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, GET_NAME(tmp)))
 					{
 						target = tmp;
 						return true;
@@ -401,7 +401,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		Character *tmp;
 		for (tmp = DC::getInstance()->world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
 		{
-			if (isname(left, GET_NAME(tmp)))
+			if (isexact(left, GET_NAME(tmp)))
 			{
 				target = tmp;
 				break;
@@ -430,7 +430,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
 			if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
-				if (isname(left, otmp->name))
+				if (isexact(left, otmp->name))
 				{
 					otarget = otmp;
 					break;

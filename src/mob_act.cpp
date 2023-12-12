@@ -281,7 +281,7 @@ void mobile_activity(void)
         if (!IS_MOB(tmp_ch) && DC::isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
-        if (isname(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
+        if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
         {
           if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
           {
@@ -421,7 +421,7 @@ void mobile_activity(void)
           tmp_bitv = GET_BITV(tmp_ch);
 
           if (ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
-              (ch->mobdata->hated.isEmpty() || !isname(GET_NAME(tmp_ch), ch->mobdata->hated)) &&
+              (ch->mobdata->hated.isEmpty() || !isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) &&
               tmp_ch->fighting &&
               CAN_SEE(ch, tmp_ch) &&
               (DC::isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||

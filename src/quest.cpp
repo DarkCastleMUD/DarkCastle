@@ -1643,7 +1643,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (!isname("quest", ((Object *)(obj_index[obj->item_number].item))->name) &&
+      if (!isexact("quest", ((Object *)(obj_index[obj->item_number].item))->name) &&
           obj_index[obj->item_number].virt != 3124 &&
           obj_index[obj->item_number].virt != 3125 &&
           obj_index[obj->item_number].virt != 3126 &&

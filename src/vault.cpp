@@ -1288,7 +1288,7 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
   for (items = vault->items; items; items = items->next)
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
-    if (obj && isname(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, GET_OBJ_NAME(obj)))
     {
       if (i == num)
         return items;
@@ -1310,7 +1310,7 @@ class Object *get_unique_obj_in_vault(struct vault_data *vault, char *object, in
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isname(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, GET_OBJ_NAME(obj)))
     {
       if (i == num)
         return obj;
@@ -1332,14 +1332,14 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isname(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, GET_OBJ_NAME(obj)))
     {
       if (i == num)
         return items;
       else
       {
         for (j = 1; j <= items->count; j++)
-          if (isname(object, GET_OBJ_NAME(obj)))
+          if (isexact(object, GET_OBJ_NAME(obj)))
           {
             if (i == num)
               return items;
@@ -1363,7 +1363,7 @@ class Object *get_obj_in_vault(struct vault_data *vault, QString object, int num
   {
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     //    obj = get_obj(items->item_vnum);
-    if (obj && isname(object, GET_OBJ_NAME(obj)))
+    if (obj && isexact(object, GET_OBJ_NAME(obj)))
     {
       if (i == num)
         return obj;
@@ -1490,7 +1490,7 @@ void vault_get(Character *ch, QString object, QString owner)
       if (obj == 0)
         continue;
 
-      if (isname(object, GET_OBJ_NAME(obj)))
+      if (isexact(object, GET_OBJ_NAME(obj)))
         num += items->count;
     }
 
@@ -1974,7 +1974,7 @@ void vault_put(Character *ch, QString object, QString owner)
     for (obj = ch->carrying; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next_content;
-      if (!isname(object, GET_OBJ_NAME(obj)))
+      if (!isexact(object, GET_OBJ_NAME(obj)))
         continue;
       if (!can_put_in_vault(obj, self, vault, ch))
         continue;
@@ -2674,7 +2674,7 @@ int vault_search(Character *ch, const char *args)
           case vault_search_type::UNDEFINED:
             break;
           case vault_search_type::KEYWORD:
-            if (!isname((*p).str_argument, GET_OBJ_NAME(obj)))
+            if (!isexact((*p).str_argument, GET_OBJ_NAME(obj)))
             {
               nomatch = true;
             }

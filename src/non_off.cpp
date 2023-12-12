@@ -89,7 +89,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   if (obj == nullptr)
   {
     obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
-    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
+    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->name) || isexact("pc", obj->name))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
       return eFAILURE;
@@ -107,7 +107,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
       ch->sendln("(This item is cursed, BTW.)");
   }
 
-  if (obj->obj_flags.value[3] == 1 && isname("pc", obj->name))
+  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->name))
   {
     ch->sendln("You probably don't *really* want to do that.");
     return eFAILURE;
