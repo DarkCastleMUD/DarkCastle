@@ -1740,7 +1740,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      csendf(ch, "Invalid number. Choose between 1 and %d.\r\n", MAX_EDDIE_ITEMS);
+      ch->send(QString("Invalid number. Choose between 1 and %1.\r\n").arg(MAX_EDDIE_ITEMS));
       return eSUCCESS;
     }
 

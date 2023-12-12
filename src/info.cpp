@@ -1054,9 +1054,9 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
    ch->send(QString("$3Worn by: $R%1\r\n").arg(buf));
 
-   csendf(ch, "$3Level: $R%d\n\r", obj->obj_flags.eq_level);
-   csendf(ch, "$3Weight: $R%d\r\n", obj->obj_flags.weight);
-   csendf(ch, "$3Value: $R%d\r\n", obj->obj_flags.cost);
+   ch->send(QString("$3Level: $R%1\n\r").arg(obj->obj_flags.eq_level));
+   ch->send(QString("$3Weight: $R%1\r\n").arg(obj->obj_flags.weight));
+   ch->send(QString("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
    const Object *vobj = nullptr;
    if (obj->item_number >= 0)

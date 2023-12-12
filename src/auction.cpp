@@ -152,13 +152,13 @@ AuctionHouse TheAuctionHouse("auctionhouse");
 void AuctionHouse::ShowStats(Character *ch)
 {
   send_to_char("Vendor Statistics:\r\n", ch);
-  csendf(ch, "Items Posted:     %u\r\n", ItemsPosted);
-  csendf(ch, "Items For Sale:   %u\r\n", ItemsActive);
-  csendf(ch, "Items Sold:       %u\r\n", ItemsSold);
-  csendf(ch, "Items Expired:    %u\r\n", ItemsExpired);
-  csendf(ch, "Total Revenue:    %u\r\n", Revenue);
-  csendf(ch, "Tax Collected:    %u\r\n", TaxCollected);
-  csendf(ch, "Uncollected Gold: %u\r\n", UncollectedGold);
+  ch->send(QString("Items Posted:     %1\r\n").arg(ItemsPosted));
+  ch->send(QString("Items For Sale:   %1\r\n").arg(ItemsActive));
+  ch->send(QString("Items Sold:       %1\r\n").arg(ItemsSold));
+  ch->send(QString("Items Expired:    %1\r\n").arg(ItemsExpired));
+  ch->send(QString("Total Revenue:    %1\r\n").arg(Revenue));
+  ch->send(QString("Tax Collected:    %1\r\n").arg(TaxCollected));
+  ch->send(QString("Uncollected Gold: %1\r\n").arg(UncollectedGold));
   return;
 }
 

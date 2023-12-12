@@ -803,7 +803,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
     if (!*buf)
     {
-      csendf(ch, "Syntax: set <vict> profession <0-%d>\r\n", MAX_PROFESSIONS);
+      ch->send(QString("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
       return eFAILURE;
     }
 
@@ -815,7 +815,7 @@ int do_set(Character *ch, char *argument, int cmd)
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
-      csendf(ch, "Save type be from 0 to %d.\r\n", MAX_PROFESSIONS);
+      ch->send(QString("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
       return eFAILURE;
     }
 

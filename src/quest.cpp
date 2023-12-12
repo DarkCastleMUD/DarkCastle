@@ -1142,7 +1142,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       int i = 0;
       while (*tmp != nullptr)
       {
-         csendf(ch, "%s\t", *tmp);
+         ch->send(QString("%1\t").arg(*tmp));
          if (++i % 4 == 0)
          {
             csendf(ch, "\n\r");
