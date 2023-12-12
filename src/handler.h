@@ -42,6 +42,7 @@ affected_type *affected_by_random(Character *ch);
 /* utility */
 class Object *create_money(int amount);
 QString fname(QString namelist);
+int isname2(const char *str, const char *namel);
 int get_max_stat(Character *ch, attribute_t stat);
 // TIMERS
 bool isTimer(Character *ch, int spell);

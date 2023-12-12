@@ -515,6 +515,7 @@ int isname(std::string arg, std::string namelist);
 int isname(std::string arg, const char *namelist);
 int isname(QString arg, const char *namelist);
 int isname(QString arg, QString namelist);
+int isname2(QString str, QString namel);
 int isname(QString arg, QStringList namelist);
 int isname(const char *arg, const char *namelist);
 int isname(const char *arg, std::string namelist);
