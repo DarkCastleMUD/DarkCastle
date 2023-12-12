@@ -1694,7 +1694,7 @@ int do_random(Character *ch, char *argument, int cmd)
   }
 
   i = number(1, 100);
-  csendf(ch, "You roll a random number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+  ch->send(QString("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
   sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
   act(buf, ch, 0, 0, TO_ROOM, 0);
   return eSUCCESS;

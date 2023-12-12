@@ -278,13 +278,13 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
   }
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %u doesn't seem to exist.\r\n", ticket);
+    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
 
   if (Item_it->seller.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %u doesn't belong to you.\r\n", ticket);
+    ch->send(QString("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
     return;
   }
 
@@ -1104,19 +1104,19 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %u doesn't seem to exist.\r\n", ticket);
+    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
 
   if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %u is private.\r\n", ticket);
+    ch->send(QString("Ticket number %1 is private.\r\n").arg(ticket));
     return;
   }
 
   if (Item_it->state != AUC_FOR_SALE)
   {
-    csendf(ch, "Ticket number %u has already been sold\n\r.", ticket);
+    ch->send(QString("Ticket number %1 has already been sold\n\r.").arg(ticket));
     return;
   }
 

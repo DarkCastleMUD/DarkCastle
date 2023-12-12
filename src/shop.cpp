@@ -1264,7 +1264,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 
   shop->money_on_hand -= value;
   ch->addGold(value);
-  csendf(ch, "You take %ld $B$5gold$R out of the till.\r\n", value);
+  ch->send(QString("You take %1 $B$5gold$R out of the till.\r\n").arg(value));
   write_one_player_shop(shop);
 }
 
@@ -1410,7 +1410,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
-    csendf(ch, "\r\nYour shop has %ld cash in the till.\r\n", shop->money_on_hand);
+    ch->send(QString("\r\nYour shop has %1 cash in the till.\r\n").arg(shop->money_on_hand));
 }
 
 int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
