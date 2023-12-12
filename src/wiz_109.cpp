@@ -259,7 +259,7 @@ int do_advance(Character *ch, char *argument, int cmd)
   else
     while (victim->getLevel() < new_newlevel)
     {
-      send_to_char("You raise a level!!  ", victim);
+      victim->send("You raise a level!!  ");
       victim->incrementLevel();
       advance_level(victim, 0);
     }

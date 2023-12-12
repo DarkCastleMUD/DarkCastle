@@ -423,7 +423,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 	if (cmd == 59) // list
 	{
 		sprintf(buf, "%s_consent", GET_NAME(ch));
-		send_to_char("Available corpses (freshest first):\n\r$B", ch);
+		ch->send("Available corpses (freshest first):\n\r$B");
 		for (obj = object_list; obj; obj = obj->next)
 		{
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses

@@ -1555,9 +1555,7 @@ int do_release(Character *ch, char *argument, int cmd)
       if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
         if (!done && !skill_success(ch, nullptr, SKILL_RELEASE))
         {
-          send_to_char(
-              "You failed to release the spell, and are left momentarily dazed.\r\n",
-              ch);
+          ch->sendln("You failed to release the spell, and are left momentarily dazed.");
           act(
               "$n fails to release the magic surrounding $m and is left momentarily dazed.",
               ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1890,7 +1888,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     }
     else if (GET_CLASS(ch) == CLASS_BARD)
     {
-      send_to_char("Stick to singing bucko.", ch);
+      ch->send("Stick to singing bucko.");
       return eFAILURE;
     }
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))

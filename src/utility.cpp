@@ -1282,8 +1282,7 @@ int do_order(Character *ch, char *argument, int cmd)
       if (found)
         ch->sendln("Ok.");
       else
-        send_to_char("Nobody here are loyal subjects of yours!\n\r",
-                     ch);
+        ch->sendln("Nobody here are loyal subjects of yours!");
     }
   }
   return eSUCCESS;
@@ -2220,7 +2219,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
     }
   }
   if (!found)
-    send_to_char("No matching bits found.\n\n", ch);
+    ch->send("No matching bits found.\n\n");
 }
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint32_t &value)

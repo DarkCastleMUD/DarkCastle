@@ -123,8 +123,7 @@ command_return_t do_say(Character *ch, std::string argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -513,8 +512,7 @@ int do_shout(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -1068,8 +1066,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
   else if (vict == ch)
   {
     act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
-    send_to_char(
-        "You can't seem to get your mouth close enough to your ear...\r\n", ch);
+    ch->sendln("You can't seem to get your mouth close enough to your ear...");
   }
   else if (is_ignoring(vict, ch))
   {
@@ -1242,8 +1239,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 

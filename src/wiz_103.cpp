@@ -47,7 +47,7 @@ int do_boot(Character *ch, char *arg, int cmd)
     }
     if (!IS_MOB(victim) && victim->player->possesing)
     {
-      send_to_char("Oops! They ain't linkdead! Just possessing.", ch);
+      ch->send("Oops! They ain't linkdead! Just possessing.");
       return eFAILURE;
     }
     if (IS_AFFECTED(victim, AFF_CANTQUIT))

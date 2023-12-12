@@ -96,7 +96,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
 
   if (IS_NPC(this))
   {
-    send_to_char("Did you ever try this before?", this);
+    this->send("Did you ever try this before?");
     return eFAILURE;
   }
 
@@ -182,8 +182,7 @@ int do_stealth(Character *ch, char *argument, int cmd)
 
   if (argument[0] != '\0')
   {
-    send_to_char(
-        "STEALTH doesn't take any arguments; arg ignored.\r\n", ch);
+    ch->sendln("STEALTH doesn't take any arguments; arg ignored.");
   } /* if */
 
   if (ch->player->stealth)

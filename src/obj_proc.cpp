@@ -397,7 +397,7 @@ int dawnsword(Character *ch, class Object *obj, int cmd, const char *arg, Charac
   }
   if (isTimer(ch, OBJ_DAWNSWORD))
   {
-    send_to_char("Dawn needs more time to recharge and is not ready to hear your prayer yet.", ch);
+    ch->send("Dawn needs more time to recharge and is not ready to hear your prayer yet.");
     return eSUCCESS;
   }
   if (!ch->in_room || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
@@ -1793,7 +1793,7 @@ int restring_machine(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   act("The machine flashes and shoots sparks and smoke throughout the room.", ch, 0, 0, TO_ROOM, 0);
-  send_to_char("The machine beeps and emits hollow a voice...\n", ch);
+  ch->send("The machine beeps and emits hollow a voice...\n");
 
   half_chop(arg, name, buf);
 
@@ -1810,25 +1810,25 @@ int restring_machine(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (!(target_obj = get_obj_in_list_vis(ch, name, ch->carrying)))
   {
-    send_to_char("'Cannot find this item in your inventory.  *beep*'\n", ch);
+    ch->send("'Cannot find this item in your inventory.  *beep*'\n");
     return eSUCCESS;
   }
 
   if (!DC::isSet(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("'The item must be godload.  *beep*'\n", ch);
+    ch->send("'The item must be godload.  *beep*'\n");
     return eSUCCESS;
   }
 
   if (strlen(buf) > 80)
   {
-    send_to_char("'The description cannot be longer than 80 characters. *beep*'\n", ch);
+    ch->send("'The description cannot be longer than 80 characters. *beep*'\n");
     return eSUCCESS;
   }
 
   if (GET_PLATINUM(ch) < (uint32_t)(ch->getLevel()))
   {
-    send_to_char("'Insufficient platinum.  *beep*'\n", ch);
+    ch->send("'Insufficient platinum.  *beep*'\n");
     return eSUCCESS;
   }
 

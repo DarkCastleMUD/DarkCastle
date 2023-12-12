@@ -472,7 +472,7 @@ void boro_mob_stat(Character *ch, Character *k)
   if (k->description)
     ch->send(k->description);
   else
-    send_to_char("None", ch);
+    ch->send("None");
 
   // LIST OF FOLLOWERS
   ch->sendln("$3Followers$R:");
@@ -616,16 +616,16 @@ void mob_stat(Character *ch, Character *k)
   strcat(buf, "\n\r");
   ch->send(buf);
 
-  send_to_char("$3Long description$R: ", ch);
+  ch->send("$3Long description$R: ");
   if (k->long_desc)
     ch->send(k->long_desc);
   else
-    send_to_char("None", ch);
+    ch->send("None");
   ch->sendln("$3Detailed description$R:");
   if (k->description)
     ch->send(k->description);
   else
-    send_to_char("None", ch);
+    ch->send("None");
 
   strcpy(buf, "\r\n$3Class$R: ");
   sprinttype(k->c_class, pc_clss_types, buf2);
@@ -664,16 +664,16 @@ void mob_stat(Character *ch, Character *k)
   switch (k->sex)
   {
   case SEX_NEUTRAL:
-    send_to_char("NEUTRAL]  ", ch);
+    ch->send("NEUTRAL]  ");
     break;
   case SEX_MALE:
-    send_to_char("MALE]  ", ch);
+    ch->send("MALE]  ");
     break;
   case SEX_FEMALE:
-    send_to_char("FEMALE]  ", ch);
+    ch->send("FEMALE]  ");
     break;
   default:
-    send_to_char("ILLEGAL-VALUE!]  ", ch);
+    ch->send("ILLEGAL-VALUE!]  ");
     break;
   }
 
@@ -1001,22 +1001,22 @@ void obj_stat(Character *ch, class Object *j)
     strcpy(buf, "$3Extra description keyword(s)$R: None\n\r");
     ch->send(buf);
   }
-  send_to_char("$3Can be worn on$R:", ch);
+  ch->send("$3Can be worn on$R:");
   sprintbit(j->obj_flags.wear_flags, Object::wear_bits, buf);
   strcat(buf, "\n\r");
   ch->send(buf);
 
-  send_to_char("$3Can be worn by$R:", ch);
+  ch->send("$3Can be worn by$R:");
   sprintbit(j->obj_flags.size, Object::size_bits, buf);
   strcat(buf, "\n\r");
   ch->send(buf);
 
-  send_to_char("$3Extra flags$R: ", ch);
+  ch->send("$3Extra flags$R: ");
   sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
   strcat(buf, "\n\r");
   ch->send(buf);
 
-  send_to_char("$3More flags$R: ", ch);
+  ch->send("$3More flags$R: ");
   sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
   strcat(buf, "\n\r");
   ch->send(buf);

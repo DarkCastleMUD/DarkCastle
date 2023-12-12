@@ -1133,8 +1133,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
   {
     if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
     {
-      send_to_char("You are too tiny to knock someone that HUGE anywhere!\n\r",
-                   ch);
+      ch->sendln("You are too tiny to knock someone that HUGE anywhere!");
       return eFAILURE;
     }
 
@@ -1368,7 +1367,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
   { // Str loss.
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
-    send_to_char("You lose one point of strength.", ch);
+    ch->send("You lose one point of strength.");
     logf(OVERSEER, LogChannels::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
   }
 

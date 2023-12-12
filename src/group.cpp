@@ -464,8 +464,7 @@ int do_promote(Character *ch, char *argument, int cmd)
 
   if (new_new_leader == ch)
   {
-    send_to_char("You truly must have an EGO the size of the Tarrasque!\n\r",
-                 ch);
+    ch->sendln("You truly must have an EGO the size of the Tarrasque!");
     send_to_char("You are already the group leader! Maybe you SHOULD "
                  "step down?\n\r",
                  ch);
@@ -544,8 +543,7 @@ int do_disband(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 

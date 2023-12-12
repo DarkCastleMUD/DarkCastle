@@ -213,7 +213,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		case 1:
 			if (IS_PC(mob) && ch->getLevel() < IMPLEMENTER)
 			{
-				send_to_char("You can't change that field for players.", ch);
+				ch->send("You can't change that field for players.");
 				return 1;
 			}
 
@@ -310,7 +310,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			break;
 		case 4:
 			// TODO - remove this when the obj pfile saving keeps track of extra descs
-			send_to_char("Noone may restring object extra descs at this time. -pir", ch);
+			ch->send("Noone may restring object extra descs at this time. -pir");
 			return 1;
 
 			if (!*string)
@@ -657,7 +657,7 @@ void page_string(class Connection *d, const char *str, int keep_internal)
 
 	if (!str || !*str)
 	{
-		send_to_char("", d->character);
+		d->character->send("");
 		return;
 	}
 
@@ -696,7 +696,7 @@ void page_string_dep(class Connection *d, const char *str, int keep_internal)
 		return;
 	if (!str || !*str)
 	{
-		send_to_char("", d->character);
+		d->character->send("");
 		return;
 	}
 

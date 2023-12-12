@@ -842,7 +842,7 @@ void save_char_obj_db(Character *ch)
     if(fpsave != nullptr)
       fclose(fpsave);
     sprintf(log_buf, "Save_char_obj: %s", strsave);
-    send_to_char ("WARNING: file problem. You did not save!", ch);
+    ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
     logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   }
@@ -938,7 +938,7 @@ void save_char_obj(Character *ch)
       fclose(fpsave);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
-    send_to_char("WARNING: file problem. You did not save!", ch);
+    ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
     logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   }

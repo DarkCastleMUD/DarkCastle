@@ -709,7 +709,7 @@ LIST ROOMS
 void AuctionHouse::ListRooms(Character *ch)
 {
   QMap<int, int>::iterator room_it;
-  send_to_char("Auction Rooms:", ch);
+  ch->send("Auction Rooms:");
 
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {

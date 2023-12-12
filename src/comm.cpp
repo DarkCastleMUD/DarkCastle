@@ -1248,17 +1248,17 @@ int do_prompt(Character *ch, char *arg, int cmd)
     ch->sendln("Set your prompt to what? Try 'help prompt'.");
     if (GET_PROMPT(ch))
     {
-      send_to_char("Current prompt:  ", ch);
+      ch->send("Current prompt:  ");
       send_to_char(GET_PROMPT(ch), ch);
       ch->sendln("");
-      send_to_char("Last prompt: ", ch);
+      ch->send("Last prompt: ");
       if (GET_LAST_PROMPT(ch))
       {
         send_to_char(GET_LAST_PROMPT(ch), ch);
       }
       else
       {
-        send_to_char("unset", ch);
+        ch->send("unset");
       }
       ch->sendln("");
     }
@@ -3178,7 +3178,7 @@ void check_for_awaymsgs(Character *ch)
     return;
   }
 
-  send_to_char("You have unviewed away messages. ", ch);
+  ch->send("You have unviewed away messages. ");
   ch->sendln("Type awaymsgs to view them.");
 }
 

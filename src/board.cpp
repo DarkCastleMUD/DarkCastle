@@ -813,8 +813,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
-    send_to_char("That message exists only in your imagination..\r\n",
-                 ch);
+    ch->sendln("That message exists only in your imagination..");
     return eSUCCESS;
   }
 

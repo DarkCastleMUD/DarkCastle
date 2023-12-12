@@ -589,8 +589,7 @@ int do_holylite(Character *ch, char *argument, int cmd)
 
   if (argument[0] != '\0')
   {
-    send_to_char(
-        "HOLYLITE doesn't take any arguments; arg ignored.\r\n", ch);
+    ch->sendln("HOLYLITE doesn't take any arguments; arg ignored.");
   } /* if */
 
   if (ch->player->holyLite)

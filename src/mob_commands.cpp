@@ -169,7 +169,7 @@ void mpstat(Character *ch, Character *victim)
     sprintf(buf, "$3%d$R>$3$B", i);
     ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
-    send_to_char("$R ", ch);
+    ch->send("$R ");
     sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
     ch->send(buf);
     ch->sendRaw(std::string(mprg->comlist) + "\r\n");

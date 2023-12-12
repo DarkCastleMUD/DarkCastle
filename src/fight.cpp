@@ -2351,7 +2351,7 @@ int damage(Character *ch, Character *victim,
   {
     affect_from_char(victim, INTERNAL_SLEEPING);
     act("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
-    send_to_char("You are awakened from combat adrenaline springing you to your feet!", ch);
+    ch->send("You are awakened from combat adrenaline springing you to your feet!");
     victim->setPOSFighting();
   }
 
@@ -7414,8 +7414,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
     // once on the players first attack.
     //        act("$n is stunned, but will probably recover.",
     //        victim, 0, 0, TO_ROOM, INVIS_NULL);
-    send_to_char("You are stunned, but will probably recover.\r\n",
-                 victim);
+    victim->sendln("You are stunned, but will probably recover.");
     break;
   case position_t::DEAD:
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -7439,8 +7438,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
         return;
       }
       if (dam > 0)
-        send_to_char("You wish you would stop BLEEDING so much!\n\r",
-                     victim);
+        victim->sendln("You wish you would stop BLEEDING so much!");
 
       if (IS_NPC(victim))
       {

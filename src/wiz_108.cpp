@@ -307,8 +307,7 @@ int do_set(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, name);
   if (!*name) // no arguments. print an informative text
   {
-    send_to_char(
-        "Usage:\n\rset <name> <field> <value>\n\r", ch);
+    ch->sendln("Usage:\n\rset <name> <field> <value>");
 
     strcpy(help, "\n\rField being one of the following:\n\r");
     ch->display_string_list(values);
@@ -473,8 +472,7 @@ int do_set(Character *ch, char *argument, int cmd)
     }
     if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && ch->getLevel() < OVERSEER)
     {
-      send_to_char(
-          "Level must be between 0 and 101.\r\n", ch);
+      ch->sendln("Level must be between 0 and 101.");
       return eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */

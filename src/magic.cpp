@@ -636,8 +636,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
     if (affected_by_spell(tmp_char, SPELL_CHARM_PERSON))
     {
       affect_from_char(tmp_char, SPELL_CHARM_PERSON);
-      send_to_char("You feel less enthused about your master.\r\n",
-                   tmp_char);
+      tmp_char->sendln("You feel less enthused about your master.");
       act("$N blinks and shakes its head, clearing its thoughts.",
           ch, 0, tmp_char, TO_CHAR, 0);
       act("$N blinks and shakes its head, clearing its thoughts.",
@@ -4634,7 +4633,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         ch->send(iobj->short_description);
         if (DC::isSet(iobj->obj_flags.more_flags, ITEM_NO_TRADE))
         {
-          send_to_char(" $BNO_TRADE$R", ch);
+          ch->send(" $BNO_TRADE$R");
           show_obj_class_size_mini(iobj, ch);
         }
         ch->sendln("");
@@ -4655,7 +4654,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, "\n\r");
     ch->send(buf);
 
-    send_to_char("Item is: ", ch);
+    ch->send("Item is: ");
     sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
     sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
     strcat(buf, " ");
@@ -4663,7 +4662,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, "\n\r");
     ch->send(buf);
 
-    send_to_char("Worn by: ", ch);
+    ch->send("Worn by: ");
     sprintbit(obj->obj_flags.size, Object::size_bits, buf);
     strcat(buf, "\r\n");
     ch->send(buf);
@@ -5045,8 +5044,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
 
   if (GET_POS(victim) == position_t::SLEEPING)
   {
-    send_to_char("How do you expect a sleeping person to be scared?\r\n",
-                 ch);
+    ch->sendln("How do you expect a sleeping person to be scared?");
     return eFAILURE;
   }
 
@@ -5108,9 +5106,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
 
   if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
   {
-    send_to_char(
-        "For a moment you feel compelled to run away, but you fight back the urge.\r\n",
-        victim);
+    victim->sendln("For a moment you feel compelled to run away, but you fight back the urge.");
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
         nullptr, victim, TO_CHAR, 0);
 
@@ -5126,9 +5122,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
     return retval;
   }
 
-  send_to_char(
-      "You suddenly feel very frightened, and you attempt to flee!\n\r",
-      victim);
+  victim->sendln("You suddenly feel very frightened, and you attempt to flee!");
   do_flee(victim, "", 151);
 
   return eSUCCESS;
@@ -5254,8 +5248,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (!IS_EVIL(ch) && ch->getLevel() < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
   {
-    send_to_char("You aren't evil enough to cast such a repugnant spell.\r\n",
-                 ch);
+    ch->sendln("You aren't evil enough to cast such a repugnant spell.");
     return eFAILURE;
   }
 
@@ -5933,7 +5926,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     default:
-      send_to_char("Illegal Value sent to dispel_magic switch statement.  Tell a god.", ch);
+      ch->send("Illegal Value sent to dispel_magic switch statement.  Tell a god.");
       done = true;
       break;
     } // end of switch
@@ -11296,8 +11289,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
     }
     else if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
     {
-      send_to_char("You hear the buzzing of hundreds of bees.\r\n",
-                   tmp_victim);
+      tmp_victim->sendln("You hear the buzzing of hundreds of bees.");
     }
   }
   return eSUCCESS;
@@ -14378,7 +14370,7 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (ch->desc->snoop_by)
   {
-    send_to_char("Whoa! Almost got caught snooping!\n", ch->desc->snoop_by->character);
+    ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
     ch->desc->snoop_by->character->sendln("Your victim is casting spiritwalk spell.");
     ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->getName().split(' '));
   }
@@ -14829,7 +14821,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
     return eSUCCESS;
   }
 
-  send_to_char("You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.", ch);
+  ch->send("You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.");
   act("$n reaches forth and etches a protective sigil in the air that briefly surrounds $m in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.", ch, 0, 0, TO_ROOM, 0);
 
   af.type = SPELL_IMMUNITY;
@@ -15561,8 +15553,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
         component = ch->equipment[HOLD2];
         if ((component == 0) || (compNum != obj_index[component->item_number].virt))
         {
-          send_to_char("You do not have the required components.\r\n",
-                       ch);
+          ch->sendln("You do not have the required components.");
           return eFAILURE;
         }
       }
@@ -15580,9 +15571,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
     if (ch->getMove() < 100)
     {
-      send_to_char(
-          "You do not have enough energy to complete the incantation.\r\n",
-          ch);
+      ch->sendln("You do not have enough energy to complete the incantation.");
       return eFAILURE;
     }
   }
@@ -15598,9 +15587,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (IS_MORTAL(ch))
     {
-      send_to_char(
-          "Something about this room prohibits your incantation from being completed.\r\n",
-          ch);
+      ch->sendln("Something about this room prohibits your incantation from being completed.");
       return eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
@@ -15615,21 +15602,18 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (ch == ((Character *)(cItem->obj_flags.origin)) && spl == SPELL_CONSECRATE)
     {
-      send_to_char("You have already consecrated the ground here!\r\n",
-                   ch);
+      ch->sendln("You have already consecrated the ground here!");
       return eSUCCESS;
     }
 
     if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
     {
-      send_to_char(
-          "A foul taint prevents you from consecrating the ground here!",
-          ch);
+      ch->send("A foul taint prevents you from consecrating the ground here!");
       return eSUCCESS;
     }
     if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
     {
-      send_to_char("The ground here has already been consecrated!", ch);
+      ch->send("The ground here has already been consecrated!");
       return eSUCCESS;
     }
   }
@@ -15727,8 +15711,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
         component = ch->equipment[HOLD2];
         if ((component == 0) || (compNum != obj_index[component->item_number].virt))
         {
-          send_to_char("You do not have the required components.\r\n",
-                       ch);
+          ch->sendln("You do not have the required components.");
           return eFAILURE;
         }
       }
@@ -15748,9 +15731,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 
     if (ch->getMove() < 100)
     {
-      send_to_char(
-          "You do not have enough energy to complete the incantation.\r\n",
-          ch);
+      ch->sendln("You do not have enough energy to complete the incantation.");
       return eFAILURE;
     }
   }
@@ -15766,9 +15747,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (IS_MORTAL(ch))
     {
-      send_to_char(
-          "Something about this room prohibits your incantation from being completed.\r\n",
-          ch);
+      ch->sendln("Something about this room prohibits your incantation from being completed.");
       return eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
@@ -15788,21 +15767,18 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
   {
     if (ch == ((Character *)(cItem->obj_flags.origin)))
     {
-      send_to_char("You have already desecrated the ground here!\r\n",
-                   ch);
+      ch->sendln("You have already desecrated the ground here!");
       return eSUCCESS;
     }
 
     if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
     {
-      send_to_char(
-          "A powerful aura of goodness prevents you from desecrating the ground here!",
-          ch);
+      ch->send("A powerful aura of goodness prevents you from desecrating the ground here!");
       return eSUCCESS;
     }
     if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
     {
-      send_to_char("The ground here has already been desecrated!", ch);
+      ch->send("The ground here has already been desecrated!");
       return eSUCCESS;
     }
   }

@@ -1125,9 +1125,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (!ch->canPerform(SKILL_ARCHERY))
   {
-    send_to_char(
-        "You've no idea how those pointy things with strings and feathers work.\r\n",
-        ch);
+    ch->sendln("You've no idea how those pointy things with strings and feathers work.");
     return eFAILURE;
   }
 
@@ -1151,9 +1149,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (ch->shotsthisround > 0)
   {
-    send_to_char(
-        "Slow down there tiger, you can't fire them that fast!\r\n",
-        ch);
+    ch->sendln("Slow down there tiger, you can't fire them that fast!");
     return eFAILURE;
   }
 
@@ -1179,8 +1175,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   /* make safe rooms checks */
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("You can't shoot arrows if yer in a safe room silly.\r\n",
-                 ch);
+    ch->sendln("You can't shoot arrows if yer in a safe room silly.");
     return eFAILURE;
   }
 
@@ -1236,8 +1231,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
     if (dir >= 0 && !CAN_GO(ch, dir))
     {
-      send_to_char("There is nothing to shoot in that direction.\r\n",
-                   ch);
+      ch->sendln("There is nothing to shoot in that direction.");
       return eFAILURE;
     }
     else if (artype)
@@ -1284,9 +1278,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           new_room = DC::getInstance()->world[cur_room].dir_option[dir]->to_room;
           if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
-            send_to_char(
-                "Don't shoot into a safe room!  You might hit someone!\r\n",
-                ch);
+            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             return eFAILURE;
           }
           char_from_room(ch, false);
@@ -1294,8 +1286,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            send_to_char("Error moving you to room in do_fire\r\n",
-                         ch);
+            ch->sendln("Error moving you to room in do_fire");
             return eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1310,9 +1301,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           char_from_room(ch, false);
           if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
-            send_to_char(
-                "Don't shoot into a safe room!  You might hit someone!\r\n",
-                ch);
+            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
             return eFAILURE;
           }
@@ -1320,8 +1309,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            send_to_char("Error moving you to room in do_fire\r\n",
-                         ch);
+            ch->sendln("Error moving you to room in do_fire");
             return eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1336,9 +1324,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           char_from_room(ch, false);
           if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
-            send_to_char(
-                "Don't shoot into a safe room!  You might hit someone!\r\n",
-                ch);
+            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
             return eFAILURE;
           }
@@ -1346,8 +1332,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            send_to_char("Error moving you to room in do_fire\r\n",
-                         ch);
+            ch->sendln("Error moving you to room in do_fire");
             return eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1364,17 +1349,13 @@ int do_fire(Character *ch, char *arg, int cmd)
     }
     else if (dir < 0)
     {
-      send_to_char(
-          "You aren't skilled enough to fire at a target this close.\r\n",
-          ch);
+      ch->sendln("You aren't skilled enough to fire at a target this close.");
       return eFAILURE;
     }
     if (!victim)
     {
       if (dir >= 0)
-        send_to_char(
-            "You cannot concentrate enough to fire into an adjacent room while fighting.\r\n",
-            ch);
+        ch->sendln("You cannot concentrate enough to fire into an adjacent room while fighting.");
       else
         ch->sendln("You cannot seem to locate your target.");
       return eFAILURE;
@@ -1432,9 +1413,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300 && mob_index[victim->mobdata->nr].virt <= 2399)
   {
-    send_to_char(
-        "Your arrow is disintegrated by the fortress' enchantments.\r\n",
-        ch);
+    ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);
     return eFAILURE;
   }

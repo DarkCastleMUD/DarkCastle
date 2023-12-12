@@ -591,7 +591,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
       csendf(ch, "Move: $B%3d$R ", skill_cost.find(skilllist[i].skillnum)->second);
     }
     else
-      send_to_char("          ", ch);
+      ch->send("          ");
     if (skilllist[i].attrs)
     {
       if (skilllist != g_skills)
@@ -600,7 +600,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
         ch->send(buf);
       }
       else
-        send_to_char(" General", ch);
+        ch->send(" General");
     }
     if (skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK)
     {

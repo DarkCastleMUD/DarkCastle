@@ -600,9 +600,7 @@ void advance_level(Character *ch, int is_conversion)
 	if (ch->getLevel() == 11)
 		ch->sendln("It now costs you $B$5gold$R every time you recall.");
 	if (ch->getLevel() == 20)
-		send_to_char(
-			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
-			ch);
+		ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.");
 	if (ch->getLevel() == 40)
 		ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
 	if (ch->getLevel() == 50)
@@ -665,7 +663,7 @@ void gain_exp_regardless(Character *ch, int gain)
 
 	while (GET_EXP(ch) >= (int32_t)exp_table[ch->getLevel() + 1])
 	{
-		send_to_char("You raise a level!!  ", ch);
+		ch->send("You raise a level!!  ");
 		ch->incrementLevel();
 		advance_level(ch, 0);
 	}

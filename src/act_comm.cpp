@@ -493,8 +493,7 @@ int do_write(Character *ch, char *argument, int cmd)
 
   if (!*papername) /* nothing was delivered */
   {
-    send_to_char(
-        "Write? with what? ON what? what are you trying to do??\n\r", ch);
+    ch->sendln("Write? with what? ON what? what are you trying to do??");
     return eSUCCESS;
   }
 
@@ -567,8 +566,7 @@ int do_write(Character *ch, char *argument, int cmd)
   {
     /* we can write - hooray! */
 
-    send_to_char("Ok.. go ahead and write.. end the note with a \\@.\r\n",
-                 ch);
+    ch->sendln("Ok.. go ahead and write.. end the note with a \\@.");
     act("$n begins to jot down a note.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     ch->desc->strnew = &paper->action_description;
     ch->desc->max_str = MAX_NOTE_LENGTH;

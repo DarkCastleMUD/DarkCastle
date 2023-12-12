@@ -833,7 +833,7 @@ void message_to_clan(Character *ch, char buf[])
       continue;
 
     ansi_color(YELLOW, pch);
-    send_to_char("-->> ", pch);
+    pch->send("-->> ");
     ansi_color(RED, pch);
     ansi_color(BOLD, pch);
     pch->send(buf);
@@ -1162,8 +1162,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
 
   if (!(victim = ch->get_char_room_vis(buf)))
   {
-    send_to_char("You can't cpromote someone who isn't here!\n\r",
-                 ch);
+    ch->sendln("You can't cpromote someone who isn't here!");
     return eFAILURE;
   }
 
@@ -1678,7 +1677,7 @@ void do_clan_member_list(Character *ch)
     }
     else
     {
-      send_to_char(" ", ch);
+      ch->send(" ");
     }
     column++;
   }

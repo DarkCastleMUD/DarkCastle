@@ -803,8 +803,7 @@ int do_get(Character *ch, char *argument, int cmd)
   break;
   case 5:
   {
-    send_to_char(
-        "You can't take a thing from more than one container.\r\n", ch);
+    ch->sendln("You can't take a thing from more than one container.");
   }
   break;
   case 6:
@@ -1612,8 +1611,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                 ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1784,8 +1782,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
   {
-    send_to_char("You do not seem to have anything like that.\r\n",
-                 ch);
+    ch->sendln("You do not seem to have anything like that.");
     return eFAILURE;
   }
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < OVERSEER)

@@ -857,9 +857,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
 																											   100000))
 			{
-				send_to_char(
-					"The begin and end ranges must be valid numbers.\r\n",
-					ch);
+				ch->sendln("The begin and end ranges must be valid numbers.");
 				return eFAILURE;
 			}
 			if (end != -1 && end < begin)
@@ -898,9 +896,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					if (count > 200)
 					{
-						send_to_char(
-							"Maximum number of searchable items hit.  Search ended.\r\n",
-							ch);
+						ch->sendln("Maximum number of searchable items hit.  Search ended.");
 						break;
 					}
 				}
@@ -926,9 +922,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					if (count > 200)
 					{
-						send_to_char(
-							"Maximum number of searchable items hit.  Search ended.\r\n",
-							ch);
+						ch->sendln("Maximum number of searchable items hit.  Search ended.");
 						break;
 					}
 				}
@@ -967,9 +961,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
 																											   100000))
 			{
-				send_to_char(
-					"The begin and end ranges must be valid numbers.\r\n",
-					ch);
+				ch->sendln("The begin and end ranges must be valid numbers.");
 				return eFAILURE;
 			}
 			if (end != -1 && end < begin)
@@ -1008,9 +1000,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					if (count > 200)
 					{
-						send_to_char(
-							"Maximum number of searchable items hit.  Search ended.\r\n",
-							ch);
+						ch->sendln("Maximum number of searchable items hit.  Search ended.");
 						break;
 					}
 				}
@@ -1038,9 +1028,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 				if (count > 200)
 				{
-					send_to_char(
-						"Maximum number of searchable items hit.  Search ended.\r\n",
-						ch);
+					ch->sendln("Maximum number of searchable items hit.  Search ended.");
 					break;
 				}
 			}
@@ -1069,9 +1057,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
 																											   100000))
 			{
-				send_to_char(
-					"The begin and end ranges must be valid numbers.\r\n",
-					ch);
+				ch->sendln("The begin and end ranges must be valid numbers.");
 				return eFAILURE;
 			}
 			if (end != -1 && end < begin)
@@ -1105,9 +1091,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					if (count > 200)
 					{
-						send_to_char(
-							"Maximum number of searchable items hit.  Search ended.\r\n",
-							ch);
+						ch->sendln("Maximum number of searchable items hit.  Search ended.");
 						break;
 					}
 				}
@@ -1159,9 +1143,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		argument = one_argument(argument, arg1);
 		if (!is_number(arg1))
 		{
-			send_to_char(
-				"Syntax: show rsearch <zone#> <sectorname/roomflag>\r\n",
-				ch);
+			ch->sendln("Syntax: show rsearch <zone#> <sectorname/roomflag>");
 			return eSUCCESS;
 		}
 		zon = atoi(arg1);
@@ -1195,9 +1177,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		}
 		if (!bits && !sector)
 		{
-			send_to_char(
-				"Syntax: show rsearch <zone number> <flags/sector type\r\n",
-				ch);
+			ch->sendln("Syntax: show rsearch <zone number> <flags/sector type");
 			return eSUCCESS;
 		}
 		room_t last_room = DC::getInstance()->zones.lastKey();
@@ -1302,7 +1282,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *isr_bits[z] != '\n'; z++)
 			{
@@ -1311,7 +1291,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *affected_bits[z] != '\n'; z++)
 			{
@@ -1320,7 +1300,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *pc_clss_types2[z] != '\n'; z++)
 			{
@@ -1329,7 +1309,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (i = 0; i <= MAX_RACE; i++)
 			{
@@ -1338,29 +1318,29 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
-			send_to_char("level", ch);
+			ch->send("level");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
+				ch->send(" ");
 
-			send_to_char("good", ch);
+			ch->send("good");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
-			send_to_char("evil", ch);
+				ch->send(" ");
+			ch->send("evil");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
-			send_to_char("neutral", ch);
+				ch->send(" ");
+			ch->send("neutral");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
+				ch->send(" ");
 
 			return eSUCCESS;
 		}
@@ -1575,7 +1555,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; z < Object::extra_bits.size(); z++)
 			{
@@ -1584,7 +1564,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *strs_damage_types[z] != '\n'; z++)
 			{
@@ -1593,7 +1573,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 
 			for (z = 0; z < Object::more_obj_bits.size(); z++)
@@ -1603,7 +1583,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; z < item_types.size(); z++)
 			{
@@ -1612,7 +1592,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *size_bitfields[z] != '\n'; z++)
 			{
@@ -1621,7 +1601,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
 			for (z = 0; *apply_types[z] != '\n'; z++)
 			{
@@ -1630,19 +1610,19 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (o % 7 == 0)
 					ch->sendln("");
 				else
-					send_to_char(" ", ch);
+					ch->send(" ");
 			}
-			send_to_char("oweight", ch);
+			ch->send("oweight");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
+				ch->send(" ");
 
-			send_to_char("olevel", ch);
+			ch->send("olevel");
 			if (o % 7 == 0)
 				ch->sendln("");
 			else
-				send_to_char(" ", ch);
+				ch->send(" ");
 
 			return eSUCCESS;
 		}
@@ -1795,8 +1775,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				}
 	}
 	else
-		send_to_char("Illegal type.  Type just 'show' for legal types.\r\n",
-					 ch);
+		ch->sendln("Illegal type.  Type just 'show' for legal types.");
 	return eSUCCESS;
 }
 
@@ -1936,9 +1915,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 			;
 		if (loop > 1)
 		{
-			send_to_char(
-				"There's a private conversation going on in that room\n\r",
-				ch);
+			ch->sendln("There's a private conversation going on in that room");
 			return eFAILURE;
 		} /* if */
 	}	  /* if */
@@ -2087,7 +2064,7 @@ void opstat(Character *ch, int vnum)
 		sprintf(buf, "$3%d$R>$3$B", i);
 		ch->send(buf);
 		send_to_char(oprog_type_to_name(mprg->type), ch);
-		send_to_char("$R ", ch);
+		ch->send("$R ");
 		sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
 		ch->send(buf);
 		sprintf(buf, "%s\n\r", mprg->comlist);
@@ -2103,7 +2080,7 @@ int do_opstat(Character *ch, char *argument, int cmd)
 
 	if (!*argument)
 	{
-		send_to_char("Usage: opstat <vnum>\r\n ", ch);
+		ch->send("Usage: opstat <vnum>\r\n ");
 		return eFAILURE;
 	}
 	one_argument(argument, buf);
@@ -2421,8 +2398,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 
 	if (!can_modify_object(ch, v2))
 	{
-		send_to_char("You are unable to work creation outside of your range.\r\n",
-					 ch);
+		ch->sendln("You are unable to work creation outside of your range.");
 		return eFAILURE;
 	}
 
@@ -2499,8 +2475,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 
 	if (!can_modify_mobile(ch, vdst))
 	{
-		send_to_char("You are unable to work creation outside of your range.\r\n",
-					 ch);
+		ch->sendln("You are unable to work creation outside of your range.");
 		return eFAILURE;
 	}
 

@@ -650,14 +650,14 @@ int do_sing(Character *ch, char *arg, int cmd)
 						}
 						else
 						{
-							send_to_char("You stop singing ", ch);
+							ch->send("You stop singing ");
 							send_to_char(songs[(*i).song_number], ch);
 							ch->sendln(".");
 						}
 					}
 					else
 					{
-						send_to_char("You stop singing ", ch);
+						ch->send("You stop singing ");
 						send_to_char(songs[(*ch->songs.begin()).song_number], ch);
 						ch->sendln(".");
 					}
@@ -2103,7 +2103,7 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
 		if (affected_by_spell(tmp_char, SPELL_FLY))
 		{
 			affect_from_char(tmp_char, SPELL_FLY);
-			send_to_char("Your fly spell dissipates.", tmp_char);
+			tmp_char->send("Your fly spell dissipates.");
 		}
 
 		if (affected_by_spell(tmp_char, SKILL_SONG_FLIGHT_OF_BEE))
@@ -3425,7 +3425,7 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 		if (affected_by_spell(fvictim->follower, SPELL_WATER_BREATHING))
 		{
 			affect_from_char(fvictim->follower, SPELL_WATER_BREATHING);
-			send_to_char("Your magical gills disappear.", fvictim->follower);
+			fvictim->follower->send("Your magical gills disappear.");
 		}
 
 		if (affected_by_spell(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM))

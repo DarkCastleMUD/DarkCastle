@@ -506,7 +506,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
          return;
       }
-      send_to_char("$B$3", ch);
+      ch->send("$B$3");
 
       if (!(i->long_desc) || (IS_MOB(i) && (GET_POS(i) != i->mobdata->default_pos)))
       {
@@ -651,7 +651,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          send_to_char(buffer.c_str(), ch);
 
          show_spells(i, ch);
-         send_to_char("$R$7", ch);
+         ch->send("$R$7");
       }
    }
    else if ((mode == 1) || (mode == 3))
@@ -913,7 +913,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
 
    if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() < DEITY)
    {
-      send_to_char("They might object to you trying to look in their pockets...", ch);
+      ch->send("They might object to you trying to look in their pockets...");
       return;
    }
 
@@ -1331,7 +1331,7 @@ int do_look(Character *ch, char *argument, int cmd)
    {
       ch->sendln("It is pitch black...");
       list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
-      send_to_char("$R", ch);
+      ch->send("$R");
       // TODO - if have blindfighting, list some of the room exits sometimes
    }
    else
@@ -1452,13 +1452,13 @@ int do_look(Character *ch, char *argument, int cmd)
                      switch (bits)
                      {
                      case FIND_OBJ_INV:
-                        send_to_char(" (carried) ", ch);
+                        ch->send(" (carried) ");
                         break;
                      case FIND_OBJ_ROOM:
-                        send_to_char(" (in room) ", ch);
+                        ch->send(" (in room) ");
                         break;
                      case FIND_OBJ_EQUIP:
-                        send_to_char(" (equipped) ", ch);
+                        ch->send(" (equipped) ");
                         break;
                      }
 
@@ -1802,11 +1802,11 @@ int do_look(Character *ch, char *argument, int cmd)
                        is_closed ? "-closed" : "");
          }
          ansi_color(NTEXT, ch);
-         send_to_char("Exits: ", ch);
+         ch->send("Exits: ");
          if (*buffer)
             ch->send(buffer);
          else
-            send_to_char("None.", ch);
+            ch->send("None.");
          ch->sendln("");
          if (IS_PC(ch) && !ch->hunting.isEmpty())
             ch->do_track(QString(ch->hunting).split(' '), 10);
@@ -2010,8 +2010,7 @@ int do_score(Character *ch, char *argument, int cmd)
       ch->send(buf);
    }
    else
-      send_to_char(
-          "($5:$7)===================================($5:$7)==================================($5:$7)\n\r", ch);
+      ch->sendln("($5:$7)===================================($5:$7)==================================($5:$7)");
    int found = false;
 
    if ((immune = ch->immune))
@@ -3115,12 +3114,12 @@ int do_consider(Character *ch, char *argument, int cmd)
    else
       y = 8;
 
-   send_to_char("Level comparison: ", ch);
+   ch->send("Level comparison: ");
    csendf(ch, level_messages[y], GET_SHORT(victim));
 
    if (Learned > 89)
    {
-      send_to_char("Training: ", ch);
+      ch->send("Training: ");
 
       if (GET_CLASS(victim) == CLASS_WARRIOR ||
           GET_CLASS(victim) == CLASS_THIEF ||

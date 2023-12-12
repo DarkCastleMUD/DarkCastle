@@ -120,7 +120,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
           }
           /*
           if (count >= 6) {
-                  send_to_char("You can't get close enough to do anything.", this);
+                  this->send("You can't get close enough to do anything.");
             return eFAILURE;
           }
           */

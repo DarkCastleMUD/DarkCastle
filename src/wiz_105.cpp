@@ -417,8 +417,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
     {
       ch->sendln("Killer flag removed.");
       affect_from_char(victim, FUCK_CANTQUIT);
-      send_to_char(
-          "A nice god has pardoned you of your murdering.\r\n", victim);
+      victim->sendln("A nice god has pardoned you of your murdering.");
     }
     else
     {
@@ -697,7 +696,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     }
     if (*pc_clss_types2[l] == '\n')
     {
-      send_to_char("Unknown class.", ch);
+      ch->send("Unknown class.");
       return eFAILURE;
     }
     ch->sendln("These are the current sqs:");

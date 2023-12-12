@@ -62,7 +62,7 @@ int do_alias(Character *ch, char *arg, int cmd)
     }
 	
     if (nokey == 0) {        /* No keyword to grab.. exit now...  */
-      send_to_char ("You need more than just a space for a keyword.\r\n", ch);
+      ch->sendln("You need more than just a space for a keyword.");
       return eSUCCESS;
     }
 	
@@ -152,7 +152,7 @@ int do_alias(Character *ch, char *arg, int cmd)
 #endif
       curr->keyword = str_dup(buf);
       curr->command = str_dup(buf1);
-      send_to_char ("New Alias Defined.\r\n", ch);
+      ch->sendln("New Alias Defined.");
       curr->next = ch->player->alias;
       ch->player->alias = curr;
       dc_free(buf);

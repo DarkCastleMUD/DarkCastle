@@ -199,7 +199,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
         if (results.size() == 0)
         {
-          send_to_char("Suggested help entries: ", ch);
+          ch->send("Suggested help entries: ");
         }
 
         results.push_back((*cur).second);
@@ -212,7 +212,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char(", ", ch);
+          ch->send(", ");
         }
       }
     }

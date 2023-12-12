@@ -1593,8 +1593,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 	if (cmd == 59) // list
 	{
 
-		send_to_char("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n\r\n",
-					 ch);
+		ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n");
 		ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
 
 		for (int i = 1; i <= MAX_PC_RACE; i++)

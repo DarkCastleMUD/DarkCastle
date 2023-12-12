@@ -235,7 +235,7 @@ int do_switch(Character *ch, char *arg, int cmd)
 
   if (GET_MOVE(ch) < 4)
   {
-    send_to_char("You are too tired to switch your weapons!", ch);
+    ch->send("You are too tired to switch your weapons!");
     return eFAILURE;
   }
   ch->decrementMove(4);
@@ -2151,7 +2151,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
       if (GET_MOVE(ch) < 4)
       {
-        send_to_char("You are too tired to switch your weapons!", ch);
+        ch->send("You are too tired to switch your weapons!");
         return;
       }
       ch->decrementMove(4);

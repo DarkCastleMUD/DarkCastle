@@ -252,8 +252,7 @@ int do_find(Character *ch, char *arg, int cmd)
   {
     if (x == 4)
     {
-      send_to_char("Type must be one of these: mob, pc, char, obj.\r\n",
-                   ch);
+      ch->sendln("Type must be one of these: mob, pc, char, obj.");
       return eFAILURE;
     }
     if (is_abbrev(type, types[x]))
@@ -1267,7 +1266,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     if (arguments.size() < 1)
     {
-      send_to_char("$3Usage$R: zedit copy <source line> <destination line>\r\nDestination line is optional. If no such line exists, it tacks it on at the end.", ch);
+      ch->send("$3Usage$R: zedit copy <source line> <destination line>\r\nDestination line is optional. If no such line exists, it tacks it on at the end.");
       return eFAILURE;
     }
     text = arguments.at(0);
@@ -3159,9 +3158,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   if (x != 30) // Checked in there.
     if (!can_modify_mobile(ch, mobvnum))
     {
-      send_to_char(
-          "You are unable to work creation outside of your range.\r\n",
-          ch);
+      ch->sendln("You are unable to work creation outside of your range.");
       return eFAILURE;
     }
 
@@ -3173,9 +3170,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char(
-          "$3Syntax$R: medit [mob_num] keywords <new_keywords>\n\r",
-          ch);
+      ch->sendln("$3Syntax$R: medit [mob_num] keywords <new_keywords>");
       return eFAILURE;
     }
     ((Character *)mob_index[mob_num].item)->setName(buf4);
@@ -3189,8 +3184,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] shortdesc <desc>\n\r",
-                   ch);
+      ch->sendln("$3Syntax$R: medit [mob_num] shortdesc <desc>");
       return eFAILURE;
     }
     ((Character *)mob_index[mob_num].item)->short_desc = str_hsh(buf4);
@@ -3244,9 +3238,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char(
-          "$3Syntax$R: medit [mob_num] sex <male|female|neutral>\n\r",
-          ch);
+      ch->sendln("$3Syntax$R: medit [mob_num] sex <male|female|neutral>");
       return eFAILURE;
     }
     if (is_abbrev(buf4, "male"))
@@ -3265,9 +3257,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       ch->sendln("Mob sex set to neutral.");
     }
     else
-      send_to_char(
-          "Invalid sex.  Chose 'male', 'female', or 'neutral'.\r\n",
-          ch);
+      ch->sendln("Invalid sex.  Chose 'male', 'female', or 'neutral'.");
   }
   break;
 
@@ -3718,9 +3708,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     if (intval > 250000 && ch->getLevel() <= DEITY)
     {
-      send_to_char(
-          "104-'s can only set a mob to 250k gold.  If you need more ask someone.\r\n",
-          ch);
+      ch->sendln("104-'s can only set a mob to 250k gold.  If you need more ask someone.");
       return eFAILURE;
     }
     ((Character *)mob_index[mob_num].item)->setGold(intval);
@@ -4013,9 +4001,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4 || strncmp(buf4, "yesiwanttodeletethismob", 23))
     {
-      send_to_char(
-          "$3Syntax$R: medit [mob_number] delete yesiwanttodeletethismob\n\r",
-          ch);
+      ch->sendln("$3Syntax$R: medit [mob_number] delete yesiwanttodeletethismob");
       return eFAILURE;
     }
     const auto &character_list = DC::getInstance()->character_list;
@@ -5114,9 +5100,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
   bool found_room = false;
 
-  send_to_char(
-      "Whoever thought of this had a good idea, but never really finished it.  Beg someone to finish it some time.\r\n",
-      ch);
+  ch->sendln("Whoever thought of this had a good idea, but never really finished it.  Beg someone to finish it some time.");
   return eFAILURE;
 
   // Remember if you change this that it uses string_to_file which now appends a ~\n to the end
@@ -5142,7 +5126,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
   if (!found_room)
   {
-    send_to_char("Your area doesn't seem to be there.  Tell Godflesh!", ch);
+    ch->send("Your area doesn't seem to be there.  Tell Godflesh!");
     return eFAILURE;
   }
 
@@ -5150,7 +5134,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
   if ((fl = fopen(buf, "w")) == nullptr)
   {
-    send_to_char("Couldn't open up zone file. Tell Godflesh!", ch);
+    ch->send("Couldn't open up zone file. Tell Godflesh!");
     fclose(fl);
     return eFAILURE;
   }
@@ -5456,7 +5440,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   strcat(buf, (rm->funct) ? "Exists\n\r" : "No\n\r");
   ch->send(buf);
 
-  send_to_char("Room flags: ", ch);
+  ch->send("Room flags: ");
   sprintbit((int32_t)rm->room_flags, room_bits, buf);
   std::string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
   send_to_char(buffer.c_str(), ch);
@@ -5486,7 +5470,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   for (d = rm->denied; d; d = d->next)
   {
     if (a == 0)
-      send_to_char("Mobiles Denied: ", ch);
+      ch->send("Mobiles Denied: ");
     if (real_mobile(d->vnum) == -1)
       ch->send(QString("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
@@ -5580,7 +5564,7 @@ int do_possess(Character *ch, char *argument, int cmd)
       {
         if (ch->desc->snoop_by)
         {
-          send_to_char("Whoa! Almost got caught snooping!\n", ch->desc->snoop_by->character);
+          ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
           sprintf(buf, "Your victim is now trying to possess: %s\n", victim->getNameC());
           ch->desc->snoop_by->character->send(buf);
           ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->getName().split(' '));
@@ -5594,8 +5578,7 @@ int do_possess(Character *ch, char *argument, int cmd)
 
       else if (victim->desc || (IS_PC(victim)))
       {
-        send_to_char(
-            "You can't do that, the body is already in use!\n\r", ch);
+        ch->sendln("You can't do that, the body is already in use!");
         return eFAILURE;
       }
       else
@@ -5695,7 +5678,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
 
   if (!*buf)
   {
-    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
+    ch->send("Syntax: voteset <question|add|remove|clear|start|end> <std::string>");
     return eFAILURE;
   }
 
@@ -5720,7 +5703,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
 
   if (!*buf2)
   {
-    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
+    ch->send("Syntax: voteset <question|add|remove|clear|start|end> <std::string>");
     return eFAILURE;
   }
 
@@ -5740,7 +5723,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <std::string>", ch);
+  ch->send("Syntax: voteset <question|add|remove|clear|start|end> <std::string>");
   return eFAILURE;
 }
 
@@ -5827,8 +5810,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   {
     if (DC::isSet(vict->player->punish, PUNISH_SILENCED))
     {
-      send_to_char("The gods take pity on you and lift your silence.\r\n",
-                   vict);
+      vict->sendln("The gods take pity on you and lift your silence.");
       ch->sendln("SILENCE removed.");
       sprintf(buf, "%s removes %s's silence", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -5991,40 +5973,40 @@ void display_punishes(Character *ch, Character *vict)
   ch->send(buf);
 
   if (DC::isSet(vict->player->punish, PUNISH_NONAME))
-    send_to_char("noname ", ch);
+    ch->send("noname ");
 
   if (DC::isSet(vict->player->punish, PUNISH_SILENCED))
-    send_to_char("Silence ", ch);
+    ch->send("Silence ");
 
   if (DC::isSet(vict->player->punish, PUNISH_NOEMOTE))
-    send_to_char("noemote ", ch);
+    ch->send("noemote ");
 
   if (DC::isSet(vict->player->punish, PUNISH_LOG) && ch->getLevel() > 108)
-    send_to_char("log ", ch);
+    ch->send("log ");
 
   if (DC::isSet(vict->player->punish, PUNISH_FREEZE))
-    send_to_char("Freeze ", ch);
+    ch->send("Freeze ");
 
   if (DC::isSet(vict->player->punish, PUNISH_SPAMMER))
-    send_to_char("Spammer ", ch);
+    ch->send("Spammer ");
 
   if (DC::isSet(vict->player->punish, PUNISH_STUPID))
-    send_to_char("Stupid ", ch);
+    ch->send("Stupid ");
 
   if (DC::isSet(vict->player->punish, PUNISH_NOTELL))
-    send_to_char("notell ", ch);
+    ch->send("notell ");
 
   if (DC::isSet(vict->player->punish, PUNISH_NOARENA))
-    send_to_char("noarena ", ch);
+    ch->send("noarena ");
 
   if (DC::isSet(vict->player->punish, PUNISH_NOTITLE))
-    send_to_char("notitle ", ch);
+    ch->send("notitle ");
 
   if (DC::isSet(vict->player->punish, PUNISH_UNLUCKY))
-    send_to_char("unlucky ", ch);
+    ch->send("unlucky ");
 
   if (DC::isSet(vict->player->punish, PUNISH_NOPRAY))
-    send_to_char("nopray ", ch);
+    ch->send("nopray ");
 
   ch->sendln("");
 }

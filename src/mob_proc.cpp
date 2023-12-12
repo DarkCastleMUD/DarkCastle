@@ -1103,17 +1103,13 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
   {
     act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char(
-        "The clan guard says 'Hey don't be bringing trouble around here!'\n\r",
-        ch);
+    ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
     return eSUCCESS;
   }
   else if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
     act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char(
-        "The clan guard says, 'Hey, don't be a wuss, get outta here.'\n\r",
-        ch);
+    ch->sendln("The clan guard says, 'Hey, don't be a wuss, get outta here.'");
     return eSUCCESS;
   }
   return eFAILURE;
@@ -2018,8 +2014,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
     temp = tmp_victim->next_in_room;
     if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
     {
-      send_to_char("You choke and gag as noxious gases fill the air.\r\n",
-                   tmp_victim);
+      tmp_victim->sendln("You choke and gag as noxious gases fill the air.");
       dam = dice(ch->getLevel(), 8);
       act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
           TO_ROOM, 0);
@@ -2257,7 +2252,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
     }
     if (many_charms(ch))
     {
-      send_to_char("How you plan on feeding all your pets?", ch);
+      ch->send("How you plan on feeding all your pets?");
       return eSUCCESS;
     }
 
@@ -2321,24 +2316,21 @@ int newbie_zone_guard(Character *ch, class Object *obj, int cmd, const char *arg
     {
       act("The guard refuses $n entrance to this sacred school.",
           ch, 0, 0, TO_ROOM, 0);
-      send_to_char(
-          "The guard refuses you entrance to the school.\r\n", ch);
+      ch->sendln("The guard refuses you entrance to the school.");
       return eSUCCESS;
     }
     else if (ch->in_room == real_room(6400)) /* newbie caves */
     {
       act("The guard stops $n from entering the caves.",
           ch, 0, 0, TO_ROOM, 0);
-      send_to_char(
-          "The guard refuses you entrance to the caves.\r\n", ch);
+      ch->sendln("The guard refuses you entrance to the caves.");
       return eSUCCESS;
     }
     else /* default */
     {
       act("The guard humiliates $n, and blocks $s way.",
           ch, 0, 0, TO_ROOM, 0);
-      send_to_char(
-          "The guard humiliates you, and blocks your way.\r\n", ch);
+      ch->sendln("The guard humiliates you, and blocks your way.");
       return eSUCCESS;
     }
   }
@@ -2566,8 +2558,7 @@ int generic_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("A statue magically holds $n back.",
         ch, 0, 0, TO_ROOM, 0);
-    send_to_char(
-        "A statue magically holds you from going east.\r\n", ch);
+    ch->sendln("A statue magically holds you from going east.");
     return eSUCCESS;
   }
 
@@ -2589,8 +2580,7 @@ int portal_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("Dense vegetation blocks $n's path through the door.",
         ch, 0, 0, TO_ROOM, 0);
-    send_to_char(
-        "There is too much vegetation in the way to get through.\r\n", ch);
+    ch->sendln("There is too much vegetation in the way to get through.");
     return eSUCCESS;
   }
 

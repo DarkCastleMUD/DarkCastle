@@ -330,7 +330,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   golem = ch->player->golem;
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
-    send_to_char("Something goes wrong, and you fail!", ch);
+    ch->send("Something goes wrong, and you fail!");
     return eFAILURE;
   }
   if (DC::isSet(retval, eEXTRA_VALUE))
@@ -557,8 +557,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
     }
   }
 
-  send_to_char(
-      "($5:$7)=========================================================================($5:$7)\n\r", master);
+  master->sendln("($5:$7)=========================================================================($5:$7)");
 
   return eSUCCESS;
 }

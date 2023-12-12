@@ -1219,9 +1219,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       create_table(obj);
    if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
    {
-      send_to_char(
-          "You cannot play blackjack while you are flagged as naughty.\r\n",
-          ch);
+      ch->sendln("You cannot play blackjack while you are flagged as naughty.");
       return eSUCCESS;
    }
 
@@ -1231,9 +1229,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
    {
       if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
       {
-         send_to_char(
-             "There is a hand in progress. No bets are accepted at the moment.\r\n",
-             ch);
+         ch->sendln("There is a hand in progress. No bets are accepted at the moment.");
          return eSUCCESS;
       }
       if (playing(ch, obj->table))
@@ -1269,9 +1265,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       if (obj->table->gold && (uint32_t)amt > ch->getGold())
       {
-         send_to_char(
-             "You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",
-             ch);
+         ch->sendln("You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R");
          return eSUCCESS;
       }
       else if (!obj->table->gold && (uint32_t)amt > GET_PLATINUM(ch))
@@ -1335,20 +1329,17 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       if (!canInsurance(plr))
       {
-         send_to_char("You cannot make an insurance bet at the moment.\r\n",
-                      ch);
+         ch->sendln("You cannot make an insurance bet at the moment.");
          return eSUCCESS;
       }
       if (plr->table->gold && ch->getGold() < (uint32_t)(plr->bet / 2))
       {
-         send_to_char("You cannot afford an insurance bet right now.\r\n",
-                      ch);
+         ch->sendln("You cannot afford an insurance bet right now.");
          return eSUCCESS;
       }
       if (!plr->table->gold && GET_PLATINUM(ch) < (uint32_t)(plr->bet / 2))
       {
-         send_to_char("You cannot afford an insurance bet right now.\r\n",
-                      ch);
+         ch->sendln("You cannot afford an insurance bet right now.");
          return eSUCCESS;
       }
       plr->table->handnr++;
@@ -1411,8 +1402,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          char buf[MAX_STRING_LENGTH];
          sprintf(buf, "%s busted.\r\n", GET_NAME(ch));
          send_to_table(buf, plr->table, plr);
-         send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
-                      ch);
+         ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
          nextturn(plr->table);
 
          if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
@@ -1512,8 +1502,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          char buf[MAX_STRING_LENGTH];
          sprintf(buf, "%s busted.\r\n", GET_NAME(ch));
          send_to_table(buf, plr->table, plr);
-         send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
-                      ch);
+         ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
          nextturn(plr->table);
          if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
             free_player(plr);
@@ -2519,11 +2508,11 @@ void send_wheel_bets(Character *ch, struct wheel_data *wheel)
             {
                if (!found)
                {
-                  send_to_char("You have", ch);
+                  ch->send("You have");
                   found = true;
                }
                else
-                  send_to_char(" and", ch);
+                  ch->send(" and");
                csendf(ch, " a bet of %u on %s", wheel->plr[i]->bet_array[j], bet_name[j]);
             }
          }
@@ -2533,18 +2522,18 @@ void send_wheel_bets(Character *ch, struct wheel_data *wheel)
             {
                if (!found)
                {
-                  send_to_char("You have", ch);
+                  ch->send("You have");
                   found = true;
                }
                else
-                  send_to_char(" and", ch);
+                  ch->send(" and");
                csendf(ch, " a bet of %u on %s", wheel->plr[i]->bet_array[j], roulette_display[j - 11]);
             }
          }
       }
    }
    if (!found)
-      send_to_char("You have not placed any bets", ch); // how the hell?
+      ch->send("You have not placed any bets"); // how the hell?
    ch->sendln(".");
 }
 

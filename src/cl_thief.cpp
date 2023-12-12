@@ -353,7 +353,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (ch->getHP() < min_hp)
   {
-    send_to_char("You are feeling too weak right now to attempt such a bold maneuver.", ch);
+    ch->send("You are feeling too weak right now to attempt such a bold maneuver.");
     return eFAILURE;
   }
 
@@ -915,7 +915,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     }
     if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
     {
-      send_to_char("You must earn that flag, no stealing allowed!", ch);
+      ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
     }
     if (IS_NPC(victim) && isname("prize", obj->name))

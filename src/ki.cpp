@@ -182,8 +182,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         ch->sendln("This is a peaceful ki power.");
         break;
       default:
-        send_to_char("It seems like you're in a pretty bad shape!\n\r",
-                     ch);
+        ch->sendln("It seems like you're in a pretty bad shape!");
         break;
       }
       return eFAILURE;
@@ -255,15 +254,12 @@ int do_ki(Character *ch, char *argument, int cmd)
       }
       else if ((tar_char != ch) && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
       {
-        send_to_char("You can only use this power upon yourself.\r\n",
-                     ch);
+        ch->sendln("You can only use this power upon yourself.");
         return eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
-        send_to_char(
-            "You are afraid that it might harm your master.\r\n",
-            ch);
+        ch->sendln("You are afraid that it might harm your master.");
         return eFAILURE;
       }
     }
@@ -287,9 +283,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     /* crasher right here */
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
     {
-      send_to_char(
-          "You find yourself unable to focus your energy here.\r\n",
-          ch);
+      ch->sendln("You find yourself unable to focus your energy here.");
       return eFAILURE;
     }
 
@@ -306,8 +300,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     WAIT_STATE(ch, ki_info[spl].beats);
 
     if ((ki_info[spl].ki_pointer == nullptr) && spl > 0)
-      send_to_char("Sorry, this power has not yet been implemented.\r\n",
-                   ch);
+      ch->sendln("Sorry, this power has not yet been implemented.");
     else
     {
       if (!skill_success(ch, tar_char,
@@ -340,9 +333,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
         if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
         {
-          send_to_char(
-              "There is no safe haven from an angry IMPLEMENTER!\n\r",
-              tar_char);
+          tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
         }
 
       ch->sendln("Ok.");
@@ -657,7 +648,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   if (!arg)
   {
-    send_to_char("You can only purify poison, blindness, alcohol or weaken.", ch);
+    ch->send("You can only purify poison, blindness, alcohol or weaken.");
     return eFAILURE;
   }
   if (!str_cmp(arg, "poison"))
