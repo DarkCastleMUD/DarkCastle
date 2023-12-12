@@ -195,7 +195,6 @@ command_return_t do_beacon(Character *ch, char *argument, int cmd);
 command_return_t do_beep(Character *ch, char *argument, int cmd);
 command_return_t do_behead(Character *ch, char *argument, int cmd);
 command_return_t do_berserk(Character *ch, char *argument, int cmd);
-command_return_t do_bestow(Character *ch, std::string argument, int cmd);
 command_return_t do_bladeshield(Character *ch, char *argument, int cmd);
 command_return_t do_bloodfury(Character *ch, char *argument, int cmd);
 command_return_t do_boot(Character *ch, char *argument, int cmd);
