@@ -144,7 +144,7 @@ void do_mload(Character *ch, int rnum, int cnt)
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
     logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
-    send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n", ch);
+    ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
 }
 
@@ -221,7 +221,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
         (ch->getLevel() < IMPLEMENTER))
     {
       extract_obj(obj);
-      send_to_char("Denied.\r\n", ch);
+      ch->sendln("Denied.");
       return;
     }
     else
@@ -468,7 +468,7 @@ void boro_mob_stat(Character *ch, Character *k)
   send_to_char(buf, ch);
 
   // Description
-  send_to_char("$3Detailed description$R:\r\n", ch);
+  ch->sendln("$3Detailed description$R:");
   if (k->description)
     send_to_char(k->description, ch);
   else
@@ -621,7 +621,7 @@ void mob_stat(Character *ch, Character *k)
     send_to_char(k->long_desc, ch);
   else
     send_to_char("None", ch);
-  send_to_char("$3Detailed description$R:\r\n", ch);
+  ch->sendln("$3Detailed description$R:");
   if (k->description)
     send_to_char(k->description, ch);
   else
@@ -967,7 +967,7 @@ void obj_stat(Character *ch, class Object *j)
   /*
     if(DC::isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
-      send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
+      ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return;
     }
 */
@@ -1403,7 +1403,7 @@ command_return_t do_repop(Character *ch, std::string arguments, int cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You may only repop inside of your room range.\r\n", ch);
+    ch->sendln("You may only repop inside of your room range.");
     return eFAILURE;
   }
 
@@ -1435,7 +1435,7 @@ int do_clear(Character *ch, char *argument, int cmd)
 
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You may only repop inside of your R range.\r\n", ch);
+    ch->sendln("You may only repop inside of your R range.");
     return eFAILURE;
   }
 
@@ -1498,7 +1498,7 @@ int do_linkdead(Character *ch, char *arg, int cmd)
   }
 
   if (!x)
-    send_to_char("No linkdead players found.\r\n", ch);
+    ch->sendln("No linkdead players found.");
   return eSUCCESS;
 }
 
@@ -1536,7 +1536,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill(COMMAND_RESTORE))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -1548,7 +1548,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
     if (!(victim = get_char(buf)))
     {
-      send_to_char("No-one by that name in the world.\r\n", ch);
+      ch->sendln("No-one by that name in the world.");
       return eFAILURE;
     }
 
@@ -1578,7 +1578,7 @@ int do_restore(Character *ch, char *argument, int cmd)
     redo_hitpoints(victim);
     redo_mana(victim);
     redo_ki(victim);
-    send_to_char("Done.\r\n", ch);
+    ch->sendln("Done.");
     if (!IS_AFFECTED(ch, AFF_BLIND))
       act("You have been fully healed by $N!",
           victim, 0, ch, TO_CHAR, 0);
@@ -1736,7 +1736,7 @@ int do_huntclear(Character *ch, char *arg, int cmd)
 
   if (str_cmp(arg1, "doit"))
   {
-    send_to_char("Syntax: huntclear doit\r\nClears all currently running treasure hunts.\r\n", ch);
+    ch->sendln("Syntax: huntclear doit\r\nClears all currently running treasure hunts.");
     return eSUCCESS;
   }
   else
@@ -1748,7 +1748,7 @@ int do_huntclear(Character *ch, char *arg, int cmd)
       h->time = -1;
       check_end_of_hunt(h, true);
     }
-    send_to_char("Done!\r\n", ch);
+    ch->sendln("Done!");
     return eSUCCESS;
   }
 }
@@ -1983,7 +1983,7 @@ void pick_up_item(Character *ch, class Object *obj)
             {
               if (DC::isSet(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
               {
-                send_to_char("You already have this item - Timer has been reset!\r\n", ch);
+                ch->sendln("You already have this item - Timer has been reset!");
                 extract_obj(oitem);
                 citem = search_char_for_item(ch, oitem->item_number, false);
                 citem->save_expiration = time(nullptr) + (60 * 60 * 24);
@@ -1991,7 +1991,7 @@ void pick_up_item(Character *ch, class Object *obj)
               }
               else
               {
-                send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
+                ch->sendln("The item's uniqueness causes it to poof into thin air!");
                 extract_obj(oitem);
                 break; // Used to crash it.
               }
@@ -2004,7 +2004,7 @@ void pick_up_item(Character *ch, class Object *obj)
         }
         else
         {
-          send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n", ch);
+          ch->sendln("Brick turned into a non-existent item. Tell an imm.");
           break;
         }
         if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
@@ -2075,14 +2075,14 @@ int do_showhunt(Character *ch, char *arg, int cmd)
 
   if (!hunt_list)
   {
-    send_to_char("There are no active hunts at the moment.\r\n", ch);
+    ch->sendln("There are no active hunts at the moment.");
 
     ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(nullptr)));
 
     send_to_char(buf, ch);
   }
   else
-    send_to_char("The following hunts are currently active:\r\n", ch);
+    ch->sendln("The following hunts are currently active:");
 
   for (h = hunt_list; h; h = h->next)
   {
@@ -2159,30 +2159,30 @@ int do_huntstart(Character *ch, char *argument, int cmd)
 
   if (arg3[0] == '\0')
   {
-    send_to_char("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]\r\n", ch);
+    ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
     return eSUCCESS;
   }
   int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
-    send_to_char("Non-existent item.\r\n", ch);
+    ch->sendln("Non-existent item.");
     return eSUCCESS;
   }
   if (num <= 0 || num > 50)
   {
-    send_to_char("Invalid number of items. Maximum of 50 allowed.\r\n", ch);
+    ch->sendln("Invalid number of items. Maximum of 50 allowed.");
     return eSUCCESS;
   }
   if (time <= 0)
   {
-    send_to_char("Invalid duration.\r\n", ch);
+    ch->sendln("Invalid duration.");
     return eSUCCESS;
   }
   struct hunt_data *h;
   for (h = hunt_list; h; h = h->next)
     if (h->itemnum == vnum)
     {
-      send_to_char("A hunt for that item is already ongoing!\r\n", ch);
+      ch->sendln("A hunt for that item is already ongoing!");
       return eSUCCESS;
     }
   char huntname[200];

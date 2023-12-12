@@ -591,22 +591,22 @@ void advance_level(Character *ch, int is_conversion)
 	}
 
 	if (ch->getLevel() == 6)
-		send_to_char("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\n", ch);
+		ch->sendln("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.");
 	if (ch->getLevel() == 10)
 	{
-		send_to_char("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n", ch);
+		ch->sendln("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.");
 		add_new_vault(GET_NAME(ch), 0);
 	}
 	if (ch->getLevel() == 11)
-		send_to_char("It now costs you $B$5gold$R every time you recall.\r\n", ch);
+		ch->sendln("It now costs you $B$5gold$R every time you recall.");
 	if (ch->getLevel() == 20)
 		send_to_char(
 			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
 			ch);
 	if (ch->getLevel() == 40)
-		send_to_char("You are now able to use the Anonymous command. See \"HELP ANON\" for details.\r\n", ch);
+		ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
 	if (ch->getLevel() == 50)
-		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
+		ch->sendln("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)");
 }
 
 void gain_exp(Character *ch, int64_t gain)
@@ -624,7 +624,7 @@ void gain_exp(Character *ch, int64_t gain)
 
 	/*  if(GET_EXP(ch) > 2000000000)
 	 {
-	 send_to_char("You have hit the 2 billion xp cap.  Convert or meta chode.\r\n", ch);
+	 ch->sendln("You have hit the 2 billion xp cap.  Convert or meta chode.");
 	 return;
 	 }*/
 	GET_EXP(ch) += gain;
@@ -699,18 +699,18 @@ void gain_condition(Character *ch, int condition, int value)
 	{
 	case FULL:
 	{
-		send_to_char("You are hungry.\r\n", ch);
+		ch->sendln("You are hungry.");
 		return;
 	}
 	case THIRST:
 	{
-		send_to_char("You are thirsty.\r\n", ch);
+		ch->sendln("You are thirsty.");
 		return;
 	}
 	case DRUNK:
 	{
 		if (intoxicated)
-			send_to_char("You are now sober.\r\n", ch);
+			ch->sendln("You are now sober.");
 		return;
 	}
 	default:
@@ -720,7 +720,7 @@ void gain_condition(Character *ch, int condition, int value)
 	// just for fun
 	if (1 == number(1, 2000))
 	{
-		send_to_char("You are horny\r\n", ch);
+		ch->sendln("You are horny");
 	}
 }
 
@@ -753,7 +753,7 @@ void food_update(void)
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
 					do_eat(i, food->name, CMD_DEFAULT);
 				else
-					send_to_char("You are out of food.\r\n", i);
+					i->sendln("You are out of food.");
 			}
 		}
 		gain_condition(i, DRUNK, -1);
@@ -769,7 +769,7 @@ void food_update(void)
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
 					do_drink(i, food->name, CMD_DEFAULT);
 				else
-					send_to_char("You are out of drink.\r\n", i);
+					i->sendln("You are out of drink.");
 			}
 		}
 	}

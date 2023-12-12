@@ -198,7 +198,7 @@ int do_addnews(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill(COMMAND_ADDNEWS))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -216,7 +216,7 @@ int do_addnews(Character *ch, char *argument, int cmd)
   if (!str_cmp(arg, "save"))
   {
     savenews();
-    send_to_char("Saved!\r\n", ch);
+    ch->sendln("Saved!");
     return eSUCCESS;
   }
   if (str_cmp(arg, "today"))
@@ -265,7 +265,7 @@ int do_addnews(Character *ch, char *argument, int cmd)
     addnews(nnews);
     nnews->news = nullptr;
   }
-  send_to_char("        Enter news item.  (/s saves /h for help)\r\n", ch);
+  ch->sendln("        Enter news item.  (/s saves /h for help)");
   if (nnews->news)
     send_to_char(nnews->news, ch);
   //  nnews->news = str_dup("Temporary data.\r\n");

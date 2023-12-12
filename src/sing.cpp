@@ -325,7 +325,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			*(argument + qend) = LOWER(*(argument + qend));
 		if (*(argument + qend) != '\'')
 		{
-			send_to_char("If you start with a ' you have to end with a ' too.\r\n", ch);
+			ch->sendln("If you start with a ' you have to end with a ' too.");
 			return eFAILURE;
 		}
 	}
@@ -339,46 +339,46 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 	if (spl < 0)
 	{
-		send_to_char("You know not of that song.\r\n", ch);
+		ch->sendln("You know not of that song.");
 		return eFAILURE;
 	}
 	if (cmd == CMD_ORCHESTRATE)
 	{
 		if (!IS_SINGING(ch))
 		{
-			send_to_char("You must be singing a song to orchestrate another melody.\r\n", ch);
+			ch->sendln("You must be singing a song to orchestrate another melody.");
 			return eFAILURE;
 		}
 		if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
 		{
-			send_to_char("You must be holding an instrument to orchestrate songs.\r\n", ch);
+			ch->sendln("You must be holding an instrument to orchestrate songs.");
 			return eFAILURE;
 		}
 	}
 	else if (song_info[spl].rating > 0 && IS_SINGING(ch))
 	{
 		if (ch->has_skill(SKILL_ORCHESTRATE))
-			send_to_char("You are already in the middle of another song!  Try using orchestrate.\r\n", ch);
+			ch->sendln("You are already in the middle of another song!  Try using orchestrate.");
 		else
 			send_to_char("You are already in the middle of another song!\n\r", ch);
 		return eFAILURE;
 	}
 	else if (spl == 2 && !IS_SINGING(ch))
 	{
-		send_to_char("You are not even singing a song to stop!\r\n", ch);
+		ch->sendln("You are not even singing a song to stop!");
 		return eFAILURE;
 	}
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
 		if ((*i).song_number == spl)
 		{
-			send_to_char("You are already singing this song!\r\n", ch);
+			ch->sendln("You are already singing this song!");
 			return eFAILURE;
 		}
 
 	if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
 	{
-		send_to_char("This room feels too safe to sing an offensive song such as this.\r\n", ch);
+		ch->sendln("This room feels too safe to sing an offensive song such as this.");
 		return eFAILURE;
 	}
 
@@ -389,16 +389,16 @@ int do_sing(Character *ch, char *arg, int cmd)
 			switch (GET_POS(ch))
 			{
 			case position_t::SLEEPING:
-				send_to_char("You dream of beautiful music.\r\n", ch);
+				ch->sendln("You dream of beautiful music.");
 				break;
 			case position_t::RESTING:
 				send_to_char("You can't sing this resting!!\n\r", ch);
 				break;
 			case position_t::SITTING:
-				send_to_char("You can't do this sitting.  You must stand up.\r\n", ch);
+				ch->sendln("You can't do this sitting.  You must stand up.");
 				break;
 			case position_t::FIGHTING:
-				send_to_char("This is a peaceful song.  Not for battle.\r\n", ch);
+				ch->sendln("This is a peaceful song.  Not for battle.");
 				break;
 			default:
 				send_to_char("It seems like you're in a pretty bad shape!\n\r", ch);
@@ -415,7 +415,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 						learned = 50;
 					else
 					{
-						send_to_char("You haven't learned that song.\r\n", ch);
+						ch->sendln("You haven't learned that song.");
 						return eFAILURE;
 					}
 				}
@@ -423,7 +423,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		if (getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING)
 		{
-			send_to_char("You are unable to orchestrate such a complicated melody!\r\n", ch);
+			ch->sendln("You are unable to orchestrate such a complicated melody!");
 			return eFAILURE;
 		}
 
@@ -512,19 +512,19 @@ int do_sing(Character *ch, char *arg, int cmd)
 			if (*name)
 			{
 				if (DC::isSet(song_info[spl].targets, TAR_CHAR_ROOM))
-					send_to_char("Nobody here by that name.\r\n", ch);
+					ch->sendln("Nobody here by that name.");
 				else if (DC::isSet(song_info[spl].targets, TAR_CHAR_WORLD))
-					send_to_char("Nobody playing by that name.\r\n", ch);
+					ch->sendln("Nobody playing by that name.");
 				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_INV))
-					send_to_char("You are not carrying anything like that.\r\n", ch);
+					ch->sendln("You are not carrying anything like that.");
 				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_ROOM))
-					send_to_char("Nothing here by that name.\r\n", ch);
+					ch->sendln("Nothing here by that name.");
 				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_WORLD))
-					send_to_char("Nothing at all by that name.\r\n", ch);
+					ch->sendln("Nothing at all by that name.");
 				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_EQUIP))
-					send_to_char("You are not wearing anything like that.\r\n", ch);
+					ch->sendln("You are not wearing anything like that.");
 				else if (DC::isSet(song_info[spl].targets, TAR_OBJ_WORLD))
-					send_to_char("Nothing at all by that name.\r\n", ch);
+					ch->sendln("Nothing at all by that name.");
 			}
 			else
 				/* No arguments were given */
@@ -541,12 +541,12 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 			else if ((tar_char != ch) && DC::isSet(song_info[spl].targets, TAR_SELF_ONLY))
 			{
-				send_to_char("You can only sing this song to yourself.\r\n", ch);
+				ch->sendln("You can only sing this song to yourself.");
 				return eFAILURE;
 			}
 			else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
 			{
-				send_to_char("You are afraid that it might harm your master.\r\n", ch);
+				ch->sendln("You are afraid that it might harm your master.");
 				return eFAILURE;
 			}
 		}
@@ -563,7 +563,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
 		{
-			send_to_char("You find yourself unable to use energy based chants here.\r\n", ch);
+			ch->sendln("You find yourself unable to use energy based chants here.");
 			return eFAILURE;
 		}
 
@@ -582,7 +582,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 		if ((song_info[spl].song_pointer == nullptr) && spl > 0)
 		{
-			send_to_char("Sorry, this power has not yet been implemented.\r\n", ch);
+			ch->sendln("Sorry, this power has not yet been implemented.");
 			return eFAILURE;
 		}
 		else
@@ -594,7 +594,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			{
 				if ((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
 				{
-					send_to_char("You can't even begin this song without an instrument.\r\n", ch);
+					ch->sendln("You can't even begin this song without an instrument.");
 					return eFAILURE;
 				}
 			}
@@ -627,14 +627,14 @@ int do_sing(Character *ch, char *arg, int cmd)
 				if (!origsing)
 				{
 					if (ch->songs.size() > 1 && !*name)
-						send_to_char("You stop orchestrating all of your music.\r\n", ch);
+						ch->sendln("You stop orchestrating all of your music.");
 					else if (ch->songs.size() > 1 && *name)
 					{
 						int hold = old_search_block(name, 0, strlen(name), songs, 0);
 						bool found = false;
 						if (--hold < 0)
 						{
-							send_to_char("You do not know of that song.\r\n", ch);
+							ch->sendln("You do not know of that song.");
 							return eFAILURE;
 						}
 						for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -645,21 +645,21 @@ int do_sing(Character *ch, char *arg, int cmd)
 							}
 						if (!found)
 						{
-							send_to_char("You are not singing that song.\r\n", ch);
+							ch->sendln("You are not singing that song.");
 							return eFAILURE;
 						}
 						else
 						{
 							send_to_char("You stop singing ", ch);
 							send_to_char(songs[(*i).song_number], ch);
-							send_to_char(".\r\n", ch);
+							ch->sendln(".");
 						}
 					}
 					else
 					{
 						send_to_char("You stop singing ", ch);
 						send_to_char(songs[(*ch->songs.begin()).song_number], ch);
-						send_to_char(".\r\n", ch);
+						ch->sendln(".");
 					}
 				}
 				// If the song is a steady one, (like flight) than it needs to be
@@ -676,7 +676,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			{
 				if (!skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 				{
-					send_to_char("You failed to orchestrate your music!\r\n", ch);
+					ch->sendln("You failed to orchestrate your music!");
 					return eFAILURE;
 				}
 				else
@@ -729,7 +729,7 @@ void update_bard_singing()
 
 		for (j = i->songs.begin(); j != i->songs.end(); ++j) {
 			if ((*j).song_timer == -1) {
-				send_to_char("You run out of lyrics and end the song.\r\n", i);
+				i->sendln("You run out of lyrics and end the song.");
 				if ((song_info[(*j).song_number].intrp_pointer)) {
 					((*song_info[(*j).song_number].intrp_pointer)(i->getLevel(), i, nullptr, nullptr, -1));
 					if (i->songs.empty()) {
@@ -749,7 +749,7 @@ void update_bard_singing()
 	if ((*j).song_timer > 0) {
 		if (ISSET(i->affected_by, AFF_HIDE)) {
 			REMBIT(i->affected_by, AFF_HIDE);
-			send_to_char("Your singing ruins your hiding place.\r\n", i);
+			i->sendln("Your singing ruins your hiding place.");
 		}
 		if (i->getLevel() < IMPLEMENTER
 				&& ((DC::isSet(DC::getInstance()->world[i->in_room].room_flags, NO_KI) || DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE))
@@ -768,7 +768,7 @@ void update_bard_singing()
 								|| (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))) {
-			send_to_char("In this room, your song quiety fades away.\r\n", i);
+			i->sendln("In this room, your song quiety fades away.");
 			if ((song_info[(*j).song_number].intrp_pointer)) {
 				((*song_info[(*j).song_number].intrp_pointer)(i->getLevel(), i, nullptr, nullptr, -1));
 				if (i->songs.empty()) {
@@ -787,7 +787,7 @@ void update_bard_singing()
 		}
 		else if ((((GET_POS(i) < song_info[(*j).song_number].minimum_position) && IS_PC(i)) || DC::isSet(i->combat, COMBAT_STUNNED) || DC::isSet(i->combat, COMBAT_STUNNED2) || DC::isSet(i->combat, COMBAT_SHOCKED) || DC::isSet(i->combat, COMBAT_SHOCKED2) || (DC::isSet(i->combat, COMBAT_BASH1) || DC::isSet(i->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
 		{
-			send_to_char("You can't keep singing in this position!\r\n", i);
+			i->sendln("You can't keep singing in this position!");
 			(*j).song_timer = 0;
 			if ((song_info[(*j).song_number].intrp_pointer)) {
 				((*song_info[(*j).song_number].intrp_pointer)(i->getLevel(), i, nullptr, nullptr, -1));
@@ -808,7 +808,7 @@ void update_bard_singing()
 		{
 			if ((!i->equipment[HOLD] || GET_ITEM_TYPE(i->equipment[HOLD]) != ITEM_INSTRUMENT)
 					&& (!i->equipment[HOLD2] || GET_ITEM_TYPE(i->equipment[HOLD2]) != ITEM_INSTRUMENT)) {
-				send_to_char("Without an instrument, your song dies away.\r\n", i);
+				i->sendln("Without an instrument, your song dies away.");
 				if ((song_info[(*j).song_number].intrp_pointer)) {
 					((*song_info[(*j).song_number].intrp_pointer)(i->getLevel(), i, nullptr, nullptr, -1));
 					if (i->songs.empty()) {
@@ -854,7 +854,7 @@ void update_bard_singing()
 				return true;
 			}
 		} else {
-			send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
+			i->sendln("Bad exec pointer on the song you sang.  Tell a god.");
 		}
 
 		if (retval == eEXTRA_VALUE) { //the song killed itself
@@ -882,7 +882,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 	}
 	act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
 	act("$n sings an entrancing hymn to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-	send_to_char("You sing your most enchanting hymn, hoping to attract some fans.\r\n", ch);
+	ch->sendln("You sing your most enchanting hymn, hoping to attract some fans.");
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
 	{
@@ -917,7 +917,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	{
 		dc_free((*i).song_data);
 		(*i).song_data = 0;
-		send_to_char("They seem to have left.\r\nIn the middle of your performance too!\r\n", ch);
+		ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
 		return eFAILURE;
 	}
 	dc_free((*i).song_data);
@@ -926,14 +926,14 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	if (IS_PC(victim) || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
 	{
-		send_to_char("They don't seem particularily interested.\r\n", ch);
-		send_to_char("You manage to resist the entrancing lyrics.\r\n", victim);
+		ch->sendln("They don't seem particularily interested.");
+		victim->sendln("You manage to resist the entrancing lyrics.");
 		return eFAILURE;
 	}
 
 	if (circle_follow(victim, ch))
 	{
-		send_to_char("Sorry, following in circles can not be allowed.\r\n", ch);
+		ch->sendln("Sorry, following in circles can not be allowed.");
 		return eFAILURE;
 	}
 
@@ -965,7 +965,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	check_eq(victim);
 
 	act("You decide to follow $n's musical genius to the end.", ch, 0, victim, TO_VICT, 0);
-	send_to_char("You succeed, and you find yourself having a new fan.\r\n", ch);
+	ch->sendln("You succeed, and you find yourself having a new fan.");
 	return eSUCCESS;
 }
 
@@ -981,7 +981,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 
 	act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, TO_VICT, 0);
 	act("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-	send_to_char("You sing your funniest limerick!\r\n", ch);
+	ch->sendln("You sing your funniest limerick!");
 
 	WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC))
@@ -1068,7 +1068,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 
 	if (DC::isSet(retval, eVICT_DIED))
 	{
-		send_to_char("You dance a small jig on the corpse.\r\n", ch);
+		ch->sendln("You dance a small jig on the corpse.");
 		act("$n dances a little jig on the fallen corpse.", ch, 0, victim, TO_ROOM, 0);
 		return retval;
 	}
@@ -1081,7 +1081,7 @@ int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *vict
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of healing...\r\n", ch);
+	ch->sendln("You begin to sing a song of healing...");
 	act("$n raises $s voice in a soothing melody...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1112,7 +1112,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 
 	if (GET_KI(ch) < 2)
 	{
-		send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+		ch->sendln("You don't have enough ki to continue singing.");
 		return eSUCCESS;
 	}
 	GET_KI(ch) -= 2;
@@ -1147,7 +1147,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 
 	if (!skill_success(ch, nullptr, SKILL_SONG_HEALING_MELODY))
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
@@ -1172,7 +1172,7 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of revealing...\r\n", ch);
+	ch->sendln("You begin to sing a song of revealing...");
 	act("$n begins to chant in rhythm...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1216,7 +1216,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 		if (i == ch)
 		{
 			act("$n continues $s singing...", ch, 0, 0, TO_ROOM, 0);
-			send_to_char("Your singing ruins your hiding place.\r\n", ch);
+			ch->sendln("Your singing ruins your hiding place.");
 		}
 		else
 		{
@@ -1248,11 +1248,11 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
 			}
 		}
 	}
-	send_to_char("You tap your foot along to the revealing staccato.\r\n", ch);
+	ch->sendln("You tap your foot along to the revealing staccato.");
 
 	if (!skill_success(ch, nullptr, SKILL_SONG_REVEAL_STACATO))
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(k);
 		return eEXTRA_VALUE;
 	}
@@ -1281,7 +1281,7 @@ int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *v
 	// and B, there's no place to save it before we execute
 	(*i).song_data = str_dup(arg);
 
-	send_to_char("You begin to sing a long single note...\r\n", ch);
+	ch->sendln("You begin to sing a long single note...");
 	act("$n sings a long solitary note.", ch, 0, 0, TO_ROOM, 0);
 	(*i).song_timer = song_info[(*i).song_number].beats;
 
@@ -1326,7 +1326,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 		spell_identify(ch->getLevel(), ch, vict, 0, 0);
 	}
 	else
-		send_to_char("You can't seem to find that item.\r\n", ch);
+		ch->sendln("You can't seem to find that item.");
 	return eSUCCESS;
 }
 
@@ -1361,7 +1361,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 
 	if (!victim)
 	{
-		send_to_char("Your song fades outside of battle.\r\n", ch);
+		ch->sendln("Your song fades outside of battle.");
 		return eSUCCESS;
 	}
 
@@ -1383,14 +1383,14 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 		return retval;
 	if (DC::isSet(retval, eVICT_DIED))
 	{
-		send_to_char("You dance a small jig on the corpse.\r\n", ch);
+		ch->sendln("You dance a small jig on the corpse.");
 		act("$n dances a little jig on the fallen corpse.", ch, 0, victim, TO_ROOM, 0);
 		return retval;
 	}
 
 	if (!skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF))
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
@@ -1412,7 +1412,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 {
 	char buf[200];
 
-	send_to_char("Available Songs\n\r---------------\r\n", ch);
+	ch->sendln("Available Songs\n\r---------------");
 	for (int i = 0; *songs[i] != '\n'; i++)
 	{
 		if (ch->getLevel() < IMMORTAL && !ch->has_skill(song_info[i].skill_num))
@@ -1428,7 +1428,7 @@ int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of rememberance...\r\n", ch);
+	ch->sendln("You begin to sing a song of rememberance...");
 	act("$n raises $s voice in a soothing ballad...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1453,7 +1453,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 
 	if (GET_KI(ch) < 3)
 	{
-		send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+		ch->sendln("You don't have enough ki to continue singing.");
 		return eSUCCESS;
 	}
 	GET_KI(ch) -= 3;
@@ -1479,7 +1479,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 			send_to_char(buf, tmp_char);
 		}
 		else
-			send_to_char("You feel soothed.\r\n", tmp_char);
+			tmp_char->sendln("You feel soothed.");
 
 		GET_MANA(tmp_char) += heal;
 		if (GET_MANA(tmp_char) > GET_MAX_MANA(tmp_char))
@@ -1488,7 +1488,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 
 	if (!skill_success(ch, nullptr, SKILL_SONG_SOOTHING_REMEM))
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
@@ -1510,7 +1510,7 @@ int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *vic
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of travel...\r\n", ch);
+	ch->sendln("You begin to sing a song of travel...");
 	act("$n raises $s voice in an uplifting march...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1544,7 +1544,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 
 	if (GET_KI(ch) == 0)
 	{
-		send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+		ch->sendln("You don't have enough ki to continue singing.");
 		return eSUCCESS;
 	}
 
@@ -1579,14 +1579,14 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 			}
 		}
 		else
-			send_to_char("Your feet feel lighter.\r\n", tmp_char);
+			tmp_char->sendln("Your feet feel lighter.");
 
 		tmp_char->incrementMove(heal);
 	}
 
 	if (!skill_success(ch, nullptr, SKILL_SONG_TRAVELING_MARCH))
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
@@ -1612,7 +1612,7 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
 		return eFAILURE;
 	if (ch->songs.empty())
 	{
-		send_to_char("Might wanna start the performance first...Hope this isn't indicative of your love life...\r\n", ch);
+		ch->sendln("Might wanna start the performance first...Hope this isn't indicative of your love life...");
 		return eFAILURE;
 	}
 
@@ -1651,7 +1651,7 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
 
 	skill_increase_check(ch, SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num), SKILL_INCREASE_EASY);
 
-	send_to_char("You finish off your music with a flourish...\r\n", ch);
+	ch->sendln("You finish off your music with a flourish...");
 	act("$n finishes $s music in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
 
 	return eSUCCESS;
@@ -1661,7 +1661,7 @@ int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victi
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing an astral chanty...\r\n", ch);
+	ch->sendln("You begin to sing an astral chanty...");
 	act("$n starts quietly in a sea chanty...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1690,7 +1690,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		DC::isSet(DC::getInstance()->world[target->in_room].room_flags, IMP_ONLY) ||
 		DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_PORTAL))
 	{
-		send_to_char("Your astral travels fail to find your destination.\r\n", victim);
+		victim->sendln("Your astral travels fail to find your destination.");
 		return;
 	}
 
@@ -1702,13 +1702,13 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	if (IS_AFFECTED(target, AFF_SHADOWSLIP))
 	{
-		send_to_char("Something seems to block your astral travel to this target.\r\n", victim);
+		victim->sendln("Something seems to block your astral travel to this target.");
 		return;
 	}
 
 	if (affected_by_spell(victim, FUCK_PTHIEF))
 	{
-		send_to_char("Your attempt to transport stolen goods through the astral planes fails!\r\n", victim);
+		victim->sendln("Your attempt to transport stolen goods through the astral planes fails!");
 		return;
 	}
 
@@ -1717,7 +1717,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 	for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
 		{
-			send_to_char("Your astral travels fail to find your destination.\r\n", victim);
+			victim->sendln("Your astral travels fail to find your destination.");
 			return;
 		}
 
@@ -1725,7 +1725,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	if (!DC::isSet(retval, eSUCCESS))
 	{
-		send_to_char("Mystic winds shock you back into your old reality.\r\n", victim);
+		victim->sendln("Mystic winds shock you back into your old reality.");
 		act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
 		WAIT_STATE(victim, DC::PULSE_VIOLENCE * 3);
 		return;
@@ -1751,19 +1751,19 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 
 	if (!victim)
 	{
-		send_to_char("You cannot seem to accurately focus your song.\r\n", ch);
+		ch->sendln("You cannot seem to accurately focus your song.");
 		status = eFAILURE;
 	}
 	else if (victim->getLevel() > ch->getLevel())
 	{
-		send_to_char("Your target resists the song's draw.\r\n", ch);
+		ch->sendln("Your target resists the song's draw.");
 		status = eFAILURE;
 	}
 	else if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
 			 DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport() ||
 			 DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
 	{
-		send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
+		ch->sendln("A mystical force seems to be keeping you out.");
 		status = eFAILURE;
 	}
 	else
@@ -1774,7 +1774,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 			if (search_char_for_item(tmpch, real_object(51), false))
 			{
-				send_to_char("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R\r\n", ch);
+				ch->sendln("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R");
 				status = eFAILURE;
 				break;
 			}
@@ -1786,7 +1786,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 			{
 				if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
 				{
-					send_to_char("You don't posses the energy to travel that far.\r\n", ch);
+					ch->sendln("You don't posses the energy to travel that far.");
 					GET_KI(ch) += use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
 
 					// free our stored char name
@@ -1800,7 +1800,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 				}
 				else
 				{
-					send_to_char("The long distance drains additional ki from you.\r\n", ch);
+					ch->sendln("The long distance drains additional ki from you.");
 					GET_KI(ch) -= use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
 				}
 			}
@@ -1815,7 +1815,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 				do_astral_chanty_movement(tmp_char, victim);
 			}
 
-			send_to_char("Your song completes, and your vision fades.\r\n", ch);
+			ch->sendln("Your song completes, and your vision fades.");
 			act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
 			status = eSUCCESS;
 		}
@@ -1843,7 +1843,7 @@ int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *vi
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of forgetfulness...\r\n", ch);
+	ch->sendln("You begin to sing a song of forgetfulness...");
 	act("$n begins an entrancing rhythm...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1871,7 +1871,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 
 	if (!(victim = ch->get_char_room_vis((*i).song_data)))
 	{
-		send_to_char("You don't see that person here.\r\n", ch);
+		ch->sendln("You don't see that person here.");
 		dc_free((*i).song_data);
 		(*i).song_data = 0;
 		return eFAILURE;
@@ -1883,16 +1883,16 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 
 	if (IS_PC(victim))
 	{
-		send_to_char("They seem to be looking at you really strangly.\r\n", ch);
-		send_to_char("You are sung to about butterflies and bullfrogs.\r\n", victim);
+		ch->sendln("They seem to be looking at you really strangly.");
+		victim->sendln("You are sung to about butterflies and bullfrogs.");
 		return eSUCCESS;
 	}
 
 	if (number(0, 1))
 	{
 		// monster forgets hate/fear/track list
-		send_to_char("Hrm.....who were you mad at again??\r\n", victim);
-		send_to_char("You have soothed the savage beast.\r\n", ch);
+		victim->sendln("Hrm.....who were you mad at again??");
+		ch->sendln("You have soothed the savage beast.");
 		remove_memory(victim, 'h');
 		remove_memory(victim, 'f');
 		remove_memory(victim, 't');
@@ -1900,7 +1900,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 	else
 	{
 		// Die bard!
-		send_to_char("Uh oh.\r\n", ch);
+		ch->sendln("Uh oh.");
 		do_say(victim, "Die you spoony bard!", CMD_DEFAULT);
 		retval = attack(victim, ch, TYPE_UNDEFINED);
 		retval = SWAP_CH_VICT(retval);
@@ -1913,7 +1913,7 @@ int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a song of shattering...\r\n", ch);
+	ch->sendln("You begin to sing a song of shattering...");
 	act("$n begins a fading resonance...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1945,7 +1945,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 
 	if (!(obj = get_obj_in_list((*i).song_data, DC::getInstance()->world[ch->in_room].contents)))
 	{
-		send_to_char("You don't see that object here.\r\n", ch);
+		ch->sendln("You don't see that object here.");
 		dc_free((*i).song_data);
 		(*i).song_data = 0;
 		return eFAILURE;
@@ -1960,7 +1960,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 		if (!obj->equipped_by)
 		{
 			// Someone load it or something?
-			send_to_char("The magic fades away back to the ether.\r\n", ch);
+			ch->sendln("The magic fades away back to the ether.");
 			act("$p fades away gently.", ch, obj, 0, TO_ROOM, INVIS_NULL);
 		}
 		else
@@ -1978,12 +1978,12 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	// make sure the obj is a player portal
 	if (!obj->isPortal())
 	{
-		send_to_char("You can't shatter that!\r\n", ch);
+		ch->sendln("You can't shatter that!");
 		return eFAILURE;
 	}
 	if (!isname("pcportal", obj->name))
 	{
-		send_to_char("The portal resists your song.\r\n", ch);
+		ch->sendln("The portal resists your song.");
 		return eFAILURE;
 	}
 
@@ -1992,7 +1992,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	// determine chance of destroying it
 	if (number(0, 1)) // 50/50 for now
 	{
-		send_to_char("The portal resists your song.\r\n", ch);
+		ch->sendln("The portal resists your song.");
 		return eFAILURE;
 	}
 
@@ -2004,7 +2004,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 	// find it's match
 	if (!(tobj = get_obj_in_list("pcportal", DC::getInstance()->world[real_room(obj->obj_flags.value[0])].contents)))
 	{
-		send_to_char("Could not find matching exit portal? Tell an Immortal.\r\n", ch);
+		ch->sendln("Could not find matching exit portal? Tell an Immortal.");
 		return eFAILURE;
 	}
 
@@ -2019,7 +2019,7 @@ int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin chanting insanely...\r\n", ch);
+	ch->sendln("You begin chanting insanely...");
 	act("$n begins chanting wildly...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2042,7 +2042,7 @@ int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character
 	af.caster = GET_NAME(ch);
 
 	act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
-	send_to_char("Your singing drives everyone around you INSANE!!!\r\n", ch);
+	ch->sendln("Your singing drives everyone around you INSANE!!!");
 
 	for (victim = DC::getInstance()->world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
 	{
@@ -2072,7 +2072,7 @@ int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victi
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a lofty song...\r\n", ch);
+	ch->sendln("You begin to sing a lofty song...");
 	act("$n raises $s voice in an flighty quick march...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2112,7 +2112,7 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
 		}
 		affect_to_char(tmp_char, &af);
 
-		send_to_char("Your feet feel like air.\r\n", tmp_char);
+		tmp_char->sendln("Your feet feel like air.");
 	}
 
 	return eSUCCESS;
@@ -2122,7 +2122,7 @@ int song_searching_song(uint8_t level, Character *ch, char *arg, Character *vict
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("Your voice raises sending out a song to search the lands...\r\n", ch);
+	ch->sendln("Your voice raises sending out a song to search the lands...");
 	act("$n raises $s voice sending out a song to search the lands....", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2159,12 +2159,12 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 
 	if (!target || ch->getLevel() < target->getLevel())
 	{
-		send_to_char("Your song fades away, its search unfinished.\r\n", ch);
+		ch->sendln("Your song fades away, its search unfinished.");
 		return eFAILURE;
 	}
 	if (affected_by_spell(target, SKILL_INNATE_EVASION) || DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
 	{
-		send_to_char("Something blocks your vision.\r\n", ch);
+		ch->sendln("Something blocks your vision.");
 		return eFAILURE;
 	}
 
@@ -2199,7 +2199,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 	}
 
 	if (affected_by_spell(target, SPELL_DETECT_MAGIC) && affected_by_spell(target, SPELL_DETECT_MAGIC)->modifier > 80)
-		send_to_char("You sense you are the target of scrying.\r\n", target);
+		target->sendln("You sense you are the target of scrying.");
 
 	sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
 	send_to_char(buf, ch);
@@ -2210,7 +2210,7 @@ int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vic
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a quick little jig of alacrity...\r\n", ch);
+	ch->sendln("You begin to sing a quick little jig of alacrity...");
 	act("$n starts humming a quick little ditty...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2226,7 +2226,7 @@ int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *v
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n", ch);
+	ch->sendln("You begin to sing loudly, and poke everyone in your surroundings with a stick..");
 	act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2241,7 +2241,7 @@ int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim,
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin an inappropriately bawdy tune of your intimacy with pets.\r\n", ch);
+	ch->sendln("You begin an inappropriately bawdy tune of your intimacy with pets.");
 	act("$n begins an inappropriately bawdy tune of $s intimacy with pets.", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2279,7 +2279,7 @@ int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You inspire your allies with your rousing songs about rising against oppression!\r\n", ch);
+	ch->sendln("You inspire your allies with your rousing songs about rising against oppression!");
 	act("$n starts singing songs about former glory and past victories, rousing $s allies!", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2325,7 +2325,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 		if (affected_by_spell(tmp_char, SPELL_HASTE))
 		{
 			affect_from_char(tmp_char, SPELL_HASTE);
-			send_to_char("Your limbs slow back to normal.\r\n", tmp_char);
+			tmp_char->sendln("Your limbs slow back to normal.");
 		}
 
 		if (affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY))
@@ -2336,7 +2336,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 		if (!affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY))
 		{
 			affect_to_char(tmp_char, &af);
-			send_to_char("Your dance quickens your pulse!\r\n", tmp_char);
+			tmp_char->sendln("Your dance quickens your pulse!");
 		}
 	}
 
@@ -2394,14 +2394,14 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
 
 		if (affected_by_spell(tmp_char, SKILL_SONG_FANATICAL_FANFARE))
 		{
-			send_to_char("You manage to get far enough away to avoid being poked again!\r\n", tmp_char);
+			tmp_char->sendln("You manage to get far enough away to avoid being poked again!");
 			continue;
 		}
 
 		if (affected_by_spell(tmp_char, SPELL_INSOMNIA))
 		{
 			affect_from_char(tmp_char, SPELL_INSOMNIA);
-			send_to_char("Your mind returns to its normal state.\r\n", tmp_char);
+			tmp_char->sendln("Your mind returns to its normal state.");
 		}
 
 		affect_to_char(tmp_char, &af1);
@@ -2411,7 +2411,7 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
 			affect_to_char(tmp_char, &af3);
 
 		if (ch == tmp_char)
-			send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", tmp_char);
+			tmp_char->sendln("Your song causes your mind to race at a thousand miles an hour!");
 		else
 			csendf(tmp_char, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
 	}
@@ -2454,7 +2454,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 		if (affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(tmp_char, SKILL_SONG_MKING_CHARGE);
-			send_to_char("You lose the inspiration.\r\n", tmp_char);
+			tmp_char->sendln("You lose the inspiration.");
 		}
 
 		if (!affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))
@@ -2463,10 +2463,10 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 
 			if (ch == tmp_char)
 			{
-				send_to_char("Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!\r\n", tmp_char);
+				tmp_char->sendln("Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!");
 				if (af.bitvector == AFF_HASTE)
 				{
-					send_to_char("Weaving the jig of alacrity into your song of battle, your allies move faster.\r\n", ch);
+					ch->sendln("Weaving the jig of alacrity into your song of battle, your allies move faster.");
 				}
 			}
 			else
@@ -2534,7 +2534,7 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
 		if (ISSET(fvictim->follower->affected_by, AFF_HASTE) && !affected_by_spell(fvictim->follower, SPELL_HASTE))
 		{
 			REMBIT(fvictim->follower->affected_by, AFF_HASTE);
-			send_to_char("Your limbs slow back to normal.\r\n", fvictim->follower);
+			fvictim->follower->sendln("Your limbs slow back to normal.");
 		}
 	}
 
@@ -2542,7 +2542,7 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
 		if (ISSET(master->affected_by, AFF_HASTE) && !affected_by_spell(master, SPELL_HASTE))
 		{
 			REMBIT(master->affected_by, AFF_HASTE);
-			send_to_char("Your limbs slow back to normal.\r\n", master);
+			master->sendln("Your limbs slow back to normal.");
 		}
 	return eSUCCESS;
 }
@@ -2563,7 +2563,7 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 		if (ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) && !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
 		{
 			REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
-			send_to_char("Your mind returns to its normal state.\r\n", fvictim->follower);
+			fvictim->follower->sendln("Your mind returns to its normal state.");
 		}
 		if (IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
 			REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
@@ -2575,7 +2575,7 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 		if (ISSET(master->affected_by, AFF_INSOMNIA) && !affected_by_spell(master, SPELL_INSOMNIA))
 		{
 			REMBIT(master->affected_by, AFF_INSOMNIA);
-			send_to_char("Your mind returns to its normal state.\r\n", master);
+			master->sendln("Your mind returns to its normal state.");
 		}
 	if (IS_AFFECTED(master, AFF_FEARLESS))
 		REMBIT(master->affected_by, AFF_FEARLESS);
@@ -2601,7 +2601,7 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
 		if (affected_by_spell(fvictim->follower, SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(fvictim->follower, SKILL_SONG_MKING_CHARGE);
-			send_to_char("You lose the inspiration.\r\n", fvictim->follower);
+			fvictim->follower->sendln("You lose the inspiration.");
 		}
 	}
 
@@ -2609,7 +2609,7 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
 		if (affected_by_spell(master, SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(master, SKILL_SONG_MKING_CHARGE);
-			send_to_char("You lose the inspiration.\r\n", master);
+			master->sendln("You lose the inspiration.");
 		}
 	return eSUCCESS;
 }
@@ -2618,7 +2618,7 @@ int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You throw dust in the air and sing a wily ditty...\r\n", ch);
+	ch->sendln("You throw dust in the air and sing a wily ditty...");
 	act("$n throws some dust in the air and sings a wily ditty...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2650,7 +2650,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
 	af2.caster = GET_NAME(ch);
 
 	act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
-	send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
+	ch->sendln("Your dust clings to everyone, showing where they are!");
 
 	for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = victim->next_in_room)
 	{
@@ -2684,7 +2684,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
 	{
 		if (GET_ITEM_TYPE(item) == ITEM_BEACON && DC::isSet(item->obj_flags.extra_flags, ITEM_INVISIBLE))
 		{
-			send_to_char("Your glitter reveals a beacon.\r\n", ch);
+			ch->sendln("Your glitter reveals a beacon.");
 			REMOVE_BIT(item->obj_flags.extra_flags, ITEM_INVISIBLE);
 		}
 	}
@@ -2696,7 +2696,7 @@ int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *vi
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin long restoring sonnet...\r\n", ch);
+	ch->sendln("You begin long restoring sonnet...");
 	act("$n begins a long restorous sonnet...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2723,7 +2723,7 @@ int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Chara
 		if (!ISSET(fvictim->follower->affected_by, AFF_GROUP) || fvictim->follower->in_room != ch->in_room)
 			continue;
 
-		send_to_char("Your appetite has been completely satiated.\r\n", fvictim->follower);
+		fvictim->follower->sendln("Your appetite has been completely satiated.");
 		if (GET_COND(fvictim->follower, FULL) != -1 && fvictim->follower->getLevel() < 60)
 		{
 			GET_COND(fvictim->follower, FULL) = 24;
@@ -2735,7 +2735,7 @@ int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Chara
 	}
 	if (ch->in_room == master->in_room)
 	{
-		send_to_char("Your appetite has been completely satiated.\r\n", master);
+		master->sendln("Your appetite has been completely satiated.");
 		if (GET_COND(master, FULL) != -1 && master->getLevel() < 60)
 		{
 			GET_COND(master, FULL) = 24;
@@ -2769,13 +2769,13 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
 	if (!target || ch->getLevel() < target->getLevel())
 	{
-		send_to_char("Your dirge fades, its effect neutralized.\r\n", ch);
+		ch->sendln("Your dirge fades, its effect neutralized.");
 		return eFAILURE;
 	}
 
 	if (ch == target)
 	{
-		send_to_char("Your loyalties have been broken, what did you think?\r\n", ch);
+		ch->sendln("Your loyalties have been broken, what did you think?");
 		return eFAILURE;
 	}
 
@@ -2786,7 +2786,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 	}
 	if (!affected_by_spell(target, SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
 	{
-		send_to_char("As far as you can tell, they are not loyal to anyone.\r\n", ch);
+		ch->sendln("As far as you can tell, they are not loyal to anyone.");
 		return eFAILURE;
 	}
 	int type = 0;
@@ -2800,7 +2800,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		type = 1;
 	if ((type == 4 && !number(0, 9)) || (type == 2 && !number(0, 4)) || (type == 1 && !number(0, 1)))
 	{
-		send_to_char("Ooops, that didn't work out like you hoped.\r\n", ch);
+		ch->sendln("Ooops, that didn't work out like you hoped.");
 		act("$N charges at $n, for trying to break its bond with its master.\r\n", ch, 0, target, TO_ROOM, NOTVICT);
 		act("$N charges at you!", ch, 0, target, TO_CHAR, 0);
 		return attack(target, ch, TYPE_UNDEFINED);
@@ -2810,7 +2810,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 	/*   for (i = 22394; i < 22399; i++)
 	 if (real_mobile(i) == target->mobdata->nr)
 	 {
-	 send_to_char("The undead being is unaffected by your song.\r\n",ch);
+	 ch->sendln("The undead being is unaffected by your song.");
 	 return eFAILURE;
 	 }*/
 	if (IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2836,8 +2836,8 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		return eSUCCESS;
 	}
 	affect_from_char(target, SPELL_CHARM_PERSON);
-	send_to_char("You shatter their magical chains.\r\n", ch);
-	send_to_char("Boogie! Your mind has been set free!\r\n", target);
+	ch->sendln("You shatter their magical chains.");
+	target->sendln("Boogie! Your mind has been set free!");
 
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_CHAR, 0);
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_ROOM, NOTVICT);
@@ -2855,7 +2855,7 @@ int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *v
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin a wailing dirge...\r\n", ch);
+	ch->sendln("You begin a wailing dirge...");
 	act("$n begins to sing a wailing dirge...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2877,7 +2877,7 @@ int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *v
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin a strong chord...\r\n", ch);
+	ch->sendln("You begin a strong chord...");
 	act("$n begins to sound a chord...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2916,19 +2916,19 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
 	if (!target)
 	{
-		send_to_char("Your song fades away, its target unknown.\r\n", ch);
+		ch->sendln("Your song fades away, its target unknown.");
 		return eFAILURE;
 	}
 
 	if (ch == target)
 	{
-		send_to_char("You hate yourself, you self-loathing bastard.\r\n", ch);
+		ch->sendln("You hate yourself, you self-loathing bastard.");
 		return eFAILURE;
 	}
 
 	if (IS_PC(target))
 	{
-		send_to_char("They don't hate anyone, but they are looking at you kinda funny...\r\n", ch);
+		ch->sendln("They don't hate anyone, but they are looking at you kinda funny...");
 		return eFAILURE;
 	}
 
@@ -2975,7 +2975,7 @@ int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *vict
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin a slow numbing lullaby...\r\n", ch);
+	ch->sendln("You begin a slow numbing lullaby...");
 	act("$n starts singing an eye-drooping lullaby.", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3009,7 +3009,7 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
 			victim = ch->fighting;
 		else
 		{
-			send_to_char("You don't see that person here.\r\n", ch);
+			ch->sendln("You don't see that person here.");
 			dc_free((*i).song_data);
 			(*i).song_data = 0;
 			return eFAILURE;
@@ -3027,7 +3027,7 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
 
 	act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);
 	act("$N's feet fall into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
-	send_to_char("Your eyes begin to droop, and your feet fall asleep!\r\n", victim);
+	victim->sendln("Your eyes begin to droop, and your feet fall asleep!");
 	SETBIT(victim->affected_by, AFF_NO_FLEE);
 	return eSUCCESS;
 }
@@ -3036,7 +3036,7 @@ int song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vict
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing a fast nervous tune...\r\n", ch);
+	ch->sendln("You begin to sing a fast nervous tune...");
 	act("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3104,7 +3104,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 		if (skill > 90)
 			affect_to_char(tmp_char, &af3);
 
-		send_to_char("You nervously watch your surroundings with magical speed!\r\n", tmp_char);
+		tmp_char->sendln("You nervously watch your surroundings with magical speed!");
 	}
 
 	if (!skill_success(ch, nullptr, SKILL_SONG_VIGILANT_SIREN))
@@ -3152,7 +3152,7 @@ int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vic
 		if (ISSET(fvictim->follower->affected_by, AFF_ALERT))
 		{
 			REMBIT(fvictim->follower->affected_by, AFF_ALERT);
-			send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
+			fvictim->follower->sendln("You stop watching your back so closely.");
 		}
 		if (IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
 			REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
@@ -3164,7 +3164,7 @@ int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vic
 		if (ISSET(master->affected_by, AFF_ALERT))
 		{
 			REMBIT(master->affected_by, AFF_ALERT);
-			send_to_char("You stop watching your back so closely.\r\n", master);
+			master->sendln("You stop watching your back so closely.");
 		}
 	if (IS_AFFECTED(master, AFF_NO_CIRCLE))
 		REMBIT(master->affected_by, AFF_NO_CIRCLE);
@@ -3192,7 +3192,7 @@ int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing an irresistable little ditty...\r\n", ch);
+	ch->sendln("You begin to sing an irresistable little ditty...");
 	act("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3209,7 +3209,7 @@ int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Cha
 	Character *i;
 
 	act("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, TO_ROOM, 0);
-	send_to_char("Ahhh....such beautiful music.\r\n", ch);
+	ch->sendln("Ahhh....such beautiful music.");
 
 	//   int specialization = skill / 100;
 	skill %= 100;
@@ -3272,7 +3272,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 
 	if (!victim)
 	{
-		send_to_char("With the battle broken you end your crescendo.\r\n", ch);
+		ch->sendln("With the battle broken you end your crescendo.");
 		return eSUCCESS;
 	}
 
@@ -3355,14 +3355,14 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 		sprintf(buf2, "The power of your song has completely crushed %s!", buf);
 		act(buf2, ch, nullptr, victim, TO_CHAR, 0);
 
-		send_to_char("You dance a small jig on the corpse.\r\n", ch);
+		ch->sendln("You dance a small jig on the corpse.");
 		act("$n dances a little jig on the fallen corpse.", ch, 0, victim, TO_ROOM, 0);
 		return retval;
 	}
 
 	if ((int64_t)(*i).song_data > ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (int64_t)(*i).song_data > 3)
 	{
-		send_to_char("You run out of lyrics and end the song.\r\n", ch);
+		ch->sendln("You run out of lyrics and end the song.");
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
@@ -3371,7 +3371,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 	{
 		if (GET_KI(ch) < song_info[(*i).song_number].min_useski)
 		{
-			send_to_char("Having run out of ki, your song ends abruptly.\r\n", ch);
+			ch->sendln("Having run out of ki, your song ends abruptly.");
 			(*i).song_data = 0; // Reset, just in case.
 			return eSUCCESS;
 		}
@@ -3385,7 +3385,7 @@ int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing about the shining sea and her terrible ways...\r\n", ch);
+	ch->sendln("You begin to sing about the shining sea and her terrible ways...");
 	act("$n sings a surly number about $s fickle mistress, the briny deep.", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3432,7 +3432,7 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 			affect_from_char(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM);
 
 		affect_to_char(fvictim->follower, &af);
-		send_to_char("Your lungs absorb oxygen from any fluid!\r\n", fvictim->follower);
+		fvictim->follower->sendln("Your lungs absorb oxygen from any fluid!");
 	}
 
 	if (ch->in_room == master->in_room)
@@ -3440,7 +3440,7 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 		if (affected_by_spell(master, SKILL_SONG_SUBMARINERS_ANTHEM))
 			affect_from_char(master, SKILL_SONG_SUBMARINERS_ANTHEM);
 		affect_to_char(master, &af);
-		send_to_char("Your lungs absorb oxygen from any fluid!\r\n", master);
+		master->sendln("Your lungs absorb oxygen from any fluid!");
 	}
 
 	return eSUCCESS;

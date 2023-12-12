@@ -557,7 +557,7 @@ void Character::display_string_list(const char *list[])
     }
     if (*buf)
         send_to_char(buf, this);
-    send_to_char("\r\n", this);
+    this->sendln("");
 }
 
 const QStringList Player::toggle_txt = {

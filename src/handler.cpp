@@ -778,7 +778,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 					break;
 
 				default:
-					send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n", ch);
+					ch->sendln("Tough luck, you completed an unimplemented set. Report what you just wore, eh?");
 					break;
 				}
 				break;
@@ -1729,78 +1729,78 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		break;
 	case SKILL_INSANE_CHANT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The insane chanting in your mind wears off.\r\n", ch);
+			ch->sendln("The insane chanting in your mind wears off.");
 		break;
 	case SKILL_GLITTER_DUST:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The dust around your body stops glowing.\r\n", ch);
+			ch->sendln("The dust around your body stops glowing.");
 		break;
 	case SKILL_INNATE_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
 			switch (ch->race)
 			{ // Each race has its own wear off messages.
 			case RACE_GIANT:
-				send_to_char("You feel ready to wield mighty weapons again.\r\n", ch);
+				ch->sendln("You feel ready to wield mighty weapons again.");
 				break;
 			case RACE_TROLL:
-				send_to_char("Your regenerative abilitiy feels restored.\r\n", ch);
+				ch->sendln("Your regenerative abilitiy feels restored.");
 				break;
 			case RACE_GNOME:
-				send_to_char("Your ability to manipulate illusions has returned.\r\n", ch);
+				ch->sendln("Your ability to manipulate illusions has returned.");
 				break;
 			case RACE_ORC:
-				send_to_char("Your lust for blood feels restored.\r\n", ch);
+				ch->sendln("Your lust for blood feels restored.");
 				break;
 			case RACE_DWARVEN:
-				send_to_char("You feel ready to attempt more repairs.\r\n", ch);
+				ch->sendln("You feel ready to attempt more repairs.");
 				break;
 			case RACE_ELVEN:
-				send_to_char("Your mind regains its ability to sharpen concentration for brief periods.\r\n", ch);
+				ch->sendln("Your mind regains its ability to sharpen concentration for brief periods.");
 				break;
 			case RACE_PIXIE:
-				send_to_char("Your ability to avoid magical vision has returned.\r\n", ch);
+				ch->sendln("Your ability to avoid magical vision has returned.");
 				break;
 			case RACE_HOBBIT:
-				send_to_char("Your innate ability to avoid magical portals has returned.\r\n", ch);
+				ch->sendln("Your innate ability to avoid magical portals has returned.");
 				break;
 			}
 		break;
 	case SKILL_BLOOD_FURY:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your blood cools to normal levels.\r\n", ch);
+			ch->sendln("Your blood cools to normal levels.");
 		break;
 	case SKILL_CRAZED_ASSAULT:
 		if (!(flags & SUPPRESS_MESSAGES))
 		{
 			if (af->location == APPLY_HITROLL)
-				send_to_char("Your craziness has subsided.\r\n", ch);
+				ch->sendln("Your craziness has subsided.");
 			else
-				send_to_char("You feel ready to go crazy again.\r\n", ch);
+				ch->sendln("You feel ready to go crazy again.");
 		}
 		break;
 	case SKILL_INNATE_BLOODLUST:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your lust for battle has left you.\r\n", ch);
+			ch->sendln("Your lust for battle has left you.");
 		break;
 	case SKILL_INNATE_ILLUSION:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You slowly fade into existence.\r\n", ch);
+			ch->sendln("You slowly fade into existence.");
 		break;
 	case SKILL_INNATE_EVASION:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your magical obscurity has left you.\r\n", ch);
+			ch->sendln("Your magical obscurity has left you.");
 		break;
 	case SKILL_INNATE_SHADOWSLIP:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The ability to avoid magical pathways has left you.\r\n", ch);
+			ch->sendln("The ability to avoid magical pathways has left you.");
 		break;
 	case SKILL_INNATE_FOCUS:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your concentration lessens to its regular amount.\r\n", ch);
+			ch->sendln("Your concentration lessens to its regular amount.");
 		break;
 	case SKILL_INNATE_REGENERATION:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your regeneration slows back to normal.\r\n", ch);
+			ch->sendln("Your regeneration slows back to normal.");
 		break;
 	case SKILL_INNATE_POWERWIELD:
 		class Object *obj;
@@ -1852,62 +1852,62 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				}
 			}
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You can no longer wield two handed weapons.\r\n", ch);
+			ch->sendln("You can no longer wield two handed weapons.");
 		check_weapon_weights(ch);
 		break;
 	case SKILL_BLADESHIELD:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The draining affect of the blade shield technique has worn off.\r\n", ch);
+			ch->sendln("The draining affect of the blade shield technique has worn off.");
 		break;
 	case SKILL_CLANAREA_CLAIM:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You can attempt to claim an area again.\r\n", ch);
+			ch->sendln("You can attempt to claim an area again.");
 		break;
 	case SKILL_CLANAREA_CHALLENGE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You can attempt to challenge an area again.\r\n", ch);
+			ch->sendln("You can attempt to challenge an area again.");
 		break;
 	case SKILL_PRIMAL_FURY:
 		if (!af->bitvector)
 		{
 			if (!(flags & SUPPRESS_MESSAGES))
-				send_to_char("TimerEndyMessage.\r\n", ch);
+				ch->sendln("TimerEndyMessage.");
 		}
 		else
 		{
 			if (!(flags & SUPPRESS_MESSAGES))
-				send_to_char("Your primal fury has abated.\r\n", ch);
+				ch->sendln("Your primal fury has abated.");
 		}
 		break;
 	case SKILL_FOCUSED_REPELANCE:
 		REMOVE_BIT(ch->combat, COMBAT_REPELANCE);
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your mind recovers from the repelance.\r\n", ch);
+			ch->sendln("Your mind recovers from the repelance.");
 		break;
 	case SKILL_JAB:
 		if (!(flags & SUPPRESS_MESSAGES) && af->bitvector != AFF_BLACKJACK)
-			send_to_char("You feel ready to jab some poor sucker again.\r\n", ch);
+			ch->sendln("You feel ready to jab some poor sucker again.");
 		break;
 	case SKILL_VITAL_STRIKE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The internal strength and speed from your vital strike has returned.\r\n", ch);
+			ch->sendln("The internal strength and speed from your vital strike has returned.");
 		break;
 	case SKILL_SONG_FLIGHT_OF_BEE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your feet touch the ground once more.\r\n", ch);
+			ch->sendln("Your feet touch the ground once more.");
 		break;
 	case SKILL_SONG_FANATICAL_FANFARE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your mind no longer races.\r\n", ch);
+			ch->sendln("Your mind no longer races.");
 		break;
 	case SKILL_SONG_SUBMARINERS_ANTHEM:
 		if (!(flags & SUPPRESS_CONSEQUENCES))
 		{
-			send_to_char("Your musical ability to breathe water ends.\r\n", ch);
+			ch->sendln("Your musical ability to breathe water ends.");
 			if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
 			{
 				act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
-				send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n", ch);
+				ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
 			}
 		}
 		break;
@@ -1924,13 +1924,13 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			char_died = true;
 #else
 			act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
-			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n", ch);
+			ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
 #endif
 		}
 		break;
 	case KI_STANCE + KI_OFFSET:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your body finishes venting the energy absorbed from your last ki stance.\r\n", ch);
+			ch->sendln("Your body finishes venting the energy absorbed from your last ki stance.");
 		break;
 	case SPELL_CHARM_PERSON: /* Charm Wears off */
 		remove_memory(ch, 'h');
@@ -1943,119 +1943,119 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		break;
 	case SKILL_TACTICS:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You forget your instruction in tactical fighting.\r\n", ch);
+			ch->sendln("You forget your instruction in tactical fighting.");
 		break;
 	case SKILL_DECEIT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your deceitful practices have stopped helping you.\r\n", ch);
+			ch->sendln("Your deceitful practices have stopped helping you.");
 		break;
 	case SKILL_FEROCITY:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The ferocity within your mind has dwindled.\r\n", ch);
+			ch->sendln("The ferocity within your mind has dwindled.");
 		break;
 	case KI_AGILITY + KI_OFFSET:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your body has lost its focused agility.\r\n", ch);
+			ch->sendln("Your body has lost its focused agility.");
 		break;
 	case BASE_TIMERS + SPELL_MANA:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The magical energy of your robes has recharged.\r\n", ch);
+			ch->sendln("The magical energy of your robes has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_PROTECT_FROM_EVIL:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The defender's magical energy has recharged.\r\n", ch);
+			ch->sendln("The defender's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_GROUP_SANC:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The cassock's magical energy has recharged.\r\n", ch);
+			ch->sendln("The cassock's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_TELEPORT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The armbands' magical energy has recharged.\r\n", ch);
+			ch->sendln("The armbands' magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_KNOW_ALIGNMENT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The gaze's magical energy has recharged.\r\n", ch);
+			ch->sendln("The gaze's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_PARALYZE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The paralytic's magical energy has recharged.\r\n", ch);
+			ch->sendln("The paralytic's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_GLOBE_OF_DARKNESS:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The choker's magical energy has recharged.\r\n", ch);
+			ch->sendln("The choker's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_CONT_LIGHT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The necklace's magical energy has recharged.\r\n", ch);
+			ch->sendln("The necklace's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_MISANRA_QUIVER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The quiver's magical energy has recharged.\r\n", ch);
+			ch->sendln("The quiver's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_ALIGN_GOOD:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The fire's magical energy has recharged.\r\n", ch);
+			ch->sendln("The fire's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_ALIGN_EVIL:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The blackened heart's magical energy has recharged.\r\n", ch);
+			ch->sendln("The blackened heart's magical energy has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_EARTHQUAKE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The magical energy of your hammer has recharged.\r\n", ch);
+			ch->sendln("The magical energy of your hammer has recharged.");
 		break;
 	case BASE_TIMERS + SPELL_WIZARD_EYE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The scrying ball's magical energies have recharged.\r\n", ch);
+			ch->sendln("The scrying ball's magical energies have recharged.");
 		break;
 	case SPELL_NAT_SELECT_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel capable of studying a new enemy of choice.\r\n", ch);
+			ch->sendln("You feel capable of studying a new enemy of choice.");
 		break;
 	case SKILL_DECEIT_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel like you could be deceitful again.\r\n", ch);
+			ch->sendln("You feel like you could be deceitful again.");
 		break;
 	case SKILL_FEROCITY_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel like you could be fierce again.\r\n", ch);
+			ch->sendln("You feel like you could be fierce again.");
 		break;
 	case SKILL_TACTICS_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel like you could be tactical again.\r\n", ch);
+			ch->sendln("You feel like you could be tactical again.");
 		break;
 	case SKILL_LAY_HANDS:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your god returns your ability to fill others with life.\r\n", ch);
+			ch->sendln("Your god returns your ability to fill others with life.");
 		break;
 	case SKILL_HARM_TOUCH:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your god returns your ability to cause pain to others with a touch.\r\n", ch);
+			ch->sendln("Your god returns your ability to cause pain to others with a touch.");
 		break;
 	case SPELL_DIV_INT_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The gods smile upon you and are ready to intervene on your behalf again.\r\n", ch);
+			ch->sendln("The gods smile upon you and are ready to intervene on your behalf again.");
 		break;
 	case SPELL_NO_CAST_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel able to concentrate on spellcasting once again.\r\n", ch);
+			ch->sendln("You feel able to concentrate on spellcasting once again.");
 		break;
 	case SKILL_QUIVERING_PALM:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your body feels well enough to vibrate intensely once more.\r\n", ch);
+			ch->sendln("Your body feels well enough to vibrate intensely once more.");
 		break;
 	case SKILL_FORAGE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel ready to look for \"herb\" again.\r\n", ch);
+			ch->sendln("You feel ready to look for \"herb\" again.");
 		break;
 	case SKILL_TRIAGE_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel ready to mend your wounds once again.\r\n", ch);
+			ch->sendln("You feel ready to mend your wounds once again.");
 		break;
 	case SKILL_TRIAGE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You finish cleaning and bandaging your wounds.\r\n", ch);
+			ch->sendln("You finish cleaning and bandaging your wounds.");
 		break;
 	case SKILL_LEADERSHIP:
 		affect_from_char(ch, SKILL_LEADERSHIP_BONUS);
@@ -2068,37 +2068,37 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			}
 		}
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("Your inspirational leadership has ended.\r\n", ch);
+			ch->sendln("Your inspirational leadership has ended.");
 		break;
 	case SKILL_MAKE_CAMP_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel ready to set up another camp.\r\n", ch);
+			ch->sendln("You feel ready to set up another camp.");
 		break;
 	case SKILL_SMITE_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel ready to once again smite your opponents.\r\n", ch);
+			ch->sendln("You feel ready to once again smite your opponents.");
 		break;
 	case SKILL_PERSEVERANCE:
 		affect_from_char(ch, SKILL_PERSEVERANCE_BONUS);
 		break;
 	case SKILL_ONSLAUGHT_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You feel ready to begin another onslaught.\r\n", ch);
+			ch->sendln("You feel ready to begin another onslaught.");
 		break;
 	case SKILL_ONSLAUGHT:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("You don't feel as fast and furious as you once did...\r\n", ch);
+			ch->sendln("You don't feel as fast and furious as you once did...");
 		break;
 	case SKILL_BREW_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
 		{
-			send_to_char("You feel ready to brew something again.\r\n", ch);
+			ch->sendln("You feel ready to brew something again.");
 		}
 		break;
 	case SKILL_SCRIBE_TIMER:
 		if (!(flags & SUPPRESS_MESSAGES))
 		{
-			send_to_char("You feel ready to scribe something again.\r\n", ch);
+			ch->sendln("You feel ready to scribe something again.");
 		}
 		break;
 	case OBJ_LILITHRING:
@@ -3671,7 +3671,7 @@ void update_char_objects(Character *ch)
 				(ch->equipment[WEAR_LIGHT]->obj_flags.value[2])--;
 				if (!ch->equipment[WEAR_LIGHT]->obj_flags.value[2])
 				{
-					send_to_char("Your light flickers out and dies.\r\n", ch);
+					ch->sendln("Your light flickers out and dies.");
 					ch->glow_factor--;
 					if (ch->in_room > DC::NOWHERE)
 						DC::getInstance()->world[ch->in_room].light--;

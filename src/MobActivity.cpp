@@ -76,7 +76,7 @@ char *Path::determineRoute(Character *ch, int from, int to)
   if (!isRoomPathed(from) || !isRoomPathed(to))
   {
     if (ch)
-      send_to_char("Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path.\r\n", ch);
+      ch->sendln("Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path.");
     return nullptr;
   }
   i = 1000;
@@ -181,14 +181,14 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
     if (!isRoomConnected(room))
     {
       if (ch)
-        send_to_char("This room is does not connect to that path.\r\n", ch);
+        ch->sendln("This room is does not connect to that path.");
       return;
     }
   }
   if (isRoomPathed(room))
   {
     if (ch)
-      send_to_char("This room is already connected to that path.\r\n", ch);
+      ch->sendln("This room is already connected to that path.");
     return;
   }
   struct path_data *pa;
@@ -238,7 +238,7 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
   DC::getInstance()->world[room].paths = pa;
   (*this)[room] = 0;
   if (ch)
-    send_to_char("Room successfully added to path.\r\n", ch);
+    ch->sendln("Room successfully added to path.");
 }
 
 int do_newPath(Character *ch, char *argument, int cmd)
@@ -247,7 +247,7 @@ int do_newPath(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    send_to_char("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.\r\n", ch);
+    ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
     return eFAILURE;
   }
   class Path *p;
@@ -256,7 +256,7 @@ int do_newPath(Character *ch, char *argument, int cmd)
       break;
   if (p)
   {
-    send_to_char("That path already exists.\r\n", ch);
+    ch->sendln("That path already exists.");
     return eFAILURE;
   }
   p = new Path;
@@ -294,7 +294,7 @@ int do_listPathsByZone(Character *ch, char *argument, int cmd)
         break;
       }
   if (!found)
-    send_to_char("No paths connecting to this zone has been found.\r\n", ch);
+    ch->sendln("No paths connecting to this zone has been found.");
 
   return eSUCCESS;
 }
@@ -313,7 +313,7 @@ int do_listAllPaths(Character *ch, char *argument, int cmd)
     found = true;
   }
   if (!found)
-    send_to_char("No paths found.\r\n", ch);
+    ch->sendln("No paths found.");
 
   return eSUCCESS;
 }
@@ -324,7 +324,7 @@ int do_addRoom(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    send_to_char("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.\r\n", ch);
+    ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
     return eFAILURE;
   }
   class Path *p;
@@ -333,7 +333,7 @@ int do_addRoom(Character *ch, char *argument, int cmd)
       break;
   if (!p)
   {
-    send_to_char("No such path exists.\r\n", ch);
+    ch->sendln("No such path exists.");
     return eFAILURE;
   }
   p->addRoom(ch, ch->in_room, false);
@@ -346,7 +346,7 @@ int do_findPath(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    send_to_char("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.\r\n", ch);
+    ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
     return eFAILURE;
   }
   class Path *p;
@@ -355,7 +355,7 @@ int do_findPath(Character *ch, char *argument, int cmd)
       break;
   if (!p)
   {
-    send_to_char("No such path exists.\r\n", ch);
+    ch->sendln("No such path exists.");
     return eFAILURE;
   }
   int start, end;
@@ -446,7 +446,7 @@ int do_pathpath(Character *ch, char *argument, int cmd)
       break;
   if (!pt || !pt2)
   {
-    send_to_char("Missing path.\r\n", ch);
+    ch->sendln("Missing path.");
     return eFAILURE;
   }
   class Path *pa;
@@ -461,7 +461,7 @@ int do_pathpath(Character *ch, char *argument, int cmd)
 
   if (i >= 50)
   {
-    send_to_char("Crazy #. Stopping.\r\n", ch);
+    ch->sendln("Crazy #. Stopping.");
     return eFAILURE;
   }
 
@@ -569,7 +569,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
 
   if (i >= 50)
   {
-    send_to_char("Crazy #. Stopping.\r\n", ch);
+    ch->sendln("Crazy #. Stopping.");
     return "Crazy #";
   }
 
@@ -607,7 +607,7 @@ int do_findpath(Character *ch, char *argument, int cmd)
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     int i = atoi(arg1), z = atoi(arg2);
-    if (!i || !z) { send_to_char("BLeh!\r\n",ch); return eFAILURE; }
+    if (!i || !z) { ch->sendln("BLeh!"); return eFAILURE; }
     char *t =  findPath(i, z, ch);
     ch->send(QString("Final Path: %1\r\n").arg(t));
     return eSUCCESS;

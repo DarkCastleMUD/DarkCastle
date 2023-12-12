@@ -319,7 +319,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char("Someone disappears in a puff of smoke.\r\n", tmp_ch);
+        tmp_ch->sendln("Someone disappears in a puff of smoke.");
         ansi_color(NTEXT, tmp_ch);
       }
     }
@@ -371,7 +371,7 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Mobs can't poof.\r\n", ch);
+    ch->sendln("Mobs can't poof.");
     return eFAILURE;
   }
 
@@ -397,13 +397,13 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("A poof type message was expected.\r\n", ch);
+    ch->sendln("A poof type message was expected.");
     return eFAILURE;
   }
 
   if (strlen(arg) > 72)
   {
-    send_to_char("Poof message too long, must be under 72 characters long.\r\n", ch);
+    ch->sendln("Poof message too long, must be under 72 characters long.");
     return eFAILURE;
   }
 
@@ -465,7 +465,7 @@ int do_poof(Character *ch, char *arg, int cmd)
     ch->player->poofout = str_dup(buf);
   }
 
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   return eSUCCESS;
 }
 
@@ -483,7 +483,7 @@ int do_at(Character *ch, char *argument, int cmd)
   half_chop(argument, loc_str, command);
   if (!*loc_str)
   {
-    send_to_char("You must supply a room number or a name.\r\n", ch);
+    ch->sendln("You must supply a room number or a name.");
     return eFAILURE;
   }
 
@@ -493,7 +493,7 @@ int do_at(Character *ch, char *argument, int cmd)
     if ((loc_nr == 0 && *loc_str != '0') ||
         ((location = real_room(loc_nr)) < 0))
     {
-      send_to_char("No room exists with that number.\r\n", ch);
+      ch->sendln("No room exists with that number.");
       return eFAILURE;
     }
   }
@@ -504,19 +504,19 @@ int do_at(Character *ch, char *argument, int cmd)
       location = target_obj->in_room;
     else
     {
-      send_to_char("The object is not available.\r\n", ch);
+      ch->sendln("The object is not available.");
       return eFAILURE;
     }
   else
   {
-    send_to_char("No such creature or object around.\r\n", ch);
+    ch->sendln("No such creature or object around.");
     return eFAILURE;
   }
 
   /* a location has been found. */
   if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
-    send_to_char("No.\r\n", ch);
+    ch->sendln("No.");
     return eFAILURE;
   }
 
@@ -524,7 +524,7 @@ int do_at(Character *ch, char *argument, int cmd)
   if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
-    send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+    ch->sendln("For your protection, 104-'s may not be in clanhalls.");
     return eFAILURE;
   }
 
@@ -559,7 +559,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
 
   if (!(victim = get_char_vis(ch, buf)))
   {
-    send_to_char("No-one by that name in the world.\r\n", ch);
+    ch->sendln("No-one by that name in the world.");
     return eFAILURE;
   }
 
@@ -596,12 +596,12 @@ int do_holylite(Character *ch, char *argument, int cmd)
   if (ch->player->holyLite)
   {
     ch->player->holyLite = false;
-    send_to_char("Holy light mode off.\r\n", ch);
+    ch->sendln("Holy light mode off.");
   }
   else
   {
     ch->player->holyLite = true;
-    send_to_char("Holy light mode on.\r\n", ch);
+    ch->sendln("Holy light mode on.");
   } /* if */
   return eSUCCESS;
 }
@@ -652,12 +652,12 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   if (DC::isSet(ch->player->toggles, Player::PLR_NOHASSLE))
   {
     REMOVE_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
-    send_to_char("Mobiles can bother you again.\r\n", ch);
+    ch->sendln("Mobiles can bother you again.");
   }
   else
   {
     SET_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
-    send_to_char("Those pesky mobiles will leave you alone now.\r\n", ch);
+    ch->sendln("Those pesky mobiles will leave you alone now.");
   }
   return eSUCCESS;
 }
@@ -676,7 +676,7 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
 
   if (cmd == CMD_IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -689,16 +689,16 @@ command_return_t do_wiz(Character *ch, std::string argument, int cmd)
     if (cmd == CMD_IMMORT)
     {
       tmp = imm_history;
-      send_to_char("Here are the last 10 imm messages:\r\n", ch);
+      ch->sendln("Here are the last 10 imm messages:");
     }
     else if (cmd == CMD_IMPCHAN)
     {
       tmp = imp_history;
-      send_to_char("Here are the last 10 imp messages:\r\n", ch);
+      ch->sendln("Here are the last 10 imp messages:");
     }
     else
     {
-      send_to_char("What? How did you get here?? Contact a coder.\r\n", ch);
+      ch->sendln("What? How did you get here?? Contact a coder.");
       return eSUCCESS;
     }
 
@@ -819,7 +819,7 @@ int do_varstat(Character *ch, char *argument, int cmd)
 
   if ((vict = get_char_vis(ch, arg)) == nullptr)
   {
-    send_to_char("Target not found.\r\n", ch);
+    ch->sendln("Target not found.");
     return eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
@@ -833,7 +833,7 @@ int do_varstat(Character *ch, char *argument, int cmd)
   }
   if (buf[0] == '\0')
   {
-    send_to_char("No temporary variables found.\r\n", ch);
+    ch->sendln("No temporary variables found.");
   }
   return eSUCCESS;
 }

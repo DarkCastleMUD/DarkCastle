@@ -831,7 +831,7 @@ void new_string_add(class Connection *d, char *str)
             if (d->connected != Connection::states::EXDSCR)
                d->connected = Connection::states::PLAYING;
          }
-         send_to_char("Aborted.\r\n", ch);
+         ch->sendln("Aborted.");
          if (d->connected == Connection::states::EXDSCR)
          {
             STATE(d) = Connection::states::SELECT_MENU;
@@ -864,7 +864,7 @@ void new_string_add(class Connection *d, char *str)
             }
             else
             {
-               send_to_char("Ok.\r\n", ch);
+               ch->sendln("Ok.");
 
                if (d->connected != Connection::states::EXDSCR)
                {

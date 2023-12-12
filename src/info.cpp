@@ -501,7 +501,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       {
          if (IS_AFFECTED(ch, AFF_SENSE_LIFE))
          {
-            send_to_char("$R$7You sense a hidden life form in the room.\r\n", ch);
+            ch->sendln("$R$7You sense a hidden life form in the room.");
          }
 
          return;
@@ -758,7 +758,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
          }
          if (!found)
-            send_to_char("You can't see anything.\r\n", ch);
+            ch->sendln("You can't see anything.");
       }
    }
    else if (mode == 2)
@@ -809,14 +809,14 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 
    if (victim->getLevel() > this->getLevel())
    {
-      send_to_char("Unable to show information.\r\n", this);
+      this->sendln("Unable to show information.");
       csendf(this, "%s is a higher level than you.\r\n", victim->getNameC());
       return eFAILURE;
    }
 
    if (IS_NPC(victim))
    {
-      send_to_char("Unable to show information.\r\n", this);
+      this->sendln("Unable to show information.");
       csendf(this, "%s is a mob.\r\n", victim->getNameC());
       return eFAILURE;
    }
@@ -897,7 +897,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
       else if (IS_DARK(ch->in_room))
       {
          if (known && skill_success(ch, nullptr, SKILL_BLINDFIGHTING))
-            send_to_char("Your blindfighting awareness alerts you to a presense in the area.\r\n", ch);
+            ch->sendln("Your blindfighting awareness alerts you to a presense in the area.");
          else if (number(1, 10) == 1)
             send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
       }
@@ -920,13 +920,13 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    if (!(cont = get_obj_in_list_vis(ch, container, vict->carrying)) ||
        number(0, MORTAL + 30) > ch->getLevel())
    {
-      send_to_char("You cannot see a container named that to peek into.\r\n", ch);
+      ch->sendln("You cannot see a container named that to peek into.");
       return;
    }
 
    if (NOT_CONTAINERS(cont))
    {
-      send_to_char("It's not a container....\r\n", ch);
+      ch->sendln("It's not a container....");
       return;
    }
 
@@ -936,7 +936,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
 
    if (DC::isSet(cont->obj_flags.value[1], CONT_CLOSED))
    {
-      send_to_char("It is closed.\r\n", ch);
+      ch->sendln("It is closed.");
       return;
    }
 
@@ -948,7 +948,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
       }
 
    if (!found)
-      send_to_char("You don't see anything inside it.\r\n", ch);
+      ch->sendln("You don't see anything inside it.");
 }
 
 QString Character::getStatDiff(int base, int random, bool swapcolors)
@@ -1019,7 +1019,7 @@ bool identify(Character *ch, Object *obj)
 
    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < IMMORTAL)
    {
-      send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
+      ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return false;
    }
 
@@ -1329,7 +1329,7 @@ int do_look(Character *ch, char *argument, int cmd)
    }
    else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
    {
-      send_to_char("It is pitch black...\r\n", ch);
+      ch->sendln("It is pitch black...");
       list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
       send_to_char("$R", ch);
       // TODO - if have blindfighting, list some of the room exits sometimes
@@ -1378,7 +1378,7 @@ int do_look(Character *ch, char *argument, int cmd)
             }
             else
             {
-               send_to_char("You see nothing special.\r\n", ch);
+               ch->sendln("You see nothing special.");
             }
 
             if (DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
@@ -1400,7 +1400,7 @@ int do_look(Character *ch, char *argument, int cmd)
          }
          else
          {
-            send_to_char("You see nothing special.\r\n", ch);
+            ch->sendln("You see nothing special.");
          }
       }
       break;
@@ -1502,16 +1502,16 @@ int do_look(Character *ch, char *argument, int cmd)
                      list_obj_to_char(tmp_object->contains, ch, 2, true);
                   }
                   else
-                     send_to_char("It is closed.\r\n", ch);
+                     ch->sendln("It is closed.");
                }
                else
                {
-                  send_to_char("That is not a container.\r\n", ch);
+                  ch->sendln("That is not a container.");
                }
             }
             else
             { /* wrong argument */
-               send_to_char("You do not see that item here.\r\n", ch);
+               ch->sendln("You do not see that item here.");
             }
          }
          else
@@ -1659,7 +1659,7 @@ int do_look(Character *ch, char *argument, int cmd)
             }
             else if (!found)
             {
-               send_to_char("You do not see that here.\r\n", ch);
+               ch->sendln("You do not see that here.");
             }
          }
          else
@@ -1683,7 +1683,7 @@ int do_look(Character *ch, char *argument, int cmd)
          }
          if (found != true)
          {
-            send_to_char("Nothing much to see there.\r\n", ch);
+            ch->sendln("Nothing much to see there.");
             return eFAILURE;
          }
       }
@@ -1722,7 +1722,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          if (found != true)
          {
-            send_to_char("You can't seem to look through that.\r\n", ch);
+            ch->sendln("You can't seem to look through that.");
             return eFAILURE;
          }
          /* no break */
@@ -1911,12 +1911,12 @@ int do_exits(Character *ch, char *argument, int cmd)
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name);
    }
 
-   send_to_char("You scan around the exits to see where they lead.\r\n", ch);
+   ch->sendln("You scan around the exits to see where they lead.");
 
    if (buf[0])
       send_to_char(buf, ch);
    else
-      send_to_char("None.\r\n", ch);
+      ch->sendln("None.");
 
    return eSUCCESS;
 }
@@ -2381,7 +2381,7 @@ int do_weather(Character *ch, char *argument, int cmd)
 
    if (GET_POS(ch) <= position_t::SLEEPING)
    {
-      send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\r\n", ch);
+      ch->sendln("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.");
       return eSUCCESS;
    }
    if (OUTSIDE(ch))
@@ -2393,7 +2393,7 @@ int do_weather(Character *ch, char *argument, int cmd)
       act(buf, ch, 0, 0, TO_CHAR, 0);
    }
    else
-      send_to_char("You have no feeling about the weather at all.\r\n", ch);
+      ch->sendln("You have no feeling about the weather at all.");
 
    if (ch->getLevel() >= IMMORTAL)
    {
@@ -2425,7 +2425,7 @@ int do_help(Character *ch, char *argument, int cmd)
    {
       if (!help_index)
       {
-         send_to_char("No help available.\r\n", ch);
+         ch->sendln("No help available.");
          return eSUCCESS;
       }
       bot = 0;
@@ -2455,7 +2455,7 @@ int do_help(Character *ch, char *argument, int cmd)
          }
          else if (bot >= top)
          {
-            send_to_char("There is no help on that word.\r\n", ch);
+            ch->sendln("There is no help on that word.");
             return 1;
          }
          else if (chk > 0)
@@ -2547,7 +2547,7 @@ int do_equipment(Character *ch, char *argument, int cmd)
    }
    if (!found)
    {
-      send_to_char("Nothing.\r\n", ch);
+      ch->sendln("Nothing.");
    }
    return eSUCCESS;
 }
@@ -2689,7 +2689,7 @@ int do_olocate(Character *ch, char *name, int cmd)
    }
 
    if (!*buf2)
-      send_to_char("Couldn't find any such OBJECT.\r\n", ch);
+      ch->sendln("Couldn't find any such OBJECT.");
    else
       page_string(ch->desc, buf2, 1);
    return eSUCCESS;
@@ -2754,7 +2754,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
    }
 
    if (!*buf2)
-      send_to_char("Couldn't find any MOBS by that NAME.\r\n", ch);
+      ch->sendln("Couldn't find any MOBS by that NAME.");
    else
       page_string(ch->desc, buf2, 1);
    return eSUCCESS;
@@ -3294,13 +3294,13 @@ int do_tick(Character *ch, char *argument, int cmd)
 
    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
    {
-      send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
       return 1;
    }
 
    if (IS_NPC(ch))
    {
-      send_to_char("Monsters don't wait for anything.\r\n", ch);
+      ch->sendln("Monsters don't wait for anything.");
       return eFAILURE;
    }
 

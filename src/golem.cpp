@@ -306,7 +306,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     return eFAILURE;
   if (ch->player->golem)
   {
-    send_to_char("You already have a golem.\r\n", ch);
+    ch->sendln("You already have a golem.");
     return eFAILURE;
   }
   for (i = 0; i < MAX_GOLEMS; i++)
@@ -316,13 +316,13 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   }
   if (i >= MAX_GOLEMS)
   {
-    send_to_char("You cannot create any such golem.\r\n", ch);
+    ch->sendln("You cannot create any such golem.");
     return eFAILURE;
   }
   int retval = verify_existing_components(ch, i);
   if (DC::isSet(retval, eFAILURE))
   {
-    send_to_char("Since you do not have the required spell components, the magic fades into nothingness.\r\n", ch);
+    ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
     return eFAILURE;
   }
   load_golem_data(ch, i); // Load the golem up;
@@ -335,7 +335,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   }
   if (DC::isSet(retval, eEXTRA_VALUE))
   {
-    send_to_char("Adding in the final ingredient, your golem increases in strength!\r\n", ch);
+    ch->sendln("Adding in the final ingredient, your golem increases in strength!");
     SETBIT(golem->affected_by, golem_list[i].special_aff);
     SET_BIT(golem->resist, golem_list[i].special_res);
   }
@@ -360,7 +360,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
     return eFAILURE;
   if (!ch->player->golem)
   {
-    send_to_char("But you don't have a golem!\r\n", ch);
+    ch->sendln("But you don't have a golem!");
     return eFAILURE;
   }
   ch = ch->player->golem;
@@ -573,6 +573,6 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
       extract_char(fol->follower, false);
       return eSUCCESS;
     }
-  send_to_char("You don't have a golem.\r\n", ch);
+  ch->sendln("You don't have a golem.");
   return eSUCCESS;
 }

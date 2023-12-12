@@ -94,7 +94,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
   }
 
   if(affected_by_spell(ch, SKILL_FOCUSED_REPELANCE)) {
-    send_to_char("Your mind can not yet take the strain of another repelance.\r\n", ch);
+    ch->sendln("Your mind can not yet take the strain of another repelance.");
     return eFAILURE;
   }
 
@@ -102,7 +102,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
   {
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
          ch, nullptr, nullptr, TO_ROOM, NOTVICT);
-    send_to_char("Your mind cannot handle the strain!\r\n", ch);
+    ch->sendln("Your mind cannot handle the strain!");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE*2);
     duration = 20 - (ch->has_skill( SKILL_FOCUSED_REPELANCE) / 10);
   }
@@ -142,26 +142,26 @@ int do_imbue(Character *ch, char *argument, int cmd)
 
   if(!lvl) 
   {
-    send_to_char("The best you can do to a wand is polish it.\r\n", ch);
+    ch->sendln("The best you can do to a wand is polish it.");
     return eFAILURE;
   }
 
   if(affected_by_spell(ch, SKILL_IMBUE)) 
   {
-    send_to_char("Your mind has not yet recovered from the previous imbuement.\r\n", ch);
+    ch->sendln("Your mind has not yet recovered from the previous imbuement.");
     return eFAILURE;
   }
 
   if(*buf == '\0') 
   {
-    send_to_char("Imbue what?\r\n", ch);
+    ch->sendln("Imbue what?");
     return eFAILURE;
   }
 
   if(ch->in_room && (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) 
                      || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))) 
   {
-    send_to_char("Something about this room prohibits your magical imbuement.\r\n", ch);
+    ch->sendln("Something about this room prohibits your magical imbuement.");
     return eFAILURE;
   }
  
@@ -173,7 +173,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
       wand = ch->equipment[HOLD2];
       if((wand == 0) || !isname(buf, wand->name)) 
       {
-        send_to_char("You do not have that wand.\r\n", ch);
+        ch->sendln("You do not have that wand.");
         return eFAILURE;
       }
     }
@@ -181,13 +181,13 @@ int do_imbue(Character *ch, char *argument, int cmd)
 
   if(GET_ITEM_TYPE(wand) != ITEM_WAND)
   {
-    send_to_char("That \"wand\" doesn't seem very wand-like.\r\n", ch);
+    ch->sendln("That \"wand\" doesn't seem very wand-like.");
     return eFAILURE;
   }
 
   if(ch->getLevel() < wand->obj_flags.value[0]) 
   {
-    send_to_char("This wand is too powerful for you to imbue.\r\n", ch);
+    ch->sendln("This wand is too powerful for you to imbue.");
     return eFAILURE;
   }
 
@@ -195,7 +195,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
 
   if(GET_MANA(ch) < manacost) 
   {
-    send_to_char("You do not have enough magical energy to imbue this wand.\r\n", ch);
+    ch->sendln("You do not have enough magical energy to imbue this wand.");
     return eFAILURE;
   }
 
@@ -243,7 +243,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
       act(buf, ch, wand, 0, TO_CHAR, 0);
     }
 
-    send_to_char("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.\r\n", ch);
+    ch->sendln("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.");
     act("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, TO_ROOM, 0);
     act("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, TO_ROOM, 0);
   }

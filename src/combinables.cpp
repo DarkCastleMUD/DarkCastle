@@ -130,7 +130,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   if (!learned)
   {
-    send_to_char("You do not know how to make poisons.\r\n", ch);
+    ch->sendln("You do not know how to make poisons.");
     return eFAILURE;
   }
 
@@ -139,7 +139,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   if (!container)
   {
-    send_to_char("You have nothing to make poisons in.\r\n", ch);
+    ch->sendln("You have nothing to make poisons in.");
     return eFAILURE;
   }
 
@@ -149,7 +149,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
   if (index == -2)
     return eFAILURE;
 
-  send_to_char("You mix the ingrediants together in an attempt to make a poison..\r\n", ch);
+  ch->sendln("You mix the ingrediants together in an attempt to make a poison..");
 
   // Clear the items out of the container
   while (container->contains)
@@ -176,7 +176,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   if (failure)
   {
-    send_to_char("Ahh crap, something got screwed up.  You are forced to throw away this attempt.\r\n", ch);
+    ch->sendln("Ahh crap, something got screwed up.  You are forced to throw away this attempt.");
     act("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
@@ -185,7 +185,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
   int rewardnum = real_object(poison_vial_data[index].result);
   if (rewardnum < 0)
   {
-    send_to_char("That poison is broken.  Tell a god.\r\n", ch);
+    ch->sendln("That poison is broken.  Tell a god.");
     return (eFAILURE | eINTERNAL_ERROR);
   }
 
@@ -201,7 +201,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
-    send_to_char("Only thieves are trained enough to poison their weapons.\r\n", ch);
+    ch->sendln("Only thieves are trained enough to poison their weapons.");
     return eFAILURE;
   }
 
@@ -211,13 +211,13 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 
   if (!*vialarg)
   {
-    send_to_char("Poison your weapon with what?\r\n", ch);
+    ch->sendln("Poison your weapon with what?");
     return eFAILURE;
   }
 
   if (ch->fighting)
   {
-    send_to_char("You can't do that while fighting!\r\n", ch);
+    ch->sendln("You can't do that while fighting!");
     return eFAILURE;
   }
 
@@ -225,7 +225,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   Object *weapon = ch->equipment[WIELD];
   if (!weapon)
   {
-    send_to_char("You aren't wielding a weapon to poison.\r\n", ch);
+    ch->sendln("You aren't wielding a weapon to poison.");
     return eFAILURE;
   }
 
@@ -254,7 +254,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   for (int j = 0; j < weapon->num_affects; j++)
     if (weapon->affected[j].location == WEP_THIEF_POISON)
     {
-      send_to_char("Your weapon is already poisoned.\r\n", ch);
+      ch->sendln("Your weapon is already poisoned.");
       return eFAILURE;
     }
 
@@ -332,7 +332,7 @@ void determine_trade_skill_increase(Character *ch, int skillnum, int learned, in
   // can't learn past item's trivial value
   if (learned >= trivial)
   {
-    send_to_char("You have learned all you can from making this item.\r\n", ch);
+    ch->sendln("You have learned all you can from making this item.");
     return;
   }
 
@@ -349,7 +349,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("In handle_poisoned_weapon_atack() with null wield.  Tell a god.\r\n", ch);
+    ch->sendln("In handle_poisoned_weapon_atack() with null wield.  Tell a god.");
     return (eFAILURE | eINTERNAL_ERROR);
   }
 
@@ -412,7 +412,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
-    send_to_char("You just don't have the mind for potion brewing.\r\n", ch);
+    ch->sendln("You just don't have the mind for potion brewing.");
     return eFAILURE;
   }
 
@@ -466,7 +466,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_BREW_TIMER))
   {
-    send_to_char("You aren't ready to brew anything again.\r\n", ch);
+    ch->sendln("You aren't ready to brew anything again.");
     return eFAILURE;
   }
 
@@ -495,41 +495,41 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   if (!herbobj)
   {
-    send_to_char("You do not have that type of herb.\r\n", ch);
+    ch->sendln("You do not have that type of herb.");
     return eFAILURE;
   }
   if (herbobj->obj_flags.type_flag != ITEM_OTHER)
   {
-    send_to_char("That is not an herb.\r\n", ch);
+    ch->sendln("That is not an herb.");
     return eFAILURE;
   }
 
   if (!liquidobj)
   {
-    send_to_char("You do not have that type of liquid.\r\n", ch);
+    ch->sendln("You do not have that type of liquid.");
     return eFAILURE;
   }
   if (liquidobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    send_to_char("That is not a liquid container.\r\n", ch);
+    ch->sendln("That is not a liquid container.");
     return eFAILURE;
   }
 
   if (!containerobj)
   {
-    send_to_char("You do not have that type of container.\r\n", ch);
+    ch->sendln("You do not have that type of container.");
     return eFAILURE;
   }
 
   if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    send_to_char("That is not a target container.\r\n", ch);
+    ch->sendln("That is not a target container.");
     return eFAILURE;
   }
 
   if (DC::isSet(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
   {
-    send_to_char("That container is already a brewed potion.\r\n", ch);
+    ch->sendln("That container is already a brewed potion.");
     return eFAILURE;
   }
 
@@ -541,7 +541,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   if (liquidobj->obj_flags.value[1] < 1)
   {
-    send_to_char("There is no liquid left in that container.\r\n", ch);
+    ch->sendln("There is no liquid left in that container.");
     return eFAILURE;
   }
 
@@ -822,7 +822,7 @@ int Brew::add(Character *ch, char *argument)
 
   if (herb_vnum < 6301 || herb_vnum > 6312)
   {
-    send_to_char("Only vnums 6301-6312 are valid herbs.\r\n", ch);
+    ch->sendln("Only vnums 6301-6312 are valid herbs.");
     return eFAILURE;
   }
 
@@ -841,7 +841,7 @@ int Brew::add(Character *ch, char *argument)
 
   if (container_vnum < 6320 || container_vnum > 6324)
   {
-    send_to_char("Only vnums 6320-6324 are valid containers.\r\n", ch);
+    ch->sendln("Only vnums 6320-6324 are valid containers.");
     return eFAILURE;
   }
 
@@ -854,7 +854,7 @@ int Brew::add(Character *ch, char *argument)
   recipe r = {herb_vnum, liquid_type, container_vnum};
   recipes.insert(std::make_pair(r, spell));
 
-  send_to_char("New brew recipe added.\r\n", ch);
+  ch->sendln("New brew recipe added.");
 
   return eSUCCESS;
 }
@@ -919,7 +919,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
-    send_to_char("You just don't have the mind for scribing.\r\n", ch);
+    ch->sendln("You just don't have the mind for scribing.");
     return eFAILURE;
   }
 
@@ -973,7 +973,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_SCRIBE_TIMER))
   {
-    send_to_char("You aren't ready to scribe anything again.\r\n", ch);
+    ch->sendln("You aren't ready to scribe anything again.");
     return eFAILURE;
   }
 
@@ -1012,51 +1012,51 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   if (!inkobj)
   {
-    send_to_char("You do not have that type of ink.\r\n", ch);
+    ch->sendln("You do not have that type of ink.");
     return eFAILURE;
   }
   if (inkobj->obj_flags.type_flag != ITEM_DRINKCON || inkobj->obj_flags.value[2] != LIQ_INK)
   {
-    send_to_char("That is not ink.\r\n", ch);
+    ch->sendln("That is not ink.");
     return eFAILURE;
   }
 
   if (!dustobj)
   {
-    send_to_char("You do not have that type of dust.\r\n", ch);
+    ch->sendln("You do not have that type of dust.");
     return eFAILURE;
   }
   if (dustobj->obj_flags.type_flag != ITEM_OTHER)
   {
-    send_to_char("That is not dust.\r\n", ch);
+    ch->sendln("That is not dust.");
     return eFAILURE;
   }
 
   if (!penobj)
   {
-    send_to_char("You do not have that type of pen.\r\n", ch);
+    ch->sendln("You do not have that type of pen.");
     return eFAILURE;
   }
   if (penobj->obj_flags.type_flag != ITEM_PEN)
   {
-    send_to_char("That is not a pen.\r\n", ch);
+    ch->sendln("That is not a pen.");
     return eFAILURE;
   }
 
   if (!paperobj)
   {
-    send_to_char("You do not have that type of paper.\r\n", ch);
+    ch->sendln("You do not have that type of paper.");
     return eFAILURE;
   }
   if (paperobj->obj_flags.type_flag != ITEM_SCROLL)
   {
-    send_to_char("That is not paper.\r\n", ch);
+    ch->sendln("That is not paper.");
     return eFAILURE;
   }
 
   if (inkobj->obj_flags.value[1] < 1)
   {
-    send_to_char("There is no liquid left in that ink container.\r\n", ch);
+    ch->sendln("There is no liquid left in that ink container.");
     return eFAILURE;
   }
 
@@ -1290,25 +1290,25 @@ int Scribe::add(Character *ch, char *argument)
 
   if (ink_vnum < 6326 || ink_vnum > 6328)
   {
-    send_to_char("Only vnums 6326-6328 are valid inks.\r\n", ch);
+    ch->sendln("Only vnums 6326-6328 are valid inks.");
     return eFAILURE;
   }
 
   if (dust_vnum < 6335 || dust_vnum > 6337)
   {
-    send_to_char("Only vnums 6335-6337 are valid dusts.\r\n", ch);
+    ch->sendln("Only vnums 6335-6337 are valid dusts.");
     return eFAILURE;
   }
 
   if (pen_vnum < 6329 || pen_vnum > 6334)
   {
-    send_to_char("Only vnums 6329-6334 are valid pens.\r\n", ch);
+    ch->sendln("Only vnums 6329-6334 are valid pens.");
     return eFAILURE;
   }
 
   if (paper_vnum < 6338 || paper_vnum > 6342)
   {
-    send_to_char("Only vnums 6338-6342 are valid papers.\r\n", ch);
+    ch->sendln("Only vnums 6338-6342 are valid papers.");
     return eFAILURE;
   }
 
@@ -1321,7 +1321,7 @@ int Scribe::add(Character *ch, char *argument)
   recipe r = {ink_vnum, dust_vnum, pen_vnum, paper_vnum};
   recipes.insert(std::make_pair(r, spell));
 
-  send_to_char("New scribe recipe added.\r\n", ch);
+  ch->sendln("New scribe recipe added.");
 
   return eSUCCESS;
 }

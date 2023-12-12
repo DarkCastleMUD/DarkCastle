@@ -50,23 +50,23 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis( name)) && !(victim = ch->fighting))
   {
-    send_to_char("There is no one like that here to gouge.\r\n", ch);
+    ch->sendln("There is no one like that here to gouge.");
     return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
   {
-    send_to_char("They are already blinded!\r\n", ch);
+    ch->sendln("They are already blinded!");
     return eFAILURE;
   }
   if (victim == ch)
   {
-    send_to_char("That sounds...stupid.\r\n", ch);
+    ch->sendln("That sounds...stupid.");
     return eFAILURE;
   }
 
   if (!level)
   {
-    send_to_char("You would...if you knew how.\r\n", ch);
+    ch->sendln("You would...if you knew how.");
     return eFAILURE;
   }
 
@@ -129,7 +129,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   if (!has_skill(SKILL_BACKSTAB) && !IS_MOB(this))
   {
-    send_to_char("You don't know how to backstab people!\r\n", this);
+    this->sendln("You don't know how to backstab people!");
     return eFAILURE;
   }
 
@@ -147,19 +147,19 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    send_to_char("You cannot backstab someone that HUGE!\r\n", this);
+    this->sendln("You cannot backstab someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    send_to_char("You cannot target just one to backstab!\r\n", this);
+    this->sendln("You cannot target just one to backstab!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    send_to_char("You cannot target someone that tiny to backstab!\r\n", this);
+    this->sendln("You cannot target someone that tiny to backstab!");
     return eFAILURE;
   }
 
@@ -177,19 +177,19 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   if (this->getHP() < min_hp)
   {
-    send_to_char("You are feeling too weak right now to attempt such a bold maneuver.\r\n", this);
+    this->sendln("You are feeling too weak right now to attempt such a bold maneuver.");
     return eFAILURE;
   }
 
   if (!this->equipment[WIELD])
   {
-    send_to_char("You need to wield a weapon to make it a success.\r\n", this);
+    this->sendln("You need to wield a weapon to make it a success.");
     return eFAILURE;
   }
 
   if (this->equipment[WIELD]->obj_flags.value[3] != 11 && this->equipment[WIELD]->obj_flags.value[3] != 9)
   {
-    send_to_char("You can't stab without a stabbing weapon...\r\n", this);
+    this->sendln("You can't stab without a stabbing weapon...");
     return eFAILURE;
   }
 
@@ -344,7 +344,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_CIRCLE))
   {
-    send_to_char("You do not know how to circle!\r\n", ch);
+    ch->sendln("You do not know how to circle!");
     return eFAILURE;
   }
 
@@ -361,7 +361,7 @@ int do_circle(Character *ch, char *argument, int cmd)
     victim = ch->fighting;
   else
   {
-    send_to_char("You have be in combat to perform this action.  Try using 'backstab' instead.\r\n", ch);
+    ch->sendln("You have be in combat to perform this action.  Try using 'backstab' instead.");
     return eFAILURE;
   }
 
@@ -402,7 +402,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
+    ch->sendln("You need to wield a weapon to make it a success.");
     return eFAILURE;
   }
 
@@ -425,7 +425,7 @@ int do_circle(Character *ch, char *argument, int cmd)
     stabbingCircle = true;
     break;
   default:
-    //     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\r\n", ch);
+    //     ch->sendln("Only certain weapons can be used for backstabbing, this is not one of them.");
     //     return eFAILURE;
     break;
   }
@@ -509,7 +509,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_TRIP))
   {
-    send_to_char("You should learn how to trip first!\r\n", ch);
+    ch->sendln("You should learn how to trip first!");
     return eFAILURE;
   }
 
@@ -521,7 +521,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
       for(i = ch->songs.begin(); i != ch->songs.end(); ++i) {
        if((*i).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE) {
-         send_to_char("You are too distracted by your song to do this.\r\n",ch);
+         ch->sendln("You are too distracted by your song to do this.");
     return eFAILURE;
        }
       }
@@ -543,7 +543,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\r\n", ch);
+    ch->sendln("That person seems to have left.");
     return eFAILURE;
   }
 
@@ -620,13 +620,13 @@ int do_sneak(Character *ch, char *argument, int cmd)
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
-    send_to_char("You can't do that in a potato arena ya sneaky bastard!\r\n", ch);
+    ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_SNEAK))
   {
-    send_to_char("You just don't seem like the sneaky type.\r\n", ch);
+    ch->sendln("You just don't seem like the sneaky type.");
     return eFAILURE;
   }
 
@@ -635,7 +635,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
     affect_from_char(ch, SKILL_SNEAK);
     if (cmd != 10)
     {
-      send_to_char("You won't be so sneaky anymore.\r\n", ch);
+      ch->sendln("You won't be so sneaky anymore.");
       return eFAILURE;
     }
   }
@@ -645,7 +645,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
 
   do_hide(ch, "", 12);
 
-  send_to_char("You try to move silently for a while.\r\n", ch);
+  ch->sendln("You try to move silently for a while.");
 
   //   skill_increase_check(ch, SKILL_SNEAK, ch->has_skill(SKILL_SNEAK),
   // SKILL_INCREASE_HARD);
@@ -675,7 +675,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
     if (ch->master)
       csendf(ch, "You are currently stalking %s.\r\n", GET_SHORT(ch->master));
     else
-      send_to_char("Pick a name, any name.\r\n", ch);
+      ch->sendln("Pick a name, any name.");
     return eFAILURE;
   }
 
@@ -690,16 +690,16 @@ int do_stalk(Character *ch, char *argument, int cmd)
   if (leader == ch)
   {
     if (!ch->master)
-      send_to_char("You are already following yourself.\r\n", ch);
+      ch->sendln("You are already following yourself.");
     else if (IS_AFFECTED(ch, AFF_GROUP))
-      send_to_char("You must first abandon your group.\r\n", ch);
+      ch->sendln("You must first abandon your group.");
     else
       stop_follower(ch, 1);
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You must first abandon your group.\r\n", ch);
+    ch->sendln("You must first abandon your group.");
     return eFAILURE;
   }
 
@@ -725,7 +725,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   if (!ch->canPerform(SKILL_HIDE))
   {
     if (cmd != 12)
-      send_to_char("You don't know how to hide. What do you think you are, a thief?\r\n", ch);
+      ch->sendln("You don't know how to hide. What do you think you are, a thief?");
     return eFAILURE;
   }
 
@@ -742,7 +742,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   {
     if (curr->fighting == ch)
     {
-      send_to_char("In the middle of combat?!  Impossible!\r\n", ch);
+      ch->sendln("In the middle of combat?!  Impossible!");
       return eFAILURE;
     }
   }
@@ -751,7 +751,7 @@ int do_hide(Character *ch, char *argument, int cmd)
     if (!charge_moves(ch, SKILL_HIDE))
       return eSUCCESS;
 
-  send_to_char("You attempt to hide yourself.\r\n", ch);
+  ch->sendln("You attempt to hide yourself.");
 
   if (!IS_AFFECTED(ch, AFF_HIDE))
     SETBIT(ch->affected_by, AFF_HIDE);
@@ -817,11 +817,11 @@ int do_steal(Character *ch, char *argument, int cmd)
   one_argument(argument, victim_name);
   if (ch->c_class != CLASS_THIEF || !ch->has_skill( SKILL_STEAL))
   {
-    send_to_char("You are not experienced within that field.\r\n", ch);
+    ch->sendln("You are not experienced within that field.");
     return eFAILURE;
   }
   //  if (affected_by_spell(ch, FUCK_PTHIEF)) {
-  //     send_to_char("You're too busy watching your back to steal anything right now!\r\n",ch);
+  //     ch->sendln("You're too busy watching your back to steal anything right now!");
   //     return eFAILURE;
   //  }
   pthiefaf.type = FUCK_PTHIEF;
@@ -837,13 +837,13 @@ int do_steal(Character *ch, char *argument, int cmd)
   }
   else if (victim == ch)
   {
-    send_to_char("Got it!\n\rYou receive 30000000000 experience.\r\n", ch);
+    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
     return eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    send_to_char("Don't steal from dead people!\r\n", ch);
+    ch->sendln("Don't steal from dead people!");
     return eFAILURE;
   }
 
@@ -852,7 +852,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
-    send_to_char("That person is far too experienced for you to steal from.\r\n", ch);
+    ch->sendln("That person is far too experienced for you to steal from.");
     return eFAILURE;
   }
 
@@ -881,13 +881,13 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if (victim->fighting)
   {
-    send_to_char("You can't get close enough because of the fight.\r\n", ch);
+    ch->sendln("You can't get close enough because of the fight.");
     return eFAILURE;
   }
 
   /*  if(IS_PC(victim) &&
       !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-      send_to_char("That person is not really there.\r\n", ch);
+      ch->sendln("That person is not really there.");
       return eFAILURE;
     }*/
 
@@ -905,12 +905,12 @@ int do_steal(Character *ch, char *argument, int cmd)
     chance -= GET_OBJ_WEIGHT(obj);
     if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      send_to_char("That item is protected by the gods.\r\n", ch);
+      ch->sendln("That item is protected by the gods.");
       return eFAILURE;
     }
     if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NEWBIE))
     {
-      send_to_char("That piece of equipment is protected by the powerful magics of the MUD-school elders.\r\n", ch);
+      ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return eFAILURE;
     }
     if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
@@ -920,12 +920,12 @@ int do_steal(Character *ch, char *argument, int cmd)
     }
     if (IS_NPC(victim) && isname("prize", obj->name))
     {
-      send_to_char("You have to HUNT the targets...its not a Treasture Steal!\r\n", ch);
+      ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
       return eFAILURE;
     }
     if (GET_OBJ_WEIGHT(obj) > 50)
     {
-      send_to_char("That item is too heavy to steal.\r\n", ch);
+      ch->sendln("That item is too heavy to steal.");
       return eFAILURE;
     }
 
@@ -933,7 +933,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
     {
       set_cantquit(ch, victim);
-      send_to_char("Oops, that was clumsy...\r\n", ch);
+      ch->sendln("Oops, that was clumsy...");
       ohoh = true;
       if (!number(0, 4))
       {
@@ -978,12 +978,12 @@ int do_steal(Character *ch, char *argument, int cmd)
             if (!AWAKE(victim))
             {
               //              if(number(1, 3) == 1)
-              send_to_char("You dream of someone stealing your equipment...\r\n", victim);
+              victim->sendln("You dream of someone stealing your equipment...");
 
               // if i'm not a thief, or if I fail dex-roll wake up victim
               //              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
               //              {
-              //                send_to_char("Oops...\r\n", ch);
+              //                ch->sendln("Oops...");
               if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
               {
                 paf->modifier = 0; // make sleep no longer work
@@ -1048,10 +1048,10 @@ int do_steal(Character *ch, char *argument, int cmd)
             }
         }
         else
-          send_to_char("You cannot carry that much weight.\r\n", ch);
+          ch->sendln("You cannot carry that much weight.");
       }
       else
-        send_to_char("You cannot carry that many items.\r\n", ch);
+        ch->sendln("You cannot carry that many items.");
     }
   }
   else // not in inventory
@@ -1071,14 +1071,14 @@ int do_steal(Character *ch, char *argument, int cmd)
     { // They're wearing it!
       /*    if (max_level(ch) < obj->obj_flags.eq_level)
           {
-        send_to_char("You find yourself unable to steal that.\r\n",ch);
+        ch->sendln("You find yourself unable to steal that.");
         return eFAILURE;
           }*/
 
       chance -= GET_OBJ_WEIGHT(obj);
       if (GET_OBJ_WEIGHT(obj) > 50)
       {
-        send_to_char("That item is too heavy to steal.\r\n", ch);
+        ch->sendln("That item is too heavy to steal.");
         return eFAILURE;
       }
 
@@ -1115,18 +1115,18 @@ int do_steal(Character *ch, char *argument, int cmd)
         wakey = 90;
         break;
       default:
-        send_to_char("Something just screwed up. Tell an imm what you did.\r\n", ch);
+        ch->sendln("Something just screwed up. Tell an imm what you did.");
         return eFAILURE;
       };
       wakey -= GET_DEX(ch) / 2;
       if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
       {
-        send_to_char("That item is protected by the gods.\r\n", ch);
+        ch->sendln("That item is protected by the gods.");
         return eFAILURE;
       }
       if (!ch->has_skill( SKILL_STEAL))
       {
-        send_to_char("You don't know how to steal.\r\n", ch);
+        ch->sendln("You don't know how to steal.");
         return eFAILURE;
       }
       int mod = ch->has_skill( SKILL_STEAL) - chance;
@@ -1141,7 +1141,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       {
         set_cantquit(ch, victim);
         ohoh = true;
-        send_to_char("Oops, that was clumsy...\r\n", ch);
+        ch->sendln("Oops, that was clumsy...");
         if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
         {
           paf->modifier = 0; // make sleep no longer work
@@ -1154,7 +1154,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       else if (!number(1, 4))
       {
         act("You remove $p and attempt to steal it.", ch, obj, 0, TO_CHAR, 0);
-        send_to_char("Your victim wakes up before you can complete the theft!\r\n", ch);
+        ch->sendln("Your victim wakes up before you can complete the theft!");
         act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), victim);
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
@@ -1190,12 +1190,12 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (!AWAKE(victim))
           {
             //            if(number(1, 3) == 1)
-            send_to_char("You dream of someone stealing your equipment...\r\n", victim);
+            victim->sendln("You dream of someone stealing your equipment...");
 
             // if i'm not a thief, or if I fail dex-roll wake up victim
             //            if(number(1,101) > wakey)
             //            {
-            //              send_to_char("Oops, that was clumsy...\r\n", ch);
+            //              ch->sendln("Oops, that was clumsy...");
             if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
             {
               paf->modifier = 0; // make sleep no longer work
@@ -1223,7 +1223,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
             (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
         {
-          send_to_char("Whoa! It poofed into thin air!\r\n", ch);
+          ch->sendln("Whoa! It poofed into thin air!");
           extract_obj(obj);
         }
         else
@@ -1294,25 +1294,25 @@ int do_pocket(Character *ch, char *argument, int cmd)
   }
   else if (victim == ch)
   {
-    send_to_char("Got it!\n\rYou receive 30000000000 experience.\r\n", ch);
+    ch->sendln("Got it!\n\rYou receive 30000000000 experience.");
     return eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    send_to_char("Don't steal from dead people.\r\n", ch);
+    ch->sendln("Don't steal from dead people.");
     return eFAILURE;
   }
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
-    send_to_char("That person is far too experienced to steal from.\r\n", ch);
+    ch->sendln("That person is far too experienced to steal from.");
     return eFAILURE;
   }
 
   if (IS_PC(victim) && ((victim->getLevel() + 20) < ch->getLevel()))
   {
-    send_to_char("That person is too low level, you don't want to tarnish your reputation!\r\n", ch);
+    ch->sendln("That person is too low level, you don't want to tarnish your reputation!");
     return eFAILURE;
   }
 
@@ -1341,19 +1341,19 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   if (victim->fighting)
   {
-    send_to_char("You can't get close enough because of the fight.\r\n", ch);
+    ch->sendln("You can't get close enough because of the fight.");
     return eFAILURE;
   }
 
   /*if(IS_PC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-    send_to_char("That person is not really there.\r\n", ch);
+    ch->sendln("That person is not really there.");
     return eFAILURE;
   }
 */
   if (!ch->has_skill( SKILL_POCKET) && IS_PC(ch))
   {
-    send_to_char("Well, you would, if you knew how.\r\n", ch);
+    ch->sendln("Well, you would, if you knew how.");
     return eFAILURE;
   }
 
@@ -1367,7 +1367,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, victim, SKILL_POCKET))
   {
     set_cantquit(ch, victim);
-    send_to_char("Oops, that was clumsy...\r\n", ch);
+    ch->sendln("Oops, that was clumsy...");
     ohoh = true;
     if (number(0, 6))
     {
@@ -1430,7 +1430,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("You couldn't get any gold...\r\n", ch);
+      ch->sendln("You couldn't get any gold...");
     }
   }
 
@@ -1464,7 +1464,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill( SKILL_PICK_LOCK))
   {
-    send_to_char("You don't know how to pick locks!\r\n", ch);
+    ch->sendln("You don't know how to pick locks!");
     return eFAILURE;
   }
 
@@ -1478,7 +1478,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
   if (!has_lockpicks)
   {
-    send_to_char("But...you don't have a lockpick!\r\n", ch);
+    ch->sendln("But...you don't have a lockpick!");
     return eFAILURE;
   }
 
@@ -1491,15 +1491,15 @@ int do_pick(Character *ch, char *argument, int cmd)
     // this is an object
 
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-      send_to_char("That's not a container.\r\n", ch);
+      ch->sendln("That's not a container.");
     else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("Silly, it's not even closed!\n\r", ch);
     else if (obj->obj_flags.value[2] < 0)
-      send_to_char("Odd, you can't seem to find a keyhole.\r\n", ch);
+      ch->sendln("Odd, you can't seem to find a keyhole.");
     else if (!DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
       send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
     else if (DC::isSet(obj->obj_flags.value[1], CONT_PICKPROOF))
-      send_to_char("The lock resists even your best attempts to pick it.\r\n", ch);
+      ch->sendln("The lock resists even your best attempts to pick it.");
     else
     {
       if (!charge_moves(ch, SKILL_PICK_LOCK))
@@ -1507,7 +1507,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
-        send_to_char("You failed to pick the lock.\r\n", ch);
+        ch->sendln("You failed to pick the lock.");
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         return eFAILURE;
       }
@@ -1523,7 +1523,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
     if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
     {
-      send_to_char("That's absurd.\r\n", ch);
+      ch->sendln("That's absurd.");
     }
     else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
@@ -1531,15 +1531,15 @@ int do_pick(Character *ch, char *argument, int cmd)
     }
     else if (EXIT(ch, door)->key < 0)
     {
-      send_to_char("You can't seem to spot any lock to pick.\r\n", ch);
+      ch->sendln("You can't seem to spot any lock to pick.");
     }
     else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
     {
-      send_to_char("Oh...it wasn't locked at all.\r\n", ch);
+      ch->sendln("Oh...it wasn't locked at all.");
     }
     else if (DC::isSet(EXIT(ch, door)->exit_info, EX_PICKPROOF))
     {
-      send_to_char("You seem to be unable to pick this lock.\r\n", ch);
+      ch->sendln("You seem to be unable to pick this lock.");
     }
     else
     {
@@ -1551,7 +1551,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       // skill_increase_check(ch, SKILL_PICK_LOCK, ch->has_skill(SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
-        send_to_char("You failed to pick the lock.\r\n", ch);
+        ch->sendln("You failed to pick the lock.");
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
         return eFAILURE;
@@ -1569,7 +1569,7 @@ int do_pick(Character *ch, char *argument, int cmd)
             INVIS_NULL);
       }
 
-      send_to_char("The lock quickly yields to your skills.\r\n", ch);
+      ch->sendln("The lock quickly yields to your skills.");
 
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
@@ -1604,12 +1604,12 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit this action.\r\n", ch);
+    ch->sendln("Your criminal acts prohibit this action.");
     return eFAILURE;
   }
   if (!ch->has_skill( SKILL_SLIP))
   {
-    send_to_char("You don't know how to slip.\r\n", ch);
+    ch->sendln("You don't know how to slip.");
     return eFAILURE;
   }
   argument = one_argument(argument, obj_name);
@@ -1618,12 +1618,12 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
     {
-      send_to_char("Your criminal acts prohibit this action.\r\n", ch);
+      ch->sendln("Your criminal acts prohibit this action.");
       return eFAILURE;
     }
     if (strlen(obj_name) > 7)
     {
-      send_to_char("Number field too large.  Try something smaller.\r\n", ch);
+      ch->sendln("Number field too large.  Try something smaller.");
       return eFAILURE;
     }
 
@@ -1632,7 +1632,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
     if (str_cmp("coins", arg) && str_cmp("coin", arg))
     {
-      send_to_char("Sorry, you can't do that (yet)...\r\n", ch);
+      ch->sendln("Sorry, you can't do that (yet)...");
       return eFAILURE;
     }
     if (amount <= 0)
@@ -1660,7 +1660,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (ch == vict)
     {
-      send_to_char("To yourself?!  Very cute...\r\n", ch);
+      ch->sendln("To yourself?!  Very cute...");
       return eFAILURE;
     }
 
@@ -1742,19 +1742,19 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
   {
-    send_to_char("You do not seem to have anything like that.\r\n", ch);
+    ch->sendln("You do not seem to have anything like that.");
     return eFAILURE;
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("That sure would be a stupid thing to do.\r\n", ch);
+    ch->sendln("That sure would be a stupid thing to do.");
     return eFAILURE;
   }
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    send_to_char("You can't seem to get the item to leave you.\r\n", ch);
+    ch->sendln("You can't seem to get the item to leave you.");
     return eFAILURE;
   }
 
@@ -1767,7 +1767,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("This item is NODROP btw.\r\n", ch);
+      ch->sendln("This item is NODROP btw.");
     }
   }
 
@@ -1782,12 +1782,12 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     if (GET_ITEM_TYPE(container) != ITEM_CONTAINER)
     {
-      send_to_char("That's not a container.\r\n", ch);
+      ch->sendln("That's not a container.");
       return eFAILURE;
     }
     if (DC::isSet(container->obj_flags.value[1], CONT_CLOSED))
     {
-      send_to_char("It seems to be closed.\r\n", ch);
+      ch->sendln("It seems to be closed.");
       return eFAILURE;
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
@@ -1795,7 +1795,7 @@ int do_slip(Character *ch, char *argument, int cmd)
         (obj_index[container->item_number].virt != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
-      send_to_char("It won't fit...cheater.\r\n", ch);
+      ch->sendln("It won't fit...cheater.");
       return eFAILURE;
     }
     if (!skill_success(ch, nullptr, SKILL_SLIP))
@@ -1815,7 +1815,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   }
   if (!(vict = ch->get_char_room_vis( vict_name)))
   {
-    send_to_char("No one by that name around here.\r\n", ch);
+    ch->sendln("No one by that name around here.");
     return eFAILURE;
   }
 
@@ -1827,7 +1827,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (ch == vict)
   {
-    send_to_char("To yourself?!  Very cute...\r\n", ch);
+    ch->sendln("To yourself?!  Very cute...");
     return eFAILURE;
   }
 
@@ -1855,7 +1855,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
-      send_to_char("The item's uniqueness prevents it!\r\n", ch);
+      ch->sendln("The item's uniqueness prevents it!");
       return eFAILURE;
     }
   }
@@ -1885,7 +1885,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     act("$n tries to slip $N something, but $e accidentally drops "
         "it.\r\n",
         ch, 0, vict, TO_ROOM, NOTVICT);
-    send_to_char("Whoops!  You dropped it.\r\n", ch);
+    ch->sendln("Whoops!  You dropped it.");
     ch->save();
   }
 
@@ -1918,19 +1918,19 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_VITAL_STRIKE) && ch->getLevel() < IMMORTAL)
   {
-    send_to_char("Your body is still recovering from your last vitalstrike technique.\r\n", ch);
+    ch->sendln("Your body is still recovering from your last vitalstrike technique.");
     return eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_VITAL_STRIKE))
   {
-    send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
+    ch->sendln("You'd cut yourself to ribbons just trying!");
     return eFAILURE;
   }
 
   if (!(ch->fighting))
   {
-    send_to_char("But you aren't fighting anyone!\r\n", ch);
+    ch->sendln("But you aren't fighting anyone!");
     return eFAILURE;
   }
 
@@ -1941,7 +1941,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, nullptr, SKILL_VITAL_STRIKE))
   {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger.", ch, 0, 0, TO_ROOM, NOTVICT);
-    send_to_char("You try to begin the vital strike technique and nearly slice off your own pinkie finger!\r\n", ch);
+    ch->sendln("You try to begin the vital strike technique and nearly slice off your own pinkie finger!");
   }
   else
   {
@@ -1977,18 +1977,18 @@ int do_deceit(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_DECEIT))
   {
-    send_to_char("You do not yet understand enough of the workings of your marks.\r\n", ch);
+    ch->sendln("You do not yet understand enough of the workings of your marks.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_DECEIT_TIMER))
   {
-    send_to_char("You have to wait to be more deceitful!\r\n", ch);
+    ch->sendln("You have to wait to be more deceitful!");
     return eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You have no group to instruct!\r\n", ch);
+    ch->sendln("You have no group to instruct!");
     return eFAILURE;
   }
 
@@ -2007,13 +2007,13 @@ int do_deceit(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, nullptr, SKILL_DECEIT))
   {
-    send_to_char("Your class just isn't up to the task.\r\n", ch);
+    ch->sendln("Your class just isn't up to the task.");
     act("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, TO_ROOM, 0);
   }
   else
   {
     act("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("Your instruction is well received and your pupils are more able to exploit weaknesses.\r\n", ch);
+    ch->sendln("Your instruction is well received and your pupils are more able to exploit weaknesses.");
 
     af.type = SKILL_DECEIT_TIMER;
     af.duration = 1 + ch->has_skill( SKILL_DECEIT) / 10;
@@ -2057,19 +2057,19 @@ int do_jab(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_JAB) && ch->getLevel() < IMMORTAL)
   {
-    send_to_char("Your arm is still sore from your last attempt.\r\n", ch);
+    ch->sendln("Your arm is still sore from your last attempt.");
     return eFAILURE;
   }
 
   if (!(learned = ch->has_skill( SKILL_JAB)))
   {
-    send_to_char("You don't know how to jab.\r\n", ch);
+    ch->sendln("You don't know how to jab.");
     return eFAILURE;
   }
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("Your must be wielding a weapon to make it a success.\r\n", ch);
+    ch->sendln("Your must be wielding a weapon to make it a success.");
     return eFAILURE;
   }
 
@@ -2090,31 +2090,31 @@ int do_jab(Character *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\r\n", ch);
+    ch->sendln("That person seems to have left.");
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Why are you trying to hit yourself on the head???.\r\n", ch);
+    ch->sendln("Why are you trying to hit yourself on the head???.");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
-    send_to_char("You cannot jab someone that HUGE!\r\n", ch);
+    ch->sendln("You cannot jab someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
-    send_to_char("You cannot target just one to jab!\r\n", ch);
+    ch->sendln("You cannot target just one to jab!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
-    send_to_char("You cannot target someone that tiny to jab!\r\n", ch);
+    ch->sendln("You cannot target someone that tiny to jab!");
     return eFAILURE;
   }
 
@@ -2215,7 +2215,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
 
   if (!(learned = ch->has_skill( SKILL_APPRAISE)))
   {
-    send_to_char("Your estimate would be baseless.\r\n", ch);
+    ch->sendln("Your estimate would be baseless.");
     return eFAILURE;
   }
 
@@ -2247,7 +2247,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
   {
     if (victim == ch && !*item)
     {
-      send_to_char("You're worth a million bucks, baby.\r\n", ch);
+      ch->sendln("You're worth a million bucks, baby.");
       return eFAILURE;
     }
 
@@ -2263,7 +2263,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
           weight = true;
         }
         else
-          send_to_char("You don't seem to be carrying anything like that.\r\n", ch);
+          ch->sendln("You don't seem to be carrying anything like that.");
       }
       else
       {
@@ -2346,7 +2346,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
 
   if (!(skill = ch->has_skill( SKILL_CRIPPLE)))
   {
-    send_to_char("You don't know how to cripple anybody.\r\n", ch);
+    ch->sendln("You don't know how to cripple anybody.");
     return eFAILURE;
   }
 
@@ -2358,25 +2358,25 @@ int do_cripple(Character *ch, char *argument, int cmd)
 
   if (vict == ch)
   {
-    send_to_char("You turn your head and grimace as you break your ankles with a sledgehammer.\r\n", ch);
+    ch->sendln("You turn your head and grimace as you break your ankles with a sledgehammer.");
     return eFAILURE;
   }
 
   if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
   {
-    send_to_char("You cannot cripple someone that HUGE!\r\n", ch);
+    ch->sendln("You cannot cripple someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
   {
-    send_to_char("You cannot pick just one to cripple!\r\n", ch);
+    ch->sendln("You cannot pick just one to cripple!");
     return eFAILURE;
   }
 
   if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
   {
-    send_to_char("You cannot target someone that tiny to cripple!\r\n", ch);
+    ch->sendln("You cannot target someone that tiny to cripple!");
     return eFAILURE;
   }
 

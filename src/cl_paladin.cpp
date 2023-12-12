@@ -60,21 +60,21 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     if (GET_SEX(ch) == SEX_MALE)
       send_to_char("You'd wither it!\n\r", ch);
     else if (GET_SEX(ch) == SEX_FEMALE)
-      send_to_char("You naughty naughty girl...at least wait until someone's filming.\r\n", ch);
+      ch->sendln("You naughty naughty girl...at least wait until someone's filming.");
     else
-      send_to_char("Looks like you've already harm touched yourself...\r\n", ch);
+      ch->sendln("Looks like you've already harm touched yourself...");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
   {
-    send_to_char("You have not spend enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
+    ch->sendln("You have not spend enough time in devotion to your god to warrant such a favor yet.");
     return eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
-    send_to_char("You don't posess the energy to do it!\r\n", ch);
+    ch->sendln("You don't posess the energy to do it!");
     return eFAILURE;
   }
 
@@ -84,7 +84,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
   int duration = 24;
   if (!skill_success(ch, victim, SKILL_HARM_TOUCH))
   {
-    send_to_char("Your god refuses you.\r\n", ch);
+    ch->sendln("Your god refuses you.");
     duration = 1;
     WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2 + number((quint64)1, (quint64)DC::PULSE_VIOLENCE / 2));
   }
@@ -146,7 +146,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Oh yeah...that's really holy....pervert...\r\n", ch);
+    ch->sendln("Oh yeah...that's really holy....pervert...");
     return eFAILURE;
   }
 
@@ -157,13 +157,13 @@ int do_layhands(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_LAY_HANDS))
   {
-    send_to_char("You have not spent enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
+    ch->sendln("You have not spent enough time in devotion to your god to warrant such a favor yet.");
     return eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
-    send_to_char("You don't posess the energy to do it!\r\n", ch);
+    ch->sendln("You don't posess the energy to do it!");
     return eFAILURE;
   }
 
@@ -172,7 +172,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_LAY_HANDS))
   {
-    send_to_char("Your god refuses you.\r\n", ch);
+    ch->sendln("Your god refuses you.");
     duration = 1;
   }
   else
@@ -219,7 +219,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (!ch->equipment[WIELD] || !DC::isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
   {
-    send_to_char("You need to be wielding a two handed sword to behead!\r\n", ch);
+    ch->sendln("You need to be wielding a two handed sword to behead!");
     return eFAILURE;
   }
 
@@ -250,7 +250,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, vict, SKILL_BEHEAD))
   {
-    send_to_char("Your mighty swing goes wild!\r\n", ch);
+    ch->sendln("Your mighty swing goes wild!");
     act("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, TO_VICT, 0);
     act("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, TO_ROOM, NOTVICT);
     retval = one_hit(ch, vict, SKILL_BEHEAD, FIRST);

@@ -267,7 +267,7 @@ void mobile_activity(void)
     // check hated
     if ((ch->mobdata->hated != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
-      send_to_char("You're hating.\r\n", ch);
+      ch->sendln("You're hating.");
       Character *next_blah;
       //      Character *temp = get_char(get_random_hate(ch));
       done = 0;

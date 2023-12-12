@@ -69,17 +69,17 @@ int do_spec(Character *ch, char *argument, int cmd)
     if (str_cmp(arg, "iamsure"))
     {
       // messagemoose, couple below too
-      send_to_char("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.\r\n", ch);
+      ch->sendln("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.");
       return eFAILURE;
     }
     if (ch->spec == 0)
     {
-      send_to_char("You do not have a specialization.\r\n", ch);
+      ch->sendln("You do not have a specialization.");
       return eFAILURE;
     }
     if (GET_PLATINUM(ch) < 10000)
     {
-      send_to_char("You do not have the required 10000 platinum.\r\n", ch);
+      ch->sendln("You do not have the required 10000 platinum.");
       return eFAILURE;
     }
     for (int i = 0; i < 10; i++)
@@ -127,7 +127,7 @@ int do_spec(Character *ch, char *argument, int cmd)
     ch->setLevel(51);
 
     // messagemoose
-    send_to_char("You forget your specilization.\r\n", ch);
+    ch->sendln("You forget your specilization.");
   }
   else if (!str_cmp(arg, "learn"))
   {

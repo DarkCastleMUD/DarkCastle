@@ -31,17 +31,17 @@ int do_suicide(Character *ch, char *argument, int cmd)
     return eFAILURE; // just in case
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("This place is too peaceful for that.\r\n", ch);
+    ch->sendln("This place is too peaceful for that.");
     return eFAILURE;
   }
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
-    send_to_char("You can't do that in the arena.\r\n", ch);
+    ch->sendln("You can't do that in the arena.");
     return eFAILURE;
   }
   if (affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF)))
   {
-    send_to_char("You're too busy running from the law!\r\n", ch);
+    ch->sendln("You're too busy running from the law!");
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CHAMPION))
@@ -51,7 +51,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
   }
   if (IS_AFFECTED(ch, AFF_CURSE) || IS_AFFECTED(ch, AFF_SOLIDITY))
   {
-    send_to_char("Something blocks your attempted suicide, be happy!  You have a new lease on life!\r\n", ch);
+    ch->sendln("Something blocks your attempted suicide, be happy!  You have a new lease on life!");
     return eFAILURE;
   }
   if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
@@ -66,11 +66,11 @@ int do_suicide(Character *ch, char *argument, int cmd)
 
   if (percent > 50)
   {
-    send_to_char("You miss your wrists with the blade and knick your kneecap!\r\n", ch);
+    ch->sendln("You miss your wrists with the blade and knick your kneecap!");
     act("$n tries to suicide, but fails miserably.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
-  send_to_char("Looking out upon the world, you decide that it would be a better place without you.\r\n", ch);
+  ch->sendln("Looking out upon the world, you decide that it would be a better place without you.");
   act("Tired of life, $n decides to end $s.", ch, 0, 0, TO_ROOM, 0);
   fight_kill(ch, ch, TYPE_PKILL, 0);
   return eSUCCESS;
@@ -92,7 +92,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
     {
       if (victim == this)
       {
-        send_to_char("You hit yourself..OUCH!.\r\n", this);
+        this->sendln("You hit yourself..OUCH!.");
         act("$n hits $mself, and says OUCH!",
             this, 0, victim, TO_ROOM, 0);
       }
@@ -132,7 +132,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
       }
     }
     else
-      send_to_char("They aren't here.\r\n", this);
+      this->sendln("They aren't here.");
   }
   else
     send_to_char("Hit whom?\n\r", this);
@@ -153,7 +153,7 @@ int do_murder(Character *ch, char *argument, int cmd)
     {
       if (victim == ch)
       {
-        send_to_char("You hit yourself..OUCH!.\r\n", ch);
+        ch->sendln("You hit yourself..OUCH!.");
         act("$n hits $mself, and says OUCH!", ch, 0, victim, TO_ROOM, 0);
       }
       else
@@ -182,7 +182,7 @@ int do_murder(Character *ch, char *argument, int cmd)
       }
     }
     else
-      send_to_char("They aren't here.\r\n", ch);
+      ch->sendln("They aren't here.");
   }
   else
     send_to_char("Hit whom?\n\r", ch);
@@ -205,7 +205,7 @@ int do_slay(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
-    send_to_char("They aren't here.\r\n", ch);
+    ch->sendln("They aren't here.");
     return eFAILURE;
   }
 
@@ -226,13 +226,13 @@ int do_slay(Character *ch, char *argument, int cmd)
   {
     if (victim->getLevel() >= IMPLEMENTER)
     {
-      send_to_char("You no make ME into chop suey!\r\n", ch);
+      ch->sendln("You no make ME into chop suey!");
       sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
       send_to_char(buf, victim);
       if (ch->getLevel() > IMMORTAL)
       {
         fight_kill(victim, ch, TYPE_RAW_KILL, 0);
-        send_to_char("Lunch.\r\n", ch);
+        ch->sendln("Lunch.");
       }
       return eSUCCESS | eCH_DIED;
     }
@@ -264,7 +264,7 @@ int do_kill(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
-    send_to_char("They aren't here.\r\n", ch);
+    ch->sendln("They aren't here.");
     return eFAILURE;
   }
 
@@ -293,13 +293,13 @@ int do_kill(Character *ch, char *argument, int cmd)
     {
       if (victim->getLevel() >= IMPLEMENTER)
       {
-        send_to_char("You no make ME into chop suey!\r\n", ch);
+        ch->sendln("You no make ME into chop suey!");
         sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
         if (ch->getLevel() > IMMORTAL)
         {
           fight_kill(victim, ch, TYPE_CHOOSE, 0);
-          send_to_char("Lunch.\r\n", ch);
+          ch->sendln("Lunch.");
         }
         return eSUCCESS | eCH_DIED;
       }
@@ -386,7 +386,7 @@ command_return_t Character::do_join(QStringList arguments, int cmd)
 
   if (!victim->fighting)
   {
-    send_to_char("But they're not fighting anyone.\r\n", this);
+    this->sendln("But they're not fighting anyone.");
     return eFAILURE;
   }
 

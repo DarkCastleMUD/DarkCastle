@@ -87,7 +87,7 @@ int do_innate(Character *ch, char *arg, int cmd)
 {
   if(ch && ch->in_room > 0 &&
      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
-    send_to_char("Cannot use innate skills within a potato arena.\r\n", ch);
+    ch->sendln("Cannot use innate skills within a potato arena.");
     return eFAILURE;
   }
 
@@ -106,13 +106,13 @@ int do_innate(Character *ch, char *arg, int cmd)
       } else if (!str_cmp(innates[i].name,buf)) {
 	if (str_cmp(buf, "fly") && affected_by_spell(ch,SKILL_INNATE_TIMER))
         {
-	  send_to_char("You cannot use that yet.\r\n",ch);
+	  ch->sendln("You cannot use that yet.");
 	  return eFAILURE;
 	}
 	if (GET_POS(ch) == position_t::SLEEPING && 
 		i != 1)
 	{
-		send_to_char("In your dreams, or what?\r\n",ch);
+		ch->sendln("In your dreams, or what?");
 		return eFAILURE;
 	}
 	int retval = (*(innates[i].func))(ch,arg,cmd);
@@ -140,9 +140,9 @@ int do_innate(Character *ch, char *arg, int cmd)
   }
   if (!found) {
     if (buf[0] == 0) {
-      send_to_char("Your race has no innate abilities.\r\n",ch);
+      ch->sendln("Your race has no innate abilities.");
     } else {
-      send_to_char("You do not have access to any such ability.\r\n",ch);
+      ch->sendln("You do not have access to any such ability.");
     }
     return eFAILURE;
   } else {
@@ -159,7 +159,7 @@ int innate_regeneration(Character *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_REGENERATION;
    affect_to_char(ch, &af);
-   send_to_char("Your innate regenerative abilities allow you to heal quickly.\r\n",ch);
+   ch->sendln("Your innate regenerative abilities allow you to heal quickly.");
    return eSUCCESS;
 }
 
@@ -172,7 +172,7 @@ int innate_powerwield(Character *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_POWERWIELD;
    affect_to_char(ch, &af);
-   send_to_char("You gather your energy in an effort to wield two mighty weapons.\r\n",ch);
+   ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
    act("$n gathers his strength in order to wield two mighty weapons.",ch, nullptr,nullptr,TO_ROOM,0);
    return eSUCCESS;
 }
@@ -181,11 +181,11 @@ int innate_focus(Character *ch, char *arg, int cmd)
 {
    if(IS_AFFECTED(ch, AFF_FOCUS))
    {
-      send_to_char("But you are already focusing!  Why waste it?\r\n", ch);
+      ch->sendln("But you are already focusing!  Why waste it?");
       return eFAILURE;
    }
 
-   send_to_char("You enter a trance and find yourself able to concentrate much better.\r\n",ch);
+   ch->sendln("You enter a trance and find yourself able to concentrate much better.");
 
    struct affected_type af;
    af.type = SKILL_INNATE_FOCUS;
@@ -202,7 +202,7 @@ int innate_illusion(Character *ch, char *arg, int cmd)
 {
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
-     send_to_char("But you're already invisible!\r\n",ch);
+     ch->sendln("But you're already invisible!");
     return eFAILURE;
   }
    struct affected_type af;
@@ -215,7 +215,7 @@ int innate_illusion(Character *ch, char *arg, int cmd)
    af.type = SPELL_INVISIBLE;
    af.bitvector = AFF_INVISIBLE;
    affect_to_char(ch, &af);
-   send_to_char("You use your race's innate illusion powers, and fade out of existence.\r\n",ch);
+   ch->sendln("You use your race's innate illusion powers, and fade out of existence.");
    act("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, TO_ROOM, 0);
    return eSUCCESS;
 }
@@ -224,11 +224,11 @@ int innate_bloodlust(Character *ch, char *arg, int cmd)
 {
   if (!ch->fighting)
   {
-    send_to_char("You need to be fighting to use that.\r\n",ch);
+    ch->sendln("You need to be fighting to use that.");
     return eFAILURE;
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-  send_to_char("Your blood boils as you drive yourself into a war-like state.\r\n",ch);
+  ch->sendln("Your blood boils as you drive yourself into a war-like state.");
   act("$n's blood boils has $e drives $mself into warlike rage.",ch,nullptr,nullptr, TO_ROOM, 0);
   return eSUCCESS;
 }
@@ -242,17 +242,17 @@ int innate_repair(Character *ch, char *arg, int cmd)
   arg = one_argument(arg,buf);
   if ( ( obj = get_obj_in_list_vis( ch, buf, ch->carrying ) ) == nullptr )
   {
-    send_to_char("You are not carrying anything like that.\r\n",ch);
+    ch->sendln("You are not carrying anything like that.");
     return eFAILURE;
   }
   if (ch->getLevel() < obj->obj_flags.eq_level)
   {
-   send_to_char("This item is beyond your skill.\r\n",ch);
+   ch->sendln("This item is beyond your skill.");
    return eFAILURE;
   }
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
-    send_to_char("This item is unrepairable.\r\n",ch);
+    ch->sendln("This item is unrepairable.");
     return eFAILURE;
   }
   for (i = 0; i < obj->num_affects;i++)
@@ -261,7 +261,7 @@ int innate_repair(Character *ch, char *arg, int cmd)
     {
        if (number(1,101) < chance)
        {
-	  send_to_char("You failed to repair it!\r\n",ch);
+	  ch->sendln("You failed to repair it!");
 	  act("$n fails to repair $p.",ch,obj,obj,TO_ROOM,0);
 	  return eSUCCESS;
        }
@@ -272,7 +272,7 @@ int innate_repair(Character *ch, char *arg, int cmd)
     }
   }
   if (found) { act("Your knowledge of weapons and armour allow you to quickly repair $p.",ch,obj,obj,TO_CHAR, 0); act("$n quickly repairs their $p.", ch, obj, obj, TO_ROOM, 0); return eSUCCESS; }
-  else { send_to_char("That item is already in excellent condition!\r\n",ch); return eFAILURE; }
+  else { ch->sendln("That item is already in excellent condition!"); return eFAILURE; }
   
 }
 
@@ -285,7 +285,7 @@ int innate_evasion(Character *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = -1;
    affect_to_char(ch, &af);
-   send_to_char("You bring up an aura, blocking all forms of scrying your location.\r\n",ch);
+   ch->sendln("You bring up an aura, blocking all forms of scrying your location.");
    return eSUCCESS;
 }
 
@@ -298,7 +298,7 @@ int innate_shadowslip(Character *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_SHADOWSLIP;
    affect_to_char(ch, &af);
-   send_to_char("You blend with the shadows, preventing people from reaching you magically.\r\n",ch);
+   ch->sendln("You blend with the shadows, preventing people from reaching you magically.");
    return eSUCCESS;
 }
 
@@ -306,11 +306,11 @@ int innate_fly(Character *ch, char *arg, int cmd)
 {
   if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
     affect_from_char(ch, SKILL_INNATE_FLY);
-    send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\r\n", ch);
+    ch->sendln("You fold your wings smoothly behind you and settle gently to the ground.");
    act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, TO_ROOM, 0);
   } else {
     if (ISSET(ch->affected_by, AFF_FLYING)) {
-      send_to_char("You are already flying.\r\n", ch);
+      ch->sendln("You are already flying.");
       return eFAILURE;
     }
 
@@ -321,7 +321,7 @@ int innate_fly(Character *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_FLYING;
    affect_to_char(ch, &af);
-   send_to_char("You spread your delicate wings and lift lightly into the air.\r\n", ch);
+   ch->sendln("You spread your delicate wings and lift lightly into the air.");
    act("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, TO_ROOM, 0);
   }
 

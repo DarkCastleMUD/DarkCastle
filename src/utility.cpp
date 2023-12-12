@@ -841,7 +841,7 @@ void util_archive(const char *char_name, Character *caller)
   if (!file_exists(buf) || file_exists(buf2))
   {
     if (caller)
-      send_to_char("That character does not exist.\r\n", caller);
+      caller->sendln("That character does not exist.");
     else
       logentry("Attempt to archive a non-existent char.", IMMORTAL, LogChannels::LOG_BUG);
     return;
@@ -1224,7 +1224,7 @@ int do_order(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1232,14 +1232,14 @@ int do_order(Character *ch, char *argument, int cmd)
     send_to_char("Order who to do what?\n\r", ch);
   else if (!(victim = ch->get_char_room_vis(name)) &&
            str_cmp("follower", name) && str_cmp("followers", name))
-    send_to_char("That person isn't here.\r\n", ch);
+    ch->sendln("That person isn't here.");
   else if (ch == victim)
-    send_to_char("You obviously suffer from schitzophrenia.\r\n", ch);
+    ch->sendln("You obviously suffer from schitzophrenia.");
   else
   {
     if (IS_AFFECTED(ch, AFF_CHARM))
     {
-      send_to_char("Your superior would not aprove of you giving orders.\r\n", ch);
+      ch->sendln("Your superior would not aprove of you giving orders.");
       return eFAILURE;
     }
 
@@ -1254,7 +1254,7 @@ int do_order(Character *ch, char *argument, int cmd)
         act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
       else
       {
-        send_to_char("Ok.\r\n", ch);
+        ch->sendln("Ok.");
         victim->command_interpreter(message);
       }
     }
@@ -1280,7 +1280,7 @@ int do_order(Character *ch, char *argument, int cmd)
         }
 
       if (found)
-        send_to_char("Ok.\r\n", ch);
+        ch->sendln("Ok.");
       else
         send_to_char("Nobody here are loyal subjects of yours!\n\r",
                      ch);
@@ -1296,7 +1296,7 @@ int do_idea(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters can't have ideas - Go away.\r\n", ch);
+    ch->sendln("Monsters can't have ideas - Go away.");
     return eFAILURE;
   }
 
@@ -1306,21 +1306,21 @@ int do_idea(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("That doesn't sound like a good idea to me.  Sorry.\r\n", ch);
+    ch->sendln("That doesn't sound like a good idea to me.  Sorry.");
     return eFAILURE;
   }
 
   if (!(fl = fopen(IDEA_LOG, "a")))
   {
     perror("do_idea");
-    send_to_char("Could not open the idea log.\r\n", ch);
+    ch->sendln("Could not open the idea log.");
     return eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
-  send_to_char("Ok.  Thanks.\r\n", ch);
+  ch->sendln("Ok.  Thanks.");
   return eSUCCESS;
 }
 
@@ -1331,7 +1331,7 @@ int do_typo(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters can't spell - leave me alone.\r\n", ch);
+    ch->sendln("Monsters can't spell - leave me alone.");
     return eFAILURE;
   }
 
@@ -1348,7 +1348,7 @@ int do_typo(Character *ch, char *argument, int cmd)
   if (!(fl = fopen(TYPO_LOG, "a")))
   {
     perror("do_typo");
-    send_to_char("Could not open the typo log.\r\n", ch);
+    ch->sendln("Could not open the typo log.");
     return eFAILURE;
   }
 
@@ -1356,7 +1356,7 @@ int do_typo(Character *ch, char *argument, int cmd)
           GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
-  send_to_char("Ok.  Thanks.\r\n", ch);
+  ch->sendln("Ok.  Thanks.");
   return eSUCCESS;
 }
 
@@ -1384,14 +1384,14 @@ int do_bug(Character *ch, char *argument, int cmd)
   if (!(fl = fopen(BUG_LOG, "a")))
   {
     perror("do_bug");
-    send_to_char("Could not open the bug log.\r\n", ch);
+    ch->sendln("Could not open the bug log.");
     return eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   return eSUCCESS;
 }
 
@@ -1415,20 +1415,20 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, ARENA))
   {
-    send_to_char("TYou can't recall while in the arena.\r\n", this);
+    this->sendln("TYou can't recall while in the arena.");
     return eFAILURE;
   }
 
   if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("You can't use magic here.\r\n", this);
+    this->sendln("You can't use magic here.");
     return eFAILURE;
   }
 
   if (DC::isSet(this->combat, COMBAT_BASH1) ||
       DC::isSet(this->combat, COMBAT_BASH2))
   {
-    send_to_char("You can't, you're bashed!\r\n", this);
+    this->sendln("You can't, you're bashed!");
     return eFAILURE;
   }
 
@@ -1478,13 +1478,13 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   if (victim->fighting && IS_PC(victim->fighting)) // PvP fight?
   {
-    send_to_char("The gods refuse to answer your prayers while you're fighting!\r\n", victim);
+    victim->sendln("The gods refuse to answer your prayers while you're fighting!");
     return eFAILURE;
   }
 
   if (victim->affected_by_spell(FUCK_PTHIEF) || victim->affected_by_spell(FUCK_GTHIEF))
   {
-    send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\r\n", victim);
+    victim->sendln("The gods frown upon your thieving ways and refuse to aid your escape.");
     return eFAILURE;
   }
 
@@ -1505,13 +1505,13 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (location < 0)
     {
-      send_to_char("Failed.\r\n", this);
+      this->sendln("Failed.");
       return eFAILURE;
     }
 
     if (DC::isSet(DC::getInstance()->world[location].room_flags, NOHOME))
     {
-      send_to_char("The gods reset your home.\r\n", victim);
+      victim->sendln("The gods reset your home.");
       location = real_room(START_ROOM);
       GET_HOME(victim) = START_ROOM;
     }
@@ -1522,7 +1522,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
-        send_to_char("The gods frown on you, and reset your home.\r\n", this);
+        this->sendln("The gods frown on you, and reset your home.");
         location = real_room(START_ROOM);
         GET_HOME(victim) = START_ROOM;
       }
@@ -1534,7 +1534,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
         if (!found)
         {
-          send_to_char("The gods frown on you, and reset your home.\r\n", this);
+          this->sendln("The gods frown on you, and reset your home.");
           location = real_room(START_ROOM);
           GET_HOME(victim) = START_ROOM;
         }
@@ -1544,18 +1544,18 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   if (location == -1)
   {
-    send_to_char("You are completely lost.\r\n", victim);
+    victim->sendln("You are completely lost.");
     return eFAILURE | eINTERNAL_ERROR;
   }
 
   if ((DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!.\r\n", victim);
+    victim->sendln("No recalling into a clan hall whilst Champion, go to the Tavern!.");
     location = real_room(START_ROOM);
   }
   if (location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    send_to_char("No recalling into a guild hall whilst Champion, go to the Tavern!.\r\n", victim);
+    victim->sendln("No recalling into a guild hall whilst Champion, go to the Tavern!.");
     location = real_room(START_ROOM);
   }
 
@@ -1583,12 +1583,12 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
   if (IS_AFFECTED(victim, AFF_CURSE))
   {
-    send_to_char("A curse affect prevents it.\r\n", this);
+    this->sendln("A curse affect prevents it.");
     return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    send_to_char("A solidity affect prevents it.\r\n", this);
+    this->sendln("A solidity affect prevents it.");
     return eFAILURE;
   }
 
@@ -1640,7 +1640,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && ch->getLevel() < IMMORTAL)
   {
-    send_to_char("This room doesn't feel...SAFE enough to do that.\r\n", ch);
+    ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return eFAILURE;
   }
 
@@ -1656,26 +1656,26 @@ int do_quit(Character *ch, char *argument, int cmd)
     {
       if (IS_AFFECTED(k->follower, AFF_CHARM))
       {
-        send_to_char("But you wouldn't want to just abandon your followers!\r\n", ch);
+        ch->sendln("But you wouldn't want to just abandon your followers!");
         return eFAILURE;
       }
     }
 
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
     {
-      send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
       return eFAILURE;
     }
 
     if (GET_POS(ch) == position_t::FIGHTING && cmd != 666)
     {
-      send_to_char("No way! You are fighting.\r\n", ch);
+      ch->sendln("No way! You are fighting.");
       return eFAILURE;
     }
 
     if (GET_POS(ch) < position_t::STUNNED)
     {
-      send_to_char("You're not DEAD yet.\r\n", ch);
+      ch->sendln("You're not DEAD yet.");
       return eFAILURE;
     }
 
@@ -1689,13 +1689,13 @@ int do_quit(Character *ch, char *argument, int cmd)
 
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
     {
-      send_to_char("Something about this room makes it seem like a bad place to quit.\r\n", ch);
+      ch->sendln("Something about this room makes it seem like a bad place to quit.");
       return eFAILURE;
     }
 
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
     {
-      send_to_char("Don't make me zap you.....\r\n", ch);
+      ch->sendln("Don't make me zap you.....");
       return eFAILURE;
     }
 
@@ -1703,7 +1703,7 @@ int do_quit(Character *ch, char *argument, int cmd)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
-        send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+        ch->sendln("This is a clan room dork.  Try joining one first.");
         return eFAILURE;
       }
 
@@ -1713,7 +1713,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
       if (!found)
       {
-        send_to_char("Chode! You can't quit in another clan's hall!\r\n", ch);
+        ch->sendln("Chode! You can't quit in another clan's hall!");
         return eFAILURE;
       }
     }
@@ -1895,13 +1895,13 @@ int do_home(Character *ch, char *argument, int cmd)
 
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
     {
-      send_to_char("Something prevents it.\r\n", ch);
+      ch->sendln("Something prevents it.");
       return eFAILURE;
     }
 
     if (ch->getLevel() < 11)
     {
-      send_to_char("You must grow a bit before you can leave the nursery.\r\n", ch);
+      ch->sendln("You must grow a bit before you can leave the nursery.");
       GET_HOME(ch) = START_ROOM;
       return eFAILURE;
     }
@@ -1910,7 +1910,7 @@ int do_home(Character *ch, char *argument, int cmd)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
-        send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+        ch->sendln("This is a clan room dork.  Try joining one first.");
         return eFAILURE;
       }
 
@@ -1920,13 +1920,13 @@ int do_home(Character *ch, char *argument, int cmd)
 
       if (!found)
       {
-        send_to_char("Chode! You can't set home in another clan's hall!\r\n", ch);
+        ch->sendln("Chode! You can't set home in another clan's hall!");
         return eFAILURE;
       }
     }
   }
 
-  send_to_char("You now consider this place to be your home.\r\n", ch);
+  ch->sendln("You now consider this place to be your home.");
   GET_HOME(ch) = DC::getInstance()->world[ch->in_room].number;
   return eSUCCESS;
 }
@@ -1951,7 +1951,7 @@ command_return_t Character::generic_command(QStringList argument, int cmd)
 
 int do_beep(Character *ch, char *argument, int cmd)
 {
-  send_to_char("Beep!\a\r\n", ch);
+  ch->sendln("Beep!\a");
   return eSUCCESS;
 }
 
@@ -2069,7 +2069,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
   if (!found)
   {
-    send_to_char("No matching bits found.\r\n", ch);
+    ch->sendln("No matching bits found.");
   }
 }
 
@@ -2103,7 +2103,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
   }
   if (!found && ch != nullptr)
   {
-    send_to_char("No matching bits found.\r\n", ch);
+    ch->sendln("No matching bits found.");
   }
 }
 
@@ -2160,7 +2160,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
   if (!found)
   {
-    send_to_char("No matching bits found.\r\n", ch);
+    ch->sendln("No matching bits found.");
   }
 }
 

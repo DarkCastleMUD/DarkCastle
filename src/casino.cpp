@@ -229,7 +229,7 @@ bool verify(struct player_data *plr)
          std::string buf;
          buf = fmt::format("{} folds as {} leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
          send_to_table(buf.c_str(), plr->table);
-         send_to_char("Your hand is folded as you leave the room.\r\n", plr->ch);
+         plr->ch->sendln("Your hand is folded as you leave the room.");
       }
       free_player(plr);
       return false;
@@ -497,7 +497,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "The dealer nudges %s.\r\n", GET_NAME(plr->ch));
       send_to_table(buf, plr->table, plr);
-      send_to_char("The dealer nudges you.\r\n", plr->ch);
+      plr->ch->sendln("The dealer nudges you.");
    }
    if ((uint64_t)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
    { // inactive
@@ -516,7 +516,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
       }
       if (tbl->cr && tbl->cr->ch == ch)
          free_player(tbl->cr);
-      send_to_char("Security helps you up from the table where you've apparently fallen asleep!\r\n", ch);
+      ch->sendln("Security helps you up from the table where you've apparently fallen asleep!");
    }
 }
 
@@ -673,7 +673,7 @@ void check_winner(struct table_data *tbl)
       if (dealer > 21 || (hand_strength(plr) > dealer && hand_strength(plr) <= 21))
       {
          char buf[MAX_STRING_LENGTH];
-         send_to_char("$BYou WIN!$R\r\n", plr->ch);
+         plr->ch->sendln("$BYou WIN!$R");
          sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
                  plr->bet * 2, plr->table->gold ? "gold" : "platinum");
          send_to_char(buf, plr->ch);
@@ -690,7 +690,7 @@ void check_winner(struct table_data *tbl)
       {
          if (verify(plr))
          {
-            send_to_char("$BYou LOSE your bet!$R\r\n", plr->ch);
+            plr->ch->sendln("$BYou LOSE your bet!$R");
             free_player(plr);
          }
       }
@@ -796,7 +796,7 @@ void check_blackjacks(struct table_data *tbl)
       {
          buf = fmt::format("{} blackjacks!\r\n", GET_NAME(plr->ch));
          send_to_table(buf.c_str(), tbl, plr);
-         send_to_char("$BYou BLACKJACK!$R\r\n", plr->ch);
+         plr->ch->sendln("$BYou BLACKJACK!$R");
          buf = fmt::format("The dealer gives you {} {} coins.\r\n", (int)(plr->bet * 2.5), plr->table->gold ? "gold" : "platinum");
 
          send_to_char(buf, plr->ch);
@@ -1238,12 +1238,12 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       if (playing(ch, obj->table))
       {
-         send_to_char("You have already made your bet.\r\n", ch);
+         ch->sendln("You have already made your bet.");
          return eSUCCESS;
       }
       if (!is_number(arg1))
       {
-         send_to_char("Bet how much?\r\nSyntax: bet <amount>\r\n", ch);
+         ch->sendln("Bet how much?\r\nSyntax: bet <amount>");
          return eSUCCESS;
       }
       int amt = atoi(arg1);
@@ -1276,12 +1276,12 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       else if (!obj->table->gold && (uint32_t)amt > GET_PLATINUM(ch))
       {
-         send_to_char("You cannot afford that.\r\n", ch);
+         ch->sendln("You cannot afford that.");
          return eSUCCESS;
       }
       if (players(obj->table) > 5)
       {
-         send_to_char("The table is currently full.\r\n", ch);
+         ch->sendln("The table is currently full.");
          return eSUCCESS;
       }
       plr = createPlayer(ch, obj->table);
@@ -1290,7 +1290,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          ch->removeGold(amt);
       else
          GET_PLATINUM(ch) -= amt;
-      send_to_char("The dealer accepts your bet.\r\n", ch);
+      ch->sendln("The dealer accepts your bet.");
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s bets %d.\r\n", GET_NAME(ch), amt);
       send_to_table(buf, obj->table, plr);
@@ -1330,7 +1330,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
    {
       if (!plr)
       {
-         send_to_char("You are not currently playing.\r\n", ch);
+         ch->sendln("You are not currently playing.");
          return eSUCCESS;
       }
       if (!canInsurance(plr))
@@ -1360,29 +1360,29 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          GET_PLATINUM(ch) -= plr->bet / 2;
       sprintf(buf, "%s makes an insurance bet.\r\n", GET_NAME(ch));
       send_to_table(buf, plr->table, plr);
-      send_to_char("You make an insurance bet.\r\n", ch);
+      ch->sendln("You make an insurance bet.");
       return eSUCCESS;
    }
    else if (cmd == 191) // doubledown
    {
       if (!plr)
       {
-         send_to_char("You are not currently playing.\r\n", ch);
+         ch->sendln("You are not currently playing.");
          return eSUCCESS;
       }
       if (plr->table->cr != plr)
       {
-         send_to_char("It is not currently your turn.\r\n", ch);
+         ch->sendln("It is not currently your turn.");
          return eSUCCESS;
       }
       if ((plr->table->gold && plr->ch->getGold() < (uint32_t)plr->bet) || (!plr->table->gold && GET_PLATINUM(plr->ch) < (uint32_t)plr->bet))
       {
-         send_to_char("You cannot afford to double your bet.\r\n", ch);
+         ch->sendln("You cannot afford to double your bet.");
          return eSUCCESS;
       }
       if (plr->hand_data[2] || plr->doubled)
       {
-         send_to_char("You cannot double right now.\r\n", ch);
+         ch->sendln("You cannot double right now.");
          return eSUCCESS;
       }
       if (plr->table->gold)
@@ -1395,7 +1395,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s doubles %s bet.\r\n", GET_NAME(ch), HSHR(ch));
       send_to_table(buf, plr->table, plr);
-      send_to_char("You double your bet.\r\n", ch);
+      ch->sendln("You double your bet.");
 
       plr->hand_data[2] = pickCard(plr->table->deck);
       sprintf(buf, "%s receives a %s%s%c%s.\r\n", GET_NAME(ch),
@@ -1429,12 +1429,12 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
    {
       if (!plr)
       {
-         send_to_char("You are not currently playing.\r\n", ch);
+         ch->sendln("You are not currently playing.");
          return eSUCCESS;
       }
       if (plr->table->cr != plr)
       {
-         send_to_char("It is not currently your turn.\r\n", ch);
+         ch->sendln("It is not currently your turn.");
          return eSUCCESS;
       }
       char buf[MAX_STRING_LENGTH];
@@ -1448,17 +1448,17 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
    {
       if (!plr)
       {
-         send_to_char("You are not currently playing.\r\n", ch);
+         ch->sendln("You are not currently playing.");
          return eSUCCESS;
       }
       if (!canSplit(plr))
       {
-         send_to_char("You cannot split right now.\r\n", ch);
+         ch->sendln("You cannot split right now.");
          return eSUCCESS;
       }
       if ((ch->getGold() < (uint32_t)plr->bet && plr->table->gold) || (GET_PLATINUM(ch) < (uint32_t)plr->bet && !plr->table->gold))
       {
-         send_to_char("You cannot afford to split.\r\n", ch);
+         ch->sendln("You cannot afford to split.");
          return eSUCCESS;
       }
       if (plr->table->gold)
@@ -1474,7 +1474,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       plr->hand_data[1] = pickCard(plr->table->deck);
       nw->hand_data[1] = pickCard(plr->table->deck);
       nw->doubled = plr->doubled;
-      send_to_char("You split your hand.\r\n", ch);
+      ch->sendln("You split your hand.");
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s splits %s hand.\r\n", GET_NAME(ch), HSHR(ch));
       send_to_table(buf, plr->table, plr);
@@ -1485,12 +1485,12 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
    {
       if (!plr)
       {
-         send_to_char("You are not currently playing.\r\n", ch);
+         ch->sendln("You are not currently playing.");
          return eSUCCESS;
       }
       if (plr->table->cr != plr)
       {
-         send_to_char("It is not currently your turn.\r\n", ch);
+         ch->sendln("It is not currently your turn.");
          return eSUCCESS;
       }
       int i;
@@ -2314,7 +2314,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          else
             GET_PLATINUM(machine->ch) += machine->lastwin;
          send_to_char(buf, machine->ch);
-         send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\r\n", machine->ch);
+         machine->ch->sendln("A tiny panel flips open on the slot machine, revealing red and black buttons.");
          machine->button = true;
          machine->prch = machine->ch;
       }
@@ -2339,7 +2339,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
    {
-      send_to_char("You cannot play the slots while you are flagged as naughty.\r\n", ch);
+      ch->sendln("You cannot play the slots while you are flagged as naughty.");
       return eSUCCESS;
    }
 
@@ -2347,7 +2347,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    if (cmd == 186 && strcmp(buf, "handle"))
    {
-      send_to_char("Try pulling the handle.\r\n", ch);
+      ch->sendln("Try pulling the handle.");
       return eSUCCESS;
    }
 
@@ -2356,7 +2356,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    if (obj->slot->busy)
    {
-      send_to_char("This machine is already in use, try another one.\r\n", ch);
+      ch->sendln("This machine is already in use, try another one.");
       return eSUCCESS;
    }
 
@@ -2368,16 +2368,16 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
          obj->slot->prch = ch;
          if (obj->slot->button)
          {
-            send_to_char("The panel closes quietly.\r\n", ch);
+            ch->sendln("The panel closes quietly.");
             obj->slot->button = false;
          }
          if (obj->slot->bet == 1)
-            send_to_char("You place only the minimum bet into the slot machine now.\r\n", ch);
+            ch->sendln("You place only the minimum bet into the slot machine now.");
          else
             ch->send(QString("You now start placing %1 times the base amount into the slot machine.\r\n").arg(obj->slot->bet));
          return eSUCCESS;
       }
-      send_to_char("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.\r\n", ch);
+      ch->sendln("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.");
       return eSUCCESS;
    }
 
@@ -2391,7 +2391,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
             {
                if ((obj->slot->gold && (ch->getGold() < obj->slot->lastwin)) || (!obj->slot->gold && (GET_PLATINUM(ch) < obj->slot->lastwin)))
                {
-                  send_to_char("You don't have enough money to try to double your last win.\r\n", ch);
+                  ch->sendln("You don't have enough money to try to double your last win.");
                }
                else if (number(0, 1))
                {
@@ -2413,26 +2413,26 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
                }
             }
             else
-               send_to_char("You must push either the red or black button.\r\n", ch);
+               ch->sendln("You must push either the red or black button.");
          }
          else
-            send_to_char("Nothing seems to happen.\r\n", ch);
+            ch->sendln("Nothing seems to happen.");
       }
       else
-         send_to_char("You can find nothing to push.\r\n", ch);
+         ch->sendln("You can find nothing to push.");
       return eSUCCESS;
    }
 
    if ((obj->slot->gold && (ch->getGold() < (obj->slot->cost * obj->slot->bet))) || (!obj->slot->gold && (GET_PLATINUM(ch) < (obj->slot->cost * obj->slot->bet))))
    {
-      send_to_char("You don't have enough money to start the machine.\r\n", ch);
+      ch->sendln("You don't have enough money to start the machine.");
       return eSUCCESS;
    }
 
    if (obj->slot->prch != ch)
       obj->slot->bet = 1;
    if (obj->slot->button)
-      send_to_char("The panel closes quietly.\r\n", ch);
+      ch->sendln("The panel closes quietly.");
    obj->slot->button = false;
 
    if (obj->slot->gold)
@@ -2545,7 +2545,7 @@ void send_wheel_bets(Character *ch, struct wheel_data *wheel)
    }
    if (!found)
       send_to_char("You have not placed any bets", ch); // how the hell?
-   send_to_char(".\r\n", ch);
+   ch->sendln(".");
 }
 
 uint32_t check_roulette_wins(struct roulette_player *plr, int num)
@@ -2778,13 +2778,13 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
        affected_by_spell(ch, FUCK_PTHIEF) ||
        affected_by_spell(ch, FUCK_GTHIEF))
    {
-      send_to_char("You cannot play roulette while you are flagged as naughty.\r\n", ch);
+      ch->sendln("You cannot play roulette while you are flagged as naughty.");
       return eSUCCESS;
    }
 
    if (obj->wheel->spinning)
    {
-      send_to_char("No bets may be placed while the wheel is spinning.\r\n", ch);
+      ch->sendln("No bets may be placed while the wheel is spinning.");
       return eSUCCESS;
    }
 
@@ -2803,7 +2803,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       {
          if (i == 6)
          {
-            send_to_char("You cannot muscle your way to the table.\r\n", ch);
+            ch->sendln("You cannot muscle your way to the table.");
             return eSUCCESS;
          }
          if (obj->wheel->plr[i]->ch && charExists(obj->wheel->plr[i]->ch) && obj->wheel->plr[i]->ch->in_room != obj->in_room)
@@ -2827,19 +2827,19 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       }
       if (!is_number(arg2) || atoi(arg2) < 100)
       {
-         send_to_char("You must bet an amount greater than 100 coins.\r\n", ch);
+         ch->sendln("You must bet an amount greater than 100 coins.");
          return eSUCCESS;
       }
       else
          bet = atoi(arg2);
       if (bet > 20000000)
       {
-         send_to_char("The maximum bet is 20 million coins.\r\n", ch);
+         ch->sendln("The maximum bet is 20 million coins.");
          bet = 20000000;
       }
       if (ch->getGold() < bet)
       {
-         send_to_char("You do not have enough money to place that bet.\r\n", ch);
+         ch->sendln("You do not have enough money to place that bet.");
          return eSUCCESS;
       }
       else
@@ -2852,7 +2852,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -2877,7 +2877,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -2902,7 +2902,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -2927,7 +2927,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -2952,7 +2952,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -2977,7 +2977,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3002,7 +3002,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3027,7 +3027,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3052,7 +3052,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3077,7 +3077,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3102,7 +3102,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {
@@ -3128,7 +3128,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
             {
                ch->addGold(bet);
                bet = 0;
-               send_to_char("That bet would put you over the 20 million coin limit.\r\n", ch);
+               ch->sendln("That bet would put you over the 20 million coin limit.");
             }
             else
             {

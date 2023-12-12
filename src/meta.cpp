@@ -741,10 +741,10 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	{ /* List */
 		send_to_char("$B$2The Meta-physician tells you, 'This is what I can do for you...'$R \n\r", ch);
 
-		send_to_char("$BAttribute Meta:$R\r\n", ch);
+		ch->sendln("$BAttribute Meta:$R");
 		meta_list_stats(ch);
 
-		send_to_char("$BStatistic Meta:$R\r\n", ch);
+		ch->sendln("$BStatistic Meta:$R");
 		if (hit_exp && hit_cost)
 			csendf(ch, "$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld"
 					   " Platinum coins.\r\n",
@@ -787,7 +787,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		else
 			csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
 
-		send_to_char("$BUse 'estimate' command to get costs for higher intervals.\r\n", ch);
+		ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
 
 		if (!IS_MOB(ch) && ki_cost && ki_exp)
 		{ // mobs can't meta ki
@@ -796,7 +796,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		else if (!IS_MOB(ch))
 			csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
 
-		send_to_char("$BMonetary Exchange:$R\r\n", ch);
+		ch->sendln("$BMonetary Exchange:$R");
 		send_to_char(
 			"$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\r\n"
 			"$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\r\n"
@@ -811,7 +811,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		if (!IS_MOB(ch))
 		{
 			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
-			send_to_char("$B$322)$R Add 2,000,000 experience for 1 qpoint.\r\n", ch);
+			ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
 		}
 
 		return eSUCCESS;
@@ -1075,7 +1075,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (IS_MOB(ch))
 			{
-				send_to_char("Mobs cannot meta ki.\r\n", ch);
+				ch->sendln("Mobs cannot meta ki.");
 				return eSUCCESS;
 			}
 			if (GET_EXP(ch) < ki_exp)
@@ -1105,7 +1105,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (affected_by_spell(ch, FUCK_GTHIEF))
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R");
 				return eSUCCESS;
 			}
 			if (ch->getGold() < 20000)
@@ -1115,14 +1115,14 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			ch->removeGold(20000);
 			GET_PLATINUM(ch) += 1;
-			send_to_char("Ok.\r\n", ch);
+			ch->sendln("Ok.");
 			return eSUCCESS;
 		}
 		if (choice == 14)
 		{
 			if (affected_by_spell(ch, FUCK_GTHIEF))
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R");
 				return eSUCCESS;
 			}
 			if (ch->getGold() < 100000)
@@ -1133,14 +1133,14 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			ch->removeGold(100000);
 			GET_PLATINUM(ch) += 5;
-			send_to_char("Ok.\r\n", ch);
+			ch->sendln("Ok.");
 			return eSUCCESS;
 		}
 		if (choice == 15)
 		{
 			if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 			{
-				send_to_char("Your criminal acts prohibit it.\r\n", ch);
+				ch->sendln("Your criminal acts prohibit it.");
 				return eSUCCESS;
 			}
 
@@ -1151,7 +1151,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) += 250;
 			ch->removeGold(5000000);
-			send_to_char("Ok.\r\n", ch);
+			ch->sendln("Ok.");
 			return eSUCCESS;
 		}
 		if (choice == 16)
@@ -1163,7 +1163,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) -= 5;
 			ch->addGold(100000);
-			send_to_char("Ok.\r\n", ch);
+			ch->sendln("Ok.");
 			return eSUCCESS;
 		}
 
@@ -1176,7 +1176,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) -= 250;
 			ch->addGold(5000000);
-			send_to_char("Ok.\r\n", ch);
+			ch->sendln("Ok.");
 			return eSUCCESS;
 		}
 		if (choice == 18)
@@ -1188,7 +1188,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("What would you have to spend $B$5gold$R on chode?\r\n", ch);
+				ch->sendln("What would you have to spend $B$5gold$R on chode?");
 				return eSUCCESS;
 			}
 
@@ -1203,41 +1203,41 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_PLATINUM(ch) < 25)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!'$R");
 				return eSUCCESS;
 			}
 			class Object *obj = clone_object(real_object(10003));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
-				send_to_char("You can't carry that many items.\r\n", ch);
+				ch->sendln("You can't carry that many items.");
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 
 			if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
 			{
-				send_to_char("You can't carry that much weight.\r\n", ch);
+				ch->sendln("You can't carry that much weight.");
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 25;
 			obj_to_char(obj, ch);
-			send_to_char("$B$2The Meta-physician tells you, 'Here is your potion.'$R\r\n", ch);
+			ch->sendln("$B$2The Meta-physician tells you, 'Here is your potion.'$R");
 			return eSUCCESS;
 		}
 		if (choice == 20)
 		{
 			if (GET_PLATINUM(ch) < 25)
 			{
-				send_to_char("Costs 25 plats...which you don't have.\r\n", ch);
+				ch->sendln("Costs 25 plats...which you don't have.");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("You can't buy practices chode...\r\n", ch);
+				ch->sendln("You can't buy practices chode...");
 				return eSUCCESS;
 			}
-			send_to_char("The Meta-Physician gives you a practice session.\r\n", ch);
+			ch->sendln("The Meta-Physician gives you a practice session.");
 
 			GET_PLATINUM(ch) -= 25;
 			ch->player->practices += 1;
@@ -1247,17 +1247,17 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{ // -2 AC
 			if (GET_QPOINTS(ch) < 10)
 			{
-				send_to_char("Costs 10 qpoints...which you don't have.\r\n", ch);
+				ch->sendln("Costs 10 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("You can't buy AC, chode...\r\n", ch);
+				ch->sendln("You can't buy AC, chode...");
 				return eSUCCESS;
 			}
 			if (GET_AC_METAS(ch) >= 50)
 			{
-				send_to_char("You've reached the -50 AC limit that can be purchased per character.\r\n", ch);
+				ch->sendln("You've reached the -50 AC limit that can be purchased per character.");
 				return eSUCCESS;
 			}
 
@@ -1275,12 +1275,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{ // 2,000,000 experience
 			if (GET_QPOINTS(ch) < 1)
 			{
-				send_to_char("Costs 1 qpoint...which you don't have.\r\n", ch);
+				ch->sendln("Costs 1 qpoint...which you don't have.");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("You can't buy experience, chode...\r\n", ch);
+				ch->sendln("You can't buy experience, chode...");
 				return eSUCCESS;
 			}
 
@@ -1595,17 +1595,17 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 
 		send_to_char("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n\r\n",
 					 ch);
-		send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n", ch);
+		ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
 
 		for (int i = 1; i <= MAX_PC_RACE; i++)
 			csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, races[i].singular_name, race_message(ch, i));
 
-		send_to_char("$BOther Services:$R\r\n", ch);
+		ch->sendln("$BOther Services:$R");
 
 		csendf(ch, "$B$3%d)$R %-32s - 1000 platinum coins.\r\n", MAX_PC_RACE + 1, "Sex Change");
 		csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE + 2, "A deep red vial of mana");
 
-		send_to_char("$BHeight/Weight Change:$R\r\n", ch);
+		ch->sendln("$BHeight/Weight Change:$R");
 		heightweight(ch, false);
 		if (ch->height < races[ch->race].max_height)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 3, "Increase your height by 1");
@@ -1642,22 +1642,22 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 		{
 			if (would_die(ch))
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R");
 				return eSUCCESS;
 			}
 			if (GET_RACE(ch) == choice)
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R");
 				return eSUCCESS;
 			}
 			if (!is_race_applicable(ch, choice))
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (unsigned)changecost(GET_RACE(ch), choice))
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
 				return eSUCCESS;
 			}
 
@@ -1703,13 +1703,13 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				extern int recheck_height_wears(Character * ch);
 				recheck_height_wears(ch);
 
-				send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n", ch);
-				send_to_char("After a brief moment of pain you are reborn!\r\n", ch);
+				ch->sendln("The Cardinal prays loudly and summons the magic of the gods...");
+				ch->sendln("After a brief moment of pain you are reborn!");
 			}
 			else
 			{
 				ch->send(QString("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make this change!\r\n").arg(choice));
-				send_to_char("$4NOTE$R$B: Your attributes will be adjusted to fit this new race and then lowered by 2 points each.$R\r\n", ch);
+				ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit this new race and then lowered by 2 points each.$R");
 			}
 			return eSUCCESS;
 		}
@@ -1729,44 +1729,44 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			}
 			if (GET_SEX(ch) == newsex)
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < 1000)
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 1000;
 			GET_SEX(ch) = newsex;
-			send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n", ch);
-			send_to_char("After a brief moment of pain you are reborn!\r\n", ch);
+			ch->sendln("The Cardinal prays loudly and summons the magic of the gods...");
+			ch->sendln("After a brief moment of pain you are reborn!");
 			return eSUCCESS;
 		}
 		else if (choice == MAX_PC_RACE + 2)
 		{
 			if (GET_PLATINUM(ch) < 50)
 			{
-				send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n", ch);
+				ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
 				return eSUCCESS;
 			}
 			class Object *obj = clone_object(real_object(10004));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
-				send_to_char("You can't carry that many items.\r\n", ch);
+				ch->sendln("You can't carry that many items.");
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 
 			if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
 			{
-				send_to_char("You can't carry that much weight.\r\n", ch);
+				ch->sendln("You can't carry that much weight.");
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 50;
 			obj_to_char(obj, ch);
-			send_to_char("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R\r\n", ch);
+			ch->sendln("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R");
 			return eSUCCESS;
 		}
 		else if (choice >= MAX_PC_RACE + 3 && choice <= MAX_PC_RACE + 6)
@@ -1776,25 +1776,25 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			heightweight(ch, false);
 			if (choice == 3 && ch->height >= races[ch->race].max_height)
 			{
-				send_to_char("You cannot increase your height any more.\r\n", ch);
+				ch->sendln("You cannot increase your height any more.");
 				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 4 && ch->height <= races[ch->race].min_height)
 			{
-				send_to_char("You cannot decrease your height any more.\r\n", ch);
+				ch->sendln("You cannot decrease your height any more.");
 				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 5 && ch->weight >= races[ch->race].max_weight)
 			{
-				send_to_char("You cannot increase your weight any more.\r\n", ch);
+				ch->sendln("You cannot increase your weight any more.");
 				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 6 && ch->weight <= races[ch->race].min_weight)
 			{
-				send_to_char("You cannot decrease your weight any more.\r\n", ch);
+				ch->sendln("You cannot decrease your weight any more.");
 				heightweight(ch, true);
 				return eSUCCESS;
 			}
@@ -1802,11 +1802,11 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 
 			if (GET_PLATINUM(ch) < 250)
 			{
-				send_to_char("You cannot afford it.\r\n", ch);
+				ch->sendln("You cannot afford it.");
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 250;
-			send_to_char("Cardinal Thelonius gropes you.\r\n", ch);
+			ch->sendln("Cardinal Thelonius gropes you.");
 			if (choice == 3)
 			{
 				ch->height++;
@@ -1833,17 +1833,17 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 		{
 			if (GET_QPOINTS(ch) < 5)
 			{
-				send_to_char("Costs 5 qpoints...which you don't have.\r\n", ch);
+				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("You can't buy age, chode...\r\n", ch);
+				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;
 			}
 			if (GET_AGE(ch) >= 500)
 			{
-				send_to_char("You've reached the 500 age limit that can be purchased per character.\r\n", ch);
+				ch->sendln("You've reached the 500 age limit that can be purchased per character.");
 				return eSUCCESS;
 			}
 
@@ -1860,17 +1860,17 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 		{
 			if (GET_QPOINTS(ch) < 5)
 			{
-				send_to_char("Costs 5 qpoints...which you don't have.\r\n", ch);
+				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("You can't buy age, chode...\r\n", ch);
+				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;
 			}
 			if (GET_AGE(ch) <= 18)
 			{
-				send_to_char("You've reached the age 18 minimum limit that can be purchased per character.\r\n", ch);
+				ch->sendln("You've reached the age 18 minimum limit that can be purchased per character.");
 				return eSUCCESS;
 			}
 

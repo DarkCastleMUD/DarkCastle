@@ -207,11 +207,11 @@ int do_areastats(Character *ch, char *argument, int cmd)
 	argument = one_argument(argument, buf);
 	if (!*buf)
 	{
-		send_to_char("$BUsage:$R \r\n", ch);
-		send_to_char("$Bareastats$R \r\n", ch);
-		send_to_char("$Bareastats area #$R\r\n", ch);
-		send_to_char("$Bareastats topxps$R\r\n", ch);
-		send_to_char("$Bareastats topgold$R\r\n", ch);
+		ch->sendln("$BUsage:$R ");
+		ch->sendln("$Bareastats$R ");
+		ch->sendln("$Bareastats area #$R");
+		ch->sendln("$Bareastats topxps$R");
+		ch->sendln("$Bareastats topgold$R");
 		return eSUCCESS;
 	}
 	if (!strcmp(buf, "area"))
@@ -219,7 +219,7 @@ int do_areastats(Character *ch, char *argument, int cmd)
 		argument = one_argument(argument, buf);
 		if (!*buf)
 		{
-			send_to_char("You need to specify a zone number.\r\n", ch);
+			ch->sendln("You need to specify a zone number.");
 			return eSUCCESS;
 		}
 		areaData.DisplaySingleArea(ch, atoi(buf));

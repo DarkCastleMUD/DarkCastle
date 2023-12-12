@@ -52,7 +52,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
 
   if (hands > 1)
   {
-    send_to_char("You need a free hand to eagleclaw someone.\r\n", ch);
+    ch->sendln("You need a free hand to eagleclaw someone.");
     return eFAILURE;
   }
 
@@ -64,14 +64,14 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
       victim = ch->fighting;
     else
     {
-      send_to_char("You raise your hand in a claw and make strange bird noises.\r\n", ch);
+      ch->sendln("You raise your hand in a claw and make strange bird noises.");
       return eFAILURE;
     }
   }
 
   if (victim == ch)
   {
-    send_to_char("You lower your claw-shaped hand and scratch yourself gently.\r\n", ch);
+    ch->sendln("You lower your claw-shaped hand and scratch yourself gently.");
     return eFAILURE;
   }
 
@@ -168,7 +168,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Masturbate on your own time.\r\n", ch);
+    ch->sendln("Masturbate on your own time.");
     return eFAILURE;
   }
 
@@ -180,13 +180,13 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
   {
-    send_to_char("You find yourself unable to focus your energy here.\r\n", ch);
+    ch->sendln("You find yourself unable to focus your energy here.");
     return eFAILURE;
   }
 
   if (GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL)
   {
-    send_to_char("You don't possess enough ki!\r\n", ch);
+    ch->sendln("You don't possess enough ki!");
     return eFAILURE;
   }
 
@@ -236,7 +236,7 @@ int do_stun(Character *ch, char *argument, int cmd)
   }
   if (ch->getHP() < 25)
   {
-    send_to_char("You can't muster the energy for such an attack.\r\n", ch);
+    ch->sendln("You can't muster the energy for such an attack.");
     return eFAILURE;
   }
   one_argument(argument, name);
@@ -254,7 +254,7 @@ int do_stun(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    ch->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -383,7 +383,7 @@ int do_stun(Character *ch, char *argument, int cmd)
 
     if (ch->has_skill(SKILL_STUN) > 35 && !number(0, 7))
     {
-      send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
+      ch->sendln("Your advanced knowledge of stun helps you to recover faster.");
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     }
     else
@@ -421,7 +421,7 @@ int do_stun(Character *ch, char *argument, int cmd)
 
       if (number(0, 1))
       {
-        send_to_char("The hit knocks the sense back into you!\r\n", victim);
+        victim->sendln("The hit knocks the sense back into you!");
         act_return ar = act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
         retval = ar.retval;
         if (DC::isSet(retval, eVICT_DIED) || DC::isSet(retval, eCH_DIED))

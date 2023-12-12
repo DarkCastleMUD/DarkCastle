@@ -194,7 +194,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
         if (command_skill == 0 || IS_NPC(this) || !this->has_skill(command_skill))
         {
-          send_to_char("Huh?\r\n", this);
+          this->sendln("Huh?");
 
           if (command_skill == 0)
           {
@@ -210,7 +210,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
           found->getNumber() != CMD_CTELL    // ctell
       )
       {
-        send_to_char("You've been paralyzed and are unable to move.\r\n", this);
+        this->sendln("You've been paralyzed and are unable to move.");
         return eSUCCESS;
       }
       // Character not in position for command?
@@ -223,22 +223,22 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         switch (GET_POS(this))
         {
         case position_t::DEAD:
-          send_to_char("Lie still; you are DEAD.\r\n", this);
+          this->sendln("Lie still; you are DEAD.");
           break;
         case position_t::STUNNED:
-          send_to_char("You are too stunned to do that.\r\n", this);
+          this->sendln("You are too stunned to do that.");
           break;
         case position_t::SLEEPING:
-          send_to_char("In your dreams, or what?\r\n", this);
+          this->sendln("In your dreams, or what?");
           break;
         case position_t::RESTING:
-          send_to_char("Nah... You feel too relaxed...\r\n", this);
+          this->sendln("Nah... You feel too relaxed...");
           break;
         case position_t::SITTING:
-          send_to_char("Maybe you should stand up first?\r\n", this);
+          this->sendln("Maybe you should stand up first?");
           break;
         case position_t::FIGHTING:
-          send_to_char("No way!  You are still fighting!\r\n", this);
+          this->sendln("No way!  You are still fighting!");
           break;
         }
         return eSUCCESS;
@@ -255,7 +255,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       if (IS_NPC(this) && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
       {
-        send_to_char("The spirit cannot perform that action.\r\n", this);
+        this->sendln("The spirit cannot perform that action.");
         return eFAILURE;
       }
       /*
@@ -281,7 +281,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       */
       if (!can_use_command(found->getNumber()))
       {
-        send_to_char("You are still recovering from your last attempt.\r\n", this);
+        this->sendln("You are still recovering from your last attempt.");
         return eSUCCESS;
       }
 
@@ -405,7 +405,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // If we're at this point, Paralyze stops everything so get out.
   if (IS_AFFECTED(this, AFF_PARALYSIS))
   {
-    send_to_char("You've been paralyzed and are unable to move.\r\n", this);
+    this->sendln("You've been paralyzed and are unable to move.");
     return eSUCCESS;
   }
   // Check social table
@@ -418,7 +418,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   }
 
   // Unknown command (or char too low level)
-  send_to_char("Huh?\r\n", this);
+  this->sendln("Huh?");
   return eSUCCESS;
 }
 

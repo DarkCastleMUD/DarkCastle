@@ -418,7 +418,7 @@ int do_write_skillquest(Character *ch, char *argument, int cmd)
 	if (!(fl = fopen(SKILL_QUEST_FILE, "w")))
 	{
 		if (ch)
-			send_to_char("Can't open the skill quest file.\r\n", ch);
+			ch->sendln("Can't open the skill quest file.");
 		return eFAILURE;
 	}
 	for (curr = skill_list; curr; curr = curr->next)
@@ -428,7 +428,7 @@ int do_write_skillquest(Character *ch, char *argument, int cmd)
 	}
 	fprintf(fl, "0\n");
 	fclose(fl);
-	send_to_char("Skill quests saved.\r\n", ch);
+	ch->sendln("Skill quests saved.");
 	return eSUCCESS;
 }
 
@@ -658,7 +658,7 @@ void DC::boot_db(void)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
- send_to_char("Motd and Imotd both reloaded.\r\n", ch);
+ ch->sendln("Motd and Imotd both reloaded.");
  return eSUCCESS;
  }
  */

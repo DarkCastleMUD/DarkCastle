@@ -117,7 +117,7 @@ command_return_t do_say(Character *ch, std::string argument, int cmd)
 
   if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_STUPID))
   {
-    send_to_char("You try to speak but just look like an idiot!\r\n", ch);
+    ch->sendln("You try to speak but just look like an idiot!");
     return eSUCCESS;
   }
 
@@ -188,13 +188,13 @@ command_return_t do_psay(Character *ch, std::string argument, int cmd)
 
   if (IS_PC(ch) && DC::isSet(ch->player->punish, PUNISH_STUPID))
   {
-    send_to_char("You try to speak but just look like an idiot!\r\n", ch);
+    ch->sendln("You try to speak but just look like an idiot!");
     return eSUCCESS;
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -210,7 +210,7 @@ command_return_t do_psay(Character *ch, std::string argument, int cmd)
 
   if (vict.empty() || message.empty())
   {
-    send_to_char("Say what to whom?  psay <target> <message>\r\n", ch);
+    ch->sendln("Say what to whom?  psay <target> <message>");
     return eSUCCESS;
   }
 
@@ -264,7 +264,7 @@ int do_pray(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("You must have something to tell the immortals...\r\n", ch);
+    ch->sendln("You must have something to tell the immortals...");
     return eSUCCESS;
   }
 
@@ -282,7 +282,7 @@ int do_pray(Character *ch, char *arg, int cmd)
 
   if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOPRAY))
   {
-    send_to_char("The gods are deaf to your prayers.\r\n", ch);
+    ch->sendln("The gods are deaf to your prayers.");
     return eSUCCESS;
   }
 
@@ -299,7 +299,7 @@ int do_pray(Character *ch, char *arg, int cmd)
     if (!i->connected)
       send_to_char(buf1, i->character);
   }
-  send_to_char("\a\aOk.\r\n", ch);
+  ch->sendln("\a\aOk.");
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
@@ -313,7 +313,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -332,7 +332,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (GET_POS(ch) == position_t::SLEEPING)
   {
-    send_to_char("You're asleep.  Dream or something....\r\n", ch);
+    ch->sendln("You're asleep.  Dream or something....");
     return eSUCCESS;
   }
 
@@ -352,7 +352,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     }
     if (ch->getLevel() < 3)
     {
-      send_to_char("You must be at least 3rd level to gossip.\r\n", ch);
+      ch->sendln("You must be at least 3rd level to gossip.");
       return eSUCCESS;
     }
   }
@@ -449,7 +449,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
     }
     if (level_ < 3)
     {
-      send_to_char("You must be at least 3rd level to auction.\r\n", this);
+      this->sendln("You must be at least 3rd level to auction.");
       return eSUCCESS;
     }
   }
@@ -591,7 +591,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -717,7 +717,7 @@ int do_dream(Character *ch, char *argument, int cmd)
 
   if (ch->getLevel() < 3)
   {
-    send_to_char("You must be at least 3rd level to dream.\r\n", ch);
+    ch->sendln("You must be at least 3rd level to dream.");
     return eSUCCESS;
   }
 
@@ -829,11 +829,11 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   {
     if (this->player->tell_history.isEmpty())
     {
-      send_to_char("You have not sent or recieved any tell messages.\r\n", this);
+      this->sendln("You have not sent or recieved any tell messages.");
       return eSUCCESS;
     }
 
-    send_to_char("Here are the last 10 tell messages:\r\n", this);
+    this->sendln("Here are the last 10 tell messages:");
     for (const auto &c : player->tell_history)
     {
       sendln(c.message);
@@ -856,8 +856,8 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     vict = get_pc_vis(this, name);
     if ((vict != nullptr) && vict->getLevel() >= IMMORTAL)
     {
-      send_to_char("That person is busy right now.\r\n", this);
-      send_to_char("Your message has been saved.\r\n", this);
+      this->sendln("That person is busy right now.");
+      this->sendln("Your message has been saved.");
 
       buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(this, vict), message.toStdString()).c_str();
       record_msg(buf, vict);
@@ -870,7 +870,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     }
     else
     {
-      send_to_char("No-one by that name here.\r\n", this);
+      this->sendln("No-one by that name here.");
     }
 
     return eSUCCESS;
@@ -881,16 +881,16 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
 
   if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
-    send_to_char("The person is ignoring all tells right now.\r\n", this);
+    this->sendln("The person is ignoring all tells right now.");
     return eSUCCESS;
   }
   else if (IS_PC(vict) && !DC::isSet(vict->misc, LogChannels::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-    send_to_char("That player has tell channeled off btw...\r\n", this);
+    this->sendln("That player has tell channeled off btw...");
   }
   if (this == vict)
-    send_to_char("You try to tell yourself something.\r\n", this);
+    this->sendln("You try to tell yourself something.");
   else if ((GET_POS(vict) == position_t::SLEEPING || DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
     act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
@@ -964,7 +964,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
              level_ >= SERAPH)
     {
-      send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
+      vict->sendln("A heavenly power intrudes on your subconcious dreaming...");
       if (IS_MOB(vict))
       {
         buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
@@ -988,7 +988,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
       this->tell_history(this, ar.str);
 
-      send_to_char("They were sleeping btw...\r\n", this);
+      this->sendln("They were sleeping btw...");
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && DC::isSet(vict->player->punish, PUNISH_LOG))
       {
@@ -1011,7 +1011,7 @@ command_return_t do_reply(Character *ch, std::string argument, int cmd)
 
   if (IS_MOB(ch) || ch->player->last_tell.isEmpty())
   {
-    send_to_char("You have noone to reply to.\r\n", ch);
+    ch->sendln("You have noone to reply to.");
     return eSUCCESS;
   }
 
@@ -1064,7 +1064,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
   if (!*name || !*message)
     send_to_char("Who do you want to whisper to.. and what??\n\r", ch);
   else if (!(vict = ch->get_char_room_vis(name)))
-    send_to_char("No-one by that name here..\r\n", ch);
+    ch->sendln("No-one by that name here..");
   else if (vict == ch)
   {
     act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
@@ -1111,11 +1111,11 @@ int do_ask(Character *ch, char *argument, int cmd)
   if (!*name || !*message)
     send_to_char("Who do you want to ask something, and what??\n\r", ch);
   else if (!(vict = ch->get_char_room_vis(name)))
-    send_to_char("No-one by that name here.\r\n", ch);
+    ch->sendln("No-one by that name here.");
   else if (vict == ch)
   {
     act("$n quietly asks $mself a question.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("You think about it for a while...\r\n", ch);
+    ch->sendln("You think about it for a while...");
   }
   else if (is_ignoring(vict, ch))
   {
@@ -1153,11 +1153,11 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   {
     if (ch->player->gtell_history.isEmpty())
     {
-      send_to_char("No one has said anything.\r\n", ch);
+      ch->sendln("No one has said anything.");
       return eFAILURE;
     }
 
-    send_to_char("Here are the last 10 group tells:\r\n", ch);
+    ch->sendln("Here are the last 10 group tells:");
     for (const auto &c : ch->player->gtell_history)
     {
       ch->sendln(c.message);

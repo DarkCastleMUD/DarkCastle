@@ -51,11 +51,11 @@ command_return_t Character::check_social(QString pcomm)
   switch (GET_POS(this))
   {
   case position_t::DEAD:
-    send_to_char("Lie still; you are DEAD.\r\n", this);
+    this->sendln("Lie still; you are DEAD.");
     return SOCIAL_true;
 
   case position_t::STUNNED:
-    send_to_char("You are too stunned to do that.\r\n", this);
+    this->sendln("You are too stunned to do that.");
     return SOCIAL_true;
 
   case position_t::SLEEPING:
@@ -65,7 +65,7 @@ command_return_t Character::check_social(QString pcomm)
 
   if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", this);
+    this->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return SOCIAL_true;
   }
 

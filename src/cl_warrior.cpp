@@ -46,7 +46,7 @@ int do_kick(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_KICK))
   {
-    send_to_char("You will have to study from a master before you can use this.\r\n", ch);
+    ch->sendln("You will have to study from a master before you can use this.");
     return eFAILURE;
   }
 
@@ -60,14 +60,14 @@ int do_kick(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("Your foot comes up, but there's nobody there...\r\n", ch);
+      ch->sendln("Your foot comes up, but there's nobody there...");
       return eFAILURE;
     }
   }
 
   if (victim == ch)
   {
-    send_to_char("You kick yourself, metaphorically speaking.\r\n", ch);
+    ch->sendln("You kick yourself, metaphorically speaking.");
     return eFAILURE;
   }
 
@@ -167,7 +167,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_DEATHSTROKE))
   {
-    send_to_char("You have no idea how to deathstroke.\r\n", ch);
+    ch->sendln("You have no idea how to deathstroke.");
     return eFAILURE;
   }
 
@@ -188,19 +188,19 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("The world would be a better place...\r\n", ch);
+    ch->sendln("The world would be a better place...");
     return eFAILURE;
   }
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("You must be wielding a weapon to deathstrike someone.\r\n", ch);
+    ch->sendln("You must be wielding a weapon to deathstrike someone.");
     return eFAILURE;
   }
 
   if (GET_POS(victim) > position_t::SITTING)
   {
-    send_to_char("Your opponent isn't in a vulnerable enough position!\r\n", ch);
+    ch->sendln("Your opponent isn't in a vulnerable enough position!");
     return eFAILURE;
   }
 
@@ -243,7 +243,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, 0, attacktype, SKILL_DEATHSTROKE, 0);
     if (number(1, 100) > failchance)
     {
-      send_to_char("You manage to retain your balance!\r\n", ch);
+      ch->sendln("You manage to retain your balance!");
       return eFAILURE;
     }
     dam /= 4;
@@ -288,16 +288,16 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_RETREAT))
   {
-    send_to_char("You dunno how...better flee instead.\r\n", ch);
+    ch->sendln("You dunno how...better flee instead.");
     return eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
     if (affected_by_spell(ch, SPELL_IRON_ROOTS))
-      send_to_char("The roots bracing your legs make it impossible to run!\r\n", ch);
+      ch->sendln("The roots bracing your legs make it impossible to run!");
     else
-      send_to_char("Your legs are too tired for running away!\r\n", ch);
+      ch->sendln("Your legs are too tired for running away!");
     return eFAILURE;
   }
 
@@ -315,7 +315,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
   if (!CAN_GO(ch, attempt))
   {
-    send_to_char("You cannot retreat in that direction.\r\n", ch);
+    ch->sendln("You cannot retreat in that direction.");
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_SNEAK))
@@ -342,7 +342,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
   {
     act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM,
         INVIS_NULL);
-    send_to_char("You try to beat a hasty retreat....\r\n", ch);
+    ch->sendln("You try to beat a hasty retreat....");
 
     // check for any spec procs
     retval = ch->special("", attempt + 1);
@@ -380,13 +380,13 @@ int do_hitall(Character *ch, char *argument, int cmd)
 {
   if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
-    send_to_char("You better learn how to first...\r\n", ch);
+    ch->sendln("You better learn how to first...");
     return eFAILURE;
   }
 
   if (ch->getHP() == 1)
   {
-    send_to_char("You are too weak to do this right now.\r\n", ch);
+    ch->sendln("You are too weak to do this right now.");
     return eFAILURE;
   }
 
@@ -458,7 +458,7 @@ int do_bash(Character *ch, char *argument, int cmd)
   //    if (IS_PC(ch))
   if (!ch->equipment[WIELD])
   {
-    send_to_char("You need to wield a weapon, to make it a success.\r\n", ch);
+    ch->sendln("You need to wield a weapon, to make it a success.");
     return eFAILURE;
   }
 
@@ -499,7 +499,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    ch->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -642,7 +642,7 @@ int do_redirect(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    ch->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -700,13 +700,13 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_DISARM))
   {
-    send_to_char("You dunno how.\r\n", ch);
+    ch->sendln("You dunno how.");
     return eFAILURE;
   }
 
   if (ch->equipment[WIELD] == nullptr)
   {
-    send_to_char("You must wield a weapon to disarm.\r\n", ch);
+    ch->sendln("You must wield a weapon to disarm.");
     return eFAILURE;
   }
 
@@ -745,7 +745,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
   {
     if (victim->getLevel() >= IMMORTAL)
     {
-      send_to_char("You can't seem to work it loose.\r\n", ch);
+      ch->sendln("You can't seem to work it loose.");
       return eFAILURE;
     }
     if (obj_index[ch->equipment[WIELD]->item_number].virt == 27997)
@@ -754,7 +754,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-    send_to_char("You disarm yourself!  Congratulations!  Try using 'remove' next-time.\r\n", ch);
+    ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
     obj = unequip_char(ch, WIELD);
     obj_to_char(obj, ch);
     if (ch->equipment[SECOND_WIELD])
@@ -785,7 +785,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
          (victim->getLevel() >= IMMORTAL)) &&
         (IS_PC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
          mob_index[victim->mobdata->nr].virt < 2300))
-      send_to_char("You can't seem to work it loose.\r\n", ch);
+      ch->sendln("You can't seem to work it loose.");
     else
       disarm(ch, victim);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
@@ -910,19 +910,19 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_BLADESHIELD))
   {
-    send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
+    ch->sendln("You'd cut yourself to ribbons just trying!");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_BLADESHIELD) && ch->getLevel() < IMMORTAL)
   {
-    send_to_char("Your body is still recovering from your last use of the blade shield technique.\r\n", ch);
+    ch->sendln("Your body is still recovering from your last use of the blade shield technique.");
     return eFAILURE;
   }
 
   if (!(ch->fighting))
   {
-    send_to_char("But you aren't fighting anyone!\r\n", ch);
+    ch->sendln("But you aren't fighting anyone!");
     return eFAILURE;
   }
 
@@ -932,7 +932,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, nullptr, SKILL_BLADESHIELD))
   {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
-    send_to_char("You try to begin the bladeshield technique and almost chop off your own arm!\r\n", ch);
+    ch->sendln("You try to begin the bladeshield technique and almost chop off your own arm!");
     duration /= 2;
   }
   else
@@ -1076,7 +1076,7 @@ int do_guard(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
-    send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
+    ch->sendln("You have no idea how to be a full time bodyguard.");
     return eFAILURE;
   }
   if (IS_NPC(ch))
@@ -1092,14 +1092,14 @@ int do_guard(Character *ch, char *argument, int cmd)
 
   if (ch == victim)
   {
-    send_to_char("You stop guarding anyone.\r\n", ch);
+    ch->sendln("You stop guarding anyone.");
     stop_guarding(ch);
     return eSUCCESS;
   }
 
   if (victim == ch->guarding)
   {
-    send_to_char("You are already guarding that person.\r\n", ch);
+    ch->sendln("You are already guarding that person.");
     return eFAILURE;
   }
 
@@ -1109,7 +1109,7 @@ int do_guard(Character *ch, char *argument, int cmd)
   if (ch->guarding)
   {
     stop_guarding(ch);
-    send_to_char("You stop guarding anyone.\r\n", ch);
+    ch->sendln("You stop guarding anyone.");
     //      return eFAILURE;
   }
 
@@ -1125,18 +1125,18 @@ int do_tactics(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_TACTICS))
   {
-    send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
+    ch->sendln("You just don't have the mind for strategic battle.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_TACTICS_TIMER))
   {
-    send_to_char("You will need more time to work out your tactics.\r\n", ch);
+    ch->sendln("You will need more time to work out your tactics.");
     return eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You have no group to command.\r\n", ch);
+    ch->sendln("You have no group to command.");
     return eFAILURE;
   }
 
@@ -1155,13 +1155,13 @@ int do_tactics(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, nullptr, SKILL_TACTICS))
   {
-    send_to_char("Guess you just weren't the Patton you thought you were.\r\n", ch);
+    ch->sendln("Guess you just weren't the Patton you thought you were.");
     act("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, TO_ROOM, 0);
   }
   else
   {
     act("$n takes command coordinating $s group's efforts.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("You take command coordinating the group's attacks.\r\n", ch);
+    ch->sendln("You take command coordinating the group's attacks.");
 
     af.type = SKILL_TACTICS_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
@@ -1204,7 +1204,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("You do not know how to set up a safe camp.\r\n", ch);
+    ch->sendln("You do not know how to set up a safe camp.");
     return eFAILURE;
   }
 
@@ -1214,7 +1214,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) ||
       DC::getInstance()->world[ch->in_room].sector_type == SECT_CITY || DC::getInstance()->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
-    send_to_char("Something about this area inherently prohibits a rugged camp.\r\n", ch);
+    ch->sendln("Something about this area inherently prohibits a rugged camp.");
     return eFAILURE;
   }
 
@@ -1224,20 +1224,20 @@ int do_make_camp(Character *ch, char *argument, int cmd)
 
     if ((IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
     {
-      send_to_char("This area does not yet feel secure enough to rest.\r\n", ch);
+      ch->sendln("This area does not yet feel secure enough to rest.");
       return eFAILURE;
     }
   }
 
   if (affected_by_spell(ch, SKILL_MAKE_CAMP_TIMER))
   {
-    send_to_char("You cannot make another camp so soon.\r\n", ch);
+    ch->sendln("You cannot make another camp so soon.");
     return eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_MAKE_CAMP))
   {
-    send_to_char("You are unable to muster the strength to make a camp.\r\n", ch);
+    ch->sendln("You are unable to muster the strength to make a camp.");
     return eFAILURE;
   }
 
@@ -1247,14 +1247,14 @@ int do_make_camp(Character *ch, char *argument, int cmd)
 
     if (affected_by_spell(i, SKILL_MAKE_CAMP))
     {
-      send_to_char("There is already a camp setup here.\r\n", ch);
+      ch->sendln("There is already a camp setup here.");
       return eFAILURE;
     }
   }
 
   WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 2.5));
 
-  send_to_char("You scan about for signs of danger as you clear an area to make camp...\r\n", ch);
+  ch->sendln("You scan about for signs of danger as you clear an area to make camp...");
   act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
 
   if (!skill_success(ch, 0, SKILL_MAKE_CAMP))
@@ -1308,19 +1308,19 @@ int do_triage(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
-    send_to_char("You do not know how to aid your regeneration in that way.\r\n", ch);
+    ch->sendln("You do not know how to aid your regeneration in that way.");
     return eFAILURE;
   }
 
   if (ch->fighting)
   {
-    send_to_char("You are a little too busy for that right now.\r\n", ch);
+    ch->sendln("You are a little too busy for that right now.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_TRIAGE_TIMER))
   {
-    send_to_char("You cannot take care of your battle wounds again so soon.\r\n", ch);
+    ch->sendln("You cannot take care of your battle wounds again so soon.");
     return eFAILURE;
   }
 
@@ -1340,7 +1340,7 @@ int do_triage(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, 0, SKILL_TRIAGE))
   {
-    send_to_char("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.\r\n", ch);
+    ch->sendln("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.");
     act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
     return eSUCCESS;
   }
@@ -1352,7 +1352,7 @@ int do_triage(Character *ch, char *argument, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  send_to_char("You pause to clean and bandage some of your more painful injuries and speed the healing process.\r\n", ch);
+  ch->sendln("You pause to clean and bandage some of your more painful injuries and speed the healing process.");
   act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
 
   return eSUCCESS;
@@ -1365,7 +1365,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("You do not know how to heighten your battle awareness.\r\n", ch);
+    ch->sendln("You do not know how to heighten your battle awareness.");
     return eFAILURE;
   }
 
@@ -1379,11 +1379,11 @@ int do_battlesense(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, 0, SKILL_BATTLESENSE))
   {
-    send_to_char("Your body and mind, tired from continued battle, are unable to reach full combat readiness.\r\n", ch);
+    ch->sendln("Your body and mind, tired from continued battle, are unable to reach full combat readiness.");
   }
   else
   {
-    send_to_char("Your awareness heightens dramatically as the rush of battle courses through your body.\r\n", ch);
+    ch->sendln("Your awareness heightens dramatically as the rush of battle courses through your body.");
     act("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_BATTLESENSE;
@@ -1407,7 +1407,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("You do not know how to smite your enemies effectively.\r\n", ch);
+    ch->sendln("You do not know how to smite your enemies effectively.");
     return eFAILURE;
   }
 
@@ -1433,7 +1433,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 
   if (ch == vict)
   {
-    send_to_char("There's a suicide command for that...\r\n", ch);
+    ch->sendln("There's a suicide command for that...");
     return eFAILURE;
   }
 
@@ -1445,7 +1445,7 @@ int do_smite(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_SMITE_TIMER))
   {
-    send_to_char("You cannot smite your enemies again so soon.\r\n", ch);
+    ch->sendln("You cannot smite your enemies again so soon.");
     return eFAILURE;
   }
 
@@ -1491,25 +1491,25 @@ int do_leadership(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("You do not know that ability.\r\n", ch);
+    ch->sendln("You do not know that ability.");
     return eFAILURE;
   }
 
   if (ch->master || !ch->followers)
   {
-    send_to_char("You must be leading a group to call upon your leadership skills.\r\n", ch);
+    ch->sendln("You must be leading a group to call upon your leadership skills.");
     return eFAILURE;
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("Stop trying to show off.\r\n", ch);
+    ch->sendln("Stop trying to show off.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_LEADERSHIP))
   {
-    send_to_char("You and your followers are already inspired.\r\n", ch);
+    ch->sendln("You and your followers are already inspired.");
     return eFAILURE;
   }
 
@@ -1520,7 +1520,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, 0, SKILL_LEADERSHIP))
   {
-    send_to_char("Your bravery miserably fails to inspire.\r\n", ch);
+    ch->sendln("Your bravery miserably fails to inspire.");
     act("$n's bravery miserably fails to inspire.", ch, 0, 0, TO_ROOM, 0);
   }
   else
@@ -1550,7 +1550,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("Your lack of fortitude is stunning.\r\n", ch);
+    ch->sendln("Your lack of fortitude is stunning.");
     return eFAILURE;
   }
 
@@ -1564,7 +1564,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, 0, SKILL_PERSEVERANCE))
   {
-    send_to_char("Your movements seem unchanged, though you strive to gain some momentum in your actions.\r\n", ch);
+    ch->sendln("Your movements seem unchanged, though you strive to gain some momentum in your actions.");
   }
   else
   {
@@ -1591,7 +1591,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    send_to_char("You do not know how to use this to your advantage.\r\n", ch);
+    ch->sendln("You do not know how to use this to your advantage.");
     return eFAILURE;
   }
 
@@ -1635,19 +1635,19 @@ int do_onslaught(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch) && ch->getLevel() < IMMORTAL && !learned)
   {
-    send_to_char("You do not know how to use this to your advantage.\r\n", ch);
+    ch->sendln("You do not know how to use this to your advantage.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_ONSLAUGHT_TIMER))
   {
-    send_to_char("You have not yet recovered from your previous onslaught attempt.\r\n", ch);
+    ch->sendln("You have not yet recovered from your previous onslaught attempt.");
     return eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_ONSLAUGHT))
   {
-    send_to_char("You do not have enough energy to attempt this onslaught.\r\n", ch);
+    ch->sendln("You do not have enough energy to attempt this onslaught.");
     return eFAILURE;
   }
 

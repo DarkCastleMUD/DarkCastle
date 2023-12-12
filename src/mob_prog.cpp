@@ -3035,7 +3035,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 
 	Character *ur = nullptr;
 	if (ur)
-		send_to_char("\r\nProg initiated.\r\n", ur);
+		ur->sendln("\r\nProg initiated.");
 
 	if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
 	{

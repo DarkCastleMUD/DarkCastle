@@ -375,7 +375,7 @@ void perform_violence(void)
         if (get_saves(ch, SAVE_TYPE_POISON) > number(1, 100))
         {
           dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
-          send_to_char("You feel very sick, but resist the $2poison's$R damage.\r\n", ch);
+          ch->sendln("You feel very sick, but resist the $2poison's$R damage.");
         }
         if (dam)
         {
@@ -398,7 +398,7 @@ void perform_violence(void)
       }
       else if (af->type == SPELL_ATTRITION)
       {
-        send_to_char("Your body aches at the effort of combat.\r\n", ch);
+        ch->sendln("Your body aches at the effort of combat.");
         if (affected_by_spell(ch, SPELL_DIVINE_INTER))
         {
           ch->removeHP(affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier);
@@ -691,7 +691,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
     if (DC::isSet(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
-      send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
+      ch->sendln("Your body refuses to work properly and you miss an attack.");
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
     else if (IS_PC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
@@ -705,7 +705,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   {
     if (DC::isSet(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
-      send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
+      ch->sendln("Your body refuses to work properly and you miss an attack.");
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
     else if (IS_PC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK))
@@ -837,7 +837,7 @@ void update_flags(Character *vict)
   if (DC::isSet(vict->combat, COMBAT_ORC_BLOODLUST2))
   {
     REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
-    send_to_char("Your bloodlust fades.\r\n", vict);
+    vict->sendln("Your bloodlust fades.");
     act("$n's bloodlust fades.", vict, 0, 0, TO_ROOM, 0);
   }
 
@@ -852,7 +852,7 @@ void update_flags(Character *vict)
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(vict->affected_by, AFF_BLIND);
     act("$n clears the blood from $s eyes.\r\n", vict, nullptr, nullptr, TO_ROOM, 0);
-    send_to_char("You clear the blood out of your eyes.\r\n", vict);
+    vict->sendln("You clear the blood out of your eyes.");
   }
 
   if (DC::isSet(vict->combat, COMBAT_THI_EYEGOUGE))
@@ -875,10 +875,10 @@ void update_flags(Character *vict)
     if (pspell->modifier < 0)
     {
       REMOVE_BIT(vict->combat, COMBAT_MONK_STANCE);
-      send_to_char("Your stance ends.  You can absorb no more.\r\n", vict);
+      vict->sendln("Your stance ends.  You can absorb no more.");
     }
     else
-      send_to_char("Your stance weakens...\r\n", vict);
+      vict->sendln("Your stance weakens...");
   }
 }
 
@@ -912,7 +912,7 @@ void update_stuns(Character *ch)
         ;
         if (DC::isSet(ch->combat, COMBAT_BERSERK))
         {
-          send_to_char("After that period of unconsciousness, you've forgotten what you were mad about.\r\n", ch);
+          ch->sendln("After that period of unconsciousness, you've forgotten what you were mad about.");
           REMOVE_BIT(ch->combat, COMBAT_BERSERK);
         }
       }
@@ -1893,7 +1893,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       {
         GET_STR(victim) -= 1;
         victim->raw_str -= 1;
-        send_to_char("*** You lose one strength point ***\r\n", victim);
+        victim->sendln("*** You lose one strength point ***");
         sprintf(log_buf, "%s lost a str too. ouch.", victim->getNameC());
       }
       break;
@@ -1902,14 +1902,14 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       {
         GET_WIS(victim) -= 1;
         victim->raw_wis -= 1;
-        send_to_char("*** You lose one wisdom point ***\r\n", victim);
+        victim->sendln("*** You lose one wisdom point ***");
         sprintf(log_buf, "%s lost a wis too. ouch.", victim->getNameC());
       }
       break;
     case 3:
       GET_CON(victim) -= 1;
       victim->raw_con -= 1;
-      send_to_char("*** You lose one constitution point ***\r\n", victim);
+      victim->sendln("*** You lose one constitution point ***");
       sprintf(log_buf, "%s lost a con too. ouch.", victim->getNameC());
       break;
     case 4:
@@ -1917,7 +1917,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       {
         GET_INT(victim) -= 1;
         victim->raw_intel -= 1;
-        send_to_char("*** You lose one intelligence point ***\r\n", victim);
+        victim->sendln("*** You lose one intelligence point ***");
         sprintf(log_buf, "%s lost a int too. ouch.", victim->getNameC());
       }
       break;
@@ -1926,7 +1926,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       {
         GET_DEX(victim) -= 1;
         victim->raw_dex -= 1;
-        send_to_char("*** You lose one dexterity point ***\r\n", victim);
+        victim->sendln("*** You lose one dexterity point ***");
         sprintf(log_buf, "%s lost a dex too. ouch.", victim->getNameC());
       }
       break;
@@ -2123,9 +2123,9 @@ int damage(Character *ch, Character *victim,
       attacktype <= MAX_SPL_LIST)
   {
     if (ch->getLevel() > 70)
-      send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
+      victim->sendln("The power of the spell bursts through your mental barriers as if they weren't there!");
     else if (!(number(0, 9)))
-      send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
+      victim->sendln("Your mental shields cannot hold back the force of the spell!");
     else
     {
       if (reflected)
@@ -2752,7 +2752,7 @@ int damage(Character *ch, Character *victim,
 
   if (ethereal)
   {
-    send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);
+    victim->sendln("The ethereal stones protecting you shatter and fade into nothing.");
     act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
   }
 
@@ -3475,7 +3475,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
       }
       break;
     default:
-      send_to_char("Messed up tumbling. tell somebody, whore!\r\n", ch);
+      ch->sendln("Messed up tumbling. tell somebody, whore!");
       break;
     }
   }
@@ -4214,7 +4214,7 @@ void set_fighting(Character *ch, Character *vict)
   /*(  if( ( IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM) )
         && count >= 6 )
     {
-      send_to_char("You can't get close enough to fight.\r\n",ch);
+      ch->sendln("You can't get close enough to fight.");
       return;
     }*/
 
@@ -5172,7 +5172,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
     if (GET_POS(vict) != position_t::DEAD && number(0, 4999) == 1)
     { /* tiny chance of instakill */
       vict->setHP(-1, ch);
-      send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
+      ch->sendln("You impale your weapon through your opponent's chest!");
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
       // duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
@@ -5808,7 +5808,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
       {
-        send_to_char("Your Dexterity has reached 4...you are permanently dead!\r\n", victim);
+        victim->sendln("Your Dexterity has reached 4...you are permanently dead!");
         send_to_char("\r\n"
                      " Dear Mudder, you suck.\r\nSincerely - Urizen\r\n"
                      "$4              /                   \\\r\n"
@@ -6401,12 +6401,12 @@ void disarm(Character *ch, Character *victim)
 
   if (affected_by_spell(victim, SPELL_PARALYZE))
   {
-    send_to_char("Their paralyzed fingers are gripping the weapon too tightly.\r\n", ch);
+    ch->sendln("Their paralyzed fingers are gripping the weapon too tightly.");
     return;
   }
   if (DC::isSet(victim->combat, COMBAT_BERSERK))
   {
-    send_to_char("In their enraged state, there's no chance they'd let go of their weapon!\r\n", ch);
+    ch->sendln("In their enraged state, there's no chance they'd let go of their weapon!");
     return;
   }
   act("$B$n disarms you and sends your weapon flying!$R", ch, nullptr, victim, TO_VICT, 0);
@@ -6951,7 +6951,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     }
   }
 
-  send_to_char("You have been completely healed.\r\n", victim);
+  victim->sendln("You have been completely healed.");
   victim->setResting();
   victim->fillHP();
   GET_MANA(victim) = GET_MAX_MANA(victim);
@@ -7019,7 +7019,7 @@ int can_be_attacked(Character *ch, Character *vict)
   if (IS_NPC(vict))
     if (ISSET(vict->mobdata->actflags, ACT_NOATTACK))
     {
-      send_to_char("Due to heavy magics, they cannot be attacked.\r\n", ch);
+      ch->sendln("Due to heavy magics, they cannot be attacked.");
       return false;
     }
 
@@ -7029,14 +7029,14 @@ int can_be_attacked(Character *ch, Character *vict)
 
     if (ch->fighting && ch->fighting != vict)
     {
-      send_to_char("You are already fighting someone.\r\n", ch);
+      ch->sendln("You are already fighting someone.");
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
            GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
-      send_to_char("They are already fighting someone.\r\n", ch);
+      ch->sendln("They are already fighting someone.");
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
            GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
       return false;
@@ -7048,14 +7048,14 @@ int can_be_attacked(Character *ch, Character *vict)
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
-      send_to_char("You are already fighting someone from another clan.\r\n", ch);
+      ch->sendln("You are already fighting someone from another clan.");
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
-      send_to_char("They are already fighting someone.\r\n", ch);
+      ch->sendln("They are already fighting someone.");
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
       return false;
@@ -7074,7 +7074,7 @@ int can_be_attacked(Character *ch, Character *vict)
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
         DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, SAFE))
     {
-      send_to_char("No fighting permitted in a safe room.\r\n", ch);
+      ch->sendln("No fighting permitted in a safe room.");
       return false;
     }
     // Any other mob can be attacked at any time
@@ -7142,7 +7142,7 @@ int can_be_attacked(Character *ch, Character *vict)
       return true;
     }
 
-    send_to_char("No fighting permitted in a safe room.\r\n", ch);
+    ch->sendln("No fighting permitted in a safe room.");
 
     if (ch->fighting == vict)
     {
@@ -7547,9 +7547,9 @@ int do_flee(Character *ch, char *argument, int cmd)
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
     if (affected_by_spell(ch, SPELL_IRON_ROOTS))
-      send_to_char("The roots bracing your legs make it impossible to run!\r\n", ch);
+      ch->sendln("The roots bracing your legs make it impossible to run!");
     else
-      send_to_char("Your legs are too tired for running away!\r\n", ch);
+      ch->sendln("Your legs are too tired for running away!");
     return eFAILURE;
   }
 

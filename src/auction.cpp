@@ -151,7 +151,7 @@ AuctionHouse TheAuctionHouse("auctionhouse");
 
 void AuctionHouse::ShowStats(Character *ch)
 {
-  send_to_char("Vendor Statistics:\r\n", ch);
+  ch->sendln("Vendor Statistics:");
   ch->send(QString("Items Posted:     %1\r\n").arg(ItemsPosted));
   ch->send(QString("Items For Sale:   %1\r\n").arg(ItemsActive));
   ch->send(QString("Items Sold:       %1\r\n").arg(ItemsSold));
@@ -342,7 +342,7 @@ void AuctionHouse::CheckForSoldItems(Character *ch)
     }
   }
   if (has_sold_items)
-    send_to_char("Please stop by your local Consignment House.\r\n", ch);
+    ch->sendln("Please stop by your local Consignment House.");
   return;
 }
 
@@ -486,7 +486,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
 
   if (ch->getGold() < 6000)
   {
-    send_to_char("The broker charges 6000 $B$5gold$R to identify items.\r\n", ch);
+    ch->sendln("The broker charges 6000 $B$5gold$R to identify items.");
     return;
   }
 
@@ -1157,7 +1157,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
   {
-    send_to_char("Why would you want another one of those?\r\n", ch);
+    ch->sendln("Why would you want another one of those?");
     return;
   }
 
@@ -1389,7 +1389,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
 
     if (DC::isSet(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
-      send_to_char("Why would you want another one of those?\r\n", ch);
+      ch->sendln("Why would you want another one of those?");
       return;
     }
 
@@ -1564,7 +1564,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     else if (options == LIST_BY_CLASS)
       csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\r\n", name.toStdString().c_str());
     else if (options == LIST_MINE)
-      send_to_char("\n\rYou do not have any tickets.\r\n", ch);
+      ch->sendln("\n\rYou do not have any tickets.");
     else if (options == LIST_BY_RACE)
       csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", name.toStdString().c_str());
     else
@@ -1621,7 +1621,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (!obj)
   {
-    send_to_char("You don't seem to have that item.\r\n", ch);
+    ch->sendln("You don't seem to have that item.");
     return;
   }
 
@@ -1639,7 +1639,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("You can't sell godload.\r\n", ch);
+    ch->sendln("You can't sell godload.");
     return;
   }
 
@@ -1692,19 +1692,19 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (strcmp(obj->short_description, ((class Object *)(obj_index[obj->item_number].item))->short_description))
   {
-    send_to_char("The Consignment broker informs you that he does not handle items that have been restrung.\r\n", ch);
+    ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;
   }
 
   if (eq_current_damage(obj) > 0)
   {
-    send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\r\n", ch);
+    ch->sendln("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.");
     return;
   }
 
   if ((obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_STAFF) && obj->obj_flags.value[1] != obj->obj_flags.value[2])
   {
-    send_to_char("The Consignment Broker curtly informs you that it needs to have full charges.\r\n", ch);
+    ch->sendln("The Consignment Broker curtly informs you that it needs to have full charges.");
     return;
   }
 
@@ -1713,12 +1713,12 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   {
     if (ch->getGold() < 500000)
     {
-      send_to_char("You do not have the 500,000 $B$5gold$R required to sell an item privately.\r\n", ch);
+      ch->sendln("You do not have the 500,000 $B$5gold$R required to sell an item privately.");
       return;
     }
 
     ch->removeGold(500000);
-    send_to_char("The Consignment Broker takes 500,000 $B$5gold$R from you as a cost for selling something privately.\r\n", ch);
+    ch->sendln("The Consignment Broker takes 500,000 $B$5gold$R from you as a cost for selling something privately.");
   }
 
   ItemsPosted += 1;
@@ -1774,7 +1774,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     }
     else
     {
-      send_to_char("The Consignment Broker couldn't auction. Contact an imm.\r\n", ch);
+      ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
       logentry(QString("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
@@ -1867,7 +1867,7 @@ int do_vend(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF)))
   {
-    send_to_char("You're too busy running from the law!\r\n", ch);
+    ch->sendln("You're too busy running from the law!");
     return eFAILURE;
   }
 
@@ -1877,7 +1877,7 @@ int do_vend(Character *ch, char *argument, int cmd)
   {
     send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
     if (ch->getLevel() >= 104)
-      send_to_char("Also: <addroom | removeroom | listrooms | stats>\r\n", ch);
+      ch->sendln("Also: <addroom | removeroom | listrooms | stats>");
     return eSUCCESS;
   }
 
@@ -2198,6 +2198,6 @@ int do_vend(Character *ch, char *argument, int cmd)
 
   send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
   if (ch->getLevel() >= 104)
-    send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
+    ch->sendln("Also: <addroom | removeroom | listroom | stats>");
   return eSUCCESS;
 }

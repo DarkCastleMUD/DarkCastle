@@ -650,7 +650,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   case CMD_WRITE: // write
     if (GET_INT(ch) < 9)
     {
-      send_to_char("You are too stupid to know how to write!\r\n", ch);
+      ch->sendln("You are too stupid to know how to write!");
       return eSUCCESS;
     }
     board_write_msg(ch, arg, board);
@@ -658,7 +658,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   case CMD_READ: // read
     if (GET_INT(ch) < 9)
     {
-      send_to_char("You are too stupid to know how to read!\r\n", ch);
+      ch->sendln("You are too stupid to know how to read!");
       return eSUCCESS;
     }
     board_display_msg(ch, arg, board);
@@ -666,13 +666,13 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   case CMD_ERASE: /* erase */
     if (GET_INT(ch) < 9)
     {
-      send_to_char("You are too stupid to read them!\r\nDon't erase them they might be important!\r\n", ch);
+      ch->sendln("You are too stupid to read them!\r\nDon't erase them they might be important!");
       return eSUCCESS;
     }
     if (
         ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
-      send_to_char("You can't erase posts from this board.\r\n", ch);
+      ch->sendln("You can't erase posts from this board.");
       return eSUCCESS;
       // added this for Uruk'hai board so only members can remove posts
     }
@@ -723,18 +723,18 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\r\n", ch);
+      ch->sendln("You aren't in the right clan bucko.");
       return;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_WRITE))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
+      ch->sendln("You don't have the right!  Talk to your clan leader.");
       return;
     }
   }
   if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
-    send_to_char("You do not understand the writings written on this board.\r\n", ch);
+    ch->sendln("You do not understand the writings written on this board.");
     return;
   }
 
@@ -754,7 +754,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 
   if (!*arg)
   {
-    send_to_char("Need a header, fool.\r\n", ch);
+    ch->sendln("Need a header, fool.");
     return;
   }
 
@@ -825,18 +825,18 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\r\n", ch);
+      ch->sendln("You aren't in the right clan bucko.");
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch)))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
+      ch->sendln("You don't have the right!  Talk to your clan leader.");
       return eSUCCESS;
     }
   }
   else if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
-    send_to_char("You do not understand the writings written on this board.\r\n", ch);
+    ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;
   }
   else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
@@ -850,7 +850,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 
   board->second.msgs.erase(board->second.msgs.begin() + ind);
 
-  send_to_char("Message erased.\r\n", ch);
+  ch->sendln("Message erased.");
   sprintf(buf, "$n just erased message %d.", tmessage);
 
   // Removal message also repaired
@@ -985,7 +985,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   {
     if (!*number)
     {
-      send_to_char("Sorry, mobs have to specify the number of the post they want to read.\r\n", ch);
+      ch->sendln("Sorry, mobs have to specify the number of the post they want to read.");
       return eFAILURE;
     }
   }
@@ -1000,7 +1000,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
 
   if (!*number || !isdigit(*number))
   {
-    send_to_char("Read what?\r\n", ch);
+    ch->sendln("Read what?");
     return eFAILURE;
   }
   if (!(tmessage = atoi(number)))
@@ -1010,18 +1010,18 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\r\n", ch);
+      ch->sendln("You aren't in the right clan bucko.");
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
+      ch->sendln("You don't have the right!  Talk to your clan leader.");
       return eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
-    send_to_char("You do not understand the writings written on this board.\r\n", ch);
+    ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;
   }
 
@@ -1043,7 +1043,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
-    send_to_char("That message doesn't exist, moron.\r\n", ch);
+    ch->sendln("That message doesn't exist, moron.");
     return eSUCCESS;
   }
 
@@ -1083,18 +1083,18 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\r\n", ch);
+      ch->sendln("You aren't in the right clan bucko.");
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
+      ch->sendln("You don't have the right!  Talk to your clan leader.");
       return eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
   {
-    send_to_char("You do not understand the writings written on this board.\r\n", ch);
+    ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;
   }
 

@@ -159,7 +159,7 @@ void mpstat(Character *ch, Character *victim)
 
   if (!(mob_index[victim->mobdata->nr].progtypes))
   {
-    send_to_char("That mob has no programs set.\r\n", ch);
+    ch->sendln("That mob has no programs set.");
     return;
   }
 
@@ -1191,7 +1191,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
     sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skillname);
   else
   {
-    send_to_char("I just tried to teach you an invalid skill.  Tell a god.\r\n", victim);
+    victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
     prog_error(ch, "Mpteachskill - invalid skill number");
     return eFAILURE | eINTERNAL_ERROR;
   }
@@ -1236,7 +1236,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   Character *victim;
   if (IS_PC(this) && cmd != CMD_OTHER)
   {
-    send_to_char("Huh?\r\n", this);
+    this->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -1313,7 +1313,7 @@ int do_mpsetalign(Character *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
   if (!*argument || !ch->in_room)
@@ -1682,7 +1682,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
   Character *victim, *owner = nullptr;
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
   argument = one_argument(argument, arg);
@@ -1719,7 +1719,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
         af.type = z = skill_aff[a];
         if (affected_by_spell(victim, z + BASE_TIMERS))
         {
-          //		send_to_char("A s.\r\n",victim);
+          //		victim->sendln("A s.");
           return eFAILURE;
         }
         af.duration = i;
@@ -1770,7 +1770,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 {
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -1876,7 +1876,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("No-one by that name around.\r\n", ch);
+      ch->sendln("No-one by that name around.");
       return eFAILURE;
     }
   }
@@ -1884,7 +1884,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
   if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    send_to_char("You find yourself unable to.\r\n", ch);
+    ch->sendln("You find yourself unable to.");
     if (ch != victim)
     {
       snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
@@ -1974,7 +1974,7 @@ int do_mpretval(Character *ch, char *argument, int cmd)
 {
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -2168,7 +2168,7 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
 {
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 

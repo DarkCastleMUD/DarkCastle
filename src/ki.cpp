@@ -157,7 +157,7 @@ int do_ki(Character *ch, char *argument, int cmd)
   learned = ch->has_skill((spl + KI_OFFSET));
   if (!learned)
   {
-    send_to_char("You do not know that ki power!\r\n", ch);
+    ch->sendln("You do not know that ki power!");
     return eFAILURE;
   }
 
@@ -168,7 +168,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       switch (GET_POS(ch))
       {
       case position_t::SLEEPING:
-        send_to_char("You dream of wonderful ki powers.\r\n", ch);
+        ch->sendln("You dream of wonderful ki powers.");
         break;
       case position_t::RESTING:
         send_to_char("You cannot harness that much energy while "
@@ -179,7 +179,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         send_to_char("You can't do this sitting!\n\r", ch);
         break;
       case position_t::FIGHTING:
-        send_to_char("This is a peaceful ki power.\r\n", ch);
+        ch->sendln("This is a peaceful ki power.");
         break;
       default:
         send_to_char("It seems like you're in a pretty bad shape!\n\r",
@@ -239,7 +239,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     if (target_ok != true)
     {
       if (*name)
-        send_to_char("Nobody here by that name.\r\n", ch);
+        ch->sendln("Nobody here by that name.");
       else
         /* No arguments were given */
         send_to_char("Whom should the power be used upon?\n\r", ch);
@@ -250,7 +250,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     {
       if ((tar_char == ch) && DC::isSet(ki_info[spl].targets, TAR_SELF_NONO))
       {
-        send_to_char("You cannot use this power on yourself.\r\n", ch);
+        ch->sendln("You cannot use this power on yourself.");
         return eFAILURE;
       }
       else if ((tar_char != ch) && DC::isSet(ki_info[spl].targets, TAR_SELF_ONLY))
@@ -345,7 +345,7 @@ int do_ki(Character *ch, char *argument, int cmd)
               tar_char);
         }
 
-      send_to_char("Ok.\r\n", ch);
+      ch->sendln("Ok.");
       GET_KI(ch) -= use_ki(ch, spl);
 
       return ((*ki_info[spl].ki_pointer)(ch->getLevel(), ch, argument,
@@ -560,7 +560,7 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   af.duration = level;
   af.bitvector = AFF_INFRARED;
   affect_to_char(vict, &af);
-  send_to_char("You feel your sense become more acute.\r\n", vict);
+  vict->sendln("You feel your sense become more acute.");
 
   return eSUCCESS;
 }
@@ -588,7 +588,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else
     //		if (DC::getInstance()->world[ch->in_room].zone == DC::getInstance()->world[tmp_victim->in_room].zone)
-    //	send_to_char("A crackle of energy echos past you.\r\n", tmp_victim);
+    //	tmp_victim->sendln("A crackle of energy echos past you.");
   }
   int dir = number(0, 5), distance = number(1, 3), i;
   if (room > 0)
@@ -600,7 +600,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
       if (room == DC::NOWHERE)
         break;
       for (tmp_victim = DC::getInstance()->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
-        send_to_char("A crackle of energy echoes past you.\r\n", tmp_victim);
+        tmp_victim->sendln("A crackle of energy echoes past you.");
     }
   if (number(1, 4) == 4 && !ch->fighting)
   {
@@ -666,10 +666,10 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
       affect_from_char(vict, SPELL_POISON);
     else
     {
-      send_to_char("That taint is not present.\r\n", ch);
+      ch->sendln("That taint is not present.");
       return eFAILURE;
     }
-    send_to_char("You purge the poison.\r\n", ch);
+    ch->sendln("You purge the poison.");
   }
   else if (!str_cmp(arg, "blindness"))
   {
@@ -677,10 +677,10 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
       affect_from_char(vict, SPELL_BLINDNESS);
     else
     {
-      send_to_char("That taint is not present.\r\n", ch);
+      ch->sendln("That taint is not present.");
       return eFAILURE;
     }
-    send_to_char("You purge the blindness.\r\n", ch);
+    ch->sendln("You purge the blindness.");
   }
   else if (!str_cmp(arg, "weaken"))
   {
@@ -688,10 +688,10 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
       affect_from_char(vict, SPELL_WEAKEN);
     else
     {
-      send_to_char("That taint is not present.\r\n", ch);
+      ch->sendln("That taint is not present.");
       return eFAILURE;
     }
-    send_to_char("You purge the poison.\r\n", ch);
+    ch->sendln("You purge the poison.");
   }
   else if (!str_cmp(arg, "alcohol"))
   {
@@ -699,14 +699,14 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
       gain_condition(vict, DRUNK, -GET_COND(ch, DRUNK));
     else
     {
-      send_to_char("That taint is not present.\r\n", ch);
+      ch->sendln("That taint is not present.");
       return eFAILURE;
     }
-    send_to_char("You purge the alcohol.\r\n", ch);
+    ch->sendln("You purge the alcohol.");
   }
   else
   {
-    send_to_char("You cannot purge that.\r\n", ch);
+    ch->sendln("You cannot purge that.");
   }
   return eSUCCESS;
 }
@@ -757,18 +757,18 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   {
     act("$n slams a bolt of focused ki energy into the flow of magic all around you!", ch, 0, victim, TO_VICT, 0);
     act("$n focuses a blast of ki to disrupt the flow of magic all around $N!", ch, 0, victim, TO_ROOM, 0);
-    send_to_char("You focus your ki to disrupt the flow of magic all around your opponent!\r\n", ch);
+    ch->sendln("You focus your ki to disrupt the flow of magic all around your opponent!");
   }
   else
   {
     act("$n slams a bolt of focused ki energy into the flow of magic around you!", ch, 0, victim, TO_VICT, 0);
     act("$n focuses a blast of ki to disrupt the flow of magic around $N!", ch, 0, victim, TO_ROOM, 0);
-    send_to_char("You focus your ki to disrupt the flow of magic around your opponent!\r\n", ch);
+    ch->sendln("You focus your ki to disrupt the flow of magic around your opponent!");
   }
 
   if (ISSET(victim->affected_by, AFF_GOLEM))
   {
-    send_to_char("The golem seems to shrug off your ki disrupt attempt!\r\n", ch);
+    ch->sendln("The golem seems to shrug off your ki disrupt attempt!");
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
@@ -1116,18 +1116,18 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (affected_by_spell(ch, KI_STANCE + KI_OFFSET))
   {
-    send_to_char("You focus your ki to harden your stance, but your body is still recovering from last time...\r\n", ch);
+    ch->sendln("You focus your ki to harden your stance, but your body is still recovering from last time...");
     return eFAILURE;
   }
 
   act("$n assumes a defensive stance and attempts to absorb the energies that surround $m.",
       ch, 0, vict, TO_ROOM, 0);
-  send_to_char("You take a defensive stance and try to aborb the energies seeking to harm you.\r\n", ch);
+  ch->sendln("You take a defensive stance and try to aborb the energies seeking to harm you.");
 
   // chance of failure - can be meta'd past that point though
   if (number(1, 100) > (GET_DEX(ch) * 4))
   {
-    send_to_char("You accidently stub your toe and fall out of the defenseive stance.\r\n", ch);
+    ch->sendln("You accidently stub your toe and fall out of the defenseive stance.");
     return eSUCCESS;
   }
 
@@ -1152,13 +1152,13 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {
-    send_to_char("You aren't experienced enough to teach others graceful movement.\r\n", ch);
+    ch->sendln("You aren't experienced enough to teach others graceful movement.");
     return eFAILURE;
   }
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You have no group to instruct.\r\n", ch);
+    ch->sendln("You have no group to instruct.");
     return eFAILURE;
   }
 
@@ -1170,12 +1170,12 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   percent = number(1, 101);
   if (percent > chance)
   {
-    send_to_char("Hopefully none of them noticed you trip on that rock.\r\n", ch);
+    ch->sendln("Hopefully none of them noticed you trip on that rock.");
     act("$n tries to show everyone how to be graceful and trips over a rock.", ch, 0, 0, TO_ROOM, 0);
   }
   else
   {
-    send_to_char("You instruct your party on more graceful movement.\r\n", ch);
+    ch->sendln("You instruct your party on more graceful movement.");
     act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
 
     for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
@@ -1235,13 +1235,13 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
 
   if (amount < 0)
   {
-    send_to_char("Trying to be a funny guy?\r\n", ch);
+    ch->sendln("Trying to be a funny guy?");
     return eFAILURE;
   }
 
   if (amount > GET_KI(ch))
   {
-    send_to_char("You do not have that much energy to transfer.\r\n", ch);
+    ch->sendln("You do not have that much energy to transfer.");
     return eFAILURE;
   }
 
@@ -1305,7 +1305,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
   }
   else
   {
-    send_to_char("You do not know of that essense.\r\n", ch);
+    ch->sendln("You do not know of that essense.");
     return eFAILURE;
   }
 

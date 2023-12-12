@@ -81,7 +81,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
-    send_to_char("Try learning HOW to free an animal first.\r\n", ch);
+    ch->sendln("Try learning HOW to free an animal first.");
     return eFAILURE;
   }
 
@@ -96,7 +96,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
 
   if (!victim)
   {
-    send_to_char("They aren't even here!\r\n", ch);
+    ch->sendln("They aren't even here!");
     return eSUCCESS;
   }
 
@@ -158,20 +158,20 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   if (IS_PC(victim))
   {
-    send_to_char("You find yourself unable to tame this player.\r\n", ch);
+    ch->sendln("You find yourself unable to tame this player.");
     return eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
       (ch->getLevel() < victim->getLevel()))
   {
-    send_to_char("You find yourself unable to tame this creature.\r\n", ch);
+    ch->sendln("You find yourself unable to tame this creature.");
     return eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
-    send_to_char("Sorry, following in circles can not be allowed.\r\n", ch);
+    ch->sendln("Sorry, following in circles can not be allowed.");
     return eFAILURE;
   }
 
@@ -290,7 +290,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
 
   if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
   {
-    send_to_char("Only a ranger could track someone by name.\r\n", this);
+    this->sendln("Only a ranger could track someone by name.");
     return eFAILURE;
   }
 
@@ -308,7 +308,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
   // That way possessing imms can track.
   if (IS_MOB(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
   {
-    send_to_char("Being stupid, you cannot find any..\r\n", this);
+    this->sendln("Being stupid, you cannot find any..");
     return eFAILURE;
   }
 
@@ -318,12 +318,12 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      send_to_char("You have lost the trail.\r\n", this);
+      this->sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
       // remove_memory(this, 't');
     }
     else
-      send_to_char("There are no distinct scents here.\r\n", this);
+      this->sendln("There are no distinct scents here.");
     return eFAILURE;
   }
 
@@ -342,11 +342,11 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
         {
           ansi_color(RED, this);
           ansi_color(BOLD, this);
-          send_to_char("You have lost the trail.\r\n", this);
+          this->sendln("You have lost the trail.");
           ansi_color(NTEXT, this);
         }
         else
-          send_to_char("You can't find any traces of such a scent.\r\n", this);
+          this->sendln("You can't find any traces of such a scent.");
         //         remove_memory(this, 't');
         if (IS_NPC(this))
           swap_hate_memory();
@@ -425,11 +425,11 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      send_to_char("You have lost the trail.\r\n", this);
+      this->sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
     }
     else
-      send_to_char("You can't find any traces of such a scent.\r\n", this);
+      this->sendln("You can't find any traces of such a scent.");
 
     //    remove_memory(this, 't');
     return eFAILURE;
@@ -440,7 +440,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
     if ((x > DC::getInstance()->world[this->in_room].nTracks) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
     {
       if (x == 1)
-        send_to_char("There are no distinct smells here.\r\n", this);
+        this->sendln("There are no distinct smells here.");
       break;
     }
 
@@ -496,7 +496,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
       strcpy(sex, "");
 
     if (x == 1)
-      send_to_char("Freshest scents first...\r\n", this);
+      this->sendln("Freshest scents first...");
 
     sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
             weight,
@@ -715,7 +715,7 @@ int do_forage(Character *ch, char *arg, int cmd)
     if (number(0, 1) == 0)
       send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
     else
-      send_to_char("There's a limit to how often you can play with your nuts.  Give it some time.\r\n", ch);
+      ch->sendln("There's a limit to how often you can play with your nuts.  Give it some time.");
     return eFAILURE;
   }
 
@@ -725,7 +725,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   learned = ch->has_skill(SKILL_FORAGE);
   if (!learned)
   {
-    send_to_char("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.\r\n", ch);
+    ch->sendln("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.");
     return eFAILURE;
   }
 
@@ -769,7 +769,7 @@ int do_forage(Character *ch, char *arg, int cmd)
 
       if ((1 + IS_CARRYING_N(ch)) > CAN_CARRY_N(ch))
       {
-        send_to_char("You can't carry that many items!\r\n", ch);
+        ch->sendln("You can't carry that many items!");
         return eFAILURE;
       }
 
@@ -859,22 +859,22 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   switch (number(1, 6))
   {
   case 1:
-    send_to_char("You miss your shot.\r\n", ch);
+    ch->sendln("You miss your shot.");
     break;
   case 2:
-    send_to_char("Your arrow wizzes by the target harmlessely.\r\n", ch);
+    ch->sendln("Your arrow wizzes by the target harmlessely.");
     break;
   case 3:
-    send_to_char("Your pitiful aim spears a poor woodland creature instead..\r\n", ch);
+    ch->sendln("Your pitiful aim spears a poor woodland creature instead..");
     break;
   case 4:
-    send_to_char("Your shot misses your target, and goes skittering across the ground.\r\n", ch);
+    ch->sendln("Your shot misses your target, and goes skittering across the ground.");
     break;
   case 5:
-    send_to_char("A slight breeze forces your arrow off the mark.\r\n", ch);
+    ch->sendln("A slight breeze forces your arrow off the mark.");
     break;
   case 6:
-    send_to_char("Your shot narrowly misses the mark.\r\n", ch);
+    ch->sendln("Your shot narrowly misses the mark.");
     break;
   }
 
@@ -1133,19 +1133,19 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (!ch->equipment[HOLD])
   {
-    send_to_char("You need to be holding a bow, moron.\r\n", ch);
+    ch->sendln("You need to be holding a bow, moron.");
     return eFAILURE;
   }
 
   if (!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
   {
-    send_to_char("You need to be holding a bow, moron.\r\n", ch);
+    ch->sendln("You need to be holding a bow, moron.");
     return eFAILURE;
   }
   /*
    if(GET_POS(ch) == position_t::FIGHTING)
    {
-   send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
+   ch->sendln("Aren't you a bit busy with hand to hand combat?");
    return eFAILURE;
    }*/
 
@@ -1166,7 +1166,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Shoot at whom?\r\n", ch);
+    ch->sendln("Shoot at whom?");
     return eFAILURE;
   }
   half_chop(arg, target, buf2);
@@ -1193,7 +1193,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     artype = parse_arrow(ch, arrow);
     if (!artype)
     {
-      send_to_char("You don't know of that type of arrow.\r\n", ch);
+      ch->sendln("You don't know of that type of arrow.");
       return eFAILURE;
     }
     switch (artype)
@@ -1262,7 +1262,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if ((GET_MANA(ch) < cost) && (ch->getLevel() < ANGEL))
   {
-    send_to_char("You don't have enough mana for that arrow.\r\n", ch);
+    ch->sendln("You don't have enough mana for that arrow.");
     return eFAILURE;
   }
 
@@ -1376,33 +1376,33 @@ int do_fire(Character *ch, char *arg, int cmd)
             "You cannot concentrate enough to fire into an adjacent room while fighting.\r\n",
             ch);
       else
-        send_to_char("You cannot seem to locate your target.\r\n", ch);
+        ch->sendln("You cannot seem to locate your target.");
       return eFAILURE;
     }
   }
   else
   {
-    send_to_char("Sorry, you must specify a target.\r\n", ch);
+    ch->sendln("Sorry, you must specify a target.");
     return eFAILURE;
   }
 
   /* check for accidental targeting of self */
   if (victim == ch)
   {
-    send_to_char("You need to type more of the target's name.\r\n", ch);
+    ch->sendln("You need to type more of the target's name.");
     return eFAILURE;
   }
 
   /* Protect the newbies! */
   if (IS_PC(victim) && victim->getLevel() < 6)
   {
-    send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
+    ch->sendln("Don't shoot at a poor defenseless n00b! :(");
     return eFAILURE;
   }
   /* check if target is fighting */
   /*  if(victim->fighting)
    {
-   send_to_char("You can't seem to get a clear line of sight.\r\n", ch);
+   ch->sendln("You can't seem to get a clear line of sight.");
    return eFAILURE;
    }*/
 
@@ -1426,7 +1426,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
   if (!found)
   {
-    send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
+    ch->sendln("You aren't wearing any quivers with arrows!");
     return eFAILURE;
   }
 
@@ -1599,7 +1599,7 @@ int do_fire(Character *ch, char *arg, int cmd)
       if (!char_to_room(ch, victim->in_room))
       {
         char_to_room(ch, cur_room);
-        send_to_char("Error moving you to room in do_fire.\r\n", ch);
+        ch->sendln("Error moving you to room in do_fire.");
         return eFAILURE;
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
@@ -1751,7 +1751,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Delve into whom?\r\n", ch);
+    ch->sendln("Delve into whom?");
     return eFAILURE;
   }
 
@@ -1763,7 +1763,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
     if(IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
-       send_to_char("You try to think like a chipmunk and go nuts.\r\n", ch);
+       ch->sendln("You try to think like a chipmunk and go nuts.");
        return eFAILURE;
     }
     specialization = learned / 100;
@@ -1775,7 +1775,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
 
   if (ch->getLevel() < target->getLevel())
   {
-    send_to_char("You can't seem to understand your target's mental processes.\r\n", ch);
+    ch->sendln("You can't seem to understand your target's mental processes.");
     return eFAILURE;
   }
 
@@ -1821,13 +1821,13 @@ int do_natural_selection(Character *ch, char *arg, int cmd)
   int learned = ch->has_skill(SKILL_NAT_SELECT);
   if (IS_NPC(ch) || !learned)
   {
-    send_to_char("You don't know how to use this to your advantage.\r\n", ch);
+    ch->sendln("You don't know how to use this to your advantage.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SPELL_NAT_SELECT_TIMER))
   {
-    send_to_char("You cannot yet select a new enemy of choice.\r\n", ch);
+    ch->sendln("You cannot yet select a new enemy of choice.");
     return eFAILURE;
   }
 
@@ -1839,14 +1839,14 @@ int do_natural_selection(Character *ch, char *arg, int cmd)
     {
       if (cur && cur->modifier == i)
       {
-        send_to_char("You are already studying this race.\r\n", ch);
+        ch->sendln("You are already studying this race.");
         return eFAILURE;
       }
       break;
     }
     if (i == 32)
     {
-      send_to_char("Please select a valid race.\r\n", ch);
+      ch->sendln("Please select a valid race.");
       return eFAILURE;
     }
   }

@@ -75,14 +75,14 @@ int do_pview(Character *ch, char *argument, int cmd)
 
   if (!victim->desc)
   {
-    send_to_char("This can only be used on linkalive players.\r\n", ch);
+    ch->sendln("This can only be used on linkalive players.");
     return eFAILURE;
   }
 
   make_prompt(victim->desc, tprompt);
-  send_to_char("Target's prompt is:\r\n", ch);
+  ch->sendln("Target's prompt is:");
   send_to_char(tprompt, ch);
-  send_to_char("\r\n\r\n", ch);
+  ch->sendln("\r\n");
 
   return eSUCCESS;
 }
@@ -102,7 +102,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
 
   if (!has_skill(COMMAND_SNOOP))
   {
-    send_to_char("Huh?\r\n", this);
+    this->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -131,7 +131,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
 
   if (victim == this)
   {
-    send_to_char("Ok, you just snoop yourself.\r\n", this);
+    this->sendln("Ok, you just snoop yourself.");
     if (this->desc->snooping)
     {
       this->desc->snooping->snoop_by = 0;
@@ -189,12 +189,12 @@ int do_stealth(Character *ch, char *argument, int cmd)
   if (ch->player->stealth)
   {
     ch->player->stealth = false;
-    send_to_char("Stealth mode off.\r\n", ch);
+    ch->sendln("Stealth mode off.");
   }
   else
   {
     ch->player->stealth = true;
-    send_to_char("Stealth mode on.\r\n", ch);
+    ch->sendln("Stealth mode on.");
   } /* if */
   return eSUCCESS;
 }
@@ -211,19 +211,19 @@ int do_send(Character *ch, char *argument, int cmd)
 
   if (!*name || !*message)
   {
-    send_to_char("Send what to who?\r\n", ch);
+    ch->sendln("Send what to who?");
     return eFAILURE;
   }
 
   if (!(vict = ch->get_active_pc_vis(name)))
   {
-    send_to_char("Noone by that name here.\r\n", ch);
+    ch->sendln("Noone by that name here.");
     return eFAILURE;
   }
 
   if (ch == vict)
   {
-    send_to_char("That's you, ya moron.\r\n", ch);
+    ch->sendln("That's you, ya moron.");
     return eFAILURE;
   }
 

@@ -131,7 +131,7 @@ int do_ban(Character *ch, char *argument, int cmd)
   {
     if (!ban_list)
     {
-      send_to_char("No sites are banned.\r\n", ch);
+      ch->sendln("No sites are banned.");
       return eSUCCESS;
     }
     strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
@@ -166,7 +166,7 @@ int do_ban(Character *ch, char *argument, int cmd)
   half_chop(argument, flag, site);
   if (!*site || !*flag)
   {
-    send_to_char("Usage: ban {all | select | new} site_name\r\n", ch);
+    ch->sendln("Usage: ban {all | select | new} site_name");
     return eSUCCESS;
   }
 
@@ -179,14 +179,14 @@ int do_ban(Character *ch, char *argument, int cmd)
 
   if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))
   {
-    send_to_char("Flag must be ALL, SELECT, or NEW.\r\n", ch);
+    ch->sendln("Flag must be ALL, SELECT, or NEW.");
     return eSUCCESS;
   }
   for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
   {
     if (!str_cmp(ban_node->site, site))
     {
-      send_to_char("That site has already been banned -- unban it to change the ban type.\r\n", ch);
+      ch->sendln("That site has already been banned -- unban it to change the ban type.");
       return eSUCCESS;
     }
   }
@@ -210,7 +210,7 @@ int do_ban(Character *ch, char *argument, int cmd)
   sprintf(buf, "%s has banned %s for %s players.", GET_NAME(ch), site,
           ban_types[ban_node->type]);
   logentry(buf, POWER, LogChannels::LOG_GOD);
-  send_to_char("Site banned.\r\n", ch);
+  ch->sendln("Site banned.");
   write_ban_list();
   return eSUCCESS;
 }
@@ -225,7 +225,7 @@ int do_unban(Character *ch, char *argument, int cmd)
   one_argument(argument, site);
   if (!*site)
   {
-    send_to_char("A site to unban might help.\r\n", ch);
+    ch->sendln("A site to unban might help.");
     return eSUCCESS;
   }
   ban_node = ban_list;
@@ -239,11 +239,11 @@ int do_unban(Character *ch, char *argument, int cmd)
 
   if (!found)
   {
-    send_to_char("That site is not currently banned.\r\n", ch);
+    ch->sendln("That site is not currently banned.");
     return eSUCCESS;
   }
   REMOVE_FROM_LIST(ban_node, ban_list, next);
-  send_to_char("Site unbanned.\r\n", ch);
+  ch->sendln("Site unbanned.");
   sprintf(buf, "%s removed the %s-player ban on %s.",
           GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
   logentry(buf, POWER, LogChannels::LOG_GOD);

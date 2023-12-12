@@ -35,14 +35,14 @@ int do_abandon(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
   if ((!ch->master) && (IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You can't abandon a group you're leading.\r\n", ch);
-    send_to_char("You must disband the group.\r\n", ch);
+    ch->sendln("You can't abandon a group you're leading.");
+    ch->sendln("You must disband the group.");
     return eFAILURE;
   }
 
@@ -87,7 +87,7 @@ int do_found(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -112,7 +112,7 @@ int do_found(Character *ch, char *argument, int cmd)
 
   if (strlen(argument) > 50)
   {
-    send_to_char("You gonna name your party? Or write a book?!  50 characters max.\r\n", ch);
+    ch->sendln("You gonna name your party? Or write a book?!  50 characters max.");
     return eFAILURE;
   }
 
@@ -358,12 +358,12 @@ int do_group(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis( name)))
-    send_to_char("No one here by that name.\r\n", ch);
+    ch->sendln("No one here by that name.");
 
   else
   {
@@ -399,7 +399,7 @@ int do_group(Character *ch, char *argument, int cmd)
     {
       if (ch == victim)
       {
-        send_to_char("You must found a group, or Disband a group.\r\n", ch);
+        ch->sendln("You must found a group, or Disband a group.");
         return eFAILURE;
       }
 
@@ -440,13 +440,13 @@ int do_promote(Character *ch, char *argument, int cmd)
 
   if (ch->master)
   {
-    send_to_char("You aren't running the show here, pal.\r\n", ch);
+    ch->sendln("You aren't running the show here, pal.");
     return eFAILURE;
   }
 
   if ((!ch->master) && !IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You don't even have a group to promote anyone.\r\n", ch);
+    ch->sendln("You don't even have a group to promote anyone.");
     return eFAILURE;
   }
 
@@ -559,14 +559,14 @@ int do_disband(Character *ch, char *argument, int cmd)
 
   if ((!ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You don't even have a group to disband.\r\n", ch);
+    ch->sendln("You don't even have a group to disband.");
     return eFAILURE;
   }
 
   if (!*name)
   {
     send_to_char("Who do you wish to disband? \n\r", ch);
-    send_to_char("Disband 'all' will disband the group.\r\n", ch);
+    ch->sendln("Disband 'all' will disband the group.");
     return eFAILURE;
   }
 
@@ -613,19 +613,19 @@ int do_disband(Character *ch, char *argument, int cmd)
   if (adios == ch)
   {
     send_to_char("You can't disband yourself from a group you're leading!\n\r", ch);
-    send_to_char("Either Promote someone to Group Leader, or Disband All.\r\n", ch);
+    ch->sendln("Either Promote someone to Group Leader, or Disband All.");
     return eFAILURE;
   }
 
   if (adios->master != ch)
   {
-    send_to_char("Try someone in YOUR group, fartknocker.\r\n", ch);
+    ch->sendln("Try someone in YOUR group, fartknocker.");
     return eFAILURE;
   }
 
   if ((IS_NPC(adios)) && (IS_AFFECTED(adios, AFF_CHARM)))
   {
-    send_to_char("Can't kick out a charmee.\r\n", ch);
+    ch->sendln("Can't kick out a charmee.");
     return eFAILURE;
   }
 
@@ -650,7 +650,7 @@ int do_follow(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -671,13 +671,13 @@ int do_follow(Character *ch, char *argument, int cmd)
   }
   if (cmd == 9 && !CAN_SEE(ch, leader))
   { // check it like this instead o' get_char_room_vis 'cause stalk checks.
-    send_to_char("I see no person by that name here!\r\n", ch);
+    ch->sendln("I see no person by that name here!");
     return eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You must first abandon your group.\r\n", ch);
+    ch->sendln("You must first abandon your group.");
     return eFAILURE;
   }
 
@@ -692,7 +692,7 @@ int do_follow(Character *ch, char *argument, int cmd)
     {
       if (!ch->master)
       {
-        send_to_char("You are already following yourself.\r\n", ch);
+        ch->sendln("You are already following yourself.");
         return eFAILURE;
       }
       stop_follower(ch, STOP_FOLLOW);

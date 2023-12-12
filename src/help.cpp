@@ -122,7 +122,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
   if (!new_help_table)
   {
-    send_to_char("No help available.\r\n", ch);
+    ch->sendln("No help available.");
     return eFAILURE;
   }
 
@@ -229,7 +229,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
   int a = ch->getLevel() == 0 ? 1 : ch->getLevel();
   if (this_help->min_level > a)
   {
-    send_to_char("There is no help on that word.\r\n", ch);
+    ch->sendln("There is no help on that word.");
     return eFAILURE;
   }
 
@@ -435,7 +435,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
       { // not valid numbers
         if (atoi(argument) > atoi(arg))
         {
-          send_to_char("Usage: hindex -l <low level> <high level>\r\n", ch);
+          ch->sendln("Usage: hindex -l <low level> <high level>");
           return eFAILURE;
         }
         if (!*arg)
@@ -484,17 +484,17 @@ int do_hindex(Character *ch, char *argument, int cmd)
   { // index #s out of range
     if (atoi(argument) > atoi(arg))
     {
-      send_to_char("Usage: hindex <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
+      ch->sendln("Usage: hindex <low ID#> <high ID#>"); // wrong order, first > second
       return eFAILURE;
     }
     else if ((atoi(arg) - atoi(argument)) >= 30)
     { // too many listed, only 30 at a time or we get too much spam
-      send_to_char("You can only list 30 help entries at a time.\r\n", ch);
+      ch->sendln("You can only list 30 help entries at a time.");
       return eFAILURE;
     }
     else if (atoi(argument) >= new_top_of_helpt || atoi(arg) >= new_top_of_helpt)
     {
-      send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+      ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
     }
 
@@ -509,7 +509,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
   { // show a specific ID #
     if (atoi(argument) >= new_top_of_helpt)
     {
-      send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+      ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
     }
 
@@ -560,12 +560,12 @@ int do_index(Character *ch, char *argument, int cmd)
   { // index #s out of range
     if (atoi(argument) > atoi(arg))
     {
-      send_to_char("Usage: index <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
+      ch->sendln("Usage: index <low ID#> <high ID#>"); // wrong order, first > second
       return eFAILURE;
     }
     if (atoi(argument) >= new_top_of_helpt || atoi(arg) >= new_top_of_helpt)
     {
-      send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+      ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
     }
     show_help_header(ch);
@@ -583,12 +583,12 @@ int do_index(Character *ch, char *argument, int cmd)
   { // show a specific ID #
     if (atoi(argument) >= new_top_of_helpt)
     {
-      send_to_char("Out of range.\r\n", ch);
+      ch->sendln("Out of range.");
       return eFAILURE;
     }
 
     if (new_help_table[atoi(argument)].min_level > 1)
-      send_to_char("You are not high enough level to view this helpfile.\r\n", ch);
+      ch->sendln("You are not high enough level to view this helpfile.");
     else
     {
       show_help_header(ch);
@@ -680,7 +680,7 @@ int do_reload_help(Character *ch, char *argument, int cmd)
   FILE *new_help_fl;
   int help_rec_count = 0, ret = 0;
 
-  // send_to_char("Command disabled!\r\n", ch);
+  // ch->sendln("Command disabled!");
   // return eFAILURE;
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
@@ -706,11 +706,11 @@ int do_reload_help(Character *ch, char *argument, int cmd)
 
   if (ret == eFAILURE)
   {
-    send_to_char("Error reloading help files!\r\n", ch);
+    ch->sendln("Error reloading help files!");
     return eFAILURE;
   }
 
-  send_to_char("Help files reloaded.\r\n", ch);
+  ch->sendln("Help files reloaded.");
   return eSUCCESS;
 }
 
@@ -725,7 +725,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill(COMMAND_HEDIT))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -776,7 +776,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
       help_id = 0;
     if (help_id < 0 || help_id >= new_top_of_helpt)
     {
-      send_to_char("Not a valid help ID number.  Try using 'hindex'\r\n", ch);
+      ch->sendln("Not a valid help ID number.  Try using 'hindex'");
       return eFAILURE;
     }
     half_chop(buf2, field, buf2);
@@ -785,7 +785,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
       half_chop(buf2, buf3, value);
       if (!*buf3 || !*value)
       {
-        send_to_char("Not a valid key # or no value specified.\r\n", ch);
+        ch->sendln("Not a valid key # or no value specified.");
         return eFAILURE;
       }
       if ((key_id = atoi(buf3)))
@@ -814,7 +814,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
           new_help_table[help_id].keyword5 = str_hsh(value);
           break;
         default:
-          send_to_char("Not a valid key #.\r\n", ch);
+          ch->sendln("Not a valid key #.");
           return eFAILURE;
           break;
         }
@@ -823,7 +823,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("Not a valid key #.\r\n", ch);
+        ch->sendln("Not a valid key #.");
         return eFAILURE;
       }
     }
@@ -839,7 +839,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("Invalid level specified.\r\n", ch);
+        ch->sendln("Invalid level specified.");
       }
     }
     else if (is_abbrev(field, "related"))
@@ -915,7 +915,7 @@ void save_help(Character *ch)
 
   if ((f = fopen(file, "w")) == nullptr)
   {
-    send_to_char("Couldn't open help file for saving.\r\n", ch);
+    ch->sendln("Couldn't open help file for saving.");
     perror("Couldn't open help file for saving.\r\n");
     return;
   }
@@ -941,7 +941,7 @@ void save_help(Character *ch)
   fprintf(f, "$~\n");
 
   fclose(f);
-  send_to_char("Saved.\r\n", ch);
+  ch->sendln("Saved.");
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
   logentry(buf, OVERSEER, LogChannels::LOG_HELP);
 
@@ -949,7 +949,7 @@ void save_help(Character *ch)
 
   if ((f = fopen(file, "w")) == nullptr)
   {
-    send_to_char("Couldn't open web help file for saving.\r\n", ch);
+    ch->sendln("Couldn't open web help file for saving.");
     perror("Couldn't open web help file for saving.\r\n");
     return;
   }

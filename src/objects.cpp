@@ -221,7 +221,7 @@ int do_switch(Character *ch, char *arg, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -248,13 +248,13 @@ int do_switch(Character *ch, char *arg, int cmd)
   }
   if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
-    send_to_char("Your primary wield is too heavy to wield as secondary.\r\n", ch);
+    ch->sendln("Your primary wield is too heavy to wield as secondary.");
     return eFAILURE;
   }
   between = ch->equipment[WIELD];
   ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
   ch->equipment[SECOND_WIELD] = between;
-  send_to_char("You switch your weapon positions.\r\n", ch);
+  ch->sendln("You switch your weapon positions.");
   return eSUCCESS;
 }
 
@@ -319,7 +319,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -367,7 +367,7 @@ int do_recite(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("Your magic is muffled by greater beings.\r\n", ch);
+    ch->sendln("Your magic is muffled by greater beings.");
     return eFAILURE;
   }
   equipped = false;
@@ -408,7 +408,7 @@ int do_recite(Character *ch, char *argument, int cmd)
     bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj, true);
     if (bits == 0)
     {
-      send_to_char("No such thing around to recite the scroll on.\r\n", ch);
+      ch->sendln("No such thing around to recite the scroll on.");
       return eFAILURE;
     }
   }
@@ -434,12 +434,12 @@ int do_recite(Character *ch, char *argument, int cmd)
   {
     // failed to read scroll
     act("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("You mumble the words and the scroll goes up in flame!\r\n", ch);
+    ch->sendln("You mumble the words and the scroll goes up in flame!");
   }
   else
   {
     if (victim && !AWAKE(victim) && number(1, 5) < 3)
-      send_to_char("Your sleep is restless.\r\n", victim);
+      victim->sendln("Your sleep is restless.");
 
     // success
     for (i = 1; i < 4; i++)
@@ -534,7 +534,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   one_argument(arg, direct);
   if (!arg)
   {
-    send_to_char("Set it off in which direction?\r\n", ch);
+    ch->sendln("Set it off in which direction?");
     return false;
   }
 
@@ -558,12 +558,12 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("In the rear with the gear huh?  Maybe use this somewhere in the field.\r\n", ch);
+    ch->sendln("In the rear with the gear huh?  Maybe use this somewhere in the field.");
     return false;
   }
   if (CAN_GO(ch, dir) && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
   {
-    send_to_char("Firing it into a safe room seems wasteful.\r\n", ch);
+    ch->sendln("Firing it into a safe room seems wasteful.");
     return false;
   }
 
@@ -576,7 +576,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
 
   do_say(ch, "Fire in the hole!", CMD_DEFAULT);
   act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
-  send_to_char("You set off the device with a loud bang.\r\n", ch);
+  ch->sendln("You set off the device with a loud bang.");
 
   if (!CAN_GO(ch, dir))
   {
@@ -613,7 +613,7 @@ void set_catstink(Character *ch, class Object *obj)
     if (SECT_MAX_SECT < obj->obj_flags.value[1] ||
         0 > obj->obj_flags.value[1])
     {
-      send_to_char("This item has an illegal value1.  Tell a god.\r\n", ch);
+      ch->sendln("This item has an illegal value1.  Tell a god.");
       return;
     }
 
@@ -636,7 +636,7 @@ void set_utility_item(Character *ch, class Object *obj, char *argument)
 
   if (class_restricted(ch, obj))
   {
-    send_to_char("You are forbidden.\r\n", ch);
+    ch->sendln("You are forbidden.");
     return;
   }
 
@@ -656,7 +656,7 @@ void set_utility_item(Character *ch, class Object *obj, char *argument)
       return; // it failed
     break;
   default:
-    send_to_char("Unknown utility item value.  Tell a god.\r\n", ch);
+    ch->sendln("Unknown utility item value.  Tell a god.");
     return;
     break;
   }
@@ -675,7 +675,7 @@ int do_mortal_set(Character *ch, char *argument, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Set what?\r\n", ch);
+    ch->sendln("Set what?");
     return eFAILURE;
   }
 
@@ -695,7 +695,7 @@ int do_mortal_set(Character *ch, char *argument, int cmd)
     //      set_trap_item(ch, obj, argument);
     //      break;
   default:
-    send_to_char("You can't set that.\r\n", ch);
+    ch->sendln("You can't set that.");
     break;
   }
   return eSUCCESS;
@@ -713,13 +713,13 @@ int do_use(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("Your magic is muffled by greater beings.\r\n", ch);
+    ch->sendln("Your magic is muffled by greater beings.");
     return eFAILURE;
   }
 
@@ -756,7 +756,7 @@ int do_use(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("The staff seems powerless.\r\n", ch);
+      ch->sendln("The staff seems powerless.");
     }
   }
   else if (stick->obj_flags.type_flag == ITEM_WAND)
@@ -791,7 +791,7 @@ int do_use(Character *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("The wand seems powerless.\r\n", ch);
+        ch->sendln("The wand seems powerless.");
       }
     }
     else
@@ -801,7 +801,7 @@ int do_use(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Use is normally only for wands and staves.\r\n", ch);
+    ch->sendln("Use is normally only for wands and staves.");
   }
   return eFAILURE;
 }
@@ -816,12 +816,12 @@ int do_name(Character *ch, char *arg, int cmd)
 
   if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NONAME))
   {
-    send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
+    ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
   }
   if (ch->getLevel() < 5)
   {
-    send_to_char("You cannot use the \"name\" command until you have reached level 5.\r\n", ch);
+    ch->sendln("You cannot use the \"name\" command until you have reached level 5.");
     return eFAILURE;
   }
   while (*arg == ' ') /* get rid of white space */
@@ -835,7 +835,7 @@ int do_name(Character *ch, char *arg, int cmd)
 
   if (strlen(arg) > 30)
   {
-    send_to_char("Name too long, must be under 30 characters long.\r\n", ch);
+    ch->sendln("Name too long, must be under 30 characters long.");
     return eFAILURE;
   }
 
@@ -864,7 +864,7 @@ int do_name(Character *ch, char *arg, int cmd)
   }
   if (nope == 0)
   {
-    send_to_char("You MUST include your real name. Use % to indicate where you want it.\r\n", ch);
+    ch->sendln("You MUST include your real name. Use % to indicate where you want it.");
     return eFAILURE;
   }
 
@@ -895,7 +895,7 @@ int do_name(Character *ch, char *arg, int cmd)
     GET_SHORT_ONLY(ch) = str_hsh(buf);
   else
     GET_SHORT_ONLY(ch) = str_dup(buf);
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   return eSUCCESS;
 }
 
@@ -908,7 +908,7 @@ int do_drink(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -947,7 +947,7 @@ int do_drink(Character *ch, char *argument, int cmd)
 
   if (GET_COND(ch, THIRST) > 20)
   {
-    send_to_char("Your stomach cannot contain anymore liquid!\r\n", ch);
+    ch->sendln("Your stomach cannot contain anymore liquid!");
     return eFAILURE;
   }
 
@@ -1004,7 +1004,7 @@ int do_drink(Character *ch, char *argument, int cmd)
           ch->getHP() < GET_MAX_HIT(ch) &&
           number(0, 1))
       {
-        send_to_char("You feel refreshed!\r\n", ch);
+        ch->sendln("You feel refreshed!");
         ch->addHP(10);
       }
 
@@ -1016,7 +1016,7 @@ int do_drink(Character *ch, char *argument, int cmd)
             ch, 0, 0, TO_ROOM, 0);
         if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
         {
-          send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
+          ch->sendln("Luckily, your body rejects the poison almost immediately.");
         }
         else
         {
@@ -1059,7 +1059,7 @@ int do_eat(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1099,7 +1099,7 @@ int do_eat(Character *ch, char *argument, int cmd)
 
     if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
     {
-      send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
+      ch->sendln("Luckily, your body rejects the poison almost immediately.");
     }
     else
     {
@@ -1127,7 +1127,7 @@ int do_pour(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1242,7 +1242,7 @@ int do_sip(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1304,7 +1304,7 @@ int do_taste(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -1575,7 +1575,7 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
     // Only have to check the item itself if we're wearing it, not removing
     //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
-    send_to_char("After modifying your height that item would not fit!\r\n", ch);
+    ch->sendln("After modifying your height that item would not fit!");
     return true;
   }
 
@@ -1689,7 +1689,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_FINGER))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FINGER_L))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_FINGER_L]) && (ch->equipment[WEAR_FINGER_R]))
       {
         act("You are already wearing $p on your left ring-finger.", ch, ch->equipment[WEAR_FINGER_L], 0, TO_CHAR, 0);
@@ -1717,7 +1717,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your finger.\r\n", ch);
+      ch->sendln("You can't wear that on your finger.");
   }
   break;
   case 1:
@@ -1725,7 +1725,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_NECK))
     {
       if (charmie_restricted(ch, obj_object, WEAR_NECK_1))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_NECK_1]) && (ch->equipment[WEAR_NECK_2]))
       {
         act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_1], 0, TO_CHAR, 0);
@@ -1747,7 +1747,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that around your neck.\r\n", ch);
+      ch->sendln("You can't wear that around your neck.");
   }
   break;
   case 2:
@@ -1755,7 +1755,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_BODY))
     {
       if (charmie_restricted(ch, obj_object, WEAR_BODY))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_BODY])
       {
         act("You already wear $p on your body.", ch, ch->equipment[WEAR_BODY], 0, TO_CHAR, 0);
@@ -1768,7 +1768,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your body.\r\n", ch);
+      ch->sendln("You can't wear that on your body.");
   }
   break;
   case 3:
@@ -1776,7 +1776,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_HEAD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HEAD))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_HEAD])
       {
         act("You already wear $p on your head.", ch, ch->equipment[WEAR_HEAD], 0, TO_CHAR, 0);
@@ -1789,7 +1789,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your head.\r\n", ch);
+      ch->sendln("You can't wear that on your head.");
   }
   break;
   case 4:
@@ -1797,7 +1797,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_LEGS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_LEGS))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_LEGS])
       {
         act("You already wear $p on your legs.", ch, ch->equipment[WEAR_LEGS], 0, TO_CHAR, 0);
@@ -1810,7 +1810,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your legs.\r\n", ch);
+      ch->sendln("You can't wear that on your legs.");
   }
   break;
   case 5:
@@ -1818,7 +1818,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_FEET))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FEET))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_FEET])
       {
         act("You already wear $p on your feet.", ch, ch->equipment[WEAR_FEET], 0, TO_CHAR, 0);
@@ -1831,7 +1831,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your feet.\r\n", ch);
+      ch->sendln("You can't wear that on your feet.");
   }
   break;
   case 6:
@@ -1839,7 +1839,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_HANDS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HANDS))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_HANDS])
       {
         act("You already wear $p on your hands.", ch, ch->equipment[WEAR_HANDS], 0, TO_CHAR, 0);
@@ -1852,7 +1852,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your hands.\r\n", ch);
+      ch->sendln("You can't wear that on your hands.");
   }
   break;
   case 7:
@@ -1860,7 +1860,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_ARMS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ARMS))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_ARMS])
       {
         act("You already wear $p on your arms.", ch, ch->equipment[WEAR_ARMS], 0, TO_CHAR, 0);
@@ -1873,7 +1873,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your arms.\r\n", ch);
+      ch->sendln("You can't wear that on your arms.");
   }
   break;
   case 8:
@@ -1881,7 +1881,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_ABOUT))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ABOUT))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_ABOUT])
       {
         act("You already wear $p about your body.", ch, ch->equipment[WEAR_ABOUT], 0, TO_CHAR, 0);
@@ -1894,7 +1894,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that about your body.\r\n", ch);
+      ch->sendln("You can't wear that about your body.");
   }
   break;
   case 9:
@@ -1902,7 +1902,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_WAISTE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WAISTE))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_WAISTE])
       {
         act("You already wear $p about your waist.", ch, ch->equipment[WEAR_WAISTE], 0, TO_CHAR, 0);
@@ -1915,7 +1915,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that about your waist.\r\n", ch);
+      ch->sendln("You can't wear that about your waist.");
   }
   break;
   case 10:
@@ -1923,7 +1923,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_WRIST))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WRIST_L))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_WRIST_L]) && (ch->equipment[WEAR_WRIST_R]))
       {
         act("You already wear $p around your left wrist.", ch, ch->equipment[WEAR_WRIST_L], 0, TO_CHAR, 0);
@@ -1950,7 +1950,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that around your wrist.\r\n", ch);
+      ch->sendln("You can't wear that around your wrist.");
   }
   break;
 
@@ -1959,10 +1959,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_FACE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FACE))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_FACE]))
       {
-        send_to_char("You only have one face.\r\n", ch);
+        ch->sendln("You only have one face.");
       }
       else
       {
@@ -1981,7 +1981,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     {
       if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
-        send_to_char("It is too heavy for you to use.\r\n", ch);
+        ch->sendln("It is too heavy for you to use.");
       else if (ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
@@ -1989,13 +1989,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
       else if ((!hands_are_free(ch, 2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
-        send_to_char("You need both hands for this weapon.\r\n", ch);
+        ch->sendln("You need both hands for this weapon.");
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\r\n", ch);
+        ch->sendln("Your hands are already full.");
 
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
-        send_to_char("Sorry, charmies can't wield stuff anymore:(\r\n", ch);
+        ch->sendln("Sorry, charmies can't wield stuff anymore:(");
         do_say(ch, "I'm sorry my master, I lack the dexterity.", 0);
       }
       else
@@ -2009,7 +2009,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wield that.\r\n", ch);
+      ch->sendln("You can't wield that.");
     break;
 
   case 13:
@@ -2017,7 +2017,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_SHIELD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_SHIELD))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (ch->equipment[WEAR_SHIELD])
       {
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
@@ -2025,10 +2025,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       else if ((!hands_are_free(ch, 2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
-        send_to_char("You need both hands for this shield.\r\n", ch);
+        ch->sendln("You need both hands for this shield.");
       }
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\r\n", ch);
+        ch->sendln("Your hands are already full.");
 
       else
       {
@@ -2039,7 +2039,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     }
 
     else
-      send_to_char("You can't use that as a shield.\r\n", ch);
+      ch->sendln("You can't use that as a shield.");
   }
   break;
 
@@ -2048,17 +2048,17 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     {
 
       if (charmie_restricted(ch, obj_object, HOLD))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\r\n", ch);
+        ch->sendln("Your hands are already full.");
       else if ((!hands_are_free(ch, 2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
-        send_to_char("You need both hands for this item.\r\n", ch);
+        ch->sendln("You need both hands for this item.");
       }
       else if (obj_object->obj_flags.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[HOLD] && ch->equipment[HOLD]->obj_flags.type_flag == ITEM_INSTRUMENT) || (ch->equipment[HOLD2] && ch->equipment[HOLD2]->obj_flags.type_flag == ITEM_INSTRUMENT)))
       {
-        send_to_char("You're busy enough playing the instrument you're already using.\r\n", ch);
+        ch->sendln("You're busy enough playing the instrument you're already using.");
       }
       else
       {
@@ -2071,7 +2071,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't hold this.\r\n", ch);
+      ch->sendln("You can't hold this.");
     break;
 
   case 15:
@@ -2079,7 +2079,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (CAN_WEAR(obj_object, ITEM_WEAR_EAR))
     {
       if (charmie_restricted(ch, obj_object, WEAR_EAR_L))
-        send_to_char("You cannot wear this.\r\n", ch);
+        ch->sendln("You cannot wear this.");
       else if ((ch->equipment[WEAR_EAR_L]) && (ch->equipment[WEAR_EAR_R]))
       {
         act("You already wearing $p on your left ear.", ch, ch->equipment[WEAR_EAR_L], 0, TO_CHAR, 0);
@@ -2103,14 +2103,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that in your ear.\r\n", ch);
+      ch->sendln("You can't wear that in your ear.");
   }
   break;
 
   case 16:
   { /* LIGHT SOURCE */
     if (charmie_restricted(ch, obj_object, WEAR_LIGHT))
-      send_to_char("You cannot wear this.\r\n", ch);
+      ch->sendln("You cannot wear this.");
     else if (ch->equipment[WEAR_LIGHT])
     {
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
@@ -2118,10 +2118,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     else if ((!hands_are_free(ch, 2)) &&
              (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
     {
-      send_to_char("You need both hands for this light.\r\n", ch);
+      ch->sendln("You need both hands for this light.");
     }
     else if (!hands_are_free(ch, 1))
-      send_to_char("Your hands are already full.\r\n", ch);
+      ch->sendln("Your hands are already full.");
     else if (obj_object->obj_flags.type_flag != ITEM_LIGHT)
       send_to_char("That isn't a light you cheating fuck!\n\r", ch);
     else
@@ -2145,7 +2145,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
       if (!hands_are_free(ch, 1))
       {
-        send_to_char("Your hands are already full.\r\n", ch);
+        ch->sendln("Your hands are already full.");
         break;
       }
 
@@ -2170,7 +2170,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       return;
     }
     else
-      send_to_char("You can't wield that.\r\n", ch);
+      ch->sendln("You can't wield that.");
     break;
 
   case -1:
@@ -2270,7 +2270,7 @@ int do_wear(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -2346,7 +2346,7 @@ int do_wield(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -2395,7 +2395,7 @@ int do_grab(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -2488,7 +2488,7 @@ int do_remove(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
@@ -2531,7 +2531,7 @@ int do_remove(Character *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You can't carry that many items.\r\n", ch);
+          ch->sendln("You can't carry that many items.");
           j = MAX_WEAR;
         }
       }
@@ -2587,13 +2587,13 @@ int do_remove(Character *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You can't carry that many items.\r\n", ch);
+          ch->sendln("You can't carry that many items.");
           j = MAX_WEAR;
         }
       }
       else
       {
-        send_to_char("You are not using it.\r\n", ch);
+        ch->sendln("You are not using it.");
       }
     }
   }

@@ -270,7 +270,7 @@ void show_quest_info(Character *ch, int num)
          return;
       }
    }
-   send_to_char("That quest doesn't exist.\r\n", ch);
+   ch->sendln("That quest doesn't exist.");
 }
 
 bool check_available_quest(Character *ch, struct quest_info *quest)
@@ -534,7 +534,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    if (!check_available_quest(ch, quest))
    {
-      send_to_char("That quest is not available to you.\r\n", ch);
+      ch->sendln("That quest is not available to you.");
       return eFAILURE;
    }
 
@@ -545,7 +545,7 @@ int start_quest(Character *ch, struct quest_info *quest)
       count++;
       if (count == QUEST_MAX)
       {
-         send_to_char("You've got too many quests started already.\r\n", ch);
+         ch->sendln("You've got too many quests started already.");
          return eEXTRA_VALUE;
       }
    }
@@ -584,7 +584,7 @@ int start_quest(Character *ch, struct quest_info *quest)
 
    if (!mob)
    {
-      send_to_char("This quest is temporarily unavailable.\r\n", ch);
+      ch->sendln("This quest is temporarily unavailable.");
       return eFAILURE;
    }
 
@@ -679,7 +679,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
 
    if (!obj)
    {
-      send_to_char("You do not appear to have the quest object yet.\r\n", ch);
+      ch->sendln("You do not appear to have the quest object yet.");
       return eFAILURE;
    }
 
@@ -978,7 +978,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You must ask the Quest Master for available quests.\r\n", ch);
+         ch->sendln("You must ask the Quest Master for available quests.");
       else
          retval = quest_handler(ch, qmaster, 1, 0);
    }
@@ -987,7 +987,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You must let the Quest Master know of your intentions.\r\n", ch);
+         ch->sendln("You must let the Quest Master know of your intentions.");
       else
          retval = quest_handler(ch, qmaster, 2, name);
       return retval;
@@ -997,7 +997,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You may only begin quests given from the Quest Master.\r\n", ch);
+         ch->sendln("You may only begin quests given from the Quest Master.");
       else
          retval = quest_handler(ch, qmaster, 3, name);
       return retval;
@@ -1007,7 +1007,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You may only finish quests in the presence of the Quest Master.\r\n", ch);
+         ch->sendln("You may only finish quests in the presence of the Quest Master.");
       else
          retval = quest_handler(ch, qmaster, 4, name);
       return retval;
@@ -1021,7 +1021,7 @@ int do_quest(Character *ch, char *arg, int cmd)
 
       if (ch->in_room != qmaster->in_room)
       {
-         send_to_char("You may only reset all quests in the presence of the Quest Master.\r\n", ch);
+         ch->sendln("You may only reset all quests in the presence of the Quest Master.");
          return eFAILURE;
       }
 
@@ -1087,7 +1087,7 @@ int do_quest(Character *ch, char *arg, int cmd)
       }
       memset(ch->player->quest_cancel, 0, sizeof(ch->player->quest_cancel));
       memset(ch->player->quest_complete, 0, sizeof(ch->player->quest_complete));
-      send_to_char("All quests have been reset.\r\n", ch);
+      ch->sendln("All quests have been reset.");
       return retval;
    }
    else
@@ -1156,7 +1156,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
 
    if (is_abbrev(arg, "save"))
    {
-      send_to_char("Quests saved.\r\n", ch);
+      ch->sendln("Quests saved.");
       return save_quests();
    }
 
@@ -1172,7 +1172,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
          quest = get_quest_struct(argument);
          if (quest)
          {
-            send_to_char("A quest by this name already exists.\r\n", ch);
+            ch->sendln("A quest by this name already exists.");
             return eFAILURE;
          }
          else
@@ -1204,7 +1204,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       {
          if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
          {
-            send_to_char("No living thing by that name.\r\n", ch);
+            ch->sendln("No living thing by that name.");
             return eFAILURE;
          }
 
@@ -1224,7 +1224,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       {
          if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
          {
-            send_to_char("No living thing by that name.\r\n", ch);
+            ch->sendln("No living thing by that name.");
             return eFAILURE;
          }
 
@@ -1252,7 +1252,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       {
          if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
          {
-            send_to_char("No living thing by that name.\r\n", ch);
+            ch->sendln("No living thing by that name.");
             return eFAILURE;
          }
 
@@ -1313,25 +1313,25 @@ int do_qedit(Character *ch, char *argument, int cmd)
 
    if (holdernum <= 0 || holdernum > QUEST_TOTAL)
    {
-      send_to_char("Invalid quest number.\r\n", ch);
+      ch->sendln("Invalid quest number.");
       return eFAILURE;
    }
 
    if (!(quest = get_quest_struct(holdernum)))
    {
-      send_to_char("That quest doesn't exist.\r\n", ch);
+      ch->sendln("That quest doesn't exist.");
       return eFAILURE;
    }
 
    if (!*field)
    {
-      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\r\n", ch);
+      ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.");
       return eFAILURE;
    }
 
    if (!(*value))
    {
-      send_to_char("You must enter a value.\r\n", ch);
+      ch->sendln("You must enter a value.");
       return eFAILURE;
    }
 
@@ -1346,7 +1346,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
 
    if (valid_fields[i] == nullptr)
    {
-      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.\r\n", ch);
+      ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.");
       return eFAILURE;
    }
 
@@ -1359,7 +1359,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       oldquest = get_quest_struct(field);
       if (oldquest)
       {
-         send_to_char("A quest by this name already exists.\r\n", ch);
+         ch->sendln("A quest by this name already exists.");
          return eFAILURE;
       }
       else
@@ -1484,7 +1484,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
    if (cmd == CMD_LIST)
    { /* List */
       send_to_char("$B$2Orro tells you, 'This is what I can do for you...$R \n\r", ch);
-      send_to_char("$BQuest Equipment:$R\r\n", ch);
+      ch->sendln("$BQuest Equipment:$R");
 
       int n = 0;
       for (int qvnum = 27975; qvnum < 27997; qvnum++)

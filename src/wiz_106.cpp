@@ -79,7 +79,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
   else if (name != "all")
   {
     if (!(vict = get_char_vis(ch, name)))
-      send_to_char("No one by that name here..\r\n", ch);
+      ch->sendln("No one by that name here..");
     else
     {
       if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
@@ -100,7 +100,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
         {
           buf = fmt::format("$n has forced you to '{}'.", to_force);
           act(buf, ch, 0, vict, TO_VICT, 0);
-          send_to_char("Ok.\r\n", ch);
+          ch->sendln("Ok.");
         }
         buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
                           GET_NAME(vict), to_force);
@@ -114,7 +114,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
   { /* force all */
     if (ch->getLevel() < OVERSEER)
     {
-      send_to_char("Not gonna happen.\r\n", ch);
+      ch->sendln("Not gonna happen.");
       return eFAILURE;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = next_i)
@@ -136,7 +136,7 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
         }
       }
     }
-    send_to_char("Ok.\r\n", ch);
+    ch->sendln("Ok.");
     buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
   }

@@ -107,7 +107,7 @@ public:
 	  ch->desc->web_connected = Connection::states::PLAYING;
 	  result = *(ch->desc->strnew);
 	  ch->desc->strnew = 0;
-	  send_to_char("Entry submitted.\r\n", ch);
+	  ch->sendln("Entry submitted.");
 	} else {
 	  std::string str_result = *(ch->desc->strnew);
 

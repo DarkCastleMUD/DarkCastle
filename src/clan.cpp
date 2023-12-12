@@ -856,7 +856,7 @@ void clan_death(Character *ch, Character *killer)
 
   if (!(clan = get_clan(ch->clan)))
   {
-    send_to_char("You have an illegal clan number.  Contact a god.\r\n", ch);
+    ch->sendln("You have an illegal clan number.  Contact a god.");
     return;
   }
 
@@ -869,7 +869,7 @@ void clan_death(Character *ch, Character *killer)
 
   if (!(curr = strstr(clan->death_message, "%")))
   {
-    send_to_char("Error:  clan with illegal death_message.  Contact a god.\r\n", ch);
+    ch->sendln("Error:  clan with illegal death_message.  Contact a god.");
     return;
   }
 
@@ -879,7 +879,7 @@ void clan_death(Character *ch, Character *killer)
 
   if (!(curr = strstr(buf, "#")))
   {
-    send_to_char("Error:  clan with illegal death_message.  Contact a god.\r\n", ch);
+    ch->sendln("Error:  clan with illegal death_message.  Contact a god.");
     return;
   }
 
@@ -913,7 +913,7 @@ void clan_login(Character *ch)
 
   if (!is_in_clan(clan, ch))
   {
-    send_to_char("You were kicked out of your clan.\r\n", ch);
+    ch->sendln("You were kicked out of your clan.");
     ch->clan = 0;
     return;
   }
@@ -923,7 +923,7 @@ void clan_login(Character *ch)
 
   if (!(curr = strstr(clan->login_message, "%")))
   {
-    send_to_char("Error:  clan with illegal login_message.  Contact a god.\r\n", ch);
+    ch->sendln("Error:  clan with illegal login_message.  Contact a god.");
     return;
   }
 
@@ -945,7 +945,7 @@ void clan_logout(Character *ch)
 
   if (!(clan = get_clan(ch->clan)))
   {
-    send_to_char("You have an illegal clan number.  Contact a god.\r\n", ch);
+    ch->sendln("You have an illegal clan number.  Contact a god.");
     return;
   }
 
@@ -960,7 +960,7 @@ void clan_logout(Character *ch)
 
   if (!(curr = strstr(clan->logout_message, "%")))
   {
-    send_to_char("Error:  clan with illegal logout_message.  Contact a god.\r\n", ch);
+    ch->sendln("Error:  clan with illegal logout_message.  Contact a god.");
     return;
   }
 
@@ -1008,13 +1008,13 @@ int do_accept(Character *ch, char *arg, int cmd)
 
   if (IS_NPC(victim) || victim->getLevel() >= IMMORTAL)
   {
-    send_to_char("Yeah right.\r\n", ch);
+    ch->sendln("Yeah right.");
     return eFAILURE;
   }
 
   if (victim->clan)
   {
-    send_to_char("This person already belongs to a clan.\r\n", ch);
+    ch->sendln("This person already belongs to a clan.");
     return eFAILURE;
   }
 
@@ -1022,7 +1022,7 @@ int do_accept(Character *ch, char *arg, int cmd)
   add_clan_member(clan, victim);
   save_clans();
   sprintf(buf, "You are now a member of %s.\r\n", clan->name);
-  send_to_char("Your clan now has a new member.\r\n", ch);
+  ch->sendln("Your clan now has a new member.");
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
@@ -1082,7 +1082,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
 
   if (!victim->clan)
   {
-    send_to_char("This person isn't in a clan in the first place...\r\n", this);
+    this->sendln("This person isn't in a clan in the first place...");
     return eFAILURE;
   }
 
@@ -1101,7 +1101,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   if (victim == this)
   {
     logentry(QString("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
-    send_to_char("You quit your clan.\r\n", this);
+    this->sendln("You quit your clan.");
     remove_totem_stats(victim);
     victim->clan = 0;
     remove_clan_member(clan, this);
@@ -1111,7 +1111,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
 
   if (victim->clan != this->clan)
   {
-    send_to_char("That person isn't in your clan!\r\n", this);
+    this->sendln("That person isn't in your clan!");
     return eFAILURE;
   }
 
@@ -1169,7 +1169,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
 
   if (IS_NPC(victim))
   {
-    send_to_char("Yeah right.\r\n", ch);
+    ch->sendln("Yeah right.");
     return eFAILURE;
   }
 
@@ -1187,7 +1187,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
   save_clans();
 
   sprintf(buf, "You are now the leader of %s.\r\n", clan->name);
-  send_to_char("Your clan now has a new leader.\r\n", ch);
+  ch->sendln("Your clan now has a new leader.");
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
@@ -1210,7 +1210,7 @@ int clan_desc(Character *ch, char *arg)
     if (clan->description)
       dc_free(clan->description);
     clan->description = nullptr;
-    send_to_char("Clan description removed.\r\n", ch);
+    ch->sendln("Clan description removed.");
     return 1;
   }
 
@@ -1219,7 +1219,7 @@ int clan_desc(Character *ch, char *arg)
     sprintf(buf, "$3Syntax$R:  clans description change\r\n\r\nCurrent description: %s\r\n",
             clan->description ? clan->description : "(No Description)");
     send_to_char(buf, ch);
-    send_to_char("To not have any description use:  clans description delete\r\n", ch);
+    ch->sendln("To not have any description use:  clans description delete");
     return 0;
   }
 
@@ -1227,7 +1227,7 @@ int clan_desc(Character *ch, char *arg)
       dc_free(clan->description);
     clan->description = nullptr;
   */
-  // send_to_char("Write new description.  ~ to end.\r\n", ch);
+  // ch->sendln("Write new description.  ~ to end.");
 
   //  ch->desc->connected = Connection::states::EDITING;
   //  ch->desc->str = &clan->description;
@@ -1263,7 +1263,7 @@ int clan_motd(Character *ch, char *arg)
     if (clan->clanmotd)
       dc_free(clan->clanmotd);
     clan->clanmotd = nullptr;
-    send_to_char("Clan motd removed.\r\n", ch);
+    ch->sendln("Clan motd removed.");
     return 1;
   }
 
@@ -1272,7 +1272,7 @@ int clan_motd(Character *ch, char *arg)
     sprintf(buf, "$3Syntax$R:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
             clan->clanmotd ? clan->clanmotd : "(No Motd)");
     send_to_char(buf, ch);
-    send_to_char("To not have any motd use:  clans motd delete\r\n", ch);
+    ch->sendln("To not have any motd use:  clans motd delete");
     return 0;
   }
 
@@ -1280,7 +1280,7 @@ int clan_motd(Character *ch, char *arg)
       dc_free(clan->clanmotd);
     clan->clanmotd = nullptr;
   */
-  // send_to_char("Write new motd.  ~ to end.\r\n", ch);
+  // ch->sendln("Write new motd.  ~ to end.");
 
   // ch->desc->connected = Connection::states::EDITING;
   // ch->desc->str = &clan->clanmotd;
@@ -1314,14 +1314,14 @@ int clan_death_message(Character *ch, char *arg)
     sprintf(buf, "$3Syntax$R:  clans death <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->death_message);
     send_to_char(buf, ch);
-    send_to_char("To not have any message use:  clans death delete\r\n", ch);
+    ch->sendln("To not have any message use:  clans death delete");
     return 0;
   }
 
   one_argument(arg, buf);
   if (!strncmp(buf, "delete", 6))
   {
-    send_to_char("Clan death message removed.\r\n", ch);
+    ch->sendln("Clan death message removed.");
     if (clan->death_message)
       dc_free(clan->death_message);
     clan->death_message = nullptr;
@@ -1330,7 +1330,7 @@ int clan_death_message(Character *ch, char *arg)
 
   if (strstr(arg, "~"))
   {
-    send_to_char("No ~s fatt butt!\r\n", ch);
+    ch->sendln("No ~s fatt butt!");
     return 0;
   }
 
@@ -1338,25 +1338,25 @@ int clan_death_message(Character *ch, char *arg)
 
   if (!(curr = strstr(arg, "%")))
   {
-    send_to_char("You must include a '%' to represent the victim's name.\r\n", ch);
+    ch->sendln("You must include a '%' to represent the victim's name.");
     return 0;
   }
 
   if (strstr(curr + 1, "%"))
   {
-    send_to_char("You may only have one '%' in the message.\r\n", ch);
+    ch->sendln("You may only have one '%' in the message.");
     return 0;
   }
 
   if (!(curr = strstr(arg, "#")))
   {
-    send_to_char("You must include a '#' to represent the killer's name.\r\n", ch);
+    ch->sendln("You must include a '#' to represent the killer's name.");
     return 0;
   }
 
   if (strstr(curr + 1, "#"))
   {
-    send_to_char("You may only have one '#' in the message.\r\n", ch);
+    ch->sendln("You may only have one '#' in the message.");
     return 0;
   }
 
@@ -1382,14 +1382,14 @@ int clan_logout_message(Character *ch, char *arg)
     sprintf(buf, "$3Syntax$R:  clans logout <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->logout_message);
     send_to_char(buf, ch);
-    send_to_char("To not have any message use:  clans logout delete\r\n", ch);
+    ch->sendln("To not have any message use:  clans logout delete");
     return 0;
   }
 
   one_argument(arg, buf);
   if (!strncmp(buf, "delete", 6))
   {
-    send_to_char("Clan logout message removed.\r\n", ch);
+    ch->sendln("Clan logout message removed.");
     if (clan->logout_message)
       dc_free(clan->logout_message);
     clan->logout_message = nullptr;
@@ -1398,7 +1398,7 @@ int clan_logout_message(Character *ch, char *arg)
 
   if (strstr(arg, "~"))
   {
-    send_to_char("No ~s fatt butt!\r\n", ch);
+    ch->sendln("No ~s fatt butt!");
     return 0;
   }
 
@@ -1406,13 +1406,13 @@ int clan_logout_message(Character *ch, char *arg)
 
   if (!(curr = strstr(arg, "%")))
   {
-    send_to_char("You must include a '%' to represent the person's name.\r\n", ch);
+    ch->sendln("You must include a '%' to represent the person's name.");
     return 0;
   }
 
   if (strstr(curr + 1, "%"))
   {
-    send_to_char("You may only have one '%' in the message.\r\n", ch);
+    ch->sendln("You may only have one '%' in the message.");
     return 0;
   }
 
@@ -1438,14 +1438,14 @@ int clan_login_message(Character *ch, char *arg)
     sprintf(buf, "$3Syntax$R:  clans login <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->login_message);
     send_to_char(buf, ch);
-    send_to_char("To not have any message use:  clans login delete\r\n", ch);
+    ch->sendln("To not have any message use:  clans login delete");
     return 0;
   }
 
   one_argument(arg, buf);
   if (!strncmp(buf, "delete", 6))
   {
-    send_to_char("Clan login message removed.\r\n", ch);
+    ch->sendln("Clan login message removed.");
     if (clan->login_message)
       dc_free(clan->login_message);
     clan->login_message = nullptr;
@@ -1454,7 +1454,7 @@ int clan_login_message(Character *ch, char *arg)
 
   if (strstr(arg, "~"))
   {
-    send_to_char("No ~s fatt butt!\r\n", ch);
+    ch->sendln("No ~s fatt butt!");
     return 0;
   }
 
@@ -1462,13 +1462,13 @@ int clan_login_message(Character *ch, char *arg)
 
   if (!(curr = strstr(arg, "%")))
   {
-    send_to_char("You must include a '%' to represent the person's name.\r\n", ch);
+    ch->sendln("You must include a '%' to represent the person's name.");
     return 0;
   }
 
   if (strstr(curr + 1, "%"))
   {
-    send_to_char("You may only have one '%' in the message.\r\n", ch);
+    ch->sendln("You may only have one '%' in the message.");
     return 0;
   }
 
@@ -1495,7 +1495,7 @@ int clan_email(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans email <new address>\r\n\r\nCurrent address: %s\r\n", clan->email);
     send_to_char(buf, ch);
-    send_to_char("To not have any email use:  clans email delete\r\n", ch);
+    ch->sendln("To not have any email use:  clans email delete");
     return 0;
   }
 
@@ -1504,14 +1504,14 @@ int clan_email(Character *ch, char *arg)
     if (clan->email)
       dc_free(clan->email);
     clan->email = nullptr;
-    send_to_char("Clan email address removed.\r\n", ch);
+    ch->sendln("Clan email address removed.");
     return 1;
   }
 
   if (strstr(text, "~") || strstr(text, "<") || strstr(text, ">") ||
       strstr(text, "&") || strstr(text, "$"))
   {
-    send_to_char("We both know those characters aren't legal in email addresses....\r\n", ch);
+    ch->sendln("We both know those characters aren't legal in email addresses....");
     return 0;
   }
 
@@ -1549,7 +1549,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     arg++;
   if (!has_right(ch, CLAN_RIGHTS_CHANNEL) && ch->getLevel() < 51)
   {
-    send_to_char("You don't have the right to talk to your clan.\r\n", ch);
+    ch->sendln("You don't have the right to talk to your clan.");
     return eFAILURE;
   }
 
@@ -1564,11 +1564,11 @@ int do_ctell(Character *ch, char *arg, int cmd)
     std::queue<std::string> tmp = get_clan(ch)->ctell_history;
     if (tmp.empty())
     {
-      send_to_char("No one has said anything lately.\r\n", ch);
+      ch->sendln("No one has said anything lately.");
       return eFAILURE;
     }
 
-    send_to_char("Here are the last 10 ctells:\r\n", ch);
+    ch->sendln("Here are the last 10 ctells:");
     while (!tmp.empty())
     {
       send_to_char((tmp.front()).c_str(), ch);
@@ -1659,7 +1659,7 @@ void do_clan_member_list(Character *ch)
 
   if (!(pclan = get_clan(ch->clan)))
   {
-    send_to_char("Error:  Not in clan.  Contact a god.\r\n", ch);
+    ch->sendln("Error:  Not in clan.  Contact a god.");
     return;
   }
 
@@ -1744,14 +1744,14 @@ void do_clan_rights(Character *ch, char *arg)
 
   if (bit < 0)
   {
-    send_to_char("Right not found.\r\n", ch);
+    ch->sendln("Right not found.");
     return;
   }
   bit--;
 
   if (!is_clan_leader(ch) && !has_right(ch, 1 << bit))
   {
-    send_to_char("You can't give out rights that you don't have.\r\n", ch);
+    ch->sendln("You can't give out rights that you don't have.");
     return;
   }
 
@@ -1821,14 +1821,14 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     }
     if (*buf)
       send_to_char(buf, ch);
-    send_to_char("\r\n", ch);
+    ch->sendln("");
     return;
   }
 
   skill = old_search_block(select, 0, strlen(select), god_values, 1);
   if (skill < 0)
   {
-    send_to_char("That value not recognized.\r\n", ch);
+    ch->sendln("That value not recognized.");
     return;
   }
   skill--;
@@ -1841,12 +1841,12 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     arg = one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans create <clanname> <clannumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans create <clanname> <clannumber>");
       return;
     }
     if (strlen(text) > 29)
     {
-      send_to_char("Clan name too long.\r\n", ch);
+      ch->sendln("Clan name too long.");
       return;
     }
     x = atoi(last);
@@ -1874,7 +1874,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     clan->email = nullptr;
     clan->description = nullptr;
     add_clan(clan);
-    send_to_char("New clan created.\r\n", ch);
+    ch->sendln("New clan created.");
     break;
   }
   case 1: /* rename */
@@ -1883,7 +1883,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     arg = one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$r: clans rename <targetclannum> <newname>\r\n", ch);
+      ch->sendln("$3Syntax$r: clans rename <targetclannum> <newname>");
       return;
     }
     x = atoi(text);
@@ -1892,18 +1892,18 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
     if (strlen(last) > 29)
     {
-      send_to_char("Clan name too long.\r\n", ch);
+      ch->sendln("Clan name too long.");
       return;
     }
 
     strcpy(tarclan->name, last);
-    send_to_char("Clan name changed.\r\n", ch);
+    ch->sendln("Clan name changed.");
     break;
   }
   case 2: /* leader */
@@ -1912,13 +1912,13 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     arg = one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans leader <clannumber> <leadername>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans leader <clannumber> <leadername>");
       return;
     }
 
     if (strlen(last) > 14)
     {
-      send_to_char("Clan leader name too long.\r\n", ch);
+      ch->sendln("Clan leader name too long.");
       return;
     }
 
@@ -1927,7 +1927,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -1935,7 +1935,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
       dc_free(tarclan->leader);
     tarclan->leader = str_dup(last);
 
-    send_to_char("Clan leader name changed.\r\n", ch);
+    ch->sendln("Clan leader name changed.");
     break;
   }
   case 3: /* delete */
@@ -1944,12 +1944,12 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans delete <clannumber> dElEtE\r\n", ch);
+      ch->sendln("$3Syntax$R: clans delete <clannumber> dElEtE");
       return;
     }
     if (!isname(last, "dElEtE"))
     {
-      send_to_char("You MUST end the line with 'dElEtE' to delete the clan.\r\n", ch);
+      ch->sendln("You MUST end the line with 'dElEtE' to delete the clan.");
       return;
     }
     x = atoi(text);
@@ -1957,11 +1957,11 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
     delete_clan(tarclan);
-    send_to_char("Clan deleted.\r\n", ch);
+    ch->sendln("Clan deleted.");
     break;
   }
   case 4: /* addroom */
@@ -1970,7 +1970,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     arg = one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans addroom <clannumber> <roomnumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans addroom <clannumber> <roomnumber>");
       return;
     }
     x = atoi(text);
@@ -1978,14 +1978,14 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
     skill = atoi(last);
     if (-1 == real_room(skill))
     {
-      send_to_char("Invalid room number.\r\n", ch);
+      ch->sendln("Invalid room number.");
       return;
     }
 
@@ -1998,7 +1998,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     newroom->room_number = skill;
     newroom->next = tarclan->rooms;
     tarclan->rooms = newroom;
-    send_to_char("Room added.\r\n", ch);
+    ch->sendln("Room added.");
     break;
   }
   case 5: /* list */
@@ -2009,7 +2009,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
   case 6: /* save */
   {
     save_clans();
-    send_to_char("Saved.\r\n", ch);
+    ch->sendln("Saved.");
     break;
   }
   case 7: /* showrooms */
@@ -2017,7 +2017,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     arg = one_argumentnolow(arg, text);
     if (!*text)
     {
-      send_to_char("$3Syntax$R: clans showrooms <clannumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans showrooms <clannumber>");
       return;
     }
     x = atoi(text);
@@ -2025,17 +2025,17 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
     if (!tarclan->rooms)
     {
-      send_to_char("This clan has no rooms set.\r\n", ch);
+      ch->sendln("This clan has no rooms set.");
       return;
     }
 
-    send_to_char("Rooms\r\n-----\r\n", ch);
+    ch->sendln("Rooms\r\n-----");
     strcpy(buf2, "\r\n");
     for (newroom = tarclan->rooms; newroom; newroom = newroom->next)
     {
@@ -2060,7 +2060,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     one_argumentnolow(arg, last);
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans killroom <clannumber> <roomnumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans killroom <clannumber> <roomnumber>");
       return;
     }
     x = atoi(text);
@@ -2068,13 +2068,13 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
     if (!tarclan->rooms)
     {
-      send_to_char("Error.  Target clan has no rooms.\r\n", ch);
+      ch->sendln("Error.  Target clan has no rooms.");
       return;
     }
 
@@ -2087,7 +2087,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
       lastroom = tarclan->rooms;
       tarclan->rooms = tarclan->rooms->next;
       dc_free(lastroom);
-      send_to_char("Deleted.\r\n", ch);
+      ch->sendln("Deleted.");
       return;
     }
 
@@ -2100,7 +2100,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
             REMOVE_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
         lastroom->next = newroom->next;
         dc_free(newroom);
-        send_to_char("Deleted.\r\n", ch);
+        ch->sendln("Deleted.");
         return;
       }
       else
@@ -2109,7 +2109,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
         newroom = newroom->next;
       }
 
-    send_to_char("Specified room number not found.\r\n", ch);
+    ch->sendln("Specified room number not found.");
     break;
   }
 
@@ -2121,8 +2121,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans email <clannumber> <address>\r\n", ch);
-      send_to_char("To not have any email use:  clans email <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans email <clannumber> <address>");
+      ch->sendln("To not have any email use:  clans email <clannumber> delete");
       return;
     }
 
@@ -2131,7 +2131,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2151,8 +2151,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans description <clannumber> change\r\n", ch);
-      send_to_char("To not have any description use:  clans description <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans description <clannumber> change");
+      ch->sendln("To not have any description use:  clans description <clannumber> delete");
       return;
     }
 
@@ -2161,7 +2161,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2178,8 +2178,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans login <clannumber> <login message>\r\n", ch);
-      send_to_char("To not have any message use:  clans login <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans login <clannumber> <login message>");
+      ch->sendln("To not have any message use:  clans login <clannumber> delete");
       return;
     }
 
@@ -2188,7 +2188,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2207,8 +2207,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans logout <clannumber> <logout message>\r\n", ch);
-      send_to_char("To not have any message use:  clans logout <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans logout <clannumber> <logout message>");
+      ch->sendln("To not have any message use:  clans logout <clannumber> delete");
       return;
     }
 
@@ -2217,7 +2217,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2234,8 +2234,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans death <clannumber> <death message>\r\n", ch);
-      send_to_char("To not have any message use:  clans death <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans death <clannumber> <death message>");
+      ch->sendln("To not have any message use:  clans death <clannumber> delete");
       return;
     }
 
@@ -2244,7 +2244,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2261,7 +2261,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text)
     {
-      send_to_char("$3Syntax$R: clans members <clannumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans members <clannumber>");
       return;
     }
 
@@ -2270,7 +2270,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2287,7 +2287,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text)
     {
-      send_to_char("$3Syntax$R: clans rights <clannumber>\r\n", ch);
+      ch->sendln("$3Syntax$R: clans rights <clannumber>");
       return;
     }
 
@@ -2296,7 +2296,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2314,8 +2314,8 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!*text || !*last)
     {
-      send_to_char("$3Syntax$R: clans motd <clannumber> change\r\n", ch);
-      send_to_char("To not have any motd use:  clans motd <clannumber> delete\r\n", ch);
+      ch->sendln("$3Syntax$R: clans motd <clannumber> change");
+      ch->sendln("To not have any motd use:  clans motd <clannumber> delete");
       return;
     }
 
@@ -2324,7 +2324,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (!tarclan)
     {
-      send_to_char("Invalid clan number.\r\n", ch);
+      ch->sendln("Invalid clan number.");
       return;
     }
 
@@ -2337,7 +2337,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
   }
   default:
   {
-    send_to_char("Default hit in clans switch statement.\r\n", ch);
+    ch->sendln("Default hit in clans switch statement.");
     return;
     break;
   }
@@ -2424,14 +2424,14 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
     }
     if (*buf)
       send_to_char(buf, ch);
-    send_to_char("\r\n", ch);
+    ch->sendln("");
     return;
   }
 
   skill = old_search_block(select, 0, strlen(select), mortal_values, 1);
   if (skill < 0)
   {
-    send_to_char("That value not recognized.\r\n", ch);
+    ch->sendln("That value not recognized.");
     return;
   }
   skill--;
@@ -2531,7 +2531,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
   }
   default:
   {
-    send_to_char("Default hit in clans switch statement.\r\n", ch);
+    ch->sendln("Default hit in clans switch statement.");
     return;
     break;
   }
@@ -2622,7 +2622,7 @@ int do_clans(Character *ch, char *arg, int cmd)
 
       if (!(pmember = get_member(ch->getNameC(), ch->clan)))
       {
-        send_to_char("You don't seem to be in a clan.\r\n", ch);
+        ch->sendln("You don't seem to be in a clan.");
         return eSUCCESS;
       }
 
@@ -2663,7 +2663,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("$3Syntax$R:  cinfo <clannumber>\r\n", ch);
+    ch->sendln("$3Syntax$R:  cinfo <clannumber>");
     return eSUCCESS;
   }
 
@@ -2671,7 +2671,7 @@ int do_cinfo(Character *ch, char *arg, int cmd)
 
   if (!(clan = get_clan(nClan)))
   {
-    send_to_char("That is not a valid clan number.\r\n", ch);
+    ch->sendln("That is not a valid clan number.");
     return eFAILURE;
   }
   sprintf(buf, "$3Name$R:           %s$R $3($R%d$3)$R\r\n"
@@ -2770,7 +2770,7 @@ int do_cmotd(Character *ch, char *arg, int cmd)
 
   if (!clan->clanmotd)
   {
-    send_to_char("There is no motd for your clan currently.\r\n", ch);
+    ch->sendln("There is no motd for your clan currently.");
     return eSUCCESS;
   }
 
@@ -2783,7 +2783,7 @@ int do_ctax(Character *ch, char *arg, int cmd)
   char arg1[MAX_INPUT_LENGTH];
   if (!ch->clan)
   {
-    send_to_char("You not a member of a clan.\r\n", ch);
+    ch->sendln("You not a member of a clan.");
     return eFAILURE;
   }
   arg = one_argument(arg, arg1);
@@ -2794,18 +2794,18 @@ int do_ctax(Character *ch, char *arg, int cmd)
   }
   if (!has_right(ch, CLAN_RIGHTS_TAX))
   {
-    send_to_char("You don't have the right to modify taxes.\r\n", ch);
+    ch->sendln("You don't have the right to modify taxes.");
     return eFAILURE;
   }
 
   int tax = atoi(arg1);
   if (tax < 0 || tax > 99)
   {
-    send_to_char("You can have a maximum of 99% in taxes.\r\n", ch);
+    ch->sendln("You can have a maximum of 99% in taxes.");
     return eFAILURE;
   }
   get_clan(ch)->tax = tax;
-  send_to_char("Your clan's tax rate has been modified.\r\n", ch);
+  ch->sendln("Your clan's tax rate has been modified.");
   save_clans();
   return eSUCCESS;
 }
@@ -2882,30 +2882,30 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
   char arg1[MAX_INPUT_LENGTH];
   if (!ch->clan)
   {
-    send_to_char("You not a member of a clan.\r\n", ch);
+    ch->sendln("You not a member of a clan.");
     return eFAILURE;
   }
   if (!has_right(ch, CLAN_RIGHTS_WITHDRAW) && ch->getLevel() < 108)
   {
-    send_to_char("You don't have the right to withdraw $B$5gold$R from your clan's account.\r\n", ch);
+    ch->sendln("You don't have the right to withdraw $B$5gold$R from your clan's account.");
     return eFAILURE;
   }
   if (DC::getInstance()->world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
   {
-    send_to_char("This can only be done at the Sorpigal bank.\r\n", ch);
+    ch->sendln("This can only be done at the Sorpigal bank.");
     return eFAILURE;
   }
 
   arg = one_argument(arg, arg1);
   if (!is_number(arg1))
   {
-    send_to_char("How much do you want to withdraw?\r\n", ch);
+    ch->sendln("How much do you want to withdraw?");
     return eFAILURE;
   }
   uint64_t wdraw = atoi(arg1);
   if (get_clan(ch)->getBalance() < wdraw || wdraw < 0)
   {
-    send_to_char("Your clan lacks the funds.\r\n", ch);
+    ch->sendln("Your clan lacks the funds.");
     return eFAILURE;
   }
   ch->addGold(wdraw);
@@ -2943,18 +2943,18 @@ int do_cbalance(Character *ch, char *arg, int cmd)
 {
   if (!ch->clan)
   {
-    send_to_char("You not a member of a clan.\r\n", ch);
+    ch->sendln("You not a member of a clan.");
     return eFAILURE;
   }
   if (DC::getInstance()->world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
   {
-    send_to_char("This can only be done at the Sorpigal bank.\r\n", ch);
+    ch->sendln("This can only be done at the Sorpigal bank.");
     return eFAILURE;
   }
 
   if (!has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
   {
-    send_to_char("You don't have the right to see your clan's account.\r\n", ch);
+    ch->sendln("You don't have the right to see your clan's account.");
     return eFAILURE;
   }
   std::stringstream ss;
@@ -3402,7 +3402,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
 
   if (!has_right(this, CLAN_RIGHTS_AREA) && !clanless_challenge)
   {
-    send_to_char("You have not been granted that right.\r\n", this);
+    this->sendln("You have not been granted that right.");
     return eFAILURE;
   }
 
@@ -3410,13 +3410,13 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   {
     if (can_collect(DC::getInstance()->world[in_room].zone))
     {
-      send_to_char("There is no challenge to withdraw from.\r\n", this);
+      this->sendln("There is no challenge to withdraw from.");
       return eFAILURE;
     }
 
     if (!affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\r\n", this);
+      this->sendln("You did not issue the challenge, or you have waited too long to withdraw.");
       return eFAILURE;
     }
 
@@ -3427,23 +3427,23 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
       {
         take->clan1points += 20;
         check_victory(take);
-        send_to_char("You withdraw your challenge.\r\n", this);
+        this->sendln("You withdraw your challenge.");
         return eSUCCESS;
       }
-    send_to_char("Your did not issue this challenge.\r\n", this);
+    this->sendln("Your did not issue this challenge.");
     return eFAILURE;
   }
   else if (arg == "claim")
   {
     if (affected_by_spell(SKILL_CLANAREA_CLAIM))
     {
-      send_to_char("You need to wait before you can attempt to claim an area.\r\n", this);
+      this->sendln("You need to wait before you can attempt to claim an area.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0 && !can_challenge(clan, DC::getInstance()->world[in_room].zone))
     {
-      send_to_char("You cannot claim this area right now.\r\n", this);
+      this->sendln("You cannot claim this area right now.");
       return eFAILURE;
     }
 
@@ -3456,12 +3456,12 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).isNoClaim())
     {
-      send_to_char("This area cannot be claimed.\r\n", this);
+      this->sendln("This area cannot be claimed.");
       return eFAILURE;
     }
     if (count_controlled_areas(clan) >= online_clan_members(clan))
     {
-      send_to_char("You cannot claim any more areas.\r\n", this);
+      this->sendln("You cannot claim any more areas.");
       return eFAILURE;
     }
 
@@ -3485,12 +3485,12 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   {
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This zone is not under anyone's control.\r\n", this);
+      this->sendln("This zone is not under anyone's control.");
       return eFAILURE;
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner != clan)
     {
-      send_to_char("This zone is not under your clan's control.\r\n", this);
+      this->sendln("This zone is not under your clan's control.");
       return eFAILURE;
     }
 
@@ -3503,7 +3503,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
         check_victory(take);
         return eSUCCESS;
       }
-    send_to_char("You yield the area on behalf of your clan.\r\n", this);
+    this->sendln("You yield the area on behalf of your clan.");
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n",
             get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name);
@@ -3516,24 +3516,24 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   {
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This area is not under anyone's control.\r\n", this);
+      this->sendln("This area is not under anyone's control.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner != clan)
     {
-      send_to_char("This area is not under your clan's control.\r\n", this);
+      this->sendln("This area is not under your clan's control.");
       return eFAILURE;
     }
 
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).gold == 0)
     {
-      send_to_char("There is no $B$5gold$R to collect.\r\n", this);
+      this->sendln("There is no $B$5gold$R to collect.");
       return eFAILURE;
     }
     if (!can_collect(DC::getInstance()->world[in_room].zone))
     {
-      send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n", this);
+      this->sendln("There is currently an active challenge for this area, and collecting is not possible.");
       return eFAILURE;
     }
     get_clan(this)->cdeposit(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).gold);
@@ -3559,7 +3559,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
 
     if (z == 0)
     {
-      send_to_char("Your clan has not claimed any areas.\r\n", this);
+      this->sendln("Your clan has not claimed any areas.");
       return eFAILURE;
     }
     return eSUCCESS;
@@ -3568,35 +3568,35 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
   {
     if (affected_by_spell(SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You need to wait before you can attempt to challenge an area.\r\n", this);
+      this->sendln("You need to wait before you can attempt to challenge an area.");
       return eFAILURE;
     }
     if (level_ < 40)
     {
-      send_to_char("You must be level 40 to issue a challenge.\r\n", this);
+      this->sendln("You must be level 40 to issue a challenge.");
       return eFAILURE;
     }
 
     // most annoying one for last.
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This area is not under anyone's control, you could simply claim it.\r\n", this);
+      this->sendln("This area is not under anyone's control, you could simply claim it.");
       return eFAILURE;
     }
     if (!can_challenge(clan, DC::getInstance()->world[in_room].zone))
     {
-      send_to_char("You cannot issue a challenge for this area at the moment.\r\n", this);
+      this->sendln("You cannot issue a challenge for this area at the moment.");
       return eFAILURE;
     }
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner == clan && !clanless_challenge)
     {
-      send_to_char("Your clan already controls this area!\r\n", this);
+      this->sendln("Your clan already controls this area!");
       return eFAILURE;
     }
 
     if (count_controlled_areas(clan) >= online_clan_members(clan) && !clanless_challenge)
     {
-      send_to_char("You cannot own any more areas.\r\n", this);
+      this->sendln("You cannot own any more areas.");
       return eFAILURE;
     }
 

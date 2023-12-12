@@ -34,7 +34,7 @@ int do_alias(Character *ch, char *arg, int cmd)
   {
     curr = ch->player->alias;
     if(!curr) {
-      send_to_char("No aliases defined.\r\n", ch);
+      ch->sendln("No aliases defined.");
       return eSUCCESS;
     }
     for (x = 1; curr; curr = curr->next, x++)
@@ -139,7 +139,7 @@ int do_alias(Character *ch, char *arg, int cmd)
       }
 
       if(count > 24) {
-        send_to_char("You can only have 25 aliases, sorry.  Go get tintin or something.\r\n", ch);
+        ch->sendln("You can only have 25 aliases, sorry.  Go get tintin or something.");
         dc_free(buf);
         dc_free(buf1);
         return eSUCCESS;
@@ -182,7 +182,7 @@ int do_alias(Character *ch, char *arg, int cmd)
             dc_free (curr);
          }
          ch->player->alias = nullptr;
-         send_to_char("All aliases deleted.\r\n", ch);
+         ch->sendln("All aliases deleted.");
          dc_free(buf);
          return eSUCCESS;
       }
@@ -213,7 +213,7 @@ int do_alias(Character *ch, char *arg, int cmd)
             return eSUCCESS;
           }
       }
-      send_to_char("Alias not found to delete.\r\n", ch);
+      ch->sendln("Alias not found to delete.");
       dc_free(buf);
     }
   } 

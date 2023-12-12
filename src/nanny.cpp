@@ -1084,9 +1084,9 @@ void nanny(class Connection *d, std::string arg)
       clan_data *clan;
       if ((clan = get_clan(ch->clan)) && clan->clanmotd)
       {
-         send_to_char("$B----------------------------------------------------------------------$R\r\n", ch);
+         ch->sendln("$B----------------------------------------------------------------------$R");
          send_to_char(clan->clanmotd, ch);
-         send_to_char("$B----------------------------------------------------------------------$R\r\n", ch);
+         ch->sendln("$B----------------------------------------------------------------------$R");
       }
 
       sprintf(log_buf, "\n\rIf you have read this motd, press Return."
@@ -1448,7 +1448,7 @@ void nanny(class Connection *d, std::string arg)
       case 2:
          if (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_ELVEN;
@@ -1463,7 +1463,7 @@ void nanny(class Connection *d, std::string arg)
       case 3:
          if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_DWARVEN;
@@ -1477,7 +1477,7 @@ void nanny(class Connection *d, std::string arg)
       case 4:
          if (GET_RAW_DEX(ch) < 10)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_HOBBIT;
@@ -1491,7 +1491,7 @@ void nanny(class Connection *d, std::string arg)
       case 5:
          if (GET_RAW_INT(ch) < 12)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_PIXIE;
@@ -1505,7 +1505,7 @@ void nanny(class Connection *d, std::string arg)
       case 6:
          if (GET_RAW_STR(ch) < 12)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_GIANT;
@@ -1519,7 +1519,7 @@ void nanny(class Connection *d, std::string arg)
       case 7:
          if (GET_RAW_WIS(ch) < 12)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_GNOME;
@@ -1533,7 +1533,7 @@ void nanny(class Connection *d, std::string arg)
       case 8:
          if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
 
@@ -1548,7 +1548,7 @@ void nanny(class Connection *d, std::string arg)
       case 9:
          if (GET_RAW_CON(ch) < 12)
          {
-            send_to_char("Your stats do not qualify for that race.\r\n", ch);
+            ch->sendln("Your stats do not qualify for that race.");
             return;
          }
          ch->race = RACE_TROLL;
@@ -1777,13 +1777,13 @@ void nanny(class Connection *d, std::string arg)
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
             logentry(log_buf, 100, LogChannels::LOG_WARNINGS);
          }
-         send_to_char("\n\rWelcome to Dark Castle.\r\n", ch);
+         ch->sendln("\n\rWelcome to Dark Castle.");
          character_list.insert(ch);
 
          if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
          {
             REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
-            send_to_char("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R\r\n", ch);
+            ch->sendln("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R");
          }
 
          do_on_login_stuff(ch);
@@ -2072,7 +2072,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
          d->character = tmp_ch;
          tmp_ch->desc = d;
          tmp_ch->timer = 0;
-         send_to_char("Reconnecting.\r\n", tmp_ch);
+         tmp_ch->sendln("Reconnecting.");
 
          QString log_buf = QString("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -2214,7 +2214,7 @@ void update_characters()
          if (get_saves(i, SAVE_TYPE_POISON) > number(1, 101))
          {
             tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
-            send_to_char("You feel very sick, but resist the $2poison's$R damage.\r\n", i);
+            i->sendln("You feel very sick, but resist the $2poison's$R damage.");
          }
          if (tmp)
          {
@@ -2327,14 +2327,14 @@ void checkConsecrate(int pulseType)
                         if (ch->in_room != obj->in_room)
                            csendf(ch, "You sense your consecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
                         else
-                           send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.\r\n", ch);
+                           ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
                      }
                      else
                      {
                         if (ch->in_room != obj->in_room)
                            csendf(ch, "You sense your desecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
                         else
-                           send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.\r\n", ch);
+                           ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
                      }
                   }
                }
@@ -2354,7 +2354,7 @@ void checkConsecrate(int pulseType)
                   if (spl == SPELL_CONSECRATE)
                   {
                      if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
-                        send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.\r\n", tmp_ch);
+                        tmp_ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.");
                   }
                   else
                   {
@@ -2363,7 +2363,7 @@ void checkConsecrate(int pulseType)
                         {
                            send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
                         }
-                     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.\r\n", tmp_ch);
+                     tmp_ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.");
                   }
                }
                extract_obj(obj);

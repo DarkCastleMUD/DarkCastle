@@ -132,7 +132,7 @@ int protect(Character *ch, int iFriendId)
       if (SOMEONE_DIED(retval))
         return retval;
       // pertant rescue code (easier than calling it)
-      send_to_char("Banzai! To the rescue...\r\n", ch);
+      ch->sendln("Banzai! To the rescue...");
       act("You are rescued by $N, you are confused!",
           ally, 0, ch, TO_CHAR, 0);
       act("$n heroically rescues $N.", ch, 0, ally, TO_ROOM, NOTVICT);
@@ -919,27 +919,27 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
       {
         if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
         {
-          send_to_char("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
-          send_to_char("Despite having the Champion flag, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          ch->sendln("Despite having the Champion flag, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
         }
         else if (GET_CLASS(ch) != clas)
         {
-          send_to_char("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
-          send_to_char("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
-          send_to_char("Despite not being good, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
         }
       }
@@ -948,31 +948,31 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
         if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
         {
           act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because of your crimes.\r\n", ch);
+          ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
           return eSUCCESS;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
           act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you have the Champion flag.\r\n", ch);
+          ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
           return eSUCCESS;
         }
         else if (GET_CLASS(ch) != clas)
         {
           act("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are the wrong class.\r\n", ch);
+          ch->sendln("The guard humiliates you, and blocks your way because you are the wrong class.");
           return eSUCCESS;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
           act("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are not evil.\r\n", ch);
+          ch->sendln("The guard humiliates you, and blocks your way because you are not evil.");
           return eSUCCESS;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
           act("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are not good.\r\n", ch);
+          ch->sendln("The guard humiliates you, and blocks your way because you are not good.");
           return eSUCCESS;
         }
       }
@@ -1066,7 +1066,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
       act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      send_to_char("The clan guard throws you out on your ass.\r\n", ch);
+      ch->sendln("The clan guard throws you out on your ass.");
       return eSUCCESS;
     }
   }
@@ -1095,7 +1095,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     )
     {
       act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      send_to_char("The clan guard throws you out on your ass.\r\n", ch);
+      ch->sendln("The clan guard throws you out on your ass.");
       return eSUCCESS;
     }
   }
@@ -2036,7 +2036,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
           af.bitvector = AFF_POISON;
 
           affect_join(tmp_victim, &af, false, false);
-          send_to_char("You feel very sick.\r\n", tmp_victim);
+          tmp_victim->sendln("You feel very sick.");
           return eSUCCESS;
         }
     }
@@ -2290,7 +2290,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
     IS_CARRYING_W(pet) = 1000;
     IS_CARRYING_N(pet) = 100;
 
-    send_to_char("May you enjoy your pet.\r\n", ch);
+    ch->sendln("May you enjoy your pet.");
     act("$n bought $N as a pet.", ch, 0, pet, TO_ROOM, 0);
 
     return eSUCCESS;
@@ -2866,7 +2866,7 @@ int foggy_non(Character *ch, class Object *obj, int cmd, const char *arg,
   // message the player
   act("The foggy guardian flows in front of $n, and blocks $s way.",
       ch, 0, 0, TO_ROOM, 0);
-  send_to_char("The foggy guardian flows in front of you, and blocks your way.\r\n", ch);
+  ch->sendln("The foggy guardian flows in front of you, and blocks your way.");
 
   // return true.  This lets the mud know that you already took care of
   // the command, and to ignore whatever it was.  (ie, don't move)
@@ -3473,7 +3473,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
     arg = one_argument(arg, arg2);
     if (str_cmp(arg1, "far") && str_cmp(arg1, "near"))
     {
-      send_to_char("$BDo you want to spy $3far$7 or $3near$7?$R\r\n", ch);
+      ch->sendln("$BDo you want to spy $3far$7 or $3near$7?$R");
       return eSUCCESS;
     }
     int dir;
@@ -3483,7 +3483,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
         break;
     if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
     {
-      send_to_char("In what direction did you say?\r\n", ch);
+      ch->sendln("In what direction did you say?");
       return eSUCCESS;
     }
     int to_room = 0;
@@ -3494,11 +3494,11 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
       to_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
     if (!check_components(ch, 1, 44, 0, 0, 0, true))
     {
-      send_to_char("The owl requires a feeding to do this for you.\r\n", ch);
+      ch->sendln("The owl requires a feeding to do this for you.");
       return eSUCCESS;
     }
-    send_to_char("The owl accepts your mouse greedily.\r\n", ch);
-    send_to_char("You see through the eyes of your familiar, looking into the distant room...\r\n", ch);
+    ch->sendln("The owl accepts your mouse greedily.");
+    ch->sendln("You see through the eyes of your familiar, looking into the distant room...");
     int oldroom = ch->in_room;
     char_from_room(ch);
     char_to_room(ch, to_room);
@@ -3593,7 +3593,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const
 
     if (number(1, 100) == 1)
     {
-      send_to_char("The presence of your chipmunk is soothing to your mind.\r\n", ch->master);
+      ch->master->sendln("The presence of your chipmunk is soothing to your mind.");
       GET_MANA(ch->master) += 10;
       if (GET_MANA(ch->master) > GET_MAX_MANA(ch->master))
         GET_MANA(ch->master) = GET_MAX_MANA(ch->master);

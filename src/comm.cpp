@@ -1239,13 +1239,13 @@ int do_prompt(Character *ch, char *arg, int cmd)
 
   if (IS_MOB(ch))
   {
-    send_to_char("You're a mob!  You can't set your prompt.\r\n", ch);
+    ch->sendln("You're a mob!  You can't set your prompt.");
     return eFAILURE;
   }
 
   if (!*arg)
   {
-    send_to_char("Set your prompt to what? Try 'help prompt'.\r\n", ch);
+    ch->sendln("Set your prompt to what? Try 'help prompt'.");
     if (GET_PROMPT(ch))
     {
       send_to_char("Current prompt:  ", ch);
@@ -1275,7 +1275,7 @@ int do_prompt(Character *ch, char *arg, int cmd)
   }
 
   GET_PROMPT(ch) = str_dup(arg);
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   return eSUCCESS;
 }
 
@@ -3179,7 +3179,7 @@ void check_for_awaymsgs(Character *ch)
   }
 
   send_to_char("You have unviewed away messages. ", ch);
-  send_to_char("Type awaymsgs to view them.\r\n", ch);
+  ch->sendln("Type awaymsgs to view them.");
 }
 
 void send_to_char(const char *mesg, Character *ch)
@@ -3466,15 +3466,15 @@ int do_editor(Character *ch, char *argument, int cmd)
     if (!strcmp(arg1, "web"))
     {
       SET_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
-      send_to_char("Changing to web editor.\r\n", ch);
-      send_to_char("Ok.\r\n", ch);
+      ch->sendln("Changing to web editor.");
+      ch->sendln("Ok.");
       return eSUCCESS;
     }
     else if (!strcmp(arg1, "game"))
     {
       REMOVE_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
-      send_to_char("Changing to in game line editor.\r\n", ch);
-      send_to_char("Ok.\r\n", ch);
+      ch->sendln("Changing to in game line editor.");
+      ch->sendln("Ok.");
       return eSUCCESS;
     }
   }

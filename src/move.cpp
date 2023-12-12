@@ -76,7 +76,7 @@ void move_player_home(Character *victim)
 	{
 		if (!victim->clan || !(clan = get_clan(victim)))
 		{
-			send_to_char("The gods frown on you, and reset your home.\r\n", victim);
+			victim->sendln("The gods frown on you, and reset your home.");
 			GET_HOME(victim) = START_ROOM;
 			move_player(victim, real_room(GET_HOME(victim)));
 		}
@@ -87,7 +87,7 @@ void move_player_home(Character *victim)
 					found = 1;
 			if (!found)
 			{
-				send_to_char("The gods frown on you, and reset your home.\r\n", victim);
+				victim->sendln("The gods frown on you, and reset your home.");
 				GET_HOME(victim) = START_ROOM;
 			}
 			move_player(victim, real_room(GET_HOME(victim)));
@@ -213,7 +213,7 @@ int do_fall(Character *ch, short dir)
 	if (IS_AFFECTED(ch, AFF_FREEFLOAT))
 	{
 		dam = 0;
-		send_to_char("Your freefloating magics reduce your fall to a safer speed.\r\n", ch);
+		ch->sendln("Your freefloating magics reduce your fall to a safer speed.");
 	}
 
 	// Don't effect mobs
@@ -240,7 +240,7 @@ int do_fall(Character *ch, short dir)
 				ppl++;
 		if (ppl > 2)
 		{
-			send_to_char("There isn't enough space for you to follow.\r\n", ch);
+			ch->sendln("There isn't enough space for you to follow.");
 			return eFAILURE;
 		}
 	}
@@ -254,7 +254,7 @@ int do_fall(Character *ch, short dir)
 				ppl++;
 		if (ppl > 4)
 		{
-			send_to_char("There isn't enough space for you to follow.\r\n", ch);
+			ch->sendln("There isn't enough space for you to follow.");
 			return eFAILURE;
 		}
 	}
@@ -266,27 +266,27 @@ int do_fall(Character *ch, short dir)
 	{
 	case 0:
 		act("$n rolls out to the north.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the north...\r\n", ch);
+		ch->sendln("You tumble to the north...");
 		break;
 	case 1:
 		act("$n rolls out to the east.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the east...\r\n", ch);
+		ch->sendln("You tumble to the east...");
 		break;
 	case 2:
 		act("$n rolls out to the south.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the south...\r\n", ch);
+		ch->sendln("You tumble to the south...");
 		break;
 	case 3:
 		act("$n rolls out to the west.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the west...\r\n", ch);
+		ch->sendln("You tumble to the west...");
 		break;
 	case 4:
 		act("$n is launched upwards.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You are launched into the air...\r\n", ch);
+		ch->sendln("You are launched into the air...");
 		break;
 	case 5:
 		act("$n falls through the room.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You fall...\r\n", ch);
+		ch->sendln("You fall...");
 		break;
 	default:
 		logentry("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
@@ -516,7 +516,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && ch->getLevel() < IMMORTAL &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
-				send_to_char("You need a boat to go there.\r\n", ch);
+				ch->sendln("You need a boat to go there.");
 				return eFAILURE;
 			}
 		}
@@ -526,7 +526,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 			// It's NOT a water room and we don't have fly
 			if (GET_RACE(ch) == RACE_FISH)
 			{
-				send_to_char("You can't swim around outside water without being able to fly!\r\n", ch);
+				ch->sendln("You can't swim around outside water without being able to fly!");
 				act("$n flops around in a futile attempt to move out of water.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 				return eFAILURE;
 			}
@@ -536,7 +536,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	if (DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].room_flags, IMP_ONLY) &&
 		ch->getLevel() < IMPLEMENTER)
 	{
-		send_to_char("No.\r\n", ch);
+		ch->sendln("No.");
 		return eFAILURE;
 	}
 
@@ -547,7 +547,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		int s2 = rm->sector_type, s1 = DC::getInstance()->world[ch->in_room].sector_type;
 		if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) || (s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) || (s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) || (s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) || (s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) || (s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) || (s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) || (s1 == SECT_BEACH && (s2 != SECT_DESERT)) || (s1 == SECT_DESERT && (s2 != SECT_BEACH)) || (s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) || (s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) || (s1 == SECT_AIR) || (s1 == SECT_SWAMP))
 		{
-			send_to_char("The ghost evaporates as you leave its habitat.\r\n", ch);
+			ch->sendln("The ghost evaporates as you leave its habitat.");
 			do_return(ch, "", 0);
 			// extract_char(ch,true);
 			return eSUCCESS | eCH_DIED;
@@ -563,7 +563,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				ppl++;
 		if (ppl > 2)
 		{
-			send_to_char("There's no room.\r\n", ch);
+			ch->sendln("There's no room.");
 			return eFAILURE;
 		}
 	}
@@ -584,7 +584,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		{
 			if (rm->allow_class[GET_CLASS(ch)] != true)
 			{
-				send_to_char("Your class is not allowed there.\r\n", ch);
+				ch->sendln("Your class is not allowed there.");
 				return eFAILURE;
 			}
 		}
@@ -599,15 +599,15 @@ int do_simple_move(Character *ch, int cmd, int following)
 				ppl++;
 		if (ppl > 4)
 		{
-			send_to_char("There's no room.\r\n", ch);
+			ch->sendln("There's no room.");
 			return eFAILURE;
 		}
 	}
 
 	if (IS_PC(ch) && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
-		send_to_char("You feel air trying to explode from your lungs as you swim around.\r\n", ch);
-		// send_to_char("Underwater?!\r\n", ch);
+		ch->sendln("You feel air trying to explode from your lungs as you swim around.");
+		// ch->sendln("Underwater?!");
 		// return eFAILURE;
 	}
 
@@ -622,9 +622,9 @@ int do_simple_move(Character *ch, int cmd, int following)
 	if (GET_MOVE(ch) < need_movement && IS_PC(ch))
 	{
 		if (!following)
-			send_to_char("You are too exhausted.\r\n", ch);
+			ch->sendln("You are too exhausted.");
 		else
-			send_to_char("You are too exhausted to follow.\r\n", ch);
+			ch->sendln("You are too exhausted to follow.");
 		return eFAILURE;
 	}
 
@@ -633,13 +633,13 @@ int do_simple_move(Character *ch, int cmd, int following)
 	{
 		if (affected_by_spell(ch, SPELL_IRON_ROOTS))
 		{
-			send_to_char("The roots bracing your legs keep you from moving!\r\n", ch);
+			ch->sendln("The roots bracing your legs keep you from moving!");
 			return eFAILURE;
 		}
 		else
 		{
 			REMBIT(ch->affected_by, AFF_NO_FLEE);
-			send_to_char("The travel wakes you up some, and clears the drowsiness from your legs.\r\n", ch);
+			ch->sendln("The travel wakes you up some, and clears the drowsiness from your legs.");
 		}
 	}
 
@@ -675,7 +675,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		{
 			sprintf(tmp, "$n leaves %s.", dirs[cmd]);
 			REMBIT(ch->affected_by, AFF_FOREST_MELD);
-			send_to_char("You detach yourself from the forest.\r\n", ch);
+			ch->sendln("You detach yourself from the forest.");
 			act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
 		}
 		else
@@ -697,14 +697,14 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	if (DC::isSet(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
 	{
-		send_to_char("Your crippled body responds slowly.\r\n", ch);
+		ch->sendln("Your crippled body responds slowly.");
 		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 	}
 
 	Object *tmp_obj;
 	for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
-			send_to_char("The sounds around you fade to nothing as the silence takes hold...\r\n", ch);
+			ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
 
 	for (tmp_obj = DC::getInstance()->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
@@ -712,7 +712,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	if (!DC::isSet(retval, eSUCCESS))
 	{
-		send_to_char("You fail to move.\r\n", ch);
+		ch->sendln("You fail to move.");
 		return retval;
 	}
 
@@ -876,24 +876,24 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 
 	if (!DC::getInstance()->world[ch->in_room].dir_option[cmd])
 	{
-		send_to_char("You can't go that way.\r\n", ch);
+		ch->sendln("You can't go that way.");
 		return eFAILURE;
 	}
 
 	if (DC::isSet(EXIT(ch, cmd)->exit_info, EX_CLOSED))
 	{
 		if (DC::isSet(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
-			send_to_char("You can't go that way.\r\n", ch);
+			ch->sendln("You can't go that way.");
 		else if (EXIT(ch, cmd)->keyword)
 			csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, cmd)->keyword));
 		else
-			send_to_char("It seems to be closed.\r\n", ch);
+			ch->sendln("It seems to be closed.");
 		return eFAILURE;
 	}
 
 	if (EXIT(ch, cmd)->to_room == DC::NOWHERE)
 	{
-		send_to_char("Alas, you can't go that way.\r\n", ch);
+		ch->sendln("Alas, you can't go that way.");
 		return eFAILURE;
 	}
 
@@ -920,18 +920,18 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 
 	if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room))
 	{
-		send_to_char("You are unable to abandon your master.\r\n", ch);
+		ch->sendln("You are unable to abandon your master.");
 		act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
 		if (IS_PC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
 		{
-			send_to_char("You struggle to maintain control.\r\n", ch->master);
+			ch->master->sendln("You struggle to maintain control.");
 			/*
 			 if (GET_KI(ch->master) < 5) {
 			 ch->add_memory(GET_NAME(ch->master), 'h');
 			 stop_follower(ch, BROKE_CHARM);
 			 //ch->add_memory(GET_NAME(ch->master), 'h');
 			 do_say(ch, "Hey! You tricked me!", CMD_DEFAULT);
-			 send_to_char("You lose control.\r\n",ch->master);
+			 ch->master->sendln("You lose control.");
 			 }
 			 else
 			 GET_KI(ch->master) -= 5;
@@ -972,9 +972,9 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 				if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
 				{
 					if (affected_by_spell(k->follower, SPELL_IRON_ROOTS))
-						send_to_char("The roots bracing your legs make it impossible to run!\r\n", k->follower);
+						k->follower->sendln("The roots bracing your legs make it impossible to run!");
 					else
-						send_to_char("Your legs are too tired for running away!\r\n", k->follower);
+						k->follower->sendln("Your legs are too tired for running away!");
 					continue; // keep going through the groupies
 				}
 				if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && IS_NPC(k->follower->fighting))
@@ -1043,12 +1043,12 @@ int do_leave(Character *ch, char *arguement, int cmd)
 				{
 					if (k->getPortalDestinationRoom() == DC::getInstance()->world[ch->in_room].number || k->obj_flags.value[2] == DC::getInstance()->world[ch->in_room].zone)
 					{
-						send_to_char("You exit the area.\r\n", ch);
+						ch->sendln("You exit the area.");
 						act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 						retval = move_char(ch, real_room(DC::getInstance()->world[k->in_room].number));
 						if (!DC::isSet(retval, eSUCCESS))
 						{
-							send_to_char("You attempt to leave, but the door slams in your face!\r\n", ch);
+							ch->sendln("You attempt to leave, but the door slams in your face!");
 							act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 							return eFAILURE;
 						}
@@ -1062,7 +1062,7 @@ int do_leave(Character *ch, char *arguement, int cmd)
 		}
 	}
 
-	send_to_char("There are no exits around!\r\n", ch);
+	ch->sendln("There are no exits around!");
 
 	return eFAILURE;
 }
@@ -1088,13 +1088,13 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if ((portal = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)) == nullptr)
 	{
-		send_to_char("Nothing here by that name.\r\n", ch);
+		ch->sendln("Nothing here by that name.");
 		return eFAILURE;
 	}
 
 	if (!portal->isPortal())
 	{
-		send_to_char("You can't enter that.\r\n", ch);
+		ch->sendln("You can't enter that.");
 		return eFAILURE;
 	}
 
@@ -1102,19 +1102,19 @@ int do_enter(Character *ch, char *argument, int cmd)
 	{
 		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
 		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
-		send_to_char("You can't enter that.\r\n", ch);
+		ch->sendln("You can't enter that.");
 		return eFAILURE;
 	}
 
 	if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
-		send_to_char("You bravely attempt to plunge through the portal - let's hope you have gills!\r\n", ch);
+		ch->sendln("You bravely attempt to plunge through the portal - let's hope you have gills!");
 		return eSUCCESS;
 	}
 
 	if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && DC::isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
 	{
-		send_to_char("You may not enter a clanhall at your level.\r\n", ch);
+		ch->sendln("You may not enter a clanhall at your level.");
 		return eFAILURE;
 	}
 
@@ -1126,7 +1126,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 			// Is golem's master not a member of this clan
 			if (others_clan_room(sesame, &DC::getInstance()->world[real_room(portal->obj_flags.value[0])]) == true)
 			{
-				send_to_char("Your master is not from that clan.\r\n", ch);
+				ch->sendln("Your master is not from that clan.");
 				act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 				do_say(ch, "I may not enter.", CMD_DEFAULT);
 				return eFAILURE;
@@ -1141,7 +1141,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	// should probably just combine this with 'if' below it, but i'm lazy
 	if (DC::isSet(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
 	{
-		send_to_char("The portal's destination rebels against you.\r\n", ch);
+		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
@@ -1149,27 +1149,27 @@ int do_enter(Character *ch, char *argument, int cmd)
 	// Thieves arent allowed through cleric portals
 	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->isPortalTypePlayer())
 	{
-		send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n", ch);
+		ch->sendln("Your attempt to transport stolen goods through planes of magic fails!");
 		return eFAILURE;
 	}
 
 	if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) && (DC::isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
 	{
-		send_to_char("The portal's destination rebels against you.\r\n", ch);
+		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
 
 	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name))
 	{
-		send_to_char("The portal fades when you draw near, then shimmers as you withdraw.\r\n", ch);
+		ch->sendln("The portal fades when you draw near, then shimmers as you withdraw.");
 		return eFAILURE;
 	}
 
 	switch (portal->obj_flags.value[1])
 	{
 	case 0:
-		send_to_char("You reach out tentatively and touch the portal...\r\n", ch);
+		ch->sendln("You reach out tentatively and touch the portal...");
 		act("$n reaches out to the glowing dimensional portal....", ch, 0, 0, TO_ROOM, 0);
 		break;
 	case 1:
@@ -1180,7 +1180,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 		break;
 	case 3:
-		send_to_char("You cannot enter that.\r\n", ch);
+		ch->sendln("You cannot enter that.");
 		return eFAILURE;
 	default:
 		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
@@ -1204,7 +1204,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	case 0:
 		do_look(ch, "", CMD_DEFAULT);
 		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-		send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\r\n", ch);
+		ch->sendln("\n\rYou are momentarily dazed from the dimensional shift.");
 		act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
 		break;
 	case 1:
@@ -1269,19 +1269,19 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	if (!*buf)
 	{
-		send_to_char("Climb what?\r\n", ch);
+		ch->sendln("Climb what?");
 		return eSUCCESS;
 	}
 
 	if (!(obj = get_obj_in_list_vis(ch, buf, DC::getInstance()->world[ch->in_room].contents)))
 	{
-		send_to_char("Climb what?\r\n", ch);
+		ch->sendln("Climb what?");
 		return eSUCCESS;
 	}
 
 	if (obj->obj_flags.type_flag != ITEM_CLIMBABLE)
 	{
-		send_to_char("You can't climb that.\r\n", ch);
+		ch->sendln("You can't climb that.");
 		return eSUCCESS;
 	}
 
@@ -1290,7 +1290,7 @@ int do_climb(Character *ch, char *argument, int cmd)
 	if (real_room(dest) < 0)
 	{
 		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->item_number].virt);
-		send_to_char("You can't climb that.\r\n", ch);
+		ch->sendln("You can't climb that.");
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1340,7 +1340,7 @@ int ambush(Character *ch)
 
 			if (IS_AFFECTED(ch, AFF_ALERT))
 			{
-				send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
+				i->sendln("Your target is far too alert to accomplish an ambush!");
 				continue;
 			}
 

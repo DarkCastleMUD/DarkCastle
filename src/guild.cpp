@@ -32,7 +32,7 @@ int do_practice(Character *ch, char *arg, int cmd)
 
   if (arg[0] != '\0')
   {
-    send_to_char("You can only practice in a guild.\r\n", ch);
+    ch->sendln("You can only practice in a guild.");
   }
   else
   {
@@ -522,8 +522,8 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
       {
         last_profession = skilllist[i].group;
         csendf(ch, "\n\r$B%s Profession Skills:$R\n\r", find_profession(ch->c_class, skilllist[i].group));
-        send_to_char(" Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
-        send_to_char("--------------------------------------------------------------------------------\r\n", ch);
+        ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+        ch->sendln("--------------------------------------------------------------------------------");
       }
     }
 
@@ -654,36 +654,36 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   {
     sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     send_to_char(buf, ch);
-    send_to_char("You can practice any of these skills:\n\r\r\n", ch);
+    ch->sendln("You can practice any of these skills:\n\r");
 
-    send_to_char("$BUniversal skills:$R\r\n", ch);
-    send_to_char(" Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
-    send_to_char("--------------------------------------------------------------------------------\r\n", ch);
+    ch->sendln("$BUniversal skills:$R");
+    ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+    ch->sendln("--------------------------------------------------------------------------------");
     output_praclist(ch, g_skills);
 
     sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1 + pc_clss_types[GET_CLASS(ch)]));
     send_to_char(buf, ch);
 
     if (GET_CLASS(ch) != CLASS_MONK)
-      send_to_char(" Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
+      ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
     else
-      send_to_char(" Ability:                Current/Practice/Autolearn  Cost:     Style:\r\n", ch);
+      ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Style:");
 
-    send_to_char("--------------------------------------------------------------------------------\r\n", ch);
+    ch->sendln("--------------------------------------------------------------------------------");
 
     output_praclist(ch, skilllist);
 
-    send_to_char("\r\n", ch);
+    ch->sendln("");
 
     if (GET_CLASS(ch) == CLASS_BARD)
-      send_to_char("$B#$R denotes a song which requires an instrument.\r\n", ch);
+      ch->sendln("$B#$R denotes a song which requires an instrument.");
 
     return eSUCCESS;
   }
 
   if (GET_POS(ch) == position_t::SLEEPING)
   {
-    send_to_char("You cannot practice in your sleep.\r\n", ch);
+    ch->sendln("You cannot practice in your sleep.");
     return eSUCCESS;
   }
   skillnumber = search_skills(arg, skilllist);
@@ -695,7 +695,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (ch->getLevel() < skilllist[skillnumber].levelavailable)
   {
-    send_to_char("You aren't advanced enough for that yet.\r\n", ch);
+    ch->sendln("You aren't advanced enough for that yet.");
     return eSUCCESS;
   }
 
@@ -748,7 +748,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   }
   if (ch->player->practices <= 0)
   {
-    send_to_char("You do not seem to be able to practice now.\r\n", ch);
+    ch->sendln("You do not seem to be able to practice now.");
     return eSUCCESS;
   }
 
@@ -762,7 +762,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    send_to_char("You are already learned in this area.\r\n", ch);
+    ch->sendln("You are already learned in this area.");
     return eSUCCESS;
   }
   float maxlearn = (float)skilllist[skillnumber].maximum;
@@ -770,12 +770,12 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (known >= (ch->getLevel() * 2))
   {
-    send_to_char("You are not experienced enough to practice that any further right now.\r\n", ch);
+    ch->sendln("You are not experienced enough to practice that any further right now.");
     return eSUCCESS;
   }
   if (known >= maxlearn)
   {
-    send_to_char("You cannot learn more here.. you need to go out into the world and use it.\r\n", ch);
+    ch->sendln("You cannot learn more here.. you need to go out into the world and use it.");
     return eSUCCESS;
   }
   switch (skillnumber)
@@ -836,7 +836,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
       break;
     }
 
-  send_to_char("You practice for a while...\r\n", ch);
+  ch->sendln("You practice for a while...");
   ch->player->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
@@ -845,7 +845,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    send_to_char("You are now learned in this area.\r\n", ch);
+    ch->sendln("You are now learned in this area.");
     return eSUCCESS;
   }
 
@@ -910,7 +910,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       if (!ch->has_skill( skl))
       {
-        send_to_char("You need to learn your Quest Skill before you can progress further.\r\n", ch);
+        ch->sendln("You need to learn your Quest Skill before you can progress further.");
         return eSUCCESS;
       }
     }
@@ -979,7 +979,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
 
-    send_to_char("Your profession skills have been reset.\r\n", ch);
+    ch->sendln("Your profession skills have been reset.");
     struct class_skill_defines *class_skills = get_skill_list(ch);
     struct char_skill_data *skill;
 
@@ -992,7 +992,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
         }
       }
 
-    send_to_char("You have remorted back to level 50.\r\n", ch);
+    ch->sendln("You have remorted back to level 50.");
     if (ch->getLevel() <= DC::MAX_MORTAL_LEVEL)
       ch->setLevel(50);
 
@@ -1007,7 +1007,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (IS_MOB(ch))
   {
-    send_to_char("Why practice?  You're just going to die anyway...\r\n", ch);
+    ch->sendln("Why practice?  You're just going to die anyway...");
     return eFAILURE;
   }
 
@@ -1025,7 +1025,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     else if (search_skills(arg, g_skills) != -1)
       do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", CMD_DEFAULT);
     else
-      send_to_char("You do not know of this ability...\r\n", ch);
+      ch->sendln("You do not know of this ability...");
   }
 
   return eSUCCESS;
@@ -1041,7 +1041,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (IS_MOB(ch))
   {
-    send_to_char("Why practice?  You're just going to die anyway...\r\n", ch);
+    ch->sendln("Why practice?  You're just going to die anyway...");
     return eFAILURE;
   }
 
@@ -1165,29 +1165,29 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.", CMD_DEFAULT);
     else
-      send_to_char("You do not know of this skill...\r\n", ch);
+      ch->sendln("You do not know of this skill...");
     return eSUCCESS;
   }
 
   if (ch->player->practices <= 0)
   {
-    send_to_char("You do not seem to be able to practice now.\r\n", ch);
+    ch->sendln("You do not seem to be able to practice now.");
     return eSUCCESS;
   }
   learned = ch->has_skill( g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
-    send_to_char("You are already learned in this area.\r\n", ch);
+    ch->sendln("You are already learned in this area.");
     return eSUCCESS;
   }
   if (learned >= (ch->getLevel() * 3))
   {
-    send_to_char("You aren't experienced enough to practice that any further right now.\r\n", ch);
+    ch->sendln("You aren't experienced enough to practice that any further right now.");
     return eSUCCESS;
   }
 
-  send_to_char("You practice for a while...\r\n", ch);
+  ch->sendln("You practice for a while...");
   ch->player->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
@@ -1197,7 +1197,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (learned >= g_skills[number].maximum)
   {
-    send_to_char("You are now learned in this area.\r\n", ch);
+    ch->sendln("You are now learned in this area.");
     return eSUCCESS;
   }
   return eSUCCESS;

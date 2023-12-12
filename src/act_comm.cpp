@@ -56,7 +56,7 @@ int do_report(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
-    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
@@ -341,7 +341,7 @@ int do_channel(Character *ch, char *arg, int cmd)
   {
     if (x == 27)
     {
-      send_to_char("That type was not found.\r\n", ch);
+      ch->sendln("That type was not found.");
       return eSUCCESS;
     }
     if (is_abbrev(buf, types[x]))
@@ -351,12 +351,12 @@ int do_channel(Character *ch, char *arg, int cmd)
   if (ch->getLevel() < IMMORTAL &&
       (x < 7 || (x > 14 && x < 22)))
   {
-    send_to_char("That type was not found.\r\n", ch);
+    ch->sendln("That type was not found.");
     return eSUCCESS;
   }
   if (x > 19 && ch->getLevel() != 110 && x < 22)
   {
-    send_to_char("That type was not found.\r\n", ch);
+    ch->sendln("That type was not found.");
     return eSUCCESS;
   }
   if (DC::isSet(ch->misc, (1 << x)))
@@ -487,7 +487,7 @@ int do_write(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   if (ch->getLevel() < 5)
   {
-    send_to_char("You need to be at least level 5 to write on the board.\r\n", ch);
+    ch->sendln("You need to be at least level 5 to write on the board.");
     return eSUCCESS;
   }
 
@@ -528,7 +528,7 @@ int do_write(Character *ch, char *argument, int cmd)
     }
     else if (paper->obj_flags.type_flag != ITEM_NOTE)
     {
-      send_to_char("That thing has nothing to do with writing.\r\n", ch);
+      ch->sendln("That thing has nothing to do with writing.");
       return eSUCCESS;
     }
 
@@ -562,7 +562,7 @@ int do_write(Character *ch, char *argument, int cmd)
   }
   else if (paper->action_description)
     /*    else if (paper->item_number != real_object(1205) )  */
-    send_to_char("There's something written on it already.\r\n", ch);
+    ch->sendln("There's something written on it already.");
   else
   {
     /* we can write - hooray! */
@@ -624,7 +624,7 @@ int do_insult(Character *ch, char *argument, int cmd)
       }
       else
       { /* ch == victim */
-        send_to_char("You feel insulted.\r\n", ch);
+        ch->sendln("You feel insulted.");
       }
     }
   }

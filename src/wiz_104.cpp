@@ -62,7 +62,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 		;
 
 	if (!(*argument))
-		send_to_char("It's not gonna look that impressive...\r\n", ch);
+		ch->sendln("It's not gonna look that impressive...");
 	else
 	{
 		if (cmd == CMD_DEFAULT)
@@ -101,7 +101,7 @@ int do_incognito(Character *ch, char *argument, int cmd)
 
 	if (ch->player->incognito == true)
 	{
-		send_to_char("Incognito off.\r\n", ch);
+		ch->sendln("Incognito off.");
 		ch->player->incognito = false;
 	}
 	else
@@ -137,12 +137,12 @@ int do_load(Character *ch, char *arg, int cmd)
 
 	if (!ch->has_skill(COMMAND_LOAD) && cmd == CMD_DEFAULT)
 	{
-		send_to_char("Huh?\r\n", ch);
+		ch->sendln("Huh?");
 		return eFAILURE;
 	}
 	if (!ch->has_skill(COMMAND_PRIZE) && cmd == CMD_PRIZE)
 	{
-		send_to_char("Huh?\r\n", ch);
+		ch->sendln("Huh?");
 		return eFAILURE;
 	}
 
@@ -174,12 +174,12 @@ int do_load(Character *ch, char *arg, int cmd)
 
 			if (cnt > 200)
 			{
-				send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
+				ch->sendln("Maximum number of searchable items hit.  Search ended.");
 				break;
 			}
 		}
 
-		send_to_char("To load: prize <name|vnum>\r\n", ch);
+		ch->sendln("To load: prize <name|vnum>");
 		return eFAILURE;
 	}
 
@@ -195,7 +195,7 @@ int do_load(Character *ch, char *arg, int cmd)
 
 		if (cnt > 50)
 		{
-			send_to_char("Sorry, you can only load at most 50 of something at a time.\r\n", ch);
+			ch->sendln("Sorry, you can only load at most 50 of something at a time.");
 			return eFAILURE;
 		}
 	}
@@ -211,7 +211,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		{
 			if (x == 2)
 			{
-				send_to_char("Type must mobile or object.\r\n", ch);
+				ch->sendln("Type must mobile or object.");
 				return eFAILURE;
 			}
 			if (is_abbrev(type, types[x]))
@@ -224,7 +224,7 @@ int do_load(Character *ch, char *arg, int cmd)
 	switch (x)
 	{
 	default:
-		send_to_char("Problem...fuck up in do_load.\r\n", ch);
+		ch->sendln("Problem...fuck up in do_load.");
 		logentry("Default in do_load...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
@@ -234,12 +234,12 @@ int do_load(Character *ch, char *arg, int cmd)
 		{
 			if ((number = real_mobile(num)) < 0)
 			{
-				send_to_char("No such mobile.\r\n", ch);
+				ch->sendln("No such mobile.");
 				return eFAILURE;
 			}
 			if (ch->getLevel() < DEITY && !can_modify_mobile(ch, num))
 			{
-				send_to_char("You may only load mobs inside of your range.\r\n", ch);
+				ch->sendln("You may only load mobs inside of your range.");
 				return eFAILURE;
 			}
 			do_mload(ch, number, cnt);
@@ -247,7 +247,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		}
 		if ((num = mob_in_index(c, number)) == -1)
 		{
-			send_to_char("No such mobile.\r\n", ch);
+			ch->sendln("No such mobile.");
 			return eFAILURE;
 		}
 		do_mload(ch, num, cnt);
@@ -259,7 +259,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		{
 			if ((number = real_object(num)) < 0)
 			{
-				send_to_char("No such object.\r\n", ch);
+				ch->sendln("No such object.");
 				return eFAILURE;
 			}
 			if ((ch->getLevel() < 108) &&
@@ -270,12 +270,12 @@ int do_load(Character *ch, char *arg, int cmd)
 			}
 			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->name))
 			{
-				send_to_char("This command can only load prize items.\r\n", ch);
+				ch->sendln("This command can only load prize items.");
 				return eFAILURE;
 			}
 			else if (cmd != CMD_PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
 			{
-				send_to_char("You may only load objects inside of your range.\r\n", ch);
+				ch->sendln("You may only load objects inside of your range.");
 				return eFAILURE;
 			}
 
@@ -304,7 +304,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		}
 		if ((num = obj_in_index(c, number)) == -1)
 		{
-			send_to_char("No such object.\r\n", ch);
+			ch->sendln("No such object.");
 			return eFAILURE;
 		}
 		if ((ch->getLevel() < IMPLEMENTER) &&
@@ -316,7 +316,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		}
 		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->name))
 		{
-			send_to_char("This command can only load prize items.\r\n", ch);
+			ch->sendln("This command can only load prize items.");
 			return eFAILURE;
 		}
 
@@ -380,7 +380,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 	{ /* no argument. clean out the room */
 		if (IS_NPC(ch))
 		{
-			send_to_char("Don't... You would kill yourself too.\r\n", ch);
+			ch->sendln("Don't... You would kill yourself too.");
 			return eFAILURE;
 		}
 
@@ -476,7 +476,7 @@ int Zone::show_info(Character *ch)
 			repops_without_deaths,
 			repops_with_bonus);
 	send_to_char(buf, ch);
-	send_to_char("\r\n", ch);
+	ch->sendln("");
 
 	return eSUCCESS;
 }
@@ -729,7 +729,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 
 	if (num_to_show != 1)
 	{
-		send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);
+		ch->sendln("\r\nUse zedit to see the rest of the commands if they were truncated.");
 	}
 	return eSUCCESS;
 }
@@ -935,7 +935,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any MOBS by that NAME.\r\n", ch);
+			ch->sendln("Couldn't find any MOBS by that NAME.");
 	} /* "mobile" */
 	else if (is_abbrev(type, "counts") && has_range)
 	{
@@ -1046,14 +1046,14 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any OBJECTS by that NAME.\r\n", ch);
+			ch->sendln("Couldn't find any OBJECTS by that NAME.");
 	} /* "object" */
 	else if (is_abbrev(type, "room"))
 	{
 		argument = one_argument(argument, name);
 		if (!*name)
 		{
-			send_to_char("Format:  show room <beginrange> <endrange>\r\n", ch);
+			ch->sendln("Format:  show room <beginrange> <endrange>");
 			return eFAILURE;
 		}
 
@@ -1114,14 +1114,14 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any ROOMS in that range.\r\n", ch);
+			ch->sendln("Couldn't find any ROOMS in that range.");
 	} /* "object" */
 	else if (is_abbrev(type, "zone"))
 	{
 		argument = one_argument(argument, name);
 		if (!*name)
 		{
-			send_to_char("Show which zone? (# or 'all')\r\n", ch);
+			ch->sendln("Show which zone? (# or 'all')");
 			return eFAILURE;
 		}
 
@@ -1191,7 +1191,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				}
 
 			if (!found)
-				send_to_char("Unknown room-flag or sector type.\r\n", ch);
+				ch->sendln("Unknown room-flag or sector type.");
 		}
 		if (!bits && !sector)
 		{
@@ -1285,7 +1285,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					levhigh = atoi(arg1);
 				if (levhigh == -555 || levlow == -555)
 				{
-					send_to_char("Incorrect level requirement.\r\n", ch);
+					ch->sendln("Incorrect level requirement.");
 					return eFAILURE;
 				}
 			}
@@ -1300,7 +1300,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(action_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1309,7 +1309,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(isr_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1318,7 +1318,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(affected_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1327,7 +1327,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char(pc_clss_types2[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1336,29 +1336,29 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(races[i].singular_name, ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
 			send_to_char("level", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 
 			send_to_char("good", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 			send_to_char("evil", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 			send_to_char("neutral", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 
@@ -1367,7 +1367,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		int c, nr;
 		if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
 		{
-			send_to_char("No valid search supplied.\r\n", ch);
+			ch->sendln("No valid search supplied.");
 			return eFAILURE;
 		}
 		for (c = 0; c < mob_index[top_of_mobt].virt; c++)
@@ -1416,7 +1416,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			count++;
 			if (count > 200)
 			{
-				send_to_char("Limit reached.\r\n", ch);
+				ch->sendln("Limit reached.");
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
@@ -1538,7 +1538,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 				if (levhigh == -555 || levlow == -555)
 				{
-					send_to_char("Incorrect level requirement.\r\n", ch);
+					ch->sendln("Incorrect level requirement.");
 					return eFAILURE;
 				}
 			}
@@ -1554,7 +1554,7 @@ int do_show(Character *ch, char *argument, int cmd)
 
 				if (lweight == -555 || hweight == -555)
 				{
-					send_to_char("Incorrect weight requirement.\r\n", ch);
+					ch->sendln("Incorrect weight requirement.");
 					return eFAILURE;
 				}
 			}
@@ -1573,7 +1573,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(Object::wear_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1582,7 +1582,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(Object::extra_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1591,7 +1591,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(strs_damage_types[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1601,7 +1601,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(Object::more_obj_bits[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1610,7 +1610,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(item_types[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1619,7 +1619,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(size_bitfields[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
@@ -1628,19 +1628,19 @@ int do_show(Character *ch, char *argument, int cmd)
 				o++;
 				send_to_char_nosp(apply_types[z], ch);
 				if (o % 7 == 0)
-					send_to_char("\r\n", ch);
+					ch->sendln("");
 				else
 					send_to_char(" ", ch);
 			}
 			send_to_char("oweight", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 
 			send_to_char("olevel", ch);
 			if (o % 7 == 0)
-				send_to_char("\r\n", ch);
+				ch->sendln("");
 			else
 				send_to_char(" ", ch);
 
@@ -1740,7 +1740,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			count++;
 			if (count > 200)
 			{
-				send_to_char("Limit reached.\r\n", ch);
+				ch->sendln("Limit reached.");
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
@@ -1767,14 +1767,14 @@ int do_show(Character *ch, char *argument, int cmd)
 	{
 		if (!*name)
 		{
-			send_to_char("Show which key? (# of key)\r\n", ch);
+			ch->sendln("Show which key? (# of key)");
 			return eFAILURE;
 		}
 
 		count = atoi(name);
 		if ((!count && *name != '0') || count < 0)
 		{
-			send_to_char("Which key was that?\r\n", ch);
+			ch->sendln("Which key was that?");
 			return eFAILURE;
 		}
 
@@ -1842,7 +1842,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 			}
 		}
 
-		send_to_char("Ok.\r\n", ch);
+		ch->sendln("Ok.");
 		return eSUCCESS;
 	}
 
@@ -1856,7 +1856,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 
 	if (DC::getInstance()->world[destination_room].number == IMM_PIRAHNA_ROOM && !isname(GET_NAME(ch), "Pirahna"))
 	{
-		send_to_char("Damn! That is rude! This ain't your place. :P\r\n", ch);
+		ch->sendln("Damn! That is rude! This ain't your place. :P");
 		return eFAILURE;
 	}
 
@@ -1866,7 +1866,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
 	do_look(victim, "", 15);
-	send_to_char("Ok.\r\n", ch);
+	ch->sendln("Ok.");
 
 	return eSUCCESS;
 }
@@ -1897,7 +1897,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 
 	if (!(victim = get_char_vis(ch, person)))
 	{
-		send_to_char("No-one by that name around.\r\n", ch);
+		ch->sendln("No-one by that name around.");
 		return eFAILURE;
 	} /* if */
 
@@ -1906,7 +1906,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		target = atoi(&room[0]);
 		if ((*room != '0' && target == 0) || !DC::getInstance()->rooms.contains(target))
 		{
-			send_to_char("No room exists with that number.\r\n", ch);
+			ch->sendln("No room exists with that number.");
 			return eFAILURE;
 		}
 		//      for (loop = 0; loop <= top_of_world; loop++) {
@@ -1914,7 +1914,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		//            target = (int16_t)loop;
 		//            break;
 		//      } else if (loop == top_of_world) {
-		//            send_to_char("No room exists with that number.\r\n", ch);
+		//            ch->sendln("No room exists with that number.");
 		//            return eFAILURE;
 		//      } /* if */
 		//       } /* for */
@@ -1925,7 +1925,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 	}
 	else
 	{
-		send_to_char("No such target (person) can be found.\r\n", ch);
+		ch->sendln("No such target (person) can be found.");
 		return eFAILURE;
 	} /* if */
 
@@ -1945,14 +1945,14 @@ int do_teleport(Character *ch, char *argument, int cmd)
 
 	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 	{
-		send_to_char("No.\r\n", ch);
+		ch->sendln("No.");
 		return eFAILURE;
 	}
 
 	if (DC::isSet(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
 		ch->getLevel() < DEITY)
 	{
-		send_to_char("No.\r\n", ch);
+		ch->sendln("No.");
 		return eFAILURE;
 	}
 
@@ -1963,7 +1963,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has teleported you!", ch, 0, (char *)victim, TO_VICT, 0);
 	do_look(victim, "", 15);
-	send_to_char("Teleport completed.\r\n", ch);
+	ch->sendln("Teleport completed.");
 
 	return eSUCCESS;
 } /* do_teleport */
@@ -1988,7 +1988,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 
 	if (!(victim = get_char_vis(ch, buf)))
 	{
-		send_to_char("No-one by that name around.\r\n", ch);
+		ch->sendln("No-one by that name around.");
 		return eFAILURE;
 	}
 	else
@@ -2022,7 +2022,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 					do_look(k->follower, "", 15);
 				}
 			} /* for */
-		send_to_char("Ok.\r\n", ch);
+		ch->sendln("Ok.");
 	} /* else */
 	return eSUCCESS;
 }
@@ -2065,7 +2065,7 @@ void opstat(Character *ch, int vnum)
 	char buf[MAX_STRING_LENGTH];
 	if (num < 0)
 	{
-		send_to_char("Error, non-existant object.\r\n", ch);
+		ch->sendln("Error, non-existant object.");
 		return;
 	}
 	obj = (Object *)obj_index[num].item;
@@ -2074,10 +2074,10 @@ void opstat(Character *ch, int vnum)
 	send_to_char(buf, ch);
 	if (obj_index[num].progtypes == 0)
 	{
-		send_to_char("This object has no special procedures.\r\n", ch);
+		ch->sendln("This object has no special procedures.");
 		return;
 	}
-	send_to_char("\r\n", ch);
+	ch->sendln("");
 	mob_prog_data *mprg;
 	int i;
 	char buf2[MAX_STRING_LENGTH];
@@ -2110,7 +2110,7 @@ int do_opstat(Character *ch, char *argument, int cmd)
 
 	if (!ch->has_skill(COMMAND_OPSTAT))
 	{
-		send_to_char("Huh?\r\n", ch);
+		ch->sendln("Huh?");
 		return eFAILURE;
 	}
 	if (isdigit(*buf))
@@ -2157,12 +2157,12 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 	if ((num = real_object(vnum)) < 0)
 	{
-		send_to_char("No such object.\r\n", ch);
+		ch->sendln("No such object.");
 		return eFAILURE;
 	}
 	if (!can_modify_object(ch, vnum))
 	{
-		send_to_char("You are unable to work creation outside your range.\r\n", ch);
+		ch->sendln("You are unable to work creation outside your range.");
 		return eFAILURE;
 	}
 	ch->player->last_obj_vnum = vnum;
@@ -2201,7 +2201,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		else
 			obj_index[num].mobprogs = prog;
 		update_objprog_bits(num);
-		send_to_char("New obj proc created.\r\n", ch);
+		ch->sendln("New obj proc created.");
 		return eSUCCESS;
 	}
 	else if (!str_cmp(arg, "remove"))
@@ -2223,7 +2223,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 			;
 		if (!currprog)
 		{
-			send_to_char("Invalid proc number.\r\n", ch);
+			ch->sendln("Invalid proc number.");
 			return eFAILURE;
 		}
 		if (prog)
@@ -2238,7 +2238,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 		update_objprog_bits(num);
 
-		send_to_char("Program deleted.\r\n", ch);
+		ch->sendln("Program deleted.");
 		return eSUCCESS;
 	}
 	else if (!str_cmp(arg, "type"))
@@ -2246,8 +2246,8 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		argument = one_argument(argument, arg);
 		if (!*arg || !argument || !*argument || !isdigit(*arg) || !isdigit(*(1 + argument)))
 		{
-			send_to_char("$3Syntax$R: opedit [obj_num] type <prog> <type>\r\n", ch);
-			send_to_char("$3Valid types are$R:\r\n", ch);
+			ch->sendln("$3Syntax$R: opedit [obj_num] type <prog> <type>");
+			ch->sendln("$3Valid types are$R:");
 			char buf[MAX_STRING_LENGTH];
 			for (i = 0; *obj_types[i] != '\n'; i++)
 			{
@@ -2265,7 +2265,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 		if (!currprog)
 		{
-			send_to_char("Invalid prog number.\r\n", ch);
+			ch->sendln("Invalid prog number.");
 			return eFAILURE;
 		}
 		switch (atoi(argument + 1))
@@ -2304,12 +2304,12 @@ int do_opedit(Character *ch, char *argument, int cmd)
 			a = CAN_SEE_PROG;
 			break;
 		default:
-			send_to_char("Invalid progtype.\r\n", ch);
+			ch->sendln("Invalid progtype.");
 			return eFAILURE;
 		}
 		currprog->type = a;
 		update_objprog_bits(num);
-		send_to_char("Proc type changed.\r\n", ch);
+		ch->sendln("Proc type changed.");
 		return eSUCCESS;
 	}
 	else if (!str_cmp(arg, "arglist"))
@@ -2319,7 +2319,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		//    argument = one_argument(argument, arg1);
 		if (!*arg || !argument || !*argument || !isdigit(*arg))
 		{
-			send_to_char("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>\r\n", ch);
+			ch->sendln("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>");
 			return eFAILURE;
 		}
 		a = atoi(arg);
@@ -2330,13 +2330,13 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 		if (!currprog)
 		{
-			send_to_char("Invalid prog number.\r\n", ch);
+			ch->sendln("Invalid prog number.");
 			return eFAILURE;
 		}
 		dc_free(currprog->arglist);
 		currprog->arglist = strdup(argument + 1);
 
-		send_to_char("Arglist changed.\r\n", ch);
+		ch->sendln("Arglist changed.");
 		return eSUCCESS;
 	}
 	else if (!str_cmp(arg, "command"))
@@ -2344,7 +2344,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		argument = one_argument(argument, arg);
 		if (!*arg || !isdigit(*arg))
 		{
-			send_to_char("$3Syntax$R: opedit [obj_num] command <prog>\r\n", ch);
+			ch->sendln("$3Syntax$R: opedit [obj_num] command <prog>");
 			return eFAILURE;
 		}
 		a = atoi(arg);
@@ -2355,7 +2355,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 
 		if (!currprog)
 		{ // intval was too high
-			send_to_char("Invalid prog number.\r\n", ch);
+			ch->sendln("Invalid prog number.");
 			return eFAILURE;
 		}
 
@@ -2415,7 +2415,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	int r1 = real_object(v1), r2 = real_object(v2);
 	if (r1 < 0)
 	{
-		send_to_char("Source vnum does not exist.\r\n", ch);
+		ch->sendln("Source vnum does not exist.");
 		return eFAILURE;
 	}
 
@@ -2437,7 +2437,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 		r2 = real_object(v2);
 		if (r2 == -1)
 		{
-			send_to_char("Something failed. Possibly your destination vnum was too high.\r\n", ch);
+			ch->sendln("Something failed. Possibly your destination vnum was too high.");
 			return eFAILURE;
 		}
 	}
@@ -2493,7 +2493,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	int dst = real_mobile(vdst), src = real_mobile(vsrc);
 	if (src < 0)
 	{
-		send_to_char("Source vnum does not exist.\r\n", ch);
+		ch->sendln("Source vnum does not exist.");
 		return eFAILURE;
 	}
 
@@ -2515,7 +2515,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 		src = real_mobile(vsrc);
 		if (dst == -1)
 		{
-			send_to_char("Something failed. Possibly your destination vnum was too high.\r\n", ch);
+			ch->sendln("Something failed. Possibly your destination vnum was too high.");
 			return eFAILURE;
 		}
 	}
@@ -2566,15 +2566,15 @@ int do_mclone(Character *ch, char *argument, int cmd)
 
 	if (mob_index[src].non_combat_func)
 	{
-		send_to_char("Warning: hardcoded non_combat function found. Notify coder.\r\n", ch);
+		ch->sendln("Warning: hardcoded non_combat function found. Notify coder.");
 	}
 	if (mob_index[src].combat_func)
 	{
-		send_to_char("Warning: hardcoded combat function found. Notify coder.\r\n", ch);
+		ch->sendln("Warning: hardcoded combat function found. Notify coder.");
 	}
 	if (mob_index[src].mobprogs)
 	{
-		send_to_char("Warning: mob program found. This will need to be copied manually.\r\n", ch);
+		ch->sendln("Warning: mob program found. This will need to be copied manually.");
 	}
 
 	ch->player->last_mob_edit = dst;

@@ -78,7 +78,7 @@ struct vault_data *has_vault(QString name)
     for (vault = vault_table; vault; vault = vault->next)
       if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
       {
-        //	 send_to_char("A vault was created for you.\r\n",ch);
+        //	 ch->sendln("A vault was created for you.");
         return vault;
       }
   }
@@ -161,7 +161,7 @@ void vault_access(Character *ch, const char *who)
 
   if (!vault && !(vault = has_vault(GET_NAME(ch))))
   {
-    send_to_char("You don't seem to have a vault.\r\n", ch);
+    ch->sendln("You don't seem to have a vault.");
     return;
   }
 
@@ -187,20 +187,20 @@ void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
   {
     if (!(vault = has_vault(arg)))
     {
-      send_to_char("No such player.\r\n", ch);
+      ch->sendln("No such player.");
       return;
     }
     if (!has_vault_access(GET_NAME(ch), vault))
     {
-      send_to_char("You do not have access to that vault anyway.\r\n", ch);
+      ch->sendln("You do not have access to that vault anyway.");
       return;
     }
     access_remove(GET_NAME(ch), vault);
-    send_to_char("You remove your access to that vault.\r\n", ch);
+    ch->sendln("You remove your access to that vault.");
     return;
   }
 
-  send_to_char("You have access to the following vaults:\r\n", ch);
+  ch->sendln("You have access to the following vaults:");
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && has_vault_access(GET_NAME(ch), vault))
       ch->send(QString("%1\r\n").arg(vault->owner));
@@ -253,7 +253,7 @@ int do_vault(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF)))
   {
-    send_to_char("You're too busy running from the law!\r\n", ch);
+    ch->sendln("You're too busy running from the law!");
     return eFAILURE;
   }
 
@@ -310,7 +310,7 @@ int do_vault(Character *ch, char *argument, int cmd)
         clan_data *clan = get_clan(ch);
         if (clan == nullptr)
         {
-          send_to_char("You are not a member of any clan.\r\n", ch);
+          ch->sendln("You are not a member of any clan.");
           return eFAILURE;
         }
 
@@ -326,7 +326,7 @@ int do_vault(Character *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You don't have access to view the clan's vault log.\r\n", ch);
+          ch->sendln("You don't have access to view the clan's vault log.");
           return eFAILURE;
         }
       }
@@ -361,7 +361,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   }
   else if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("You don't feel safe enough to manage your valuables.\r\n", ch);
+    ch->sendln("You don't feel safe enough to manage your valuables.");
     return eSUCCESS;
   }
   else if (!strncmp(arg, "withdraw", strlen(arg)))
@@ -419,7 +419,7 @@ int do_vault(Character *ch, char *argument, int cmd)
       strcpy(arg2, clanVName(ch->clan).toStdString().c_str());
     if (!*argument)
     {
-      send_to_char("What item would you like to place in the vault?\r\n", ch);
+      ch->sendln("What item would you like to place in the vault?");
       return eSUCCESS;
     }
     else if (!*arg2)
@@ -436,7 +436,7 @@ int do_vault(Character *ch, char *argument, int cmd)
 
     if (!*argument)
     {
-      send_to_char("What item would you like to get from the vault?\r\n", ch);
+      ch->sendln("What item would you like to get from the vault?");
       return eSUCCESS;
     }
     else if (!*arg2)
@@ -928,7 +928,7 @@ void add_vault_access(Character *ch, QString name, struct vault_data *vault)
 
   if (name == GET_NAME(ch))
   {
-    send_to_char("Don't be a moron, you already have access.\r\n", ch);
+    ch->sendln("Don't be a moron, you already have access.");
     return;
   }
 
@@ -937,13 +937,13 @@ void add_vault_access(Character *ch, QString name, struct vault_data *vault)
   if (!get_pc(name))
     if (!(load_char_obj(&d, name)))
     {
-      send_to_char("You can't give access to someone who doesn't exist.\r\n", ch);
+      ch->sendln("You can't give access to someone who doesn't exist.");
       return;
     }
 
   if (has_vault_access(name, vault))
   {
-    send_to_char("That person already has access to your vault.\r\n", ch);
+    ch->sendln("That person already has access to your vault.");
     if (d.character)
       free_char(d.character, Trace("add_vault_access 1"));
     return;
@@ -1187,13 +1187,13 @@ void remove_vault_access(Character *ch, QString name, struct vault_data *vault)
 
   if (name == GET_NAME(ch))
   {
-    send_to_char("Don't be a moron, you can't remove your own access.\r\n", ch);
+    ch->sendln("Don't be a moron, you can't remove your own access.");
     return;
   }
 
   if (!has_vault_access(name, vault))
   {
-    send_to_char("That person doesn't have access to your vault.\r\n", ch);
+    ch->sendln("That person doesn't have access to your vault.");
     return;
   }
 
@@ -1512,34 +1512,34 @@ void vault_get(Character *ch, QString object, QString owner)
 
     if (!(obj = get_obj_in_vault(vault, object, num)))
     {
-      send_to_char("There is nothing like that in the vault.\r\n", ch);
+      ch->sendln("There is nothing like that in the vault.");
       return;
     }
 
     if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
     {
-      send_to_char("Why would you want another one of those?\r\n", ch);
+      ch->sendln("Why would you want another one of those?");
       return;
     }
 
     if (!self && (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && ch->getLevel() < IMMORTAL)
     {
-      send_to_char("That item seems to be bound to the vault.\r\n", ch);
+      ch->sendln("That item seems to be bound to the vault.");
       return;
     }
 
     if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch))
     {
-      send_to_char("You cannot hold any more.\r\n", ch);
+      ch->sendln("You cannot hold any more.");
       if (ch->getLevel() < IMMORTAL)
         return;
       else
-        send_to_char("But since you're an immortal, you get it anyway.\r\n", ch);
+        ch->sendln("But since you're an immortal, you get it anyway.");
     }
 
     if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
     {
-      send_to_char("You cannot carry any more items.\r\n", ch);
+      ch->sendln("You cannot carry any more items.");
       return;
     }
 
@@ -2010,7 +2010,7 @@ void vault_put(Character *ch, QString object, QString owner)
   {
     if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying)))
     {
-      send_to_char("You don't have anything like that.\r\n", ch);
+      ch->sendln("You don't have anything like that.");
       return;
     }
 
@@ -2405,14 +2405,14 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     if (!vault)
     {
-      send_to_char("You need to level up some before obtaining a vault.\r\n", ch);
+      ch->sendln("You need to level up some before obtaining a vault.");
       return eSUCCESS;
     }
     else if (vault->size < VAULT_MAX_SIZE)
       sprintf(buf, "$B1)$R Increase the size of vault by 10 lbs: %d platinum.\r\n", VAULT_UPGRADE_COST);
     else
       sprintf(buf, "1) You cannot increase your vault-size further.\r\n");
-    send_to_char("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R\r\n", ch);
+    ch->sendln("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R");
 
     send_to_char(buf, ch);
 
@@ -2439,44 +2439,44 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
     case 1:
       if (!vault)
       {
-        send_to_char("You need to level up some before obtaining a vault.\r\n", ch);
+        ch->sendln("You need to level up some before obtaining a vault.");
         return eSUCCESS;
       }
       if (vault->size >= VAULT_MAX_SIZE)
       {
-        send_to_char("Your vault's size is already at its maximum capacity.\r\n", ch);
+        ch->sendln("Your vault's size is already at its maximum capacity.");
         return eSUCCESS;
       }
       if (GET_PLATINUM(ch) < VAULT_UPGRADE_COST)
       {
-        send_to_char("You do not have enough platinum.\r\n", ch);
+        ch->sendln("You do not have enough platinum.");
         return eSUCCESS;
       }
       GET_PLATINUM(ch) -= VAULT_UPGRADE_COST;
       vault->size += 10;
       save_char_obj(ch);
       save_vault(vault->owner);
-      send_to_char("$B$2Paul the sleazy vault salesman tells you, '10 lbs added to your vault.$R'\r\n", ch);
+      ch->sendln("$B$2Paul the sleazy vault salesman tells you, '10 lbs added to your vault.$R'");
       return eSUCCESS;
     case 2:
       if (cvault)
       {
-        send_to_char("Your clan already has a vault.\r\n", ch);
+        ch->sendln("Your clan already has a vault.");
         return eSUCCESS;
       }
       if (!ch->clan)
       {
-        send_to_char("You're not a member of any clan.\r\n", ch);
+        ch->sendln("You're not a member of any clan.");
         return eSUCCESS;
       }
       if (!has_right(ch, CLAN_RIGHTS_VAULT))
       {
-        send_to_char("You are not authorized to make that purchase.\r\n", ch);
+        ch->sendln("You are not authorized to make that purchase.");
         return eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 1000)
       {
-        send_to_char("You do not have enough platinum.\r\n", ch);
+        ch->sendln("You do not have enough platinum.");
         return eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
@@ -2485,34 +2485,34 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
       cvault = has_vault(clanVName(ch->clan));
       cvault->size = 500;
       save_vault(clanVName(ch->clan));
-      send_to_char("You have purchased a vault for your clan's perusal.\r\n", ch);
+      ch->sendln("You have purchased a vault for your clan's perusal.");
       return eSUCCESS;
     case 3:
       if (!cvault)
       {
-        send_to_char("Your clan does not have a vault.\r\n", ch);
+        ch->sendln("Your clan does not have a vault.");
         return eSUCCESS;
       }
       if (!has_right(ch, CLAN_RIGHTS_VAULT))
       {
-        send_to_char("You are not authorized to make that purchase.\r\n", ch);
+        ch->sendln("You are not authorized to make that purchase.");
         return eSUCCESS;
       }
       if (cvault->size >= VAULT_MAX_SIZE)
       {
-        send_to_char("The vault is already at its maximum capacity.\r\n", ch);
+        ch->sendln("The vault is already at its maximum capacity.");
         return eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 200)
       {
-        send_to_char("You do not have enough platinum.\r\n", ch);
+        ch->sendln("You do not have enough platinum.");
         return eSUCCESS;
       }
       GET_PLATINUM(ch) -= 200;
       cvault->size += 10;
       save_char_obj(ch);
       save_vault(clanVName(ch->clan));
-      send_to_char("You have added 10 lbs capacity to your clan's vault.\r\n", ch);
+      ch->sendln("You have added 10 lbs capacity to your clan's vault.");
       return eSUCCESS;
     }
   }
@@ -2521,14 +2521,14 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 
 void vault_search_usage(Character *ch)
 {
-  send_to_char("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n", ch);
-  send_to_char("keyword <keyword>  -  Single word keyword. Can be used multiple times.\r\n", ch);
-  send_to_char("level <levels>     -  Single object level or range of levels.\r\n\r\n", ch);
-  send_to_char("Examples:\r\n", ch);
-  send_to_char("vault search keyword staff\r\n", ch);
-  send_to_char("vault search level 55\r\n", ch);
-  send_to_char("vault search keyword staff level 55.\r\n", ch);
-  send_to_char("vault search keyword staff level 40-60.\r\n\r\n", ch);
+  ch->sendln("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...");
+  ch->sendln("keyword <keyword>  -  Single word keyword. Can be used multiple times.");
+  ch->sendln("level <levels>     -  Single object level or range of levels.\r\n");
+  ch->sendln("Examples:");
+  ch->sendln("vault search keyword staff");
+  ch->sendln("vault search level 55");
+  ch->sendln("vault search keyword staff level 55.");
+  ch->sendln("vault search keyword staff level 40-60.\r\n");
 }
 
 int vault_search(Character *ch, const char *args)
@@ -2561,7 +2561,7 @@ int vault_search(Character *ch, const char *args)
       std::tie(arg1, arguments) = half_chop(arguments);
       if (arg1.isEmpty())
       {
-        send_to_char("Missing keyword parameter.\r\n\r\n", ch);
+        ch->sendln("Missing keyword parameter.\r\n");
         vault_search_usage(ch);
         return eFAILURE;
       }
@@ -2579,7 +2579,7 @@ int vault_search(Character *ch, const char *args)
       std::tie(arg1, arguments) = half_chop(arguments);
       if (arg1.isEmpty())
       {
-        send_to_char("Missing level parameter.\r\n\r\n", ch);
+        ch->sendln("Missing level parameter.\r\n");
         vault_search_usage(ch);
         return eFAILURE;
       }
@@ -2597,7 +2597,7 @@ int vault_search(Character *ch, const char *args)
           // Check if a non numeric value is passed
           if (!ok)
           {
-            send_to_char("Invalid level specified.\r\n\r\n", ch);
+            ch->sendln("Invalid level specified.\r\n");
             vault_search_usage(ch);
             return eFAILURE;
           }
@@ -2614,7 +2614,7 @@ int vault_search(Character *ch, const char *args)
           // Check if a non numeric value is passed
           if (!ok)
           {
-            send_to_char("Invalid minimum level specified.\r\n\r\n", ch);
+            ch->sendln("Invalid minimum level specified.\r\n");
             vault_search_usage(ch);
             return eFAILURE;
           }
@@ -2629,7 +2629,7 @@ int vault_search(Character *ch, const char *args)
           // Check if a non numeric value is passed
           if (!ok)
           {
-            send_to_char("Invalid maximum level specified.\r\n\r\n", ch);
+            ch->sendln("Invalid maximum level specified.\r\n");
             vault_search_usage(ch);
             return eFAILURE;
           }
@@ -2641,7 +2641,7 @@ int vault_search(Character *ch, const char *args)
     }
     else
     {
-      send_to_char("Invalid argument.\r\n\r\n", ch);
+      ch->sendln("Invalid argument.\r\n");
       vault_search_usage(ch);
       return eFAILURE;
     }

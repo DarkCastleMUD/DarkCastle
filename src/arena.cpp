@@ -34,7 +34,7 @@ int do_arena(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill( COMMAND_ARENA))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -64,7 +64,7 @@ int do_arena(Character *ch, char *argument, int cmd)
     arena.low = 0;
     arena.high = 0;
     arena.status = CLOSED;
-    send_to_char("Closing the arena.\r\n", ch);
+    ch->sendln("Closing the arena.");
     send_info("## The Arena has been CLOSED!\n\r");
     return eSUCCESS;
   }
@@ -138,7 +138,7 @@ int do_arena(Character *ch, char *argument, int cmd)
     arena.type = NORMAL;
   }
 
-  send_to_char("The Arena has been opened for the specified levels.\r\n", ch);
+  ch->sendln("The Arena has been opened for the specified levels.");
   return eSUCCESS;
 }
 
@@ -152,22 +152,22 @@ int do_joinarena(Character *ch, char *arg, int cmd)
 
   if (arena.low > ch->getLevel() || arena.high < ch->getLevel())
   {
-    send_to_char("The arena is not open for anyone your level.\r\n", ch);
+    ch->sendln("The arena is not open for anyone your level.");
     return eFAILURE;
   }
   if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOARENA))
   {
-    send_to_char("You have been banned from arenas.\r\n", ch);
+    ch->sendln("You have been banned from arenas.");
     return eFAILURE;
   }
   if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
   {
-    send_to_char("They don't allow criminals in the arena.\r\n", ch);
+    ch->sendln("They don't allow criminals in the arena.");
     return eFAILURE;
   }
   if (arena.type == CHAOS && !ch->clan)
   {
-    send_to_char("Only clan members may join this arena.\r\n", ch);
+    ch->sendln("Only clan members may join this arena.");
     return eFAILURE;
   }
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
@@ -187,7 +187,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   }
   if (ch->fighting)
   {
-    send_to_char("You're ALREADY in a fight...isn't that kinda silly?\r\n", ch);
+    ch->sendln("You're ALREADY in a fight...isn't that kinda silly?");
     return eFAILURE;
   }
 

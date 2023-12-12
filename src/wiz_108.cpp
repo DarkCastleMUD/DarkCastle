@@ -35,7 +35,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You are unable to do this outside of your range.\r\n", ch);
+    ch->sendln("You are unable to do this outside of your range.");
     return eFAILURE;
   }
 
@@ -152,7 +152,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   // catch(char *errmsg)
   // {
   //   ch->send(QString("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
-  //   send_to_char("Ask Rubicon if it needs fixed...\r\n", ch);
+  //   ch->sendln("Ask Rubicon if it needs fixed...");
   //   return eFAILURE;
   //}
 
@@ -167,7 +167,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill( COMMAND_PURLOIN))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -267,7 +267,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
     j++;
   }
 
-  send_to_char("Sorry, couldn't find it or something.\r\n", ch);
+  ch->sendln("Sorry, couldn't find it or something.");
   return eSUCCESS;
 }
 
@@ -300,7 +300,7 @@ int do_set(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill( COMMAND_SET))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -329,13 +329,13 @@ int do_set(Character *ch, char *argument, int cmd)
   }
   if (!(vict = get_char_vis(ch, name)))
   {
-    send_to_char("No living thing by that name.\r\n", ch);
+    ch->sendln("No living thing by that name.");
     return eFAILURE;
   }
 
   if (ch->getLevel() < vict->getLevel())
   {
-    send_to_char("Get real! You ain't that big.\r\n", ch);
+    ch->sendln("Get real! You ain't that big.");
     if (IS_PC(vict))
     {
       sprintf(buf2, "%s just tried to set: %s\n\r", GET_NAME(ch), buf);
@@ -346,21 +346,21 @@ int do_set(Character *ch, char *argument, int cmd)
 
   if (IS_PC(vict) && (vict->getLevel() == IMPLEMENTER) && (GET_NAME(vict) != GET_NAME(ch)))
   {
-    send_to_char("Forget it dweeb.\r\n", ch);
+    ch->sendln("Forget it dweeb.");
     return eFAILURE;
   }
 
   argument = one_argument(argument, buf);
   if (!*buf)
   {
-    send_to_char("A field was expected.\r\n", ch);
+    ch->sendln("A field was expected.");
     return eFAILURE;
   }
 
   skill = old_search_block(buf, 0, strlen(buf), values, 1);
   if (skill < 0)
   {
-    send_to_char("That value not recognized.\r\n", ch);
+    ch->sendln("That value not recognized.");
     return eFAILURE;
   }
   argument = one_argument(argument, buf); /* update argument */
@@ -374,7 +374,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
     if (IS_MOB(vict))
     {
-      send_to_char("Can't set a mob's age.\r\n", ch);
+      ch->sendln("Can't set a mob's age.");
       return eFAILURE;
     }
     value = atoi(buf);
@@ -388,7 +388,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
     if (str_cmp(buf, "m") && str_cmp(buf, "f") && str_cmp(buf, "n"))
     {
-      send_to_char("Sex must be 'm','f' or 'n'.\r\n", ch);
+      ch->sendln("Sex must be 'm','f' or 'n'.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -511,7 +511,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Strength must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\r\n", ch);
+      ch->sendln("and less than 26.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -521,7 +521,7 @@ int do_set(Character *ch, char *argument, int cmd)
   break;
   case 7: /* stradd */
   {
-    send_to_char("Strength addition not supported.\r\n", ch);
+    ch->sendln("Strength addition not supported.");
   }
   break;
   case 8: /* int */
@@ -530,7 +530,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Intelligence must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\r\n", ch);
+      ch->sendln("and less than 26.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -546,7 +546,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Wisdom must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\r\n", ch);
+      ch->sendln("and less than 26.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -560,7 +560,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Dexterity must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\r\n", ch);
+      ch->sendln("and less than 26.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -574,7 +574,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Constitution must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\r\n", ch);
+      ch->sendln("and less than 26.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -631,7 +631,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
     if (IS_MOB(vict))
     {
-      send_to_char("Can't set a mob's pracs...\r\n", ch);
+      ch->sendln("Can't set a mob's pracs...");
       return eFAILURE;
     }
     value = atoi(buf);
@@ -646,7 +646,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value < -1000) || (value > 1000))
     {
       send_to_char("Alignment must be more than -1000\n\r", ch);
-      send_to_char("and less than 1000.\r\n", ch);
+      ch->sendln("and less than 1000.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -660,7 +660,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Thirst must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\r\n", ch);
+      ch->sendln("and less than 101.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -674,7 +674,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Drunk must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\r\n", ch);
+      ch->sendln("and less than 101.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -688,7 +688,7 @@ int do_set(Character *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Full must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\r\n", ch);
+      ch->sendln("and less than 101.");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -702,7 +702,7 @@ int do_set(Character *ch, char *argument, int cmd)
     {
       if (x == 31)
       {
-        send_to_char("No such race.\r\n", ch);
+        ch->sendln("No such race.");
         return eFAILURE;
       }
       if (isname(races[x].singular_name, buf))
@@ -751,25 +751,25 @@ int do_set(Character *ch, char *argument, int cmd)
     one_argument(argument, buf2);
     if (!*buf || !*buf2)
     {
-      send_to_char("Syntax: set <vict> saves <0-5> <num>\r\n", ch);
+      ch->sendln("Syntax: set <vict> saves <0-5> <num>");
       return eFAILURE;
     }
 
     if (IS_NPC(vict))
     {
-      send_to_char("You cannot set saves_bases on mobs.\r\n", ch);
+      ch->sendln("You cannot set saves_bases on mobs.");
       return eFAILURE;
     }
 
     if (!check_range_valid_and_convert(i, buf, 0, 5))
     {
-      send_to_char("Save type be from 0 to 5.\r\n", ch);
+      ch->sendln("Save type be from 0 to 5.");
       return eFAILURE;
     }
 
     if (!check_range_valid_and_convert(value, buf2, 0, 5))
     {
-      send_to_char("Value must be from -10 to 100.\r\n", ch);
+      ch->sendln("Value must be from -10 to 100.");
       return eFAILURE;
     }
     vict->player->saves_mods[i] = value;
@@ -809,7 +809,7 @@ int do_set(Character *ch, char *argument, int cmd)
 
     if (IS_NPC(vict))
     {
-      send_to_char("You cannot set profession on mobs.\r\n", ch);
+      ch->sendln("You cannot set profession on mobs.");
       return eFAILURE;
     }
 
@@ -825,7 +825,7 @@ int do_set(Character *ch, char *argument, int cmd)
   break;
   }
 
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   affect_total(vict);
   return eSUCCESS;
 }

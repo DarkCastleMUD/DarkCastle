@@ -99,7 +99,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   if (fprintf(fl, "~\n") < 0)
   {
     fclose(fl);
-    send_to_char("Failure writing to transition file.\r\n", ch);
+    ch->sendln("Failure writing to transition file.");
     return eFAILURE;
   }
 
@@ -128,7 +128,7 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
   {
     if (!(victim = get_pc_vis(this, name)))
     {
-      send_to_char("That player is not here.\r\n", this);
+      this->sendln("That player is not here.");
       return eFAILURE;
     }
   }
@@ -141,14 +141,14 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
   if (!DC::isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
     send(QString("%1 is now a guide.\r\n").arg(victim->getNameC()));
-    send_to_char("You have been selected to be a DC Guide!\r\n", victim);
+    victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
     send(QString("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
-    send_to_char("You have been removed as a DC guide.\r\n", victim);
+    victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
@@ -174,7 +174,7 @@ int do_advance(Character *ch, char *argument, int cmd)
   {
     if (!(victim = get_char_vis(ch, name)))
     {
-      send_to_char("That player is not here.\r\n", ch);
+      ch->sendln("That player is not here.");
       return eFAILURE;
     }
   }
@@ -186,14 +186,14 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(victim))
   {
-    send_to_char("NO! Not on NPC's.\r\n", ch);
+    ch->sendln("NO! Not on NPC's.");
     return eFAILURE;
   }
 
   if (!*level ||
       (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
-    send_to_char("Level must be 1 to 110.\r\n", ch);
+    ch->sendln("Level must be 1 to 110.");
     return eFAILURE;
   }
 
@@ -205,14 +205,14 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   if (ch->getLevel() < OVERSEER && new_newlevel >= IMMORTAL)
   {
-    send_to_char("Limited to levels lower than Titan.\r\n", ch);
+    ch->sendln("Limited to levels lower than Titan.");
     return eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
   if (new_newlevel > ch->getLevel())
   {
-    send_to_char("Yeah right.\r\n", ch);
+    ch->sendln("Yeah right.");
     return eFAILURE;
   }
 
@@ -240,7 +240,7 @@ int do_advance(Character *ch, char *argument, int cmd)
     redo_hitpoints(victim);
   }
 
-  send_to_char("You feel generous.\r\n", ch);
+  ch->sendln("You feel generous.");
   act("$n makes some strange gestures.\n\rA strange feeling comes upon you,"
       "like a giant hand. Light comes\n\rdown from above, grabbing your "
       "body, which begins to pulse\n\rwith coloured lights from inside.\n\rYo"
@@ -299,7 +299,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
-      send_to_char("Get stuffed.\r\n", this);
+      this->sendln("Get stuffed.");
       return eFAILURE;
     }
 
@@ -386,7 +386,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
 
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    send_to_char("Huh?\r\n", this);
+    this->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -445,19 +445,19 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     if (!write_hotboot_file(new_argv))
     {
       logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
-      send_to_char("Hot reboot failed.\r\n", this);
+      this->sendln("Hot reboot failed.");
     }
   }
   else if (arg1 == "auto")
   {
     if (try_to_hotboot_on_crash)
     {
-      send_to_char("Mud will not try to hotboot when it crashes next.\r\n", this);
+      this->sendln("Mud will not try to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 0;
     }
     else
     {
-      send_to_char("Mud will now TRY to hotboot when it crashes next.\r\n", this);
+      this->sendln("Mud will now TRY to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 1;
     }
   }
@@ -517,7 +517,7 @@ command_return_t Character::do_shutdow(QStringList arguments, int cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    send_to_char("Huh?\r\n", this);
+    this->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -538,7 +538,7 @@ int do_testport(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTPORT))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -560,7 +560,7 @@ int do_testport(Character *ch, char *argument, int cmd)
     }
 
     logf(105, LogChannels::LOG_MISC, "Starting testport.");
-    send_to_char("Testport successfully started.\r\n", ch);
+    ch->sendln("Testport successfully started.");
   }
   else if (!str_cmp(arg1, "stop"))
   {
@@ -572,7 +572,7 @@ int do_testport(Character *ch, char *argument, int cmd)
     }
 
     logf(105, LogChannels::LOG_MISC, "Shutdown testport under pid %d", child);
-    send_to_char("Testport successfully shutdown.\r\n", ch);
+    ch->sendln("Testport successfully shutdown.");
   }
 
   return eSUCCESS;
@@ -594,7 +594,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTUSER))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -609,7 +609,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
 
   if (strlen(arg1) > 19 || _parse_name(arg1, username))
   {
-    send_to_char("Invalid username passed.\r\n", ch);
+    ch->sendln("Invalid username passed.");
     return eFAILURE;
   }
 
@@ -624,7 +624,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
 
   if (!file_exists(savefile))
   {
-    send_to_char("Player file not found.\r\n", ch);
+    ch->sendln("Player file not found.");
     return eFAILURE;
   }
 
@@ -638,7 +638,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Only on or off are valid second arguments to this command.\r\n", ch);
+    ch->sendln("Only on or off are valid second arguments to this command.");
     return eFAILURE;
   }
 
@@ -646,11 +646,11 @@ int do_testuser(Character *ch, char *argument, int cmd)
 
   if (system(command))
   {
-    send_to_char("Error occurred.\r\n", ch);
+    ch->sendln("Error occurred.");
   }
   else
   {
-    send_to_char("Ok.\r\n", ch);
+    ch->sendln("Ok.");
   }
 
   return eSUCCESS;
@@ -684,7 +684,7 @@ int do_skilledit(Character *ch, char *argument, int cmd)
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    send_to_char("Edit the skills of whom?\r\n", ch);
+    ch->sendln("Edit the skills of whom?");
     return eFAILURE;
   }
 

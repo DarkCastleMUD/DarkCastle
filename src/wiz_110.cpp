@@ -98,7 +98,7 @@ int do_maxes(Character *ch, char *argument, int cmd)
       break;
   if (pc_clss_types2[i][0] == '\n')
   {
-    send_to_char("No such class.\r\n", ch);
+    ch->sendln("No such class.");
     return eFAILURE;
   }
   GET_CLASS(ch) = i;
@@ -129,7 +129,7 @@ int do_maxes(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
   }
-  send_to_char("No such race.\r\n", ch);
+  ch->sendln("No such race.");
   return eFAILURE;
 }
 
@@ -168,7 +168,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
       }
     }
 
-    send_to_char("\r\n", this);
+    this->sendln("");
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
                  this);
@@ -290,14 +290,14 @@ int do_wizlock(Character *ch, char *argument, int cmd)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
     logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
-    send_to_char("Game wizlocked.\r\n", ch);
+    ch->sendln("Game wizlocked.");
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
     logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
-    send_to_char("Game un-wizlocked.\r\n", ch);
+    ch->sendln("Game un-wizlocked.");
   }
   return eSUCCESS;
 }
@@ -329,7 +329,7 @@ int do_chpwd(Character *ch, char *arg, int cmd)
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    send_to_char("That player was not found.\r\n", ch);
+    ch->sendln("That player was not found.");
     return eFAILURE;
   }
 
@@ -337,14 +337,14 @@ int do_chpwd(Character *ch, char *arg, int cmd)
 
   if (!*name || strlen(name) > 10)
   {
-    send_to_char("Password must be 10 characters or less.\r\n", ch);
+    ch->sendln("Password must be 10 characters or less.");
     return eFAILURE;
   }
 
   strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
   victim->player->pwd[PASSWORD_LEN] = '\0';
 
-  send_to_char("Ok.\r\n", ch);
+  ch->sendln("Ok.");
   return eSUCCESS;
 }
 
@@ -361,7 +361,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
 
   if (!*lev_str)
   {
-    send_to_char("Also, you must supply a level.\r\n", ch);
+    ch->sendln("Also, you must supply a level.");
     return eFAILURE;
   }
 
@@ -370,7 +370,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
     lev_nr = atoi(lev_str);
     if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
-      send_to_char("You must use a valid level from 100-110.\r\n", ch);
+      ch->sendln("You must use a valid level from 100-110.");
       return eFAILURE;
     }
   }
@@ -576,7 +576,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", this);
+    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
     return eFAILURE;
   }
   do_name(victim, " %", CMD_DEFAULT);
@@ -604,7 +604,7 @@ int do_install(Character *ch, char *arg, int cmd)
   int ret;
 
   /*  if(!ch->has_skill( COMMAND_INSTALL)) {
-          send_to_char("Huh?\r\n", ch);
+          ch->sendln("Huh?");
           return eFAILURE;
     }
   */
@@ -629,7 +629,7 @@ int do_install(Character *ch, char *arg, int cmd)
 
   if (range <= 0)
   {
-    send_to_char("Range number must be greater than 0\r\n", ch);
+    ch->sendln("Range number must be greater than 0");
     return eFAILURE;
   }
 
@@ -643,7 +643,7 @@ int do_install(Character *ch, char *arg, int cmd)
 
   if (numrooms <= 0)
   {
-    send_to_char("Number of rooms must be greater than 0.\r\n", ch);
+    ch->sendln("Number of rooms must be greater than 0.");
     return eFAILURE;
   }
 
@@ -713,7 +713,7 @@ int do_range(Character *ch, char *arg, int cmd)
   */
   if (!ch->has_skill(COMMAND_RANGE))
   {
-    send_to_char("Huh?\r\n", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -739,7 +739,7 @@ int do_range(Character *ch, char *arg, int cmd)
   {
     if (!isdigit(*buf) || !isdigit(*trail))
     {
-      send_to_char("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.\r\n", ch);
+      ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
       return eFAILURE;
     }
     low = atoi(buf);
@@ -749,7 +749,7 @@ int do_range(Character *ch, char *arg, int cmd)
   {
     if (!isdigit(*buf) || !isdigit(*kind))
     {
-      send_to_char("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.\r\n", ch);
+      ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
       return eFAILURE;
     }
     low = atoi(kind);
@@ -757,7 +757,7 @@ int do_range(Character *ch, char *arg, int cmd)
   }
   if (low < 0 || high < 0)
   {
-    send_to_char("The number needs to be positive.\r\n", ch);
+    ch->sendln("The number needs to be positive.");
     return eFAILURE;
   }
   if (trail[0])
@@ -789,7 +789,7 @@ int do_range(Character *ch, char *arg, int cmd)
       send_to_char(message, victim);
       return eSUCCESS;
     default:
-      send_to_char("Invalid type. Valid ones are r/o/m.\r\n", ch);
+      ch->sendln("Invalid type. Valid ones are r/o/m.");
       return eFAILURE;
     }
   }
@@ -822,7 +822,7 @@ int do_metastat(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
-    send_to_char("metastat who?\r\n", ch);
+    ch->sendln("metastat who?");
     return eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
@@ -868,7 +868,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
 
   if (!arg[0])
   {
-    send_to_char("Syntax: acfinder <wear slot>\r\n", ch);
+    ch->sendln("Syntax: acfinder <wear slot>");
     return eFAILURE;
   }
 
@@ -878,7 +878,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
       break;
   if (i >= Object::wear_bits.size())
   {
-    send_to_char("Syntax: acfinder <wear slot>\r\n", ch);
+    ch->sendln("Syntax: acfinder <wear slot>");
     return eFAILURE;
   }
   i = 1 << i;
@@ -902,7 +902,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
     o++;
     if (o == 150)
     {
-      send_to_char("Max number of items hit.\r\n", ch);
+      ch->sendln("Max number of items hit.");
       return eSUCCESS;
     }
   }
@@ -918,7 +918,7 @@ int do_testhit(Character *ch, char *argument, int cmd)
 
   if (!arg3[0])
   {
-    send_to_char("Syntax: <tohit> <level> <target level>\r\n", ch);
+    ch->sendln("Syntax: <tohit> <level> <target level>");
     return eFAILURE;
   }
   int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);

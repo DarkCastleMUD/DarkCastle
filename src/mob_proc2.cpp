@@ -89,7 +89,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\r\n", ch);
+		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
 	}
 
@@ -105,7 +105,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
 	if (obj == nullptr)
 	{
-		send_to_char("You don't have that item.\r\n", ch);
+		ch->sendln("You don't have that item.");
 		return eSUCCESS;
 	}
 
@@ -167,7 +167,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\r\n", ch);
+		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
 	}
 
@@ -183,7 +183,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 
 	if (obj == nullptr)
 	{
-		send_to_char("You don't have that item.\r\n", ch);
+		ch->sendln("You don't have that item.");
 		return eSUCCESS;
 	}
 
@@ -268,7 +268,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\r\n", ch);
+		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
 	}
 
@@ -284,7 +284,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 
 	if (obj == nullptr)
 	{
-		send_to_char("You don't have that item.\r\n", ch);
+		ch->sendln("You don't have that item.");
 		return eSUCCESS;
 	}
 
@@ -505,7 +505,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		return eSUCCESS;
 	}
 
-	send_to_char("No such corpse was found.  Try \"list\".\r\n", ch);
+	ch->sendln("No such corpse was found.  Try \"list\".");
 	return eSUCCESS;
 }
 
@@ -800,7 +800,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\r\n", ch);
+		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
 	}
 
@@ -816,7 +816,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 
 	if (obj == nullptr)
 	{
-		send_to_char("You don't have that item.\r\n", ch);
+		ch->sendln("You don't have that item.");
 		return eSUCCESS;
 	}
 

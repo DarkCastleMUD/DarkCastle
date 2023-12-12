@@ -184,7 +184,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\r\n", ch);
+    ch->sendln("Your criminal acts prohibit it.");
     return;
   }
 
@@ -197,7 +197,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("The shop keeper changes his mind and refuses to sell such a special item.\r\n", ch);
+    ch->sendln("The shop keeper changes his mind and refuses to sell such a special item.");
     return;
   }
 
@@ -221,13 +221,13 @@ void shopping_buy(const char *arg, Character *ch,
 
   if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
   {
-    send_to_char("You can't carry that many items.\r\n", ch);
+    ch->sendln("You can't carry that many items.");
     return;
   }
 
   if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
   {
-    send_to_char("You can't carry that much weight.\r\n", ch);
+    ch->sendln("You can't carry that much weight.");
     return;
   }
 
@@ -235,7 +235,7 @@ void shopping_buy(const char *arg, Character *ch,
   {
     if (search_char_for_item(ch, obj->item_number, false))
     {
-      send_to_char("The item's uniqueness prevents it!\r\n", ch);
+      ch->sendln("The item's uniqueness prevents it!");
       return;
     }
   }
@@ -292,7 +292,7 @@ void shopping_sell(const char *arg, Character *ch,
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\r\n", ch);
+    ch->sendln("Your criminal acts prohibit it.");
     return;
   }
 
@@ -304,24 +304,24 @@ void shopping_sell(const char *arg, Character *ch,
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    send_to_char("It seems magically attached to you.\r\n", ch);
+    ch->sendln("It seems magically attached to you.");
     return;
   }
 
   if (contains_no_trade_item(obj))
   {
     if (ch->getLevel() > IMMORTAL)
-      send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+      ch->sendln("That was a NO_TRADE item btw....");
     else
     {
-      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+      ch->sendln("Something inside it seems magically attached to you.");
       return;
     }
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("That would be really fucking smart.\r\n", ch);
+    ch->sendln("That would be really fucking smart.");
     return;
   }
 
@@ -1080,13 +1080,13 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    send_to_char("Invalid player shop keeper.  Let a god know.\r\n", ch);
+    ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
 
   if (strcmp(shop->owner, GET_NAME(ch)))
   {
-    send_to_char("You don't own this shop, you can't stock the shelves!\r\n", ch);
+    ch->sendln("You don't own this shop, you can't stock the shelves!");
     return;
   }
 
@@ -1097,7 +1097,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   if (!*item || !*price)
   {
-    send_to_char("Syntax:  stock <item> <price>\r\n", ch);
+    ch->sendln("Syntax:  stock <item> <price>");
     return;
   }
 
@@ -1105,7 +1105,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   value = atol(price);
   if (value < 1 || value > 20000000)
   {
-    send_to_char("Invalid price.  The price must be between 1 $B$5gold$R and 20 million $B$5gold$R.\r\n", ch);
+    ch->sendln("Invalid price.  The price must be between 1 $B$5gold$R and 20 million $B$5gold$R.");
     return;
   }
 
@@ -1114,7 +1114,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == nullptr)
   {
-    send_to_char("Stock what item?\r\n", ch);
+    ch->sendln("Stock what item?");
     return;
   }
 
@@ -1124,13 +1124,13 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
       DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP) ||
       DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
-    send_to_char("You can't give that to the shop keeper to sell!\r\n", ch);
+    ch->sendln("You can't give that to the shop keeper to sell!");
     return;
   }
 
   if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    send_to_char("For now you can't sell unique items.\r\n", ch);
+    ch->sendln("For now you can't sell unique items.");
     return;
   }
 
@@ -1141,7 +1141,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
   extract_obj(obj);
-  send_to_char("You put the item up for sale.\r\n", ch);
+  ch->sendln("You put the item up for sale.");
   write_one_player_shop(shop);
 }
 
@@ -1150,7 +1150,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    send_to_char("Invalid player shop keeper.  Let a god know.\r\n", ch);
+    ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
 
@@ -1170,21 +1170,21 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
 
   if (!item || item_pos < 1)
   {
-    send_to_char("Choose a valid number!\r\n", ch);
+    ch->sendln("Choose a valid number!");
     return;
   }
 
   // make sure they can afford it
   if (ch->getGold() < item->price)
   {
-    send_to_char("You can't afford that!\r\n", ch);
+    ch->sendln("You can't afford that!");
     return;
   }
 
   int robj = real_object(item->item_vnum);
   if (robj < 0)
   {
-    send_to_char("Error, that is not a valid item.  Let a god know.\r\n", ch);
+    ch->sendln("Error, that is not a valid item.  Let a god know.");
     return;
   }
 
@@ -1229,13 +1229,13 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    send_to_char("Invalid player shop keeper.  Let a god know.\r\n", ch);
+    ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
 
   if (strcmp(shop->owner, GET_NAME(ch)))
   {
-    send_to_char("You don't own this shop!  Go rob a bank or something.\r\n", ch);
+    ch->sendln("You don't own this shop!  Go rob a bank or something.");
     return;
   }
 
@@ -1244,7 +1244,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 
   if (!*price)
   {
-    send_to_char("Withdraw how much from your store?\r\n", ch);
+    ch->sendln("Withdraw how much from your store?");
     return;
   }
 
@@ -1252,13 +1252,13 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
   value = atol(price);
   if (value < 1 || value > 20000000)
   {
-    send_to_char("Invalid amount.  The amount must be between 1 gold and 20 million gold.\r\n", ch);
+    ch->sendln("Invalid amount.  The amount must be between 1 gold and 20 million gold.");
     return;
   }
 
   if (value > shop->money_on_hand)
   {
-    send_to_char("You don't have that much in the till!\r\n", ch);
+    ch->sendln("You don't have that much in the till!");
     return;
   }
 
@@ -1286,13 +1286,13 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    send_to_char("Invalid player shop keeper.  Let a god know.\r\n", ch);
+    ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
 
   if (strcmp(shop->owner, GET_NAME(ch)))
   {
-    send_to_char("You don't own this shop, you can't change the design!\r\n", ch);
+    ch->sendln("You don't own this shop, you can't change the design!");
     return;
   }
 
@@ -1311,7 +1311,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   {
     if (pdesign_values[skill][0] == '\n')
     {
-      send_to_char("Invalid field.\r\n", ch);
+      ch->sendln("Invalid field.");
       return;
     }
     if (is_abbrev(select, pdesign_values[skill]))
@@ -1330,7 +1330,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
     }
     if (strlen(text) > (PC_SHOP_SELL_MESS_SIZE - 20))
     {
-      send_to_char("That sell message is too long.\r\n", ch);
+      ch->sendln("That sell message is too long.");
       return;
     }
     if (!strcmp(text, "none"))
@@ -1344,12 +1344,12 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   case 1: // roomname
     if (!*text)
     {
-      send_to_char("$3Syntax$R: design roomname <name>\r\n", ch);
+      ch->sendln("$3Syntax$R: design roomname <name>");
       return;
     }
     if (strlen(text) > 60)
     {
-      send_to_char("That room name is too long (60 chars max).\r\n", ch);
+      ch->sendln("That room name is too long (60 chars max).");
       return;
     }
     dc_free(DC::getInstance()->world[shop->room_num].name);
@@ -1359,7 +1359,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
     break;
 
   case 2: // roomdesc
-    send_to_char("Not active yet.\r\n", ch);
+    ch->sendln("Not active yet.");
     break;
 
   default:
@@ -1373,12 +1373,12 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
 
 void player_shopping_sell(const char *arg, Character *ch, Character *keeper)
 {
-  send_to_char("These shop keeper's don't buy stuff.\r\n", ch);
+  ch->sendln("These shop keeper's don't buy stuff.");
 }
 
 void player_shopping_value(const char *arg, Character *ch, Character *keeper)
 {
-  send_to_char("These shop keeper's don't buy stuff.\r\n", ch);
+  ch->sendln("These shop keeper's don't buy stuff.");
 }
 
 void player_shopping_list(const char *arg, Character *ch, Character *keeper)
@@ -1388,7 +1388,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    send_to_char("Invalid player shop keeper.  Let a god know.\r\n", ch);
+    ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
   send_to_char("Item                                          Price\r\n"
@@ -1396,7 +1396,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
                ch);
 
   if (!shop->sale_list)
-    send_to_char("There is nothing for sale here :(\r\n", ch);
+    ch->sendln("There is nothing for sale here :(");
 
   else
     for (player_shop_item *item = shop->sale_list; item; item = item->next)
@@ -1468,7 +1468,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
     return eFAILURE;
 
   if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
-        send_to_char("Huh?\r\n", ch);
+        ch->sendln("Huh?");
         return eFAILURE;
   }
 
@@ -1493,7 +1493,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
   {
     if(pshopedit_values[skill][0] == '\n')
     {
-      send_to_char("Invalid field.\r\n", ch);
+      ch->sendln("Invalid field.");
       return eFAILURE;
     }
     if(is_abbrev(select, pshopedit_values[skill]))
@@ -1511,7 +1511,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
       }
       i = atoi(text);
       if(i < 1 || i > top_of_world || !DC::getInstance()->rooms[i]) {
-         send_to_char("You must choose a valid room number.\r\n", ch);
+         ch->sendln("You must choose a valid room number.");
          return eFAILURE;
       }
       shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
@@ -1533,9 +1533,9 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
       break;
 
     case 2: // list
-      send_to_char("Player Shops\r\n-------------------------\r\n", ch);
+      ch->sendln("Player Shops\r\n-------------------------");
       if(!g_playershops)
-         send_to_char("No current shops.\r\n", ch);
+         ch->sendln("No current shops.");
       else for(i = 1, shop = g_playershops; shop; shop = shop->next, i++)
         csendf(ch, "%2d$3)$R %-15s $3Room$R: %5d\r\n", i, shop->owner, shop->room_num);
       break;
@@ -1705,22 +1705,22 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
     csendf(ch, "--------------------------------------------------------------------------------\n\r");
 
     /*
-    send_to_char(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.\r\n", ch);
-    send_to_char(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.\r\n", ch);
-    send_to_char(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.\r\n", ch);
+    ch->sendln(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.");
+    ch->sendln(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.");
+    ch->sendln(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.");
 
-    send_to_char(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.\r\n", ch);
-    send_to_char(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.\r\n", ch);
-    send_to_char(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.\r\n", ch);
+    ch->sendln(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.");
+    ch->sendln(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.");
+    ch->sendln(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.");
 
-    send_to_char(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.\r\n", ch);
-    send_to_char(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.\r\n", ch);
-    send_to_char(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.\r\n", ch);
+    ch->sendln(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.");
+    ch->sendln(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.");
+    ch->sendln(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.");
 
-    send_to_char("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.\r\n", ch);
-    send_to_char("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.\r\n", ch);
+    ch->sendln("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.");
+    ch->sendln("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.");
 
-    send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\r\n", ch);
+    ch->sendln("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.");
     */
     return eSUCCESS;
   }
@@ -1777,7 +1777,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
       if (count < eddie[choice - 1].cost_qty)
       {
-        send_to_char("You don't have enough to trade.\r\n", ch);
+        ch->sendln("You don't have enough to trade.");
         return eSUCCESS;
       }
 

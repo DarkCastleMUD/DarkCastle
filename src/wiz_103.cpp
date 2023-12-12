@@ -30,7 +30,7 @@ int do_boot(Character *ch, char *arg, int cmd)
   if (!(*name))
   {
     send_to_char("Syntax: boot <victim> [boot]\n\r", ch);
-    send_to_char("The boot option causes the victim to see a large ASCII boot.\r\n", ch);
+    ch->sendln("The boot option causes the victim to see a large ASCII boot.");
     return eFAILURE;
   }
 
@@ -62,8 +62,8 @@ int do_boot(Character *ch, char *arg, int cmd)
     }
 
     /* Still here? Ok, the boot continues */
-    send_to_char("You have been disconnected.\r\n", victim);
-    send_to_char("Ok.\r\n", ch);
+    victim->sendln("You have been disconnected.");
+    ch->sendln("Ok.");
     if (IS_PC(victim))
     {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
@@ -172,7 +172,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
   sdesc = atoi(arg);
   if (arg == 0)
   {
-    send_to_char("Illegal descriptor number.\r\n", ch);
+    ch->sendln("Illegal descriptor number.");
     send_to_char("Usage: release <#>\n\r", ch);
     return eFAILURE;
   }
@@ -214,13 +214,13 @@ int do_fsave(Character *ch, std::string argument, int cmd)
   std::tie(name, argument) = half_chop(argument);
   if (name.empty())
   {
-    send_to_char("Who do you wish to force to save?\r\n", ch);
+    ch->sendln("Who do you wish to force to save?");
     return eFAILURE;
   }
 
   if (!(vict = get_char_vis(ch, name)))
   {
-    send_to_char("No-one by that name here..\r\n", ch);
+    ch->sendln("No-one by that name here..");
     return eFAILURE;
   }
 
@@ -229,7 +229,7 @@ int do_fsave(Character *ch, std::string argument, int cmd)
     buf = "$n has forced you to 'save'.";
     act(buf, ch, 0, vict, TO_VICT, 0);
     buf = {};
-    send_to_char("Ok.\r\n", ch);
+    ch->sendln("Ok.");
   }
   vict->save();
 
@@ -288,9 +288,9 @@ int do_fighting(Character *ch, char *argument, int cmd)
   if (countFighters == 0)
   {
     if (arenaONLY)
-      send_to_char("No fighting characters found in the arena.\r\n", ch);
+      ch->sendln("No fighting characters found in the arena.");
     else
-      send_to_char("No fighting characters found.\r\n", ch);
+      ch->sendln("No fighting characters found.");
   }
   return eSUCCESS;
 }
@@ -307,7 +307,7 @@ int do_peace(Character *ch, char *argument, int cmd)
       stop_fighting(rch);
   }
   act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);
-  send_to_char("You stop all fighting in this room.\r\n", ch);
+  ch->sendln("You stop all fighting in this room.");
   return eSUCCESS;
 }
 
@@ -376,7 +376,7 @@ int lookupRoom(Character *ch, char *str)
   {
     if (ch)
     {
-      send_to_char("No such room exists.\r\n", ch);
+      ch->sendln("No such room exists.");
     }
 
     return -1;
@@ -472,7 +472,7 @@ int do_guild(Character *ch, char *argument, int cmd)
 
       if (count == 0)
       {
-        send_to_char("None found.\r\n", ch);
+        ch->sendln("None found.");
       }
       else
       {
@@ -498,7 +498,7 @@ int do_guild(Character *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, room))
   {
-    send_to_char("You are unable to work creation outside of your range.\r\n", ch);
+    ch->sendln("You are unable to work creation outside of your range.");
     return eFAILURE;
   }
 

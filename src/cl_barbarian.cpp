@@ -39,7 +39,7 @@ int do_batter(Character *ch, char *argument, int cmd)
 
   if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
   {
-    send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
+    ch->sendln("You could accidentally hurt someone if you try this untrained...");
     return eFAILURE;
   }
 
@@ -47,14 +47,14 @@ int do_batter(Character *ch, char *argument, int cmd)
 
   if (!*type)
   {
-    send_to_char("Batter what??\r\n", ch);
-    send_to_char("batter <door> <direction>\r\n", ch);
+    ch->sendln("Batter what??");
+    ch->sendln("batter <door> <direction>");
     return eFAILURE;
   }
 
   if (!*dir)
   {
-    send_to_char("What direction?\r\n", ch);
+    ch->sendln("What direction?");
     return eFAILURE;
   }
 
@@ -65,19 +65,19 @@ int do_batter(Character *ch, char *argument, int cmd)
     // check to make sure door is in right state
     if (!DC::isSet(exit->exit_info, EX_ISDOOR))
     {
-      send_to_char("You can't figure out how to break it down.\r\n", ch);
+      ch->sendln("You can't figure out how to break it down.");
       return eFAILURE;
     }
 
     if (!DC::isSet(exit->exit_info, EX_CLOSED))
     {
-      send_to_char("You can't break down an open door!\r\n", ch);
+      ch->sendln("You can't break down an open door!");
       return eFAILURE;
     }
 
     if (DC::isSet(exit->exit_info, EX_PICKPROOF))
     {
-      send_to_char("It seems far too sturdy for you to break down.\r\n", ch);
+      ch->sendln("It seems far too sturdy for you to break down.");
       return eFAILURE;
     }
 
@@ -188,7 +188,7 @@ int do_batter(Character *ch, char *argument, int cmd)
 
       if (number(1, 100) > (40 - GET_DEX(ch)) + (100 - skill))
       {
-        send_to_char("You manage to maintain your balance and admire your handywork.\r\n", ch);
+        ch->sendln("You manage to maintain your balance and admire your handywork.");
         act("$n manages to maintain $h balance and admires $s handywork.", ch, 0, exit->keyword, TO_ROOM, 0);
       }
       else
@@ -199,7 +199,7 @@ int do_batter(Character *ch, char *argument, int cmd)
             class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
             !others_clan_room(ch, &DC::getInstance()->world[EXIT(ch, door)->to_room]))
         {
-          send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n\r\n", ch);
+          ch->sendln("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n");
           act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
           move_char(ch, exit->to_room);
           act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
@@ -207,7 +207,7 @@ int do_batter(Character *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You are unable to maintain your balance and sail towards the adjacent room, but some force keeps you out!\r\n", ch);
+          ch->sendln("You are unable to maintain your balance and sail towards the adjacent room, but some force keeps you out!");
           act("$n is unable to maintain $h balance and sails towards the adjacent room, but some force keeps $h out!",
               ch, 0, exit->keyword, TO_ROOM, 0);
         }
@@ -218,7 +218,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
   }
-  send_to_char("You don't see anything like that to batter.\r\n", ch);
+  ch->sendln("You don't see anything like that to batter.");
   return eFAILURE;
 }
 
@@ -232,7 +232,7 @@ int do_brace(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill(SKILL_BATTERBRACE))
   {
-    send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
+    ch->sendln("You could accidentally hurt someone if you try this untrained...");
     return eFAILURE;
   }
 
@@ -256,14 +256,14 @@ int do_brace(Character *ch, char *argument, int cmd)
       ch->brace_exit = nullptr;
       return eSUCCESS;
     }
-    send_to_char("Brace what??\r\n", ch);
-    send_to_char("brace <door> <direction>\r\n", ch);
+    ch->sendln("Brace what??");
+    ch->sendln("brace <door> <direction>");
     return eFAILURE;
   }
 
   if (!*dir)
   {
-    send_to_char("What direction?\r\n", ch);
+    ch->sendln("What direction?");
     return eFAILURE;
   }
 
@@ -274,13 +274,13 @@ int do_brace(Character *ch, char *argument, int cmd)
 
     if (!DC::isSet(exit->exit_info, EX_ISDOOR))
     {
-      send_to_char("You can't figure out how to hold it shut.\r\n", ch);
+      ch->sendln("You can't figure out how to hold it shut.");
       return eFAILURE;
     }
 
     if (!DC::isSet(exit->exit_info, EX_CLOSED))
     {
-      send_to_char("You have to close it first!\r\n", ch);
+      ch->sendln("You have to close it first!");
       return eFAILURE;
     }
     if (exit->bracee != nullptr)
@@ -313,13 +313,13 @@ int do_brace(Character *ch, char *argument, int cmd)
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
-      send_to_char("Your attempt to block the passage fails.\r\n", ch);
+      ch->sendln("Your attempt to block the passage fails.");
       act("$s attempt to block the passage fails!", ch, 0, exit->keyword, TO_ROOM, 0);
       return eFAILURE;
     }
     else
     {
-      send_to_char("The passage now appears firmly blocked.\r\n", ch);
+      ch->sendln("The passage now appears firmly blocked.");
       act("The passage now appears firmly blocked.", ch, 0, exit->keyword, TO_ROOM, 0);
       exit->bracee = ch;
       ch->brace_at = exit;
@@ -335,7 +335,7 @@ int do_brace(Character *ch, char *argument, int cmd)
     }
   }
 
-  send_to_char("You don't see anything like that to block.\r\n", ch);
+  ch->sendln("You don't see anything like that to block.");
   return eFAILURE;
 }
 
@@ -370,13 +370,13 @@ command_return_t Character::do_rage(QStringList arguments, int cmd)
 
   if (in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\r\n", this);
+    this->sendln("That person seems to have left.");
     return eFAILURE;
   }
 
   if (victim == this)
   {
-    send_to_char("Aren't we funny today...\r\n", this);
+    this->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -442,13 +442,13 @@ int do_battlecry(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("You must be fighting already in order to battlecry.\r\n", ch);
+    ch->sendln("You must be fighting already in order to battlecry.");
     return eFAILURE;
   }
 
   if (ch->master || !ch->followers)
   {
-    send_to_char("You must be leading a group in order to battlecry.\r\n", ch);
+    ch->sendln("You must be leading a group in order to battlecry.");
     return eFAILURE;
   }
 
@@ -537,19 +537,19 @@ int do_berserk(Character *ch, char *argument, int cmd)
   }
   else if (ch->fighting)
   {
-    send_to_char("You're already in combat, and focus your energies on your current target instead.\r\n", ch);
+    ch->sendln("You're already in combat, and focus your energies on your current target instead.");
     victim = ch->fighting;
   }
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\r\n", ch);
+    ch->sendln("That person seems to have left.");
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    ch->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -574,7 +574,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
     if (ch->has_skill(SKILL_BERSERK) > 50 && !number(0, 5))
     {
       SET_BIT(ch->combat, COMBAT_BASH2);
-      send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
+      ch->sendln("Your advanced training in berserk allows you to roll with your fall and get up faster.");
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     }
     else
@@ -652,7 +652,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\r\n", ch);
+    ch->sendln("Aren't we funny today...");
     return eFAILURE;
   }
 
@@ -786,7 +786,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_BLOOD_FURY))
   {
-    send_to_char("Your body can not yet take the strain of another blood fury yet.\r\n", ch);
+    ch->sendln("Your body can not yet take the strain of another blood fury yet.");
     return eFAILURE;
   }
 
@@ -796,7 +796,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, nullptr, SKILL_BLOOD_FURY))
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, nullptr, nullptr, TO_ROOM, NOTVICT);
-    send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
+    ch->sendln("You try to pysch yourself up and choke on the taste of blood.");
     duration = 1;
   }
   else
@@ -832,7 +832,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
   int duration = 20;
   if (affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && ch->getLevel() < IMMORTAL)
   {
-    send_to_char("Your body is still recovering from your last crazed assault technique.\r\n", ch);
+    ch->sendln("Your body is still recovering from your last crazed assault technique.");
     return eFAILURE;
   }
 
@@ -844,12 +844,12 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, nullptr, SKILL_CRAZED_ASSAULT))
   {
-    send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
+    ch->sendln("You try to psyche yourself up for it but just can't muster the concentration.");
     duration = 1;
   }
   else
   {
-    send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
+    ch->sendln("Your mind focuses completely on hitting your opponent.");
     af.type = SKILL_CRAZED_ASSAULT;
     af.duration = 2;
     af.modifier = (ch->has_skill(SKILL_CRAZED_ASSAULT) / 5) + 5;
@@ -889,13 +889,13 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   if (ch->getHP() == 1)
   {
-    send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
+    ch->sendln("You are feeling too weak right now for rushing to and fro.");
     return eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_RUSH_CD))
   {
-    send_to_char("You must take a moment to gather your strength before another rush!\r\n", ch);
+    ch->sendln("You must take a moment to gather your strength before another rush!");
     return eFAILURE;
   }
   if (!ch->canPerform(SKILL_BULLRUSH, "Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n"))
@@ -907,12 +907,12 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   one_argument(argument, direction);
   if (!*direction)
   {
-    send_to_char("Bullrush which direction?\r\n", ch);
+    ch->sendln("Bullrush which direction?");
     return eFAILURE;
   }
   if (!*who)
   {
-    send_to_char("Bullrush on.. who?\r\n", ch);
+    ch->sendln("Bullrush on.. who?");
     return eFAILURE;
   }
 
@@ -927,7 +927,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   if (!dir)
   {
-    send_to_char("Bullrush a valid direction dumb barb...like north maybe?\r\n", ch);
+    ch->sendln("Bullrush a valid direction dumb barb...like north maybe?");
     return eFAILURE;
   }
 
@@ -960,7 +960,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(who)))
   {
-    send_to_char("You charge in, but are left confused by the complete lack of such a target!\r\n", ch);
+    ch->sendln("You charge in, but are left confused by the complete lack of such a target!");
     //     WAIT_STATE(ch,DC::PULSE_VIOLENCE/2);
     return eFAILURE;
   }
@@ -968,7 +968,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_BULLRUSH))
   {
-    send_to_char("You rush in madly and fail to find your target!\r\n", ch);
+    ch->sendln("You rush in madly and fail to find your target!");
     act("$n rushes into the room with nostrils flaring then looks around sheepishly.",
         ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     return eFAILURE;
@@ -976,7 +976,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
 
   if (!victim || victim == ch)
   {
-    send_to_char("You successfully rush in and bushwack... the air.\r\n", ch);
+    ch->sendln("You successfully rush in and bushwack... the air.");
     return eFAILURE;
   }
 
@@ -995,12 +995,12 @@ int do_ferocity(Character *ch, char *argument, int cmd)
   }
   if (affected_by_spell(ch, SKILL_FEROCITY_TIMER))
   {
-    send_to_char("It is too soon to try and rile up the masses!\r\n", ch);
+    ch->sendln("It is too soon to try and rile up the masses!");
     return eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You have no group to inspire.\r\n", ch);
+    ch->sendln("You have no group to inspire.");
     return eFAILURE;
   }
 
@@ -1019,13 +1019,13 @@ int do_ferocity(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, nullptr, SKILL_FEROCITY))
   {
-    send_to_char("Guess you just weren't that angry.\r\n", ch);
+    ch->sendln("Guess you just weren't that angry.");
     act("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
   }
   else
   {
     act("$n lets out a deafening roar!", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("Your heart beats adrenaline through your body and you roar with ferocity!\r\n", ch);
+    ch->sendln("Your heart beats adrenaline through your body and you roar with ferocity!");
 
     af.type = SKILL_FEROCITY_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_FEROCITY) / 10;
@@ -1080,7 +1080,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
 
   if (ch->getHP() == 1)
   {
-    send_to_char("You are feeling too weak right now to smash into anybody.\r\n", ch);
+    ch->sendln("You are feeling too weak right now to smash into anybody.");
     return eFAILURE;
   }
 
@@ -1322,17 +1322,17 @@ int do_primalfury(Character *ch, char *argument, int cmd)
 
   if (!ch->has_skill(SKILL_PRIMAL_FURY))
   {
-    send_to_char("You don't know how to.\r\n", ch);
+    ch->sendln("You don't know how to.");
     return eSUCCESS;
   }
   if (affected_by_spell(ch, SKILL_PRIMAL_FURY))
   {
-    send_to_char("You must wait before using this ability again.\r\n", ch);
+    ch->sendln("You must wait before using this ability again.");
     return eSUCCESS;
   }
   if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
   {
-    send_to_char("You must be in combat in order to use this ability.\r\n", ch);
+    ch->sendln("You must be in combat in order to use this ability.");
     return eSUCCESS;
   }
   if (!charge_moves(ch, SKILL_PRIMAL_FURY))
@@ -1340,7 +1340,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
 
   if (GET_RAW_STR(ch) < 16)
   {
-    send_to_char("You do not possess sufficient strength to attempt this feat.\r\n", ch);
+    ch->sendln("You do not possess sufficient strength to attempt this feat.");
     return eSUCCESS;
   }
 
@@ -1355,7 +1355,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
   if (!skill_success(ch, nullptr, SKILL_PRIMAL_FURY))
   {
     affect_to_char(ch, &af);
-    send_to_char("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!\r\n", ch);
+    ch->sendln("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!");
     act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
     ch->setMove(ch->getMove() / 2.0);
     return eSUCCESS;
@@ -1378,7 +1378,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
   affect_to_char(ch, &af);
 
   act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, TO_ROOM, 0);
-  send_to_char("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!\r\n", ch);
+  ch->sendln("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!");
 
   return eSUCCESS;
 }
@@ -1387,18 +1387,18 @@ int do_pursue(Character *ch, char *argument, int cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {
-    send_to_char("You don't know how to.\r\n", ch);
+    ch->sendln("You don't know how to.");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_PURSUIT))
   {
-    send_to_char("You will no longer pursue your victims.\r\n", ch);
+    ch->sendln("You will no longer pursue your victims.");
     affect_from_char(ch, SKILL_PURSUIT);
   }
   else
   {
-    send_to_char("You will pursue your victims.\r\n", ch);
+    ch->sendln("You will pursue your victims.");
     affected_type af;
     af.type = SKILL_PURSUIT;
     af.duration = -1;
