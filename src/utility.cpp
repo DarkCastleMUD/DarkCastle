@@ -897,7 +897,7 @@ void util_unarchive(char *char_name, Character *caller)
   if (!file_exists(buf))
   {
     if (caller)
-      send_to_char("Character not archived or already deleted!\n\r", caller);
+      caller->sendln("Character not archived or already deleted!");
     return;
   }
   sprintf(buf, "%s -d %s/%s.gz", GZIP, ARCHIVE_DIR, char_name);
@@ -1203,7 +1203,7 @@ bool check_blind(Character *ch)
 
   if (IS_AFFECTED(ch, AFF_BLIND) && number(0, 4)) // 20% chance of seeing
   {
-    send_to_char("You can't see a damn thing!\n\r", ch);
+    ch->sendln("You can't see a damn thing!");
     return true;
   }
 
@@ -1229,7 +1229,7 @@ int do_order(Character *ch, char *argument, int cmd)
   }
 
   if (!*name || !*message)
-    send_to_char("Order who to do what?\n\r", ch);
+    ch->sendln("Order who to do what?");
   else if (!(victim = ch->get_char_room_vis(name)) &&
            str_cmp("follower", name) && str_cmp("followers", name))
     ch->sendln("That person isn't here.");
@@ -1341,7 +1341,7 @@ int do_typo(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("I beg your pardon?\n\r", ch);
+    ch->sendln("I beg your pardon?");
     return eFAILURE;
   }
 
@@ -1367,7 +1367,7 @@ int do_bug(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("You are a monster! Bug off!\n\r", ch);
+    ch->sendln("You are a monster! Bug off!");
     return eFAILURE;
   }
 
@@ -1377,7 +1377,7 @@ int do_bug(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("Pardon?\n\r", ch);
+    ch->sendln("Pardon?");
     return eFAILURE;
   }
 
@@ -1442,7 +1442,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     victim = get_char_room_vis(name);
     if (victim == nullptr)
     {
-      send_to_char("Whom do you want to recall?\n\r", this);
+      this->sendln("Whom do you want to recall?");
       return eFAILURE;
     }
 
@@ -1471,7 +1471,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (percent > 50)
     {
-      send_to_char("You failed in your recall!\n\r", this);
+      this->sendln("You failed in your recall!");
       return eFAILURE;
     }
   }
@@ -1610,7 +1610,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
 int do_qui(Character *ch, char *argument, int cmd)
 {
-  send_to_char("You have to write quit - no less, to quit!\n\r", ch);
+  ch->sendln("You have to write quit - no less, to quit!");
   return eSUCCESS;
 }
 
@@ -1683,7 +1683,7 @@ int do_quit(Character *ch, char *argument, int cmd)
         affected_by_spell(ch, FUCK_PTHIEF) ||
         affected_by_spell(ch, FUCK_GTHIEF))
     {
-      send_to_char("You can't quit, because you are still wanted!\n\r", ch);
+      ch->sendln("You can't quit, because you are still wanted!");
       return eFAILURE;
     }
 

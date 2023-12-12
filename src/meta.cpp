@@ -698,24 +698,24 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 		if (!is_number(arg2) || !is_number(argument))
 		{
-			send_to_char("$B$2The Meta-physician tells you, 'If you want to estimate a cost, specify which and how many points.'$R \n\r", ch);
-			send_to_char("$B$2The Meta-physician tells you, 'Example: estimate 1 1000'$R \n\r", ch);
-			send_to_char("$B$31)$R Estimate hit point cost.$R \n\r", ch);
-			send_to_char("$B$32)$R Estimate mana cost.$R \n\r", ch);
-			send_to_char("$B$33)$R Estimate move cost.$R \n\r", ch);
+			ch->sendln("$B$2The Meta-physician tells you, 'If you want to estimate a cost, specify which and how many points.'$R ");
+			ch->sendln("$B$2The Meta-physician tells you, 'Example: estimate 1 1000'$R ");
+			ch->sendln("$B$31)$R Estimate hit point cost.$R ");
+			ch->sendln("$B$32)$R Estimate mana cost.$R ");
+			ch->sendln("$B$33)$R Estimate move cost.$R ");
 			return eSUCCESS;
 		}
 
 		int choice = atoi(argument);
 		if (choice < 1 || choice > 3)
 		{
-			send_to_char("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R \n\r", ch);
+			ch->sendln("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R ");
 			return eSUCCESS;
 		}
 		int amount = atoi(arg2);
 		if (amount < 5 || amount > 10000)
 		{
-			send_to_char("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R \n\r", ch);
+			ch->sendln("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R ");
 			return eSUCCESS;
 		}
 
@@ -739,7 +739,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	}
 	else if (cmd == CMD_LIST)
 	{ /* List */
-		send_to_char("$B$2The Meta-physician tells you, 'This is what I can do for you...'$R \n\r", ch);
+		ch->sendln("$B$2The Meta-physician tells you, 'This is what I can do for you...'$R ");
 
 		ch->sendln("$BAttribute Meta:$R");
 		meta_list_stats(ch);
@@ -821,7 +821,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		one_argument(arg, argument);
 		if ((choice = atoi(argument)) == 0 || choice < 0)
 		{
-			send_to_char("The Meta-physician tells you, 'Pick a number.'\n\r", ch);
+			ch->sendln("The Meta-physician tells you, 'Pick a number.'");
 			return eSUCCESS;
 		}
 		switch (choice)
@@ -871,17 +871,17 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (GET_PLATINUM(ch) < (unsigned)statplatprice)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R");
 				return eSUCCESS;
 			}
 			if (GET_EXP(ch) < pprice)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (stat >= max_stat)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You're already as good at that as yer gonna get.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You're already as good at that as yer gonna get.'$R");
 				return eSUCCESS;
 			}
 
@@ -912,12 +912,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_EXP(ch) < hit_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 			GET_EXP(ch) -= hit_exp;
@@ -940,12 +940,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (GET_EXP(ch) < hit_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)hit_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'");
 				return eSUCCESS;
 			}
 			GET_EXP(ch) -= hit_exp;
@@ -966,12 +966,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (GET_EXP(ch) < mana_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -995,12 +995,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (GET_EXP(ch) < mana_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)mana_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -1021,12 +1021,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_EXP(ch) < move_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)move_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -1050,12 +1050,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (GET_EXP(ch) < move_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)move_cost)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -1080,12 +1080,12 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			if (GET_EXP(ch) < ki_exp)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (GET_PLATINUM(ch) < (uint32_t)(ki_cost))
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -1110,7 +1110,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			if (ch->getGold() < 20000)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
 				return eSUCCESS;
 			}
 			ch->removeGold(20000);
@@ -1127,7 +1127,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			}
 			if (ch->getGold() < 100000)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
 				return eSUCCESS;
 			}
 
@@ -1146,7 +1146,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 			if (ch->getGold() < 5000000)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) += 250;
@@ -1158,7 +1158,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_PLATINUM(ch) < 5)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 5;
@@ -1171,7 +1171,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_PLATINUM(ch) < 250)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!  SCRAM$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!  SCRAM$R");
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 250;
@@ -1183,7 +1183,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		{
 			if (GET_EXP(ch) < 100000000)
 			{
-				send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
@@ -1294,7 +1294,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			return eSUCCESS;
 		}
 	}
-	send_to_char("$B$2The Meta-physician tells you, 'Buy what?!'$R\n\r", ch);
+	ch->sendln("$B$2The Meta-physician tells you, 'Buy what?!'$R");
 	return eSUCCESS;
 }
 
@@ -1885,7 +1885,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 		}
 		else
 		{
-			send_to_char("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R\n\r", ch);
+			ch->sendln("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R");
 			return eSUCCESS;
 		}
 	}

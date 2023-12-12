@@ -807,7 +807,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 
   if (board->second.msgs.empty())
   {
-    send_to_char("The board is empty!\n\r", ch);
+    ch->sendln("The board is empty!");
     return eSUCCESS;
   }
 
@@ -1037,7 +1037,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
 
   if (board->second.msgs.empty())
   {
-    send_to_char("The board is empty!\n\r", ch);
+    ch->sendln("The board is empty!");
     return eSUCCESS;
   }
 

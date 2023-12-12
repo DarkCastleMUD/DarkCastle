@@ -44,7 +44,7 @@ command_return_t Character::check_social(QString pcomm)
 
   if (isPlayer() && DC::isSet(player->punish, PUNISH_NOEMOTE))
   {
-    send_to_char("You are anti-social!\n\r", this);
+    this->sendln("You are anti-social!");
     return SOCIAL_true;
   }
 
@@ -59,7 +59,7 @@ command_return_t Character::check_social(QString pcomm)
     return SOCIAL_true;
 
   case position_t::SLEEPING:
-    send_to_char("In your dreams, or what?\n\r", this);
+    this->sendln("In your dreams, or what?");
     return SOCIAL_true;
   }
 

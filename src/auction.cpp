@@ -1006,7 +1006,7 @@ void AuctionHouse::CancelAll(Character *ch)
   }
   if (tickets_to_cancel.isEmpty())
   {
-    send_to_char("You have no tickets to cancel!\n\r", ch);
+    ch->sendln("You have no tickets to cancel!");
     return;
   }
   while (!tickets_to_cancel.isEmpty())
@@ -1051,7 +1051,7 @@ void AuctionHouse::CollectTickets(Character *ch, unsigned int ticket)
   }
   if (tickets_to_remove.isEmpty())
   {
-    send_to_char("You have nothing to collect!\n\r", ch);
+    ch->sendln("You have nothing to collect!");
     return;
   }
   while (!tickets_to_remove.isEmpty())
@@ -1122,7 +1122,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (!Item_it->seller.compare(GET_NAME(ch)))
   {
-    send_to_char("That's your own item you're selling, dumbass!\n\r", ch);
+    ch->sendln("That's your own item you're selling, dumbass!");
     return;
   }
 
@@ -1477,9 +1477,9 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
   char buf[MAX_STRING_LENGTH] = {0};
 
   if (options == LIST_MINE)
-    send_to_char("Ticket-Buyer--------Price------Status--T--Item---------------------------\n\r", ch);
+    ch->sendln("Ticket-Buyer--------Price------Status--T--Item---------------------------");
   else
-    send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
+    ch->sendln("Ticket-Seller-------Price------Status--T--Item---------------------------");
 
   for (i = 0, Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
@@ -1568,7 +1568,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     else if (options == LIST_BY_RACE)
       csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", name.toStdString().c_str());
     else
-      send_to_char("\n\rThere is nothing for sale!\n\r", ch);
+      ch->sendln("\n\rThere is nothing for sale!");
   }
 
   if (options == LIST_MINE)
@@ -1627,13 +1627,13 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (!IsOkToSell(obj))
   {
-    send_to_char("You can't sell that type of item here!\n\r", ch);
+    ch->sendln("You can't sell that type of item here!");
     return;
   }
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
-    send_to_char("You can't sell that item!\n\r", ch);
+    ch->sendln("You can't sell that item!");
     return;
   }
 
@@ -1662,14 +1662,14 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
       cur_index = 1;
     if (full_checker == cur_index)
     {
-      send_to_char("The auctioneer is selling too many items already!\n\r", ch);
+      ch->sendln("The auctioneer is selling too many items already!");
       return;
     }
   }
 
   if (!strcmp(buf, GET_NAME(ch)))
   {
-    send_to_char("Why would you want to privately sell something to yourself?\n\r", ch);
+    ch->sendln("Why would you want to privately sell something to yourself?");
     return;
   }
 
@@ -1861,7 +1861,7 @@ int do_vend(Character *ch, char *argument, int cmd)
 
   if (!TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
-    send_to_char("You must be in an auction house to do this!\n\r", ch);
+    ch->sendln("You must be in an auction house to do this!");
     return eFAILURE;
   }
 
@@ -1875,7 +1875,7 @@ int do_vend(Character *ch, char *argument, int cmd)
 
   if (!*buf)
   {
-    send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
+    ch->sendln("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
     if (ch->getLevel() >= 104)
       ch->sendln("Also: <addroom | removeroom | listrooms | stats>");
     return eSUCCESS;
@@ -1888,14 +1888,14 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Modify what ticket?\n\rSyntax: vend modify <ticket> <new_price>\n\r", ch);
+      ch->sendln("Modify what ticket?\n\rSyntax: vend modify <ticket> <new_price>");
       return eSUCCESS;
     }
     ticket = atoi(buf);
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>\n\r", ch);
+      ch->sendln("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>");
       return eSUCCESS;
     }
     TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
@@ -1909,7 +1909,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>\n\r", ch);
+      ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "name"))
@@ -1917,7 +1917,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What name do you want to search for?\n\rSyntax: vend search name <keyword>\n\r", ch);
+        ch->sendln("What name do you want to search for?\n\rSyntax: vend search name <keyword>");
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
@@ -1973,7 +1973,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       }
       if (strlen(buf) < 4)
       {
-        send_to_char("Class name needs to be at least 4 letters to search!\n\r", ch);
+        ch->sendln("Class name needs to be at least 4 letters to search!");
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
@@ -2004,7 +2004,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       argument = one_argument(argument, buf);
       if (!*buf)
       {
-        send_to_char("What level?\n\rSyntax: vend search level <min_level> [max_level]\n\r", ch);
+        ch->sendln("What level?\n\rSyntax: vend search level <min_level> [max_level]");
         return eSUCCESS;
       }
       level = atoi(buf);
@@ -2018,7 +2018,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>\n\r", ch);
+    ch->sendln("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>");
     return eSUCCESS;
   }
 
@@ -2028,7 +2028,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Collect what?\n\rSyntax: vend collect <all | ticket#>\n\r", ch);
+      ch->sendln("Collect what?\n\rSyntax: vend collect <all | ticket#>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "all"))
@@ -2042,7 +2042,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    send_to_char("Syntax: vend collect <all | ticket#>\n\r", ch);
+    ch->sendln("Syntax: vend collect <all | ticket#>");
     return eSUCCESS;
   }
 
@@ -2052,7 +2052,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Buy what?\n\rSyntax: vend buy <ticket #>\n\r", ch);
+      ch->sendln("Buy what?\n\rSyntax: vend buy <ticket #>");
       return eSUCCESS;
     }
     TheAuctionHouse.BuyItem(ch, atoi(buf));
@@ -2065,7 +2065,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Cancel what?\n\rSyntax: vend cancel <all | ticket#>\n\r", ch);
+      ch->sendln("Cancel what?\n\rSyntax: vend cancel <all | ticket#>");
       return eSUCCESS;
     }
     if (!strcmp(buf, "all")) // stupid cancel all didn't fit my design, but the boss wanted it
@@ -2083,7 +2083,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("List what?\n\rSyntax: vend list <all | mine | private | recent>\n\r", ch);
+      ch->sendln("List what?\n\rSyntax: vend list <all | mine | private | recent>");
       return eSUCCESS;
     }
 
@@ -2105,7 +2105,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("List what?\n\rSyntax: vend list <all | mine | private>\n\r", ch);
+      ch->sendln("List what?\n\rSyntax: vend list <all | mine | private>");
     }
     return eSUCCESS;
   }
@@ -2116,25 +2116,25 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Sell what?\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
+      ch->sendln("Sell what?\n\rSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     obj = get_obj_in_list_vis(ch, buf, ch->carrying);
     if (!obj)
     {
-      send_to_char("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
+      ch->sendln("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
+      ch->sendln("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]");
       return eSUCCESS;
     }
     price = atoi(buf);
     if (price < 1000)
     {
-      send_to_char("Minimum sell price is 1000 coins!\n\r", ch);
+      ch->sendln("Minimum sell price is 1000 coins!");
       return eSUCCESS;
     }
 
@@ -2149,7 +2149,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Identify what?\n\rSyntax: vend identify <ticket>\n\r", ch);
+      ch->sendln("Identify what?\n\rSyntax: vend identify <ticket>");
       return eSUCCESS;
     }
     TheAuctionHouse.Identify(ch, atoi(buf));
@@ -2169,7 +2169,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Add what room?\n\rSyntax: vend addroom <vnum>\n\r", ch);
+      ch->sendln("Add what room?\n\rSyntax: vend addroom <vnum>");
       return eSUCCESS;
     }
     TheAuctionHouse.AddRoom(ch, atoi(buf));
@@ -2182,7 +2182,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if (!*buf)
     {
-      send_to_char("Remove what room?\n\rSyntax: vend removeroom <vnum>\n\r", ch);
+      ch->sendln("Remove what room?\n\rSyntax: vend removeroom <vnum>");
       return eSUCCESS;
     }
     TheAuctionHouse.RemoveRoom(ch, atoi(buf));
@@ -2196,7 +2196,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
+  ch->sendln("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>");
   if (ch->getLevel() >= 104)
     ch->sendln("Also: <addroom | removeroom | listroom | stats>");
   return eSUCCESS;

@@ -22,7 +22,7 @@ int do_archive(Character *ch, char *argument, int cmd)
 
   if (!*name)
   {
-    send_to_char("Archive whom?\n\r", ch);
+    ch->sendln("Archive whom?");
     return eFAILURE;
   }
 
@@ -69,7 +69,7 @@ int do_pview(Character *ch, char *argument, int cmd)
 
   if ((!*name) || (!(victim = get_pc_vis(ch, name))))
   {
-    send_to_char("View the prompt of whom?\n\r", ch);
+    ch->sendln("View the prompt of whom?");
     return eFAILURE;
   }
 
@@ -110,7 +110,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
 
   if (arg1.isEmpty())
   {
-    send_to_char("Snoop whom?\n\r", this);
+    this->sendln("Snoop whom?");
     return eFAILURE;
   }
 
@@ -119,12 +119,12 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
     send_to_char("Your victim is either not available or "
                  "linkdead.\r\n",
                  this);
-    send_to_char("(You can only snoop a link-active pc.)\n\r", this);
+    this->sendln("(You can only snoop a link-active pc.)");
     return eFAILURE;
   }
   if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
-    send_to_char("Can't do that. That mob is higher than you!\n\r", this);
+    this->sendln("Can't do that. That mob is higher than you!");
     logentry(QString("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, LogChannels::LOG_GOD);
     return eFAILURE;
   }

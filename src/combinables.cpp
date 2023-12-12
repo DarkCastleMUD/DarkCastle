@@ -535,7 +535,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   if (containerobj == liquidobj)
   {
-    send_to_char("Your liquid and target container cannot be the same object!\n\r", ch);
+    ch->sendln("Your liquid and target container cannot be the same object!");
     return eFAILURE;
   }
 
@@ -784,7 +784,7 @@ void Brew::list(Character *ch)
     return;
   }
 
-  send_to_char("[# ] [herb #] [liquid] [container] Spell Name\n\r\n\r", ch);
+  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\n\r");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
@@ -812,7 +812,7 @@ int Brew::add(Character *ch, char *argument)
 
   if (!*arg1 || !*arg2 || !*arg3 || !*arg4)
   {
-    send_to_char("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n\r", ch);
+    ch->sendln("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]");
     return eFAILURE;
   }
 
@@ -868,7 +868,7 @@ int Brew::remove(Character *ch, char *argument)
 
   if (!*argument)
   {
-    send_to_char("Syntax: brew remove [recipe_num]\n\r", ch);
+    ch->sendln("Syntax: brew remove [recipe_num]");
     return eFAILURE;
   }
 
@@ -1250,7 +1250,7 @@ void Scribe::list(Character *ch)
     return;
   }
 
-  send_to_char("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n\r\n\r", ch);
+  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n\r");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
@@ -1279,7 +1279,7 @@ int Scribe::add(Character *ch, char *argument)
 
   if (!*arg1 || !*arg2 || !*arg3 || !*arg4 || !*arg5)
   {
-    send_to_char("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]\n\r", ch);
+    ch->sendln("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]");
     return eFAILURE;
   }
 
@@ -1335,7 +1335,7 @@ int Scribe::remove(Character *ch, char *argument)
 
   if (!*argument)
   {
-    send_to_char("Syntax: scribe remove [recipe_num]\n\r", ch);
+    ch->sendln("Syntax: scribe remove [recipe_num]");
     return eFAILURE;
   }
 

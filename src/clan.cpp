@@ -839,7 +839,7 @@ void message_to_clan(Character *ch, char buf[])
     pch->send(buf);
     ansi_color(NTEXT, pch);
     ansi_color(YELLOW, pch);
-    send_to_char(" <<--\n\r", pch);
+    pch->sendln(" <<--");
     ansi_color(GREY, pch);
   }
 }
@@ -982,19 +982,19 @@ int do_accept(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Accept who into your clan?\n\r", ch);
+    ch->sendln("Accept who into your clan?");
     return eFAILURE;
   }
 
   if (!ch->clan || !(clan = get_clan(ch)))
   {
-    send_to_char("You aren't the member of any clan!\n\r", ch);
+    ch->sendln("You aren't the member of any clan!");
     return eFAILURE;
   }
 
   if (strcmp(clan->leader, GET_NAME(ch)) && !has_right(ch, CLAN_RIGHTS_ACCEPT))
   {
-    send_to_char("You aren't the leader of your clan!\n\r", ch);
+    ch->sendln("You aren't the leader of your clan!");
     return eFAILURE;
   }
 
@@ -1002,7 +1002,7 @@ int do_accept(Character *ch, char *arg, int cmd)
 
   if (!(victim = ch->get_char_room_vis(buf)))
   {
-    send_to_char("You can't accept someone into your clan who isn't here!\n\r", ch);
+    ch->sendln("You can't accept someone into your clan who isn't here!");
     return eFAILURE;
   }
 
@@ -1088,13 +1088,13 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
 
   if (strcmp(clanPtr->leader, getNameC()) && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
   {
-    send_to_char("You don't have the right to outcast people from your clan!\n\r", this);
+    this->sendln("You don't have the right to outcast people from your clan!");
     return eFAILURE;
   }
 
   if (!strcmp(clanPtr->leader, victim->getNameC()))
   {
-    send_to_char("You can't outcast the clan leader!\n\r", this);
+    this->sendln("You can't outcast the clan leader!");
     return eFAILURE;
   }
 
@@ -1142,19 +1142,19 @@ int do_cpromote(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Who do you want to make the new clan leader?\n\r", ch);
+    ch->sendln("Who do you want to make the new clan leader?");
     return eFAILURE;
   }
 
   if (!ch->clan || !(clan = get_clan(ch)))
   {
-    send_to_char("You aren't the member of any clan!\n\r", ch);
+    ch->sendln("You aren't the member of any clan!");
     return eFAILURE;
   }
 
   if (!isname(clan->leader, GET_NAME(ch)))
   {
-    send_to_char("You aren't the leader of your clan!\n\r", ch);
+    ch->sendln("You aren't the leader of your clan!");
     return eFAILURE;
   }
 
@@ -1533,7 +1533,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   if (!ch->clan)
   {
-    send_to_char("But you don't belong to a clan!\n\r", ch);
+    ch->sendln("But you don't belong to a clan!");
     return eFAILURE;
   }
 
@@ -1541,7 +1541,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      ch->sendln("The magical silence prevents you from speaking!");
       return eFAILURE;
     }
 
@@ -1555,7 +1555,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   if (!(DC::isSet(ch->misc, LogChannels::CHANNEL_CLAN)))
   {
-    send_to_char("You have that channel off!!\n\r", ch);
+    ch->sendln("You have that channel off!!");
     return eFAILURE;
   }
 
@@ -1628,11 +1628,11 @@ void do_clan_list(Character *ch)
 
   if (ch->getLevel() > 103)
   {
-    send_to_char("$B$7## Clan                 Leader           Tax   $B$5Gold$7 Balance$R\n\r", ch);
+    ch->sendln("$B$7## Clan                 Leader           Tax   $B$5Gold$7 Balance$R");
   }
   else
   {
-    send_to_char("$B$7## Clan                 Leader           $R\n\r", ch);
+    ch->sendln("$B$7## Clan                 Leader           $R");
   }
 
   std::locale("en_US.UTF-8");
@@ -1663,7 +1663,7 @@ void do_clan_member_list(Character *ch)
     return;
   }
 
-  send_to_char("Members of clan:\n\r", ch);
+  ch->sendln("Members of clan:");
   sprintf(buf, "  ");
 
   for (pmember = pclan->members; pmember; pmember = pmember->next)
@@ -1673,7 +1673,7 @@ void do_clan_member_list(Character *ch)
 
     if (0 == (column % 3))
     {
-      send_to_char("\n\r", ch);
+      ch->sendln("");
       column = 0;
     }
     else
@@ -1685,7 +1685,7 @@ void do_clan_member_list(Character *ch)
 
   if (column != 0)
   {
-    send_to_char("\n\r", ch);
+    ch->sendln("");
   }
 }
 
@@ -1715,7 +1715,7 @@ void do_clan_rights(Character *ch, char *arg)
 
   if (!*name)
   {
-    send_to_char("$3Syntax$R:  clan rights <member> [right]\n\r", ch);
+    ch->sendln("$3Syntax$R:  clan rights <member> [right]");
     return;
   }
 
@@ -2390,7 +2390,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
 
   if (!(pmember = get_member(GET_NAME(ch), ch->clan)))
   {
-    send_to_char("Error:  no clan in do_clans_leader\n\r", ch);
+    ch->sendln("Error:  no clan in do_clans_leader");
     return;
   }
 
@@ -2438,7 +2438,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
 
   if (!leader && right_required[skill] && !has_right(ch, right_required[skill]))
   {
-    send_to_char("You don't have that right!\n\r", ch);
+    ch->sendln("You don't have that right!");
     return;
   }
 
@@ -2764,7 +2764,7 @@ int do_cmotd(Character *ch, char *arg, int cmd)
 
   if (!ch->clan || !(clan = get_clan(ch)))
   {
-    send_to_char("You aren't the member of any clan!\n\r", ch);
+    ch->sendln("You aren't the member of any clan!");
     return eFAILURE;
   }
 

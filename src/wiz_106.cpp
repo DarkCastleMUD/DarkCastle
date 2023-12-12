@@ -29,8 +29,8 @@ int do_plats(Character *ch, char *argument, int cmd)
   else
     minamt = 1;
 
-  send_to_char("          Plats - Player\n\r", ch);
-  send_to_char("          --------------\n\r", ch);
+  ch->sendln("          Plats - Player");
+  ch->sendln("          --------------");
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -84,13 +84,13 @@ int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
     {
       if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
       {
-        send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
+        ch->sendln("Now doing that would just tick off the IMPS!");
         logentry(QString("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
       if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
       {
-        send_to_char("Why be forceful?\n\r", ch);
+        ch->sendln("Why be forceful?");
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
         act(buf, ch, 0, vict, TO_VICT, 0);
       }

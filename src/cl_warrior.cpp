@@ -76,7 +76,7 @@ int do_kick(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Kicking a bladeshielded opponent would be a good way to lose a leg!\n\r", ch);
+    ch->sendln("Kicking a bladeshielded opponent would be a good way to lose a leg!");
     return eFAILURE;
   }
 
@@ -181,7 +181,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("Deathstroke whom?\n\r", ch);
+      ch->sendln("Deathstroke whom?");
       return eFAILURE;
     }
   }
@@ -209,7 +209,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Stroking a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Stroking a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -372,7 +372,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
   }
 
   // No exits were found
-  send_to_char("You cannot retreat in that direction.!\n\r", ch);
+  ch->sendln("You cannot retreat in that direction.!");
   return eFAILURE;
 }
 
@@ -399,7 +399,7 @@ int do_hitall(Character *ch, char *argument, int cmd)
   // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
   if (DC::isSet(ch->combat, COMBAT_HITALL))
   {
-    send_to_char("You can't disengage!\n\r", ch);
+    ch->sendln("You can't disengage!");
     return eFAILURE;
   }
 
@@ -469,7 +469,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   if (!victim)
   {
-    send_to_char("Bash whom?\n\r", ch);
+    ch->sendln("Bash whom?");
     return eFAILURE;
   }
 
@@ -481,19 +481,19 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    send_to_char("You cannot bash something that HUGE!\n\r", ch);
+    ch->sendln("You cannot bash something that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    send_to_char("You cannot pick just one to bash!\n\r", ch);
+    ch->sendln("You cannot pick just one to bash!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    send_to_char("You cannot target something that tiny!\n\r", ch);
+    ch->sendln("You cannot target something that tiny!");
     return eFAILURE;
   }
 
@@ -507,7 +507,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Bashing a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Bashing a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -636,7 +636,7 @@ int do_redirect(Character *ch, char *argument, int cmd)
 
   if (victim == nullptr)
   {
-    send_to_char("Redirect your attacks to whom?\n\r", ch);
+    ch->sendln("Redirect your attacks to whom?");
     return eFAILURE;
   }
 
@@ -648,13 +648,13 @@ int do_redirect(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("You're not fighting anyone to begin with!\n\r", ch);
+    ch->sendln("You're not fighting anyone to begin with!");
     return eFAILURE;
   }
 
   if (!victim->fighting)
   {
-    send_to_char("He isn't bothering anyone, you have enough problems as it is anyways!\n\r", ch);
+    ch->sendln("He isn't bothering anyone, you have enough problems as it is anyways!");
     return eFAILURE;
   }
   if (ch->fighting == victim)
@@ -717,13 +717,13 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
   if (victim == nullptr)
   {
-    send_to_char("Disarm whom?\n\r", ch);
+    ch->sendln("Disarm whom?");
     return eFAILURE;
   }
 
   if (victim->equipment[WIELD] == nullptr)
   {
-    send_to_char("Your opponent is not wielding a weapon!\n\r", ch);
+    ch->sendln("Your opponent is not wielding a weapon!");
     return eFAILURE;
   }
 
@@ -732,7 +732,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Attempting to disarm a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Attempting to disarm a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -1086,7 +1086,7 @@ int do_guard(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(name)))
   {
-    send_to_char("Some bodyguard you are.  That person isn't even here!\n\r", ch);
+    ch->sendln("Some bodyguard you are.  That person isn't even here!");
     return eFAILURE;
   }
 
@@ -1371,7 +1371,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("You must be in battle to heighten your combat awareness!\n\r", ch);
+    ch->sendln("You must be in battle to heighten your combat awareness!");
     return eFAILURE;
   }
 
@@ -1415,7 +1415,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   {
     if (!ch->fighting)
     {
-      send_to_char("Smite whom?\n\r", ch);
+      ch->sendln("Smite whom?");
       return eFAILURE;
     }
     else
@@ -1427,7 +1427,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   if (*argument)
     if (!(vict = ch->get_char_room_vis(name)))
     {
-      send_to_char("Smite whom?\n\r", ch);
+      ch->sendln("Smite whom?");
       return eFAILURE;
     }
 
@@ -1513,7 +1513,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  send_to_char("You loudly call, 'Once more unto the breach, dear friends!'\n\r", ch);
+  ch->sendln("You loudly call, 'Once more unto the breach, dear friends!'");
   act("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, TO_ROOM, 0);
 
   WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
@@ -1525,7 +1525,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Your bravery lends you additional might and inspires the group!\n\r", ch);
+    ch->sendln("Your bravery lends you additional might and inspires the group!");
     act("$n's bravery lends $m additional might and inspires the group!", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_LEADERSHIP;
@@ -1556,7 +1556,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("What, exactly, are you trying to persevere through?\n\r", ch);
+    ch->sendln("What, exactly, are you trying to persevere through?");
     return eFAILURE;
   }
 
@@ -1568,7 +1568,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Your movements seem to build energy and gain momentum as you fight with renewed vigor!\n\r", ch);
+    ch->sendln("Your movements seem to build energy and gain momentum as you fight with renewed vigor!");
     act("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, TO_ROOM, 0);
 
     af.type = SKILL_PERSEVERANCE;
@@ -1597,7 +1597,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("From whom are you trying to defend yourself?\n\r", ch);
+    ch->sendln("From whom are you trying to defend yourself?");
     return eFAILURE;
   }
 

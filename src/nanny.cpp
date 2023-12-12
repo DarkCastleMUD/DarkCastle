@@ -2426,7 +2426,7 @@ void checkConsecrate(int pulseType)
                         if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                           send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);
+                           tmp_ch->sendln("You have been KILLED!!\n\r");
                         }
                         group_gain(ch, tmp_ch);
                         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
@@ -2482,7 +2482,7 @@ void checkConsecrate(int pulseType)
                         if (IS_PC(tmp_ch))
                         {
                            act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                           send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);
+                           tmp_ch->sendln("You have been KILLED!!\n\r");
                         }
                         group_gain(ch, tmp_ch);
                         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);

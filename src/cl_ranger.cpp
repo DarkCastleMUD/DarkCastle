@@ -133,7 +133,7 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Who do you want to tame?\n\r", ch);
+    ch->sendln("Who do you want to tame?");
     return eFAILURE;
   }
 
@@ -146,13 +146,13 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   if (!(victim = ch->get_char_room_vis(buf)))
   {
-    send_to_char("No one here by that name!\n\r", ch);
+    ch->sendln("No one here by that name!");
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Tame the wild beast!\n\r", ch);
+    ch->sendln("Tame the wild beast!");
     return eFAILURE;
   }
 
@@ -177,7 +177,7 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0)
   {
-    send_to_char("How you plan on controlling so many followers?\n\r", ch);
+    ch->sendln("How you plan on controlling so many followers?");
     return eFAILURE;
     /*   Character * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
@@ -273,7 +273,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      send_to_char("You have found your target!\n\r", this);
+      this->sendln("You have found your target!");
       ansi_color(NTEXT, this);
 
       //      remove_memory(this, 't');
@@ -283,7 +283,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
 
   else if (quarry)
   {
-    send_to_char("There's one right here ;)\n\r", this);
+    this->sendln("There's one right here ;)");
     //  remove_memory(this, 't');
     return eSUCCESS;
   }
@@ -298,7 +298,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
     return eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
-  send_to_char("You search for signs of your quarry...\n\r\n\r", this);
+  this->sendln("You search for signs of your quarry...\n\r");
 
   if (learned)
     skill_increase_check(this, SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -713,7 +713,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   if (affected_by_spell(ch, SKILL_FORAGE))
   {
     if (number(0, 1) == 0)
-      send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
+      ch->sendln("You already foraged recently.  Give mother nature a break!");
     else
       ch->sendln("There's a limit to how often you can play with your nuts.  Give it some time.");
     return eFAILURE;
@@ -1230,7 +1230,7 @@ int do_fire(Character *ch, char *arg, int cmd)
       artype = parse_arrow(ch, direct);
     else
     {
-      send_to_char("Shoot in which direction?\n\r", ch);
+      ch->sendln("Shoot in which direction?");
       return eFAILURE;
     }
 

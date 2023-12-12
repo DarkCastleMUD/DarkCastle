@@ -1227,7 +1227,7 @@ int do_lastprompt(Character *ch, char *arg, int cmd)
   if (GET_LAST_PROMPT(ch))
     csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
   else
-    send_to_char("Last prompt: unset\n\r", ch);
+    ch->sendln("Last prompt: unset");
 
   return eSUCCESS;
 }
@@ -1250,7 +1250,7 @@ int do_prompt(Character *ch, char *arg, int cmd)
     {
       send_to_char("Current prompt:  ", ch);
       send_to_char(GET_PROMPT(ch), ch);
-      send_to_char("\n\r", ch);
+      ch->sendln("");
       send_to_char("Last prompt: ", ch);
       if (GET_LAST_PROMPT(ch))
       {
@@ -1260,7 +1260,7 @@ int do_prompt(Character *ch, char *arg, int cmd)
       {
         send_to_char("unset", ch);
       }
-      send_to_char("\n\r", ch);
+      ch->sendln("");
     }
     return eSUCCESS;
   }
@@ -3479,10 +3479,10 @@ int do_editor(Character *ch, char *argument, int cmd)
     }
   }
 
-  send_to_char("Usage: editor <type>\n\r", ch);
-  send_to_char("Where type can be:\n\r", ch);
-  send_to_char("web    - use online web editor\n\r", ch);
-  send_to_char("game   - use in game line editor\n\r", ch);
+  ch->sendln("Usage: editor <type>");
+  ch->sendln("Where type can be:");
+  ch->sendln("web    - use online web editor");
+  ch->sendln("game   - use in game line editor");
 
   return eSUCCESS;
 }

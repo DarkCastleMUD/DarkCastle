@@ -312,7 +312,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
         tmp_ch->send(player->poofout);
-        send_to_char("\n\r", tmp_ch);
+        tmp_ch->sendln("");
         ansi_color(NTEXT, tmp_ch);
       }
       else if (tmp_ch != this && !player->stealth)
@@ -335,14 +335,14 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
         tmp_ch->send(player->poofin);
-        send_to_char("\n\r", tmp_ch);
+        tmp_ch->sendln("");
         ansi_color(NTEXT, tmp_ch);
       }
       else if (tmp_ch != this && !player->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char("Someone appears with an ear-splitting bang!\n\r", tmp_ch);
+        tmp_ch->sendln("Someone appears with an ear-splitting bang!");
         ansi_color(NTEXT, tmp_ch);
       }
     }
@@ -379,19 +379,19 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (!*inout)
   {
-    send_to_char("Usage:\n\rpoof [i|o] <std::string>\n\r", ch);
-    send_to_char("\n\rCurrent poof in is:\n\r", ch);
+    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
+    ch->sendln("\n\rCurrent poof in is:");
     ch->send(ch->player->poofin);
-    send_to_char("\n\r", ch);
-    send_to_char("\n\rCurrent poof out is:\n\r", ch);
+    ch->sendln("");
+    ch->sendln("\n\rCurrent poof out is:");
     ch->send(ch->player->poofout);
-    send_to_char("\n\r", ch);
+    ch->sendln("");
     return eSUCCESS;
   }
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    send_to_char("Usage:\n\rpoof [i|o] <std::string>\n\r", ch);
+    ch->sendln("Usage:\n\rpoof [i|o] <std::string>");
     return eFAILURE;
   }
 
@@ -417,7 +417,7 @@ int do_poof(Character *ch, char *arg, int cmd)
         nope = 1;
       else if (nope == 1)
       {
-        send_to_char("You can only include one % in your poofin ;)\n\r", ch);
+        ch->sendln("You can only include one % in your poofin ;)");
         return eFAILURE;
       }
     }
@@ -553,7 +553,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
   one_argument(argument, buf);
   if (!*buf)
   {
-    send_to_char("Who do you wish to high-five? \n\r", ch);
+    ch->sendln("Who do you wish to high-five? ");
     return eFAILURE;
   }
 
@@ -565,7 +565,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
 
   if (victim->getLevel() < IMMORTAL)
   {
-    send_to_char("What you wanna give a mortal a high-five for?! *smirk* \n\r", ch);
+    ch->sendln("What you wanna give a mortal a high-five for?! *smirk* ");
     return eFAILURE;
   }
 

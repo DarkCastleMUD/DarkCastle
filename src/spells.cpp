@@ -1023,7 +1023,7 @@ void affect_update(int32_t duration_type)
           if (*spell_wear_off_msg[af->type])
           {
             send_to_char(spell_wear_off_msg[af->type], i);
-            send_to_char("\n\r", i);
+            i->sendln("");
           }
         if (af->type == SPELL_ETHEREAL_FOCUS)
         {
@@ -1577,7 +1577,7 @@ int do_release(Character *ch, char *argument, int cmd)
       if (*spell_wear_off_msg[aff->type])
       {
         send_to_char(spell_wear_off_msg[aftype], ch);
-        send_to_char("\n\r", ch);
+        ch->sendln("");
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
@@ -1846,13 +1846,13 @@ int do_cast(Character *ch, char *argument, int cmd)
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      send_to_char("The magical silence prevents you from casting!\n\r", ch);
+      ch->sendln("The magical silence prevents you from casting!");
       return eFAILURE;
     }
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    send_to_char("You cannot cast while charmed!\n\r", ch);
+    ch->sendln("You cannot cast while charmed!");
     return eFAILURE;
   }
 
@@ -1880,12 +1880,12 @@ int do_cast(Character *ch, char *argument, int cmd)
     }
     else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch)))
     {
-      send_to_char("You're not evil enough!\n\r", ch);
+      ch->sendln("You're not evil enough!");
       return eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_PALADIN) && (!IS_GOOD(ch)))
     {
-      send_to_char("You're not pure enough!\n\r", ch);
+      ch->sendln("You're not pure enough!");
       return eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARD)
@@ -1905,13 +1905,13 @@ int do_cast(Character *ch, char *argument, int cmd)
   /* If there is no chars in argument */
   if (!(*argument))
   {
-    send_to_char("Cast which what where?\n\r", ch);
+    ch->sendln("Cast which what where?");
     return eFAILURE;
   }
 
   if (*argument != '\'')
   {
-    send_to_char("Magic must always be enclosed by the holy magic symbols : '\n\r", ch);
+    ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
     return eFAILURE;
   }
 
@@ -1922,7 +1922,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
   if (*(argument + qend) != '\'')
   {
-    send_to_char("Magic must always be enclosed by the holy magic symbols : '\n\r", ch);
+    ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
     return eFAILURE;
   }
 
@@ -1951,13 +1951,13 @@ int do_cast(Character *ch, char *argument, int cmd)
         ch->sendln("You can't concentrate enough while resting.");
         break;
       case position_t::SITTING:
-        send_to_char("You can't do this sitting!\n\r", ch);
+        ch->sendln("You can't do this sitting!");
         break;
       case position_t::FIGHTING:
-        send_to_char("Impossible! You can't concentrate enough!\n\r", ch);
+        ch->sendln("Impossible! You can't concentrate enough!");
         break;
       default:
-        send_to_char("It seems like you're in a pretty bad shape!\n\r", ch);
+        ch->sendln("It seems like you're in a pretty bad shape!");
         break;
       } /* Switch */
     }
@@ -1969,7 +1969,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         {
           if (ch->getLevel() < 101)
           {
-            send_to_char("You do not know how to cast that spell!\n\r", ch);
+            ch->sendln("You do not know how to cast that spell!");
             return eFAILURE;
           }
           else
@@ -2032,7 +2032,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
           if (ch->fighting)
           {
-            send_to_char("You cannot concentrate enough to fire a bolt of lightning into another room!\n\r", ch);
+            ch->sendln("You cannot concentrate enough to fire a bolt of lightning into another room!");
             return eFAILURE;
           }
           int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
@@ -2324,9 +2324,9 @@ int do_cast(Character *ch, char *argument, int cmd)
         else
         { /* Nothing was given as argument */
           if (spell_info[spl].targets < TAR_OBJ_INV)
-            send_to_char("Whom should the spell be cast upon?\n\r", ch);
+            ch->sendln("Whom should the spell be cast upon?");
           else
-            send_to_char("What should the spell be cast upon?\n\r", ch);
+            ch->sendln("What should the spell be cast upon?");
         }
         return eFAILURE;
       }
@@ -2403,7 +2403,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         WAIT_STATE(ch, (int)(spell_info[spl].beats / 1.5));
 
       if ((spell_info[spl].spell_pointer == 0) && spl > 0)
-        send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
+        ch->sendln("Sorry, this magic has not yet been implemented :(");
       else
       {
         int chance = 50;

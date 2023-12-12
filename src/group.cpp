@@ -48,13 +48,13 @@ int do_abandon(Character *ch, char *argument, int cmd)
 
   if ((!ch->master) || (!IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("Who you gonna abandon?!\n\r", ch);
+    ch->sendln("Who you gonna abandon?!");
     return eFAILURE;
   }
 
   if ((IS_NPC(ch)) && (IS_AFFECTED(ch, AFF_CHARM)))
   {
-    send_to_char("You're in love. Forget it!\n\r", ch);
+    ch->sendln("You're in love. Forget it!");
     return eFAILURE;
   }
 
@@ -93,17 +93,17 @@ int do_found(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("Found what?!\n\r", ch);
+    ch->sendln("Found what?!");
     return eFAILURE;
   }
   if ((ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You can't found your own group while following someone around!\n\r", ch);
+    ch->sendln("You can't found your own group while following someone around!");
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You can't found a group if you're already in one!\n\r", ch);
+    ch->sendln("You can't found a group if you're already in one!");
     return eFAILURE;
   }
 
@@ -326,10 +326,10 @@ int do_group(Character *ch, char *argument, int cmd)
   if (!*name)
   {
     if (!IS_AFFECTED(ch, AFF_GROUP))
-      send_to_char("But you are a member of no group?!\n\r", ch);
+      ch->sendln("But you are a member of no group?!");
     else
     {
-      send_to_char("Your group consists of:\n\r", ch);
+      ch->sendln("Your group consists of:");
       if (ch->master)
         k = ch->master;
       else
@@ -369,7 +369,7 @@ int do_group(Character *ch, char *argument, int cmd)
   {
     if (!IS_AFFECTED(ch, AFF_GROUP))
     {
-      send_to_char("You must first found a group!\n\r", ch);
+      ch->sendln("You must first found a group!");
       return eFAILURE;
     }
 
@@ -452,13 +452,13 @@ int do_promote(Character *ch, char *argument, int cmd)
 
   if (!*name)
   {
-    send_to_char("Who do you wish to promote to group leader? \n\r", ch);
+    ch->sendln("Who do you wish to promote to group leader? ");
     return eFAILURE;
   }
 
   if (!(new_new_leader = ch->get_char_room_vis( name)))
   {
-    send_to_char("I see no person by that name here!\n\r", ch);
+    ch->sendln("I see no person by that name here!");
     return eFAILURE;
   }
 
@@ -474,13 +474,13 @@ int do_promote(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(new_new_leader))
   {
-    send_to_char("Yeah right!\n\r", ch);
+    ch->sendln("Yeah right!");
     return eFAILURE;
   }
 
   if (!ARE_GROUPED(ch, new_new_leader))
   {
-    send_to_char("But you aren't even in the same group!\n\r", ch);
+    ch->sendln("But you aren't even in the same group!");
     return eFAILURE;
   }
 
@@ -553,7 +553,7 @@ int do_disband(Character *ch, char *argument, int cmd)
 
   if (ch->master)
   {
-    send_to_char("You aren't running the show here pal!\n\r", ch);
+    ch->sendln("You aren't running the show here pal!");
     return eFAILURE;
   }
 
@@ -565,7 +565,7 @@ int do_disband(Character *ch, char *argument, int cmd)
 
   if (!*name)
   {
-    send_to_char("Who do you wish to disband? \n\r", ch);
+    ch->sendln("Who do you wish to disband? ");
     ch->sendln("Disband 'all' will disband the group.");
     return eFAILURE;
   }
@@ -606,13 +606,13 @@ int do_disband(Character *ch, char *argument, int cmd)
 
   if (!(adios = ch->get_char_room_vis( name)))
   {
-    send_to_char("I see no person by that name here!\n\r", ch);
+    ch->sendln("I see no person by that name here!");
     return eFAILURE;
   }
 
   if (adios == ch)
   {
-    send_to_char("You can't disband yourself from a group you're leading!\n\r", ch);
+    ch->sendln("You can't disband yourself from a group you're leading!");
     ch->sendln("Either Promote someone to Group Leader, or Disband All.");
     return eFAILURE;
   }
@@ -660,13 +660,13 @@ int do_follow(Character *ch, char *argument, int cmd)
   {
     if (!(leader = get_char_room(name, ch->in_room)))
     {
-      send_to_char("I see no person by that name here!\n\r", ch);
+      ch->sendln("I see no person by that name here!");
       return eFAILURE;
     }
   }
   else
   {
-    send_to_char("Who do you wish to follow?\n\r", ch);
+    ch->sendln("Who do you wish to follow?");
     return eFAILURE;
   }
   if (cmd == 9 && !CAN_SEE(ch, leader))

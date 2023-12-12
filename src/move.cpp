@@ -297,7 +297,7 @@ int do_fall(Character *ch, short dir)
 
 	if (!DC::isSet(retval, eSUCCESS))
 	{
-		send_to_char("You are miraculously upheld by divine powers!\n\r", ch);
+		ch->sendln("You are miraculously upheld by divine powers!");
 		return retval;
 	}
 
@@ -495,7 +495,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		// not ok, if room we're going to is AIR though
 		if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == 0 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH)) || (cmd == 1 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST)) || (cmd == 2 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[2]->to_room].room_flags, FALL_NORTH)) || (cmd == 3 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[3]->to_room].room_flags, FALL_EAST)) || (cmd == 4 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[4]->to_room].room_flags, FALL_DOWN)) || (cmd == 5 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[5]->to_room].room_flags, FALL_UP)) || DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_AIR))
 		{
-			send_to_char("You would need to fly to go there!\n\r", ch);
+			ch->sendln("You would need to fly to go there!");
 			return eFAILURE;
 		}
 
@@ -708,7 +708,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	for (tmp_obj = DC::getInstance()->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
-			send_to_char("The noise around you returns as you leave the silenced area!\n\r", ch);
+			ch->sendln("The noise around you returns as you leave the silenced area!");
 
 	if (!DC::isSet(retval, eSUCCESS))
 	{
@@ -1082,7 +1082,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if (!*buf)
 	{
-		send_to_char("Enter what?\n\r", ch);
+		ch->sendln("Enter what?");
 		return eFAILURE;
 	}
 
@@ -1195,7 +1195,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if (!DC::isSet(retval, eSUCCESS))
 	{
-		send_to_char("You recoil in pain as the portal slams shut!\n\r", ch);
+		ch->sendln("You recoil in pain as the portal slams shut!");
 		act("$n recoils in pain as the portal slams shut!", ch, 0, 0, TO_ROOM, 0);
 	}
 

@@ -323,7 +323,7 @@ int do_chpwd(Character *ch, char *arg, int cmd)
 
   if (!*name)
   {
-    send_to_char("Change whose password?\n\r", ch);
+    ch->sendln("Change whose password?");
     return eFAILURE;
   }
 
@@ -724,14 +724,14 @@ int do_range(Character *ch, char *arg, int cmd)
 
   if (!(*name) || !(*buf) || !(*kind))
   {
-    send_to_char("Syntax: range <god> <low vnum> <high vnum>\n\r", ch);
-    send_to_char("Syntax: range <god> <r/m/o> <low vnum> <high vnum>\n\r", ch);
+    ch->sendln("Syntax: range <god> <low vnum> <high vnum>");
+    ch->sendln("Syntax: range <god> <r/m/o> <low vnum> <high vnum>");
     return eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    send_to_char("Set whose range?!\n\r", ch);
+    ch->sendln("Set whose range?!");
     return eFAILURE;
   }
   int low, high;
@@ -979,7 +979,7 @@ int do_export(Character *ch, char *args, int cmdnum)
 
   if (*export_type == 0 || *filename == 0)
   {
-    send_to_char("Syntax: export obj <filename>\n\r\n\r", ch);
+    ch->sendln("Syntax: export obj <filename>\n\r");
     return eFAILURE;
   }
 

@@ -475,7 +475,7 @@ void boro_mob_stat(Character *ch, Character *k)
     send_to_char("None", ch);
 
   // LIST OF FOLLOWERS
-  send_to_char("$3Followers$R:\n\r", ch);
+  ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
@@ -539,7 +539,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->affected)
   {
-    send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
+    ch->sendln("\n\r$3Affecting Spells$R:\n\r--------------");
 
     for (aff = k->affected; aff; aff = aff->next)
     {
@@ -555,7 +555,7 @@ void boro_mob_stat(Character *ch, Character *k)
       strcat(buf, "\n\r");
       ch->send(buf);
     }
-    send_to_char("\n\r", ch);
+    ch->sendln("");
   }
 
   if (!IS_MOB(k))
@@ -683,7 +683,7 @@ void mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
   else
-    send_to_char("\n\r", ch);
+    ch->sendln("");
 
   sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
                "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\n\r",
@@ -829,7 +829,7 @@ void mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Master$R: '%s'\n\r",
           ((k->master) ? GET_NAME(k->master) : "NOBODY"));
   ch->send(buf);
-  send_to_char("$3Followers$R:\n\r", ch);
+  ch->sendln("$3Followers$R:");
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
@@ -887,7 +887,7 @@ void mob_stat(Character *ch, Character *k)
 
   if (k->affected)
   {
-    send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
+    ch->sendln("\n\r$3Affecting Spells$R:\n\r--------------");
     for (aff = k->affected; aff; aff = aff->next)
     {
 
@@ -914,7 +914,7 @@ void mob_stat(Character *ch, Character *k)
       strcat(buf, "\n\r");
       ch->send(buf);
     }
-    send_to_char("\n\r", ch);
+    ch->sendln("");
   }
 
   if (IS_MOB(k))
@@ -1317,7 +1317,7 @@ void obj_stat(Character *ch, class Object *j)
     strcpy(buf, "$3Contains$R : Nothing\n\r");
   ch->send(buf);
 
-  send_to_char("$3Can affect char$R :\n\r", ch);
+  ch->sendln("$3Can affect char$R :");
   for (i = 0; i < j->num_affects; i++)
   {
     //      sprinttype(j->affected[i].location,apply_types,buf2);
@@ -1412,14 +1412,14 @@ command_return_t do_repop(Character *ch, std::string arguments, int cmd)
 
   if (arg1 == "full")
   {
-    send_to_char("Performing full zone reset!\n\r", ch);
+    ch->sendln("Performing full zone reset!");
     std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
-    send_to_char("Resetting this entire zone!\n\r", ch);
+    ch->sendln("Resetting this entire zone!");
     std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
@@ -1466,10 +1466,10 @@ int do_clear(Character *ch, char *argument, int cmd)
         extract_char(tmp_victim, true);
       }
       else
-        send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_victim);
+        tmp_victim->sendln("You hear unmatched screams of terror as all mobs are summarily executed!");
     }
   }
-  send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r", ch);
+  ch->sendln("You have just caused the destruction of countless creatures in ths area!");
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
   logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
@@ -1515,7 +1515,7 @@ int do_echo(Character *ch, char *argument, int cmd)
     ;
 
   if (!*(argument + i))
-    send_to_char("What message do you want to echo to ths room?\n\r", ch);
+    ch->sendln("What message do you want to echo to ths room?");
 
   else
   {
@@ -1542,7 +1542,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
   if (!*buf)
-    send_to_char("Whom do you wish to restore?\n\r", ch);
+    ch->sendln("Whom do you wish to restore?");
   else if (strcmp(buf, "all"))
   {
 
@@ -1589,7 +1589,7 @@ int do_restore(Character *ch, char *argument, int cmd)
 
     if (ch->getLevel() < OVERSEER)
     {
-      send_to_char("You don't have the ability to do that!\n\r", ch);
+      ch->sendln("You don't have the ability to do that!");
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
 
@@ -1623,7 +1623,7 @@ int do_restore(Character *ch, char *argument, int cmd)
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
     logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
-    send_to_char("Trying to be Mister Popularity?\n\r", ch);
+    ch->sendln("Trying to be Mister Popularity?");
   }
   return eSUCCESS;
 }

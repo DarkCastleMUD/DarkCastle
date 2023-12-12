@@ -29,7 +29,7 @@ int do_boot(Character *ch, char *arg, int cmd)
 
   if (!(*name))
   {
-    send_to_char("Syntax: boot <victim> [boot]\n\r", ch);
+    ch->sendln("Syntax: boot <victim> [boot]");
     ch->sendln("The boot option causes the victim to see a large ASCII boot.");
     return eFAILURE;
   }
@@ -153,7 +153,7 @@ int do_boot(Character *ch, char *arg, int cmd)
   }
 
   else
-    send_to_char("Boot Who?\n\r", ch);
+    ch->sendln("Boot Who?");
 
   return eSUCCESS;
 }
@@ -173,7 +173,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
   if (arg == 0)
   {
     ch->sendln("Illegal descriptor number.");
-    send_to_char("Usage: release <#>\n\r", ch);
+    ch->sendln("Usage: release <#>");
     return eFAILURE;
   }
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
@@ -184,7 +184,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
       {
         sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", GET_NAME(ch));
         d->character->send(buf);
-        send_to_char("You dummy, can't do that to your elders!\n\r", ch);
+        ch->sendln("You dummy, can't do that to your elders!");
         close_socket(ch->desc);
         return eFAILURE;
       }
@@ -197,7 +197,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
       }
     }
   }
-  send_to_char("Descriptor not found!\n\r", ch);
+  ch->sendln("Descriptor not found!");
   return eSUCCESS;
 }
 
@@ -354,8 +354,8 @@ int lookupClass(Character *ch, char *str)
 
   if (ch != 0)
   {
-    send_to_char("Invalid class.\n\r\n\r", ch);
-    send_to_char("Valid classes:\n\r", ch);
+    ch->sendln("Invalid class.\n\r");
+    ch->sendln("Valid classes:");
     for (c_class = 1; c_class <= CLASS_MAX; c_class++)
     {
       csendf(ch, "%s\n\r", pc_clss_types[c_class]);
@@ -400,10 +400,10 @@ int do_guild(Character *ch, char *argument, int cmd)
   // No arguments
   if (arg1[0] == 0)
   {
-    send_to_char("Syntax:\n\r", ch);
-    send_to_char("guild <room #>           - List all classes allowed in room\n\r", ch);
-    send_to_char("guild <class>            - List all rooms that allow that class\n\r", ch);
-    send_to_char("guild <class> <room #>   - Toggle allow/deny class in room\n\r\n\r", ch);
+    ch->sendln("Syntax:");
+    ch->sendln("guild <room #>           - List all classes allowed in room");
+    ch->sendln("guild <class>            - List all rooms that allow that class");
+    ch->sendln("guild <class> <room #>   - Toggle allow/deny class in room\n\r");
     return eFAILURE;
   }
 
@@ -432,11 +432,11 @@ int do_guild(Character *ch, char *argument, int cmd)
 
       if (found)
       {
-        send_to_char("\n\r", ch);
+        ch->sendln("");
       }
       else
       {
-        send_to_char("All\n\r", ch);
+        ch->sendln("All");
       }
 
       return eSUCCESS;
@@ -465,7 +465,7 @@ int do_guild(Character *ch, char *argument, int cmd)
           if (cols == 11)
           {
             cols = 0;
-            send_to_char("\n\r", ch);
+            ch->sendln("");
           }
         }
       }
@@ -476,7 +476,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("\n\r", ch);
+        ch->sendln("");
       }
 
       return eSUCCESS;

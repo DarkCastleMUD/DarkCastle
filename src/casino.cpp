@@ -2395,7 +2395,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
                }
                else if (number(0, 1))
                {
-                  send_to_char("$BWinner!!$R The button lights up and the room is filled with whirring noises!\n\r", ch);
+                  ch->sendln("$BWinner!!$R The button lights up and the room is filled with whirring noises!");
                   if (obj->slot->gold)
                      ch->addGold(obj->slot->lastwin);
                   else
@@ -2404,7 +2404,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
                }
                else
                {
-                  send_to_char("Oh no!! The other button lights up! You lose everything!\n\r", ch);
+                  ch->sendln("Oh no!! The other button lights up! You lose everything!");
                   if (obj->slot->gold)
                      ch->removeGold(obj->slot->lastwin);
                   else
@@ -2443,7 +2443,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
    sprintf(buf, "You place %d %s into the slot and set the reels spinning!\n\r", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
    ch->send(buf);
    act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
-   send_to_char("   |      |      |\n\r", ch);
+   ch->sendln("   |      |      |");
    obj->slot->ch = ch;
 
    slot_timer(obj->slot, -1, -1, 2);
@@ -2822,7 +2822,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
    {
       if (!*arg2)
       {
-         send_to_char("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>\n\r", ch);
+         ch->sendln("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>");
          return eSUCCESS;
       }
       if (!is_number(arg2) || atoi(arg2) < 100)
@@ -3149,7 +3149,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       }
       else
       {
-         send_to_char("Bet what?\n\r", ch);
+         ch->sendln("Bet what?");
          ch->addGold(bet);
          return eSUCCESS;
       }

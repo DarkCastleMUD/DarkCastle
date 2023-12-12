@@ -145,7 +145,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 		tmpchar = get_mob_vnum(mobs->name);
 		if (!tmpchar)
 		{
-			send_to_char("Shit a mob is missing from game!!!\n\r", ch);
+			ch->sendln("Shit a mob is missing from game!!!");
 			continue;
 		}
 		snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\r\n", get_mob_vnum(mobs->name)->short_desc,

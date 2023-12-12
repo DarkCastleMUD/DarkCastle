@@ -116,7 +116,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
   if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
-    send_to_char("You are unable to control your ki in this way!\n\r", ch);
+    ch->sendln("You are unable to control your ki in this way!");
     return eFAILURE;
   }
   /*
@@ -130,7 +130,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
   if (!(*argument))
   {
-    send_to_char("Yes, but WHAT would you like to do?\n\r", ch);
+    ch->sendln("Yes, but WHAT would you like to do?");
     return eFAILURE;
   }
 
@@ -142,7 +142,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
   if (spl < 0)
   {
-    send_to_char("You cannot harness that energy!\n\r", ch);
+    ch->sendln("You cannot harness that energy!");
     return eFAILURE;
   }
 
@@ -176,7 +176,7 @@ int do_ki(Character *ch, char *argument, int cmd)
                      ch);
         break;
       case position_t::SITTING:
-        send_to_char("You can't do this sitting!\n\r", ch);
+        ch->sendln("You can't do this sitting!");
         break;
       case position_t::FIGHTING:
         ch->sendln("This is a peaceful ki power.");
@@ -242,7 +242,7 @@ int do_ki(Character *ch, char *argument, int cmd)
         ch->sendln("Nobody here by that name.");
       else
         /* No arguments were given */
-        send_to_char("Whom should the power be used upon?\n\r", ch);
+        ch->sendln("Whom should the power be used upon?");
       return eFAILURE;
     }
 
@@ -299,7 +299,7 @@ int do_ki(Character *ch, char *argument, int cmd)
 
     if (ch->getLevel() < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
     {
-      send_to_char("You do not have enough ki!\n\r", ch);
+      ch->sendln("You do not have enough ki!");
       return eFAILURE;
     }
 
@@ -314,7 +314,7 @@ int do_ki(Character *ch, char *argument, int cmd)
                          spl + KI_OFFSET) &&
           !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
       {
-        send_to_char("You lost your concentration!\n\r", ch);
+        ch->sendln("You lost your concentration!");
         GET_KI(ch) -= use_ki(ch, spl) / 2;
         WAIT_STATE(ch, ki_info[spl].beats / 2);
 
@@ -324,7 +324,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
         if (!tar_char || (ch->in_room != tar_char->in_room))
         {
-          send_to_char("Whom should the power be used upon?\n\r", ch);
+          ch->sendln("Whom should the power be used upon?");
           return eFAILURE;
         }
 
@@ -332,7 +332,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!DC::isSet(ki_info[spl].targets, TAR_IGNORE))
         if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
-          send_to_char("That just might annoy them!\n\r", ch);
+          ch->sendln("That just might annoy them!");
           return eFAILURE;
         }
 
@@ -538,7 +538,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 
   else
   {
-    send_to_char("Your opponent has too many hit points!\n\r", ch);
+    ch->sendln("Your opponent has too many hit points!");
     if (!vict->fighting)
       return attack(vict, ch, TYPE_UNDEFINED);
   }
@@ -572,7 +572,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
   Character *tmp_victim, *temp;
 
   dam = number(135, 165);
-  //  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
+  //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
   //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
   int32_t room = ch->in_room;
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
@@ -644,7 +644,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   affect_to_char(vict, &af);
 
-  send_to_char("You feel a quickening in your limbs!\n\r", vict);
+  vict->sendln("You feel a quickening in your limbs!");
   return eSUCCESS;
 }
 

@@ -150,15 +150,15 @@ int do_load(Character *ch, char *arg, int cmd)
 
 	if (cmd == CMD_DEFAULT && (!*type || !*arg2))
 	{
-		send_to_char("Usage:  load <mob> <name|vnum> [qty]\n\r", ch);
-		send_to_char("        load <obj> <name|vnum> [qty] [random]\n\r", ch);
+		ch->sendln("Usage:  load <mob> <name|vnum> [qty]");
+		ch->sendln("        load <obj> <name|vnum> [qty] [random]");
 		return eFAILURE;
 	}
 	if (cmd == CMD_PRIZE && !*type)
 	{
 
 		*buf = '\0';
-		send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
+		ch->sendln("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n");
 
 		for (x = 0; (x < obj_index[top_of_objt].virt); x++)
 		{
@@ -265,7 +265,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			if ((ch->getLevel() < 108) &&
 				DC::isSet(((class Object *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
-				send_to_char("Why would you want to load that?\n\r", ch);
+				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
 			}
 			else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[number].item))->name))
@@ -311,7 +311,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			DC::isSet(((class Object *)(obj_index[num].item))->obj_flags.extra_flags,
 					  ITEM_SPECIAL))
 		{
-			send_to_char("Why would you want to load that?\n\r", ch);
+			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
 		}
 		else if (cmd == CMD_PRIZE && !isname("prize", ((class Object *)(obj_index[num].item))->name))
@@ -372,7 +372,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 		}
 		else
 		{
-			send_to_char("You can't find it to purge!\n\r", ch);
+			ch->sendln("You can't find it to purge!");
 			return eFAILURE;
 		}
 	}
@@ -870,7 +870,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 
 			*buf = '\0';
-			send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
+			ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
 			if (end == -1)
 			{
@@ -909,7 +909,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		else
 		{
 			*buf = '\0';
-			send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
+			ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
 			for (i = 0; (i <= mob_index[top_of_mobt].virt); i++)
 			{
@@ -980,7 +980,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 
 			*buf = '\0';
-			send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
+			ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
 			if (end == -1)
 			{
@@ -1019,7 +1019,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		else
 		{
 			*buf = '\0';
-			send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
+			ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
 			for (i = 0; (i <= obj_index[top_of_objt].virt); i++)
 			{
@@ -1082,7 +1082,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 
 			*buf = '\0';
-			send_to_char("[#  ] [ROOM#] ROOM'S NAME\n\n\r", ch);
+			ch->sendln("[#  ] [ROOM#] ROOM'S NAME\n");
 
 			if (end == -1)
 			{
@@ -1885,13 +1885,13 @@ int do_teleport(Character *ch, char *argument, int cmd)
 
 	if (!*person)
 	{
-		send_to_char("Who do you wish to teleport?\n\r", ch);
+		ch->sendln("Who do you wish to teleport?");
 		return eFAILURE;
 	} /* if */
 
 	if (!*room)
 	{
-		send_to_char("Where do you wish to send ths person?\n\r", ch);
+		ch->sendln("Where do you wish to send ths person?");
 		return eFAILURE;
 	} /* if */
 
@@ -1982,7 +1982,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 	one_argument(argument, buf);
 	if (!*buf)
 	{
-		send_to_char("Whom is the group leader you wish to transfer?\n\r", ch);
+		ch->sendln("Whom is the group leader you wish to transfer?");
 		return eFAILURE;
 	}
 
@@ -2407,7 +2407,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	one_argument(argument, arg2);
 	if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
 	{
-		send_to_char("Syntax: oclone <source vnum> <destination vnum>\n\r", ch);
+		ch->sendln("Syntax: oclone <source vnum> <destination vnum>");
 		return eFAILURE;
 	}
 	Object *obj, *otmp;
@@ -2485,7 +2485,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	one_argument(argument, arg2);
 	if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
 	{
-		send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r", ch);
+		ch->sendln("Syntax: mclone <source vnum> <destination vnum>");
 		return eFAILURE;
 	}
 	Character *mob;

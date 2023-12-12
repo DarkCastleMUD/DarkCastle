@@ -629,7 +629,7 @@ void shopping_list(const char *arg, Character *ch,
     restock_keeper(keeper, shop_nr);
   }
   i = 0;
-  send_to_char("[Amt] [ Price ] Item\n\r", ch);
+  ch->sendln("[Amt] [ Price ] Item");
   found = false;
   for (obj = keeper->carrying; obj; obj = obj->next_content)
   {
@@ -670,7 +670,7 @@ void shopping_list(const char *arg, Character *ch,
   }
 
   if (!found)
-    send_to_char("You can't buy anything here!\n\r", ch);
+    ch->sendln("You can't buy anything here!");
 
   return;
 }
@@ -1733,7 +1733,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
     if (*arg1 == 0)
     {
-      send_to_char("Buy what?\n\r", ch);
+      ch->sendln("Buy what?");
       return eSUCCESS;
     }
 

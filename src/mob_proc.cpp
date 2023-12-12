@@ -792,7 +792,7 @@ int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     act("The brass dragon says '$n isn't invited'",
         ch, 0, 0, TO_ROOM, 0);
-    send_to_char("The brass dragon says 'you're not invited'\n\r", ch);
+    ch->sendln("The brass dragon says 'you're not invited'");
     return eSUCCESS;
   }
 
@@ -2229,7 +2229,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
 
   if (cmd == 59)
   { /* List */
-    send_to_char("Available pets are:\n\r", ch);
+    ch->sendln("Available pets are:");
     for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
       sprintf(buf, "%8ld - %s\n\r",
@@ -2246,13 +2246,13 @@ int pet_shops(Character *ch, int cmd, char const *arg)
 
     if (!(pet = get_char_room(buf, pet_room)))
     {
-      send_to_char("There is no such pet!\n\r", ch);
+      ch->sendln("There is no such pet!");
       return eSUCCESS;
     }
 
     if (ch->getGold() < (uint32_t)(GET_EXP(pet) * 3))
     {
-      send_to_char("You don't have enough gold!\n\r", ch);
+      ch->sendln("You don't have enough gold!");
       return eSUCCESS;
     }
     if (many_charms(ch))

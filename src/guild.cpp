@@ -46,7 +46,7 @@ int do_profession(Character *ch, char *args, int cmdnum)
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill( SKILL_PROFESSION))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eFAILURE;
   }
 
@@ -604,34 +604,34 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
     }
     if (skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK)
     {
-      send_to_char("$B        #$R\n\r", ch);
+      ch->sendln("$B        #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE)
     {
-      send_to_char("$B  #$R\n\r", ch);
+      ch->sendln("$B  #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG)
     {
-      send_to_char("$B    #$R\n\r", ch);
+      ch->sendln("$B    #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN)
     {
-      send_to_char("$B  #$R\n\r", ch);
+      ch->sendln("$B  #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE)
     {
-      send_to_char("$B      #$R\n\r", ch);
+      ch->sendln("$B      #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY)
     {
-      send_to_char("$B        #$R\n\r", ch);
+      ch->sendln("$B        #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO)
     {
-      send_to_char("$B        #$R\n\r", ch);
+      ch->sendln("$B        #$R");
     }
     else
-      send_to_char("\n\r", ch);
+      ch->sendln("");
   }
 }
 
@@ -863,7 +863,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
 
     if ((ch->getLevel() >= IMMORTAL) || (ch->getLevel() == DC::MAX_MORTAL_LEVEL))
     {
-      send_to_char("You have already reached the highest level!\n\r", ch);
+      ch->sendln("You have already reached the highest level!");
       return eSUCCESS;
     }
 
@@ -924,7 +924,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
 
-    send_to_char("You raise a level!\n\r", ch);
+    ch->sendln("You raise a level!");
     logf(IMMORTAL, LogChannels::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
@@ -975,7 +975,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     }
     else
     {
-      send_to_char("You have not even chosen a profession out of which to remort!\n\r", ch);
+      ch->sendln("You have not even chosen a profession out of which to remort!");
       return eSUCCESS;
     }
 
@@ -1144,7 +1144,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     ch->send(buf);
-    send_to_char("You can practice any of these skills:\n\r", ch);
+    ch->sendln("You can practice any of these skills:");
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
     {
       int known = ch->has_skill( g_skills[i].skillnum);

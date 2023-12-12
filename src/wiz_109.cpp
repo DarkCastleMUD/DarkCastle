@@ -41,7 +41,7 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    send_to_char("Linkload whom?\n\r", this);
+    this->sendln("Linkload whom?");
     return eFAILURE;
   }
 
@@ -49,13 +49,13 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
 
   if (get_pc(arg1))
   {
-    send_to_char("That person is already on the game!\n\r", this);
+    this->sendln("That person is already on the game!");
     return eFAILURE;
   }
 
   if (!(load_char_obj(&d, arg1)))
   {
-    send_to_char("Unable to load! (Character might not exist...)\n\r", this);
+    this->sendln("Unable to load! (Character might not exist...)");
     return eFAILURE;
   }
 
@@ -134,7 +134,7 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
   }
   else
   {
-    send_to_char("Who exactly would you like to be a guide?\n\r", this);
+    this->sendln("Who exactly would you like to be a guide?");
     return eFAILURE;
   }
 
@@ -180,7 +180,7 @@ int do_advance(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Advance whom?\n\r", ch);
+    ch->sendln("Advance whom?");
     return eFAILURE;
   }
 
@@ -199,7 +199,7 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   if ((new_newlevel > DC::MAX_MORTAL_LEVEL) && (new_newlevel < MIN_GOD))
   {
-    send_to_char("That level doesn't exist!!\n\r", ch);
+    ch->sendln("That level doesn't exist!!");
     return eFAILURE;
   }
 
@@ -224,7 +224,7 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   if (new_newlevel <= victim->getLevel())
   {
-    send_to_char("Warning:  Lowering a player's level!\n\r", ch);
+    ch->sendln("Warning:  Lowering a player's level!");
 
     victim->setLevel(1);
     GET_EXP(victim) = 1;
@@ -363,7 +363,7 @@ int do_global(Character *ch, char *argument, int cmd)
     ;
 
   if (!*(argument + i))
-    send_to_char("What message do you want to send to all players?\n\r", ch);
+    ch->sendln("What message do you want to send to all players?");
   else
   {
     sprintf(buf, "\n\r%s\n\r", argument + i);
@@ -521,7 +521,7 @@ command_return_t Character::do_shutdow(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  send_to_char("If you want to shut something down - say so!\n\r", this);
+  this->sendln("If you want to shut something down - say so!");
   return eSUCCESS;
 }
 
@@ -546,7 +546,7 @@ int do_testport(Character *ch, char *argument, int cmd)
 
   if (*arg1 == 0)
   {
-    send_to_char("testport <start | stop>\n\r\n\r", ch);
+    ch->sendln("testport <start | stop>\n\r");
     return eFAILURE;
   }
 
@@ -603,7 +603,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
 
   if (*arg1 == 0 || *arg2 == 0)
   {
-    send_to_char("testuser <user> <on|off>\n\r\n\r", ch);
+    ch->sendln("testuser <user> <on|off>\n\r");
     return eFAILURE;
   }
 

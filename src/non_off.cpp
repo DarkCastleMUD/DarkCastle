@@ -100,11 +100,11 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   {
     if (ch->getLevel() < IMMORTAL)
     {
-      send_to_char("You are unable to destroy this item, it must be CURSED!\n\r", ch);
+      ch->sendln("You are unable to destroy this item, it must be CURSED!");
       return eFAILURE;
     }
     else
-      send_to_char("(This item is cursed, BTW.)\n\r", ch);
+      ch->sendln("(This item is cursed, BTW.)");
   }
 
   if (obj->obj_flags.value[3] == 1 && isname("pc", obj->name))
@@ -191,7 +191,7 @@ int do_donate(Character *ch, char *argument, int cmd)
 
   if (ch->fighting)
   {
-    send_to_char("Aren't we a little to busy for that right now?\n\r", ch);
+    ch->sendln("Aren't we a little to busy for that right now?");
     return eFAILURE;
   }
 
@@ -199,7 +199,7 @@ int do_donate(Character *ch, char *argument, int cmd)
 
   if (!*name)
   {
-    send_to_char("Donate what?\n\r", ch);
+    ch->sendln("Donate what?");
     return eFAILURE;
   }
 
@@ -270,7 +270,7 @@ int do_donate(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    send_to_char("Since you can't let go of it, how are you going to donate it?\n\r", ch);
+    ch->sendln("Since you can't let go of it, how are you going to donate it?");
     return eFAILURE;
   }
 
@@ -342,7 +342,7 @@ int do_title(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("Change your title to what?\n\r", ch);
+    ch->sendln("Change your title to what?");
     return eFAILURE;
   }
 
@@ -1157,7 +1157,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
   break;
   case position_t::FIGHTING:
   {
-    send_to_char("Sleep while fighting? Are you MAD?\n\r", ch);
+    ch->sendln("Sleep while fighting? Are you MAD?");
     return eFAILURE; // so we don't set INTERNAL_SLEEPING
   }
   break;
@@ -1336,34 +1336,34 @@ void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
   }
   if (answers.empty())
   {
-    send_to_char("That answer doesn't exist!\n\r", ch);
+    ch->sendln("That answer doesn't exist!");
     return;
   }
   if (answer > answers.size())
   {
-    send_to_char("That answer doesn't exist!\n\r", ch);
+    ch->sendln("That answer doesn't exist!");
     return;
   }
   std::vector<SVoteData>::iterator answer_it = answers.begin();
   answers.erase(answer_it + answer - 1); // need to offset by 1
-  send_to_char("Answer removed!\n\r", ch);
+  ch->sendln("Answer removed!");
 }
 
 void CVoteData::StartVote(Character *ch)
 {
   if (active)
   {
-    send_to_char("There is already an active vote, you can't start another\n\r", ch);
+    ch->sendln("There is already an active vote, you can't start another");
     return;
   }
   if (vote_question.empty())
   {
-    send_to_char("You can't start a vote without a topic to vote on!\n\r", ch);
+    ch->sendln("You can't start a vote without a topic to vote on!");
     return;
   }
   if (answers.empty())
   {
-    send_to_char("You can't start a vote without any answers!\n\r", ch);
+    ch->sendln("You can't start a vote without any answers!");
     return;
   }
 
@@ -1392,7 +1392,7 @@ void CVoteData::AddAnswer(Character *ch, std::string answer)
 {
   if (active)
   {
-    send_to_char("You can't add answers during an active vote!\n\r", ch);
+    ch->sendln("You can't add answers during an active vote!");
     return;
   }
   ch->sendln("Answer added.");
@@ -1411,13 +1411,13 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
 {
   if (!ch->desc)
   {
-    send_to_char("Monsters don't get to vote!\n\r", ch);
+    ch->sendln("Monsters don't get to vote!");
     return false;
   }
 
   if (this->HasVoted(ch))
   {
-    send_to_char("You have already voted!\n\r", ch);
+    ch->sendln("You have already voted!");
     return false;
   }
 
@@ -1432,7 +1432,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
   total_votes++;
   answers.at(vote - 1).votes++;
 
-  send_to_char("Vote sent!\n\r", ch);
+  ch->sendln("Vote sent!");
   OutToFile();
   return true;
 }

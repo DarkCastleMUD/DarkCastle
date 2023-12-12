@@ -50,7 +50,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     victim = ch->fighting;
     if (!victim)
     {
-      send_to_char("Whom do you want to harmtouch?\n\r", ch);
+      ch->sendln("Whom do you want to harmtouch?");
       return eFAILURE;
     }
   }
@@ -58,7 +58,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
   if (victim == ch)
   {
     if (GET_SEX(ch) == SEX_MALE)
-      send_to_char("You'd wither it!\n\r", ch);
+      ch->sendln("You'd wither it!");
     else if (GET_SEX(ch) == SEX_FEMALE)
       ch->sendln("You naughty naughty girl...at least wait until someone's filming.");
     else
@@ -140,7 +140,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis( victim_name)))
   {
-    send_to_char("Whom do you want to layhands on?\n\r", ch);
+    ch->sendln("Whom do you want to layhands on?");
     return eFAILURE;
   }
 
@@ -151,7 +151,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
   }
 
   //   if (ch->fighting == victim) {
-  //     send_to_char("Aren't you a little busy trying to KILL them right now?\n\r",ch);
+  //     ch->sendln("Aren't you a little busy trying to KILL them right now?");
   //     return eFAILURE;
   //   }
 
@@ -229,7 +229,7 @@ int do_behead(Character *ch, char *argument, int cmd)
       vict = ch->fighting;
     else
     {
-      send_to_char("Whom do you want behead?\n\r", ch);
+      ch->sendln("Whom do you want behead?");
       return eFAILURE;
     }
   }
@@ -239,7 +239,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(vict->combat, COMBAT_BLADESHIELD1) || DC::isSet(vict->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("You can't behead a bladeshielded opponent!\n\r", ch);
+    ch->sendln("You can't behead a bladeshielded opponent!");
     return eFAILURE;
   }
 

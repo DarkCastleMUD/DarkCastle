@@ -83,7 +83,7 @@ int do_batter(Character *ch, char *argument, int cmd)
 
     if (exit->bracee == ch)
     {
-      send_to_char("You can't batter a door you're bracing shut!\n\r", ch);
+      ch->sendln("You can't batter a door you're bracing shut!");
       return eFAILURE;
     }
 
@@ -531,7 +531,7 @@ int do_berserk(Character *ch, char *argument, int cmd)
       victim = ch->fighting;
     else
     {
-      send_to_char("Who do you want to go berserk on?\n\r", ch);
+      ch->sendln("Who do you want to go berserk on?");
       return eFAILURE;
     }
   }
@@ -646,7 +646,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (victim == nullptr)
   {
-    send_to_char("Headbutt whom?\n\r", ch);
+    ch->sendln("Headbutt whom?");
     return eFAILURE;
   }
 
@@ -658,13 +658,13 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
-    send_to_char("You are too puny to headbutt someone that HUGE!\n\r", ch);
+    ch->sendln("You are too puny to headbutt someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    send_to_char("You cannot pick just one to headbutt!\n\r", ch);
+    ch->sendln("You cannot pick just one to headbutt!");
     return eFAILURE;
   }
 
@@ -676,7 +676,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
   {
-    send_to_char("That would be like smashing your head into a wall!\n\r", ch);
+    ch->sendln("That would be like smashing your head into a wall!");
     return eFAILURE;
   }
 
@@ -685,7 +685,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Headbutting a bladeshielded opponent would be asking for decapitation!\n\r", ch);
+    ch->sendln("Headbutting a bladeshielded opponent would be asking for decapitation!");
     return eFAILURE;
   }
 
@@ -1094,7 +1094,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
 
   if (!*who)
   {
-    send_to_char("Knockback whom?\n\r", ch);
+    ch->sendln("Knockback whom?");
     return eFAILURE;
   }
 
@@ -1105,13 +1105,13 @@ int do_knockback(Character *ch, char *argument, int cmd)
 
   if (victim == nullptr)
   {
-    send_to_char("Knockback whom?\n\r", ch);
+    ch->sendln("Knockback whom?");
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Where do you want to go today?\n\r", ch);
+    ch->sendln("Where do you want to go today?");
     return eFAILURE;
   }
 
@@ -1140,7 +1140,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
 
     if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
     {
-      send_to_char("You cannot pick just one to knockback!\n\r", ch);
+      ch->sendln("You cannot pick just one to knockback!");
       return eFAILURE;
     }
 
@@ -1166,7 +1166,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
   if (*where)
   {
     if (learned < 80)
-      send_to_char("You're not good enough to direct your smashes, so you just let it fly!\n\r", ch);
+      ch->sendln("You're not good enough to direct your smashes, so you just let it fly!");
     else
     {
       for (int i = 0; i < 6; i++)

@@ -314,7 +314,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 	if (!(*argument))
 	{
-		send_to_char("Yes, but WHAT would you like to sing?\n\r", ch);
+		ch->sendln("Yes, but WHAT would you like to sing?");
 		return eFAILURE;
 	}
 
@@ -360,7 +360,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		if (ch->has_skill(SKILL_ORCHESTRATE))
 			ch->sendln("You are already in the middle of another song!  Try using orchestrate.");
 		else
-			send_to_char("You are already in the middle of another song!\n\r", ch);
+			ch->sendln("You are already in the middle of another song!");
 		return eFAILURE;
 	}
 	else if (spl == 2 && !IS_SINGING(ch))
@@ -392,7 +392,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				ch->sendln("You dream of beautiful music.");
 				break;
 			case position_t::RESTING:
-				send_to_char("You can't sing this resting!!\n\r", ch);
+				ch->sendln("You can't sing this resting!!");
 				break;
 			case position_t::SITTING:
 				ch->sendln("You can't do this sitting.  You must stand up.");
@@ -401,7 +401,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				ch->sendln("This is a peaceful song.  Not for battle.");
 				break;
 			default:
-				send_to_char("It seems like you're in a pretty bad shape!\n\r", ch);
+				ch->sendln("It seems like you're in a pretty bad shape!");
 				break;
 			}
 			return eFAILURE;
@@ -528,7 +528,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			}
 			else
 				/* No arguments were given */
-				send_to_char("Whom should you sing to?\n\r", ch);
+				ch->sendln("Whom should you sing to?");
 			return eFAILURE;
 		}
 
@@ -536,7 +536,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		{
 			if ((tar_char == ch) && DC::isSet(song_info[spl].targets, TAR_SELF_NONO))
 			{
-				send_to_char("You cannot sing this to yourself!\n\r", ch);
+				ch->sendln("You cannot sing this to yourself!");
 				return eFAILURE;
 			}
 			else if ((tar_char != ch) && DC::isSet(song_info[spl].targets, TAR_SELF_ONLY))
@@ -570,7 +570,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		if (ch->getLevel() < ARCHANGEL && !IS_MOB(ch) &&
 			GET_KI(ch) < use_song(ch, spl))
 		{
-			send_to_char("You do not have enough ki!\n\r", ch);
+			ch->sendln("You do not have enough ki!");
 			return eFAILURE;
 		}
 
@@ -602,7 +602,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
 			{
 
-				send_to_char("You forgot the words!\n\r", ch);
+				ch->sendln("You forgot the words!");
 				GET_KI(ch) -= use_song(ch, spl) / 2;
 				return eSUCCESS;
 			}
@@ -611,7 +611,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			if (!DC::isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
 				if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
 				{
-					send_to_char("That just might annoy them!\n\r", ch);
+					ch->sendln("That just might annoy them!");
 					return eFAILURE;
 				}
 
@@ -619,7 +619,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			if (!DC::isSet(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
 				if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
 				{
-					send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", tar_char);
+					tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
 				}
 
 			if (cmd != CMD_ORCHESTRATE && IS_SINGING(ch)) // I'm singing
@@ -942,7 +942,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	if (charm_levels(ch) - charm_space(victim->getLevel()) < 0 && victim->master != ch)
 	{
-		send_to_char("How you plan on controlling so many followers?\n\r", ch);
+		ch->sendln("How you plan on controlling so many followers?");
 		return eFAILURE;
 	}
 
@@ -1334,7 +1334,7 @@ int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victi
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin a song of battle!\n\r", ch);
+	ch->sendln("You begin a song of battle!");
 	act("$n sings a horrible battle hymn!", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1696,7 +1696,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	if ((IS_PC(target)) && (target->getLevel() >= IMMORTAL))
 	{
-		send_to_char("Just who do you think you are?\n\r", victim);
+		victim->sendln("Just who do you think you are?");
 		return;
 	}
 
@@ -1965,9 +1965,9 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
 		}
 		else
 		{
-			send_to_char("The magic is shattered by your will!\n\r", ch);
+			ch->sendln("The magic is shattered by your will!");
 			act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
-			send_to_char("Your magic beacon is shattered!\n\r", obj->equipped_by);
+			obj->equipped_by->sendln("Your magic beacon is shattered!");
 			obj->equipped_by->beacon = nullptr;
 			obj->equipped_by = nullptr;
 		}
@@ -2270,7 +2270,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
 		}
 	if (false == summoned)
 	{
-		send_to_char("You don't have any followers to summon. You are sad. :(\n\r", ch);
+		ch->sendln("You don't have any followers to summon. You are sad. :(");
 		act("$n hangs $s head in disappointment and surreptitiously wipes away a tear.", ch, 0, 0, TO_ROOM, 0);
 	}
 	return eSUCCESS;
@@ -3240,7 +3240,7 @@ int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *
 {
 	std::vector<songInfo>::iterator i;
 
-	send_to_char("You begin to sing, approaching crescendo!\n\r", ch);
+	ch->sendln("You begin to sing, approaching crescendo!");
 	act("$n begins to sing, raising the volume to deafening levels!", ch, 0, 0, TO_ROOM, 0);
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)

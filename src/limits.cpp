@@ -584,7 +584,7 @@ void advance_level(Character *ch, int is_conversion)
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
 		{
-			send_to_char("10 lbs has been added to your vault!\n\r", ch);
+			ch->sendln("10 lbs has been added to your vault!");
 			vault->size += 10;
 			save_vault(vault->owner);
 		}
@@ -644,7 +644,7 @@ void gain_exp(Character *ch, int64_t gain)
 
 	if (!x && GET_EXP(ch) >= y)
 	{
-		send_to_char("You now have enough experience to level!\n\r", ch);
+		ch->sendln("You now have enough experience to level!");
 		if (ch->getLevel() == 1)
 			csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\n\r",
 				   pc_clss_types[GET_CLASS(ch)]);
@@ -747,7 +747,7 @@ void food_update(void)
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
-					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
+					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
@@ -763,7 +763,7 @@ void food_update(void)
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
-					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
+					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))

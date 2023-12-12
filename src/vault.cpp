@@ -336,7 +336,7 @@ int do_vault(Character *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("Syntax: vault log <clan>\n\r", ch);
+        ch->sendln("Syntax: vault log <clan>");
         return eFAILURE;
       }
     }

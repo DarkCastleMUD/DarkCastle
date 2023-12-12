@@ -46,7 +46,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
   }
   if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
-    send_to_char("You have no reason to feel sad, oh great Champion!\n\r", ch);
+    ch->sendln("You have no reason to feel sad, oh great Champion!");
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CURSE) || IS_AFFECTED(ch, AFF_SOLIDITY))
@@ -56,7 +56,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
   }
   if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
   {
-    send_to_char("You are too busy trying to kill somebody else!\n\r", ch);
+    ch->sendln("You are too busy trying to kill somebody else!");
     return eFAILURE;
   }
 
@@ -128,14 +128,14 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
           return attack(this, victim, TYPE_UNDEFINED);
         }
         else
-          send_to_char("You do the best you can!\n\r", this);
+          this->sendln("You do the best you can!");
       }
     }
     else
       this->sendln("They aren't here.");
   }
   else
-    send_to_char("Hit whom?\n\r", this);
+    this->sendln("Hit whom?");
   return eFAILURE;
 }
 
@@ -178,14 +178,14 @@ int do_murder(Character *ch, char *argument, int cmd)
           return attack(ch, victim, TYPE_UNDEFINED);
         }
         else
-          send_to_char("You do the best you can!\n\r", ch);
+          ch->sendln("You do the best you can!");
       }
     }
     else
       ch->sendln("They aren't here.");
   }
   else
-    send_to_char("Hit whom?\n\r", ch);
+    ch->sendln("Hit whom?");
   return eSUCCESS;
 }
 
@@ -199,7 +199,7 @@ int do_slay(Character *ch, char *argument, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Slay whom?\n\r", ch);
+    ch->sendln("Slay whom?");
     return eFAILURE;
   }
 
@@ -221,7 +221,7 @@ int do_slay(Character *ch, char *argument, int cmd)
   }
 
   if (ch == victim)
-    send_to_char("Your mother would be so sad.. :(\n\r", ch);
+    ch->sendln("Your mother would be so sad.. :(");
   else
   {
     if (victim->getLevel() >= IMPLEMENTER)
@@ -258,7 +258,7 @@ int do_kill(Character *ch, char *argument, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Slay whom?\n\r", ch);
+    ch->sendln("Slay whom?");
     return eFAILURE;
   }
 
@@ -288,7 +288,7 @@ int do_kill(Character *ch, char *argument, int cmd)
   else
   {
     if (ch == victim)
-      send_to_char("Your mother would be so sad.. :(\n\r", ch);
+      ch->sendln("Your mother would be so sad.. :(");
     else
     {
       if (victim->getLevel() >= IMPLEMENTER)

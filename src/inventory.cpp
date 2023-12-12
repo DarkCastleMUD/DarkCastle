@@ -2658,7 +2658,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       }
     if (contents_cause_unique_problem(obj_object, ch))
     {
-      send_to_char("Something inside the item is unique and prevents it!\n\r", ch);
+      ch->sendln("Something inside the item is unique and prevents it!");
       return eFAILURE;
     }
   }

@@ -552,7 +552,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
     dir = 5;
   else
   {
-    send_to_char("Set it off in which direction?\n\r", ch);
+    ch->sendln("Set it off in which direction?");
     return false;
   }
 
@@ -796,7 +796,7 @@ int do_use(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("What should the wand be pointed at?\n\r", ch);
+      ch->sendln("What should the wand be pointed at?");
     }
   }
   else
@@ -829,7 +829,7 @@ int do_name(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Set your name to what?\n\r", ch);
+    ch->sendln("Set your name to what?");
     return eFAILURE;
   }
 
@@ -857,7 +857,7 @@ int do_name(Character *ch, char *arg, int cmd)
         nope = 1;
       else if (nope == 1)
       {
-        send_to_char("You can only include one % in your name ;)\n\r", ch);
+        ch->sendln("You can only include one % in your name ;)");
         return eFAILURE;
       }
     }
@@ -1679,7 +1679,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   if (IS_FAMILIAR(ch))
   {
-    send_to_char("Familiar's cannot wear eq!\n\r", ch);
+    ch->sendln("Familiar's cannot wear eq!");
     return;
   }
   switch (keyword)
@@ -1972,7 +1972,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your face!\n\r", ch);
+      ch->sendln("You can't wear that on your face!");
   }
   break;
 
@@ -2123,7 +2123,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     else if (!hands_are_free(ch, 1))
       ch->sendln("Your hands are already full.");
     else if (obj_object->obj_flags.type_flag != ITEM_LIGHT)
-      send_to_char("That isn't a light you cheating fuck!\n\r", ch);
+      ch->sendln("That isn't a light you cheating fuck!");
     else
     {
       obj_from_char(obj_object);
@@ -2278,7 +2278,7 @@ int do_wear(Character *ch, char *argument, int cmd)
 
   if (!(*arg1))
   {
-    send_to_char("Wear what?\n\r", ch);
+    ch->sendln("Wear what?");
     return eFAILURE;
   }
 
@@ -2380,7 +2380,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Wield what?\n\r", ch);
+    ch->sendln("Wield what?");
   }
   return eSUCCESS;
 }
@@ -2426,7 +2426,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Hold what?\n\r", ch);
+    ch->sendln("Hold what?");
   }
   return eSUCCESS;
 }
@@ -2599,7 +2599,7 @@ int do_remove(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Remove what?\n\r", ch);
+    ch->sendln("Remove what?");
   }
   return eSUCCESS;
 }

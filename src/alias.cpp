@@ -45,7 +45,7 @@ int do_alias(Character *ch, char *arg, int cmd)
     }
   } else {
     if (strlen(arg) > MAX_INPUT_LENGTH - 10) {
-      send_to_char("That's a little to long for an alias. Try something shorter. \n\r", ch);
+      ch->sendln("That's a little to long for an alias. Try something shorter. ");
       return eSUCCESS;
     }
     nokey = 0;

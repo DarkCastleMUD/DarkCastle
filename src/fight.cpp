@@ -425,7 +425,7 @@ void perform_violence(void)
         if (af->type < MAX_SPL_LIST && *spell_wear_off_msg[af->type])
         {
           send_to_char(spell_wear_off_msg[af->type], ch);
-          send_to_char("\n\r", ch);
+          ch->sendln("");
         }
 
         while (next_af_dude && af->type == next_af_dude->type)
@@ -1018,7 +1018,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (IS_PC(ch))
-      send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return eSUCCESS | eCH_DIED;
@@ -1135,7 +1135,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (IS_PC(ch))
-      send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return eSUCCESS | eCH_DIED;
@@ -1221,7 +1221,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (IS_PC(ch))
-      send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return eSUCCESS | eCH_DIED;
@@ -1281,7 +1281,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (IS_PC(ch))
-      send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      ch->sendln("You have been KILLED!!\n\r");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return eSUCCESS | eCH_DIED;
@@ -2897,7 +2897,7 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
     if (char_death_msg)
     {
       ch->send(char_death_msg);
-      send_to_char("\n\rYou have been KILLED!\n\r", ch);
+      ch->sendln("\n\rYou have been KILLED!");
     }
     if (room_death_msg)
       act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
@@ -5176,7 +5176,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
       // duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
-      send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
+      vict->sendln("You have been SKEWERED!!\n\r");
       damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
       //      update_pos(vict);
       return eSUCCESS | eVICT_DIED;
@@ -5644,7 +5644,7 @@ void raw_kill(Character *ch, Character *victim)
           {
             GET_CON(victim) -= 1;
             victim->raw_con -= 1;
-            send_to_char("*** You lose one constitution point ***\n\r", victim);
+            victim->sendln("*** You lose one constitution point ***");
             if (IS_PC(victim))
             {
               sprintf(log_buf, "%s lost a con. ouch.", victim->getNameC());
@@ -5656,7 +5656,7 @@ void raw_kill(Character *ch, Character *victim)
           {
             GET_DEX(victim) -= 1;
             victim->raw_dex -= 1;
-            send_to_char("*** You lose one dexterity point ***\n\r", victim);
+            victim->sendln("*** You lose one dexterity point ***");
             if (IS_PC(victim))
             {
               sprintf(log_buf, "%s lost a dex. ouch.", victim->getNameC());
@@ -5672,7 +5672,7 @@ void raw_kill(Character *ch, Character *victim)
       // hmm
       if (GET_CON(victim) <= 4)
       {
-        send_to_char("Your Constitution has reached 4...you are permanently dead!\n\r", victim);
+        victim->sendln("Your Constitution has reached 4...you are permanently dead!");
         send_to_char("\r\n"
                      "         (buh bye, - pirahna)\r\n"
                      "        O  ,-----------,\r\n"
@@ -5701,7 +5701,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else if (GET_INT(victim) <= 4)
       {
-        send_to_char("Your Intelligence has reached 4...you are permanently dead!\n\r", victim);
+        victim->sendln("Your Intelligence has reached 4...you are permanently dead!");
         send_to_char("\r\n"
                      "                     At least you have something nice to look at before your character is erased! - Wendy\r\n"
                      "   888   M:::::::::::::M8888888888888M:::::mM888888888888888    8888\r\n"
@@ -5748,7 +5748,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else if (GET_WIS(victim) <= 4)
       {
-        send_to_char("Your Wisdom has reached 4...you are permanently dead!\n\r", victim);
+        victim->sendln("Your Wisdom has reached 4...you are permanently dead!");
         send_to_char("\r\n"
                      "    	The other stat deaths have alot fancier ASCII pics.\r\n"
                      "          =,    (\\_/)    ,=\r\n"
@@ -5775,7 +5775,7 @@ void raw_kill(Character *ch, Character *victim)
       }
       else if (GET_STR(victim) <= 4)
       {
-        send_to_char("Your Strength has reached 4...you are permanently dead!\n\r", victim);
+        victim->sendln("Your Strength has reached 4...you are permanently dead!");
         send_to_char("\r\n"
                      "           To moose heaven with you! - Apoc\r\n"
                      "    _/\\_       __/\\__\r\n"
@@ -6983,14 +6983,14 @@ int can_attack(Character *ch)
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
   {
-    send_to_char("Wait until it closes!\n\r", ch);
+    ch->sendln("Wait until it closes!");
     return false;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
-    send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
+    ch->sendln("You can't attack in a potato arena, go find a potato would ya?!");
     return false;
   }
 
@@ -7083,7 +7083,7 @@ int can_be_attacked(Character *ch, Character *vict)
 
   if (IS_PC(ch) && IS_PC(vict) && ch->getLevel() < 5)
   {
-    send_to_char("You are too new in this realm to make enemies!\n\r", ch);
+    ch->sendln("You are too new in this realm to make enemies!");
     return false;
   }
 
@@ -7129,7 +7129,7 @@ int can_be_attacked(Character *ch, Character *vict)
     /* Imps ignore safe flags  */
     if (IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
     {
-      send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", vict);
+      vict->sendln("There is no safe haven from an angry IMPLEMENTER!");
       return true;
     }
 
@@ -7419,13 +7419,13 @@ void inform_victim(Character *ch, Character *victim, int dam)
     break;
   case position_t::DEAD:
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    send_to_char("You have been KILLED!!\n\r\n\r", victim);
+    victim->sendln("You have been KILLED!!\n\r");
 
     break;
   default:
     max_hit = hit_limit(victim);
     if (dam > max_hit / 5)
-      send_to_char("That really did HURT!\n\r", victim);
+      victim->sendln("That really did HURT!");
     // Wimp out?
     if (victim->getHP() < (max_hit / 5))
     {
@@ -7511,7 +7511,7 @@ int do_flee(Character *ch, char *argument, int cmd)
   {
     if (IS_PC(ch) && !(escape = ch->has_skill(SKILL_ESCAPE)))
     {
-      send_to_char("Huh?\n\r", ch);
+      ch->sendln("Huh?");
       return eFAILURE;
     }
     if (IS_NPC(ch))
@@ -7519,7 +7519,7 @@ int do_flee(Character *ch, char *argument, int cmd)
 
     if (!ch->fighting)
     {
-      send_to_char("But there is nobody from whom to escape!\n\r", ch);
+      ch->sendln("But there is nobody from whom to escape!");
       return eFAILURE;
     }
     else
@@ -7626,7 +7626,7 @@ int do_flee(Character *ch, char *argument, int cmd)
   }     // for
 
   // No exits were found
-  send_to_char("PANIC! You couldn't escape!\n\r", ch);
+  ch->sendln("PANIC! You couldn't escape!");
   return eFAILURE;
 }
 

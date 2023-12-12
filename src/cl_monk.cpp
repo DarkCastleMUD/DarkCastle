@@ -77,7 +77,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Clawing a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Clawing a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -149,7 +149,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
 
   if (hands > 1)
   {
-    send_to_char("You need at least one hand free to perform this!\n\r", ch);
+    ch->sendln("You need at least one hand free to perform this!");
     return eFAILURE;
   }
 
@@ -161,7 +161,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
       victim = ch->fighting;
     else
     {
-      send_to_char("Quivering palm whom?\n\r", ch);
+      ch->sendln("Quivering palm whom?");
       return eFAILURE;
     }
   }
@@ -174,7 +174,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Palming a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Palming a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -248,7 +248,7 @@ int do_stun(Character *ch, char *argument, int cmd)
 
   if (victim == nullptr)
   {
-    send_to_char("Stun whom?\n\r", ch);
+    ch->sendln("Stun whom?");
     return eFAILURE;
   }
 
@@ -260,7 +260,7 @@ int do_stun(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Stunning a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Stunning a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -306,19 +306,19 @@ int do_stun(Character *ch, char *argument, int cmd)
 
   if (victim->getLevel() == IMPLEMENTER)
   {
-    send_to_char("You gotta be kidding!\n\r", ch);
+    ch->sendln("You gotta be kidding!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    send_to_char("You cannot stun something that HUGE!\n\r", ch);
+    ch->sendln("You cannot stun something that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    send_to_char("You cannot pick just one of them to stun!\n\r", ch);
+    ch->sendln("You cannot pick just one of them to stun!");
     return eFAILURE;
   }
 

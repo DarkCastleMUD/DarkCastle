@@ -817,12 +817,12 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
     one_argument(arg, buf);
     if (!*buf || !(x = atoi(buf)) || x < 0)
     {
-      send_to_char("Deposit what?\n\r", ch);
+      ch->sendln("Deposit what?");
       return eSUCCESS;
     }
     if ((uint32_t)x > ch->getGold())
     {
-      send_to_char("You don't have that much gold!\n\r", ch);
+      ch->sendln("You don't have that much gold!");
       return eSUCCESS;
     }
     if ((uint32_t)x + GET_BANK(ch) > 2000000000)
@@ -841,12 +841,12 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   one_argument(arg, buf);
   if (!*buf || !(x = atoi(buf)) || x < 0)
   {
-    send_to_char("Withdraw what?\n\r", ch);
+    ch->sendln("Withdraw what?");
     return eSUCCESS;
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
-    send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
+    ch->sendln("You don't have that much $B$5gold$R in the bank!");
     return eSUCCESS;
   }
   ch->addGold(x);
@@ -883,12 +883,12 @@ int casino_atm(Character *ch, class Object *obj, int cmd, const char *arg,
   one_argument(arg, buf);
   if (!*buf || !(x = atoi(buf)) || x < 0)
   {
-    send_to_char("Withdraw what?\n\r", ch);
+    ch->sendln("Withdraw what?");
     return eSUCCESS;
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
-    send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
+    ch->sendln("You don't have that much $B$5gold$R in the bank!");
     return eSUCCESS;
   }
   ch->addGold(x);
@@ -1283,11 +1283,11 @@ int stupid_button(Character *ch, class Object *obj, int cmd, const char *arg,
   one_argument(arg, vict);
   if (strcmp(vict, "button") && strcmp(vict, "red") && strcmp(vict, "big"))
   {
-    send_to_char("Push what?\n\r", ch);
+    ch->sendln("Push what?");
     return eFAILURE;
   }
 
-  send_to_char("You couldn't help but push the $4$Bbutton$R, could you?\n\r", ch);
+  ch->sendln("You couldn't help but push the $4$Bbutton$R, could you?");
   ch->sendln("The floor drops out beneath you and you find yourself.. er.. somewhere.");
   move_char(ch, real_room(49));
   do_look(ch, "\0", 15);
@@ -1321,7 +1321,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
     }
     else
     {
-      send_to_char("Gaze on whom?\n\r", ch);
+      ch->sendln("Gaze on whom?");
       return eSUCCESS;
     }
   }
@@ -1421,7 +1421,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
       af.location = APPLY_NONE;
       af.bitvector = AFF_PROTECT_EVIL;
       affect_to_char(ch, &af);
-      send_to_char("You have a righteous, protected feeling!\n\r", ch);
+      ch->sendln("You have a righteous, protected feeling!");
     }
 
     act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
@@ -2880,7 +2880,7 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
       return eSUCCESS;
     }
 
-    send_to_char("You can't just leave the ship in the middle of the Blood Sea!\n\r", ch);
+    ch->sendln("You can't just leave the ship in the middle of the Blood Sea!");
     return eSUCCESS;
     break;
   default:
@@ -3810,16 +3810,16 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eFAILURE;
     if (obj->obj_flags.value[3] > 0)
     {
-      send_to_char("It's already been started!\n\r", vict);
+      vict->sendln("It's already been started!");
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
         DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
     {
-      send_to_char("Wait until the potato arena is open before you try blowing yourself up!\n\r", vict);
+      vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
       return eSUCCESS;
     }
-    send_to_char("The potato starts getting really really hot and burns your hands!!\n\r", vict);
+    vict->sendln("The potato starts getting really really hot and burns your hands!!");
     obj->obj_flags.value[3] = number(1, 100);
     return eSUCCESS;
   }
@@ -3829,32 +3829,32 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (cmd == CMD_SLIP)
   {
-    send_to_char("You can't slip anything when you have a hot potato! (sorry)\n\r", vict);
+    vict->sendln("You can't slip anything when you have a hot potato! (sorry)");
     return eSUCCESS;
   }
   if (cmd == CMD_DROP)
   {
-    send_to_char("You can't drop anything when you have a hot potato!\n\r", vict);
+    vict->sendln("You can't drop anything when you have a hot potato!");
     return eSUCCESS;
   }
   if (cmd == CMD_DONATE)
   {
-    send_to_char("You can't donate anything when you have a hot potato!\n\r", vict);
+    vict->sendln("You can't donate anything when you have a hot potato!");
     return eSUCCESS;
   }
   if (cmd == CMD_QUIT)
   {
-    send_to_char("You can't quit when you have a hot potato!\n\r", vict);
+    vict->sendln("You can't quit when you have a hot potato!");
     return eSUCCESS;
   }
   if (cmd == CMD_SACRIFICE)
   {
-    send_to_char("You can't junk stuff when you have a hot potato!\n\r", vict);
+    vict->sendln("You can't junk stuff when you have a hot potato!");
     return eSUCCESS;
   }
   if (cmd == CMD_PUT)
   {
-    send_to_char("You can't 'put' stuff when you have a hot potato!\n\r", vict);
+    vict->sendln("You can't 'put' stuff when you have a hot potato!");
     return eSUCCESS;
   }
 
@@ -3869,13 +3869,13 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eFAILURE; // Not giving to char/mob, so ok
     if (IS_MOB(give_vict))
     {
-      send_to_char("You can only give things to other players when you have a hot potato!\n\r", vict);
+      vict->sendln("You can only give things to other players when you have a hot potato!");
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
         DC::isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && vict->getLevel() < IMMORTAL)
     {
-      send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
+      vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
       return eSUCCESS;
     }
 
@@ -4470,7 +4470,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
 
     if (sunglyph == nullptr)
     {
-      send_to_char("Put what where?\n\r", ch);
+      ch->sendln("Put what where?");
       return eFAILURE;
     }
     if (!str_cmp(target, "sun"))
@@ -4491,7 +4491,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
     }
     else
     {
-      send_to_char("Put it where?\n\r", ch);
+      ch->sendln("Put it where?");
       return eFAILURE;
     }
   }
@@ -4504,7 +4504,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
     }
     if (bookglyph == nullptr)
     {
-      send_to_char("Put what where?\n\r", ch);
+      ch->sendln("Put what where?");
       return eFAILURE;
     }
     if (!str_cmp(target, "sun"))
@@ -4525,7 +4525,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
     }
     else
     {
-      send_to_char("Put it where?\n\r", ch);
+      ch->sendln("Put it where?");
       return eFAILURE;
     }
   }
@@ -4539,7 +4539,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
 
     if (heartglyph == nullptr)
     {
-      send_to_char("Put what where?\n\r", ch);
+      ch->sendln("Put what where?");
       return eFAILURE;
     }
     if (!str_cmp(target, "sun"))
@@ -4560,19 +4560,19 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
     }
     else
     {
-      send_to_char("Put it where?\n\r", ch);
+      ch->sendln("Put it where?");
       return eFAILURE;
     }
   }
   else
     return eFAILURE;
-  //      send_to_char("Which glyph?\n\r", ch);
+  //      ch->sendln("Which glyph?");
   if (ch->spellcraftglyph == 7)
   {
     if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !ch->has_skill(SKILL_SPELLCRAFT))
     {
       send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
-      send_to_char("A beam of light hits you in the head!\n\rYou have learned spellcraft!\n\r", ch);
+      ch->sendln("A beam of light hits you in the head!\n\rYou have learned spellcraft!");
       learn_skill(ch, SKILL_SPELLCRAFT, 1, 1);
     }
   }
@@ -4697,7 +4697,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (IS_PC(victim))
-      send_to_char("You have been KILLED!!\n\r\n\r", victim);
+      victim->sendln("You have been KILLED!!\n\r");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return eSUCCESS | eVICT_DIED;
   }
@@ -4750,7 +4750,7 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (IS_PC(victim))
-      send_to_char("You have been KILLED!!\n\r\n\r", victim);
+      victim->sendln("You have been KILLED!!\n\r");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return eSUCCESS | eVICT_DIED;
   }

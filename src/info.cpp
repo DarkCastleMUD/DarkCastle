@@ -414,7 +414,7 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
    }
 
    if ((!found) && (show))
-      send_to_char("Nothing\n\r", ch);
+      ch->sendln("Nothing");
 }
 
 void show_spells(Character *i, Character *ch)
@@ -744,7 +744,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || ch->getLevel() > IMMORTAL)
       {
          found = false;
-         send_to_char("\n\rYou attempt to peek at the inventory:\n\r", ch);
+         ch->sendln("\n\rYou attempt to peek at the inventory:");
          for (tmp_obj = i->carrying; tmp_obj;
               tmp_obj = tmp_obj->next_content)
          {
@@ -774,7 +774,7 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
    QString name = arguments.value(0);
    if (name.isEmpty())
    {
-      send_to_char("botcheck <player> or all\n\r\n\r", this);
+      this->sendln("botcheck <player> or all\n\r");
       return eFAILURE;
    }
 
@@ -899,7 +899,7 @@ void list_char_to_char(Character *list, Character *ch, int mode)
          if (known && skill_success(ch, nullptr, SKILL_BLINDFIGHTING))
             ch->sendln("Your blindfighting awareness alerts you to a presense in the area.");
          else if (number(1, 10) == 1)
-            send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
+            ch->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
       }
    }
 }
@@ -1207,7 +1207,7 @@ bool identify(Character *ch, Object *obj)
       {
          if (!found)
          {
-            send_to_char("$3Can affect you as:$R\n\r", ch);
+            ch->sendln("$3Can affect you as:$R");
             found = true;
          }
 
@@ -1319,9 +1319,9 @@ int do_look(Character *ch, char *argument, int cmd)
    if (!ch->desc)
       return 1;
    if (GET_POS(ch) < position_t::SLEEPING)
-      send_to_char("You can't see anything but stars!\n\r", ch);
+      ch->sendln("You can't see anything but stars!");
    else if (GET_POS(ch) == position_t::SLEEPING)
-      send_to_char("You can't see anything, you're sleeping!\n\r", ch);
+      ch->sendln("You can't see anything, you're sleeping!");
    else if (check_blind(ch))
    {
       ansi_color(GREY, ch);
@@ -1516,7 +1516,7 @@ int do_look(Character *ch, char *argument, int cmd)
          }
          else
          { /* no argument */
-            send_to_char("Look in what?!\n\r", ch);
+            ch->sendln("Look in what?!");
          }
       }
       break;
@@ -1665,7 +1665,7 @@ int do_look(Character *ch, char *argument, int cmd)
          else
          {
             /* no argument */
-            send_to_char("Look at what?\n\r", ch);
+            ch->sendln("Look at what?");
          }
       }
       break;
@@ -1714,7 +1714,7 @@ int do_look(Character *ch, char *argument, int cmd)
                }
                else
                {
-                  send_to_char("Look through what?\n\r", ch);
+                  ch->sendln("Look through what?");
                   return eFAILURE;
                }
             }
@@ -1756,7 +1756,7 @@ int do_look(Character *ch, char *argument, int cmd)
             }
          }
 
-         send_to_char("\n\r", ch);
+         ch->sendln("");
 
          if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
             send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
@@ -1807,7 +1807,7 @@ int do_look(Character *ch, char *argument, int cmd)
             ch->send(buffer);
          else
             send_to_char("None.", ch);
-         send_to_char("\n\r", ch);
+         ch->sendln("");
          if (IS_PC(ch) && !ch->hunting.isEmpty())
             ch->do_track(QString(ch->hunting).split(' '), 10);
       }
@@ -1816,7 +1816,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          /* wrong arg 	*/
       case -1:
-         send_to_char("Sorry, I didn't understand that!\n\r", ch);
+         ch->sendln("Sorry, I didn't understand that!");
          break;
       }
 
@@ -1853,7 +1853,7 @@ int do_examine(Character *ch, char *argument, int cmd)
 
    if (!*name)
    {
-      send_to_char("Examine what?\n\r", ch);
+      ch->sendln("Examine what?");
       return eFAILURE;
    }
 
@@ -1863,7 +1863,7 @@ int do_examine(Character *ch, char *argument, int cmd)
    {
       if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON || ARE_CONTAINERS(tmp_object))
       {
-         send_to_char("When you look inside, you see:\n\r", ch);
+         ch->sendln("When you look inside, you see:");
          sprintf(buf, "in %s", argument);
          do_look(ch, buf, 15);
       }
@@ -2228,7 +2228,7 @@ int do_score(Character *ch, char *argument, int cmd)
       elemental_score(ch, level);
 
    if (found)
-      send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
+      ch->sendln("($5:$7)=========================================================================($5:$7)");
 
    found = false;
 
@@ -2255,7 +2255,7 @@ int do_score(Character *ch, char *argument, int cmd)
    }
 
    if (found)
-      send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
+      ch->sendln("($5:$7)=========================================================================($5:$7)");
 
    if (IS_PC(ch)) // mob can't view this part
    {
@@ -2511,7 +2511,7 @@ int do_count(Character *ch, char *arg, int cmd)
 
 int do_inventory(Character *ch, char *argument, int cmd)
 {
-   send_to_char("You are carrying:\n\r", ch);
+   ch->sendln("You are carrying:");
    list_obj_to_char(ch->carrying, ch, 1, true);
    return eSUCCESS;
 }
@@ -2521,7 +2521,7 @@ int do_equipment(Character *ch, char *argument, int cmd)
    int j;
    bool found;
 
-   send_to_char("You are using:\n\r", ch);
+   ch->sendln("You are using:");
    found = false;
    for (j = 0; j < MAX_WEAR; j++)
    {
@@ -2540,7 +2540,7 @@ int do_equipment(Character *ch, char *argument, int cmd)
          else
          {
             send_to_char(where[j], ch);
-            send_to_char("something\n\r", ch);
+            ch->sendln("something");
             found = true;
          }
       }
@@ -2593,7 +2593,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       searchnum = real_object(vnum);
    }
 
-   send_to_char("-#-- Short Description ------- Room Number\n\n\r", ch);
+   ch->sendln("-#-- Short Description ------- Room Number\n");
 
    for (k = object_list; k; k = k->next)
    {
@@ -2681,7 +2681,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       }
       if (strlen(buf2) + strlen(buf) + 3 >= MAX_STRING_LENGTH)
       {
-         send_to_char("LIST TRUNCATED...TOO LONG\n\r", ch);
+         ch->sendln("LIST TRUNCATED...TOO LONG");
          break;
       }
       strcat(buf2, buf);
@@ -2712,7 +2712,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
    }
 
    *buf2 = '\0';
-   send_to_char(" #   Short description          Room Number\n\n\r", ch);
+   ch->sendln(" #   Short description          Room Number\n");
 
    const auto &character_list = DC::getInstance()->character_list;
    for (const auto &i : character_list)
@@ -2747,7 +2747,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
               DC::getInstance()->world[i->in_room].number);
       if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
       {
-         send_to_char("LIST TRUNCATED...TOO LONG\n\r", ch);
+         ch->sendln("LIST TRUNCATED...TOO LONG");
          break;
       }
       strcat(buf2, buf);
@@ -2851,13 +2851,13 @@ int do_consider(Character *ch, char *argument, int cmd)
 
    if (!(victim = ch->get_char_room_vis(name)))
    {
-      send_to_char("Who was that you're scoping out?\n\r", ch);
+      ch->sendln("Who was that you're scoping out?");
       return eFAILURE;
    }
 
    if (victim == ch)
    {
-      send_to_char("Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)\n\r", ch);
+      ch->sendln("Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)");
       return eFAILURE;
    }
 
@@ -2868,7 +2868,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
    if (!skill_success(ch, nullptr, SKILL_CONSIDER))
    {
-      send_to_char("You try really hard, but you really have no idea about their capabilties!\n\r", ch);
+      ch->sendln("You try really hard, but you really have no idea about their capabilties!");
       return eFAILURE;
    }
 
@@ -3173,7 +3173,7 @@ int do_scan(Character *ch, char *argument, int cmd)
 
    act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
        INVIS_NULL | STAYHIDE);
-   send_to_char("You carefully search the surroundings...\n\r\n\r", ch);
+   ch->sendln("You carefully search the surroundings...\n\r");
 
    for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
    {

@@ -188,7 +188,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
   // sets pBuf so it points to the name.
   if ((nIndex = get_number(&pBuf)) == 0)
   {
-    send_to_char("get_number failed.  bad input?\n\r", ch);
+    ch->sendln("get_number failed.  bad input?");
     return eFAILURE;
   }
 
@@ -324,7 +324,7 @@ int do_set(Character *ch, char *argument, int cmd)
             }
             if (*help)
                 ch->send(help);
-            send_to_char("\n\r", ch);*/
+            ch->sendln("");*/
     return eFAILURE;
   }
   if (!(vict = get_char_vis(ch, name)))
@@ -468,7 +468,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if (value > DC::MAX_MORTAL_LEVEL && value < MIN_GOD)
     {
-      send_to_char("That level doesn't exist!\n\r", ch);
+      ch->sendln("That level doesn't exist!");
       return eFAILURE;
     }
     if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && ch->getLevel() < OVERSEER)
@@ -480,7 +480,7 @@ int do_set(Character *ch, char *argument, int cmd)
     /* why the fuck was ths missing? -Sadus */
     if (IS_PC(vict) && value > ch->getLevel())
     {
-      send_to_char("That level is higher than you!\n\r", ch);
+      ch->sendln("That level is higher than you!");
       return eFAILURE;
     }
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
@@ -510,7 +510,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      send_to_char("Strength must be more than 0\n\r", ch);
+      ch->sendln("Strength must be more than 0");
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
@@ -529,7 +529,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      send_to_char("Intelligence must be more than 0\n\r", ch);
+      ch->sendln("Intelligence must be more than 0");
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
@@ -545,7 +545,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      send_to_char("Wisdom must be more than 0\n\r", ch);
+      ch->sendln("Wisdom must be more than 0");
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
@@ -559,7 +559,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      send_to_char("Dexterity must be more than 0\n\r", ch);
+      ch->sendln("Dexterity must be more than 0");
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
@@ -573,7 +573,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      send_to_char("Constitution must be more than 0\n\r", ch);
+      ch->sendln("Constitution must be more than 0");
       ch->sendln("and less than 26.");
       return eFAILURE;
     }
@@ -645,7 +645,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value < -1000) || (value > 1000))
     {
-      send_to_char("Alignment must be more than -1000\n\r", ch);
+      ch->sendln("Alignment must be more than -1000");
       ch->sendln("and less than 1000.");
       return eFAILURE;
     }
@@ -659,7 +659,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      send_to_char("Thirst must be more than -2\n\r", ch);
+      ch->sendln("Thirst must be more than -2");
       ch->sendln("and less than 101.");
       return eFAILURE;
     }
@@ -673,7 +673,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      send_to_char("Drunk must be more than -2\n\r", ch);
+      ch->sendln("Drunk must be more than -2");
       ch->sendln("and less than 101.");
       return eFAILURE;
     }
@@ -687,7 +687,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      send_to_char("Full must be more than -2\n\r", ch);
+      ch->sendln("Full must be more than -2");
       ch->sendln("and less than 101.");
       return eFAILURE;
     }

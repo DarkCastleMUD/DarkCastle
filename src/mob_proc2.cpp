@@ -97,7 +97,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
 	if (!*item)
 	{
-		send_to_char("What item?\n\r", ch);
+		ch->sendln("What item?");
 		return eSUCCESS;
 	}
 
@@ -175,7 +175,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 
 	if (!*item)
 	{
-		send_to_char("What item?\n\r", ch);
+		ch->sendln("What item?");
 		return eSUCCESS;
 	}
 
@@ -276,7 +276,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 
 	if (!*item)
 	{
-		send_to_char("What item?\n\r", ch);
+		ch->sendln("What item?");
 		return eSUCCESS;
 	}
 
@@ -491,7 +491,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		cost = MAX(cost, 30);
 		if (GET_PLATINUM(ch) < (uint32_t)cost)
 		{
-			send_to_char("You can't afford that!\n\r", ch);
+			ch->sendln("You can't afford that!");
 			return eSUCCESS;
 		}
 		move_obj(obj, ch->in_room);
@@ -808,7 +808,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 
 	if (!*item)
 	{
-		send_to_char("What item?\n\r", ch);
+		ch->sendln("What item?");
 		return eSUCCESS;
 	}
 

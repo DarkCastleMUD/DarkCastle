@@ -447,7 +447,7 @@ void show_available_quests(Character *ch)
       }
    }
    if (!count)
-      send_to_char("$B$7There are currently no available quests for you, try later.$R\n\r", ch);
+      ch->sendln("$B$7There are currently no available quests for you, try later.$R");
    else
       //       show_quest_amount(ch, count);
 
@@ -1164,7 +1164,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
    {
       if (!*argument)
       {
-         send_to_char("Usage: qedit new <name>\n\r", ch);
+         ch->sendln("Usage: qedit new <name>");
          return eFAILURE;
       }
       else
@@ -1197,7 +1197,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
    {
       if (!*field)
       {
-         send_to_char("Usage: qedit stat <playername>\n\r", ch);
+         ch->sendln("Usage: qedit stat <playername>");
          return eFAILURE;
       }
       else
@@ -1217,7 +1217,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
    {
       if (!*field)
       {
-         send_to_char("Usage: qedit reset <playername>\n\r", ch);
+         ch->sendln("Usage: qedit reset <playername>");
          return eFAILURE;
       }
       else
@@ -1245,7 +1245,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
 
       if (!*field || !*value || !is_number(value))
       {
-         send_to_char("Usage: qedit set <playername> <value>\n\r", ch);
+         ch->sendln("Usage: qedit set <playername> <value>");
          return eFAILURE;
       }
       else
@@ -1269,7 +1269,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
    if (is_abbrev(arg, "show"))
    {
       if (!*field || !is_number(field))
-         send_to_char("Usage: qedit show <number>\n\r", ch);
+         ch->sendln("Usage: qedit show <number>");
       else
          show_quest_info(ch, atoi(field));
       return eSUCCESS;
@@ -1305,7 +1305,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
 
    if (!is_number(arg))
    {
-      send_to_char("Usage: qedit <number> <field> <value>\n\r", ch);
+      ch->sendln("Usage: qedit <number> <field> <value>");
       return eFAILURE;
    }
 
@@ -1483,7 +1483,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    if (cmd == CMD_LIST)
    { /* List */
-      send_to_char("$B$2Orro tells you, 'This is what I can do for you...$R \n\r", ch);
+      ch->sendln("$B$2Orro tells you, 'This is what I can do for you...$R ");
       ch->sendln("$BQuest Equipment:$R");
 
       int n = 0;

@@ -172,17 +172,17 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   }
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
-    send_to_char("You are already there!\n\r", ch);
+    ch->sendln("You are already there!");
     return eFAILURE;
   }
   if (arena.cur_num >= arena.num && arena.num > 0)
   {
-    send_to_char("The arena is already full!\n\r", ch);
+    ch->sendln("The arena is already full!");
     return eFAILURE;
   }
   if (arena.type == HP && GET_RAW_HIT(ch) > arena.hplimit)
   {
-    send_to_char("You are too strong for this arena!\n\r", ch);
+    ch->sendln("You are too strong for this arena!");
     return eFAILURE;
   }
   if (ch->fighting)

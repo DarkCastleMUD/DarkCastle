@@ -186,7 +186,7 @@ int do_mpasound(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -224,7 +224,7 @@ int do_mpkill(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -270,7 +270,7 @@ int do_mphit(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -317,7 +317,7 @@ int do_mpaddlag(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -357,7 +357,7 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
   char dotbuf[MAX_INPUT_LENGTH];
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
   dotbuf[0] = '\0';
@@ -413,7 +413,7 @@ int do_mpechoaround(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -442,7 +442,7 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -479,7 +479,7 @@ int do_mpechoat(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -507,7 +507,7 @@ int do_mpecho(Character *ch, char *argument, int cmd)
 {
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -533,7 +533,7 @@ int do_mpmload(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -569,7 +569,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -624,7 +624,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -708,7 +708,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -796,7 +796,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -865,7 +865,7 @@ int do_mpxpreward(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -909,7 +909,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
   argument = one_argument(argument, arg1);
@@ -990,7 +990,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -1138,7 +1138,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -1389,7 +1389,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
   free_dmg_list();
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
 
@@ -1938,7 +1938,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
 {
   if (IS_PC(ch))
   {
-    send_to_char("Huh?\n\r", ch);
+    ch->sendln("Huh?");
     return eSUCCESS;
   }
   char arg[MAX_INPUT_LENGTH];

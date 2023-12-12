@@ -578,7 +578,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   int count = 0;
   clan_data *clan;
 
-  send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
+  ch->sendln("\n\rPlayers in the Arena:\n\r--------------------------");
 
   if (ch->getLevel() <= MORTAL)
   {
@@ -640,7 +640,7 @@ int do_where(Character *ch, char *argument, int cmd)
 
   if (ch->getLevel() >= IMMORTAL && *buf && !strcmp(buf, "all"))
   { //  immortal noly, shows all
-    send_to_char("All Players:\n\r--------\n\r", ch);
+    ch->sendln("All Players:\n\r--------");
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
@@ -660,7 +660,7 @@ int do_where(Character *ch, char *argument, int cmd)
   }
   else if (ch->getLevel() >= IMMORTAL && *buf)
   { // immortal only, shows ONE person
-    send_to_char("Search of Players:\n\r--------\n\r", ch);
+    ch->sendln("Search of Players:\n\r--------");
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
@@ -687,7 +687,7 @@ int do_where(Character *ch, char *argument, int cmd)
   else
   { // normal, mortal where
     zonenumber = DC::getInstance()->world[ch->in_room].zone;
-    send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
+    ch->sendln("Players in your vicinity:\n\r-------------------------");
     if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_WHERE))
       return eFAILURE;
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)

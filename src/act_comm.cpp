@@ -281,7 +281,7 @@ int do_channel(Character *ch, char *arg, int cmd)
 
   else
   {
-    //    send_to_char("\n\r", ch);
+    //    ch->sendln("");
 
     if (ch->getLevel() < IMMORTAL)
     {
@@ -541,7 +541,7 @@ int do_write(Character *ch, char *argument, int cmd)
     }
     if (!CAN_SEE_OBJ(ch, ch->equipment[HOLD]))
     {
-      send_to_char("The stuff in your hand is invisible! Yeech!!\n\r", ch);
+      ch->sendln("The stuff in your hand is invisible! Yeech!!");
       return eSUCCESS;
     }
 
@@ -589,7 +589,7 @@ int do_insult(Character *ch, char *argument, int cmd)
   {
     if (!(victim = ch->get_char_room_vis( arg)))
     {
-      send_to_char("Can't hear you!\n\r", ch);
+      ch->sendln("Can't hear you!");
     }
     else
     {
@@ -629,7 +629,7 @@ int do_insult(Character *ch, char *argument, int cmd)
     }
   }
   else
-    send_to_char("Insult who?\n\r", ch);
+    ch->sendln("Insult who?");
   return eSUCCESS;
 }
 
@@ -640,7 +640,7 @@ int do_emote(Character *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
-    send_to_char("You can't show your emotions!!\n\r", ch);
+    ch->sendln("You can't show your emotions!!");
     return eSUCCESS;
   }
 
@@ -648,7 +648,7 @@ int do_emote(Character *ch, char *argument, int cmd)
     ;
 
   if (!*(argument + i))
-    send_to_char("Yes.. But what?\n\r", ch);
+    ch->sendln("Yes.. But what?");
   else
   {
     sprintf(buf, "$n %s", argument + i);

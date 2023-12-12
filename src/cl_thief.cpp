@@ -75,7 +75,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Trying to eyegouge a bladeshielded opponent would be suicide!\n\r", ch);
+    ch->sendln("Trying to eyegouge a bladeshielded opponent would be suicide!");
     return eFAILURE;
   }
 
@@ -135,13 +135,13 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   if (!(victim = get_char_room_vis(name)))
   {
-    send_to_char("Backstab whom?\n\r", this);
+    this->sendln("Backstab whom?");
     return eFAILURE;
   }
 
   if (victim == this)
   {
-    send_to_char("How can you sneak up on yourself?\n\r", this);
+    this->sendln("How can you sneak up on yourself?");
     return eFAILURE;
   }
 
@@ -195,7 +195,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   if (victim->fighting)
   {
-    send_to_char("You can't backstab a fighting person, they are too alert!\n\r", this);
+    this->sendln("You can't backstab a fighting person, they are too alert!");
     return eFAILURE;
   }
 
@@ -368,21 +368,21 @@ int do_circle(Character *ch, char *argument, int cmd)
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
       ch->has_skill( SKILL_CIRCLE) <= 80)
   {
-    send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
+    ch->sendln("You cannot circle behind someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
       ch->has_skill( SKILL_CIRCLE) <= 80)
   {
-    send_to_char("You cannot pick just one to circle behind!\n\r", ch);
+    ch->sendln("You cannot pick just one to circle behind!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
       ch->has_skill( SKILL_CIRCLE) <= 80)
   {
-    send_to_char("You cannot target something that tiny to circle behind!\n\r", ch);
+    ch->sendln("You cannot target something that tiny to circle behind!");
     return eFAILURE;
   }
 
@@ -396,7 +396,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("How can you sneak up on yourself?\n\r", ch);
+    ch->sendln("How can you sneak up on yourself?");
     return eFAILURE;
   }
 
@@ -432,7 +432,7 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (ch == victim->fighting && !IS_AFFECTED(victim, AFF_BLACKJACK))
   {
-    send_to_char("You can't break away while that person is hitting you!\n\r", ch);
+    ch->sendln("You can't break away while that person is hitting you!");
     return eFAILURE;
   }
 
@@ -537,7 +537,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
   if (!victim)
   {
-    send_to_char("Trip whom?\n\r", ch);
+    ch->sendln("Trip whom?");
     return eFAILURE;
   }
 
@@ -549,7 +549,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("(You would look pretty silly trying to trip yourself.)\n\r", ch);
+    ch->sendln("(You would look pretty silly trying to trip yourself.)");
     return eFAILURE;
   }
 
@@ -558,7 +558,7 @@ int do_trip(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    send_to_char("Tripping a bladeshielded opponent would be impossible!\n\r", ch);
+    ch->sendln("Tripping a bladeshielded opponent would be impossible!");
     return eFAILURE;
   }
 
@@ -666,7 +666,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
 
   if (!ch->canPerform(SKILL_STALK))
   {
-    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
+    ch->sendln("I bet you think you're a thief. ;)");
     return eFAILURE;
   }
 
@@ -683,7 +683,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
 
   if (!(leader = ch->get_char_room_vis( name)))
   {
-    send_to_char("I see no person by that name here!\n\r", ch);
+    ch->sendln("I see no person by that name here!");
     return eFAILURE;
   }
 
@@ -732,7 +732,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
-    send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
+    ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
   }
 
@@ -832,7 +832,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis( victim_name)))
   {
-    send_to_char("Steal what from who?\n\r", ch);
+    ch->sendln("Steal what from who?");
     return eFAILURE;
   }
   else if (victim == ch)
@@ -858,19 +858,19 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("No stealing permitted in safe areas!\n\r", ch);
+    ch->sendln("No stealing permitted in safe areas!");
     return eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
-    send_to_char("You can't steal inside of a camp!\n\r", ch);
+    ch->sendln("You can't steal inside of a camp!");
     return eFAILURE;
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
-    send_to_char("Do what!? This is an Arena, go kill someone!\n\r", ch);
+    ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;
   }
 
@@ -963,7 +963,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
             _exp = 0;
 
-          send_to_char("Got it!\n\r", ch);
+          ch->sendln("Got it!");
           if (_exp)
           {
             GET_EXP(ch) += _exp; /* exp for stealing :) */
@@ -1134,7 +1134,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       if (GET_POS(victim) > position_t::SLEEPING ||
           GET_POS(victim) == position_t::STUNNED)
       {
-        send_to_char("Steal the equipment now? Impossible!\n\r", ch);
+        ch->sendln("Steal the equipment now? Impossible!");
         return eFAILURE;
       }
       else if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
@@ -1289,7 +1289,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis( victim_name)))
   {
-    send_to_char("Steal what from who?\n\r", ch);
+    ch->sendln("Steal what from who?");
     return eFAILURE;
   }
   else if (victim == ch)
@@ -1318,19 +1318,19 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("No stealing permitted in safe areas!\n\r", ch);
+    ch->sendln("No stealing permitted in safe areas!");
     return eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
-    send_to_char("You can't pocket $B$5gold$R while inside of a camp!\n\r", ch);
+    ch->sendln("You can't pocket $B$5gold$R while inside of a camp!");
     return eFAILURE;
   }
 
   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
-    send_to_char("Do what!? This is an Arena, go kill someone!\n\r", ch);
+    ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;
   }
 
@@ -1484,7 +1484,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
   if (!*type)
   {
-    send_to_char("Pick what?\n\r", ch);
+    ch->sendln("Pick what?");
   }
   else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM), ch, &victim, &obj, true))
   {
@@ -1493,11 +1493,11 @@ int do_pick(Character *ch, char *argument, int cmd)
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
     else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
-      send_to_char("Silly, it's not even closed!\n\r", ch);
+      ch->sendln("Silly, it's not even closed!");
     else if (obj->obj_flags.value[2] < 0)
       ch->sendln("Odd, you can't seem to find a keyhole.");
     else if (!DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
-      send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
+      ch->sendln("Oh-ho! This thing is not even locked!");
     else if (DC::isSet(obj->obj_flags.value[1], CONT_PICKPROOF))
       ch->sendln("The lock resists even your best attempts to pick it.");
     else
@@ -1513,7 +1513,7 @@ int do_pick(Character *ch, char *argument, int cmd)
       }
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-      send_to_char("*Click*\n\r", ch);
+      ch->sendln("*Click*");
       act("$n fiddles with $p.", ch, obj, 0, TO_ROOM, 0);
     }
   }
@@ -1527,7 +1527,7 @@ int do_pick(Character *ch, char *argument, int cmd)
     }
     else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
-      send_to_char("You realize that the door is already open!\n\r", ch);
+      ch->sendln("You realize that the door is already open!");
     }
     else if (EXIT(ch, door)->key < 0)
     {
@@ -1586,7 +1586,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Pick what?\n\r", ch);
+    ch->sendln("Pick what?");
   }
 
   return eSUCCESS;
@@ -1637,12 +1637,12 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (amount <= 0)
     {
-      send_to_char("Sorry, you can't do that!\n\r", ch);
+      ch->sendln("Sorry, you can't do that!");
       return eFAILURE;
     }
     if ((ch->getGold() < (uint32_t)amount) && (ch->getLevel() < DEITY))
     {
-      send_to_char("You haven't got that many coins!\n\r", ch);
+      ch->sendln("You haven't got that many coins!");
       return eFAILURE;
     }
 
@@ -1650,12 +1650,12 @@ int do_slip(Character *ch, char *argument, int cmd)
 
     if (!*vict_name)
     {
-      send_to_char("To who?\n\r", ch);
+      ch->sendln("To who?");
       return eFAILURE;
     }
     if (!(vict = ch->get_char_room_vis( vict_name)))
     {
-      send_to_char("To who?\n\r", ch);
+      ch->sendln("To who?");
       return eFAILURE;
     }
     if (ch == vict)
@@ -1669,7 +1669,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     // Failure
     if (!skill_success(ch, vict, SKILL_SLIP))
     {
-      send_to_char("Whoops!  You dropped the coins!\n\r", ch);
+      ch->sendln("Whoops!  You dropped the coins!");
       if (ch->getLevel() >= IMMORTAL)
       {
         sprintf(buf, "%s tries to slip %d coins to %s and drops them!", GET_NAME(ch),
@@ -1736,7 +1736,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!*obj_name || !*vict_name)
   {
-    send_to_char("Slip what to who?\n\r", ch);
+    ch->sendln("Slip what to who?");
     return eFAILURE;
   }
 
@@ -1762,7 +1762,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     if (ch->getLevel() < DEITY)
     {
-      send_to_char("You can't let go of it! Yeech!!\n\r", ch);
+      ch->sendln("You can't let go of it! Yeech!!");
       return eFAILURE;
     }
     else
@@ -1773,7 +1773,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
   {
-    send_to_char("That would ruin it!\n\r", ch);
+    ch->sendln("That would ruin it!");
     return eFAILURE;
   }
 
@@ -1866,7 +1866,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   {
     if (obj_index[obj->item_number].virt == 393)
     {
-      send_to_char("Whoa, you almost dropped your hot potato!\n\r", ch);
+      ch->sendln("Whoa, you almost dropped your hot potato!");
       return eFAILURE;
     }
 
@@ -2084,7 +2084,7 @@ int do_jab(Character *ch, char *argument, int cmd)
 
   if (!victim)
   {
-    send_to_char("Jab whom?\n\r", ch);
+    ch->sendln("Jab whom?");
     return eFAILURE;
   }
 
@@ -2221,7 +2221,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
 
   if (name[0] == '\0')
   {
-    send_to_char("Appraise whom?\n\r", ch);
+    ch->sendln("Appraise whom?");
     return eFAILURE;
   }
 
@@ -2230,7 +2230,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
 
   if (!bits)
   {
-    send_to_char("Appraise whom?\n\r", ch);
+    ch->sendln("Appraise whom?");
     return eFAILURE;
   }
 
@@ -2318,7 +2318,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_APPRAISE))
   {
-    send_to_char("You estimate a worth of 30000000000?!?\n\r", ch);
+    ch->sendln("You estimate a worth of 30000000000?!?");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
@@ -2352,7 +2352,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
 
   if (!(vict = ch->get_char_room_vis( name)) && !(vict = ch->fighting))
   {
-    send_to_char("Cripple whom?\n\r", ch);
+    ch->sendln("Cripple whom?");
     return eFAILURE;
   }
 

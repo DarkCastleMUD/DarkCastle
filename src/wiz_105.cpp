@@ -99,7 +99,7 @@ int do_log(Character *ch, char *argument, int cmd)
 
   if (!*buf)
   {
-    send_to_char("Log who?\n\r", ch);
+    ch->sendln("Log who?");
   }
   else if (!(vict = get_pc_vis(ch, buf)))
     ch->sendln("Couldn't find any such creature.");
@@ -152,81 +152,81 @@ int do_showbits(Character *ch, char *argument, int cmd)
   csendf(ch, "Player: %s\n\r", victim->getNameC());
 
   if (DC::isSet(victim->combat, COMBAT_SHOCKED))
-    send_to_char("COMBAT_SHOCKED\n\r", ch);
+    ch->sendln("COMBAT_SHOCKED");
 
   if (DC::isSet(victim->combat, COMBAT_BASH1))
-    send_to_char("COMBAT_BASH1\n\r", ch);
+    ch->sendln("COMBAT_BASH1");
 
   if (DC::isSet(victim->combat, COMBAT_BASH2))
-    send_to_char("COMBAT_BASH2\n\r", ch);
+    ch->sendln("COMBAT_BASH2");
 
   if (DC::isSet(victim->combat, COMBAT_STUNNED))
-    send_to_char("COMBAT_STUNNED\n\r", ch);
+    ch->sendln("COMBAT_STUNNED");
 
   if (DC::isSet(victim->combat, COMBAT_STUNNED2))
-    send_to_char("COMBAT_STUNNED2\n\r", ch);
+    ch->sendln("COMBAT_STUNNED2");
 
   if (DC::isSet(victim->combat, COMBAT_CIRCLE))
-    send_to_char("COMBAT_CIRCLE\n\r", ch);
+    ch->sendln("COMBAT_CIRCLE");
 
   if (DC::isSet(victim->combat, COMBAT_BERSERK))
-    send_to_char("COMBAT_BERSERK\n\r", ch);
+    ch->sendln("COMBAT_BERSERK");
 
   if (DC::isSet(victim->combat, COMBAT_HITALL))
-    send_to_char("COMBAT_HITALL\n\r", ch);
+    ch->sendln("COMBAT_HITALL");
 
   if (DC::isSet(victim->combat, COMBAT_RAGE1))
-    send_to_char("COMBAT_RAGE1\n\r", ch);
+    ch->sendln("COMBAT_RAGE1");
 
   if (DC::isSet(victim->combat, COMBAT_RAGE1))
-    send_to_char("COMBAT_RAGE2\n\r", ch);
+    ch->sendln("COMBAT_RAGE2");
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1))
-    send_to_char("COMBAT_BLADESHIELD1\n\r", ch);
+    ch->sendln("COMBAT_BLADESHIELD1");
 
   if (DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
-    send_to_char("COMBAT_BLADESHIELD2\n\r", ch);
+    ch->sendln("COMBAT_BLADESHIELD2");
 
   if (DC::isSet(victim->combat, COMBAT_REPELANCE))
-    send_to_char("COMBAT_REPELANCE\n\r", ch);
+    ch->sendln("COMBAT_REPELANCE");
 
   if (DC::isSet(victim->combat, COMBAT_VITAL_STRIKE))
-    send_to_char("COMBAT_VITAL_STRIKE\n\r", ch);
+    ch->sendln("COMBAT_VITAL_STRIKE");
 
   if (DC::isSet(victim->combat, COMBAT_MONK_STANCE))
-    send_to_char("COMBAT_MONK_STANCE\n\r", ch);
+    ch->sendln("COMBAT_MONK_STANCE");
 
   if (DC::isSet(victim->combat, COMBAT_MISS_AN_ATTACK))
-    send_to_char("COMBAT_MISS_AN_ATTACK\n\r", ch);
+    ch->sendln("COMBAT_MISS_AN_ATTACK");
 
   if (DC::isSet(victim->combat, COMBAT_ORC_BLOODLUST1))
-    send_to_char("COMBAT_ORC_BLOODLUST1\n\r", ch);
+    ch->sendln("COMBAT_ORC_BLOODLUST1");
 
   if (DC::isSet(victim->combat, COMBAT_ORC_BLOODLUST2))
-    send_to_char("COMBAT_ORC_BLOODLUST2\n\r", ch);
+    ch->sendln("COMBAT_ORC_BLOODLUST2");
 
   if (DC::isSet(victim->combat, COMBAT_THI_EYEGOUGE))
-    send_to_char("COMBAT_THI_EYEGOUGE\n\r", ch);
+    ch->sendln("COMBAT_THI_EYEGOUGE");
 
   if (DC::isSet(victim->combat, COMBAT_THI_EYEGOUGE2))
-    send_to_char("COMBAT_THI_EYEGOUGE2\n\r", ch);
+    ch->sendln("COMBAT_THI_EYEGOUGE2");
 
   if (DC::isSet(victim->combat, COMBAT_FLEEING))
-    send_to_char("COMBAT_FLEEING\n\r", ch);
+    ch->sendln("COMBAT_FLEEING");
 
   if (DC::isSet(victim->combat, COMBAT_SHOCKED2))
-    send_to_char("COMBAT_SHOCKED2\n\r", ch);
+    ch->sendln("COMBAT_SHOCKED2");
 
   if (DC::isSet(victim->combat, COMBAT_CRUSH_BLOW))
-    send_to_char("COMBAT_CRUSH_BLOW\n\r", ch);
+    ch->sendln("COMBAT_CRUSH_BLOW");
 
   if (DC::isSet(victim->combat, COMBAT_CRUSH_BLOW2))
-    send_to_char("COMBAT_CRUSH_BLOW2\n\r", ch);
+    ch->sendln("COMBAT_CRUSH_BLOW2");
 
   if (DC::isSet(victim->combat, COMBAT_ATTACKER))
-    send_to_char("COMBAT_ATTACKER\n\r", ch);
+    ch->sendln("COMBAT_ATTACKER");
 
-  send_to_char("--------------------\n\r\n\r", ch);
+  ch->sendln("--------------------\n\r");
 
   return eSUCCESS;
 }
@@ -387,7 +387,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
 
   if (!*person)
   {
-    send_to_char("Pardon whom?\n\r", ch);
+    ch->sendln("Pardon whom?");
     return eFAILURE;
   }
 
@@ -407,7 +407,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("That character is not a thief!\n\r", ch);
+      ch->sendln("That character is not a thief!");
       return eFAILURE;
     }
   }
@@ -422,13 +422,13 @@ int do_pardon(Character *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("That player has no CANTQUIT flag!\n\r", ch);
+      ch->sendln("That player has no CANTQUIT flag!");
       return eFAILURE;
     }
   }
   else
   {
-    send_to_char("No flag specified! (Flags are 'thief' & 'killer')\n\r", ch);
+    ch->sendln("No flag specified! (Flags are 'thief' & 'killer')");
     return eFAILURE;
   }
 

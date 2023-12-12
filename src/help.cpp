@@ -207,7 +207,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
         if (results.size() >= 5)
         {
-          send_to_char("\n\r", ch);
+          ch->sendln("");
           break;
         }
         else

@@ -112,7 +112,7 @@ int do_check(Character *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Check who?\n\r", ch);
+    ch->sendln("Check who?");
     return eFAILURE;
   }
 
@@ -139,7 +139,7 @@ int do_check(Character *ch, char *arg, int cmd)
       if (file_exists(tmp_buf))
         ch->sendln("Character is archived.");
       else
-        send_to_char("Unable to load! (Character might not exist...)\n\r", ch);
+        ch->sendln("Unable to load! (Character might not exist...)");
       return eFAILURE;
     }
 
@@ -209,10 +209,10 @@ int do_check(Character *ch, char *arg, int cmd)
       }
     }
     else
-      send_to_char("(Linkdead)\n\r", ch);
+      ch->sendln("(Linkdead)");
   else
   {
-    send_to_char("(Not on game)\n\r", ch);
+    ch->sendln("(Not on game)");
     free_char(vict, Trace("do_check"));
   }
   return eSUCCESS;
@@ -244,7 +244,7 @@ int do_find(Character *ch, char *arg, int cmd)
 
   if (!*type || !*name)
   {
-    send_to_char("Usage:  find <mob|pc|char|obj> <name>\n\r", ch);
+    ch->sendln("Usage:  find <mob|pc|char|obj> <name>");
     return eFAILURE;
   }
 
@@ -315,7 +315,7 @@ int do_stat(Character *ch, char *arg, int cmd)
 
   if (!*type || !*name)
   {
-    send_to_char("Usage:  stat <mob|obj|char> <name>\n\r", ch);
+    ch->sendln("Usage:  stat <mob|obj|char> <name>");
     return eFAILURE;
   }
 
@@ -372,7 +372,7 @@ int do_stat(Character *ch, char *arg, int cmd)
     // must be done to clear out "d" before it is used
     if (!(load_char_obj(&d, name)))
     {
-      send_to_char("Unable to load! (Character might not exist...)\n\r", ch);
+      ch->sendln("Unable to load! (Character might not exist...)");
       return eFAILURE;
     }
 
@@ -422,7 +422,7 @@ int do_mpstat(Character *ch, char *arg, int cmd)
 
   if (!*name)
   {
-    send_to_char("Usage:  procstat <name|num>\n\r", ch);
+    ch->sendln("Usage:  procstat <name|num>");
     return eFAILURE;
   }
 
@@ -1600,7 +1600,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
                  "The field must be one of the following:\n\r",
                  ch);
     ch->display_string_list(fields);
-    send_to_char("\n\r$3Current Descs$R:\n\r", ch);
+    ch->sendln("\n\r$3Current Descs$R:");
     for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
       csendf(ch, "$3%d$R) %s\n\r%s\n\r", x, curr->keyword, curr->description);
     return eFAILURE;
@@ -2147,7 +2147,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] keywords <new_keywords>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return eFAILURE;
     }
     ((Object *)obj_index[rnum].item)->name = str_hsh(buf4);
@@ -2161,7 +2161,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] longdesc <new_desc>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)obj_index[rnum].item)->description = str_hsh(buf4);
@@ -2175,7 +2175,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] shortdesc <new_desc>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)obj_index[rnum].item)->short_description = str_hsh(buf4);
@@ -2189,7 +2189,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] actiondesc <new_desc>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return eFAILURE;
     }
     ((Object *)obj_index[rnum].item)->action_description = str_hsh(buf4);
@@ -2306,7 +2306,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] weight <>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] weight <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 99999))
@@ -2325,7 +2325,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] value <>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] value <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 5000000))
@@ -2365,7 +2365,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [vnum] level <>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [vnum] level <>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 110))
@@ -2384,7 +2384,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [vnum] 1value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [vnum] 1value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -2403,7 +2403,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [vnum] 2value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [vnum] 2value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -2422,7 +2422,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [vnum] 3value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [vnum] 3value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -2441,7 +2441,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [vnum] 4value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [vnum] 4value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -2474,7 +2474,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit new [vnum]\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit new [vnum]");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 35000))
@@ -2519,7 +2519,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4 || strncmp(buf4, "yesiwanttodeletethisitem", 24))
     {
-      send_to_char("$3Syntax$R: oedit [item_num] delete yesiwanttodeletethisitem\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] delete yesiwanttodeletethisitem");
       ch->sendln("\r\nDeleting an item is $3permanent$R and will cause ALL copies of");
       ch->sendln("that items in the world to disappear.  Logged out players will lose the");
       ch->sendln("item upon logging in as long as no other items is created with that number.");
@@ -2586,7 +2586,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] 3value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: oedit [item_num] 3value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -2789,7 +2789,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: procedit [mob_num] remove <prog>\n\r", ch);
+      ch->sendln("$3Syntax$R: procedit [mob_num] remove <prog>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 1, 999))
@@ -2943,7 +2943,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     half_chop(buf4, buf2, buf3);
     if (!*buf2 || !*buf3)
     {
-      send_to_char("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>\n\r", ch);
+      ch->sendln("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>");
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf2, 1, 999))
@@ -3204,7 +3204,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_num] longdesc <desc>\n\r", ch);
+      ch->sendln("$3Syntax$R: medit [mob_num] longdesc <desc>");
       return eFAILURE;
     }
     strcat(buf4, "\r\n");
@@ -4064,7 +4064,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_vnum] 1value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: medit [mob_vnum] 1value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -4083,7 +4083,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_vnum] 2value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: medit [mob_vnum] 2value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -4102,7 +4102,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_vnum] 3value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: medit [mob_vnum] 3value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -4121,7 +4121,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   {
     if (!*buf4)
     {
-      send_to_char("$3Syntax$R: medit [mob_vnum] 4value <num>\n\r", ch);
+      ch->sendln("$3Syntax$R: medit [mob_vnum] 4value <num>");
       return eFAILURE;
     }
     if (!check_valid_and_convert(intval, buf4))
@@ -4178,7 +4178,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   std::tie(arg1, remainder_args) = half_chop(std::string(argument));
   if (arg1.empty())
   {
-    send_to_char("The field must be one of the following:\n\r", ch);
+    ch->sendln("The field must be one of the following:");
     for (x = 0;; x++)
     {
       if (fields[x][0] == '\0')
@@ -4197,7 +4197,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   {
     if (fields[x][0] == '\0')
     {
-      send_to_char("The field must be one of the following:\n\r", ch);
+      ch->sendln("The field must be one of the following:");
       for (x = 0;; x++)
       {
         if (fields[x][0] == '\0')
@@ -4217,7 +4217,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   {
     if (remainder_args.empty())
     {
-      send_to_char("$3Syntax$R: redit name <Room Name>\n\r", ch);
+      ch->sendln("$3Syntax$R: redit name <Room Name>");
       return eFAILURE;
     }
     dc_free(DC::getInstance()->world[ch->in_room].name);
@@ -4582,7 +4582,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   {
     if (remainder_args.empty())
     {
-      send_to_char("$3Syntax$R: redit exdesc <direction>\n\r", ch);
+      ch->sendln("$3Syntax$R: redit exdesc <direction>");
       return eFAILURE;
     }
 
@@ -4625,8 +4625,8 @@ int do_redit(Character *ch, char *argument, int cmd)
     a = false;
     if (remainder_args.empty())
     {
-      send_to_char("$3Syntax$R: redit rflag <flags>\n\r", ch);
-      send_to_char("$3Available room flags$R:\n\r", ch);
+      ch->sendln("$3Syntax$R: redit rflag <flags>");
+      ch->sendln("$3Available room flags$R:");
       for (x = 0;; x++)
       {
         if (!strcmp(room_bits[x], "\n"))
@@ -4655,7 +4655,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     if (remainder_args.empty())
     {
       ch->sendln("$3Syntax$R: redit sector <sector>");
-      send_to_char("$3Available sector types$R:\n\r", ch);
+      ch->sendln("$3Available sector types$R:");
       for (x = 0;; x++)
       {
         if (!strcmp(sector_types[x], "\n"))
@@ -4828,7 +4828,7 @@ int do_rdelete(Character *ch, char *arg, int cmd)
   {
     if (!*buf2)
     {
-      send_to_char("Syntax:\n\rrdelete exdesc <direction>\n\r", ch);
+      ch->sendln("Syntax:\n\rrdelete exdesc <direction>");
       return eFAILURE;
     }
     one_argument(buf2, buf);
@@ -5123,7 +5123,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   // of the std::string.  This command does NOT take that into consideration currently.
 
   /*    if(!GET_RANGE(ch)) {
-   send_to_char("You don't have a zone assigned to you!\n\r", ch);
+   ch->sendln("You don't have a zone assigned to you!");
    return eFAILURE;
    }
 
@@ -5400,7 +5400,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
   fprintf(fl, "S\n");
   fclose(fl);
-  send_to_char("Zone File Created! Tell someone who can put it in!\n\r", ch);
+  ch->sendln("Zone File Created! Tell someone who can put it in!");
   return eSUCCESS;
 }
 
@@ -5461,7 +5461,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   std::string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
   send_to_char(buffer.c_str(), ch);
 
-  send_to_char("Description:\n\r", ch);
+  ch->sendln("Description:");
   ch->send(rm->description);
 
   strcpy(buf, "Extra description keywords(s): ");
@@ -5519,7 +5519,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   buffer += "\n\r";
   send_to_char(const_cast<char *>(buffer.c_str()), ch);
 
-  send_to_char("------- Exits defined -------\n\r", ch);
+  ch->sendln("------- Exits defined -------");
   for (i = 0; i <= 5; i++)
   {
     if (rm->dir_option[i])
@@ -5557,7 +5557,7 @@ int do_possess(Character *ch, char *argument, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Possess who?\n\r", ch);
+    ch->sendln("Possess who?");
   }
   else
   {
@@ -5567,7 +5567,7 @@ int do_possess(Character *ch, char *argument, int cmd)
     {
       if (ch == victim)
       {
-        send_to_char("He he he... We are jolly funny today, eh?\n\r", ch);
+        ch->sendln("He he he... We are jolly funny today, eh?");
         return eFAILURE;
       }
       else if ((victim->getLevel() > ch->getLevel()) &&
@@ -5626,7 +5626,7 @@ int do_return(Character *ch, char *argument, int cmd)
 
   if (!ch->desc->original)
   {
-    send_to_char("Huh!?!\n\r", ch);
+    ch->sendln("Huh!?!");
     return eFAILURE;
   }
   else
@@ -5761,7 +5761,7 @@ int do_punish(Character *ch, char *arg, int cmd)
 
   if (!*name)
   {
-    send_to_char("Punish who?\n\r", ch);
+    ch->sendln("Punish who?");
     send_to_char("\n\rusage: punish <char> [stupid silence freeze noemote "
                  "notell noname noarena notitle nopray]\n\r",
                  ch);
@@ -5797,7 +5797,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   {
     if (DC::isSet(vict->player->punish, PUNISH_STUPID))
     {
-      send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
+      vict->sendln("You feel a sudden onslaught of wisdom!");
       ch->sendln("STUPID removed.");
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -5809,8 +5809,8 @@ int do_punish(Character *ch, char *arg, int cmd)
     }
     else
     {
-      send_to_char("You suddenly feel dumb as a rock!\n\r", vict);
-      send_to_char("You can't remember how to do basic things!\n\r", vict);
+      vict->sendln("You suddenly feel dumb as a rock!");
+      vict->sendln("You can't remember how to do basic things!");
       sprintf(buf, "You have been lobotomized by %s!\n\r", GET_NAME(ch));
       vict->send(buf);
       ch->sendln("STUPID set.");
@@ -6026,7 +6026,7 @@ void display_punishes(Character *ch, Character *vict)
   if (DC::isSet(vict->player->punish, PUNISH_NOPRAY))
     send_to_char("nopray ", ch);
 
-  send_to_char("\n\r", ch);
+  ch->sendln("");
 }
 
 int do_colors(Character *ch, char *argument, int cmd)
