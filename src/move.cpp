@@ -989,7 +989,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 					sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
 				else
 					strcpy(tmp, "You follow someone.\n\r\n\r");
-				send_to_char(tmp, k->follower);
+				k->follower->send(tmp);
 				// do_move(k->follower, "", cmd + 1);
 				char tempcommand[32];
 				strcpy(tempcommand, dirs[cmd]);
@@ -1175,7 +1175,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	case 1:
 	case 2:
 		sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
-		send_to_char(buf, ch);
+		ch->send(buf);
 		sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), portal->short_description);
 		act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 		break;
@@ -1296,7 +1296,7 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
 	sprintf(buf, "You carefully climb %s.\r\n", obj->short_description);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	int retval = move_char(ch, real_room(dest));
 
 	if (SOMEONE_DIED(retval))

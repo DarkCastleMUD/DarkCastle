@@ -932,7 +932,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       vict->tell_history(this, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      send_to_char(buf, this);
+      this->send(buf);
     }
     else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
     {

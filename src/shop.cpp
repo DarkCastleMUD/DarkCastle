@@ -666,7 +666,7 @@ void shopping_list(const char *arg, Character *ch,
     sprintf(buf, "[%3d] [%7d] %s.\r\n",
             a, cost, obj->short_description);
     //        }
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (!found)

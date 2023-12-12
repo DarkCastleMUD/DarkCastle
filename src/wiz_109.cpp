@@ -114,7 +114,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   tmp = fread_string(fl, 0);
   fclose(fl);
 
-  send_to_char(tmp, ch);
+  ch->send(tmp);
   FREE(tmp);
   return eSUCCESS;
 }
@@ -369,7 +369,7 @@ int do_global(Character *ch, char *argument, int cmd)
     sprintf(buf, "\n\r%s\n\r", argument + i);
     for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
-        send_to_char(buf, point->character);
+        point->character->send(buf);
   }
   return eSUCCESS;
 }

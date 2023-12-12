@@ -259,9 +259,9 @@ int do_vault(Character *ch, char *argument, int cmd)
 
   if (!*arg)
   {
-    send_to_char(vault_usage, ch);
+    ch->send(vault_usage);
     if (ch->getLevel() > IMMORTAL)
-      send_to_char(imm_vault_usage, ch);
+      ch->send(imm_vault_usage);
     return eSUCCESS;
   }
 
@@ -445,9 +445,9 @@ int do_vault(Character *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char(vault_usage, ch);
+    ch->send(vault_usage);
     if (ch->getLevel() > IMMORTAL)
-      send_to_char(imm_vault_usage, ch);
+      ch->send(imm_vault_usage);
   }
   return eSUCCESS;
 }
@@ -2414,13 +2414,13 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
       sprintf(buf, "1) You cannot increase your vault-size further.\r\n");
     ch->sendln("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R");
 
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     sprintf(buf, "$B2)$R Purchase a clan vault: %s\r\n",
             ch->clan ? cvault ? "Your clan already has a vault" : has_right(ch, CLAN_RIGHTS_VAULT) ? "1000 platinum coins."
                                                                                                    : "You are not authorized to make this purchase."
                      : "You are not a member of any clan.");
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     if (!cvault)
       sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan ? "Your clan has no vault." : "You're not in a clan.");
@@ -2428,7 +2428,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
       sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT) ? "200 platinum coins." : "You are not authorized to make this purchase.");
     else
       sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
   else

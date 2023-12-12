@@ -228,7 +228,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
   if (!(vict = get_pc_vis(ch, arg)))
   {
     sprintf(buf, "You don't see anyone named '%s'.", arg);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
 
@@ -239,12 +239,12 @@ int do_revoke(Character *ch, char *arg, int cmd)
     vict->skills.clear();
 
     sprintf(buf, "%s has had all comands revoked.\r\n", GET_NAME(vict));
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
             GET_NAME(ch));
     logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
-    send_to_char(buf, vict);
+    vict->send(buf);
     return eSUCCESS;
   }
 
@@ -255,27 +255,27 @@ int do_revoke(Character *ch, char *arg, int cmd)
   if (i == DC::bestowable_god_commands.size())
   {
     sprintf(buf, "There is no god command named '%s'.\r\n", command);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
     sprintf(buf, "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
   sprintf(buf, "%s has had %s revoked.\r\n", GET_NAME(vict),
           DC::bestowable_god_commands[i].name);
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict),
           DC::bestowable_god_commands[i].name, GET_NAME(ch));
   logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
   sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch),
           DC::bestowable_god_commands[i].name);
-  send_to_char(buf, vict);
+  vict->send(buf);
   return eSUCCESS;
 }
 
@@ -615,7 +615,7 @@ int do_install(Character *ch, char *arg, int cmd)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
-    send_to_char(err, ch);
+    ch->send(err);
     return eFAILURE;
   }
 
@@ -623,7 +623,7 @@ int do_install(Character *ch, char *arg, int cmd)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
-    send_to_char(err, ch);
+    ch->send(err);
     return eFAILURE;
   }
 
@@ -637,7 +637,7 @@ int do_install(Character *ch, char *arg, int cmd)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
-    send_to_char(err, ch);
+    ch->send(err);
     return eFAILURE;
   }
 
@@ -670,7 +670,7 @@ int do_install(Character *ch, char *arg, int cmd)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
-    send_to_char(err, ch);
+    ch->send(err);
     return eFAILURE;
   }
 
@@ -694,7 +694,7 @@ int do_install(Character *ch, char *arg, int cmd)
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n",
             ret);
   }
-  send_to_char(err, ch);
+  ch->send(err);
   return eSUCCESS;
 }
 
@@ -768,25 +768,25 @@ int do_range(Character *ch, char *arg, int cmd)
       victim->player->buildMLowVnum = low;
       victim->player->buildMHighVnum = high;
       sprintf(message, "%s M range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      send_to_char(message, ch);
+      ch->send(message);
       sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
-      send_to_char(message, victim);
+      victim->send(message);
       return eSUCCESS;
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
       sprintf(message, "%s O range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      send_to_char(message, ch);
+      ch->send(message);
       sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
-      send_to_char(message, victim);
+      victim->send(message);
       return eSUCCESS;
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
       sprintf(message, "%s R range set to %d-%d.\r\n", victim->getNameC(), low, high);
-      send_to_char(message, ch);
+      ch->send(message);
       sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
-      send_to_char(message, victim);
+      victim->send(message);
       return eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
@@ -798,9 +798,9 @@ int do_range(Character *ch, char *arg, int cmd)
     victim->player->buildLowVnum = victim->player->buildOLowVnum = victim->player->buildMLowVnum = low;
     victim->player->buildHighVnum = victim->player->buildOHighVnum = victim->player->buildMHighVnum = high;
     sprintf(message, "%s range set to %d-%d.\r\n", victim->getNameC(), low, high);
-    send_to_char(message, ch);
+    ch->send(message);
     sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
-    send_to_char(message, victim);
+    victim->send(message);
   }
   return eSUCCESS;
 }
@@ -829,25 +829,25 @@ int do_metastat(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
           GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "Hit points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_HIT(victim), hps_exp_spent(victim), hps_plats_spent(victim),
           r_new_meta_platinum_cost(0, hps_plats_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
           r_new_meta_exp_cost(0, hps_exp_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "Mana points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_MANA(victim), mana_exp_spent(victim), mana_plats_spent(victim),
           r_new_meta_platinum_cost(0, mana_plats_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
           r_new_meta_exp_cost(0, mana_exp_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "Move points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
           GET_RAW_MOVE(victim), moves_exp_spent(victim), moves_plats_spent(victim),
           r_new_meta_platinum_cost(0, moves_plats_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
           r_new_meta_exp_cost(0, moves_exp_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   buf[0] = '\0';
   unsigned int i = 1, l = 0;
@@ -857,7 +857,7 @@ int do_metastat(Character *ch, char *argument, int cmd)
       sprintf(buf, "%s\r\n", buf);
     sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }
 
@@ -898,7 +898,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
             o % 2 == 0 ? "$2" : "$3", o, obj->short_description, obj_index[r].virt, ac);
-    send_to_char(buf, ch);
+    ch->send(buf);
     o++;
     if (o == 150)
     {

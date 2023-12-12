@@ -46,7 +46,7 @@ int do_plats(Character *ch, char *argument, int cmd)
       continue;
 
     sprintf(buf, "%15d - %s - %ld - %d\n\r", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   return eSUCCESS;
 }

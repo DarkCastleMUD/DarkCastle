@@ -1522,7 +1522,7 @@ int do_release(Character *ch, char *argument, int cmd)
       { // Spells that default to self seems a good measure of
         // allow to release spells..
         const char *aff_name = get_skill_name(aff->type);
-        send_to_char(aff_name, ch);
+        ch->send(aff_name);
         ch->sendln("");
       }
     }

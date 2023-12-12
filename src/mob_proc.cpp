@@ -2234,7 +2234,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
     {
       sprintf(buf, "%8ld - %s\n\r",
               3 * GET_EXP(pet), pet->short_desc);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     return eSUCCESS;
   }

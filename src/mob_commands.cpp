@@ -150,12 +150,12 @@ void mpstat(Character *ch, Character *victim)
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
           victim->getNameC(), mob_index[victim->mobdata->nr].virt);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
           victim->short_desc,
           victim->long_desc ? victim->long_desc : "(nullptr)");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (!(mob_index[victim->mobdata->nr].progtypes))
   {
@@ -167,11 +167,11 @@ void mpstat(Character *ch, Character *victim)
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
-    send_to_char(buf, ch);
+    ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
     send_to_char("$R ", ch);
     sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendRaw(std::string(mprg->comlist) + "\r\n");
   }
 }
@@ -1196,7 +1196,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  send_to_char(skill, victim);
+  victim->send(skill);
 
   learn_skill(victim, skillnum, 1, 1);
 
@@ -1888,7 +1888,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     if (ch != victim)
     {
       snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
     }
     return eFAILURE;
   }

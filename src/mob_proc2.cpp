@@ -441,7 +441,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 			cost /= 20000;
 			cost = MAX(cost, 30);
 			sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
-			send_to_char(buf, ch);
+			ch->send(buf);
 		}
 		send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
 					 "list is therefore always changing.  If you purchase one, it will be\n\r"
@@ -693,7 +693,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
 			char *tmp = gl_item((Object *)obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
-			send_to_char(tmp, ch);
+			ch->send(tmp);
 			dc_free(tmp);
 		}
 		return eSUCCESS;

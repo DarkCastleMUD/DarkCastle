@@ -405,7 +405,7 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
          if (number > 1)
          {
             sprintf(buf, "[%d] ", number);
-            send_to_char(buf, ch);
+            ch->send(buf);
          }
          show_obj_to_char(i, ch, mode);
          found = true;
@@ -660,7 +660,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       {
          if (i->description)
          {
-            send_to_char(i->description, ch);
+            ch->send(i->description);
          }
          else
          {
@@ -932,7 +932,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
 
    char buf[200];
    sprintf(buf, "You attempt to peek into the %s.\r\n", cont->short_description);
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    if (DC::isSet(cont->obj_flags.value[1], CONT_CLOSED))
    {
@@ -1091,19 +1091,19 @@ bool identify(Character *ch, Object *obj)
       {
          sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
          strcat(buf, "\n\r");
-         send_to_char(buf, ch);
+         ch->send(buf);
       }
       if (obj->obj_flags.value[2] >= 1)
       {
          sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
          strcat(buf, "\n\r");
-         send_to_char(buf, ch);
+         ch->send(buf);
       }
       if (obj->obj_flags.value[3] >= 1)
       {
          sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
          strcat(buf, "\n\r");
-         send_to_char(buf, ch);
+         ch->send(buf);
       }
       break;
 
@@ -1112,16 +1112,16 @@ bool identify(Character *ch, Object *obj)
       sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\n\r",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       sprintf(buf, "$3Level $R%d$3 spell of:$R\n\r", obj->obj_flags.value[0]);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
       {
          sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
          strcat(buf, "\n\r");
-         send_to_char(buf, ch);
+         ch->send(buf);
       }
       break;
 
@@ -1150,7 +1150,7 @@ bool identify(Character *ch, Object *obj)
       sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
    case ITEM_MISSILE:
@@ -1159,14 +1159,14 @@ bool identify(Character *ch, Object *obj)
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
               obj->obj_flags.value[3]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
    case ITEM_FIREWEAPON:
       sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
    case ITEM_ARMOR:
@@ -1181,7 +1181,7 @@ bool identify(Character *ch, Object *obj)
       }
 
       sprintf(buf, "$3AC-apply is $R%d (", value);
-      send_to_char(buf, ch);
+      ch->send(buf);
       if (vobj != nullptr)
       {
          showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
@@ -1385,7 +1385,7 @@ int do_look(Character *ch, char *argument, int cmd)
             {
                sprintf(buffer, "The %s is closed.\r\n",
                        fname(EXIT(ch, keyword_no)->keyword));
-               send_to_char(buffer, ch);
+               ch->send(buffer);
             }
             else
             {
@@ -1394,7 +1394,7 @@ int do_look(Character *ch, char *argument, int cmd)
                {
                   sprintf(buffer, "The %s is open.\r\n",
                           fname(EXIT(ch, keyword_no)->keyword));
-                  send_to_char(buffer, ch);
+                  ch->send(buffer);
                }
             }
          }
@@ -1440,7 +1440,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      sprintf(buffer, "It's %sfull of a %s liquid.\r\n",
                              fullness[temp],
                              color_liquid[tmp_object->obj_flags.value[2]]);
-                     send_to_char(buffer, ch);
+                     ch->send(buffer);
                   }
                }
                else if (ARE_CONTAINERS(tmp_object))
@@ -1703,7 +1703,7 @@ int do_look(Character *ch, char *argument, int cmd)
                         sprintf(tmpbuf,
                                 "You look through %s but it seems to be opaque.\r\n",
                                 tmp_object->short_description);
-                        send_to_char(tmpbuf, ch);
+                        ch->send(tmpbuf);
                         return eFAILURE;
                      }
                      if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == DC::NOWHERE)
@@ -1804,7 +1804,7 @@ int do_look(Character *ch, char *argument, int cmd)
          ansi_color(NTEXT, ch);
          send_to_char("Exits: ", ch);
          if (*buffer)
-            send_to_char(buffer, ch);
+            ch->send(buffer);
          else
             send_to_char("None.", ch);
          send_to_char("\n\r", ch);
@@ -1914,7 +1914,7 @@ int do_exits(Character *ch, char *argument, int cmd)
    ch->sendln("You scan around the exits to see where they lead.");
 
    if (buf[0])
-      send_to_char(buf, ch);
+      ch->send(buf);
    else
       ch->sendln("None.");
 
@@ -1959,7 +1959,7 @@ int do_score(Character *ch, char *argument, int cmd)
            "========================($5:$7)\n\r",
            GET_SHORT(ch));
 
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    sprintf(buf,
            "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
@@ -1975,7 +1975,7 @@ int do_score(Character *ch, char *argument, int cmd)
            GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), ch->hit_gain_lookup(),
            ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
            GET_ALIGNMENT(ch));
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    if (IS_PC(ch)) // mobs can't view this part
    {
@@ -2007,7 +2007,7 @@ int do_score(Character *ch, char *argument, int cmd)
               get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QString("%L1").arg(ch->getGold()).toStdString().c_str(),
               ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QString("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
 
-      send_to_char(buf, ch);
+      ch->send(buf);
    }
    else
       send_to_char(
@@ -2024,7 +2024,7 @@ int do_score(Character *ch, char *argument, int cmd)
             scratch = frills[level];
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Immunity", isrString.c_str(), scratch);
-            send_to_char(buf, ch);
+            ch->send(buf);
             found = true;
             isrString = std::string();
             if (++level == 4)
@@ -2042,7 +2042,7 @@ int do_score(Character *ch, char *argument, int cmd)
             scratch = frills[level];
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Susceptibility", isrString.c_str(), scratch);
-            send_to_char(buf, ch);
+            ch->send(buf);
             found = true;
             isrString = std::string();
             if (++level == 4)
@@ -2060,7 +2060,7 @@ int do_score(Character *ch, char *argument, int cmd)
             scratch = frills[level];
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Resistibility", isrString.c_str(), scratch);
-            send_to_char(buf, ch);
+            ch->send(buf);
             found = true;
             isrString = std::string();
             if (++level == 4)
@@ -2216,7 +2216,7 @@ int do_score(Character *ch, char *argument, int cmd)
        scratch = frills[level];
        sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
                scratch, scratch);
-       send_to_char(buf, ch);
+       ch->send(buf);
        found = true;
        if(++level == 4)
          level = 0;
@@ -2250,7 +2250,7 @@ int do_score(Character *ch, char *argument, int cmd)
          else
             sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\n\r",
                     scratch, affected_bits[aff_idx - 1], ch->spell_reflect, scratch);
-         send_to_char(buf, ch);
+         ch->send(buf);
       }
    }
 
@@ -2265,16 +2265,16 @@ int do_score(Character *ch, char *argument, int cmd)
              ch->player->buildLowVnum == ch->player->buildMLowVnum)
          {
             sprintf(buf, "CREATION RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
-            send_to_char(buf, ch);
+            ch->send(buf);
          }
          else
          {
             sprintf(buf, "ROOM RANGE: %d-%d\n\r", ch->player->buildLowVnum, ch->player->buildHighVnum);
-            send_to_char(buf, ch);
+            ch->send(buf);
             sprintf(buf, "MOB RANGE: %d-%d\n\r", ch->player->buildMLowVnum, ch->player->buildMHighVnum);
-            send_to_char(buf, ch);
+            ch->send(buf);
             sprintf(buf, "OBJ RANGE: %d-%d\n\r", ch->player->buildOLowVnum, ch->player->buildOHighVnum);
-            send_to_char(buf, ch);
+            ch->send(buf);
          }
       }
    }
@@ -2302,7 +2302,7 @@ int do_time(Character *ch, char *argument, int cmd)
            ((time_info.hours >= 12) ? "pm" : "am"),
            weekdays[weekday]);
 
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    day = time_info.day + 1; /* day in [1..35] */
 
@@ -2329,7 +2329,7 @@ int do_time(Character *ch, char *argument, int cmd)
            month_name[time_info.month],
            time_info.year);
 
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    // Changed to the below code without seconds in an attempt to stop
    // the timing of bingos... - pir 2/7/1999
@@ -2338,7 +2338,7 @@ int do_time(Character *ch, char *argument, int cmd)
    {
       sprintf(buf, "The system time is %ld.\r\n", timep);
 
-      send_to_char(buf, ch);
+      ch->send(buf);
    }
 
    pTime = localtime(&timep);
@@ -2361,7 +2361,7 @@ int do_time(Character *ch, char *argument, int cmd)
            pTime->tm_min,
            pTime->tm_zone);
 #endif
-   send_to_char(buf, ch);
+   ch->send(buf);
 
    timep -= start_time;
    h = timep / 3600;
@@ -2370,7 +2370,7 @@ int do_time(Character *ch, char *argument, int cmd)
    // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \n\r",
    // 			h,m,s);
    sprintf(buf, "The mud has been running for: %02li:%02li \n\r", h, m);
-   send_to_char(buf, ch);
+   ch->send(buf);
    return eSUCCESS;
 }
 
@@ -2465,7 +2465,7 @@ int do_help(Character *ch, char *argument, int cmd)
       }
    }
 
-   send_to_char(help, ch);
+   ch->send(help);
    return eSUCCESS;
 }
 

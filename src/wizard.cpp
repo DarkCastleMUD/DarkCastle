@@ -112,7 +112,7 @@ void do_mload(Character *ch, int rnum, int cnt)
         ch, 0, 0, TO_ROOM, 0);
     act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
     sprintf(buf, "You create %i %s!\n\r", cnt, mob->short_desc);
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (cnt > 1)
     {
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
@@ -232,7 +232,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
 
   snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->short_description);
 
-  send_to_char(buf, ch);
+  ch->send(buf);
   if (cnt > 1)
   {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %d (%s) at room %d (%s).",
@@ -307,7 +307,7 @@ void boro_mob_stat(Character *ch, Character *k)
           GET_MANA(k), mana_limit(k), k->mana_gain_lookup());
   /* end of the first sprintf */
 
-  send_to_char(buf, ch); // this sends to char, now we can overwrite buf
+  ch->send(buf); // this sends to char, now we can overwrite buf
 
   if (IS_MOB(k))
   {
@@ -339,7 +339,7 @@ void boro_mob_stat(Character *ch, Character *k)
           GET_WEIGHT(k),
           k->alignment);
 
-  send_to_char(buf, ch);
+  ch->send(buf);
   /* end of second sprintf */
 
   switch (k->sex)
@@ -364,7 +364,7 @@ void boro_mob_stat(Character *ch, Character *k)
           k->timer,
           (IS_PC(ch) ? k->hometown : -1),
           buf2);         /* buf is the sex... */
-  send_to_char(buf, ch); /* THIRD sprintf */
+  ch->send(buf); /* THIRD sprintf */
 
   if (IS_MOB(k))
   {
@@ -390,7 +390,7 @@ void boro_mob_stat(Character *ch, Character *k)
           k->saves[SAVE_TYPE_ACID], k->saves[SAVE_TYPE_MAGIC], k->saves[SAVE_TYPE_POISON],
           buf3); /* buf2 = whether or not there is a combat spec proc */
   /* end of fourth sprintf */
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprinttype(GET_POS(k), Character::position_types, buf2);
 
@@ -415,7 +415,7 @@ void boro_mob_stat(Character *ch, Character *k)
           IS_CARRYING_W(k), i);
   /* END OF SECOND LINE */
 
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   for (i = 0, i2 = 0; i < MAX_WEAR; i++)
     if (k->equipment[i])
@@ -424,13 +424,13 @@ void boro_mob_stat(Character *ch, Character *k)
   sprintf(buf,
           "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
           GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf,
           "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
           "(:)=================================(:)====================================(:)\r\n",
           k->hitroll, k->damroll);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintbit(k->suscept, isr_bits, buf2);
   sprintbit(k->immune, isr_bits, buf3);
@@ -438,11 +438,11 @@ void boro_mob_stat(Character *ch, Character *k)
           "|/| $7Immune$R: %-63s|o|\r\n"
           "|o| $7Susceptible$R: %-58s|/|\r\n",
           buf2, buf3); // immune and susceptible bits, first and second.
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintbit(k->affected_by, affected_bits, buf2);
   sprintf(buf,
           "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_MOB(k)) // AND THIS
     sprintbit(k->mobdata->actflags, action_bits, buf2);
@@ -453,24 +453,24 @@ void boro_mob_stat(Character *ch, Character *k)
           "|~| $7NPC flags$R: %-60s|\\|\r\n"
           "|/| $7Combat flags$R: %-57s|o|\r\n",
           buf2, buf3); // npc flags and combat flags respectively
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintbit(k->resist, isr_bits, buf2);
   sprintf(buf,
           "|o| $7Resistant$R: %-60s|/|\r\n"
           "(:)========================================================================(:)\r\n",
           buf2); // the resisted bits
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
   strcat(buf, (k->title ? k->title : "None"));
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   // Description
   ch->sendln("$3Detailed description$R:");
   if (k->description)
-    send_to_char(k->description, ch);
+    ch->send(k->description);
   else
     send_to_char("None", ch);
 
@@ -485,18 +485,18 @@ void boro_mob_stat(Character *ch, Character *k)
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
             k->age().year, k->age().month, k->age().day, k->age().hours);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (IS_PC(k))
@@ -508,32 +508,32 @@ void boro_mob_stat(Character *ch, Character *k)
             k->player->saves_mods[SAVE_TYPE_ACID],
             k->player->saves_mods[SAVE_TYPE_MAGIC],
             k->player->saves_mods[SAVE_TYPE_POISON]);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
         (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
       sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     else
     {
       sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->player->buildMLowVnum, k->player->buildMHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
   }
 
@@ -545,15 +545,15 @@ void boro_mob_stat(Character *ch, Character *k)
     {
       sprintf(buf, "Spell : '%s'\n\r",
               aff->type < 300 ? spells[(int)aff->type - 1] : skills[(int)aff->type - 300]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "     Modifies %s by %d points\n\r",
               apply_types[(int)aff->location], aff->modifier);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintbit(aff->bitvector, affected_bits, buf);
       strcat(buf, "\n\r");
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     send_to_char("\n\r", ch);
   }
@@ -567,7 +567,7 @@ void boro_mob_stat(Character *ch, Character *k)
     strcat(buf, "  $3Connected$R: ");
     strcat(buf, buf2);
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 }
 
 void mob_stat(Character *ch, Character *k)
@@ -604,26 +604,26 @@ void mob_stat(Character *ch, Character *k)
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "$3Short description$R: ");
   strcat(buf, (k->short_desc ? k->short_desc : "None"));
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
   strcat(buf, (k->title ? k->title : "None"));
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("$3Long description$R: ", ch);
   if (k->long_desc)
-    send_to_char(k->long_desc, ch);
+    ch->send(k->long_desc);
   else
     send_to_char("None", ch);
   ch->sendln("$3Detailed description$R:");
   if (k->description)
-    send_to_char(k->description, ch);
+    ch->send(k->description);
   else
     send_to_char("None", ch);
 
@@ -635,11 +635,11 @@ void mob_stat(Character *ch, Character *k)
   sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->getLevel(),
           k->alignment);
   strcat(buf, buf2);
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (!IS_MOB(k))
   {
@@ -647,19 +647,19 @@ void mob_stat(Character *ch, Character *k)
             k->player->time.birth,
             k->player->time.logon,
             (int32_t)(k->player->time.played));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
             k->age().year, k->age().month, k->age().day, k->age().hours);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   if (IS_NPC(k))
   {
     sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   switch (k->sex)
   {
@@ -680,7 +680,7 @@ void mob_stat(Character *ch, Character *k)
   if (IS_PC(ch))
   {
     sprintf(buf, "$3Hometown$R:[%d]\n\r", k->hometown);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   else
     send_to_char("\n\r", ch);
@@ -692,24 +692,24 @@ void mob_stat(Character *ch, Character *k)
           GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
           GET_RAW_DEX(k), GET_DEX_BONUS(k), GET_DEX(k),
           GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
           GET_MANA(k), mana_limit(k), k->mana_gain_lookup(),
           k->getHP(), hit_limit(k), k->hit_gain_lookup(),
           GET_MOVE(k), k->move_limit(), k->move_gain_lookup(),
           GET_KI(k), ki_limit(k));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\n\r",
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", k->getPositionQString().toStdString().c_str(),
@@ -721,17 +721,17 @@ void mob_stat(Character *ch, Character *k)
     strcat(buf, "  $3Connected$R: ");
     strcat(buf, buf2);
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_NPC(k))
   {
     strcpy(buf, "$3Default position$R: ");
     strcat(buf, Character::position_to_string(k->mobdata->default_pos).toStdString().c_str());
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   sprintf(buf, "  $3Timer$R:[%d] \n\r", k->timer);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_NPC(k))
   {
@@ -744,31 +744,31 @@ void mob_stat(Character *ch, Character *k)
     sprintbit(k->player->toggles, player_bits, buf2);
   }
   strcat(buf, buf2);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_MOB(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
     strcat(buf, (mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
-    send_to_char(buf, ch);
+    ch->send(buf);
     strcpy(buf, "$3Combat Special Proc$R: ");
     strcat(buf, (mob_index[k->mobdata->nr].combat_func ? "Exists  " : "None  "));
-    send_to_char(buf, ch);
+    ch->send(buf);
     strcpy(buf, "$3Mob Progs$R: ");
     strcat(buf, (mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (IS_NPC(k))
   {
     sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
             k->mobdata->damnodice, k->mobdata->damsizedice);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\n\r",
           IS_CARRYING_W(k), IS_CARRYING_N(k));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   for (i = 0, j = k->carrying; j; j = j->next_content, i++)
     ;
@@ -780,7 +780,7 @@ void mob_stat(Character *ch, Character *k)
 
   sprintf(buf2, "$3Items in equipment$R: %d\n\r", i2);
   strcat(buf, buf2);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
           k->saves[SAVE_TYPE_FIRE],
@@ -789,7 +789,7 @@ void mob_stat(Character *ch, Character *k)
           k->saves[SAVE_TYPE_ACID],
           k->saves[SAVE_TYPE_MAGIC],
           k->saves[SAVE_TYPE_POISON]);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_PC(k))
   {
@@ -800,35 +800,35 @@ void mob_stat(Character *ch, Character *k)
             k->player->saves_mods[SAVE_TYPE_ACID],
             k->player->saves_mods[SAVE_TYPE_MAGIC],
             k->player->saves_mods[SAVE_TYPE_POISON]);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\n\r",
           k->conditions[THIRST],
           k->conditions[FULL],
           k->conditions[DRUNK]);
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n",
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (IS_MOB(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
             (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     sprintf(buf, "$3Fears$R: '%s'\n\r",
             ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   sprintf(buf, "$3Master$R: '%s'\n\r",
           ((k->master) ? GET_NAME(k->master) : "NOBODY"));
-  send_to_char(buf, ch);
+  ch->send(buf);
   send_to_char("$3Followers$R:\n\r", ch);
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
@@ -855,25 +855,25 @@ void mob_stat(Character *ch, Character *k)
   if (!IS_MOB(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->player->holyLite) ? "ON" : "OFF"));
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->player->stealth) ? "ON" : "OFF"));
-    send_to_char(buf, ch);
+    ch->send(buf);
     if ((k->player->buildLowVnum == k->player->buildMLowVnum) == k->player->buildOLowVnum &&
         (k->player->buildHighVnum == k->player->buildMHighVnum) == k->player->buildOHighVnum)
     {
       sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->player->buildLowVnum, k->player->buildHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     else
     {
       sprintf(buf, "$3R Range$R:  %d-%d  ", k->player->buildLowVnum, k->player->buildHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "$3M Range$R:  %d-%d  ", k->player->buildMLowVnum, k->player->buildMHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->player->buildOLowVnum, k->player->buildOHighVnum);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
   }
 
@@ -903,16 +903,16 @@ void mob_stat(Character *ch, Character *k)
           aff_name = "Unknown!!!";
       }
       sprintf(buf, "Spell : '%s' (%d)\n\r", aff_name, aff->type);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "     Modifies %s by %d points\n\r",
               apply_types[(int)aff->location], aff->modifier);
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintf(buf, "     Expires in %3d hours", aff->duration);
       //    strcat(buf,",Bits set ");
-      //      send_to_char(buf, ch);
+      //      ch->send(buf);
       //      sprintbit(aff->bitvector,affected_bits,buf);
       strcat(buf, "\n\r");
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     send_to_char("\n\r", ch);
   }
@@ -930,7 +930,7 @@ void mob_stat(Character *ch, Character *k)
                    "    $3Unused (v4)$R: [%d]\n\r",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
     case mob_type_t::MOB_CLAN_GUARD:
       sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
@@ -939,13 +939,13 @@ void mob_stat(Character *ch, Character *k)
                    "    $3Unused (v4)$R: [%d]\n\r",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
     default:
       sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
     }
   }
@@ -979,12 +979,12 @@ void obj_stat(Character *ch, class Object *j)
 
   strcat(buf, buf2);
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
           ((j->short_description) ? j->short_description : "None"),
           ((j->description) ? j->description : "None"));
-  send_to_char(buf, ch);
+  ch->send(buf);
   if (j->ex_description)
   {
     strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\n\r");
@@ -994,32 +994,32 @@ void obj_stat(Character *ch, class Object *j)
       strcat(buf, "\n\r");
     }
     strcat(buf, "----------\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   else
   {
     strcpy(buf, "$3Extra description keyword(s)$R: None\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   send_to_char("$3Can be worn on$R:", ch);
   sprintbit(j->obj_flags.wear_flags, Object::wear_bits, buf);
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("$3Can be worn by$R:", ch);
   sprintbit(j->obj_flags.size, Object::size_bits, buf);
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("$3Extra flags$R: ", ch);
   sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("$3More flags$R: ", ch);
   sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprintf(buf,
           "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
@@ -1027,7 +1027,7 @@ void obj_stat(Character *ch, class Object *j)
           j->obj_flags.cost,
           j->obj_flags.timer,
           j->obj_flags.eq_level);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "$3In room$R: ");
   if (j->in_room == DC::NOWHERE)
@@ -1042,7 +1042,7 @@ void obj_stat(Character *ch, class Object *j)
   strcat(buf, "  $3Carried by$R: ");
   strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   switch (j->obj_flags.type_flag)
   {
@@ -1271,7 +1271,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[3]);
     break;
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "\n\r$3Equipment Status$R: ");
   if (!j->carried_by)
@@ -1291,20 +1291,20 @@ void obj_stat(Character *ch, class Object *j)
     if (!found)
       strcat(buf, "Inventory");
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
     strcat(buf, (obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
   strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
     strcat(buf, (obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
   strcpy(buf, "$3Contains$R :\n\r");
   found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
@@ -1315,7 +1315,7 @@ void obj_stat(Character *ch, class Object *j)
   }
   if (!found)
     strcpy(buf, "$3Contains$R : Nothing\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("$3Can affect char$R :\n\r", ch);
   for (i = 0; i < j->num_affects; i++)
@@ -1329,7 +1329,7 @@ void obj_stat(Character *ch, class Object *j)
       strcpy(buf2, "Invalid");
 
     sprintf(buf, "    $3Affects$R : %s By %d\n\r", buf2, j->affected[i].modifier);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   return;
 }
@@ -1494,7 +1494,7 @@ int do_linkdead(Character *ch, char *arg, int cmd)
     else
       sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
               (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (!x)
@@ -1521,7 +1521,7 @@ int do_echo(Character *ch, char *argument, int cmd)
   {
     sprintf(buf, "\n\r%s\n\r", argument + i);
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
-      send_to_char(buf, vict);
+      vict->send(buf);
   }
   return eSUCCESS;
 }
@@ -1973,7 +1973,7 @@ void pick_up_item(Character *ch, class Object *obj)
           oitem = clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
                   obj->short_description, oitem->short_description);
-          send_to_char(buf, ch);
+          ch->send(buf);
           sprintf(buf, "## %s turned into %s!\r\n",
                   obj->short_description, oitem->short_description);
           send_info(buf);
@@ -2019,7 +2019,7 @@ void pick_up_item(Character *ch, class Object *obj)
         gold = obj->obj_flags.value[0];
         sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
                 obj->short_description, gold);
-        send_to_char(buf, ch);
+        ch->send(buf);
 
         ch->addGold(gold);
         obj_from_char(obj);
@@ -2079,7 +2079,7 @@ int do_showhunt(Character *ch, char *arg, int cmd)
 
     ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(nullptr)));
 
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   else
     ch->sendln("The following hunts are currently active:");

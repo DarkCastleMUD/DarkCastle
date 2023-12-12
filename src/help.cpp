@@ -51,7 +51,7 @@ void show_help_bar(Character *ch);
 int do_mortal_help(Character *ch, char *argument, int cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
-  send_to_char(new_help, ch);
+  ch->send(new_help);
   return eSUCCESS;
 }
 
@@ -114,9 +114,9 @@ int do_new_help(Character *ch, char *argument, int cmd)
   if (!*argument)
   {
     if (ch->getLevel() < IMMORTAL)
-      send_to_char(new_help, ch);
+      ch->send(new_help);
     else
-      send_to_char(new_ihelp, ch);
+      ch->send(new_ihelp);
     return eFAILURE;
   }
 
@@ -133,7 +133,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
   {
     snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
              upper_argument);
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     // Find similar help entries based on the Levenshtein distance
     // between keywords.
@@ -264,7 +264,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
   if (cmd)
     page_string(ch->desc, entry, 1);
   else
-    send_to_char(entry, ch);
+    ch->send(entry);
 
   return eSUCCESS;
 }
@@ -534,7 +534,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
     }
     show_help_bar(ch);
   }
-  send_to_char(help_buf, ch);
+  ch->send(help_buf);
   ch->send(QString("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
   ch->send(QString("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
 
@@ -617,7 +617,7 @@ int do_index(Character *ch, char *argument, int cmd)
     }
     show_help_bar(ch);
   }
-  send_to_char(help_buf, ch);
+  ch->send(help_buf);
   ch->send(QString("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
   ch->send(QString("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
 
@@ -765,7 +765,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
     RECREATE(new_help_table, struct help_index_element_new, new_top_of_helpt + 1);
     new_help_table[new_top_of_helpt] = new_help;
     sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", new_top_of_helpt, buf2);
-    send_to_char(buf, ch);
+    ch->send(buf);
     new_top_of_helpt++;
     sprintf(buf, "%s just created a help file for '%s'.", GET_NAME(ch), buf2);
     logentry(buf, OVERSEER, LogChannels::LOG_HELP);
@@ -819,7 +819,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
           break;
         }
         sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\r\n", key_id, value, help_id);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
@@ -835,7 +835,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
           level = 0;
         new_help_table[help_id].min_level = level;
         sprintf(buf, "Level changed to '%d' for ID# %d.\r\n", level, help_id);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
@@ -854,7 +854,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
           buf2[i] = UPPER(buf2[i]);
         new_help_table[help_id].related = str_hsh(buf2);
         sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
@@ -871,7 +871,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
       if (new_help_table[help_id].entry)
       {
         ch->desc->backstr = str_dup(new_help_table[help_id].entry);
-        send_to_char(ch->desc->backstr, ch);
+        ch->send(ch->desc->backstr);
       }
 
       ch->desc->connected = Connection::states::EDITING;

@@ -504,7 +504,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
             sex,
             race,
             dirs[y]);
-    send_to_char(buf, this);
+    this->send(buf);
   }
   return eSUCCESS;
 }
@@ -884,14 +884,14 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
     if (dir < 0)
     {
       sprintf(buf, "%s wizzes by.\r\n", found->short_description);
-      send_to_char(buf, victim);
+      victim->send(buf);
       sprintf(buf, "%s wizzes by.", found->short_description);
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
       sprintf(buf, "%s wizzes by from the %s.\r\n", found->short_description, dirs[rev_dir[dir]]);
-      send_to_char(buf, victim);
+      victim->send(buf);
       sprintf(buf, "%s wizzes by from the %s.",
               found->short_description, dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
@@ -909,7 +909,7 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
     if (dir < 0)
     {
       sprintf(buf, "%s narrowly misses your head.\r\n", found->short_description);
-      send_to_char(buf, victim);
+      victim->send(buf);
       sprintf(buf, "%s narrowly misses $n.", found->short_description);
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
@@ -917,7 +917,7 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
     {
       sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
               found->short_description, dirs[rev_dir[dir]]);
-      send_to_char(buf, victim);
+      victim->send(buf);
       sprintf(buf, "%s from the %s narrowly misses $n.",
               found->short_description, dirs[rev_dir[dir]]);
       act(buf, victim, nullptr, 0, TO_ROOM, 0);
@@ -1038,10 +1038,10 @@ int do_arrow_damage(Character *ch, Character *victim,
    {
     case 1:
     sprintf(buf, "Your shot impales %s through the heart!\r\n", GET_SHORT(victim));
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
        found->short_description, dirs[rev_dir[dir]]);
-    send_to_char(buf, victim);
+    victim->send(buf);
     sprintf(buf, "%s from the %s impales $n through the chest!",
        found->short_description, dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
@@ -1050,10 +1050,10 @@ int do_arrow_damage(Character *ch, Character *victim,
     case 2:
     sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n",
        found->short_description, GET_SHORT(victim));
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "%s drives right through your left eye!\r\nThe last thing through your mind is.........an arrowhead.\r\n",
        found->short_description);
-    send_to_char(buf, victim);
+    victim->send(buf);
     sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.",
        found->short_description, dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
@@ -1064,7 +1064,7 @@ int do_arrow_damage(Character *ch, Character *victim,
   {
     sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
        found->short_description);
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, "You get shot with %s from the %s.  Ouch.",
           found->short_description, dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_CHAR, 0);
@@ -1504,7 +1504,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         {
           sprintf(buf, "Your shot impales %s through the heart!\r\n",
                   victname);
-          send_to_char(buf, ch);
+          ch->send(buf);
           sprintf(buf,
                   "%s from the %s impales %s through the chest!\r\n",
                   found->short_description, dirs[rev_dir[dir]],
@@ -1525,7 +1525,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           sprintf(buf,
                   "Your %s drives through the eye of %s ending %s life.\r\n",
                   found->short_description, victname, victhshr);
-          send_to_char(buf, ch);
+          ch->send(buf);
           sprintf(buf,
                   "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n",
                   found->short_description, dirs[rev_dir[dir]],
@@ -1546,7 +1546,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           sprintf(buf,
                   "Your shot rips through the throat of %s ending their life with a gurgle.\r\n",
                   victname);
-          send_to_char(buf, ch);
+          ch->send(buf);
           sprintf(buf,
                   "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n",
                   found->short_description, dirs[rev_dir[dir]],
@@ -1567,13 +1567,13 @@ int do_fire(Character *ch, char *arg, int cmd)
         act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
         sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
                 found->short_description);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
         sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
                 found->short_description);
-        send_to_char(buf, ch);
+        ch->send(buf);
         sprintf(buf, "You get shot with %s from the %s.  Ouch.",
                 found->short_description, dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_CHAR, 0);
@@ -1782,7 +1782,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   if (!IS_MOB(target))
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eFAILURE;
   }
 
@@ -1795,7 +1795,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   else
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
             "Noone!");
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }
 

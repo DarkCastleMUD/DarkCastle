@@ -41,7 +41,7 @@ int do_alias(Character *ch, char *arg, int cmd)
     {
       sprintf(outbuf, "Alias %2d:  %s == %s\n\r", x, 
               curr->keyword, curr->command);
-      send_to_char(outbuf, ch);
+      ch->send(outbuf);
     }
   } else {
     if (strlen(arg) > MAX_INPUT_LENGTH - 10) {
@@ -101,14 +101,14 @@ int do_alias(Character *ch, char *arg, int cmd)
      */       
       if (!str_cmp(buf, "alias")) {
           sprintf(outbuf, "Setting 'alias' as an alias would be silly!\n\r");
-          send_to_char(outbuf, ch);
+          ch->send(outbuf);
           dc_free(buf);
           dc_free(buf1);
           return eSUCCESS;
       }
       if (!str_cmp(buf, "deleteall")) {
           sprintf(outbuf, "Setting 'deleteall' as an alias would be silly!\n\r");
-          send_to_char(outbuf, ch);
+          ch->send(outbuf);
           dc_free(buf);
           dc_free(buf1);
           return eSUCCESS;
@@ -122,7 +122,7 @@ int do_alias(Character *ch, char *arg, int cmd)
           if (!str_cmp(curr->keyword, buf)) {
             sprintf(outbuf, "Alias %d: %s == %s    REPLACED with '%s'.\r\n", x,
                buf, curr->command, buf1);
-            send_to_char(outbuf, ch);
+            ch->send(outbuf);
             dc_free (curr->command);
             curr->command = str_dup(buf1);
             dc_free(buf);
@@ -193,7 +193,7 @@ int do_alias(Character *ch, char *arg, int cmd)
           if (!str_cmp(buf, curr->keyword)) {
             sprintf(outbuf,"Alias %2d: %s == %s DELETED.\r\n",o, 
                    curr->keyword, curr->command);
-            send_to_char(outbuf, ch);
+            ch->send(outbuf);
             // if we're first, reassign the chain
             if(curr == ch->player->alias)
               ch->player->alias = curr->next;

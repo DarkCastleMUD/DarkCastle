@@ -525,7 +525,7 @@ int do_boss(Character *ch, char *arg, int cmd)
     sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
                  "/white tree node %d\n\r",
             x, 50 - x, x + x);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   return eSUCCESS;

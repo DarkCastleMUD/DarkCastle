@@ -1044,7 +1044,7 @@ void nanny(class Connection *d, std::string arg)
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
                              //           "Attempt was from %s.$R\r\n"
                              "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n");
-            send_to_char(log_buf, ch);
+            ch->send(log_buf);
          }
          else
          {
@@ -1077,15 +1077,15 @@ void nanny(class Connection *d, std::string arg)
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
       if (ch->getLevel() < IMMORTAL)
-         send_to_char(motd, d->character);
+         d->character->send(motd);
       else
-         send_to_char(imotd, d->character);
+         d->character->send(imotd);
 
       clan_data *clan;
       if ((clan = get_clan(ch->clan)) && clan->clanmotd)
       {
          ch->sendln("$B----------------------------------------------------------------------$R");
-         send_to_char(clan->clanmotd, ch);
+         ch->send(clan->clanmotd);
          ch->sendln("$B----------------------------------------------------------------------$R");
       }
 

@@ -140,13 +140,13 @@ int do_ban(Character *ch, char *argument, int cmd)
             "Ban Type",
             "Banned On",
             "Banned By");
-    send_to_char(buf, ch);
+    ch->send(buf);
     sprintf(buf, format,
             "-----------------------",
             "---------------------------------",
             "-------------------",
             "---------------------------------");
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
     {

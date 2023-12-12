@@ -97,7 +97,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
   if (*target)
   {
     sprintf(gWhoBuffer, "Searching for '$B%s$R'...\r\n", target);
-    send_to_char(gWhoBuffer, ch);
+    ch->send(gWhoBuffer);
   }
 
   clear_who_buffer();
@@ -185,7 +185,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
     }
     else if (*target && foundtarget)
     {
-      send_to_char(gWhoBuffer, ch);
+      ch->send(gWhoBuffer);
       clear_who_buffer();
     }
   } // End for(d).

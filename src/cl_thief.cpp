@@ -968,7 +968,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           {
             GET_EXP(ch) += _exp; /* exp for stealing :) */
             sprintf(buf, "You receive %d experience.\r\n", _exp);
-            send_to_char(buf, ch);
+            ch->send(buf);
           }
 
           if (IS_PC(victim))
@@ -1179,7 +1179,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
         sprintf(buf, "You receive %d exps.\r\n", _exp);
-        send_to_char(buf, ch);
+        ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
         logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
@@ -1402,12 +1402,12 @@ int do_pocket(Character *ch, char *argument, int cmd)
         _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
-      send_to_char(buf, ch);
+      ch->send(buf);
       if (_exp && _exp > 1)
       {
         GET_EXP(ch) += _exp; /* exp for stealing :) */
         sprintf(buf, "You receive %d experience.\r\n", _exp);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
 
       if (IS_PC(victim))
@@ -2329,7 +2329,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
       sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
     else
       sprintf(buf, "After some consideration, you estimate the amount of $B$5gold$R %s is carrying to be %d.\r\n", victim->getNameC(), appraised);
-    send_to_char(buf, ch);
+    ch->send(buf);
     WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
   }
 

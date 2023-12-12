@@ -836,7 +836,7 @@ void message_to_clan(Character *ch, char buf[])
     send_to_char("-->> ", pch);
     ansi_color(RED, pch);
     ansi_color(BOLD, pch);
-    send_to_char(buf, pch);
+    pch->send(buf);
     ansi_color(NTEXT, pch);
     ansi_color(YELLOW, pch);
     send_to_char(" <<--\n\r", pch);
@@ -1023,7 +1023,7 @@ int do_accept(Character *ch, char *arg, int cmd)
   save_clans();
   sprintf(buf, "You are now a member of %s.\r\n", clan->name);
   ch->sendln("Your clan now has a new member.");
-  send_to_char(buf, victim);
+  victim->send(buf);
 
   sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
   logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
@@ -1188,7 +1188,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
 
   sprintf(buf, "You are now the leader of %s.\r\n", clan->name);
   ch->sendln("Your clan now has a new leader.");
-  send_to_char(buf, victim);
+  victim->send(buf);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
   logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
@@ -1218,7 +1218,7 @@ int clan_desc(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans description change\r\n\r\nCurrent description: %s\r\n",
             clan->description ? clan->description : "(No Description)");
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any description use:  clans description delete");
     return 0;
   }
@@ -1239,7 +1239,7 @@ int clan_desc(Character *ch, char *arg)
   if (clan->description)
   {
     ch->desc->backstr = str_dup(clan->description);
-    send_to_char(ch->desc->backstr, ch);
+    ch->send(ch->desc->backstr);
   }
 
   ch->desc->connected = Connection::states::EDITING;
@@ -1271,7 +1271,7 @@ int clan_motd(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
             clan->clanmotd ? clan->clanmotd : "(No Motd)");
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any motd use:  clans motd delete");
     return 0;
   }
@@ -1293,7 +1293,7 @@ int clan_motd(Character *ch, char *arg)
   if (clan->clanmotd)
   {
     ch->desc->backstr = str_dup(clan->clanmotd);
-    send_to_char(ch->desc->backstr, ch);
+    ch->send(ch->desc->backstr);
   }
 
   ch->desc->connected = Connection::states::EDITING;
@@ -1313,7 +1313,7 @@ int clan_death_message(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans death <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->death_message);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any message use:  clans death delete");
     return 0;
   }
@@ -1366,7 +1366,7 @@ int clan_death_message(Character *ch, char *arg)
   clan->death_message = str_dup(arg);
 
   sprintf(buf, "Clan death message changed to: %s\r\n", clan->death_message);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return 1;
 }
 
@@ -1381,7 +1381,7 @@ int clan_logout_message(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans logout <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->logout_message);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any message use:  clans logout delete");
     return 0;
   }
@@ -1422,7 +1422,7 @@ int clan_logout_message(Character *ch, char *arg)
   clan->logout_message = str_dup(arg);
 
   sprintf(buf, "Clan logout message changed to: %s\r\n", clan->logout_message);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return 1;
 }
 
@@ -1437,7 +1437,7 @@ int clan_login_message(Character *ch, char *arg)
   {
     sprintf(buf, "$3Syntax$R:  clans login <new message>\r\n\r\nCurrent message: %s\r\n",
             clan->login_message);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any message use:  clans login delete");
     return 0;
   }
@@ -1478,7 +1478,7 @@ int clan_login_message(Character *ch, char *arg)
   clan->login_message = str_dup(arg);
 
   sprintf(buf, "Clan login message changed to: %s\r\n", clan->login_message);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return 1;
 }
 
@@ -1494,7 +1494,7 @@ int clan_email(Character *ch, char *arg)
   if (!*text)
   {
     sprintf(buf, "$3Syntax$R:  clans email <new address>\r\n\r\nCurrent address: %s\r\n", clan->email);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("To not have any email use:  clans email delete");
     return 0;
   }
@@ -1521,7 +1521,7 @@ int clan_email(Character *ch, char *arg)
   clan->email = str_dup(text);
 
   sprintf(buf, "Clan email changed to: %s\r\n", clan->email);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return 1;
 }
 
@@ -1580,7 +1580,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   sprintf(buf, "You tell the clan, '%s'\n\r", arg);
   ansi_color(GREEN, ch);
-  send_to_char(buf, ch);
+  ch->send(buf);
   ansi_color(NTEXT, ch);
 
   sprintf(buf, "%s tells the clan, '%s'\n\r", GET_SHORT(ch), arg);
@@ -1607,7 +1607,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
       continue;
 
     ansi_color(GREEN, pch);
-    send_to_char(buf, pch);
+    pch->send(buf);
     ansi_color(NTEXT, pch);
   }
 
@@ -1646,7 +1646,7 @@ void do_clan_list(Character *ch)
     {
       buf = fmt::format("{:2} {:<20}$R {:<16}\r\n", clan->number, clan->name, clan->leader);
     }
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 }
 
@@ -1724,18 +1724,18 @@ void do_clan_rights(Character *ch, char *arg)
   if (!(pmember = get_member(name, ch->clan)))
   {
     sprintf(buf, "Could not find '%s' in your clan.\r\n", name);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return;
   }
 
   if (!*last)
   { // diag
     sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->member_name);
-    send_to_char(buf, ch);
+    ch->send(buf);
     for (bit = 0; *clan_rights[bit] != '\n'; bit++)
     {
       sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (DC::isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     return;
   }
@@ -1767,7 +1767,7 @@ void do_clan_rights(Character *ch, char *arg)
     sprintf(buf, "%s toggled off.\r\n", clan_rights[bit]);
     sprintf(buf2, "%s has taken away '%s' rights within your clan.\r\n", GET_SHORT(ch), clan_rights[bit]);
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if ((victim = get_char(pmember->member_name)))
   {
@@ -1815,12 +1815,12 @@ void do_god_clans(Character *ch, char *arg, int cmd)
       if (!(i % 4))
       {
         strcat(buf, "\r\n");
-        send_to_char(buf, ch);
+        ch->send(buf);
         *buf = '\0';
       }
     }
     if (*buf)
-      send_to_char(buf, ch);
+      ch->send(buf);
     ch->sendln("");
     return;
   }
@@ -2417,13 +2417,13 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
       if (!(j % 4))
       {
         strcat(buf, "\r\n");
-        send_to_char(buf, ch);
+        ch->send(buf);
         *buf = '\0';
       }
       j++;
     }
     if (*buf)
-      send_to_char(buf, ch);
+      ch->send(buf);
     ch->sendln("");
     return;
   }
@@ -2627,11 +2627,11 @@ int do_clans(Character *ch, char *arg, int cmd)
       }
 
       sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->member_name);
-      send_to_char(buf, ch);
+      ch->send(buf);
       for (bit = 0; *clan_rights[bit] != '\n'; bit++)
       {
         sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (DC::isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eSUCCESS;
     }
@@ -2684,12 +2684,12 @@ int do_cinfo(Character *ch, char *arg, int cmd)
           clan->leader,
           clan->email ? clan->email : "(No Email)",
           clan->rooms ? "Yes" : "No");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   // This has to be separate, or if the leader uses $'s, it comes out funky
   sprintf(buf, "%s\r\n",
           clan->description ? clan->description : "(No Description)\r\n");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MESSAGES)))
@@ -2700,13 +2700,13 @@ int do_cinfo(Character *ch, char *arg, int cmd)
             clan->login_message ? clan->login_message : "(No Message)",
             clan->logout_message ? clan->logout_message : "(No Message)",
             clan->death_message ? clan->death_message : "(No Message)");
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
     sprintf(buf, "$3Balance$R:         %lu coins\r\n", clan->getBalance());
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   return eSUCCESS;
 }
@@ -2745,13 +2745,13 @@ int do_whoclan(Character *ch, char *arg, int cmd)
       if (found == 0)
       {
         sprintf(buf, "$3Clan %s$R:\n\r", clan->name);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
         sprintf(buf, "  %s %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), DC::isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
       else
         sprintf(buf, "  %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
-      send_to_char(buf, ch);
+      ch->send(buf);
       found++;
     }
   }
@@ -2774,7 +2774,7 @@ int do_cmotd(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  send_to_char(clan->clanmotd, ch);
+  ch->send(clan->clanmotd);
   return eSUCCESS;
 }
 

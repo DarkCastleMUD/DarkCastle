@@ -228,7 +228,7 @@ int do_slay(Character *ch, char *argument, int cmd)
     {
       ch->sendln("You no make ME into chop suey!");
       sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
       if (ch->getLevel() > IMMORTAL)
       {
         fight_kill(victim, ch, TYPE_RAW_KILL, 0);
@@ -295,7 +295,7 @@ int do_kill(Character *ch, char *argument, int cmd)
       {
         ch->sendln("You no make ME into chop suey!");
         sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
-        send_to_char(buf, victim);
+        victim->send(buf);
         if (ch->getLevel() > IMMORTAL)
         {
           fight_kill(victim, ch, TYPE_CHOOSE, 0);

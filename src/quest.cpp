@@ -1493,7 +1493,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (rnum >= 0)
          {
             char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             dc_free(buffer);
          }
       }
@@ -1503,7 +1503,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (rnum >= 0)
          {
             char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             dc_free(buffer);
          }
       }
@@ -1513,7 +1513,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (rnum >= 0)
          {
             char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             dc_free(buffer);
          }
       }
@@ -1523,7 +1523,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (rnum >= 0)
          {
             char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             dc_free(buffer);
          }
       }

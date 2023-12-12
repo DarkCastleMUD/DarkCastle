@@ -211,7 +211,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
                          obj_object->obj_flags.value[0]);
     if (IS_MOB(ch) || !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
-      send_to_char(buffer, ch);
+      ch->send(buffer);
       ch->sendln("");
     }
     bool tax = false;
@@ -275,7 +275,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
 
     if (!IS_MOB(ch) && DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
-      send_to_char(buffer, ch);
+      ch->send(buffer);
     extract_obj(obj_object);
   }
 
@@ -493,13 +493,13 @@ int do_get(Character *ch, char *argument, int cmd)
             !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
         {
           sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           fail = true;
         }
         else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
           sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           fail = true;
         }
         else if (CAN_WEAR(obj_object, ITEM_TAKE))
@@ -567,14 +567,14 @@ int do_get(Character *ch, char *argument, int cmd)
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
       {
         sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-        send_to_char(buffer, ch);
+        ch->send(buffer);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
         sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-        send_to_char(buffer, ch);
+        ch->send(buffer);
         fail = true;
       }
       else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
@@ -619,7 +619,7 @@ int do_get(Character *ch, char *argument, int cmd)
     else
     {
       sprintf(buffer, "You do not see a %s here.\r\n", arg1);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
       fail = true;
     }
   }
@@ -664,7 +664,7 @@ int do_get(Character *ch, char *argument, int cmd)
         if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
           sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           return eFAILURE;
         }
         for (obj_object = sub_object->contains;
@@ -715,7 +715,7 @@ int do_get(Character *ch, char *argument, int cmd)
                 !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
             {
               sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-              send_to_char(buffer, ch);
+              ch->send(buffer);
               fail = true;
             }
             else
@@ -771,7 +771,7 @@ int do_get(Character *ch, char *argument, int cmd)
                 sprintf(buffer,
                         "%s : You can't carry that much weight.\r\n",
                         fname(obj_object->name));
-                send_to_char(buffer, ch);
+                ch->send(buffer);
                 fail = true;
               }
             }
@@ -781,7 +781,7 @@ int do_get(Character *ch, char *argument, int cmd)
         {
           sprintf(buffer, "You do not see anything in the %s.\r\n",
                   fname(sub_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           fail = true;
         }
       }
@@ -789,14 +789,14 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         sprintf(buffer, "The %s is not a container.\r\n",
                 fname(sub_object->name));
-        send_to_char(buffer, ch);
+        ch->send(buffer);
         fail = true;
       }
     }
     else
     {
       sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
       fail = true;
     }
   }
@@ -850,7 +850,7 @@ int do_get(Character *ch, char *argument, int cmd)
         if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
           sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           return eFAILURE;
         }
         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
@@ -879,7 +879,7 @@ int do_get(Character *ch, char *argument, int cmd)
                    !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
           {
             sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             fail = true;
           }
           else if (inventorycontainer ||
@@ -958,7 +958,7 @@ int do_get(Character *ch, char *argument, int cmd)
           else
           {
             sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             fail = true;
           }
         }
@@ -966,7 +966,7 @@ int do_get(Character *ch, char *argument, int cmd)
         {
           sprintf(buffer, "The %s does not contain the %s.\r\n",
                   fname(sub_object->name), arg1);
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           fail = true;
         }
       }
@@ -974,14 +974,14 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         sprintf(buffer,
                 "The %s is not a container.\r\n", fname(sub_object->name));
-        send_to_char(buffer, ch);
+        ch->send(buffer);
         fail = true;
       }
     }
     else
     {
       sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
       fail = true;
     }
   }
@@ -1199,12 +1199,12 @@ int do_drop(Character *ch, char *argument, int cmd)
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
             sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
           }
           else if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
             sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             blindlag = true;
           }
           else
@@ -1233,7 +1233,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
             sprintf(buffer, "You can't drop the %s, it must be CURSED!\r\n", fname(tmp_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
             test = true;
           }
         }
@@ -1277,7 +1277,7 @@ int do_drop(Character *ch, char *argument, int cmd)
           if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
           sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
@@ -1376,7 +1376,7 @@ int do_put(Character *ch, char *argument, int cmd)
       if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, DC::getInstance()->world[ch->in_room].contents)))
       {
         sprintf(buffer, "You don't have a %s.\r\n", arg2);
-        send_to_char(buffer, ch);
+        ch->send(buffer);
         return 1;
       }
       allbuf[0] = '\0';
@@ -1542,25 +1542,25 @@ int do_put(Character *ch, char *argument, int cmd)
           else
           {
             sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name));
-            send_to_char(buffer, ch);
+            ch->send(buffer);
           }
         }
         else
         {
           sprintf(buffer, "You dont have the %s.\r\n", arg2);
-          send_to_char(buffer, ch);
+          ch->send(buffer);
         }
       }
       else
       {
         sprintf(buffer, "You dont have the %s.\r\n", arg1);
-        send_to_char(buffer, ch);
+        ch->send(buffer);
       }
     } /* if arg2 */
     else
     {
       sprintf(buffer, "Put %s in what?\r\n", arg1);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
     }
   } /* if arg1 */
   else
@@ -2770,7 +2770,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     obj_from_char(obj_object);
     sprintf(buffer, "There was %d coins.\r\n",
             obj_object->obj_flags.value[0]);
-    send_to_char(buffer, ch);
+    ch->send(buffer);
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)
     {

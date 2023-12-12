@@ -3113,7 +3113,7 @@ void send_to_char_regardless(std::string messg, Character *ch)
 void send_to_char_nosp(const char *messg, Character *ch)
 {
   char *tmp = str_nospace(messg);
-  send_to_char(tmp, ch);
+  ch->send(tmp);
   dc_free(tmp);
 }
 
@@ -3253,7 +3253,7 @@ void ansi_color(char *txt, Character *ch)
       if ((!strcmp(txt, GREEN)) || (!strcmp(txt, RED)) || (!strcmp(txt, BLUE)) || (!strcmp(txt, BLACK)) || (!strcmp(txt, CYAN)) || (!strcmp(txt, GREY)) || (!strcmp(txt, EEEE)) || (!strcmp(txt, YELLOW)) || (!strcmp(txt, PURPLE)))
         return;
     }
-    send_to_char(txt, ch);
+    ch->send(txt);
     return;
   }
 }

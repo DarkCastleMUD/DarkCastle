@@ -470,7 +470,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
       else
       {
         sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
-        send_to_char(buf, tmp_char);
+        tmp_char->send(buf);
       }
     }
     else
@@ -2450,7 +2450,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
     {
       char buf[2000];
       sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eSUCCESS;
     }
   }
@@ -3991,7 +3991,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, int cmd, const cha
     dam = dice(obj->obj_flags.value[1], obj->obj_flags.value[2]);
     victim->removeHP(dam);
     sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
-    send_to_char(buf, victim);
+    victim->send(buf);
     if (victim->getHP() < 1)
     {
       victim->sendln("You have been KILLED!!");

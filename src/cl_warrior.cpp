@@ -1057,7 +1057,7 @@ void stop_guarding_me(Character *victim)
   while (curr)
   {
     sprintf(buf, "You stop trying to guard %s.\r\n", GET_SHORT(victim));
-    send_to_char(buf, curr->follower);
+    curr->follower->send(buf);
     curr->follower->guarding = nullptr;
     last = curr;
     curr = curr->next;
@@ -1115,7 +1115,7 @@ int do_guard(Character *ch, char *argument, int cmd)
 
   start_guarding(ch, victim);
   sprintf(name, "You begin trying to guard %s.\r\n", GET_SHORT(victim));
-  send_to_char(name, ch);
+  ch->send(name);
   return eSUCCESS;
 }
 

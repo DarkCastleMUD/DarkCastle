@@ -551,12 +551,12 @@ void Character::display_string_list(const char *list[])
         if (!(i % 4))
         {
             strcat(buf, "\r\n");
-            send_to_char(buf, this);
+            this->send(buf);
             *buf = '\0';
         }
     }
     if (*buf)
-        send_to_char(buf, this);
+        this->send(buf);
     this->sendln("");
 }
 

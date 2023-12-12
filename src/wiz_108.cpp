@@ -318,12 +318,12 @@ int do_set(Character *ch, char *argument, int cmd)
                 if (!(i % 4))
                 {
                     strcat(help, "\n\r");
-                    send_to_char(help, ch);
+                    ch->send(help);
                     *help = '\0';
                 }
             }
             if (*help)
-                send_to_char(help, ch);
+                ch->send(help);
             send_to_char("\n\r", ch);*/
     return eFAILURE;
   }

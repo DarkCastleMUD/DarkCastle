@@ -982,6 +982,6 @@ int do_listproc(Character *ch, char *argument, int a)
       sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)obj_index[real_object(i)].item)->name);
     }
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }

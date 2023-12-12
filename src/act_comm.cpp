@@ -226,7 +226,7 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
       if (i->character->isNPC() || DC::isSet(i->character->player->toggles, Player::PLR_ANSI))
         send_to_char(buf1, i->character);
       else
-        send_to_char(buf, i->character);
+        i->character->send(buf);
     }
   }
   return (1);
@@ -362,13 +362,13 @@ int do_channel(Character *ch, char *arg, int cmd)
   if (DC::isSet(ch->misc, (1 << x)))
   {
     sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     REMOVE_BIT(ch->misc, (1 << x));
   }
   else
   {
     sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     SET_BIT(ch->misc, (1 << x));
   }
   return eSUCCESS;
@@ -503,13 +503,13 @@ int do_write(Character *ch, char *argument, int cmd)
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
       sprintf(buf, "You have no %s.\r\n", papername);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eSUCCESS;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, ch->carrying)))
     {
       sprintf(buf, "You have no %s.\r\n", papername);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eSUCCESS;
     }
   }
@@ -518,7 +518,7 @@ int do_write(Character *ch, char *argument, int cmd)
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
       sprintf(buf, "There is no %s in your inventory.\r\n", papername);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eSUCCESS;
     }
     if (paper->obj_flags.type_flag == ITEM_PEN) /* oops, a pen.. */
@@ -536,7 +536,7 @@ int do_write(Character *ch, char *argument, int cmd)
     if (!ch->equipment[HOLD])
     {
       sprintf(buf, "You can't write with a %s alone.\r\n", papername);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eSUCCESS;
     }
     if (!CAN_SEE_OBJ(ch, ch->equipment[HOLD]))
@@ -596,7 +596,7 @@ int do_insult(Character *ch, char *argument, int cmd)
       if (victim != ch)
       {
         sprintf(buf, "You insult %s.\r\n", GET_SHORT(victim));
-        send_to_char(buf, ch);
+        ch->send(buf);
 
         switch (number(0, 3))
         {

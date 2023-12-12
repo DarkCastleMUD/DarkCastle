@@ -61,7 +61,7 @@ int do_spec(Character *ch, char *argument, int cmd)
         }
     */
 
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   else if (!str_cmp(arg, "unlearn"))
   {

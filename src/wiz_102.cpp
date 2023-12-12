@@ -156,40 +156,40 @@ int do_check(Character *ch, char *arg, int cmd)
   }
 
   sprintf(buf, "$3Short Desc$R: %s\n\r", GET_SHORT(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
           races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
   if (ch->getLevel() >= SERAPH)
   {
     sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
             DC::getInstance()->world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   sprintf(buf, "$3Str$R: %-2d  $3Wis$R: %-2d  $3Int$R: %-2d  $3Dex$R: %-2d  $3Con$R: %d\n\r",
           GET_STR(vict), GET_WIS(vict), GET_INT(vict), GET_DEX(vict),
           GET_CON(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "$3Hit Points$R: %d/%d $3Mana$R: %d/%d $3Move$R: %d/%d $3Ki$R: %d/%d\n\r",
           vict->getHP(), GET_MAX_HIT(vict), GET_MANA(vict),
           GET_MAX_MANA(vict), GET_MOVE(vict), GET_MAX_MOVE(vict),
           GET_KI(vict), GET_MAX_KI(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (ch->getLevel() >= OVERSEER && !IS_MOB(vict) && ch->getLevel() >= vict->getLevel())
   {
     sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     /* ctime adds a \n to the std::string it returns! */
     const time_t tBuffer = vict->player->time.logon;
     +sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   display_punishes(ch, vict);
@@ -200,12 +200,12 @@ int do_check(Character *ch, char *arg, int cmd)
       if (ch->getLevel() >= OVERSEER && ch->getLevel() >= vict->getLevel())
       {
         sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->getPeerOriginalAddress().toString().toStdString().c_str());
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
         sprintf(buf, "Connected.\r\n");
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
     }
     else
@@ -284,7 +284,7 @@ int do_find(Character *ch, char *arg, int cmd)
 
   sprintf(type, "%30s -- %s [%d]\n\r", GET_SHORT(vict),
           DC::getInstance()->world[vict->in_room].name, DC::getInstance()->world[vict->in_room].number);
-  send_to_char(type, ch);
+  ch->send(type);
   return eSUCCESS;
 }
 
@@ -1288,7 +1288,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
                     "'%2' is not valid.\r\n")
                 .arg(zone.cmd.size())
                 .arg(text);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
 
@@ -1315,7 +1315,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     zone.cmd[to]->arg2 = tmp->arg2;
     zone.cmd[to]->arg3 = tmp->arg3;
     zone.cmd[to]->comment = tmp->comment;
-    send_to_char(buf, ch);
+    ch->send(buf);
     break;
 
   case 12: // continent
@@ -1834,13 +1834,13 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to delete.\r\n", obj_index[item_num].virt);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     remove_obj_affect_by_index(obj, num - 1);
@@ -1870,7 +1870,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
 
       sprintf(buf, "%2d$3)$R %s$3($R%d$3)$R by %d.\r\n", x + 1, buf2,
               obj->affected[x].location, obj->affected[x].modifier);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     return eSUCCESS; // return so we don't mark as changed
     break;
@@ -1887,7 +1887,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       for (x = 0; x <= APPLY_MAXIMUM_VALUE; x++)
       {
         sprintf(buf, "%3d$3)$R %s\r\n", x, apply_types[x]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       ch->sendln("Make $B$5sure$R you don't use a spell that is restricted.  See builder guide.");
       return eFAILURE;
@@ -1895,26 +1895,26 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n", obj_index[item_num].virt);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     num -= 1; // since arrays start at 0
     if (!check_range_valid_and_convert(modifier, value, APPLY_NONE, APPLY_MAXIMUM_VALUE))
     {
       sprintf(buf, "You must select between %d and %d.\r\n", APPLY_NONE, APPLY_MAXIMUM_VALUE);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     obj->affected[num].location = modifier;
     sprintf(buf, "Affect %d changed to %s by %d.\r\n", num + 1,
             apply_types[obj->affected[num].location], obj->affected[num].modifier);
-    send_to_char(buf, ch);
+    ch->send(buf);
     break;
   }
 
@@ -1933,14 +1933,14 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
               obj_index[item_num].virt);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
               obj->num_affects);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(modifier, value, -100, 100))
@@ -1974,14 +1974,14 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
               obj_index[item_num].virt);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert<decltype(num)>(num, select, 1, obj->num_affects))
     {
       sprintf(buf, "You must select between 1 and %d.\r\n",
               obj->num_affects);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     modifier = atoi(value);
@@ -2152,7 +2152,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->name = str_hsh(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2166,7 +2166,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->description = str_hsh(buf4);
     sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2180,7 +2180,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->short_description = str_hsh(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2194,7 +2194,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->action_description = str_hsh(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2207,7 +2207,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintf(buf, "%s\n", item_types[((Object *)obj_index[rnum].item)->obj_flags.type_flag]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
 
       for (i = 1; i < item_types.size(); i++)
@@ -2231,7 +2231,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.type_flag = intval;
     sprintf(buf, "Item type set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2244,7 +2244,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.wear_flags, Object::wear_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::wear_bits.size(); i++)
       {
@@ -2266,12 +2266,12 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.size,
                 size_bitfields, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *size_bitfields[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", size_bitfields[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -2289,7 +2289,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::extra_bits.size(); i++)
       {
@@ -2316,7 +2316,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.weight = intval;
     sprintf(buf, "Item weight set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2335,7 +2335,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.cost = intval;
     sprintf(buf, "Item value set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2348,7 +2348,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
                    "$3Current$R: ",
                    ch);
       sprintbit(((Object *)obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::more_obj_bits.size(); i++)
       {
@@ -2375,7 +2375,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.eq_level = intval;
     sprintf(buf, "Item minimum level set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2394,7 +2394,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.value[0] = intval;
     sprintf(buf, "Item value 1 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2413,7 +2413,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.value[1] = intval;
     sprintf(buf, "Item value 2 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2432,7 +2432,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.value[2] = intval;
     sprintf(buf, "Item value 3 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2451,7 +2451,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.value[3] = intval;
     sprintf(buf, "Item value 4 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -2596,7 +2596,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ((Object *)obj_index[rnum].item)->obj_flags.timer = intval;
     sprintf(buf, "Item timer to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
   case 22:
@@ -3180,7 +3180,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->setName(buf4);
     sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3195,7 +3195,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->short_desc = str_hsh(buf4);
     sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3210,7 +3210,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     strcat(buf4, "\r\n");
     ((Character *)mob_index[mob_num].item)->long_desc = str_hsh(buf4);
     sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3281,12 +3281,12 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%s\n",
               pc_clss_types[((Character *)mob_index[mob_num].item)->c_class]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *pc_clss_types[i] != '\n'; i++)
       {
         sprintf(buf, "  %d) %s\n\r", i, pc_clss_types[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3297,7 +3297,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->c_class = intval;
     sprintf(buf, "Mob class set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3312,7 +3312,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       sprintf(buf, "%s\n\r\n\r"
                    "Available types:\r\n",
               races[((Character *)mob_index[mob_num].item)->race].singular_name);
-      send_to_char(buf, ch);
+      ch->send(buf);
       for (i = 0; i <= MAX_RACE; i++)
         csendf(ch, "  %s\r\n", races[i].singular_name);
       ch->sendln("");
@@ -3368,7 +3368,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->getLevel());
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, 0, 110))
@@ -3378,7 +3378,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->setLevel(intval);
     sprintf(buf, "Mob level set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3392,7 +3392,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->alignment);
-      send_to_char(buf, ch);
+      ch->send(buf);
       return eFAILURE;
     }
     if (!check_range_valid_and_convert(intval, buf4, -1000, 1000))
@@ -3402,7 +3402,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->alignment = intval;
     sprintf(buf, "Mob alignment set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3494,7 +3494,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       break;
     }
     sprintf(buf, "Mob default position set to %s.\r\n", Character::position_to_string(mobdata->default_pos));
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3510,12 +3510,12 @@ int do_medit(Character *ch, char *argument, int cmd)
       sprintbit(
           ((Character *)mob_index[mob_num].item)->mobdata->actflags,
           action_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *action_bits[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", action_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3556,12 +3556,12 @@ int do_medit(Character *ch, char *argument, int cmd)
           ch);
       sprintbit(((Character *)mob_index[mob_num].item)->affected_by[0],
                 affected_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *affected_bits[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", affected_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3581,7 +3581,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->mobdata->damnodice);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 400");
       return eFAILURE;
     }
@@ -3592,7 +3592,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->damnodice = intval;
     sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3606,7 +3606,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->mobdata->damsizedice);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 400");
       return eFAILURE;
     }
@@ -3617,7 +3617,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->damsizedice = intval;
     sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3631,7 +3631,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->damroll);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: -50 to 400");
       return eFAILURE;
     }
@@ -3642,7 +3642,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->damroll = intval;
     sprintf(buf, "Mob damroll set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3656,7 +3656,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->hitroll);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: -50 to 100");
       return eFAILURE;
     }
@@ -3667,7 +3667,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->hitroll = intval;
     sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3681,7 +3681,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_hit);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 64000");
       return eFAILURE;
     }
@@ -3693,7 +3693,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     ((Character *)mob_index[mob_num].item)->raw_hit = intval;
     ((Character *)mob_index[mob_num].item)->max_hit = intval;
     sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3707,7 +3707,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%lu\n",
               ((Character *)mob_index[mob_num].item)->getGold());
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 0 to 10000000");
       return eFAILURE;
     }
@@ -3725,7 +3725,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->setGold(intval);
     sprintf(buf, "Mob gold set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3740,7 +3740,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           ch);
       sprintf(buf, "%d\n",
               (int)((Character *)mob_index[mob_num].item)->exp);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 0 to 20000000");
       return eFAILURE;
     }
@@ -3751,7 +3751,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->exp = intval;
     sprintf(buf, "Mob experience set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3765,12 +3765,12 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintbit(((Character *)mob_index[mob_num].item)->immune, isr_bits,
                 buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", isr_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3789,12 +3789,12 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintbit(((Character *)mob_index[mob_num].item)->suscept,
                 isr_bits, buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", isr_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3813,12 +3813,12 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintbit(((Character *)mob_index[mob_num].item)->resist, isr_bits,
                 buf);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *isr_bits[i] != '\n'; i++)
       {
         sprintf(buf, "  %s\n\r", isr_bits[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -3837,7 +3837,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->armor);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 100 to $B-$R2000");
       return eFAILURE;
     }
@@ -3848,7 +3848,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->armor = intval;
     sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -3869,7 +3869,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_str);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return eFAILURE;
     }
@@ -3880,7 +3880,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->raw_str = intval;
     sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     // dexterity
@@ -3893,7 +3893,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_dex);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return eFAILURE;
     }
@@ -3904,7 +3904,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->raw_dex = intval;
     sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     // intelligence
@@ -3917,7 +3917,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_intel);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return eFAILURE;
     }
@@ -3928,7 +3928,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->raw_intel = intval;
     sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     // wisdom
@@ -3941,7 +3941,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_wis);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return eFAILURE;
     }
@@ -3952,7 +3952,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->raw_wis = intval;
     sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     // constitution
@@ -3965,7 +3965,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%d\n",
               ((Character *)mob_index[mob_num].item)->raw_con);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("$3Valid Range$R: 1 to 28");
       return eFAILURE;
     }
@@ -3976,7 +3976,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->raw_con = intval;
     sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     // New
@@ -4037,12 +4037,12 @@ int do_medit(Character *ch, char *argument, int cmd)
                    ch);
       sprintf(buf, "%s\n",
               mob_types[((Character *)mob_index[mob_num].item)->mobdata->mob_flags.type]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; *mob_types[i] != '\n'; i++)
       {
         sprintf(buf, "  %d) %s\n\r", i, mob_types[i]);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       return eFAILURE;
     }
@@ -4056,7 +4056,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.type =
         (mob_type_t)intval;
     sprintf(buf, "Mob type set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
     /* edit 1value */
@@ -4074,7 +4074,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[0] = intval;
     sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -4093,7 +4093,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[1] = intval;
     sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -4112,7 +4112,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[2] = intval;
     sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
 
@@ -4131,7 +4131,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     }
     ((Character *)mob_index[mob_num].item)->mobdata->mob_flags.value[3] = intval;
     sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   break;
   }
@@ -5446,15 +5446,15 @@ int do_rstat(Character *ch, char *argument, int cmd)
   sprintf(buf,
           "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\n\r",
           rm->name, rm->zone, rm->number, ch->in_room);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   sprinttype(rm->sector_type, sector_types, buf2);
   sprintf(buf, "Sector type : %s ", buf2);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   strcpy(buf, "Special procedure : ");
   strcat(buf, (rm->funct) ? "Exists\n\r" : "No\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   send_to_char("Room flags: ", ch);
   sprintbit((int32_t)rm->room_flags, room_bits, buf);
@@ -5462,7 +5462,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   send_to_char(buffer.c_str(), ch);
 
   send_to_char("Description:\n\r", ch);
-  send_to_char(rm->description, ch);
+  ch->send(rm->description);
 
   strcpy(buf, "Extra description keywords(s): ");
   if (rm->ex_description)
@@ -5474,12 +5474,12 @@ int do_rstat(Character *ch, char *argument, int cmd)
       strcat(buf, "\n\r");
     }
     strcat(buf, "\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   else
   {
     strcat(buf, "None\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   struct deny_data *d;
   int a = 0;
@@ -5505,7 +5505,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     }
   }
   strcat(buf, "\n\r");
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   buffer = "--------- Contents ---------\n\r";
   for (j = rm->contents; j; j = j->next_content)
@@ -5526,19 +5526,19 @@ int do_rstat(Character *ch, char *argument, int cmd)
     {
       sprintf(buf, "Direction %s . Keyword : %s\n\r",
               dirs[i], rm->dir_option[i]->keyword);
-      send_to_char(buf, ch);
+      ch->send(buf);
       strcpy(buf, "Description:\n\r  ");
       if (rm->dir_option[i]->general_description)
         strcat(buf, rm->dir_option[i]->general_description);
       else
         strcat(buf, "UNDEFINED\n\r");
-      send_to_char(buf, ch);
+      ch->send(buf);
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
       sprintf(buf,
               "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\n\r",
               buf2, rm->dir_option[i]->key,
               rm->dir_option[i]->to_room);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
   }
   return eSUCCESS;
@@ -5582,7 +5582,7 @@ int do_possess(Character *ch, char *argument, int cmd)
         {
           send_to_char("Whoa! Almost got caught snooping!\n", ch->desc->snoop_by->character);
           sprintf(buf, "Your victim is now trying to possess: %s\n", victim->getNameC());
-          send_to_char(buf, ch->desc->snoop_by->character);
+          ch->desc->snoop_by->character->send(buf);
           ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->getName().split(' '));
         }
         else
@@ -5771,7 +5771,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   if (!(vict = get_pc_vis(ch, name)))
   {
     snprintf(buf, sizeof(buf), "%s not found.\r\n", name);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eFAILURE;
   }
 
@@ -5812,7 +5812,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       send_to_char("You suddenly feel dumb as a rock!\n\r", vict);
       send_to_char("You can't remember how to do basic things!\n\r", vict);
       sprintf(buf, "You have been lobotomized by %s!\n\r", GET_NAME(ch));
-      send_to_char(buf, vict);
+      vict->send(buf);
       ch->sendln("STUPID set.");
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -5836,7 +5836,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     else
     {
       sprintf(buf, "You have been silenced by %s!\n\r", GET_NAME(ch));
-      send_to_char(buf, vict);
+      vict->send(buf);
       ch->sendln("SILENCE set.");
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -5855,7 +5855,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     else
     {
       sprintf(buf, "%s takes away your ability to....\r\n", GET_NAME(ch));
-      send_to_char(buf, vict);
+      vict->send(buf);
       ch->sendln("FREEZE set.");
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -5873,7 +5873,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     {
       sprintf(buf, "%s takes away your ability to join arenas!\n\r", GET_NAME(ch));
       ch->sendln("NOARENA set.");
-      send_to_char(buf, vict);
+      vict->send(buf);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOARENA);
   }
@@ -5887,7 +5887,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     else
     {
       sprintf(buf, "%s takes away your ability to emote!\n\r", GET_NAME(ch));
-      send_to_char(buf, vict);
+      vict->send(buf);
       ch->sendln("NOEMOTE set.");
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5902,7 +5902,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     else
     {
       sprintf(buf, "%s takes away your ability to use telepathic communication!\n\r", GET_NAME(ch));
-      send_to_char(buf, vict);
+      vict->send(buf);
       ch->sendln("NOTELL set.");
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOTELL);
@@ -5918,7 +5918,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     {
       sprintf(buf, "%s removes your ability to set your name!\n\r", GET_NAME(ch));
       ch->sendln("NONAME set.");
-      send_to_char(buf, vict);
+      vict->send(buf);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NONAME);
   }
@@ -5934,7 +5934,7 @@ int do_punish(Character *ch, char *arg, int cmd)
     {
       sprintf(buf, "%s removes your ability to set your title!\n\r", GET_NAME(ch));
       ch->sendln("NOTITLE set.");
-      send_to_char(buf, vict);
+      vict->send(buf);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_NOTITLE);
   }
@@ -5956,7 +5956,7 @@ int do_punish(Character *ch, char *arg, int cmd)
         sprintf(buf, "%s curses you with god-given bad luck!\n\r", GET_NAME(ch));
         ch->sendln("UNLUCKY set.");
       }
-      send_to_char(buf, vict);
+      vict->send(buf);
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
       logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
     }
@@ -5988,7 +5988,7 @@ void display_punishes(Character *ch, Character *vict)
   char buf[100];
 
   sprintf(buf, "$3Punishments for %s$R: ", GET_NAME(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   if (DC::isSet(vict->player->punish, PUNISH_NONAME))
     send_to_char("noname ", ch);
@@ -6041,7 +6041,7 @@ int do_colors(Character *ch, char *argument, int cmd)
   for (int i = 1; i < 8; i++)
   {
     sprintf(buf, "  $$$%d%d)   $B********$R  $%d$I***********$R  $%d$B$I**********$R\r\n", i, i, i, i);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   send_to_char("\r\nTo return to 'normal' color use $$R.\r\n\r\n"
                "Example:  'This is $$Bbold and $$4bold $$R$$4red$R!' will print:\r\n"

@@ -3212,7 +3212,7 @@ int move_obj(Object *obj, Character *ch)
 	 if(obj->obj_flags.type_flag == ITEM_MONEY &&
 	 obj->obj_flags.value[0] >= 1 ) {
 	 sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
-	 send_to_char(buffer,ch);
+	 ch->send(buffer);
 	 GET_GOLD(ch) += obj->obj_flags.value[0];
 	 extract_obj(obj);
 	 return 1;

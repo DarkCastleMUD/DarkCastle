@@ -535,14 +535,14 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
 
     sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
             per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(ch, skilllist[i].skillnum));
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
     {
       if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
         sprintf(buf, "Mana: $B%3d$R ", 150);
       else
         sprintf(buf, "Mana: $B%3d$R ", use_mana(ch, skilllist[i].skillnum));
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
@@ -597,7 +597,7 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
       if (skilllist != g_skills)
       {
         sprintf(buf, " %s", attrname(GET_CLASS(ch), skilllist[i].attrs));
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
         send_to_char(" General", ch);
@@ -653,7 +653,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   if (!*arg) // display skills that can be learned
   {
     sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ch->sendln("You can practice any of these skills:\n\r");
 
     ch->sendln("$BUniversal skills:$R");
@@ -662,7 +662,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     output_praclist(ch, g_skills);
 
     sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1 + pc_clss_types[GET_CLASS(ch)]));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     if (GET_CLASS(ch) != CLASS_MONK)
       ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
@@ -939,7 +939,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
         sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
         do_say(owner, buf, CMD_DEFAULT);
         do_say(owner, "As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!", 9);
-        //	     send_to_char(buf, ch);
+        //	     ch->send(buf);
       }
       else
       {
@@ -947,7 +947,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
 
         do_say(owner, buf, CMD_DEFAULT);
         sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
-        send_to_char(buf, ch);
+        ch->send(buf);
         GET_PLATINUM(ch) += bonus;
       }
     }
@@ -1093,7 +1093,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     char buf[MAX_STRING_LENGTH];
 
     sprintf(buf, "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", get_skill_name(skl));
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
   if (cmd == 56)
@@ -1127,14 +1127,14 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     extern void prepare_character_for_sixty(Character * ch);
     prepare_character_for_sixty(ch);
     sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
       learn_skill(ch, SPELL_RELEASE_ELEMENTAL, 1, 1);
       sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL));
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
     }
     return eSUCCESS;
@@ -1143,7 +1143,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!*arg)
   {
     sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
-    send_to_char(buf, ch);
+    ch->send(buf);
     send_to_char("You can practice any of these skills:\n\r", ch);
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
     {
@@ -1152,7 +1152,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
         continue;
       sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
-      send_to_char(buf, ch);
+      ch->send(buf);
     }
     return eSUCCESS;
   }

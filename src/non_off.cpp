@@ -382,7 +382,7 @@ int do_title(Character *ch, char *argument, int cmd)
     dc_free(ch->title);
   ch->title = str_dup(argument);
   sprintf(buf, "Your title is now: %s\n\r", argument);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }
 

@@ -185,7 +185,7 @@ void send_to_table(QString msg, struct table_data *tbl, struct player_data *plrS
    //  struct player_data *plr;
    /*  for (plr = tbl->plr ; plr ; plr = plr->next)
       if (verify(plr) && plrSilent != plr)
-        send_to_char(msg,plr->ch);
+        plr->ch->send(msg);
      */
    if (tbl->obj->in_room)
    {
@@ -657,7 +657,7 @@ void check_winner(struct table_data *tbl)
          char buf[MAX_STRING_LENGTH];
          sprintf(buf, "It's a PUSH!\r\nThe dealer takes your cards and gives you %d %s coins.\r\n",
                  plr->bet, plr->table->gold ? "gold" : "platinum");
-         send_to_char(buf, plr->ch);
+         plr->ch->send(buf);
          sprintf(buf, "The dealer gives %s %d coins.\r\n", GET_NAME(plr->ch),
                  plr->bet); //, plr->table->gold?"gold":"platinum");
                             //		plr->bet);
@@ -676,7 +676,7 @@ void check_winner(struct table_data *tbl)
          plr->ch->sendln("$BYou WIN!$R");
          sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
                  plr->bet * 2, plr->table->gold ? "gold" : "platinum");
-         send_to_char(buf, plr->ch);
+         plr->ch->send(buf);
          sprintf(buf, "The dealer gives %s %d %s coins.\r\n", GET_NAME(plr->ch),
                  plr->bet * 2, plr->table->gold ? "gold" : "platinum");
          send_to_table(buf, tbl, plr);
@@ -781,7 +781,7 @@ void check_blackjacks(struct table_data *tbl)
             continue;
          buf[0] = '\0';
          blackjack_prompt(plr->ch, buf, !DC::isSet(plr->ch->player->toggles, Player::PLR_ASCII));
-         send_to_char(buf, plr->ch);
+         plr->ch->send(buf);
       }
       check_winner(tbl);
       return;
@@ -799,10 +799,10 @@ void check_blackjacks(struct table_data *tbl)
          plr->ch->sendln("$BYou BLACKJACK!$R");
          buf = fmt::format("The dealer gives you {} {} coins.\r\n", (int)(plr->bet * 2.5), plr->table->gold ? "gold" : "platinum");
 
-         send_to_char(buf, plr->ch);
+         plr->ch->send(buf);
          buf[0] = '\0';
          blackjack_prompt(plr->ch, buf, !DC::isSet(plr->ch->player->toggles, Player::PLR_ASCII));
-         send_to_char(buf, plr->ch);
+         plr->ch->send(buf);
 
          if (plr->table->gold)
             plr->ch->addGold((uint32_t)(plr->bet * 2.5));
@@ -1404,7 +1404,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       send_to_table(buf, plr->table, plr);
       sprintf(buf, "You receive a %s%s%c%s.\r\n", suitcol(plr->hand_data[2]),
               valstri(plr->hand_data[2]), suit(plr->hand_data[2]), NTEXT);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       if (hand_strength(plr) > 21) // busted
       {
@@ -1506,7 +1506,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
               suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]),
               suit(plr->hand_data[i]), NTEXT);
-      send_to_char(buf, ch);
+      ch->send(buf);
       if (hand_strength(plr) > 21) // busted
       {
          char buf[MAX_STRING_LENGTH];
@@ -1892,7 +1892,7 @@ int do_testhand(Character *ch, char *argument, int cmd)
    //	hand[0][z],hand[1][z],
    //	hand[2][z],hand[3][z],
    //	hand[4][z]);
-   // send_to_char(buf, ch);
+   // ch->send(buf);
    return eSUCCESS;
 }
 
@@ -2219,7 +2219,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       stop1 = number(0, 19);
       send_to_room("You hear a loud clunk as the first stopper snaps into place.\r\n", machine->obj->in_room);
       sprintf(buf, "%s    |      |\n\r", reel1[stop1]);
-      send_to_char(buf, machine->ch);
+      machine->ch->send(buf);
       slot_timer(machine, stop1, -1, 2);
    }
    else if (stop2 < 0 && charExists(machine->ch) && verify_slot(machine))
@@ -2227,7 +2227,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       stop2 = number(0, 19);
       send_to_room("You hear a loud clunk as the second stopper snaps into place.\r\n", machine->obj->in_room);
       sprintf(buf, "%s %s    |\n\r", reel1[stop1], reel2[stop2]);
-      send_to_char(buf, machine->ch);
+      machine->ch->send(buf);
       slot_timer(machine, stop1, stop2, 2);
    }
    else if (charExists(machine->ch) && verify_slot(machine))
@@ -2236,7 +2236,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       int stop3 = number(0, 19);
       send_to_room("You hear a loud clunk as the final stopper snaps into place.\r\n", machine->obj->in_room);
       sprintf(buf, "%s %s %s\n\r", reel1[stop1], reel2[stop2], reel3[stop3]);
-      send_to_char(buf, machine->ch);
+      machine->ch->send(buf);
 
       if (stop1 == 6 && stop2 == 3 && stop3 == 14)
          payout = 200;
@@ -2313,7 +2313,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
             machine->ch->addGold(machine->lastwin);
          else
             GET_PLATINUM(machine->ch) += machine->lastwin;
-         send_to_char(buf, machine->ch);
+         machine->ch->send(buf);
          machine->ch->sendln("A tiny panel flips open on the slot machine, revealing red and black buttons.");
          machine->button = true;
          machine->prch = machine->ch;
@@ -2441,7 +2441,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
       GET_PLATINUM(ch) -= obj->slot->cost * obj->slot->bet;
    obj->slot->busy = true;
    sprintf(buf, "You place %d %s into the slot and set the reels spinning!\n\r", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
-   send_to_char(buf, ch);
+   ch->send(buf);
    act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
    send_to_char("   |      |      |\n\r", ch);
    obj->slot->ch = ch;

@@ -484,7 +484,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   class Object *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->short_description);
-  send_to_char(buf, ch);
+  ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
@@ -505,7 +505,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   class Object *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->short_description);
-  send_to_char(buf, ch);
+  ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
@@ -604,7 +604,7 @@ void set_catstink(Character *ch, class Object *obj)
   extern const char *sector_types[];
 
   sprintf(buf, "You sprinkle the %s all around you.\r\n", obj->short_description);
-  send_to_char(buf, ch);
+  ch->send(buf);
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make sure it's useable in the place we're at
@@ -619,7 +619,7 @@ void set_catstink(Character *ch, class Object *obj)
 
     sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
             obj->short_description, sector_types[obj->obj_flags.value[1]]);
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     // small chance of success
     if (number(0, 9))
@@ -682,7 +682,7 @@ int do_mortal_set(Character *ch, char *argument, int cmd)
   if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
     sprintf(buf, "You do not seem to have a '%s'.\r\n", arg);
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eFAILURE;
   }
 
@@ -970,7 +970,7 @@ int do_drink(Character *ch, char *argument, int cmd)
       sprintf(buf, "$n drinks %s from $p.", drinks[temp->obj_flags.value[2]]);
       act(buf, ch, temp, 0, TO_ROOM, INVIS_NULL);
       sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       if (ch->getLevel() >= IMMORTAL)
         return eSUCCESS;
@@ -1207,7 +1207,7 @@ int do_pour(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "You pour the %s into the %s.\r\n",
           drinks[from_obj->obj_flags.value[2]], arg2);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   /* First same type liq. */
   to_obj->obj_flags.value[2] = from_obj->obj_flags.value[2];
@@ -1275,7 +1275,7 @@ int do_sip(Character *ch, char *argument, int cmd)
 
   act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
   sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
-  send_to_char(buf, ch);
+  ch->send(buf);
 
   gain_condition(ch, DRUNK,
                  (int)(drink_aff[temp->obj_flags.value[2]][DRUNK] / 4));
@@ -1702,7 +1702,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           sprintf(buffer, "You put the %s on your right ring-finger.\r\n",
                   fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_R);
         }
@@ -1710,7 +1710,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           sprintf(buffer, "You put the %s on your left ring-finger.\r\n",
                   fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_L);
         }
@@ -1937,14 +1937,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           sprintf(buffer, "You wear the %s around your right wrist.\r\n",
                   fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           equip_char(ch, obj_object, WEAR_WRIST_R);
         }
         else
         {
           sprintf(buffer, "You wear the %s around your left wrist.\r\n",
                   fname(obj_object->name));
-          send_to_char(buffer, ch);
+          ch->send(buffer);
           equip_char(ch, obj_object, WEAR_WRIST_L);
         }
       }
@@ -2176,14 +2176,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   case -1:
   {
     sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name));
-    send_to_char(buffer, ch);
+    ch->send(buffer);
   }
   break;
   case -2:
   {
     sprintf(buffer, "You can't wear the %s.\r\n",
             fname(obj_object->name));
-    send_to_char(buffer, ch);
+    ch->send(buffer);
   }
   break;
   default:
@@ -2313,7 +2313,7 @@ int do_wear(Character *ch, char *argument, int cmd)
       {
         sprintf(buf,
                 "%s is an unknown body location.\r\n", arg2);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       else
       {
@@ -2330,7 +2330,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   else
   {
     sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
-    send_to_char(buffer, ch);
+    ch->send(buffer);
   }
   return eSUCCESS;
 }
@@ -2375,7 +2375,7 @@ int do_wield(Character *ch, char *argument, int cmd)
     else
     {
       sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
     }
   }
   else
@@ -2421,7 +2421,7 @@ int do_grab(Character *ch, char *argument, int cmd)
     else
     {
       sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
-      send_to_char(buffer, ch);
+      ch->send(buffer);
     }
   }
   else

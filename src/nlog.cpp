@@ -129,7 +129,7 @@ int csendf(Character *ch, const char *arg, ...)
   vsprintf(s, arg, args);
   va_end(args);
 
-  send_to_char(s, ch);
+  ch->send(s);
 
   return (1);
 }

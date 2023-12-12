@@ -204,7 +204,7 @@ int do_string(Character *ch, char *arg, int cmd)
 		if ((mob->getLevel() > ch->getLevel()) && IS_PC(mob))
 		{
 			sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
-			send_to_char(message, ch);
+			ch->send(message);
 			return 1;
 		}
 
@@ -770,7 +770,7 @@ void show_string(class Connection *d, const char *input)
 	{
 		strncpy(buffer, d->showstr_vector[d->showstr_page], diff = (d->showstr_vector[d->showstr_page + 1]) - (d->showstr_vector[d->showstr_page]));
 		buffer[diff] = '\0';
-		send_to_char(buffer, d->character);
+		d->character->send(buffer);
 		d->showstr_page++;
 	}
 }

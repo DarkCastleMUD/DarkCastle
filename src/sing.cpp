@@ -1318,7 +1318,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
 	else if (skill > 80 && corpse)
 	{
 		sprintf(buf, "Corpse '%s'\n\r", corpse->name);
-		send_to_char(buf, ch);
+		ch->send(buf);
 		spell_identify(ch->getLevel(), ch, 0, corpse, 0);
 	}
 	else if (skill > 85 && vict)
@@ -1419,7 +1419,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 			continue;
 
 		sprintf(buf, " %-50s    %d ki\r\n", songs[i], song_info[i].min_useski);
-		send_to_char(buf, ch);
+		ch->send(buf);
 	}
 	return eSUCCESS;
 }
@@ -1476,7 +1476,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
 				sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
 			else
 				sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", GET_NAME(ch), heal);
-			send_to_char(buf, tmp_char);
+			tmp_char->send(buf);
 		}
 		else
 			tmp_char->sendln("You feel soothed.");
@@ -1575,7 +1575,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 			else
 			{
 				sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
-				send_to_char(buf, tmp_char);
+				tmp_char->send(buf);
 			}
 		}
 		else
@@ -2202,7 +2202,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 		target->sendln("You sense you are the target of scrying.");
 
 	sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	return eSUCCESS;
 }
 
@@ -2935,7 +2935,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 	act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
 	auto new_hate = target->get_random_hate();
 	sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
-	send_to_char(buf, ch);
+	ch->send(buf);
 
 	if (skill > 80)
 	{

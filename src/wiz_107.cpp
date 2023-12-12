@@ -81,7 +81,7 @@ int do_pview(Character *ch, char *argument, int cmd)
 
   make_prompt(victim->desc, tprompt);
   ch->sendln("Target's prompt is:");
-  send_to_char(tprompt, ch);
+  ch->send(tprompt);
   ch->sendln("\r\n");
 
   return eSUCCESS;
@@ -228,8 +228,8 @@ int do_send(Character *ch, char *argument, int cmd)
   }
 
   sprintf(buf, "You send '%s' to %s.\r\n", message, GET_NAME(vict));
-  send_to_char(buf, ch);
+  ch->send(buf);
   sprintf(buf, "%s\r\n", message);
-  send_to_char(buf, vict);
+  vict->send(buf);
   return eSUCCESS;
 }

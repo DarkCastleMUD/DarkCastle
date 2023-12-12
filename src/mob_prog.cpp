@@ -3753,7 +3753,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 		sprintf(buf,"%sLeft: %s\n",buf,left);
 		sprintf(buf,"%sRight: %s\n",buf,right);
 	//        if (actor)
-	//	  send_to_char(buf, actor);
+	//	  actor->send(buf);
 		return eSUCCESS;
 		 }
 		 str++;

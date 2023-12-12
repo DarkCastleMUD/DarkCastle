@@ -47,7 +47,7 @@ int do_arena(Character *ch, char *argument, int cmd)
   if (!*arg1 || !*arg2)
   {
     sprintf(buf, "Currently open for levels: %d %d\n\r", arena.low, arena.high);
-    send_to_char(buf, ch);
+    ch->send(buf);
     send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type] [hp limit if applicable]\n\r"
                  "Valid types: chaos, potato, prize, hp\n\r"
                  "Use -1 for no limit on number of mortals.\r\n"

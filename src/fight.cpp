@@ -2896,7 +2896,7 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
   {
     if (char_death_msg)
     {
-      send_to_char(char_death_msg, ch);
+      ch->send(char_death_msg);
       send_to_char("\n\rYou have been KILLED!\n\r", ch);
     }
     if (room_death_msg)
@@ -5937,7 +5937,7 @@ void group_gain(Character *ch, Character *victim)
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
       share = (int)((double)share * 1.10);
     sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
-    send_to_char(buf, tmp_ch);
+    tmp_ch->send(buf);
     gain_exp(tmp_ch, share);
     total_share += share;
     change_alignment(tmp_ch, victim);
@@ -7837,7 +7837,7 @@ void Character::send(const char *buffer)
 
 void Character::send(std::string buffer)
 {
-  send_to_char(buffer, this);
+  this->send(buffer);
 }
 
 void Character::send(QString buffer)
@@ -7852,7 +7852,7 @@ void Character::sendRaw(std::string buffer)
     this->desc->allowColor = 0;
   }
 
-  send_to_char(buffer, this);
+  this->send(buffer);
 
   if (this->desc != nullptr)
   {

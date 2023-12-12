@@ -564,7 +564,7 @@ void advance_level(Character *ch, int is_conversion)
 			GET_MAX_MOVE(ch),
 			IS_MOB(ch) ? 0 : add_practices, IS_MOB(ch) ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
 	if (!is_conversion)
-		send_to_char(buf, ch);
+		ch->send(buf);
 
 	if (ch->getLevel() % 3 == 0)
 		for (int i = 0; i <= SAVE_TYPE_MAX; i++)

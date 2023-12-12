@@ -546,7 +546,7 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
 
   //   char out_buf[MAX_STRING_LENGTH];
   //  sprintf(out_buf, "%s is an unknown body location.\r\n", buf);
-  // send_to_char(out_buf, ch);
+  // ch->send(out_buf);
 
   int nr = real_object(vnum);
 

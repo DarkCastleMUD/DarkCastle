@@ -169,7 +169,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			{
 				cnt++;
 				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(obj_index[num].item))->short_description);
-				send_to_char(buf, ch);
+				ch->send(buf);
 			}
 
 			if (cnt > 200)
@@ -347,7 +347,7 @@ int do_purge(Character *ch, char *argument, int cmd)
 				sprintf(buf, "%s is surrounded with scorching flames but is"
 							 " unharmed.\r\n",
 						GET_SHORT(vict));
-				send_to_char(buf, ch);
+				ch->send(buf);
 				act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
 				return eFAILURE;
 			}
@@ -465,7 +465,7 @@ int Zone::show_info(Character *ch)
 				 .arg(last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str()));
 
 	sprintbit(zone_flags, Zone::zone_bits, buf);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	sprintf(buf, "\r\n"
 				 "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
 				 "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
@@ -475,7 +475,7 @@ int Zone::show_info(Character *ch)
 			died_this_tick,
 			repops_without_deaths,
 			repops_with_bonus);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	ch->sendln("");
 
 	return eSUCCESS;
@@ -494,7 +494,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	if (k < start)
 	{
 		sprintf(buf, "Last command in this zone is %d.\r\n", k);
-		send_to_char(buf, ch);
+		ch->send(buf);
 		return eFAILURE;
 	}
 
@@ -720,7 +720,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j]->comment.toStdString().c_str());
 		}
 
-		send_to_char(buf, ch);
+		ch->send(buf);
 		if (stats)
 		{
 			csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
@@ -879,7 +879,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
 							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
-					send_to_char(buf, ch);
+					ch->send(buf);
 				}
 			}
 			else
@@ -894,7 +894,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
-					send_to_char(buf, ch);
+					ch->send(buf);
 
 					if (count > 200)
 					{
@@ -922,7 +922,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((Character *)(mob_index[nr].item))->getLevel(),
 							((Character *)(mob_index[nr].item))->short_desc);
-					send_to_char(buf, ch);
+					ch->send(buf);
 
 					if (count > 200)
 					{
@@ -989,7 +989,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(obj_index[nr].item))->short_description);
-					send_to_char(buf, ch);
+					ch->send(buf);
 				}
 			}
 			else
@@ -1004,7 +1004,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(obj_index[nr].item))->short_description);
-					send_to_char(buf, ch);
+					ch->send(buf);
 
 					if (count > 200)
 					{
@@ -1033,7 +1033,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
 							((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
 							((class Object *)(obj_index[nr].item))->short_description);
-					send_to_char(buf, ch);
+					ch->send(buf);
 				}
 
 				if (count > 200)
@@ -1090,7 +1090,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				{
 					sprintf(buf, "[  1] [%5d] %s\n\r", begin,
 							DC::getInstance()->world[begin].name);
-					send_to_char(buf, ch);
+					ch->send(buf);
 				}
 			}
 			else
@@ -1101,7 +1101,7 @@ int do_show(Character *ch, char *argument, int cmd)
 						continue;
 					count++;
 					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, DC::getInstance()->world[i].name);
-					send_to_char(buf, ch);
+					ch->send(buf);
 
 					if (count > 200)
 					{
@@ -1220,7 +1220,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (DC::getInstance()->world[i].sector_type != sector)
 					continue;
 			sprintf(buf, "[%3d] %s\r\n", i, DC::getInstance()->world[i].name);
-			send_to_char(buf, ch);
+			ch->send(buf);
 		}
 	}
 	else if (is_abbrev(type, "msearch") && has_range)
@@ -1422,7 +1422,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
 					((Character *)(mob_index[nr].item))->getLevel(),
 					((Character *)(mob_index[nr].item))->short_desc);
-			send_to_char(buf, ch);
+			ch->send(buf);
 		eheh:
 			continue;
 		}
@@ -1746,7 +1746,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
 					((class Object *)(obj_index[nr].item))->obj_flags.eq_level,
 					((class Object *)(obj_index[nr].item))->short_description);
-			send_to_char(buf, ch);
+			ch->send(buf);
 		endLoop:
 			continue;
 		}
@@ -2071,7 +2071,7 @@ void opstat(Character *ch, int vnum)
 	obj = (Object *)obj_index[num].item;
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
 			obj->name, vnum);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	if (obj_index[num].progtypes == 0)
 	{
 		ch->sendln("This object has no special procedures.");
@@ -2085,11 +2085,11 @@ void opstat(Character *ch, int vnum)
 		 i++, mprg = mprg->next)
 	{
 		sprintf(buf, "$3%d$R>$3$B", i);
-		send_to_char(buf, ch);
+		ch->send(buf);
 		send_to_char(oprog_type_to_name(mprg->type), ch);
 		send_to_char("$R ", ch);
 		sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
-		send_to_char(buf, ch);
+		ch->send(buf);
 		sprintf(buf, "%s\n\r", mprg->comlist);
 		double_dollars(buf2, buf);
 		send_to_char(buf2, ch);
@@ -2253,7 +2253,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 			{
 				sprintf(buf, " %2d - %15s\r\n",
 						i + 1, obj_types[i]);
-				send_to_char(buf, ch);
+				ch->send(buf);
 			}
 			return eFAILURE;
 		}
@@ -2378,7 +2378,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 			if (currprog->comlist)
 			{
 				ch->desc->backstr = str_dup(currprog->comlist);
-				send_to_char(ch->desc->backstr, ch);
+				ch->send(ch->desc->backstr);
 			}
 		}
 
@@ -2396,7 +2396,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 				 ch);
 	char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
-	send_to_char(buf, ch);
+	ch->send(buf);
 	return eSUCCESS;
 }
 

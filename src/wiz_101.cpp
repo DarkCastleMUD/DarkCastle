@@ -311,7 +311,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(player->poofout, tmp_ch);
+        tmp_ch->send(player->poofout);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
@@ -334,7 +334,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(player->poofin, tmp_ch);
+        tmp_ch->send(player->poofin);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
@@ -381,10 +381,10 @@ int do_poof(Character *ch, char *arg, int cmd)
   {
     send_to_char("Usage:\n\rpoof [i|o] <std::string>\n\r", ch);
     send_to_char("\n\rCurrent poof in is:\n\r", ch);
-    send_to_char(ch->player->poofin, ch);
+    ch->send(ch->player->poofin);
     send_to_char("\n\r", ch);
     send_to_char("\n\rCurrent poof out is:\n\r", ch);
-    send_to_char(ch->player->poofout, ch);
+    ch->send(ch->player->poofout);
     send_to_char("\n\r", ch);
     return eSUCCESS;
   }
@@ -640,7 +640,7 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
     ch->player->wizinvis = arg1;
   }
   sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }
 
@@ -829,7 +829,7 @@ int do_varstat(Character *ch, char *argument, int cmd)
   {
     sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
             eh->name, eh->data);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
   if (buf[0] == '\0')
   {

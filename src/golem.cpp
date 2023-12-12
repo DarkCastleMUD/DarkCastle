@@ -133,7 +133,7 @@ int verify_existing_components(Character *ch, int golemtype)
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
           sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
-          send_to_char(buf, ch);
+          ch->send(buf);
           obj_from_char(curr);
           extract_obj(curr);
           break; // Only remove ONE of the components of that type.
@@ -141,7 +141,7 @@ int verify_existing_components(Character *ch, int golemtype)
         else
         {
           sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", curr->short_description);
-          send_to_char(buf, ch);
+          ch->send(buf);
           break;
         }
       }
@@ -392,7 +392,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           "========================($5:$7)\n\r",
           GET_SHORT(ch));
 
-  send_to_char(buf, master);
+  master->send(buf);
 
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
@@ -409,7 +409,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           ch->mana_gain_lookup(), ch->move_gain_lookup(), ch->ki_gain_lookup(), GET_AGE(ch),
           GET_ALIGNMENT(ch));
 
-  send_to_char(buf, master);
+  master->send(buf);
 
   sprintf(buf,
           "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
@@ -427,7 +427,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
           get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
-  send_to_char(buf, master);
+  master->send(buf);
 
   if ((immune = ch->immune))
   {
@@ -439,7 +439,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         scratch = frills[level];
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Immunity", isrString.c_str(), scratch);
-        send_to_char(buf, master);
+        master->send(buf);
         isrString = std::string();
         if (++level == 4)
           level = 0;
@@ -456,7 +456,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         scratch = frills[level];
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Susceptibility", isrString.c_str(), scratch);
-        send_to_char(buf, master);
+        master->send(buf);
         isrString = std::string();
         if (++level == 4)
           level = 0;
@@ -473,7 +473,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         scratch = frills[level];
         sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                 scratch, "Resistibility", isrString.c_str(), scratch);
-        send_to_char(buf, master);
+        master->send(buf);
         isrString = std::string();
         if (++level == 4)
           level = 0;
@@ -483,17 +483,17 @@ int do_golem_score(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
           frills[level], "STABILITY", "NONE", frills[level]);
-  send_to_char(buf, master);
+  master->send(buf);
   ++level == 4 ? level = 0 : level;
   sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
           frills[level], "INFRARED", "NONE", frills[level]);
-  send_to_char(buf, master);
+  master->send(buf);
   ++level == 4 ? level = 0 : level;
   if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD))
   {
     sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
             frills[level], "LIGHTNING SHIELD", "NONE", frills[level]);
-    send_to_char(buf, master);
+    master->send(buf);
     ++level == 4 ? level = 0 : level;
   }
 
@@ -551,7 +551,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], scratch);
       }
-      send_to_char(buf, master);
+      master->send(buf);
       if (++level == 4)
         level = 0;
     }

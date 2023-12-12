@@ -402,7 +402,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
     {
       dam = victim->getHP() * 5 + 20;
       sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
       act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
       return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
@@ -718,7 +718,7 @@ int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Ob
   if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", GET_SHORT(victim));
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
 
@@ -857,7 +857,7 @@ int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, 
   if (affected_by_spell(victim, SPELL_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a stone shield.\r\n", GET_SHORT(victim));
-    send_to_char(buf, ch);
+    ch->send(buf);
     return eSUCCESS;
   }
 
@@ -1698,7 +1698,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     if (ch != victim)
     {
       sprintf(buf, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
     }
     return eFAILURE;
   }
@@ -3129,7 +3129,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
         n++;
         if (n >= number)
         {
-          send_to_char(buf, ch);
+          ch->send(buf);
           j--;
         }
       }
@@ -4030,9 +4030,9 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
   if (level < victim->getLevel())
   {
     snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\r\n", GET_SHORT(victim));
-    send_to_char(buf, ch);
+    ch->send(buf);
     snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\r\n", GET_SHORT(ch));
-    send_to_char(buf, victim);
+    victim->send(buf);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
     return retval;
@@ -4152,7 +4152,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     if (ch != victim)
     {
       sprintf(buf, "%s just tried to recall you.\r\n", GET_SHORT(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
     }
     return eFAILURE;
   }
@@ -4631,7 +4631,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       {
         if (!CAN_SEE_OBJ(ch, iobj))
           continue;
-        send_to_char(iobj->short_description, ch);
+        ch->send(iobj->short_description);
         if (DC::isSet(iobj->obj_flags.more_flags, ITEM_NO_TRADE))
         {
           send_to_char(" $BNO_TRADE$R", ch);
@@ -4653,7 +4653,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
     strcat(buf, buf2);
     strcat(buf, "\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     send_to_char("Item is: ", ch);
     sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
@@ -4661,15 +4661,15 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     strcat(buf, " ");
     strcat(buf, buf2);
     strcat(buf, "\n\r");
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     send_to_char("Worn by: ", ch);
     sprintbit(obj->obj_flags.size, Object::size_bits, buf);
     strcat(buf, "\r\n");
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     sprintf(buf, "Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
-    send_to_char(buf, ch);
+    ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
     {
@@ -4677,24 +4677,24 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
     case ITEM_SCROLL:
     case ITEM_POTION:
       sprintf(buf, "Level %d spells of:\n\r", obj->obj_flags.value[0]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       if (obj->obj_flags.value[1] >= 1)
       {
         sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
         strcat(buf, "\n\r");
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       if (obj->obj_flags.value[2] >= 1)
       {
         sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
         strcat(buf, "\n\r");
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
         strcat(buf, "\n\r");
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       break;
 
@@ -4703,16 +4703,16 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       sprintf(buf, "Has %d charges, with %d charges left.\r\n",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       sprintf(buf, "Level %d spell of:\n\r", obj->obj_flags.value[0]);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
       {
         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
         strcat(buf, "\n\r");
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
       break;
 
@@ -4720,14 +4720,14 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       sprintf(buf, "Damage Dice are '%dD%d'\n\r",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
     case ITEM_INSTRUMENT:
       sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
     case ITEM_MISSILE:
@@ -4736,14 +4736,14 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
               obj->obj_flags.value[3]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
     case ITEM_FIREWEAPON:
       sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
 
     case ITEM_ARMOR:
@@ -4759,7 +4759,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
       sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
               value, obj->obj_flags.value[2]);
-      send_to_char(buf, ch);
+      ch->send(buf);
       break;
     }
 
@@ -4783,7 +4783,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         else
           strcpy(buf2, "Invalid");
         sprintf(buf, "    Affects : %s By %d\n\r", buf2, obj->affected[i].modifier);
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
     }
   }
@@ -4795,16 +4795,16 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\r\n",
               victim->age().year, victim->age().month,
               victim->age().day, victim->age().hours);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       sprintf(buf, "Race: ");
       sprinttype(victim->race, race_types, buf2);
       strcat(buf, buf2);
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       sprintf(buf, "   Height %dcm  Weight %dpounds \n\r",
               GET_HEIGHT(victim), GET_WEIGHT(victim));
-      send_to_char(buf, ch);
+      ch->send(buf);
 
       if (victim->getLevel() > 9)
       {
@@ -4815,7 +4815,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
                 GET_WIS(victim),
                 GET_DEX(victim),
                 GET_CON(victim));
-        send_to_char(buf, ch);
+        ch->send(buf);
       }
     }
     else
@@ -10342,7 +10342,7 @@ bool elemental_score(Character *ch, int level)
   {
     sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
             frills[level], "Enhanced Fire Aura", "NONE", frills[level]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (++level == 4)
       level = 0;
   }
@@ -10350,7 +10350,7 @@ bool elemental_score(Character *ch, int level)
   {
     sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
             frills[level], "Enhanced Cold Aura", "NONE", frills[level]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (++level == 4)
       level = 0;
   }
@@ -10358,7 +10358,7 @@ bool elemental_score(Character *ch, int level)
   {
     sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
             frills[level], "Enhanced Energy Aura", "NONE", frills[level]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (++level == 4)
       level = 0;
   }
@@ -10366,7 +10366,7 @@ bool elemental_score(Character *ch, int level)
   {
     sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
             frills[level], "Enhanced Physical Aura", "NONE", frills[level]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     if (++level == 4)
       level = 0;
   }
@@ -12844,7 +12844,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
             races[ptrack->race].singular_name,
             ptrack->trackee.toStdString().c_str(),
             dirs[ptrack->direction]);
-    send_to_char(buf, ch);
+    ch->send(buf);
     ptrack = ptrack->next;
   }
 

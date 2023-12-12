@@ -321,14 +321,14 @@ int do_social(Character *ch, char *argument, int cmd)
     if (!(i % 4))
     {
       strcat(buf, "\r\n");
-      send_to_char(buf, ch);
+      ch->send(buf);
       *buf = '\0';
     }
   }
   if (*buf)
-    send_to_char(buf, ch);
+    ch->send(buf);
 
   sprintf(buf, "\r\nCurrent Socials:  %d\r\n", i);
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }

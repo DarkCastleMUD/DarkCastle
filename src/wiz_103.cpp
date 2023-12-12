@@ -70,7 +70,7 @@ int do_boot(Character *ch, char *arg, int cmd)
                    "you between the eyes.\n\rYou have been removed from the "
                    "world by %s.\r\n",
               GET_SHORT(ch));
-      send_to_char(buf, victim);
+      victim->send(buf);
     }
 
     act("A stream of fire arcs down from the heavens, striking "
@@ -183,7 +183,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
       if (d->character && (d->character->getLevel() > ch->getLevel()))
       {
         sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", GET_NAME(ch));
-        send_to_char(buf, d->character);
+        d->character->send(buf);
         send_to_char("You dummy, can't do that to your elders!\n\r", ch);
         close_socket(ch->desc);
         return eFAILURE;
@@ -192,7 +192,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
       {
         close_socket(d);
         sprintf(buf, "Closing socket to descriptor #%d\n\r", sdesc);
-        send_to_char(buf, ch);
+        ch->send(buf);
         return eFAILURE;
       }
     }
@@ -282,7 +282,7 @@ int do_fighting(Character *ch, char *argument, int cmd)
              GET_NAME(i), ch_clan_name,
              GET_NAME(i->fighting), victim_clan_name,
              DC::getInstance()->world[i->in_room].number);
-    send_to_char(buf, ch);
+    ch->send(buf);
   }
 
   if (countFighters == 0)
@@ -332,7 +332,7 @@ int do_matrixinfo(Character *ch, char *argument, int cmd)
     sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
             buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
   }
-  send_to_char(buf, ch);
+  ch->send(buf);
   return eSUCCESS;
 }
 
