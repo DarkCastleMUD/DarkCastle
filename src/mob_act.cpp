@@ -46,7 +46,6 @@
 #include "Timer.h"
 #include "move.h"
 
-int hands_are_free(Character *ch, int number);
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);
 bool is_protected(Character *vict, Character *ch);
@@ -428,7 +427,7 @@ void mobile_activity(void)
                (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
               !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !DC::isSet(races[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
-              !affected_by_spell(tmp_ch, FUCK_PTHIEF) && !affected_by_spell(tmp_ch, FUCK_GTHIEF))
+              !tmp_ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !tmp_ch->isPlayerGoldThief())
           {
             tmp_race = GET_RACE(tmp_ch);
             if (GET_RACE(ch) == tmp_race)
@@ -628,7 +627,7 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
 // protected from.  PAL's ANTI's take spell/level whichever higher
 bool is_protected(Character *vict, Character *ch)
 {
-  struct affected_type *aff = affected_by_spell(vict, SPELL_PROTECT_FROM_EVIL);
+  struct affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
   int level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();
@@ -639,7 +638,7 @@ bool is_protected(Character *vict, Character *ch)
   if (IS_EVIL(ch) && ch->getLevel() <= vict->getLevel() && IS_AFFECTED(vict, AFF_PROTECT_EVIL))
     return true;
 
-  aff = affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD);
+  aff = vict->affected_by_spell(SPELL_PROTECT_FROM_GOOD);
   level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();
@@ -658,7 +657,7 @@ bool is_protected(Character *vict, Character *ch)
      }
 
      if(IS_GOOD(ch) && ch->getLevel() <= (vict->getLevel())) {
-        if((affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD)) ||
+        if((vict->affected_by_spell(SPELL_PROTECT_FROM_GOOD))||
           (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict)))
              return(true);
      }
@@ -688,7 +687,7 @@ void scavenge(Character *ch)
 
     if (keyword != -2)
     {
-      if (hands_are_free(ch, 1))
+      if (ch->hands_are_free(1))
       {
         if (CAN_WEAR(obj, ITEM_WEAR_WIELD))
         {
@@ -718,7 +717,7 @@ void scavenge(Character *ch)
         } /* if can wear */
         else
         {
-          if (((keyword == 13) || (keyword == 14)) && !hands_are_free(ch, 1))
+          if (((keyword == 13) || (keyword == 14)) && !ch->hands_are_free(1))
             continue;
 
           switch (keyword)

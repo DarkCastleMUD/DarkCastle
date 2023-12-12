@@ -326,7 +326,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     return eFAILURE;
   }
   load_golem_data(ch, i); // Load the golem up;
-  skill_increase_check(ch, SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
+  ch->skill_increase_check(SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
   golem = ch->player->golem;
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
@@ -506,10 +506,10 @@ int do_golem_score(Character *ch, char *argument, int cmd)
       const char *aff_name = get_skill_name(aff->type);
       switch (aff->type)
       {
-      case FUCK_CANTQUIT:
+      case Character::PLAYER_CANTQUIT:
         aff_name = "Can't Quit";
         break;
-      case FUCK_PTHIEF:
+      case Character::PLAYER_OBJECT_THIEF:
         aff_name = "DIRTY_DIRTY_THIEF";
         break;
       case SKILL_HARM_TOUCH:
@@ -537,7 +537,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
       if (!aff_name) // not one we want displayed
         continue;
 
-      if (aff->type == FUCK_CANTQUIT)
+      if (aff->type == Character::PLAYER_CANTQUIT)
       {
         sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
                 scratch, aff_name,

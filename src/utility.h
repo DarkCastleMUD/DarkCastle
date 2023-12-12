@@ -100,7 +100,6 @@ char *index(char *buf, char op);
 #define SKILL_INCREASE_HARD 300
 void check_timer();
 
-void skill_increase_check(Character *ch, int skill, int learned, int difficulty);
 bool is_hiding(Character *ch, Character *vict);
 
 // End defines for gradual skill increase code
@@ -777,7 +776,6 @@ int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
 bool identify(Character *ch, Object *obj);
 extern void end_oproc(Character *ch, Trace trace = Trace("unknown"));
-void undo_race_saves(Character *ch);
 QByteArray handle_ansi(QByteArray, Character *ch);
 QString handle_ansi(QString, Character *ch);
 std::string handle_ansi(std::string s, Character *ch);

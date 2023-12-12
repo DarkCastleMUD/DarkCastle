@@ -36,11 +36,7 @@ extern int drink_aff[][3];
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-int hands_are_free(Character *ch, int number);
-class Object *get_object_in_equip_vis(Character *ch,
-                                      char *arg, class Object *equipment[], int *j, bool blindfighting);
 
-// add an affect to an item
 void add_obj_affect(Object *obj, int loc, int mod)
 {
   obj->num_affects++;
@@ -240,7 +236,7 @@ int do_switch(Character *ch, char *arg, int cmd)
   }
   ch->decrementMove(4);
 
-  if (!ch->has_skill( SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
+  if (!ch->has_skill(SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
   {
     act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -1987,10 +1983,10 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
         act("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, TO_CHAR, 0);
 
-      else if ((!hands_are_free(ch, 2)) &&
+      else if ((!ch->hands_are_free(2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
         ch->sendln("You need both hands for this weapon.");
-      else if (!hands_are_free(ch, 1))
+      else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
 
       else if (IS_AFFECTED(ch, AFF_CHARM))
@@ -2022,12 +2018,12 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
       }
-      else if ((!hands_are_free(ch, 2)) &&
+      else if ((!ch->hands_are_free(2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this shield.");
       }
-      else if (!hands_are_free(ch, 1))
+      else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
 
       else
@@ -2049,9 +2045,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
       if (charmie_restricted(ch, obj_object, HOLD))
         ch->sendln("You cannot wear this.");
-      else if (!hands_are_free(ch, 1))
+      else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
-      else if ((!hands_are_free(ch, 2)) &&
+      else if ((!ch->hands_are_free(2)) &&
                (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this item.");
@@ -2115,12 +2111,12 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     {
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
-    else if ((!hands_are_free(ch, 2)) &&
+    else if ((!ch->hands_are_free(2)) &&
              (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
     {
       ch->sendln("You need both hands for this light.");
     }
-    else if (!hands_are_free(ch, 1))
+    else if (!ch->hands_are_free(1))
       ch->sendln("Your hands are already full.");
     else if (obj_object->obj_flags.type_flag != ITEM_LIGHT)
       ch->sendln("That isn't a light you cheating fuck!");
@@ -2143,7 +2139,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         return;
       }
 
-      if (!hands_are_free(ch, 1))
+      if (!ch->hands_are_free(1))
       {
         ch->sendln("Your hands are already full.");
         break;
@@ -2156,7 +2152,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
       ch->decrementMove(4);
 
-      if (!ch->has_skill( SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
+      if (!ch->has_skill(SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
       {
         act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
         act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -2299,7 +2295,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   }
 
   obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-  if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
+  if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
     blindlag = true;
@@ -2354,7 +2350,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   if (*arg1)
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
+    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
     {
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
       blindlag = true;
@@ -2404,7 +2400,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   if (*arg1)
   {
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
+    if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
     {
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, true);
       blindlag = true;
@@ -2431,44 +2427,44 @@ int do_grab(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int hands_are_free(Character *ch, int number)
+int Character::hands_are_free(int number)
 {
   class Object *wielded;
   int hands = 0;
 
-  wielded = ch->equipment[WIELD];
+  wielded = this->equipment[WIELD];
 
   if (wielded)
-    if (DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD))
+    if (DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(this->affected_by, AFF_POWERWIELD))
       hands = 2;
 
-  if (ch->equipment[WIELD])
+  if (this->equipment[WIELD])
     hands++;
-  if (ch->equipment[SECOND_WIELD])
+  if (this->equipment[SECOND_WIELD])
     hands++;
 
-  if (ch->equipment[WEAR_SHIELD])
+  if (this->equipment[WEAR_SHIELD])
   {
-    if (DC::isSet(ch->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(ch->affected_by, AFF_POWERWIELD))
+    if (DC::isSet(this->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (ch->equipment[HOLD])
+  if (this->equipment[HOLD])
   {
-    if (DC::isSet(ch->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(ch->affected_by, AFF_POWERWIELD))
+    if (DC::isSet(this->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (ch->equipment[WEAR_LIGHT])
+  if (this->equipment[WEAR_LIGHT])
   {
-    if (DC::isSet(ch->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(ch->affected_by, AFF_POWERWIELD))
+    if (DC::isSet(this->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (ch->equipment[HOLD2])
+  if (this->equipment[HOLD2])
     hands++;
 
   if (number == 1 && hands < 2)
@@ -2538,10 +2534,10 @@ int do_remove(Character *ch, char *argument, int cmd)
     }
     else
     {
-      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, false);
-      if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
+      obj_object = ch->get_object_in_equip_vis(arg1, ch->equipment, &j, false);
+      if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
       {
-        obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, true);
+        obj_object = ch->get_object_in_equip_vis(arg1, ch->equipment, &j, true);
         blindlag = true;
       }
       if (obj_object)
@@ -2607,24 +2603,24 @@ int do_remove(Character *ch, char *argument, int cmd)
 // Urizen, hack of will_screwup_worn_sizes
 // Checks for, and removes items that are no longer
 // wear-able, because of disarm, scrap etc.
-int recheck_height_wears(Character *ch)
+int Character::recheck_height_wears(void)
 {
   int j;
   class Object *obj = nullptr;
-  if (!ch || IS_NPC(ch))
+  if (!this || IS_NPC(this))
     return eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)
   {
-    if (!ch->equipment[j])
+    if (!this->equipment[j])
       continue;
 
-    if (size_restricted(ch, ch->equipment[j]))
+    if (size_restricted(this, this->equipment[j]))
     {
-      obj = unequip_char(ch, j);
-      obj_to_char(obj, ch);
-      act("$n looks uncomfortable, and shifts $p into $s inventory.", ch, obj, nullptr, TO_ROOM, 0);
-      act("$p feels uncomfortable and you shift it into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
+      obj = unequip_char(this, j);
+      obj_to_char(obj, this);
+      act("$n looks uncomfortable, and shifts $p into $s inventory.", this, obj, nullptr, TO_ROOM, 0);
+      act("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, TO_CHAR, 0);
     }
   }
   return eSUCCESS;
@@ -2686,21 +2682,21 @@ bool fullSave(Object *obj)
   return 0;
 }
 
-void heightweight(Character *ch, bool add)
+void Character::heightweight(bool add)
 {
   int i, j;
   for (i = 0; i < MAX_WEAR; i++)
   {
-    if (ch->equipment[i])
-      for (j = 0; j < ch->equipment[i]->num_affects; j++)
+    if (this->equipment[i])
+      for (j = 0; j < this->equipment[i]->num_affects; j++)
       {
-        if (ch->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
-          affect_modify(ch, ch->equipment[i]->affected[j].location,
-                        ch->equipment[i]->affected[j].modifier,
+        if (this->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
+          affect_modify(this, this->equipment[i]->affected[j].location,
+                        this->equipment[i]->affected[j].modifier,
                         -1, add);
-        else if (ch->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
-          affect_modify(ch, ch->equipment[i]->affected[j].location,
-                        ch->equipment[i]->affected[j].modifier,
+        else if (this->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
+          affect_modify(this, this->equipment[i]->affected[j].location,
+                        this->equipment[i]->affected[j].modifier,
                         -1, add);
       }
   }

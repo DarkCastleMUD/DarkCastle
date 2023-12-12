@@ -31,52 +31,52 @@ int spellcraft(Character *ch, int spell)
   if (ch->has_skill( spell) < 71) return false;
   if (spell == SPELL_MAGIC_MISSILE)
   {
-    if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
+    if (a < 11) ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_BURNING_HANDS && a > 10)
   {
-    if (a < 21) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 21) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_LIGHTNING_BOLT && a > 20)
   {
-    if (a < 31) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 31) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_CHILL_TOUCH && a > 30)
   {
-    if (a < 41) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 41) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_FIREBALL && a > 40)
   {
-    if (a < 51) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 51) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_METEOR_SWARM && a > 50)
   {
-    if (a < 61) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 61) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_PARALYZE && a > 60)
   {
-    if (a < 71) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 71) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_CREATE_GOLEM && a > 70)
   {
-    if (a < 81) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 81) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_HELLSTREAM && a > 80)
   {
-    if (a < 91) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 91) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_SOLAR_GATE && a > 90)
   {
-    if (a < 100) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
+    if (a < 100) ch->skill_increase_check(SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
 
@@ -93,7 +93,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(affected_by_spell(ch, SKILL_FOCUSED_REPELANCE)) {
+  if(ch->affected_by_spell(SKILL_FOCUSED_REPELANCE)){
     ch->sendln("Your mind can not yet take the strain of another repelance.");
     return eFAILURE;
   }
@@ -146,7 +146,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(affected_by_spell(ch, SKILL_IMBUE)) 
+  if(ch->affected_by_spell(SKILL_IMBUE))
   {
     ch->sendln("Your mind has not yet recovered from the previous imbuement.");
     return eFAILURE;
@@ -298,7 +298,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     next_i = i->next_in_room;
   
     // Only the caster should have the spell
-    if( !affected_by_spell(i, SPELL_ETHEREAL_FOCUS) )
+    if( !i->affected_by_spell(SPELL_ETHEREAL_FOCUS))
       continue; 
 
     // If I can't see my target, then I can't react, better keep true-sight up
@@ -318,7 +318,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     if(  GET_POS(i) <= position_t::RESTING || 
          GET_POS(i) == position_t::FIGHTING || i->fighting ||
          IS_AFFECTED(i, AFF_PARALYSIS) ||
-         ( DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !IS_AFFECTED(ch, AFF_CANTQUIT) )
+         ( DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit())
       )
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));

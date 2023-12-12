@@ -413,7 +413,6 @@ void eq_remove_damage(Object *obj);
 void add_obj_affect(Object *obj, int loc, int mod);
 void remove_obj_affect_by_index(Object *obj, int index);
 void remove_obj_affect_by_type(Object *obj, int loc);
-int recheck_height_wears(Character *ch);
 bool fullSave(Object *obj);
 void heightweight(Character *ch, bool add);
 void wear(Character *ch, class Object *obj_object, int keyword);

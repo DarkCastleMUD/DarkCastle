@@ -35,6 +35,7 @@
 #include "const.h"
 #include "vault.h"
 #include "Command.h"
+#include "meta.h"
 
 void AuctionHandleRenames(Character *ch, QString old_name, QString new_name);
 
@@ -199,7 +200,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
   }
 
   // give it
-  learn_skill(victim, bc->num, 1, 1);
+  victim->learn_skill(bc->num, 1, 1);
   logentry(QString("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), LogChannels::LOG_GOD);
   this->sendln(QString("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
   this->sendln(QString("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
@@ -805,16 +806,6 @@ int do_range(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-extern int r_new_meta_platinum_cost(int start, int64_t plats);
-extern int r_new_meta_exp_cost(int start, int64_t exp);
-
-extern int64_t moves_exp_spent(Character *ch);
-extern int64_t moves_plats_spent(Character *ch);
-extern int64_t hps_exp_spent(Character *ch);
-extern int64_t hps_plats_spent(Character *ch);
-extern int64_t mana_exp_spent(Character *ch);
-extern int64_t mana_plats_spent(Character *ch);
-
 int do_metastat(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -832,21 +823,21 @@ int do_metastat(Character *ch, char *argument, int cmd)
   ch->send(buf);
 
   sprintf(buf, "Hit points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_HIT(victim), hps_exp_spent(victim), hps_plats_spent(victim),
-          r_new_meta_platinum_cost(0, hps_plats_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
-          r_new_meta_exp_cost(0, hps_exp_spent(victim)) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
+          GET_RAW_HIT(victim), victim->hps_exp_spent(), victim->hps_plats_spent(),
+          r_new_meta_platinum_cost(0, victim->hps_plats_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim),
+          r_new_meta_exp_cost(0, victim->hps_exp_spent()) + GET_RAW_HIT(victim) - GET_HP_METAS(victim));
   ch->send(buf);
 
   sprintf(buf, "Mana points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_MANA(victim), mana_exp_spent(victim), mana_plats_spent(victim),
-          r_new_meta_platinum_cost(0, mana_plats_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
-          r_new_meta_exp_cost(0, mana_exp_spent(victim)) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
+          GET_RAW_MANA(victim), victim->mana_exp_spent(), victim->mana_plats_spent(),
+          r_new_meta_platinum_cost(0, victim->mana_plats_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim),
+          r_new_meta_exp_cost(0, victim->mana_exp_spent()) + GET_RAW_MANA(victim) - GET_MANA_METAS(victim));
   ch->send(buf);
 
   sprintf(buf, "Move points: %d\r\n   Exp spent: %ld\r\n   Plats spent: %ld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
-          GET_RAW_MOVE(victim), moves_exp_spent(victim), moves_plats_spent(victim),
-          r_new_meta_platinum_cost(0, moves_plats_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
-          r_new_meta_exp_cost(0, moves_exp_spent(victim)) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));
+          GET_RAW_MOVE(victim), victim->moves_exp_spent(), victim->moves_plats_spent(),
+          r_new_meta_platinum_cost(0, victim->moves_plats_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim),
+          r_new_meta_exp_cost(0, victim->moves_exp_spent()) + GET_RAW_MOVE(victim) - GET_MOVE_METAS(victim));
   ch->send(buf);
 
   buf[0] = '\0';

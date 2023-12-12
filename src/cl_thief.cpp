@@ -41,14 +41,14 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
 {
   Character *victim;
   char name[256];
-  int level = ch->has_skill( SKILL_EYEGOUGE);
+  int level = ch->has_skill(SKILL_EYEGOUGE);
 
   if (IS_NPC(ch))
     level = 50 + ch->getLevel() / 2;
 
   argument = one_argument(argument, name);
 
-  if (!(victim = ch->get_char_room_vis( name)) && !(victim = ch->fighting))
+  if (!(victim = ch->get_char_room_vis(name)) && !(victim = ch->fighting))
   {
     ch->sendln("There is no one like that here to gouge.");
     return eFAILURE;
@@ -89,8 +89,8 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -366,21 +366,21 @@ int do_circle(Character *ch, char *argument, int cmd)
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
-      ch->has_skill( SKILL_CIRCLE) <= 80)
+      ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot circle behind someone that HUGE!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
-      ch->has_skill( SKILL_CIRCLE) <= 80)
+      ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot pick just one to circle behind!");
     return eFAILURE;
   }
 
   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
-      ch->has_skill( SKILL_CIRCLE) <= 80)
+      ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot target something that tiny to circle behind!");
     return eFAILURE;
@@ -445,8 +445,8 @@ int do_circle(Character *ch, char *argument, int cmd)
 
   if (AWAKE(victim) && !skill_success(ch, victim, SKILL_CIRCLE))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
-  else if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-           number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+  else if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+           number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
     act("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
     act("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -465,7 +465,7 @@ int do_circle(Character *ch, char *argument, int cmd)
       return retval;
 
     // Now go for dual backstab
-    if (ch->equipment[SECOND_WIELD] && (ch->has_skill( SKILL_DUAL_BACKSTAB) || (ch->getLevel() >= ARCHANGEL)))
+    if (ch->equipment[SECOND_WIELD] && (ch->has_skill(SKILL_DUAL_BACKSTAB) || (ch->getLevel() >= ARCHANGEL)))
     {
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       if (AWAKE(victim) && !skill_success(ch, victim, SKILL_DUAL_BACKSTAB))
@@ -533,7 +533,7 @@ int do_trip(Character *ch, char *argument, int cmd)
     victim = ch->fighting;
   }
   else
-    victim = ch->get_char_room_vis( name);
+    victim = ch->get_char_room_vis(name);
 
   if (!victim)
   {
@@ -562,7 +562,7 @@ int do_trip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_IRON_ROOTS))
+  if (victim->affected_by_spell(SPELL_IRON_ROOTS))
   {
     act("You try to trip $N but tree roots around $S legs keep $M upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
@@ -574,7 +574,7 @@ int do_trip(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_TRIP))
     return eSUCCESS;
 
-  int modifier = get_stat(ch, attribute_t::DEXTERITY) - get_stat(victim, attribute_t::DEXTERITY);
+  int modifier = ch->get_stat(attribute_t::DEXTERITY) - victim->get_stat(attribute_t::DEXTERITY);
   if (modifier > 10)
     modifier = 10;
   if (modifier < -10)
@@ -590,8 +590,8 @@ int do_trip(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your trip coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -647,7 +647,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
 
   ch->sendln("You try to move silently for a while.");
 
-  //   skill_increase_check(ch, SKILL_SNEAK, ch->has_skill(SKILL_SNEAK),
+  //   ch->skill_increase_check(SKILL_SNEAK, ch->has_skill(SKILL_SNEAK),
   // SKILL_INCREASE_HARD);
 
   af.type = SKILL_SNEAK;
@@ -681,7 +681,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(leader = ch->get_char_room_vis( name)))
+  if (!(leader = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
     return eFAILURE;
@@ -758,7 +758,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   /* See how well it worked on those currently in the room. */
   int a, i;
   Character *temp;
-  if (IS_PC(ch) && (a = ch->has_skill( SKILL_HIDE)))
+  if (IS_PC(ch) && (a = ch->has_skill(SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = nullptr;
@@ -810,27 +810,27 @@ int do_steal(Character *ch, char *argument, int cmd)
   int retval;
   Object *has_item = nullptr;
   bool ohoh = false;
-  int chance = GET_HITROLL(ch) + ch->has_skill( SKILL_STEAL) / 4;
+  int chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
   extern struct index_data *obj_index;
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);
-  if (ch->c_class != CLASS_THIEF || !ch->has_skill( SKILL_STEAL))
+  if (ch->c_class != CLASS_THIEF || !ch->has_skill(SKILL_STEAL))
   {
     ch->sendln("You are not experienced within that field.");
     return eFAILURE;
   }
-  //  if (affected_by_spell(ch, FUCK_PTHIEF)) {
+  //  if (ch->isPlayerObjectThief()){
   //     ch->sendln("You're too busy watching your back to steal anything right now!");
   //     return eFAILURE;
   //  }
-  pthiefaf.type = FUCK_PTHIEF;
+  pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
   pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
   pthiefaf.bitvector = -1;
 
-  if (!(victim = ch->get_char_room_vis( victim_name)))
+  if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Steal what from who?");
     return eFAILURE;
@@ -886,7 +886,7 @@ int do_steal(Character *ch, char *argument, int cmd)
   }
 
   /*  if(IS_PC(victim) &&
-      !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
+      !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
       ch->sendln("That person is not really there.");
       return eFAILURE;
     }*/
@@ -929,7 +929,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    int mod = ch->has_skill( SKILL_STEAL) - chance;
+    int mod = ch->has_skill(SKILL_STEAL) - chance;
     if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
     {
       set_cantquit(ch, victim);
@@ -984,7 +984,7 @@ int do_steal(Character *ch, char *argument, int cmd)
               //              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
               //              {
               //                ch->sendln("Oops...");
-              if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
+              if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
               {
                 paf->modifier = 0; // make sleep no longer work
               }
@@ -993,12 +993,12 @@ int do_steal(Character *ch, char *argument, int cmd)
             }
 
             // if victim isn't a pthief
-            //            if(!affected_by_spell(victim, FUCK_PTHIEF) )
+            //            if(!victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
             {
               // set_cantquit( ch, victim );
-              if (affected_by_spell(ch, FUCK_PTHIEF))
+              if (ch->isPlayerObjectThief())
               {
-                affect_from_char(ch, FUCK_PTHIEF);
+                affect_from_char(ch, Character::PLAYER_OBJECT_THIEF);
                 affect_to_char(ch, &pthiefaf);
               }
               else
@@ -1124,12 +1124,12 @@ int do_steal(Character *ch, char *argument, int cmd)
         ch->sendln("That item is protected by the gods.");
         return eFAILURE;
       }
-      if (!ch->has_skill( SKILL_STEAL))
+      if (!ch->has_skill(SKILL_STEAL))
       {
         ch->sendln("You don't know how to steal.");
         return eFAILURE;
       }
-      int mod = ch->has_skill( SKILL_STEAL) - chance;
+      int mod = ch->has_skill(SKILL_STEAL) - chance;
 
       if (GET_POS(victim) > position_t::SLEEPING ||
           GET_POS(victim) == position_t::STUNNED)
@@ -1142,7 +1142,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         set_cantquit(ch, victim);
         ohoh = true;
         ch->sendln("Oops, that was clumsy...");
-        if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
+        if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
         {
           paf->modifier = 0; // make sleep no longer work
         }
@@ -1160,7 +1160,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
         victim->save(666);
         set_cantquit(ch, victim);
-        if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
+        if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
         {
           paf->modifier = 0; // make sleep no longer work
         }
@@ -1196,7 +1196,7 @@ int do_steal(Character *ch, char *argument, int cmd)
             //            if(number(1,101) > wakey)
             //            {
             //              ch->sendln("Oops, that was clumsy...");
-            if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
+            if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
             {
               paf->modifier = 0; // make sleep no longer work
             }
@@ -1205,11 +1205,11 @@ int do_steal(Character *ch, char *argument, int cmd)
           }
 
           // You don't get a thief flag from stealing from a pthief
-          //          if(!affected_by_spell(victim, FUCK_PTHIEF))
+          //          if(!victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
           {
-            if (affected_by_spell(ch, FUCK_PTHIEF))
+            if (ch->isPlayerObjectThief())
             {
-              affect_from_char(ch, FUCK_PTHIEF);
+              affect_from_char(ch, Character::PLAYER_OBJECT_THIEF);
               affect_to_char(ch, &pthiefaf);
             }
             else
@@ -1281,13 +1281,13 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   one_argument(argument, victim_name);
 
-  pthiefaf.type = FUCK_GTHIEF;
+  pthiefaf.type = Character::PLAYER_GOLD_THIEF;
   pthiefaf.duration = 6;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
   pthiefaf.bitvector = -1;
 
-  if (!(victim = ch->get_char_room_vis( victim_name)))
+  if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Steal what from who?");
     return eFAILURE;
@@ -1346,12 +1346,12 @@ int do_pocket(Character *ch, char *argument, int cmd)
   }
 
   /*if(IS_PC(victim) &&
-    !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
+    !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
     ch->sendln("That person is not really there.");
     return eFAILURE;
   }
 */
-  if (!ch->has_skill( SKILL_POCKET) && IS_PC(ch))
+  if (!ch->has_skill(SKILL_POCKET) && IS_PC(ch))
   {
     ch->sendln("Well, you would, if you knew how.");
     return eFAILURE;
@@ -1362,7 +1362,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, 20); /* It takes TIME to steal */
 
-  //    skill_increase_check(ch, SKILL_POCKET, ch->has_skill(SKILL_POCKET),SKILL_INCREASE_MEDIUM);
+  //    ch->skill_increase_check(SKILL_POCKET, ch->has_skill(SKILL_POCKET),SKILL_INCREASE_MEDIUM);
 
   if (!skill_success(ch, victim, SKILL_POCKET))
   {
@@ -1383,7 +1383,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
   }
   else
   {
-    int learned = ch->has_skill( SKILL_POCKET);
+    int learned = ch->has_skill(SKILL_POCKET);
     int percent = 7 + (learned > 40) + (learned > 60) + (learned > 80);
 
     // Steal some gold coins
@@ -1414,12 +1414,12 @@ int do_pocket(Character *ch, char *argument, int cmd)
       {
         victim->save(666);
         ch->save(666);
-        if (!affected_by_spell(victim, FUCK_GTHIEF))
+        if (!victim->isPlayerGoldThief())
         {
           // set_cantquit( ch, victim );
-          if (affected_by_spell(ch, FUCK_GTHIEF))
+          if (ch->isPlayerGoldThief())
           {
-            affect_from_char(ch, FUCK_GTHIEF);
+            affect_from_char(ch, Character::PLAYER_GOLD_THIEF);
             affect_to_char(ch, &pthiefaf);
           }
           else
@@ -1462,7 +1462,7 @@ int do_pick(Character *ch, char *argument, int cmd)
 
   argument_interpreter(argument, type, dir);
 
-  if (!ch->has_skill( SKILL_PICK_LOCK))
+  if (!ch->has_skill(SKILL_PICK_LOCK))
   {
     ch->sendln("You don't know how to pick locks!");
     return eFAILURE;
@@ -1548,7 +1548,7 @@ int do_pick(Character *ch, char *argument, int cmd)
         return eSUCCESS;
       }
 
-      // skill_increase_check(ch, SKILL_PICK_LOCK, ch->has_skill(SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+      // ch->skill_increase_check(SKILL_PICK_LOCK, ch->has_skill(SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
         ch->sendln("You failed to pick the lock.");
@@ -1602,12 +1602,12 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   extern int weight_in(Object *);
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (!IS_MOB(ch) && ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal acts prohibit this action.");
     return eFAILURE;
   }
-  if (!ch->has_skill( SKILL_SLIP))
+  if (!ch->has_skill(SKILL_SLIP))
   {
     ch->sendln("You don't know how to slip.");
     return eFAILURE;
@@ -1616,7 +1616,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit this action.");
       return eFAILURE;
@@ -1653,7 +1653,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       ch->sendln("To who?");
       return eFAILURE;
     }
-    if (!(vict = ch->get_char_room_vis( vict_name)))
+    if (!(vict = ch->get_char_room_vis(vict_name)))
     {
       ch->sendln("To who?");
       return eFAILURE;
@@ -1813,7 +1813,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
     return eSUCCESS;
   }
-  if (!(vict = ch->get_char_room_vis( vict_name)))
+  if (!(vict = ch->get_char_room_vis(vict_name)))
   {
     ch->sendln("No one by that name around here.");
     return eFAILURE;
@@ -1831,7 +1831,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc)
+  if (ch->isPlayerObjectThief() && !vict->desc)
   {
     send_to_char("Now WHY would a thief slip something to a "
                  "linkdead character?\n\r",
@@ -1860,7 +1860,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
   }
 
-  // skill_increase_check(ch, SKILL_SLIP, ch->has_skill(SKILL_SLIP), SKILL_INCREASE_EASY);
+  // ch->skill_increase_check(SKILL_SLIP, ch->has_skill(SKILL_SLIP), SKILL_INCREASE_EASY);
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
@@ -1916,7 +1916,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (affected_by_spell(ch, SKILL_VITAL_STRIKE) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && ch->getLevel() < IMMORTAL)
   {
     ch->sendln("Your body is still recovering from your last vitalstrike technique.");
     return eFAILURE;
@@ -1934,7 +1934,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  // skill_increase_check(ch, SKILL_VITAL_STRIKE, ch->has_skill(SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
+  // ch->skill_increase_check(SKILL_VITAL_STRIKE, ch->has_skill(SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
   if (!charge_moves(ch, SKILL_VITAL_STRIKE))
     return eSUCCESS;
 
@@ -1957,7 +1957,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
   // learned should have max of 80 for mortal thieves
   // this means you can use it once per tick
 
-  int length = 9 - ch->has_skill( SKILL_VITAL_STRIKE) / 10;
+  int length = 9 - ch->has_skill(SKILL_VITAL_STRIKE) / 10;
   if (!DC::isSet(ch->combat, COMBAT_VITAL_STRIKE))
     length /= 2;
   if (length < 1)
@@ -1981,7 +1981,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_DECEIT_TIMER))
+  if (ch->affected_by_spell(SKILL_DECEIT_TIMER))
   {
     ch->sendln("You have to wait to be more deceitful!");
     return eFAILURE;
@@ -2016,7 +2016,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
     ch->sendln("Your instruction is well received and your pupils are more able to exploit weaknesses.");
 
     af.type = SKILL_DECEIT_TIMER;
-    af.duration = 1 + ch->has_skill( SKILL_DECEIT) / 10;
+    af.duration = 1 + ch->has_skill(SKILL_DECEIT) / 10;
     af.modifier = 0;
     af.location = 0;
     af.bitvector = -1;
@@ -2034,8 +2034,8 @@ int do_deceit(Character *ch, char *argument, int cmd)
       act("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
 
       af.type = SKILL_DECEIT;
-      af.duration = 1 + ch->has_skill( SKILL_DECEIT) / 10;
-      af.modifier = 1 + (ch->has_skill( SKILL_DECEIT) / 20);
+      af.duration = 1 + ch->has_skill(SKILL_DECEIT) / 10;
+      af.modifier = 1 + (ch->has_skill(SKILL_DECEIT) / 20);
       af.location = APPLY_MANA_REGEN;
       af.bitvector = -1;
       affect_to_char(tmp_char, &af);
@@ -2046,7 +2046,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
     }
   }
 
-  // skill_increase_check(ch, SKILL_DECEIT, ch->has_skill(SKILL_DECEIT), SKILL_INCREASE_EASY);
+  // ch->skill_increase_check(SKILL_DECEIT, ch->has_skill(SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
@@ -2055,13 +2055,13 @@ int do_jab(Character *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if (affected_by_spell(ch, SKILL_JAB) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_JAB) && ch->getLevel() < IMMORTAL)
   {
     ch->sendln("Your arm is still sore from your last attempt.");
     return eFAILURE;
   }
 
-  if (!(learned = ch->has_skill( SKILL_JAB)))
+  if (!(learned = ch->has_skill(SKILL_JAB)))
   {
     ch->sendln("You don't know how to jab.");
     return eFAILURE;
@@ -2080,7 +2080,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   if (!*arg && ch->fighting)
     victim = ch->fighting;
   else
-    victim = ch->get_char_room_vis( arg);
+    victim = ch->get_char_room_vis(arg);
 
   if (!victim)
   {
@@ -2213,7 +2213,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
   argument = one_argument(argument, name);
   one_argument(argument, item);
 
-  if (!(learned = ch->has_skill( SKILL_APPRAISE)))
+  if (!(learned = ch->has_skill(SKILL_APPRAISE)))
   {
     ch->sendln("Your estimate would be baseless.");
     return eFAILURE;
@@ -2344,13 +2344,13 @@ int do_cripple(Character *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
-  if (!(skill = ch->has_skill( SKILL_CRIPPLE)))
+  if (!(skill = ch->has_skill(SKILL_CRIPPLE)))
   {
     ch->sendln("You don't know how to cripple anybody.");
     return eFAILURE;
   }
 
-  if (!(vict = ch->get_char_room_vis( name)) && !(vict = ch->fighting))
+  if (!(vict = ch->get_char_room_vis(name)) && !(vict = ch->fighting))
   {
     ch->sendln("Cripple whom?");
     return eFAILURE;
@@ -2408,8 +2408,8 @@ int do_cripple(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(vict, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(vict, SKILL_BATTLESENSE)->modifier)
+    if (vict->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < vict->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your strike coming from a mile away.", ch, 0, vict, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, TO_VICT, 0);

@@ -52,6 +52,7 @@ extern "C"
 #include "vault.h"
 #include "const.h"
 #include "guild.h"
+#include "meta.h"
 #include <string>
 
 #define STATE(d) ((d)->connected)
@@ -89,7 +90,6 @@ void update_wizlist(Character *ch);
 void isr_set(Character *ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
-void check_hw(Character *ch);
 char *str_str(char *first, char *second);
 bool apply_race_attributes(Character *ch, int race = 0);
 bool check_race_attributes(Character *ch, int race = 0);
@@ -234,110 +234,105 @@ int is_clss_eligible(Character *ch, int clss)
    return (x);
 }
 
-void do_inate_race_abilities(Character *ch)
+void Character::do_inate_race_abilities(void)
 {
-
    // Add race base saving throw mods
    // Yes, I could combine this 'switch' with the next one, but this is
    // alot more readable
-   switch (GET_RACE(ch))
+   switch (GET_RACE(this))
    {
    case RACE_HUMAN:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
+      this->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
       break;
    case RACE_ELVEN:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_ELVEN_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_ELVEN_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_ELVEN_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_ELVEN_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_ELVEN_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_ELVEN_POISON_MOD;
-      ch->spell_mitigation += 1;
+      this->saves[SAVE_TYPE_FIRE] += RACE_ELVEN_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_ELVEN_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_ELVEN_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_ELVEN_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_ELVEN_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_ELVEN_POISON_MOD;
+      this->spell_mitigation += 1;
       break;
    case RACE_DWARVEN:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_DWARVEN_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_DWARVEN_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_DWARVEN_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_DWARVEN_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_DWARVEN_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_DWARVEN_POISON_MOD;
-      ch->melee_mitigation += 1;
+      this->saves[SAVE_TYPE_FIRE] += RACE_DWARVEN_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_DWARVEN_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_DWARVEN_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_DWARVEN_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_DWARVEN_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_DWARVEN_POISON_MOD;
+      this->melee_mitigation += 1;
       break;
    case RACE_TROLL:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_TROLL_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_TROLL_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_TROLL_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_TROLL_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_TROLL_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_TROLL_POISON_MOD;
-      ch->spell_mitigation += 2;
+      this->saves[SAVE_TYPE_FIRE] += RACE_TROLL_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_TROLL_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_TROLL_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_TROLL_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_TROLL_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_TROLL_POISON_MOD;
+      this->spell_mitigation += 2;
       break;
    case RACE_GIANT:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_GIANT_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_GIANT_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_GIANT_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_GIANT_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_GIANT_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_GIANT_POISON_MOD;
-      ch->melee_mitigation += 2;
+      this->saves[SAVE_TYPE_FIRE] += RACE_GIANT_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_GIANT_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_GIANT_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_GIANT_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_GIANT_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_GIANT_POISON_MOD;
+      this->melee_mitigation += 2;
       break;
    case RACE_PIXIE:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_PIXIE_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_PIXIE_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_PIXIE_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_PIXIE_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_PIXIE_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_PIXIE_POISON_MOD;
-      ch->spell_mitigation += 2;
+      this->saves[SAVE_TYPE_FIRE] += RACE_PIXIE_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_PIXIE_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_PIXIE_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_PIXIE_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_PIXIE_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_PIXIE_POISON_MOD;
+      this->spell_mitigation += 2;
       break;
    case RACE_HOBBIT:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_HOBBIT_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_HOBBIT_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_HOBBIT_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_HOBBIT_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_HOBBIT_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_HOBBIT_POISON_MOD;
-      ch->melee_mitigation += 2;
+      this->saves[SAVE_TYPE_FIRE] += RACE_HOBBIT_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_HOBBIT_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_HOBBIT_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_HOBBIT_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_HOBBIT_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_HOBBIT_POISON_MOD;
+      this->melee_mitigation += 2;
       break;
    case RACE_GNOME:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_GNOME_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_GNOME_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_GNOME_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_GNOME_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_GNOME_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_GNOME_POISON_MOD;
-      ch->spell_mitigation += 1;
+      this->saves[SAVE_TYPE_FIRE] += RACE_GNOME_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_GNOME_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_GNOME_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_GNOME_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_GNOME_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_GNOME_POISON_MOD;
+      this->spell_mitigation += 1;
       break;
    case RACE_ORC:
-      ch->saves[SAVE_TYPE_FIRE] += RACE_ORC_FIRE_MOD;
-      ch->saves[SAVE_TYPE_COLD] += RACE_ORC_COLD_MOD;
-      ch->saves[SAVE_TYPE_ENERGY] += RACE_ORC_ENERGY_MOD;
-      ch->saves[SAVE_TYPE_ACID] += RACE_ORC_ACID_MOD;
-      ch->saves[SAVE_TYPE_MAGIC] += RACE_ORC_MAGIC_MOD;
-      ch->saves[SAVE_TYPE_POISON] += RACE_ORC_POISON_MOD;
-      ch->melee_mitigation += 1;
+      this->saves[SAVE_TYPE_FIRE] += RACE_ORC_FIRE_MOD;
+      this->saves[SAVE_TYPE_COLD] += RACE_ORC_COLD_MOD;
+      this->saves[SAVE_TYPE_ENERGY] += RACE_ORC_ENERGY_MOD;
+      this->saves[SAVE_TYPE_ACID] += RACE_ORC_ACID_MOD;
+      this->saves[SAVE_TYPE_MAGIC] += RACE_ORC_MAGIC_MOD;
+      this->saves[SAVE_TYPE_POISON] += RACE_ORC_POISON_MOD;
+      this->melee_mitigation += 1;
       break;
    default:
       break;
    }
 }
 
-Object *clan_altar(Character *ch)
+Object *Character::clan_altar(void)
 {
-   clan_data *clan;
-   struct clan_room_data *room;
-   extern clan_data *clan_list;
-
-   if (ch->clan)
-      for (clan = clan_list; clan; clan = clan->next)
-         if (clan->number == ch->clan)
+   if (clan)
+      for (auto c = DC::getInstance()->clan_list; c; c = c->next)
+         if (c->number == clan)
          {
-            for (room = clan->rooms; room; room = room->next)
+            for (auto room = c->rooms; room; room = room->next)
             {
                if (real_room(room->room_number) == DC::NOWHERE)
                   continue;
@@ -378,93 +373,91 @@ void update_max_who(void)
 
 // stuff that has to be done on both a normal login, as well as on
 // a hotboot login
-void do_on_login_stuff(Character *ch)
+void Character::do_on_login_stuff(void)
 {
-   void add_to_bard_list(Character * ch);
-
-   add_to_bard_list(ch);
-   ch->player->bad_pw_tries = 0;
-   redo_hitpoints(ch);
-   redo_mana(ch);
-   redo_ki(ch);
-   do_inate_race_abilities(ch);
-   check_hw(ch);
+   add_to_bard_list();
+   this->player->bad_pw_tries = 0;
+   redo_hitpoints(this);
+   redo_mana(this);
+   redo_ki(this);
+   do_inate_race_abilities();
+   check_hw();
    /* Add a character's skill item's to the list. */
-   ch->player->skillchange = nullptr;
-   ch->spellcraftglyph = 0;
+   this->player->skillchange = nullptr;
+   this->spellcraftglyph = 0;
    for (int i = 0; i < MAX_WEAR; i++)
    {
-      if (!ch->equipment[i])
+      if (!this->equipment[i])
          continue;
-      for (int a = 0; a < ch->equipment[i]->num_affects; a++)
+      for (int a = 0; a < this->equipment[i]->num_affects; a++)
       {
-         if (ch->equipment[i]->affected[a].location >= 1000)
+         if (this->equipment[i]->affected[a].location >= 1000)
          {
-            ch->equipment[i]->next_skill = ch->player->skillchange;
-            ch->player->skillchange = ch->equipment[i];
-            ch->equipment[i]->next_skill = nullptr;
+            this->equipment[i]->next_skill = this->player->skillchange;
+            this->player->skillchange = this->equipment[i];
+            this->equipment[i]->next_skill = nullptr;
          }
       }
    }
    // add character base saves to saving throws
    for (int i = 0; i <= SAVE_TYPE_MAX; i++)
    {
-      ch->saves[i] += ch->getLevel() / 4;
-      ch->saves[i] += ch->player->saves_mods[i];
+      this->saves[i] += this->getLevel() / 4;
+      this->saves[i] += this->player->saves_mods[i];
    }
 
-   if (GET_TITLE(ch) == nullptr)
+   if (GET_TITLE(this) == nullptr)
    {
-      GET_TITLE(ch) = str_dup("is a virgin.");
+      GET_TITLE(this) = str_dup("is a virgin.");
    }
 
-   if (GET_CLASS(ch) == CLASS_MONK)
+   if (GET_CLASS(this) == CLASS_MONK)
    {
-      GET_AC(ch) -= (ch->getLevel() * 2);
+      GET_AC(this) -= (this->getLevel() * 2);
    }
-   GET_AC(ch) -= ch->has_skill(SKILL_COMBAT_MASTERY) / 2;
+   GET_AC(this) -= this->has_skill(SKILL_COMBAT_MASTERY) / 2;
 
-   GET_AC(ch) -= GET_AC_METAS(ch);
+   GET_AC(this) -= GET_AC_METAS(this);
 
-   if (affected_by_spell(ch, INTERNAL_SLEEPING))
+   if (affected_by_spell(INTERNAL_SLEEPING))
    {
-      affect_from_char(ch, INTERNAL_SLEEPING);
+      affect_from_char(this, INTERNAL_SLEEPING);
    }
    /* Set ISR's cause they're not saved...   */
-   isr_set(ch);
-   ch->altar = clan_altar(ch);
+   isr_set(this);
+   this->altar = clan_altar();
 
-   if (!IS_MOB(ch) && ch->getLevel() >= IMMORTAL)
+   if (!IS_MOB(this) && this->getLevel() >= IMMORTAL)
    {
-      ch->player->holyLite = true;
-      GET_COND(ch, THIRST) = -1;
-      GET_COND(ch, FULL) = -1;
+      this->player->holyLite = true;
+      GET_COND(this, THIRST) = -1;
+      GET_COND(this, FULL) = -1;
    }
-   add_totem_stats(ch);
-   if (ch->getLevel() < 5 && GET_AGE(ch) < 21)
-      char_to_room(ch, real_room(200));
-   else if (ch->in_room >= 2)
-      char_to_room(ch, ch->in_room);
-   else if (ch->getLevel() >= IMMORTAL)
-      char_to_room(ch, real_room(17));
+   add_totem_stats(this);
+   if (this->getLevel() < 5 && GET_AGE(this) < 21)
+      char_to_room(this, real_room(200));
+   else if (this->in_room >= 2)
+      char_to_room(this, this->in_room);
+   else if (this->getLevel() >= IMMORTAL)
+      char_to_room(this, real_room(17));
    else
-      char_to_room(ch, real_room(START_ROOM));
+      char_to_room(this, real_room(START_ROOM));
 
-   ch->curLeadBonus = 0;
-   ch->changeLeadBonus = false;
-   ch->cRooms = 0;
-   REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
+   this->curLeadBonus = 0;
+   this->changeLeadBonus = false;
+   this->cRooms = 0;
+   REMBIT(this->affected_by, AFF_BLACKJACK_ALERT);
    for (int i = 0; i < QUEST_MAX; i++)
    {
-      ch->player->quest_current[i] = -1;
-      ch->player->quest_current_ticksleft[i] = 0;
+      this->player->quest_current[i] = -1;
+      this->player->quest_current_ticksleft[i] = 0;
    }
-   struct vault_data *vault = has_vault(GET_NAME(ch));
-   if (ch->player->time.logon < 1172204700)
+   struct vault_data *vault = has_vault(GET_NAME(this));
+   if (this->player->time.logon < 1172204700)
    {
       if (vault)
       {
-         int adder = ch->getLevel() - 50;
+         int adder = this->getLevel() - 50;
          if (adder < 0)
             adder = 0; // Heh :P
          vault->size += adder * 10;
@@ -476,200 +469,190 @@ void do_on_login_stuff(Character *ch)
 
    if (vault)
    {
-      if (vault->size < (unsigned)(ch->getLevel() * 10))
+      if (vault->size < (unsigned)(this->getLevel() * 10))
       {
-         logf(IMMORTAL, LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, ch->getLevel() * 10);
-         vault->size = ch->getLevel() * 10;
+         logf(IMMORTAL, LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
+         vault->size = this->getLevel() * 10;
       }
 
       save_vault(vault->owner);
    }
 
-   if (ch->player->time.logon < 1151506181)
+   if (this->player->time.logon < 1151506181)
    {
-      ch->player->quest_points = 0;
+      this->player->quest_points = 0;
       for (int i = 0; i < QUEST_CANCEL; i++)
-         ch->player->quest_cancel[i] = 0;
+         this->player->quest_cancel[i] = 0;
       for (int i = 0; i < QUEST_TOTAL / ASIZE; i++)
-         ch->player->quest_complete[i] = 0;
+         this->player->quest_complete[i] = 0;
    }
-   if (ch->player->time.logon < 1151504181)
-      SET_BIT(ch->misc, LogChannels::CHANNEL_TELL);
+   if (this->player->time.logon < 1151504181)
+      SET_BIT(this->misc, LogChannels::CHANNEL_TELL);
 
-   if (ch->player->time.logon < 1171757100)
+   if (this->player->time.logon < 1171757100)
    {
-      switch (GET_CLASS(ch))
+      switch (GET_CLASS(this))
       {
       case CLASS_MAGE:
-         GET_AC(ch) += 100;
+         GET_AC(this) += 100;
          break;
       case CLASS_DRUID:
-         GET_AC(ch) += 85;
+         GET_AC(this) += 85;
          break;
       case CLASS_CLERIC:
-         GET_AC(ch) += 70;
+         GET_AC(this) += 70;
          break;
       case CLASS_ANTI_PAL:
-         GET_AC(ch) += 55;
+         GET_AC(this) += 55;
          break;
       case CLASS_THIEF:
-         GET_AC(ch) += 40;
+         GET_AC(this) += 40;
          break;
       case CLASS_BARD:
-         GET_AC(ch) += 25;
+         GET_AC(this) += 25;
          break;
       case CLASS_BARBARIAN:
-         GET_AC(ch) += 10;
+         GET_AC(this) += 10;
          break;
       case CLASS_RANGER:
-         GET_AC(ch) -= 5;
+         GET_AC(this) -= 5;
          break;
       case CLASS_PALADIN:
-         GET_AC(ch) -= 20;
+         GET_AC(this) -= 20;
          break;
       case CLASS_WARRIOR:
-         GET_AC(ch) -= 35;
+         GET_AC(this) -= 35;
          break;
       case CLASS_MONK:
-         GET_AC(ch) -= 50;
+         GET_AC(this) -= 50;
          break;
       default:
          break;
       }
    }
 
-   if (GET_CLASS(ch) == CLASS_MONK && ch->getLevel() > 10)
+   if (GET_CLASS(this) == CLASS_MONK && this->getLevel() > 10)
    {
-      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
+      this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
    }
-   if (GET_CLASS(ch) == CLASS_PALADIN && ch->getLevel() >= 41)
+   if (GET_CLASS(this) == CLASS_PALADIN && this->getLevel() >= 41)
    {
-      ch->swapSkill(SPELL_ARMOR, SPELL_AEGIS);
-      ch->swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
+      this->swapSkill(SPELL_ARMOR, SPELL_AEGIS);
+      this->swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
    }
-   if (GET_CLASS(ch) == CLASS_RANGER && ch->getLevel() > 9)
+   if (GET_CLASS(this) == CLASS_RANGER && this->getLevel() > 9)
    {
-      if (ch->skills.contains(SKILL_SHIELDBLOCK))
+      if (this->skills.contains(SKILL_SHIELDBLOCK))
       {
-         ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
-         ch->setSkillMin(SKILL_DODGE, 50);
+         this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+         this->setSkillMin(SKILL_DODGE, 50);
       }
    }
-   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch->getLevel() >= 44)
+   if (GET_CLASS(this) == CLASS_ANTI_PAL && this->getLevel() >= 44)
    {
-      ch->swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
+      this->swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
    }
-   if (GET_CLASS(ch) == CLASS_BARD && ch->getLevel() >= 30)
+   if (GET_CLASS(this) == CLASS_BARD && this->getLevel() >= 30)
    {
-      ch->swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
+      this->swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
    }
-   if (GET_CLASS(ch) == CLASS_CLERIC && ch->getLevel() >= 42)
+   if (GET_CLASS(this) == CLASS_CLERIC && this->getLevel() >= 42)
    {
-      ch->swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
-      ch->skills.erase(SPELL_RESIST_COLD);
+      this->swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
+      this->skills.erase(SPELL_RESIST_COLD);
    }
-   if (GET_CLASS(ch) == CLASS_MAGIC_USER)
+   if (GET_CLASS(this) == CLASS_MAGIC_USER)
    {
-      ch->skills.erase(SPELL_SLEEP);
-      ch->skills.erase(SPELL_RESIST_COLD);
-      ch->skills.erase(SPELL_KNOW_ALIGNMENT);
+      this->skills.erase(SPELL_SLEEP);
+      this->skills.erase(SPELL_RESIST_COLD);
+      this->skills.erase(SPELL_KNOW_ALIGNMENT);
    }
    // Remove pick if they're no longer allowed to have it.
-   if (GET_CLASS(ch) == CLASS_THIEF && ch->getLevel() < 22 && ch->has_skill(SKILL_PICK_LOCK))
+   if (GET_CLASS(this) == CLASS_THIEF && this->getLevel() < 22 && this->has_skill(SKILL_PICK_LOCK))
    {
-      ch->skills.erase(SKILL_PICK_LOCK);
+      this->skills.erase(SKILL_PICK_LOCK);
    }
-   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_HIDE))
+   if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_HIDE))
    {
-      ch->skills.erase(SKILL_HIDE);
+      this->skills.erase(SKILL_HIDE);
    }
    // Remove listsongs
-   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_LIST_SONGS))
+   if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_SONG_LIST_SONGS))
    {
-      ch->skills.erase(SKILL_SONG_LIST_SONGS);
+      this->skills.erase(SKILL_SONG_LIST_SONGS);
    }
    // Replace shieldblock on barbs
-   if (GET_CLASS(ch) == CLASS_BARBARIAN && ch->has_skill(SKILL_SHIELDBLOCK))
+   if (GET_CLASS(this) == CLASS_BARBARIAN && this->has_skill(SKILL_SHIELDBLOCK))
    {
-      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+      this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
    }
    // Replace eagle-eye on druids
-   if (GET_CLASS(ch) == CLASS_DRUID && ch->has_skill(SPELL_EAGLE_EYE))
+   if (GET_CLASS(this) == CLASS_DRUID && this->has_skill(SPELL_EAGLE_EYE))
    {
-      ch->swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
+      this->swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
    }
    // Replace crushing on bards
-   if (GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_CRUSHING_WEAPONS))
+   if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_CRUSHING_WEAPONS))
    {
-      ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
+      this->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
    }
    // Replace crushing on thieves
-   if (GET_CLASS(ch) == CLASS_THIEF && ch->has_skill(SKILL_CRUSHING_WEAPONS))
+   if (GET_CLASS(this) == CLASS_THIEF && this->has_skill(SKILL_CRUSHING_WEAPONS))
    {
-      ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
+      this->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
    }
    // Replace firestorm on antis
-   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch->has_skill(SPELL_FIRESTORM))
+   if (GET_CLASS(this) == CLASS_ANTI_PAL && this->has_skill(SPELL_FIRESTORM))
    {
-      ch->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
+      this->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
    }
 
-   class_skill_defines *c_skills = ch->get_skill_list();
+   class_skill_defines *c_skills = this->get_skill_list();
 
-   if (IS_MORTAL(ch))
+   if (IS_MORTAL(this))
    {
       std::queue<skill_t> skills_to_delete = {};
-      for (const auto &curr : ch->skills)
+      for (const auto &curr : this->skills)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            logentry(QString("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_PLAYER);
-            // ch->send(fmt::format("Removing skill {}\r\n", curr.first));
+            logentry(QString("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, LogChannels::LOG_PLAYER);
+            // this->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
       }
       while (skills_to_delete.empty() == false)
       {
-         ch->skills.erase(skills_to_delete.front());
+         this->skills.erase(skills_to_delete.front());
          skills_to_delete.pop();
       }
    }
 
-   barb_magic_resist(ch, 0, ch->has_skill(SKILL_MAGIC_RESIST));
+   barb_magic_resist(this, 0, this->has_skill(SKILL_MAGIC_RESIST));
    /* meta reimbursement */
-   if (!ch->has_skill(META_REIMB))
+   if (!this->has_skill(META_REIMB))
    {
-      learn_skill(ch, META_REIMB, 1, 100);
-      extern int64_t new_meta_platinum_cost(int start, int end);
-      extern int r_new_meta_platinum_cost(int start, int64_t plats);
-      extern int r_new_meta_exp_cost(int start, int64_t exp);
-
-      extern int64_t moves_exp_spent(Character * ch);
-      extern int64_t moves_plats_spent(Character * ch);
-      extern int64_t hps_exp_spent(Character * ch);
-      extern int64_t hps_plats_spent(Character * ch);
-      extern int64_t mana_exp_spent(Character * ch);
-      extern int64_t mana_plats_spent(Character * ch);
-      int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent(ch)), r_new_meta_exp_cost(0, hps_exp_spent(ch)));
-      int ometa = GET_HP_METAS(ch);
-      GET_HP_METAS(ch) = new_;
-      GET_RAW_HIT(ch) += new_ - ometa;
-      new_ = MIN(r_new_meta_platinum_cost(0, mana_plats_spent(ch)), r_new_meta_exp_cost(0, mana_exp_spent(ch)));
-      ometa = GET_MANA_METAS(ch);
-      GET_RAW_MANA(ch) += new_ - ometa;
-      GET_MANA_METAS(ch) = new_;
-      new_ = MIN(r_new_meta_platinum_cost(0, moves_plats_spent(ch)), r_new_meta_exp_cost(0, moves_exp_spent(ch)));
-      ometa = GET_MOVE_METAS(ch);
-      GET_MOVE_METAS(ch) = new_;
-      GET_RAW_MOVE(ch) += new_ - ometa;
+      learn_skill(META_REIMB, 1, 100);
+      int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent()), r_new_meta_exp_cost(0, hps_exp_spent()));
+      int ometa = GET_HP_METAS(this);
+      GET_HP_METAS(this) = new_;
+      GET_RAW_HIT(this) += new_ - ometa;
+      new_ = MIN(r_new_meta_platinum_cost(0, mana_plats_spent()), r_new_meta_exp_cost(0, mana_exp_spent()));
+      ometa = GET_MANA_METAS(this);
+      GET_RAW_MANA(this) += new_ - ometa;
+      GET_MANA_METAS(this) = new_;
+      new_ = MIN(r_new_meta_platinum_cost(0, moves_plats_spent()), r_new_meta_exp_cost(0, moves_exp_spent()));
+      ometa = GET_MOVE_METAS(this);
+      GET_MOVE_METAS(this) = new_;
+      GET_RAW_MOVE(this) += new_ - ometa;
    }
    /* end meta reimbursement */
 
-   prepare_character_for_sixty(ch);
+   prepare_character_for_sixty(this);
 
    // Check for deleted characters listed in access list
    std::queue<QString> todelete;
-   vault = has_vault(GET_NAME(ch));
+   vault = has_vault(GET_NAME(this));
    if (vault)
    {
       for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next)
@@ -686,19 +669,19 @@ void do_on_login_stuff(Character *ch)
 
    while (!todelete.empty())
    {
-      logentry(QString("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(ch)), 0, LogChannels::LOG_MORTAL);
-      remove_vault_access(ch, todelete.front(), vault);
+      logentry(QString("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, LogChannels::LOG_MORTAL);
+      remove_vault_access(this, todelete.front(), vault);
       todelete.pop();
    }
 
-   if (ch->getSetting("mode").startsWith("char"))
+   if (this->getSetting("mode").startsWith("char"))
    {
-      telnet_echo_off(ch->desc);
-      telnet_sga(ch->desc);
+      telnet_echo_off(this->desc);
+      telnet_sga(this->desc);
    }
 }
 
-void roll_and_display_stats(Character *ch)
+void Character::roll_and_display_stats(void)
 {
    int x, a, b;
    char buf[MAX_STRING_LENGTH];
@@ -707,57 +690,57 @@ void roll_and_display_stats(Character *ch)
    {
       a = dice(3, 6);
       b = dice(6, 3);
-      ch->desc->stats->str[x] = MAX(12 + number(0, 1), MAX(a, b));
+      this->desc->stats->str[x] = MAX(12 + number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      ch->desc->stats->dex[x] = MAX(12 + number(0, 1), MAX(a, b));
+      this->desc->stats->dex[x] = MAX(12 + number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      ch->desc->stats->con[x] = MAX(12 + number(0, 1), MAX(a, b));
+      this->desc->stats->con[x] = MAX(12 + number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      ch->desc->stats->tel[x] = MAX(12 + number(0, 1), MAX(a, b));
+      this->desc->stats->tel[x] = MAX(12 + number(0, 1), MAX(a, b));
       a = dice(3, 6);
       b = dice(6, 3);
-      ch->desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
+      this->desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
    }
 
    /*
    For testing purposes
-   ch->desc->stats->str[0] = 13;
-   ch->desc->stats->dex[0] = 14;
-   ch->desc->stats->con[0] = 13;
-   ch->desc->stats->tel[0] = 12;
-   ch->desc->stats->wis[0] = 14;
+   this->desc->stats->str[0] = 13;
+   this->desc->stats->dex[0] = 14;
+   this->desc->stats->con[0] = 13;
+   this->desc->stats->tel[0] = 12;
+   this->desc->stats->wis[0] = 14;
    */
 
-   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
+   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", this->desc);
 
-   SEND_TO_Q("Group: 1     2     3     4     5\n\r", ch->desc);
+   SEND_TO_Q("Group: 1     2     3     4     5\n\r", this->desc);
    sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-           ch->desc->stats->str[0], ch->desc->stats->str[1], ch->desc->stats->str[2],
-           ch->desc->stats->str[3], ch->desc->stats->str[4]);
-   SEND_TO_Q(buf, ch->desc);
+           this->desc->stats->str[0], this->desc->stats->str[1], this->desc->stats->str[2],
+           this->desc->stats->str[3], this->desc->stats->str[4]);
+   SEND_TO_Q(buf, this->desc);
    sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-           ch->desc->stats->dex[0], ch->desc->stats->dex[1], ch->desc->stats->dex[2],
-           ch->desc->stats->dex[3], ch->desc->stats->dex[4]);
-   SEND_TO_Q(buf, ch->desc);
+           this->desc->stats->dex[0], this->desc->stats->dex[1], this->desc->stats->dex[2],
+           this->desc->stats->dex[3], this->desc->stats->dex[4]);
+   SEND_TO_Q(buf, this->desc);
    sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-           ch->desc->stats->con[0], ch->desc->stats->con[1], ch->desc->stats->con[2],
-           ch->desc->stats->con[3], ch->desc->stats->con[4]);
-   SEND_TO_Q(buf, ch->desc);
+           this->desc->stats->con[0], this->desc->stats->con[1], this->desc->stats->con[2],
+           this->desc->stats->con[3], this->desc->stats->con[4]);
+   SEND_TO_Q(buf, this->desc);
    sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-           ch->desc->stats->tel[0], ch->desc->stats->tel[1], ch->desc->stats->tel[2],
-           ch->desc->stats->tel[3], ch->desc->stats->tel[4]);
-   SEND_TO_Q(buf, ch->desc);
+           this->desc->stats->tel[0], this->desc->stats->tel[1], this->desc->stats->tel[2],
+           this->desc->stats->tel[3], this->desc->stats->tel[4]);
+   SEND_TO_Q(buf, this->desc);
    sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-           ch->desc->stats->wis[0], ch->desc->stats->wis[1], ch->desc->stats->wis[2],
-           ch->desc->stats->wis[3], ch->desc->stats->wis[4]);
-   SEND_TO_Q(buf, ch->desc);
-   SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
-   telnet_ga(ch->desc);
+           this->desc->stats->wis[0], this->desc->stats->wis[1], this->desc->stats->wis[2],
+           this->desc->stats->wis[3], this->desc->stats->wis[4]);
+   SEND_TO_Q(buf, this->desc);
+   SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", this->desc);
+   telnet_ga(this->desc);
 
-   WAIT_STATE(ch, DC::PULSE_TIMER / 10);
+   WAIT_STATE(this, DC::PULSE_TIMER / 10);
 }
 
 int count_IP_connections(class Connection *new_conn)
@@ -785,39 +768,39 @@ int count_IP_connections(class Connection *new_conn)
    return 0;
 }
 
-void check_hw(Character *ch)
+void Character::check_hw(void)
 {
-   heightweight(ch, false);
-   if (ch->height > races[ch->race].max_height)
+   heightweight(false);
+   if (this->height > races[this->race].max_height)
    {
-      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
-      ch->height = races[ch->race].max_height;
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
+      this->height = races[this->race].max_height;
    }
-   if (ch->height < races[ch->race].min_height)
+   if (this->height < races[this->race].min_height)
    {
-      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
-      ch->height = races[ch->race].min_height;
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
+      this->height = races[this->race].min_height;
    }
 
-   if (ch->weight > races[ch->race].max_weight)
+   if (this->weight > races[this->race].max_weight)
    {
-      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
-      ch->weight = races[ch->race].max_weight;
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
+      this->weight = races[this->race].max_weight;
    }
-   if (ch->weight < races[ch->race].min_weight)
+   if (this->weight < races[this->race].min_weight)
    {
-      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
-      ch->weight = races[ch->race].min_weight;
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
+      this->weight = races[this->race].min_weight;
    }
-   heightweight(ch, true);
+   heightweight(true);
 }
 
-void set_hw(Character *ch)
+void Character::set_hw(void)
 {
-   ch->height = number(races[ch->race].min_height, races[ch->race].max_height);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
-   ch->weight = number(races[ch->race].min_weight, races[ch->race].max_weight);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
+   this->height = number(races[this->race].min_height, races[this->race].max_height);
+   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+   this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
+   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -1416,7 +1399,7 @@ void nanny(class Connection *d, std::string arg)
          STATE(d) = Connection::states::OLD_GET_RACE;
          break;
       }
-      roll_and_display_stats(ch);
+      ch->roll_and_display_stats();
       break;
 
    case Connection::states::OLD_GET_RACE:
@@ -1561,7 +1544,7 @@ void nanny(class Connection *d, std::string arg)
          break;
       }
 
-      set_hw(ch);
+      ch->set_hw();
       SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\r\n", d);
       sprintf(buf, " %c 1: Warrior\n\r"
                    " %c 2: Cleric\n\r"
@@ -1786,7 +1769,7 @@ void nanny(class Connection *d, std::string arg)
             ch->sendln("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R");
          }
 
-         do_on_login_stuff(ch);
+         ch->do_on_login_stuff();
 
          if (ch->getLevel() < OVERSEER)
             clan_login(ch);
@@ -1795,7 +1778,7 @@ void nanny(class Connection *d, std::string arg)
          if (!GET_SHORT_ONLY(ch))
             GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch));
          update_wizlist(ch);
-         check_maxes(ch); // Check skill maxes.
+         ch->check_maxes(); // Check skill maxes.
 
          STATE(d) = Connection::states::PLAYING;
          update_max_who();
@@ -2201,16 +2184,16 @@ void update_characters()
             act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
          }
       }
-      if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON)))
+      if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
       {
          logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
          REMBIT(i->affected_by, AFF_POISON);
       }
 
       // handle poison
-      if (IS_AFFECTED(i, AFF_POISON) && !i->fighting && affected_by_spell(i, SPELL_POISON) && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE)
+      if (IS_AFFECTED(i, AFF_POISON) && !i->fighting && i->affected_by_spell(SPELL_POISON) && i->affected_by_spell(SPELL_POISON)->location == APPLY_NONE)
       {
-         int tmp = number(1, 2) + affected_by_spell(i, SPELL_POISON)->duration;
+         int tmp = number(1, 2) + i->affected_by_spell(SPELL_POISON)->duration;
          if (get_saves(i, SAVE_TYPE_POISON) > number(1, 101))
          {
             tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
@@ -2231,7 +2214,7 @@ void update_characters()
       }
 
       // handle drowning
-      if (IS_PC(i) && i->getLevel() < IMMORTAL && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM)))
+      if (IS_PC(i) && i->getLevel() < IMMORTAL && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
       {
          tmp = GET_MAX_HIT(i) / 5;
          sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
@@ -2265,17 +2248,17 @@ void update_characters()
       affect_from_char(i, SKILL_COMBAT_MASTERY);
 
       // perseverance stuff
-      if (affected_by_spell(i, SKILL_PERSEVERANCE))
+      if (i->affected_by_spell(SKILL_PERSEVERANCE))
       {
          affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
          af.type = SKILL_PERSEVERANCE_BONUS;
          af.duration = -1;
-         af.modifier = 0 - ((2 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 10) * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration));
+         af.modifier = 0 - ((2 + i->affected_by_spell(SKILL_PERSEVERANCE)->modifier / 10) * (1 + i->affected_by_spell(SKILL_PERSEVERANCE)->modifier / 11 - i->affected_by_spell(SKILL_PERSEVERANCE)->duration));
          af.location = APPLY_AC;
          af.bitvector = -1;
          affect_to_char(i, &af);
 
-         i->incrementMove(5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration));
+         i->incrementMove(5 * (1 + i->affected_by_spell(SKILL_PERSEVERANCE)->modifier / 11 - i->affected_by_spell(SKILL_PERSEVERANCE)->duration));
       }
    }
 }
@@ -2353,12 +2336,12 @@ void checkConsecrate(int pulseType)
 
                   if (spl == SPELL_CONSECRATE)
                   {
-                     if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+                     if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
                         tmp_ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.");
                   }
                   else
                   {
-                     if (affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
+                     if (tmp_ch->affected_by_spell(SPELL_DETECT_EVIL) && tmp_ch->affected_by_spell(SPELL_DETECT_EVIL)->modifier >= 80)
                         if (ch && tmp_ch != ch)
                         {
                            send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
@@ -2403,7 +2386,7 @@ void checkConsecrate(int pulseType)
                      tmp_ch->addHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground glow softly as your holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration heals you. ", TO_CHAR);
-                     else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+                     else if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
                         send_damage("Runes upon the ground glow softly as $n's holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration heals you.", TO_CHAR);
                      else
                         send_damage("Runes upon the ground glow softly as a holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration heals you.", TO_CHAR);
@@ -2436,7 +2419,7 @@ void checkConsecrate(int pulseType)
                      tmp_ch->removeHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground hum ominously as your unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration injures you. ", TO_CHAR);
-                     else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+                     else if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
                         send_damage("Runes upon the ground hum ominously as $n's unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration injures you.", TO_CHAR);
                      else
                         send_damage("Runes upon the ground hum ominously as an unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration injures you.", TO_CHAR);
@@ -2458,7 +2441,7 @@ void checkConsecrate(int pulseType)
                      tmp_ch->addHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground hum ominously as your unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration heals you. ", TO_CHAR);
-                     else if (affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
+                     else if (tmp_ch->affected_by_spell(SPELL_DETECT_EVIL) && tmp_ch->affected_by_spell(SPELL_DETECT_EVIL)->modifier >= 80)
                         send_damage("Runes upon the ground hum ominously as $n's unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration heals you.", TO_CHAR);
                      else
                         send_damage("Runes upon the ground hum ominously as an unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration heals you.", TO_CHAR);
@@ -2492,7 +2475,7 @@ void checkConsecrate(int pulseType)
                      tmp_ch->removeHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground glow softly as your holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration injures you. ", TO_CHAR);
-                     else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+                     else if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
                         send_damage("Runes upon the ground glow softly as $n's holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration injures you.", TO_CHAR);
                      else
                         send_damage("Runes upon the ground glow softly as a holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration injures you.", TO_CHAR);
@@ -2564,7 +2547,7 @@ void show_question_race(Connection *d)
             races_buffer += ",";
          }
       }
-      undo_race_saves(ch);
+      ch->undo_race_saves();
    }
    buffer += "Type 1-" + std::to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
    SEND_TO_Q(buffer.c_str(), d);
@@ -2899,7 +2882,7 @@ bool handle_get_stats(Connection *d, std::string arg)
             GET_ALIGNMENT(ch) = 1000;
          }
 
-         set_hw(ch);
+         ch->set_hw();
 
          return true;
       }

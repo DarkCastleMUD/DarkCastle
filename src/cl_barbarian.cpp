@@ -728,8 +728,8 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -784,7 +784,7 @@ int do_bloodfury(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_BLOOD_FURY))
+  if (ch->affected_by_spell(SKILL_BLOOD_FURY))
   {
     ch->sendln("Your body can not yet take the strain of another blood fury yet.");
     return eFAILURE;
@@ -830,7 +830,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 20;
-  if (affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && ch->getLevel() < IMMORTAL)
   {
     ch->sendln("Your body is still recovering from your last crazed assault technique.");
     return eFAILURE;
@@ -993,7 +993,7 @@ int do_ferocity(Character *ch, char *argument, int cmd)
   {
     return eFAILURE;
   }
-  if (affected_by_spell(ch, SKILL_FEROCITY_TIMER))
+  if (ch->affected_by_spell(SKILL_FEROCITY_TIMER))
   {
     ch->sendln("It is too soon to try and rile up the masses!");
     return eFAILURE;
@@ -1123,7 +1123,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
 
   bool victim_paralyzed = false;
   affected_type *af;
-  if ((af = affected_by_spell(victim, SPELL_PARALYZE)))
+  if ((af = victim->affected_by_spell(SPELL_PARALYZE)))
   {
     victim_paralyzed = true;
     if (af->duration >= 1)
@@ -1214,8 +1214,8 @@ int do_knockback(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
     return eFAILURE;
   }
-  else if (!victim_paralyzed && affected_by_spell(victim, SKILL_BATTLESENSE) &&
-           number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+  else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
+           number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
   {
     act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1231,7 +1231,7 @@ int do_knockback(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
   else if (CAN_GO(victim, dir) &&
-           !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
+           !victim->affected_by_spell(SPELL_IRON_ROOTS) &&
            !DC::isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
            !DC::isSet(DC::getInstance()->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
            (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
@@ -1324,7 +1324,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     ch->sendln("You don't know how to.");
     return eSUCCESS;
   }
-  if (affected_by_spell(ch, SKILL_PRIMAL_FURY))
+  if (ch->affected_by_spell(SKILL_PRIMAL_FURY))
   {
     ch->sendln("You must wait before using this ability again.");
     return eSUCCESS;
@@ -1390,7 +1390,7 @@ int do_pursue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_PURSUIT))
+  if (ch->affected_by_spell(SKILL_PURSUIT))
   {
     ch->sendln("You will no longer pursue your victims.");
     affect_from_char(ch, SKILL_PURSUIT);

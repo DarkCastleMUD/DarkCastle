@@ -125,7 +125,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (ch->isPlayerCantQuit()&& !IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -155,7 +155,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
 
 int do_visible(Character *ch, char *argument, int cmd)
 {
-  if (affected_by_spell(ch, SPELL_INVISIBLE))
+  if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
     affect_from_char(ch, SPELL_INVISIBLE);
     ch->sendln("You drop your invisiblity spell.");
@@ -211,7 +211,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (ch->isPlayerCantQuit()&& !IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1132,7 +1132,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
       ch->sendln("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!");
     }
 
-  if ((paf = affected_by_spell(ch, SPELL_SLEEP)) &&
+  if ((paf = ch->affected_by_spell(SPELL_SLEEP))&&
       paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
     paf->modifier = 0;
 

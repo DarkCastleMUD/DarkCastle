@@ -147,7 +147,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(FUCK_GTHIEF))
+  if (isPlayerGoldThief())
   {
     send("Nobody wants any part of your stolen booty!\r\n");
     return eFAILURE;

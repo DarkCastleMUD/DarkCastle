@@ -78,7 +78,6 @@ extern int getRealSpellDamage(Character *ch);
 
 /* intern functions */
 
-void list_obj_to_char(class Object *list, Character *ch, int mode, bool show);
 void showStatDiff(Character *ch, int base, int random, bool swapcolors = false);
 
 int get_saves(Character *ch, int savetype)
@@ -151,8 +150,7 @@ void argument_split_3(char *argument, char *first_arg, char *second_arg, char *t
    begin += look_at;
 }
 
-class Object *get_object_in_equip_vis(Character *ch,
-                                      char *arg, class Object *equipment[], int *j, bool blindfighting)
+class Object *Character::get_object_in_equip_vis(char *arg, class Object *equipment[], int *j, bool blindfighting)
 {
    int k, num;
    char tmpname[MAX_STRING_LENGTH];
@@ -165,7 +163,7 @@ class Object *get_object_in_equip_vis(Character *ch,
 
    for ((*j) = 0, k = 1; ((*j) < MAX_WEAR) && (k <= num); (*j)++)
       if (equipment[(*j)])
-         if (CAN_SEE_OBJ(ch, equipment[(*j)], blindfighting))
+         if (CAN_SEE_OBJ(this, equipment[(*j)], blindfighting))
             if (isexact(tmp, equipment[(*j)]->name))
             {
                if (k == num)
@@ -207,7 +205,7 @@ const char *item_condition(class Object *object)
       return " [$5Pile of Scraps$R]";
 }
 
-void show_obj_to_char(class Object *object, Character *ch, int mode)
+void Character::show_obj_to_char(class Object *object, int mode)
 {
    char buffer[MAX_STRING_LENGTH];
    char flagbuf[MAX_STRING_LENGTH];
@@ -216,7 +214,7 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
    if (mode == 0 && DC::isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
-       (ch->player && !ch->player->holyLite))
+       (this->player && !this->player->holyLite))
       return;
 
    buffer[0] = '\0';
@@ -233,10 +231,10 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
          {
             strcpy(buffer, "There is something written upon it:\n\r\n\r");
             strcat(buffer, object->action_description);
-            page_string(ch->desc, buffer, 1);
+            page_string(this->desc, buffer, 1);
          }
          else
-            act("It's blank.", ch, 0, 0, TO_CHAR, 0);
+            act("It's blank.", this, 0, 0, TO_CHAR, 0);
          return;
       }
       else if ((object->obj_flags.type_flag != ITEM_DRINKCON))
@@ -261,7 +259,7 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
          strcat(flagbuf, "Invisible");
          found++;
       }
-      if (IS_OBJ_STAT(object, ITEM_MAGIC) && IS_AFFECTED(ch, AFF_DETECT_MAGIC))
+      if (IS_OBJ_STAT(object, ITEM_MAGIC) && IS_AFFECTED(this, AFF_DETECT_MAGIC))
       {
          if (found)
             strcat(flagbuf, "$B/$R");
@@ -380,11 +378,10 @@ void show_obj_to_char(class Object *object, Character *ch, int mode)
    }
 
    strcat(buffer, "\n\r");
-   page_string(ch->desc, buffer, 1);
+   page_string(this->desc, buffer, 1);
 }
 
-void list_obj_to_char(class Object *list, Character *ch, int mode,
-                      bool show)
+void Character::list_obj_to_char(class Object *list, int mode, bool show)
 {
    class Object *i;
    bool found = false;
@@ -394,7 +391,7 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
 
    for (i = list; i; i = i->next_content)
    {
-      if ((can_see = CAN_SEE_OBJ(ch, i)) && i->next_content &&
+      if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
           i->next_content->item_number == i->item_number && i->item_number != -1 && !DC::isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
       {
          number++;
@@ -405,16 +402,16 @@ void list_obj_to_char(class Object *list, Character *ch, int mode,
          if (number > 1)
          {
             sprintf(buf, "[%d] ", number);
-            ch->send(buf);
+            this->send(buf);
          }
-         show_obj_to_char(i, ch, mode);
+         show_obj_to_char(i, mode);
          found = true;
          number = 1;
       }
    }
 
    if ((!found) && (show))
-      ch->sendln("Nothing");
+      this->sendln("Nothing");
 }
 
 void show_spells(Character *i, Character *ch)
@@ -426,11 +423,11 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$7aura! ";
    }
 
-   if (affected_by_spell(i, SPELL_PROTECT_FROM_EVIL))
+   if (i->affected_by_spell( SPELL_PROTECT_FROM_EVIL))
    {
       strbuf = strbuf + "$R$6pulsing! ";
    }
-   else if (affected_by_spell(i, SPELL_PROTECT_FROM_GOOD))
+   else if (i->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
    {
       strbuf = strbuf + "$R$6$Bpulsing! ";
    }
@@ -450,7 +447,7 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$B$2acid! ";
    }
 
-   if (affected_by_spell(i, SPELL_BARKSKIN))
+   if (i->affected_by_spell( SPELL_BARKSKIN))
    {
       strbuf = strbuf + "$R$5woody! ";
    }
@@ -465,7 +462,7 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$R$2paralyze! ";
    }
 
-   if (affected_by_spell(i, SPELL_STONE_SHIELD) || affected_by_spell(i, SPELL_GREATER_STONE_SHIELD))
+   if (i->affected_by_spell(SPELL_STONE_SHIELD)||i->affected_by_spell( SPELL_GREATER_STONE_SHIELD))
    {
       strbuf = strbuf + "$B$0stones! ";
    }
@@ -735,7 +732,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
                if (CAN_SEE_OBJ(ch, i->equipment[j]))
                {
                   send_to_char(where[j], ch);
-                  show_obj_to_char(i->equipment[j], ch, 1);
+                  ch->show_obj_to_char(i->equipment[j], 1);
                }
             }
          }
@@ -753,7 +750,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
                 CAN_SEE_OBJ(ch, tmp_obj) &&
                 number(0, MORTAL) < ch->getLevel())
             {
-               show_obj_to_char(tmp_obj, ch, 1);
+               ch->show_obj_to_char(tmp_obj, 1);
                found = true;
             }
          }
@@ -765,7 +762,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
    {
       /* Lists inventory */
       act("$n is carrying:", i, 0, ch, TO_VICT, 0);
-      list_obj_to_char(i->carrying, ch, 1, true);
+      ch->list_obj_to_char(i->carrying, 1, true);
    }
 }
 
@@ -861,45 +858,45 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
    return eSUCCESS;
 }
 
-void list_char_to_char(Character *list, Character *ch, int mode)
+void Character::list_char_to_char(Character *list, int mode)
 {
    bool clear_lastseen = false;
    Character *i;
-   int known = ch->has_skill(SKILL_BLINDFIGHTING);
+   int known = this->has_skill(SKILL_BLINDFIGHTING);
    timeval tv, tv_zero = {0, 0};
 
    for (i = list; i; i = i->next_in_room)
    {
-      if (ch == i)
+      if (this == i)
          continue;
-      if (!IS_MOB(i) && (i->player->wizinvis > ch->getLevel()))
-         if (!i->player->incognito || !(ch->in_room == i->in_room))
+      if (!IS_MOB(i) && (i->player->wizinvis > this->getLevel()))
+         if (!i->player->incognito || !(this->in_room == i->in_room))
             continue;
-      if (IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
+      if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
       {
-         show_char_to_char(i, ch, 0);
+         show_char_to_char(i, this, 0);
 
-         if (IS_PC(ch) && IS_NPC(i))
+         if (IS_PC(this) && IS_NPC(i))
          {
-            if (ch->player->lastseen == 0)
-               ch->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
+            if (this->player->lastseen == 0)
+               this->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
             if (clear_lastseen == false)
             {
-               ch->player->lastseen->clear();
+               this->player->lastseen->clear();
                clear_lastseen = true;
             }
 
             gettimeofday(&tv, nullptr);
-            ch->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
+            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
          }
       }
-      else if (IS_DARK(ch->in_room))
+      else if (IS_DARK(this->in_room))
       {
-         if (known && skill_success(ch, nullptr, SKILL_BLINDFIGHTING))
-            ch->sendln("Your blindfighting awareness alerts you to a presense in the area.");
+         if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
+            this->sendln("Your blindfighting awareness alerts you to a presense in the area.");
          else if (number(1, 10) == 1)
-            ch->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
+            this->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
       }
    }
 }
@@ -943,7 +940,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    for (obj = cont->contains; obj; obj = obj->next_content)
       if (CAN_SEE_OBJ(ch, obj) && number(0, MORTAL + 30) < ch->getLevel())
       {
-         show_obj_to_char(obj, ch, 1);
+         ch->show_obj_to_char(obj, 1);
          found = true;
       }
 
@@ -1330,7 +1327,7 @@ int do_look(Character *ch, char *argument, int cmd)
    else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
    {
       ch->sendln("It is pitch black...");
-      list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
+      ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
       ch->send("$R");
       // TODO - if have blindfighting, list some of the room exits sometimes
    }
@@ -1499,7 +1496,7 @@ int do_look(Character *ch, char *argument, int cmd)
                         ch->sendln(": ");
                      }
 
-                     list_obj_to_char(tmp_object->contains, ch, 2, true);
+                     ch->list_obj_to_char(tmp_object->contains, 2, true);
                   }
                   else
                      ch->sendln("It is closed.");
@@ -1652,10 +1649,10 @@ int do_look(Character *ch, char *argument, int cmd)
             { /* If an object was found */
                if (!found)
                   /* Show no-description */
-                  show_obj_to_char(found_object, ch, 5);
+                  ch->show_obj_to_char(found_object, 5);
                else
                   /* Find hum, glow etc */
-                  show_obj_to_char(found_object, ch, 6);
+                  ch->show_obj_to_char(found_object, 6);
             }
             else if (!found)
             {
@@ -1763,9 +1760,8 @@ int do_look(Character *ch, char *argument, int cmd)
 
          ansi_color(BLUE, ch);
          ansi_color(BOLD, ch);
-         list_obj_to_char(DC::getInstance()->world[ch->in_room].contents, ch, 0, false);
-
-         list_char_to_char(DC::getInstance()->world[ch->in_room].people, ch, 0);
+         ch->list_obj_to_char(DC::getInstance()->world[ch->in_room].contents, 0, false);
+         ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
 
          strcpy(buffer, "");
          *buffer = '\0';
@@ -2101,13 +2097,13 @@ int do_score(Character *ch, char *argument, int cmd)
             if (aff->location == 0)
                aff_name = "infravision";
             break;
-         case FUCK_CANTQUIT:
+         case Character::PLAYER_CANTQUIT:
             aff_name = "CANTQUIT";
             break;
-         case FUCK_PTHIEF:
+         case Character::PLAYER_OBJECT_THIEF:
             aff_name = "DIRTY_THIEF/CANT_QUIT";
             break;
-         case FUCK_GTHIEF:
+         case Character::PLAYER_GOLD_THIEF:
             aff_name = "GOLD_THIEF/CANT_QUIT";
             break;
          case SKILL_HARM_TOUCH:
@@ -2176,18 +2172,18 @@ int do_score(Character *ch, char *argument, int cmd)
          std::string modified = apply_types[(int)aff->location];
          if (modifyOutput)
          {
-            if (affected_by_spell(ch, SKILL_NAT_SELECT))
+            if (ch->affected_by_spell(SKILL_NAT_SELECT))
             {
                modified = races[aff->modifier].singular_name;
             }
-            else if (affected_by_spell(ch, SPELL_IMMUNITY))
+            else if (ch->affected_by_spell(SPELL_IMMUNITY))
             {
                modified = spells[aff->modifier];
             }
          }
 
          QString format;
-         if (aff->type == FUCK_CANTQUIT)
+         if (aff->type == Character::PLAYER_CANTQUIT)
          {
             format = "|%1| Affected by %2 from %3%4 Modifier %5 |%1|\r\n";
             format = format.arg(scratch);
@@ -2511,7 +2507,7 @@ int do_count(Character *ch, char *arg, int cmd)
 int do_inventory(Character *ch, char *argument, int cmd)
 {
    ch->sendln("You are carrying:");
-   list_obj_to_char(ch->carrying, ch, 1, true);
+   ch->list_obj_to_char(ch->carrying, 1, true);
    return eSUCCESS;
 }
 
@@ -2534,7 +2530,7 @@ int do_equipment(Character *ch, char *argument, int cmd)
                found = true;
             }
             send_to_char(where[j], ch);
-            show_obj_to_char(ch->equipment[j], ch, 1);
+            ch->show_obj_to_char(ch->equipment[j], 1);
          }
          else
          {

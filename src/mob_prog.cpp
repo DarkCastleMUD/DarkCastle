@@ -2415,41 +2415,41 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 
 		if (fvict)
-			return (int64_t)(affected_by_spell(fvict, find_skill_num(val)));
+			return (int64_t)(fvict->affected_by_spell(find_skill_num(val)));
 		if (ye)
 			return false;
 		switch (arg[1])
 		{
 		case 'i': // mob
-			return (int64_t)(affected_by_spell(mob, find_skill_num(val)));
+			return (int64_t)(mob->affected_by_spell(find_skill_num(val)));
 		case 'z':
 			if (mob->beacon)
-				return (int64_t)(affected_by_spell(((Character *)mob->beacon), find_skill_num(val)));
+				return (int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val)));
 			else
 				return -1;
 
 		case 'n': // actor
 			if (actor)
-				return (int64_t)(affected_by_spell(actor, find_skill_num(val)));
+				return (int64_t)(actor->affected_by_spell(find_skill_num(val)));
 			else
 				return -1;
 		case 't': // vict
 			if (vict)
-				return (int64_t)(affected_by_spell(vict, find_skill_num(val)));
+				return (int64_t)(vict->affected_by_spell(find_skill_num(val)));
 			else
 				return -1;
 		case 'r': // rand
 			if (rndm)
-				return (int64_t)(affected_by_spell(rndm, find_skill_num(val)));
+				return (int64_t)(rndm->affected_by_spell(find_skill_num(val)));
 			return -1;
 		case 'f':
 			if (actor && actor->fighting)
-				return (int64_t)(affected_by_spell(actor->fighting, find_skill_num(val)));
+				return (int64_t)(actor->fighting->affected_by_spell(find_skill_num(val)));
 			else
 				return -1;
 		case 'g':
 			if (mob && mob->fighting)
-				return (int64_t)(affected_by_spell(mob->fighting, find_skill_num(val)));
+				return (int64_t)(mob->fighting->affected_by_spell(find_skill_num(val)));
 			else
 				return 0;
 		default:

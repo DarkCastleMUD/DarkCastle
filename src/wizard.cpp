@@ -897,7 +897,7 @@ void mob_stat(Character *ch, Character *k)
       {
         if (aff->type == INTERNAL_SLEEPING)
           aff_name = "Internal Sleeping";
-        else if (aff->type == FUCK_CANTQUIT)
+        else if (aff->type == Character::PLAYER_CANTQUIT)
           aff_name = "CANTQUIT";
         else
           aff_name = "Unknown!!!";

@@ -1141,13 +1141,13 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
     return false;
 
   skill = 0;
-  if ((cur_af = affected_by_spell(sub, SPELL_DETECT_GOOD)))
+  if ((cur_af = sub->affected_by_spell(SPELL_DETECT_GOOD)))
     skill = (int)cur_af->modifier;
   if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
     return true;
 
   skill = 0;
-  if ((cur_af = affected_by_spell(sub, SPELL_DETECT_EVIL)))
+  if ((cur_af = sub->affected_by_spell(SPELL_DETECT_EVIL)))
     skill = (int)cur_af->modifier;
   if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
     return true;
@@ -1164,7 +1164,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   }
 
   // only see beacons if you have detect magic up
-  if ((cur_af = affected_by_spell(sub, SPELL_DETECT_MAGIC)))
+  if ((cur_af = sub->affected_by_spell(SPELL_DETECT_MAGIC)))
     skill = (int)cur_af->modifier;
 
   if (GET_ITEM_TYPE(obj) == ITEM_BEACON && DC::isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
@@ -1481,7 +1481,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (victim->affected_by_spell(FUCK_PTHIEF) || victim->affected_by_spell(FUCK_GTHIEF))
+  if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
   {
     victim->sendln("The gods frown upon your thieving ways and refuse to aid your escape.");
     return eFAILURE;
@@ -1678,9 +1678,9 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if ((IS_AFFECTED(ch, AFF_CANTQUIT) && cmd != 666) ||
-        affected_by_spell(ch, FUCK_PTHIEF) ||
-        affected_by_spell(ch, FUCK_GTHIEF))
+    if ((ch->isPlayerCantQuit()&& cmd != 666) ||
+        ch->isPlayerObjectThief() ||
+        ch->isPlayerGoldThief())
     {
       ch->sendln("You can't quit, because you are still wanted!");
       return eFAILURE;
@@ -2530,7 +2530,7 @@ bool check_make_camp(int room)
       return false;
     if (IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
       return false;
-    if (affected_by_spell(i, SKILL_MAKE_CAMP) && affected_by_spell(i, SKILL_MAKE_CAMP)->modifier == room)
+    if (i->affected_by_spell(SKILL_MAKE_CAMP) && i->affected_by_spell(SKILL_MAKE_CAMP)->modifier == room)
       campok = true;
   }
 
@@ -2550,10 +2550,10 @@ int get_leadership_bonus(Character *ch)
 
   if (IS_MOB(ch) || ch->in_room != leader->in_room)
     return 0;
-  if (!affected_by_spell(leader, SKILL_LEADERSHIP))
+  if (!leader->affected_by_spell(SKILL_LEADERSHIP))
     return 0;
 
-  if (affected_by_spell(ch, SKILL_LEADERSHIP) && ch->master)
+  if (ch->affected_by_spell(SKILL_LEADERSHIP) && ch->master)
     affect_from_char(ch, SKILL_LEADERSHIP);
 
   for (f = leader->followers; f; f = next_f)
@@ -2580,7 +2580,7 @@ int get_leadership_bonus(Character *ch)
     bonus++;
   }
 
-  return MIN(bonus, affected_by_spell(leader, SKILL_LEADERSHIP)->modifier);
+  return MIN(bonus, leader->affected_by_spell(SKILL_LEADERSHIP)->modifier);
 }
 
 void update_make_camp_and_leadership(void)
@@ -2594,16 +2594,16 @@ void update_make_camp_and_leadership(void)
            {
              if (!i->fighting)
              {
-               if (affected_by_spell(i, SKILL_SMITE))
+               if (i->affected_by_spell(SKILL_SMITE))
                  affect_from_char(i, SKILL_SMITE);
 
-               if (affected_by_spell(i, SKILL_PERSEVERANCE))
+               if (i->affected_by_spell(SKILL_PERSEVERANCE))
                {
                  affect_from_char(i, SKILL_PERSEVERANCE);
                  affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
                }
 
-               if (affected_by_spell(i, SKILL_BATTLESENSE))
+               if (i->affected_by_spell(SKILL_BATTLESENSE))
                  affect_from_char(i, SKILL_BATTLESENSE);
              }
 
@@ -2611,17 +2611,17 @@ void update_make_camp_and_leadership(void)
              {
                if (!check_make_camp(i->in_room))
                {
-                 if (affected_by_spell(i, SKILL_MAKE_CAMP))
+                 if (i->affected_by_spell(SKILL_MAKE_CAMP))
                  {
                    affect_from_char(i, SKILL_MAKE_CAMP);
                    send_to_room("The camp has been disturbed.\r\n", i->in_room);
                  }
-                 if (affected_by_spell(i, SPELL_FARSIGHT) && affected_by_spell(i, SPELL_FARSIGHT)->modifier == 111)
+                 if (i->affected_by_spell(SPELL_FARSIGHT) && i->affected_by_spell(SPELL_FARSIGHT)->modifier == 111)
                    affect_from_char(i, SPELL_FARSIGHT);
                }
                else
                {
-                 if (!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
+                 if (!i->affected_by_spell(SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
                  {
                    af.type = SPELL_FARSIGHT;
                    af.duration = -1;
@@ -2650,7 +2650,7 @@ void update_make_camp_and_leadership(void)
                    af.duration = -1;
                    af.bitvector = -1;
 
-                   if (affected_by_spell(i, SKILL_LEADERSHIP))
+                   if (i->affected_by_spell(SKILL_LEADERSHIP))
                    {
                      af.modifier = bonus * 2;
                      af.location = APPLY_HIT_N_DAM;

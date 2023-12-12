@@ -980,7 +980,7 @@ void affect_update(int32_t duration_type)
         continue;
       }
 
-      if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
+      if ((af->type == Character::PLAYER_OBJECT_THIEF || af->type == Character::PLAYER_CANTQUIT || af->type == Character::PLAYER_GOLD_THIEF) && !i->desc)
         continue;
       if (af->duration > 1)
       {
@@ -1220,7 +1220,7 @@ void stop_follower(Character *ch, int cmd)
   /* between affect_remove() and stop_follower()                   */
   if (cmd != CHANGE_LEADER)
   {
-    if (affected_by_spell(ch, SPELL_CHARM_PERSON))
+    if (ch->affected_by_spell(SPELL_CHARM_PERSON))
       affect_from_char(ch, SPELL_CHARM_PERSON);
     REMBIT(ch->affected_by, AFF_CHARM);
     REMBIT(ch->affected_by, AFF_GROUP);
@@ -1242,7 +1242,7 @@ void die_follower(Character *ch)
     zombie = k->follower;
     if (!ISSET(zombie->affected_by, AFF_GOLEM))
     {
-      if (affected_by_spell(zombie, SPELL_CHARM_PERSON))
+      if  (zombie->affected_by_spell( SPELL_CHARM_PERSON))
         affect_from_char(zombie, SPELL_CHARM_PERSON);
       stop_follower(zombie, STOP_FOLLOW);
     }
@@ -1738,7 +1738,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   if (stat != attribute_t::UNDEFINED && victim)
   {
     auto max_level_percent = getLevel() / 60.0;
-    i -= stat_mod[get_stat(victim, stat)] * max_level_percent; // less impact on low levels..
+    i -= stat_mod[victim->get_stat(stat)] * max_level_percent; // less impact on low levels..
   }
   i += mod;
 
@@ -1769,14 +1769,14 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   if (i > number(1, 100) || getLevel() >= IMMORTAL)
   {
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
-      skill_increase_check(this, skillnum, learned, a + 500);
+      skill_increase_check(skillnum, learned, a + 500);
     return true; // Success
   }
   else
   {
     /* Check for skill improvement anyway */
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
-      skill_increase_check(this, skillnum, learned, a);
+      skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
 }
@@ -1802,7 +1802,7 @@ bool check_conc_loss(Character *ch, int spl)
 {
   struct affected_type *af;
   int afspl;
-  if (!(af = affected_by_spell(ch, CONC_LOSS_FIXER)))
+  if (!(af =ch->affected_by_spell( CONC_LOSS_FIXER)))
     return false;
 
   afspl = af->modifier;
@@ -1834,7 +1834,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SPELL_NO_CAST_TIMER))
+  if (ch->affected_by_spell(SPELL_NO_CAST_TIMER))
   {
     ch->sendln("You seem unable to concentrate enough to cast any spells.");
     return eFAILURE;
@@ -1930,7 +1930,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     ch->sendln("Your lips do not move, no magic appears.");
     return eFAILURE;
   }
-  if (spl == SPELL_DIVINE_INTER && affected_by_spell(ch, SPELL_DIV_INT_TIMER))
+  if (spl == SPELL_DIVINE_INTER &&ch->affected_by_spell( SPELL_DIV_INT_TIMER))
   {
     ch->sendln("The gods are unwilling to intervene on your behalf again so soon.");
     return eFAILURE;
@@ -2078,7 +2078,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Reduce timer on paralyze even the victim is hit by a lightning bolt
           affected_type *af;
-          if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != nullptr)
+          if ((af = tar_char->affected_by_spell(SPELL_PARALYZE))!= nullptr)
           {
             af->duration--;
             if (af->duration <= 0)
@@ -2208,7 +2208,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             {
               if ((ch->has_skill(SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_RESIST_MAGIC || spl == SPELL_PROTECT_FROM_GOOD)) || (ch->has_skill(SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_REMOVE_POISON || spl == SPELL_REMOVE_BLIND || spl == SPELL_IRIDESCENT_AURA)) || (ch->has_skill(SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_REMOVE_PARALYSIS || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_SENSE_LIFE || spl == SPELL_CURE_LIGHT))
               {
-                skill_increase_check(ch, SKILL_COMMUNE, ch->has_skill(SKILL_COMMUNE), SKILL_INCREASE_HARD);
+                ch->skill_increase_check(SKILL_COMMUNE, ch->has_skill(SKILL_COMMUNE), SKILL_INCREASE_HARD);
                 target_ok = true;
                 group_spell = true;
                 tar_char = ch;
@@ -2392,7 +2392,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
       if (cmd == CMD_FILTER && fillvl)
       {
-        skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
+        ch->skill_increase_check(SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
       }
 
       if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL))
@@ -2417,7 +2417,6 @@ int do_cast(Character *ch, char *argument, int cmd)
           chance += int_app[GET_INT(ch)].conc_bonus;
         else
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-        extern int get_max(Character * ch, int skill);
 
         if (GET_RACE(ch) == RACE_HUMAN)
           chance = MIN(95, chance);
@@ -2430,8 +2429,8 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (check_conc_loss(ch, spl))
           chance = 99;
 
-        if (IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
-          chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier / 10;
+        if (IS_AFFECTED(ch, AFF_CRIPPLE) &&ch->affected_by_spell( SKILL_CRIPPLE))
+          chance -= 1 +ch->affected_by_spell( SKILL_CRIPPLE)->modifier / 10;
 
         if (ch->getLevel() < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
@@ -2443,7 +2442,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1) * rel;
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
-          skill_increase_check(ch, spl, learned, spell_info[spl].difficulty);
+          ch->skill_increase_check(spl, learned, spell_info[spl].difficulty);
           if (oldroom)
           {
             char_from_room(ch);
@@ -2452,7 +2451,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           return eSUCCESS;
         }
 
-        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && affected_by_spell(ch, SPELL_INVISIBLE))
+        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) &&ch->affected_by_spell( SPELL_INVISIBLE))
         {
           act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
           affect_from_char(ch, SPELL_INVISIBLE);
@@ -2495,7 +2494,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           GET_MANA(ch) -= (use_mana(ch, spl) * rel);
         if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
           tar_char->sendln("Your sleep is restless.");
-        skill_increase_check(ch, spl, learned, 500 + spell_info[spl].difficulty);
+        ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty);
 
         if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
         {
@@ -2610,7 +2609,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           argument = strdup("communegroupspell");
           argument_ptr = argument;
         }
-        else if (tar_char && affected_by_spell(tar_char, SPELL_IMMUNITY) && affected_by_spell(tar_char, SPELL_IMMUNITY)->modifier == spl - 1)
+        else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY)&&tar_char->affected_by_spell( SPELL_IMMUNITY)->modifier == spl - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);

@@ -76,8 +76,6 @@ extern struct index_data *obj_index;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
 
-class Object *get_object_in_equip_vis(Character *ch, char *arg, class Object *equipment[], int *j, bool blindfighting);
-
 /*
  * Local functions.
  */
@@ -371,7 +369,7 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
 
   if (str_cmp(arg, "all") && !sscanf(arg, "all.%s", dotbuf))
   {
-    if ((obj = get_object_in_equip_vis(ch, arg, ch->equipment, &location, false)))
+    if ((obj = ch->get_object_in_equip_vis(arg, ch->equipment, &location, false)))
     {
       extract_obj(unequip_char(ch, location));
       return eSUCCESS;
@@ -1198,7 +1196,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
 
   victim->send(skill);
 
-  learn_skill(victim, skillnum, 1, 1);
+  victim->learn_skill(skillnum, 1, 1);
 
   prepare_character_for_sixty(ch);
 
@@ -1717,7 +1715,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
         // debugpoint();
         struct affected_type af;
         af.type = z = skill_aff[a];
-        if (affected_by_spell(victim, z + BASE_TIMERS))
+        if (victim->affected_by_spell(z + BASE_TIMERS))
         {
           //		victim->sendln("A s.");
           return eFAILURE;

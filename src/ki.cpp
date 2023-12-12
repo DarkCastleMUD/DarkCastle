@@ -432,7 +432,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   else
     success -= 20; /* more than 300 pounds?! */
 
-  if (number(1, 101) > success || affected_by_spell(vict, SPELL_IRON_ROOTS)) /* 101 is complete failure */
+  if (number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS))/* 101 is complete failure */
   {
     act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
@@ -542,7 +542,7 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   struct affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
     return eSUCCESS;
-  if (affected_by_spell(ch, SPELL_INFRAVISION))
+  if (ch->affected_by_spell(SPELL_INFRAVISION))
     return eSUCCESS;
 
   af.type = SPELL_INFRAVISION;
@@ -616,7 +616,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
     return eINTERNAL_ERROR;
   }
 
-  if (affected_by_spell(vict, SPELL_HASTE))
+  if ( vict->affected_by_spell( SPELL_HASTE))
     return eSUCCESS;
 
   af.type = SPELL_HASTE;
@@ -653,7 +653,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   if (!str_cmp(arg, "poison"))
   {
-    if (affected_by_spell(vict, SPELL_POISON))
+    if ( vict->affected_by_spell( SPELL_POISON))
       affect_from_char(vict, SPELL_POISON);
     else
     {
@@ -664,7 +664,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   else if (!str_cmp(arg, "blindness"))
   {
-    if (affected_by_spell(vict, SPELL_BLINDNESS))
+    if ( vict->affected_by_spell( SPELL_BLINDNESS))
       affect_from_char(vict, SPELL_BLINDNESS);
     else
     {
@@ -675,7 +675,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   else if (!str_cmp(arg, "weaken"))
   {
-    if (affected_by_spell(vict, SPELL_WEAKEN))
+    if ( vict->affected_by_spell( SPELL_WEAKEN))
       affect_from_char(vict, SPELL_WEAKEN);
     else
     {
@@ -795,7 +795,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Check if caster gets a bonus against this victim
-  affected_type *af = affected_by_spell(victim, KI_DISRUPT + KI_OFFSET);
+  affected_type *af =victim->affected_by_spell( KI_DISRUPT + KI_OFFSET);
   if (af)
   {
     // We've KI_DISRUPTED the victim and failed before so we get a bonus
@@ -863,7 +863,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   // Disrupt bingo chance
   if (disrupt_bingo)
   {
-    if (affected_by_spell(victim, SPELL_SANCTUARY) ||
+    if (victim->affected_by_spell(SPELL_SANCTUARY)||
         IS_AFFECTED(victim, AFF_SANCTUARY))
     {
       affect_from_char(victim, SPELL_SANCTUARY);
@@ -871,28 +871,28 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
       act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
     }
-    if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+    if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     {
       affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
       act("Your protection from evil has been disrupted!", ch, 0, victim, TO_VICT, 0);
       act("The dark, $6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (affected_by_spell(victim, SPELL_HASTE))
+    if (victim->affected_by_spell(SPELL_HASTE))
     {
       affect_from_char(victim, SPELL_HASTE);
       act("Your magically enhanced speed has been disrupted!", ch, 0, victim, TO_VICT, 0);
       act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (affected_by_spell(victim, SPELL_STONE_SHIELD))
+    if (victim->affected_by_spell(SPELL_STONE_SHIELD))
     {
       affect_from_char(victim, SPELL_STONE_SHIELD);
       act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
       act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+    if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
     {
       affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
       act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
@@ -906,27 +906,27 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+    if (victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
     {
       affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
       act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
       act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (affected_by_spell(victim, SPELL_FIRESHIELD) || IS_AFFECTED(victim, AFF_FIRESHIELD))
+    if (victim->affected_by_spell(SPELL_FIRESHIELD)|| IS_AFFECTED(victim, AFF_FIRESHIELD))
     {
       REMBIT(victim->affected_by, AFF_FIRESHIELD);
       affect_from_char(victim, SPELL_FIRESHIELD);
       act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
       act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
     }
-    if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+    if (victim->affected_by_spell(SPELL_ACID_SHIELD))
     {
       affect_from_char(victim, SPELL_ACID_SHIELD);
       act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
       act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
     }
-    if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+    if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
     {
       affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
       act("Your protection from good has been disrupted!", ch, 0, victim, TO_VICT, 0);
@@ -1105,7 +1105,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   struct affected_type af;
 
-  if (affected_by_spell(ch, KI_STANCE + KI_OFFSET))
+  if (ch->affected_by_spell(KI_STANCE + KI_OFFSET))
   {
     ch->sendln("You focus your ki to harden your stance, but your body is still recovering from last time...");
     return eFAILURE;
@@ -1238,13 +1238,13 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
 
   int learned = ch->has_skill(KI_TRANSFER + KI_OFFSET);
 
-  if (affected_by_spell(victim, SPELL_KI_TRANS_TIMER))
+  if (victim->affected_by_spell(SPELL_KI_TRANS_TIMER))
   {
     act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SPELL_KI_TRANS_TIMER))
+  if (ch->affected_by_spell(SPELL_KI_TRANS_TIMER))
     affect_from_char(ch, SPELL_KI_TRANS_TIMER);
 
   af.type = SPELL_KI_TRANS_TIMER;

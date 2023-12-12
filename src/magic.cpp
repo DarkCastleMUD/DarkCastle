@@ -267,7 +267,7 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Obj
   save = saves_spell(ch, victim, (level / 2), SAVE_TYPE_COLD);
   if (save < 0 && skill > 50) // if failed
   {
-    if (affected_by_spell(victim, SPELL_CHILL_TOUCH))
+    if (victim->affected_by_spell(SPELL_CHILL_TOUCH))
       return retval;
     af.type = SPELL_CHILL_TOUCH;
     af.duration = skill / 18;
@@ -633,7 +633,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
     if (tmp_char->master == ch || ARE_GROUPED(tmp_char->master, ch))
       continue;
 
-    if (affected_by_spell(tmp_char, SPELL_CHARM_PERSON))
+    if (tmp_char->affected_by_spell(SPELL_CHARM_PERSON))
     {
       affect_from_char(tmp_char, SPELL_CHARM_PERSON);
       tmp_char->sendln("You feel less enthused about your master.");
@@ -661,9 +661,9 @@ int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *o
 {
   struct affected_type af;
   int spl = GET_CLASS(ch) == CLASS_ANTI_PAL ? SPELL_U_AEGIS : SPELL_AEGIS;
-  if (affected_by_spell(ch, spl))
+  if (ch->affected_by_spell(spl))
     affect_from_char(ch, spl);
-  if (affected_by_spell(ch, SPELL_ARMOR))
+  if (ch->affected_by_spell(SPELL_ARMOR))
   {
     act("$n is already protected by magical armour.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -688,9 +688,9 @@ int spell_aegis(uint8_t level, Character *ch, Character *victim, class Object *o
 int spell_armor(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  if (affected_by_spell(victim, SPELL_ARMOR))
+  if (victim->affected_by_spell(SPELL_ARMOR))
     affect_from_char(victim, SPELL_ARMOR);
-  if (affected_by_spell(victim, SPELL_AEGIS) || affected_by_spell(victim, SPELL_U_AEGIS))
+  if (victim->affected_by_spell(SPELL_AEGIS) || victim->affected_by_spell(SPELL_U_AEGIS))
   {
     act("$n is already protected by magical armour.", victim, 0, ch, TO_VICT, 0);
     return eFAILURE;
@@ -714,14 +714,14 @@ int spell_stone_shield(uint8_t level, Character *ch, Character *victim, class Ob
   struct affected_type af;
   char buf[160];
   int duration, modifier;
-  if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+  if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", GET_SHORT(victim));
     ch->send(buf);
     return eSUCCESS;
   }
 
-  if (affected_by_spell(victim, SPELL_STONE_SHIELD))
+  if (victim->affected_by_spell(SPELL_STONE_SHIELD))
     affect_from_char(victim, SPELL_STONE_SHIELD);
 
   duration = 4 + (skill / 10) + (GET_WIS(ch) > 20);
@@ -796,7 +796,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -808,7 +808,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -853,14 +853,14 @@ int spell_greater_stone_shield(uint8_t level, Character *ch, Character *victim, 
   struct affected_type af;
   char buf[160];
   int duration, modifier;
-  if (affected_by_spell(victim, SPELL_STONE_SHIELD))
+  if (victim->affected_by_spell(SPELL_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a stone shield.\r\n", GET_SHORT(victim));
     ch->send(buf);
     return eSUCCESS;
   }
 
-  if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+  if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
     affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
 
   modifier = 20 + skill / 4;
@@ -1245,7 +1245,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
 
                 if (!IS_AFFECTED(tmp_victim, AFF_BLIND) &&
                     !IS_AFFECTED(tmp_victim, AFF_PARALYSIS) &&
-                    !affected_by_spell(tmp_victim, SPELL_IRON_ROOTS) &&
+                    !tmp_victim->affected_by_spell(SPELL_IRON_ROOTS) &&
                     !ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) &&
                     !tmp_victim->fighting)
                   do_move(tmp_victim, "", to_charge[i]);
@@ -1684,7 +1684,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     ch->sendln("You can't teleport in potato arenas!");
     return eFAILURE;
   }
-  if (affected_by_spell(ch, FUCK_PTHIEF))
+  if (ch->isPlayerObjectThief())
   {
     ch->sendln("Your attempt to transport stolen goods through planes of magic fails!!");
     return eFAILURE;
@@ -1776,7 +1776,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
   }
   else
   {
-    if (affected_by_spell(victim, SPELL_BLESS))
+    if (victim->affected_by_spell(SPELL_BLESS))
       affect_from_char(victim, SPELL_BLESS);
     victim->sendln("You feel blessed.");
 
@@ -1806,16 +1806,16 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
   int retval;
 
   set_cantquit(ch, victim);
-  if (affected_by_spell(victim, SPELL_PARALYZE))
+  if (victim->affected_by_spell(SPELL_PARALYZE))
     return eFAILURE;
-  if (affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 70)
+  if (victim->affected_by_spell(SPELL_VILLAINY) && victim->affected_by_spell(SPELL_VILLAINY)->modifier >= 70)
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
     return eSUCCESS;
   }
 
-  if (affected_by_spell(victim, SPELL_SLEEP))
+  if (victim->affected_by_spell(SPELL_SLEEP))
   {
     if (number(1, 6) < 5)
     {
@@ -1877,7 +1877,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
   // paralyze vs sleep modifier
   int save = 0 - (int)((double)get_saves(victim, SAVE_TYPE_MAGIC) * 0.5);
-  if (affected_by_spell(victim, SPELL_SLEEP))
+  if (victim->affected_by_spell(SPELL_SLEEP))
     save = -15; // Above check takes care of sleep.
   int spellret = saves_spell(ch, victim, save, SAVE_TYPE_MAGIC);
 
@@ -1949,7 +1949,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
   int retval;
   set_cantquit(ch, victim);
 
-  if (affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 90)
+  if (victim->affected_by_spell(SPELL_VILLAINY) && victim->affected_by_spell(SPELL_VILLAINY)->modifier >= 90)
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
@@ -1970,7 +1970,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_BLINDNESS) || IS_AFFECTED(victim, AFF_BLIND))
+  if (victim->affected_by_spell(SPELL_BLINDNESS) || IS_AFFECTED(victim, AFF_BLIND))
     return eFAILURE;
 
   int spellret = saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC);
@@ -2072,7 +2072,7 @@ int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, clas
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_PARALYZE) &&
+  if (victim->affected_by_spell(SPELL_PARALYZE) &&
       number(1, 100) < (80 + skill / 6))
   {
     affect_from_char(victim, SPELL_PARALYZE);
@@ -2097,14 +2097,14 @@ int spell_remove_blind(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (number(1, 100) < (80 + skill / 6))
   {
-    if (!affected_by_spell(victim, SPELL_BLINDNESS) && !IS_AFFECTED(victim, AFF_BLIND))
+    if (!victim->affected_by_spell(SPELL_BLINDNESS) && !IS_AFFECTED(victim, AFF_BLIND))
     {
       if (victim == ch)
         ch->sendln("Seems you weren't blind after all.");
       else
         act("Seems $N wasn't blind after all.", ch, 0, victim, TO_CHAR, 0);
     }
-    if (affected_by_spell(victim, SPELL_BLINDNESS))
+    if (victim->affected_by_spell(SPELL_BLINDNESS))
     {
       affect_from_char(victim, SPELL_BLINDNESS);
       victim->sendln("Your vision returns!");
@@ -2295,7 +2295,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
 
     set_cantquit(ch, victim);
 
-    if (affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 90)
+    if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 90)
     {
       act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
       act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
@@ -2348,7 +2348,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     }
     else
     {
-      if (affected_by_spell(victim, SPELL_CURSE))
+      if (victim->affected_by_spell(SPELL_CURSE))
         return eFAILURE;
 
       af.type = SPELL_CURSE;
@@ -2404,7 +2404,7 @@ int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_DETECT_EVIL))
+  if (victim->affected_by_spell(SPELL_DETECT_EVIL))
     affect_from_char(victim, SPELL_DETECT_EVIL);
 
   af.type = SPELL_DETECT_EVIL;
@@ -2437,7 +2437,7 @@ int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_DETECT_GOOD))
+  if (victim->affected_by_spell(SPELL_DETECT_GOOD))
     affect_from_char(victim, SPELL_DETECT_GOOD);
 
   af.type = SPELL_DETECT_GOOD;
@@ -2464,7 +2464,7 @@ int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Obje
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_true_SIGHT))
+  if (victim->affected_by_spell(SPELL_true_SIGHT))
     affect_from_char(victim, SPELL_true_SIGHT);
 
   if (IS_AFFECTED(victim, AFF_true_SIGHT))
@@ -2493,7 +2493,7 @@ int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, c
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_DETECT_INVISIBLE))
+  if (victim->affected_by_spell(SPELL_DETECT_INVISIBLE))
     affect_from_char(victim, SPELL_DETECT_INVISIBLE);
 
   if (IS_AFFECTED(victim, AFF_DETECT_INVISIBLE))
@@ -2524,7 +2524,7 @@ int spell_infravision(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_INFRAVISION))
+  if (victim->affected_by_spell(SPELL_INFRAVISION))
     affect_from_char(victim, SPELL_INFRAVISION);
 
   if (IS_AFFECTED(victim, AFF_INFRARED))
@@ -2556,7 +2556,7 @@ int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_DETECT_MAGIC))
+  if (victim->affected_by_spell(SPELL_DETECT_MAGIC))
     affect_from_char(victim, SPELL_DETECT_MAGIC);
 
   af.type = SPELL_DETECT_MAGIC;
@@ -2584,7 +2584,7 @@ int spell_haste(uint8_t level, Character *ch, Character *victim, class Object *o
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_HASTE) || IS_AFFECTED(victim, AFF_HASTE))
+  if (victim->affected_by_spell(SPELL_HASTE) || IS_AFFECTED(victim, AFF_HASTE))
   {
     act("$N is already moving fast enough.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -2978,7 +2978,7 @@ int spell_invisibility(uint8_t level, Character *ch, Character *victim, class Ob
   else
   { /* Then it is a PC | NPC */
 
-    if (affected_by_spell(victim, SPELL_INVISIBLE))
+    if (victim->affected_by_spell(SPELL_INVISIBLE))
       affect_from_char(victim, SPELL_INVISIBLE);
 
     if (IS_AFFECTED(victim, AFF_INVISIBLE))
@@ -3229,10 +3229,10 @@ int spell_protection_from_evil(uint8_t level, Character *ch, Character *victim, 
   /* keep spells from stacking */
   if (IS_AFFECTED(victim, AFF_PROTECT_EVIL) ||
       IS_AFFECTED(victim, AFF_PROTECT_GOOD) ||
-      affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+      victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
     return eFAILURE;
 
-  if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+  if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
   {
     act("$N is already protected from evil.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3270,10 +3270,10 @@ int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, 
   /* keep spells from stacking */
   if (IS_AFFECTED(victim, AFF_PROTECT_GOOD) ||
       IS_AFFECTED(victim, AFF_PROTECT_EVIL) ||
-      affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+      victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     return eFAILURE;
 
-  if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+  if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
   {
     act("$N is already protected from good.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3335,7 +3335,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   /* Then it is a PC | NPC */
-  if (affected_by_spell(victim, SPELL_CURSE))
+  if (victim->affected_by_spell(SPELL_CURSE))
   {
     act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
     act("You feel better.", victim, 0, 0, TO_CHAR, 0);
@@ -3386,7 +3386,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
       break;
     }
 
-  if (affected_by_spell(victim, SPELL_ATTRITION))
+  if (victim->affected_by_spell(SPELL_ATTRITION))
   {
     act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
     act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
@@ -3405,14 +3405,14 @@ int spell_remove_poison(uint8_t level, Character *ch, Character *victim, class O
 
   if (victim)
   {
-    if (affected_by_spell(victim, SPELL_DEBILITY))
+    if (victim->affected_by_spell(SPELL_DEBILITY))
     {
       act("$n looks better.", victim, 0, 0, TO_ROOM, 0);
       act("You feel less debilitated.", victim, 0, 0, TO_CHAR, 0);
       affect_from_char(victim, SPELL_DEBILITY);
       return eSUCCESS;
     }
-    if (affected_by_spell(victim, SPELL_POISON))
+    if (victim->affected_by_spell(SPELL_POISON))
     {
       affect_from_char(victim, SPELL_POISON);
       act("A warm feeling runs through your body.", victim,
@@ -3486,7 +3486,7 @@ int spell_fireshield(uint8_t level, Character *ch, Character *victim, class Obje
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_FIRESHIELD))
+  if (!victim->affected_by_spell(SPELL_FIRESHIELD))
   {
     act("$n is surrounded by $B$4flames$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     act("You are surrounded by $B$4flames$R.", victim, 0, 0, TO_CHAR, 0);
@@ -3756,7 +3756,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -3768,7 +3768,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -3815,7 +3815,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
 int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
   struct affected_type af;
-  if (affected_by_spell(victim, SPELL_CAMOUFLAGE))
+  if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
   {
     act("$N is already hidden within the plant life.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3839,7 +3839,7 @@ int spell_camouflague(uint8_t level, Character *ch, Character *victim, class Obj
 int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
-  if (affected_by_spell(victim, SPELL_FARSIGHT))
+  if (victim->affected_by_spell(SPELL_FARSIGHT))
   {
     act("$N can already see far enough.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3862,7 +3862,7 @@ int spell_farsight(uint8_t level, Character *ch, Character *victim, class Object
 int spell_freefloat(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
-  if (affected_by_spell(victim, SPELL_FREEFLOAT))
+  if (victim->affected_by_spell(SPELL_FREEFLOAT))
   {
     act("$N is already stable enough.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3886,7 +3886,7 @@ int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_INSOMNIA))
+  if (victim->affected_by_spell(SPELL_INSOMNIA))
   {
     act("$N is already wide awake.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3909,7 +3909,7 @@ int spell_insomnia(uint8_t level, Character *ch, Character *victim, class Object
 int spell_shadowslip(uint8_t level, Character *ch, Character *victim, class Object *tar_obj, int skill)
 {
   struct affected_type af;
-  if (affected_by_spell(victim, SPELL_SHADOWSLIP))
+  if (victim->affected_by_spell(SPELL_SHADOWSLIP))
   {
     act("$N is already hidden amongst the shadows.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -3937,12 +3937,12 @@ int spell_sanctuary(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N is already sanctified.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_HOLY_AURA))
+  if (victim->affected_by_spell(SPELL_HOLY_AURA))
   {
     act("$N cannot be bestowed with that much power.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (!affected_by_spell(victim, SPELL_SANCTUARY))
+  if (!victim->affected_by_spell(SPELL_SANCTUARY))
   {
     act("$n is surrounded by a $Bwhite aura$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     act("You start $Bglowing$R.", victim, 0, 0, TO_CHAR, 0);
@@ -3974,21 +3974,21 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
   }
 
   /* You can't sleep someone higher level than you*/
-  if (affected_by_spell(victim, SPELL_INSOMNIA) || IS_AFFECTED(victim, AFF_INSOMNIA))
+  if (victim->affected_by_spell(SPELL_INSOMNIA) || IS_AFFECTED(victim, AFF_INSOMNIA))
   {
     act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
     return retval;
   }
-  if (affected_by_spell(victim, SPELL_SLEEP))
+  if (victim->affected_by_spell(SPELL_SLEEP))
   {
     act("$N's mind still has the lingering effects of a past sleep spell active.",
         ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_PARALYZE))
+  if (victim->affected_by_spell(SPELL_PARALYZE))
   {
     if (number(1, 20) < 19)
     {
@@ -4080,7 +4080,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, class Object
 
   int mod = 4 + (skill > 20) + (skill > 40) + (skill > 60) + (skill > 80);
 
-  if ((cur_af = affected_by_spell(victim, SPELL_WEAKEN)))
+  if ((cur_af = victim->affected_by_spell(SPELL_WEAKEN)))
   {
     af.type = cur_af->type;
     af.duration = cur_af->duration;
@@ -4102,7 +4102,7 @@ int spell_strength(uint8_t level, Character *ch, Character *victim, class Object
     return eSUCCESS;
   }
 
-  if ((cur_af = affected_by_spell(victim, SPELL_STRENGTH)))
+  if ((cur_af = victim->affected_by_spell(SPELL_STRENGTH)))
   {
     if (cur_af->modifier <= mod)
       affect_from_char(victim, SPELL_STRENGTH);
@@ -4182,7 +4182,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, FUCK_PTHIEF))
+  if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     victim->sendln("Your attempt to transport stolen goods through planes of magic fails!");
     return eFAILURE;
@@ -4192,7 +4192,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     location = real_room(GET_HOME(victim));
   else
   {
-    if (affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF))
+    if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
       location = real_room(START_ROOM);
     else
       location = real_room(GET_HOME(victim));
@@ -4309,7 +4309,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SKILL_INNATE_EVASION))
+  if (victim->affected_by_spell(SKILL_INNATE_EVASION))
   {
     ch->sendln("Your target evades your magical scrying!");
     return eFAILURE;
@@ -4325,7 +4325,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   target = victim->in_room;
 
   /* Detect Magic wiz-eye detection */
-  if (affected_by_spell(victim, SPELL_DETECT_MAGIC) && affected_by_spell(victim, SPELL_DETECT_MAGIC)->modifier > 80)
+  if (victim->affected_by_spell(SPELL_DETECT_MAGIC) && victim->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
     victim->sendln("You sense you are the target of magical scrying.");
 
   move_char(ch, target, false);
@@ -4362,7 +4362,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SKILL_INNATE_EVASION))
+  if (victim->affected_by_spell(SKILL_INNATE_EVASION))
   {
     ch->sendln("Your target evades the eagle's eyes!");
     return eFAILURE;
@@ -4436,7 +4436,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   }
 
   if (number(1, 100) > 50 + skill / 2 ||
-      affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF))
+      victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
   {
     ch->sendln("Your attempted summoning fails.");
     return eFAILURE;
@@ -4580,7 +4580,7 @@ int spell_sense_life(uint8_t level, Character *ch, Character *victim, class Obje
   struct affected_type af;
   assert(victim);
 
-  if (affected_by_spell(victim, SPELL_SENSE_LIFE))
+  if (victim->affected_by_spell(SPELL_SENSE_LIFE))
     affect_from_char(victim, SPELL_SENSE_LIFE);
 
   victim->sendln("You feel your awareness improve.");
@@ -5074,7 +5074,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
 
   set_cantquit(ch, victim);
 
-  if (affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 70)
+  if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 70)
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT,
@@ -5171,7 +5171,7 @@ int spell_fly(uint8_t level, Character *ch, Character *victim, class Object *obj
     return eFAILURE;
   }
 
-  if ((cur_af = affected_by_spell(victim, SPELL_FLY)))
+  if ((cur_af = victim->affected_by_spell(SPELL_FLY)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   if (IS_AFFECTED(victim, AFF_FLYING))
@@ -5381,7 +5381,7 @@ int spell_know_alignment(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
 
-  if ((cur_af = affected_by_spell(victim, SPELL_KNOW_ALIGNMENT)))
+  if ((cur_af = victim->affected_by_spell(SPELL_KNOW_ALIGNMENT)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   if (skill <= 40)
@@ -5525,7 +5525,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     switch (x)
     {
     case 1:
-      if (affected_by_spell(victim, SPELL_INVISIBLE))
+      if (victim->affected_by_spell(SPELL_INVISIBLE))
       {
         affect_from_char(victim, SPELL_INVISIBLE);
         victim->sendln("You feel your invisibility dissipate.");
@@ -5542,7 +5542,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 2:
-      if (affected_by_spell(victim, SPELL_DETECT_INVISIBLE))
+      if (victim->affected_by_spell(SPELL_DETECT_INVISIBLE))
       {
         affect_from_char(victim, SPELL_DETECT_INVISIBLE);
         victim->sendln("Your ability to detect invisible has been dispelled!");
@@ -5552,7 +5552,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 3:
-      if (affected_by_spell(victim, SPELL_CAMOUFLAGE))
+      if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
       {
         affect_from_char(victim, SPELL_CAMOUFLAGE);
         victim->sendln("Your camouflage has been dispelled!.");
@@ -5562,7 +5562,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 4:
-      if (affected_by_spell(victim, SPELL_RESIST_ACID))
+      if (victim->affected_by_spell(SPELL_RESIST_ACID))
       {
         affect_from_char(victim, SPELL_RESIST_ACID);
         victim->sendln("The $2green$R in your skin is dispelled!");
@@ -5572,7 +5572,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 5:
-      if (affected_by_spell(victim, SPELL_RESIST_COLD))
+      if (victim->affected_by_spell(SPELL_RESIST_COLD))
       {
         affect_from_char(victim, SPELL_RESIST_COLD);
         victim->sendln("The $3blue$R in your skin is dispelled!");
@@ -5582,7 +5582,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 6:
-      if (affected_by_spell(victim, SPELL_RESIST_FIRE))
+      if (victim->affected_by_spell(SPELL_RESIST_FIRE))
       {
         affect_from_char(victim, SPELL_RESIST_FIRE);
         victim->sendln("The $4red$R in your skin is dispelled!");
@@ -5592,7 +5592,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 7:
-      if (affected_by_spell(victim, SPELL_RESIST_ENERGY))
+      if (victim->affected_by_spell(SPELL_RESIST_ENERGY))
       {
         affect_from_char(victim, SPELL_RESIST_ENERGY);
         victim->sendln("The $5yellow$R in your skin is dispelled!");
@@ -5602,7 +5602,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 8:
-      if (affected_by_spell(victim, SPELL_BARKSKIN))
+      if (victim->affected_by_spell(SPELL_BARKSKIN))
       {
         affect_from_char(victim, SPELL_BARKSKIN);
         victim->sendln("Your woody has been dispelled!");
@@ -5612,7 +5612,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 9:
-      if (affected_by_spell(victim, SPELL_STONE_SKIN))
+      if (victim->affected_by_spell(SPELL_STONE_SKIN))
       {
         affect_from_char(victim, SPELL_STONE_SKIN);
         victim->sendln("Your skin loses stone-like consistency.");
@@ -5622,7 +5622,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 10:
-      if (affected_by_spell(victim, SPELL_FLY))
+      if (victim->affected_by_spell(SPELL_FLY))
       {
         affect_from_char(victim, SPELL_FLY);
         victim->sendln("You do not feel lighter than air anymore.");
@@ -5639,7 +5639,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 11:
-      if (affected_by_spell(victim, SPELL_true_SIGHT))
+      if (victim->affected_by_spell(SPELL_true_SIGHT))
       {
         affect_from_char(victim, SPELL_true_SIGHT);
         victim->sendln("You no longer see what is hidden.");
@@ -5649,7 +5649,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 12:
-      if (affected_by_spell(victim, SPELL_WATER_BREATHING))
+      if (victim->affected_by_spell(SPELL_WATER_BREATHING))
       {
         affect_from_char(victim, SPELL_WATER_BREATHING);
         victim->sendln("You can no longer breathe underwater!");
@@ -5658,7 +5658,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       }
       break;
     case 13:
-      if (affected_by_spell(victim, SPELL_ARMOR))
+      if (victim->affected_by_spell(SPELL_ARMOR))
       {
         affect_from_char(victim, SPELL_ARMOR);
         done = true;
@@ -5667,7 +5667,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       }
       break;
     case 14:
-      if (affected_by_spell(victim, SPELL_SHIELD))
+      if (victim->affected_by_spell(SPELL_SHIELD))
       {
         affect_from_char(victim, SPELL_SHIELD);
         done = true;
@@ -5677,7 +5677,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 15:
-      if (affected_by_spell(victim, SPELL_RESIST_MAGIC))
+      if (victim->affected_by_spell(SPELL_RESIST_MAGIC))
       {
         affect_from_char(victim, SPELL_RESIST_MAGIC);
         victim->sendln("The $B$7white$R in your skin is dispelled!");
@@ -5800,7 +5800,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     switch (x)
     {
     case 1:
-      if (affected_by_spell(victim, SPELL_SANCTUARY))
+      if (victim->affected_by_spell(SPELL_SANCTUARY))
       {
         affect_from_char(victim, SPELL_SANCTUARY);
         act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
@@ -5817,7 +5817,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 2:
-      if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+      if (victim->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
       {
         affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
         act("Your protection from evil has been dispelled!", ch, 0, victim, TO_VICT, 0);
@@ -5827,7 +5827,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 3:
-      if (affected_by_spell(victim, SPELL_HASTE))
+      if (victim->affected_by_spell(SPELL_HASTE))
       {
         affect_from_char(victim, SPELL_HASTE);
         act("Your magically enhanced speed has been dispelled!", ch, 0, victim, TO_VICT, 0);
@@ -5837,7 +5837,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 4:
-      if (affected_by_spell(victim, SPELL_STONE_SHIELD))
+      if (victim->affected_by_spell(SPELL_STONE_SHIELD))
       {
         affect_from_char(victim, SPELL_STONE_SHIELD);
         act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
@@ -5847,7 +5847,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 5:
-      if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+      if (victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
       {
         affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
         act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0, victim, TO_VICT, 0);
@@ -5867,7 +5867,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 7:
-      if (affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+      if (victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
       {
         affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
         act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0, victim, TO_VICT, 0);
@@ -5883,7 +5883,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       }
       break;
     case 8:
-      if (affected_by_spell(victim, SPELL_FIRESHIELD))
+      if (victim->affected_by_spell(SPELL_FIRESHIELD))
       {
         affect_from_char(victim, SPELL_FIRESHIELD);
         act("Your $B$4flames$R have been extinguished!", ch, 0, victim, TO_VICT, 0);
@@ -5899,7 +5899,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       }
       break;
     case 9:
-      if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+      if (victim->affected_by_spell(SPELL_ACID_SHIELD))
       {
         affect_from_char(victim, SPELL_ACID_SHIELD);
         act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, victim, TO_VICT, 0);
@@ -5916,7 +5916,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       break;
 
     case 10:
-      if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+      if (victim->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
       {
         affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
         act("Your protection from good has been dispelled!", ch, 0, victim, TO_VICT, 0);
@@ -6109,7 +6109,7 @@ int spell_iridescent_aura(uint8_t level, Character *ch, Character *victim, class
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_IRIDESCENT_AURA))
+  if (victim->affected_by_spell(SPELL_IRIDESCENT_AURA))
   {
     act("$N is already protected by iridescent aura.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6138,7 +6138,7 @@ int spell_resist_cold(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_RESIST_COLD))
+  if (victim->affected_by_spell(SPELL_RESIST_COLD))
   {
     act("$N is already resistant to cold.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6168,7 +6168,7 @@ int spell_resist_fire(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_RESIST_FIRE))
+  if (victim->affected_by_spell(SPELL_RESIST_FIRE))
   {
     act("$N is already resistant to fire.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6197,7 +6197,7 @@ int spell_resist_magic(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_RESIST_MAGIC))
+  if (victim->affected_by_spell(SPELL_RESIST_MAGIC))
   {
     act("$N is already resistant to magic.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6225,7 +6225,7 @@ int spell_staunchblood(uint8_t level, Character *ch, Character *victim, class Ob
     ch->sendln("You can only cast this on yourself.");
     return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_STAUNCHBLOOD))
+  if (victim->affected_by_spell(SPELL_STAUNCHBLOOD))
   {
     act("$N is already resistant to poison.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6253,7 +6253,7 @@ int spell_resist_energy(uint8_t level, Character *ch, Character *victim, class O
     ch->sendln("You can only cast this on yourself.");
     return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_RESIST_ENERGY))
+  if (victim->affected_by_spell(SPELL_RESIST_ENERGY))
   {
     act("$N is already resistant to energy.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -6282,7 +6282,7 @@ int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Obje
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SPELL_STONE_SKIN))
+  if (ch->affected_by_spell(SPELL_STONE_SKIN))
   {
     act("Your skin already rock hard.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -6314,7 +6314,7 @@ int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_SHIELD))
+  if (victim->affected_by_spell(SPELL_SHIELD))
     affect_from_char(victim, SPELL_SHIELD);
 
   act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
@@ -6356,14 +6356,14 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
 
   set_cantquit(ch, victim);
 
-  if (affected_by_spell(victim, SPELL_PARALYZE))
+  if (victim->affected_by_spell(SPELL_PARALYZE))
   {
     act("$N's paralyzed muscles are too rigid to be affected by this enchantment!", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
     return eSUCCESS;
   }
 
-  if (affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 50)
+  if (victim->affected_by_spell(SPELL_HEROISM) && victim->affected_by_spell(SPELL_HEROISM)->modifier >= 50)
   {
     act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
     act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
@@ -6403,12 +6403,12 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
   }
   else
   {
-    if (!affected_by_spell(victim, SPELL_WEAKEN))
+    if (!victim->affected_by_spell(SPELL_WEAKEN))
     {
       act("You feel weaker.", ch, 0, victim, TO_VICT, 0);
       act("$n seems weaker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
-      if ((cur_af = affected_by_spell(victim, SPELL_STRENGTH)))
+      if ((cur_af = victim->affected_by_spell(SPELL_STRENGTH)))
       {
         cur_af->modifier += str;
         af.type = cur_af->type;
@@ -6480,7 +6480,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
        tmp_victim = tmp_victim->next_in_room)
   {
     if ((ch->in_room == tmp_victim->in_room))
-      if (!affected_by_spell(tmp_victim, SPELL_INVISIBLE))
+      if (!tmp_victim->affected_by_spell(SPELL_INVISIBLE))
       {
 
         act("$n slowly fades out of existence.", tmp_victim, 0, 0,
@@ -7530,7 +7530,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -7546,7 +7546,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_ARMOR - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -7580,7 +7580,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
       return eFAILURE;
     if (!tar_ch)
       tar_ch = ch;
-    if (affected_by_spell(tar_ch, SPELL_ARMOR))
+    if (tar_ch->affected_by_spell(SPELL_ARMOR))
       return eFAILURE;
     return spell_armor(level, ch, tar_ch, 0, skill);
     break;
@@ -7616,7 +7616,7 @@ int cast_aegis(uint8_t level, Character *ch, char *arg, int type,
       return eFAILURE;
     if (!tar_ch)
       tar_ch = ch;
-    if (affected_by_spell(tar_ch, SPELL_AEGIS))
+    if (tar_ch->affected_by_spell(SPELL_AEGIS))
       return eFAILURE;
     return spell_aegis(level, ch, tar_ch, 0, skill);
     break;
@@ -7716,7 +7716,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
           tar_ch = k->follower;
           if (ch->in_room == tar_ch->in_room)
           {
-            if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
+            if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
             {
               act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -7730,7 +7730,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
         }
         if (ch->in_room == leader->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_BLESS - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8148,7 +8148,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8160,7 +8160,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8218,7 +8218,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8230,7 +8230,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8448,7 +8448,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8460,7 +8460,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8521,7 +8521,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8533,7 +8533,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8630,7 +8630,7 @@ int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -8642,7 +8642,7 @@ int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9116,7 +9116,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
           tar_ch = k->follower;
           if (ch->in_room == tar_ch->in_room)
           {
-            if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
+            if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
             {
               act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9128,7 +9128,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
         }
         if (ch->in_room == leader->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9204,7 +9204,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
           tar_ch = k->follower;
           if (ch->in_room == tar_ch->in_room)
           {
-            if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_GOOD - 1)
+            if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_GOOD - 1)
             {
               act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9216,7 +9216,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
         }
         if (ch->in_room == leader->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9857,7 +9857,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9869,7 +9869,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_REFRESH - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9934,7 +9934,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -9946,7 +9946,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_FLY - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -10394,7 +10394,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -10406,7 +10406,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -10775,7 +10775,7 @@ int cast_resist_magic(uint8_t level, Character *ch, char *arg,
         tar_ch = k->follower;
         if (ch->in_room == tar_ch->in_room)
         {
-          if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
+          if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
           {
             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -10787,7 +10787,7 @@ int cast_resist_magic(uint8_t level, Character *ch, char *arg,
       }
       if (ch->in_room == leader->in_room)
       {
-        if (affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
+        if (tar_ch->affected_by_spell(SPELL_IMMUNITY) && tar_ch->affected_by_spell(SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -11441,7 +11441,7 @@ int spell_barkskin(uint8_t level, Character *ch, Character *victim, class Object
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_BARKSKIN))
+  if (victim->affected_by_spell(SPELL_BARKSKIN))
   {
     ch->sendln("You cannot make your skin any stronger!");
     return eFAILURE;
@@ -11541,7 +11541,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case INVIS_VNUM:
       aff = AFF_INVISIBLE;
       spl = SPELL_INVISIBLE;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11552,7 +11552,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case HASTE_VNUM:
       aff = AFF_HASTE;
       spl = SPELL_HASTE;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11563,7 +11563,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case true_VNUM:
       aff = AFF_true_SIGHT;
       spl = SPELL_true_SIGHT;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11574,7 +11574,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case INFRA_VNUM:
       aff = AFF_INFRARED;
       spl = SPELL_INFRAVISION;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11585,7 +11585,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case FARSIGHT_VNUM:
       aff = AFF_FARSIGHT;
       spl = SPELL_FARSIGHT;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11601,7 +11601,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       }
       aff = AFF_LIGHTNINGSHIELD;
       spl = SPELL_LIGHTNING_SHIELD;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11612,7 +11612,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case INSOMNIA_VNUM:
       aff = AFF_INSOMNIA;
       spl = SPELL_INSOMNIA;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11623,7 +11623,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case DETECT_GOOD_VNUM:
       aff = AFF_DETECT_GOOD;
       spl = SPELL_DETECT_GOOD;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11634,7 +11634,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case DETECT_EVIL_VNUM:
       aff = AFF_DETECT_EVIL;
       spl = SPELL_DETECT_EVIL;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11645,7 +11645,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case DETECT_INVISIBLE_VNUM:
       aff = AFF_DETECT_INVISIBLE;
       spl = SPELL_DETECT_INVISIBLE;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11656,7 +11656,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case SENSE_LIFE_VNUM:
       aff = AFF_SENSE_LIFE;
       spl = SPELL_SENSE_LIFE;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11667,7 +11667,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
     case SOLIDITY_VNUM:
       aff = AFF_SOLIDITY;
       spl = SPELL_SOLIDITY;
-      if (affected_by_spell(victim, spl))
+      if (victim->affected_by_spell(spl))
       {
         ch->sendln("They are already affected by that spell.");
         return eFAILURE;
@@ -11713,7 +11713,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON) &&
+    if (IS_MOB(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
         k->follower->in_room != ch->in_room)
     {
       victim = k->follower;
@@ -11839,7 +11839,7 @@ int spell_eyes_of_the_owl(uint8_t level, Character *ch, Character *victim, class
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_INFRAVISION))
+  if (victim->affected_by_spell(SPELL_INFRAVISION))
     affect_from_char(victim, SPELL_INFRAVISION);
 
   if (IS_AFFECTED(victim, AFF_INFRARED))
@@ -11898,7 +11898,7 @@ int spell_feline_agility(uint8_t level, Character *ch, Character *victim, class 
     ch->sendln("You can only cast this spell on yourself!");
     return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_FELINE_AGILITY))
+  if (victim->affected_by_spell(SPELL_FELINE_AGILITY))
   {
     ch->sendln("You cannot be as agile as TWO cats!");
     return eFAILURE;
@@ -11958,7 +11958,7 @@ int spell_oaken_fortitude(uint8_t level, Character *ch, Character *victim, class
     ch->sendln("You can only cast this spell on yourself!");
     return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_OAKEN_FORTITUDE))
+  if (victim->affected_by_spell(SPELL_OAKEN_FORTITUDE))
   {
     ch->sendln("You cannot enhance your fortitude further.");
     return eFAILURE;
@@ -11984,7 +11984,7 @@ int cast_clarity(uint8_t level, Character *ch, char *arg, int type, Character *v
 { // Feline agility rip
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_CLARITY))
+  if (victim->affected_by_spell(SPELL_CLARITY))
   {
     ch->sendln("You cannot clear your mind any further without going stupid.");
     return eFAILURE;
@@ -12020,7 +12020,7 @@ int cast_forest_meld(uint8_t level, Character *ch, char *arg, int type, Characte
   // you?\n\r", ch);
   //		return eFAILURE;
   //	}
-  if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+  if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     ch->sendln("The forests reject your naughty, thieving self.");
     return eFAILURE;
@@ -12464,7 +12464,7 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, FUCK_PTHIEF))
+  if (ch->isPlayerObjectThief())
   {
     ch->sendln("Your attempt to transport stolen goods through the astral planes fails!!");
     return eFAILURE;
@@ -12888,7 +12888,7 @@ int spell_resist_acid(uint8_t level, Character *ch, Character *victim, class Obj
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_RESIST_ACID))
+  if (victim->affected_by_spell(SPELL_RESIST_ACID))
   {
     act("$N is already resistant to acid.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -13019,7 +13019,7 @@ int spell_rapid_mend(uint8_t level, Character *ch, Character *victim, class Obje
   struct affected_type af;
   int regen = 0, duration = 0;
 
-  if (!affected_by_spell(victim, SPELL_RAPID_MEND))
+  if (!victim->affected_by_spell(SPELL_RAPID_MEND))
   {
     act("$n starts to heal more quickly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     victim->sendln("You feel your body begin to heal more quickly.");
@@ -13095,7 +13095,7 @@ int spell_iron_roots(uint8_t level, Character *ch, Character *victim, class Obje
 {
   struct affected_type af;
 
-  if (affected_by_spell(ch, SPELL_IRON_ROOTS))
+  if (ch->affected_by_spell(SPELL_IRON_ROOTS))
   {
     affect_from_char(ch, SPELL_IRON_ROOTS);
     act("The tree roots encasing $n's legs sink away under the surface of the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -13162,7 +13162,7 @@ int spell_acid_shield(uint8_t level, Character *ch, Character *victim, class Obj
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_ACID_SHIELD))
+  if (!victim->affected_by_spell(SPELL_ACID_SHIELD))
   {
     act("$n is surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     act("You are surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_CHAR, 0);
@@ -13223,7 +13223,7 @@ int spell_water_breathing(uint8_t level, Character *ch, Character *victim, class
   struct affected_type af;
   struct affected_type *cur_af;
 
-  if ((cur_af = affected_by_spell(victim, SPELL_WATER_BREATHING)))
+  if ((cur_af = victim->affected_by_spell(SPELL_WATER_BREATHING)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   act("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -13513,7 +13513,7 @@ int spell_lightning_shield(uint8_t level, Character *ch, Character *victim, clas
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+  if (!victim->affected_by_spell(SPELL_LIGHTNING_SHIELD))
   {
     act("$n is surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     act("You are surrounded by a crackling shield of $B$5electrical$R energy.", victim, 0, 0, TO_CHAR, 0);
@@ -13664,7 +13664,7 @@ int spell_debility(uint8_t level, Character *ch, Character *victim, class Object
   int retval = eSUCCESS, duration = 0;
   double percent = 0;
 
-  if (affected_by_spell(victim, SPELL_DEBILITY))
+  if (victim->affected_by_spell(SPELL_DEBILITY))
   {
     ch->sendln("Your victim has already been debilitized.");
     return eSUCCESS;
@@ -13787,7 +13787,7 @@ int spell_attrition(uint8_t level, Character *ch, Character *victim, class Objec
   int retval = eSUCCESS;
   int acmod = 0, tohit = 0, duration = 0;
 
-  if (affected_by_spell(victim, SPELL_ATTRITION))
+  if (victim->affected_by_spell(SPELL_ATTRITION))
   {
     ch->sendln("Your victim is already suffering from the affects of that spell.");
     return eSUCCESS;
@@ -13907,13 +13907,13 @@ int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class O
 {
   struct affected_type af;
   /*
-  if (affected_by_spell(victim, SPELL_ACID_SHIELD)) {
+  if (victim->affected_by_spell(SPELL_ACID_SHIELD)){
      act("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
      ch->sendln("A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield.");
      return eFAILURE;
   }
 */
-  if (affected_by_spell(victim, SPELL_VAMPIRIC_AURA))
+  if (victim->affected_by_spell(SPELL_VAMPIRIC_AURA))
   {
     act("$N is already covered in a film of shadows.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -13972,7 +13972,7 @@ int spell_holy_aura(uint8_t level, Character *ch, Character *victim, class Objec
 {
   struct affected_type af;
 
-  if (affected_by_spell(ch, SPELL_HOLY_AURA_TIMER))
+  if (ch->affected_by_spell(SPELL_HOLY_AURA_TIMER))
   {
     ch->sendln("Your god is not so foolish as to grant that power to you so soon again.");
     return eFAILURE;
@@ -14006,7 +14006,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
   {
   case SPELL_TYPE_SPELL:
     char buf[MAX_INPUT_LENGTH];
-    if (affected_by_spell(ch, SPELL_SANCTUARY))
+    if (ch->affected_by_spell(SPELL_SANCTUARY))
     {
       act("Your god does not allow that much power to be bestowed upon you.", ch, 0, 0, TO_CHAR, 0);
       return eFAILURE;
@@ -14029,7 +14029,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
       return eFAILURE;
     }
 
-    if (affected_by_spell(ch, SPELL_HOLY_AURA_TIMER))
+    if (ch->affected_by_spell(SPELL_HOLY_AURA_TIMER))
     {
       ch->sendln("Your god is not so foolish as to grant that power to you so soon again.");
       return eFAILURE;
@@ -14128,7 +14128,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class 
   // return eFAILURE;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+    if (IS_MOB(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
     {
       victim = k->follower;
       break;
@@ -14815,9 +14815,9 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
     return eSUCCESS;
   }
 
-  if (affected_by_spell(ch, SPELL_IMMUNITY))
+  if (ch->affected_by_spell(SPELL_IMMUNITY))
   {
-    csendf(ch, "You are already immune to %s.\r\n", spells[affected_by_spell(ch, SPELL_IMMUNITY)->modifier]);
+    csendf(ch, "You are already immune to %s.\r\n", spells[ch->affected_by_spell(SPELL_IMMUNITY)->modifier]);
     return eSUCCESS;
   }
 
@@ -15069,7 +15069,7 @@ int spell_solidity(uint8_t level, Character *ch, Character *victim, Object *obj,
     return eSUCCESS;
   }
 
-  if (!affected_by_spell(victim, AFF_SOLIDITY))
+  if (!victim->affected_by_spell(AFF_SOLIDITY))
   {
     act("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_ROOM, 0);
     act("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_CHAR, 0);
@@ -15119,7 +15119,7 @@ int spell_stability(uint8_t level, Character *ch, Character *victim, Object *obj
     act("$n already has good balance.", ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;
   }
-  if (!affected_by_spell(victim, SPELL_STABILITY))
+  if (!victim->affected_by_spell(SPELL_STABILITY))
   {
     act("$n suddenly seems very hard to push over.", victim, 0, 0, TO_ROOM, 0);
     act("You feel very balanced.", victim, 0, 0, TO_CHAR, 0);
@@ -15166,7 +15166,7 @@ int spell_frostshield(uint8_t level, Character *ch, Character *victim, Object *o
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_FROSTSHIELD))
+  if (!victim->affected_by_spell(SPELL_FROSTSHIELD))
   {
     act("$n is surrounded by a shield of $1ice$R.", victim, 0, 0, TO_ROOM, 0);
     act("You become surrounded by a shield of $1ice$R.", victim, 0, 0, TO_CHAR, 0);
@@ -15434,7 +15434,7 @@ int spell_villainy(uint8_t level, Character *ch, Character *victim, class Object
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_VILLAINY))
+  if (victim->affected_by_spell(SPELL_VILLAINY))
     affect_from_char(victim, SPELL_VILLAINY);
 
   af.type = SPELL_VILLAINY;
@@ -15487,7 +15487,7 @@ int spell_heroism(uint8_t level, Character *ch, Character *victim, class Object 
 {
   struct affected_type af;
 
-  if (affected_by_spell(victim, SPELL_HEROISM))
+  if (victim->affected_by_spell(SPELL_HEROISM))
     affect_from_char(victim, SPELL_HEROISM);
 
   af.type = SPELL_HEROISM;
@@ -15886,7 +15886,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   Character *ally, *next_ally;
 
   // Set the spell on the caster to mark that they have the spell running
-  if (affected_by_spell(ch, SPELL_ETHEREAL_FOCUS))
+  if (ch->affected_by_spell(SPELL_ETHEREAL_FOCUS))
     affect_from_char(ch, SPELL_ETHEREAL_FOCUS);
 
   af.type = SPELL_ETHEREAL_FOCUS;

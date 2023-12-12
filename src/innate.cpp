@@ -104,7 +104,7 @@ int do_innate(Character *ch, char *arg, int cmd)
         csendf(ch, "Your race has access to the $B%s$R innate ability.\r\n",innates[i].name);
 	found = true;
       } else if (!str_cmp(innates[i].name,buf)) {
-	if (str_cmp(buf, "fly") && affected_by_spell(ch,SKILL_INNATE_TIMER))
+	if (str_cmp(buf, "fly") &&ch->affected_by_spell(SKILL_INNATE_TIMER))
         {
 	  ch->sendln("You cannot use that yet.");
 	  return eFAILURE;
@@ -304,7 +304,7 @@ int innate_shadowslip(Character *ch, char *arg, int cmd)
 
 int innate_fly(Character *ch, char *arg, int cmd)
 {
-  if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
+  if (ch->affected_by_spell(SKILL_INNATE_FLY)){
     affect_from_char(ch, SKILL_INNATE_FLY);
     ch->sendln("You fold your wings smoothly behind you and settle gently to the ground.");
    act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, TO_ROOM, 0);

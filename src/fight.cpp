@@ -399,9 +399,9 @@ void perform_violence(void)
       else if (af->type == SPELL_ATTRITION)
       {
         ch->sendln("Your body aches at the effort of combat.");
-        if (affected_by_spell(ch, SPELL_DIVINE_INTER))
+        if (ch->affected_by_spell(SPELL_DIVINE_INTER))
         {
-          ch->removeHP(affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier);
+          ch->removeHP(ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier);
         }
         else
         {
@@ -612,12 +612,12 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   assert(vict);
 
   if (ch->has_skill(SKILL_NAT_SELECT) &&
-      affected_by_spell(ch, SKILL_NAT_SELECT) &&
-      affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict) &&
+      ch->affected_by_spell(SKILL_NAT_SELECT) &&
+      ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == GET_RACE(vict) &&
       number(0, 3) == 0)
   {
-    skill_increase_check(ch, SKILL_NAT_SELECT, ch->has_skill(SKILL_NAT_SELECT),
-                         SKILL_INCREASE_HARD);
+    ch->skill_increase_check(SKILL_NAT_SELECT, ch->has_skill(SKILL_NAT_SELECT),
+                             SKILL_INCREASE_HARD);
   }
   /* if it's backstab send it to one_hit so it can be handled */
   if (type == SKILL_BACKSTAB)
@@ -668,7 +668,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
     if (IS_AFFECTED(ch, AFF_HASTE))
     {
-      if (affected_by_spell(ch, SPELL_HASTE)) // spell is 33%
+      if (ch->affected_by_spell(SPELL_HASTE)) // spell is 33%
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
@@ -740,7 +740,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     }
     if (IS_AFFECTED(ch, AFF_HASTE))
     {
-      if (affected_by_spell(ch, SPELL_HASTE)) // spell is 33%
+      if (ch->affected_by_spell(SPELL_HASTE)) // spell is 33%
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
@@ -755,7 +755,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
           return result;
       }
     }
-    if (affected_by_spell(ch, SKILL_ONSLAUGHT))
+    if (ch->affected_by_spell(SKILL_ONSLAUGHT))
     {
       if (number(1, 100) < ch->has_skill(SKILL_ONSLAUGHT) / 2)
       {
@@ -775,7 +775,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     int lrn = ch->has_skill(SKILL_OFFHAND_DOUBLE);
     if (gets_dual_wield_attack(ch) && lrn)
     {
-      skill_increase_check(ch, SKILL_OFFHAND_DOUBLE, lrn, SKILL_INCREASE_HARD);
+      ch->skill_increase_check(SKILL_OFFHAND_DOUBLE, lrn, SKILL_INCREASE_HARD);
       int p = lrn / 2 + ch->getHP() * 10 / GET_MAX_HIT(ch) - (10 - ch->has_skill(SKILL_SECOND_ATTACK) / 10);
       if (number(1, 100) <= p)
       {
@@ -865,7 +865,7 @@ void update_flags(Character *vict)
   {
     // stance lasts 'modifier' rounds.  Remove bit once used up
     struct affected_type *pspell;
-    pspell = affected_by_spell(vict, KI_STANCE + KI_OFFSET);
+    pspell = vict->affected_by_spell(KI_STANCE + KI_OFFSET);
     if (!pspell)
     {
       REMOVE_BIT(vict->combat, COMBAT_MONK_STANCE);
@@ -966,7 +966,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
   }
   else
   {
-    if ((cur_af = affected_by_spell(vict, SPELL_LIGHTNING_SHIELD)))
+    if ((cur_af = vict->affected_by_spell(SPELL_LIGHTNING_SHIELD)))
       learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
@@ -986,10 +986,10 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+    if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
-      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+      dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_ENERGY);
     if (number(1, 100) < save || save < 0)
     {
@@ -1041,7 +1041,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
 
   struct affected_type *af;
 
-  if (nullptr == (af = affected_by_spell(vict, SPELL_VAMPIRIC_AURA)))
+  if (nullptr == (af = vict->affected_by_spell(SPELL_VAMPIRIC_AURA)))
     return eFAILURE;
 
   // ch just hit vict...vict has Vampiric aura up
@@ -1083,7 +1083,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   }
   else
   {
-    if ((cur_af = affected_by_spell(vict, SPELL_FIRESHIELD)))
+    if ((cur_af = vict->affected_by_spell(SPELL_FIRESHIELD)))
       learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
@@ -1103,10 +1103,10 @@ int do_fireshield(Character *ch, Character *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+    if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
-      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+      dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_FIRE);
     if (number(1, 100) < save || save < 0)
     {
@@ -1169,7 +1169,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
     dam = 0;
   else
   {
-    if ((cur_af = affected_by_spell(vict, SPELL_ACID_SHIELD)))
+    if ((cur_af = vict->affected_by_spell(SPELL_ACID_SHIELD)))
       learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
@@ -1189,10 +1189,10 @@ int do_acidshield(Character *ch, Character *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+    if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
-      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+      dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_ACID);
     if (number(1, 100) < save || save < 0)
     {
@@ -1247,7 +1247,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
     return eFAILURE;
   if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
     return eFAILURE;
-  if (!affected_by_spell(vict, SPELL_BONESHIELD))
+  if (!vict->affected_by_spell(SPELL_BONESHIELD))
     return eFAILURE;
 
   if (DC::isSet(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
@@ -1255,7 +1255,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
     dam = 0;
   else
   {
-    if ((cur_af = affected_by_spell(vict, SPELL_BONESHIELD)))
+    if ((cur_af = vict->affected_by_spell(SPELL_BONESHIELD)))
       learned = (int)cur_af->modifier;
 
     dam = learned;
@@ -1266,10 +1266,10 @@ int do_boneshield(Character *ch, Character *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+    if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
-    if (affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
-      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+      dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
   }
 
   ch->removeHP(dam);
@@ -1347,7 +1347,7 @@ void check_weapon_skill_bonus(Character *ch, int type, Object *wielded,
   {
     // rare skill increases
     if (0 == number(0, 5))
-      skill_increase_check(ch, SKILL_TWO_HANDED_WEAPONS, learned, SKILL_INCREASE_HARD);
+      ch->skill_increase_check(SKILL_TWO_HANDED_WEAPONS, learned, SKILL_INCREASE_HARD);
 
     specialization = learned / 100;
     learned = learned % 100;
@@ -1510,7 +1510,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (wielded)
   {
-    if (affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->victim == vict)
+    if (ch->affected_by_spell(SKILL_SMITE) && ch->affected_by_spell(SKILL_SMITE)->victim == vict)
       for (int i = 0; i < wielded->obj_flags.value[1]; i++)
         dam += wielded->obj_flags.value[2] - number(0, 1);
     else
@@ -1582,8 +1582,8 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (SOMEONE_DIED(retval))
     return debug_retval(ch, vict, retval);
 
-  if (ch->has_skill(SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
-    if (affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
+  if (ch->has_skill(SKILL_NAT_SELECT) && ch->affected_by_spell(SKILL_NAT_SELECT))
+    if (ch->affected_by_spell(SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
       dam += 15 + ch->has_skill(SKILL_NAT_SELECT) / 10;
 
   do_combatmastery(ch, vict, weapon);
@@ -1744,8 +1744,8 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
   else
   { // if its an inventory item, do this
     act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
-    recheck_height_wears(ch); // Make sure $n can still wear the rest of
-                              // the eq
+    ch->recheck_height_wears(); // Make sure $n can still wear the rest of
+                                // the eq
   }
 
   act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
@@ -2171,25 +2171,25 @@ int damage(Character *ch, Character *victim,
       save = get_saves(victim, SAVE_TYPE_FIRE);
       sprintf(buf, "$B$4fire$R and sustain");
       if (learned)
-        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+        victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_COLD:
       save = get_saves(victim, SAVE_TYPE_COLD);
       sprintf(buf, "$B$3cold$R and sustain");
       if (learned)
-        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+        victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_ENERGY:
       save = get_saves(victim, SAVE_TYPE_ENERGY);
       sprintf(buf, "$B$5energy$R and sustain");
       if (learned)
-        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+        victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_ACID:
       save = get_saves(victim, SAVE_TYPE_ACID);
       sprintf(buf, "$B$2acid$R and sustain");
       if (learned)
-        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+        victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
       break;
     case TYPE_MAGIC:
       save = get_saves(victim, SAVE_TYPE_MAGIC);
@@ -2199,7 +2199,7 @@ int damage(Character *ch, Character *victim,
       save = get_saves(victim, SAVE_TYPE_POISON);
       sprintf(buf, "$2poison$R and sustain");
       if (learned)
-        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
+        victim->skill_increase_check(SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
       break;
     default:
       break;
@@ -2308,7 +2308,7 @@ int damage(Character *ch, Character *victim,
   }
 */
 
-  if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE))
+  if (ch->affected_by_spell(SKILL_SONG_MKING_CHARGE))
   {
     dam = (int)(dam * 1.2); // scary!
     SET_BIT(modifier, COMBAT_MOD_FRENZY);
@@ -2367,12 +2367,11 @@ int damage(Character *ch, Character *victim,
       set_fighting(ch, victim);
   }
 
-  if (IS_AFFECTED(ch, AFF_INVISIBLE) && (!IS_AFFECTED(ch, AFF_ILLUSION) || !(affected_by_spell(ch,
-                                                                                               BASE_TIMERS + SPELL_INVISIBLE) &&
-                                                                             affected_by_spell(ch, SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)->modifier == 987)))
+  if (IS_AFFECTED(ch, AFF_INVISIBLE) && (!IS_AFFECTED(ch, AFF_ILLUSION) || !(ch->affected_by_spell(BASE_TIMERS + SPELL_INVISIBLE) &&
+                                                                             ch->affected_by_spell(SPELL_INVISIBLE) && ch->affected_by_spell(SPELL_INVISIBLE)->modifier == 987)))
   {
     act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
-    // if (affected_by_spell(ch, SPELL_INVISIBLE))
+    // if (ch->affected_by_spell(SPELL_INVISIBLE))
     //  no point it looping through the list twice...
     affect_from_char(ch, SPELL_INVISIBLE);
     REMBIT(ch->affected_by, AFF_INVISIBLE);
@@ -2425,12 +2424,12 @@ int damage(Character *ch, Character *victim,
     if (dam) // misses turned to tickles
       dam = (dam * (100 - victim->melee_mitigation)) / 100;
 
-    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 50)
+    if (victim->affected_by_spell(SPELL_HOLY_AURA) && victim->affected_by_spell(SPELL_HOLY_AURA)->modifier == 50)
       dam /= 2; // half damage against physical attacks
   }
   else
   {
-    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 25)
+    if (victim->affected_by_spell(SPELL_HOLY_AURA) && victim->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
   }
   if (typeofdamage == DAMAGE_TYPE_MAGIC && dam)
@@ -2444,7 +2443,7 @@ int damage(Character *ch, Character *victim,
   // sanct damage now 35% for all caster aligns
   if (IS_AFFECTED(victim, AFF_SANCTUARY) && dam > 0)
   {
-    int mod = affected_by_spell(victim, SPELL_SANCTUARY) ? affected_by_spell(victim, SPELL_SANCTUARY)->modifier : 35;
+    int mod = victim->affected_by_spell(SPELL_SANCTUARY) ? victim->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
     dam -= (int)(float)((float)dam * ((float)mod / 100.0));
   }
   if (DC::isSet(victim->combat, COMBAT_MONK_STANCE) && dam > 0) // half damage
@@ -2507,7 +2506,7 @@ int damage(Character *ch, Character *victim,
           act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
           act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
           act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
-          skill_increase_check(ch, SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
+          ch->skill_increase_check(SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
         }
     }
     /* Never heard of it.
@@ -2553,8 +2552,8 @@ int damage(Character *ch, Character *victim,
   std::stringstream string1;
   struct affected_type *pspell = nullptr;
   if (victim->getLevel() < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
-      ((pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
-       (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))))
+      ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
+       (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
   {
     pre_stoneshield_dam = dam;
     if (dam > pspell->modifier)
@@ -2714,8 +2713,8 @@ int damage(Character *ch, Character *victim,
     }
   }
 
-  if (dam > 0 && affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
-    dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
+  if (dam > 0 && victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+    dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92) || attacktype == SKILL_FLAMESLASH)
@@ -2735,7 +2734,7 @@ int damage(Character *ch, Character *victim,
   else
   {
     affected_type *af;
-    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE)) && IS_PC(victim))
+    if (dam >= 350 && (af = victim->affected_by_spell(SPELL_PARALYZE)) && IS_PC(victim))
     {
       act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
       act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
@@ -2880,15 +2879,15 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
     dam /= 4;
   if (IS_AFFECTED(ch, AFF_SANCTUARY))
   {
-    int mod = affected_by_spell(ch, SPELL_SANCTUARY) ? affected_by_spell(ch, SPELL_SANCTUARY)->modifier : 35;
+    int mod = ch->affected_by_spell(SPELL_SANCTUARY) ? ch->affected_by_spell(SPELL_SANCTUARY)->modifier : 35;
     dam -= (int)(float)((float)dam * ((float)mod / 100.0));
   }
-  if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 50 && (type == KILL_DROWN || type == KILL_FALL))
+  if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 50 && (type == KILL_DROWN || type == KILL_FALL))
     dam /= 2;
-  if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25 && type == KILL_POISON)
+  if (ch->affected_by_spell(SPELL_HOLY_AURA) && ch->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25 && type == KILL_POISON)
     dam /= 2;
-  if (affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
-    dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+  if (ch->affected_by_spell(SPELL_DIVINE_INTER) && dam > ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+    dam = ch->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   ch->removeHP(dam);
   update_pos(ch);
@@ -3161,10 +3160,10 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
     SET_BIT(realch->combat, COMBAT_ATTACKER);
 
   if (is_pkill(realch, realvict) && !ISSET(realvict->affected_by, AFF_CANTQUIT) &&
-      !affected_by_spell(realvict, FUCK_GTHIEF) && !IS_AFFECTED(realvict, AFF_CHAMPION) && !IS_AFFECTED(realch, AFF_CHAMPION) &&
-      !affected_by_spell(realvict, FUCK_PTHIEF) && !forced)
+      !realvict->isPlayerGoldThief() && !IS_AFFECTED(realvict, AFF_CHAMPION) && !IS_AFFECTED(realch, AFF_CHAMPION) &&
+      !realvict->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !forced)
   {
-    af.type = FUCK_CANTQUIT;
+    af.type = Character::PLAYER_CANTQUIT;
     af.duration = 5;
     af.modifier = 0;
     af.location = APPLY_NONE;
@@ -3180,7 +3179,7 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
     {
       for (paf = realch->affected; paf; paf = paf->next)
       {
-        if (paf->type == FUCK_CANTQUIT)
+        if (paf->type == Character::PLAYER_CANTQUIT)
           paf->duration = 5;
       }
     }
@@ -3218,7 +3217,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
   {
   case TYPE_CHOOSE:
     /* if it's a mob then it can't be pkilled */
-    if (IS_NPC(vict) || (spec_type == KILL_POISON && affected_by_spell(vict, SPELL_POISON)->modifier == -123))
+    if (IS_NPC(vict) || (spec_type == KILL_POISON && vict->affected_by_spell(SPELL_POISON)->modifier == -123))
       raw_kill(ch, vict);
     else if (IS_ARENA(vict->in_room))
       arena_kill(ch, vict, spec_type);
@@ -3408,15 +3407,15 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   percent *= (1.0 - scale / 5.0);
 
   if (parry)
-    skill_increase_check(victim, SKILL_PARRY, parry, SKILL_INCREASE_HARD + 500);
+    victim->skill_increase_check(SKILL_PARRY, parry, SKILL_INCREASE_HARD + 500);
   if (dodge)
-    skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD + 500);
+    victim->skill_increase_check(SKILL_DODGE, dodge, SKILL_INCREASE_HARD + 500);
   if (block)
-    skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD + 500);
+    victim->skill_increase_check(SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD + 500);
   if (martial)
-    skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD + 500);
+    victim->skill_increase_check(SKILL_DEFENSE, martial, SKILL_INCREASE_HARD + 500);
   if (tumbling)
-    skill_increase_check(victim, SKILL_TUMBLING, tumbling, SKILL_INCREASE_HARD + 500);
+    victim->skill_increase_check(SKILL_TUMBLING, tumbling, SKILL_INCREASE_HARD + 500);
 
   // Ze random stuff.
   if (number(1, 100) < (int)percent && !DC::isSet(victim->combat, COMBAT_BLADESHIELD1) && !DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
@@ -3524,7 +3523,7 @@ int checkCounterStrike(Character *ch, Character *victim)
 
   int p = lvl / 2 - (100 - victim->has_skill(SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
 
-  skill_increase_check(victim, SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
+  victim->skill_increase_check(SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
 
   if (number(1, 100) > p)
     return eFAILURE;
@@ -4455,7 +4454,7 @@ void make_corpse(Character *ch)
     corpse->obj_flags.wear_flags = 0;
     sprintf(buf, "corpse %s", GET_NAME(ch));
   }
-  else if (affected_by_spell(ch, FUCK_PTHIEF))
+  else if (ch->isPlayerObjectThief())
   {
     corpse->obj_flags.wear_flags = 0;
     sprintf(buf, "corpse %s thiefcorpse", GET_NAME(ch));
@@ -5030,9 +5029,8 @@ void make_heart(Character *ch, Character *vict)
 {
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
-  int hands_are_free(Character * ch, int number);
 
-  if (!hands_are_free(ch, 1))
+  if (!ch->hands_are_free(1))
     return;
 #ifdef LEAK_CHECK
   corpse = (class Object *)calloc(1, sizeof(class Object));
@@ -5127,7 +5125,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
   if (ch->in_room != vict->in_room)
     return 0;
 
-  if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  if (ch->affected_by_spell(SKILL_DEFENDERS_STANCE))
     return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
@@ -5398,9 +5396,9 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
       act("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_ROOM, NOTVICT);
     }
   }
-  if (type == TYPE_WHIP && !affected_by_spell(ch, SKILL_CM_TIMER))
+  if (type == TYPE_WHIP && !ch->affected_by_spell(SKILL_CM_TIMER))
   {
-    if (GET_POS(vict) > position_t::SITTING && !affected_by_spell(vict, SPELL_IRON_ROOTS))
+    if (GET_POS(vict) > position_t::SITTING && !vict->affected_by_spell(SPELL_IRON_ROOTS))
     {
       vict->setSitting();
       SET_BIT(vict->combat, COMBAT_BASH2);
@@ -5533,12 +5531,12 @@ void raw_kill(Character *ch, Character *victim)
   victim->player->group_kills = 0;
   if (DC::isSet(victim->player->punish, PUNISH_SPAMMER))
     REMOVE_BIT(victim->player->punish, PUNISH_SPAMMER);
-  if (affected_by_spell(victim, FUCK_PTHIEF))
+  if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     is_thief = 1;
-    affect_from_char(victim, FUCK_PTHIEF);
+    affect_from_char(victim, Character::PLAYER_OBJECT_THIEF);
   }
-  if (affected_by_spell(victim, FUCK_GTHIEF))
+  if (victim->isPlayerGoldThief())
   {
     if (victim->getGold() > 0)
     {
@@ -5667,8 +5665,8 @@ void raw_kill(Character *ch, Character *victim)
           pir_stat_loss(victim, chance, false, is_thief);
         }
       }
-      check_maxes(victim); // Check if any skills got lowered because of
-                           // stat loss. guild.cpp.
+      victim->check_maxes(); // Check if any skills got lowered because of
+                             // stat loss. guild.cpp.
       // hmm
       if (GET_CON(victim) <= 4)
       {
@@ -6399,7 +6397,7 @@ void disarm(Character *ch, Character *victim)
   if (ch->equipment[WIELD] == nullptr)
     return;
 
-  if (affected_by_spell(victim, SPELL_PARALYZE))
+  if (victim->affected_by_spell(SPELL_PARALYZE))
   {
     ch->sendln("Their paralyzed fingers are gripping the weapon too tightly.");
     return;
@@ -6422,7 +6420,7 @@ void disarm(Character *ch, Character *victim)
     obj = unequip_char(victim, SECOND_WIELD);
     equip_char(victim, obj, WIELD);
   }
-  recheck_height_wears(victim);
+  victim->recheck_height_wears();
   return;
   //  }
 
@@ -6501,14 +6499,14 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     return;
   }
 
-  if (affected_by_spell(victim, FUCK_PTHIEF))
+  if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     victim->setMove(2);
     fight_kill(ch, victim, TYPE_RAW_KILL, 0);
     return;
   }
 
-  if (affected_by_spell(victim, FUCK_GTHIEF))
+  if (victim->isPlayerGoldThief())
   {
     victim->setMove(2);
     if (victim->getGold() > 0)
@@ -6526,12 +6524,12 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     GET_AC(victim) -= 30;
   }
 
-  if (type == KILL_POISON && affected_by_spell(victim, SPELL_POISON)->modifier > 0)
+  if (type == KILL_POISON && victim->affected_by_spell(SPELL_POISON)->modifier > 0)
   {
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &findchar : character_list)
     {
-      if (findchar == affected_by_spell(victim, SPELL_POISON)->origin)
+      if (findchar == victim->affected_by_spell(SPELL_POISON)->origin)
         ch = findchar;
     }
   }
@@ -6539,7 +6537,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   for (af = victim->affected; af; af = afpk)
   {
     afpk = af->next;
-    if (af->type != FUCK_CANTQUIT &&
+    if (af->type != Character::PLAYER_CANTQUIT &&
         af->type != SKILL_LAY_HANDS &&
         af->type != SKILL_HARM_TOUCH &&
         af->type != SKILL_BLOOD_FURY &&
@@ -7068,7 +7066,7 @@ int can_be_attacked(Character *ch, Character *vict)
 
   if (IS_NPC(vict))
   {
-    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8 || affected_by_spell(vict, SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
+    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8 || vict->affected_by_spell(SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
         vict->master &&
         vict->fighting != ch &&
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
@@ -7087,7 +7085,7 @@ int can_be_attacked(Character *ch, Character *vict)
     return false;
   }
 
-  if (IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF) || IS_AFFECTED(vict, AFF_CHAMPION))
+  if (IS_AFFECTED(vict, AFF_CANTQUIT) || vict->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || vict->isPlayerGoldThief() || IS_AFFECTED(vict, AFF_CHAMPION))
     return true;
 
   if (IS_PC(ch) && vict->getLevel() < 5)
@@ -7121,7 +7119,7 @@ int can_be_attacked(Character *ch, Character *vict)
         return true;
     }
     /* Allow players to continue fighting if they have a cantquit */
-    if (IS_AFFECTED(ch, AFF_CANTQUIT) || IS_AFFECTED(ch, AFF_CHAMPION))
+    if (ch->isPlayerCantQuit()|| IS_AFFECTED(ch, AFF_CHAMPION))
     {
       if (ch->fighting == vict)
         return true;
@@ -7359,7 +7357,7 @@ int second_attack(Character *ch)
 
   if ((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return true;
-  if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  if (ch->affected_by_spell(SKILL_DEFENDERS_STANCE))
     return false;
   learned = ch->has_skill(SKILL_SECOND_ATTACK);
   if (learned && skill_success(ch, nullptr, SKILL_SECOND_ATTACK, 15))
@@ -7375,7 +7373,7 @@ int third_attack(Character *ch)
 
   if ((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return true;
-  if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  if (ch->affected_by_spell(SKILL_DEFENDERS_STANCE))
     return false;
   learned = ch->has_skill(SKILL_THIRD_ATTACK);
   if (learned && skill_success(ch, nullptr, SKILL_THIRD_ATTACK, 15))
@@ -7528,7 +7526,7 @@ int do_flee(Character *ch, char *argument, int cmd)
     if (!charge_moves(ch, SKILL_ESCAPE))
       return eFAILURE;
 
-    skill_increase_check(ch, SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
+    ch->skill_increase_check(SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
     if (number(1, 101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape / 1.5 - GET_INT(vict) / 2 - GET_WIS(vict) / 2), 100))
       escape = 0;
   }
@@ -7544,7 +7542,7 @@ int do_flee(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
-    if (affected_by_spell(ch, SPELL_IRON_ROOTS))
+    if (ch->affected_by_spell(SPELL_IRON_ROOTS))
       ch->sendln("The roots bracing your legs make it impossible to run!");
     else
       ch->sendln("Your legs are too tired for running away!");

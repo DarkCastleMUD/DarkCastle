@@ -182,7 +182,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+  if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -290,7 +290,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;

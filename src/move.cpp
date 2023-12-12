@@ -365,7 +365,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
-					skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+					ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -377,7 +377,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 91)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_MOUNTAIN)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -389,7 +389,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 81)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_ARCTIC)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -401,7 +401,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 71)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_HILLS)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -413,7 +413,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 61)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_WATER_SWIM)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -425,7 +425,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 51)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FROZEN_TUNDRA)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -437,7 +437,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 41)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_DESERT)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -449,7 +449,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 31)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_BEACH)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -461,7 +461,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 21)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FIELD)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -473,7 +473,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				{
 					mvinroom = movement_loss[DC::getInstance()->world[ch->in_room].sector_type] / 2;
 					if (learned < 11)
-						skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+						ch->skill_increase_check(SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
 				}
 				if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FOREST)
 					mvtoroom = movement_loss[DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -604,7 +604,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (IS_PC(ch) && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+	if (IS_PC(ch) && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
 		ch->sendln("You feel air trying to explode from your lungs as you swim around.");
 		// ch->sendln("Underwater?!");
@@ -631,7 +631,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	// If they were hit with a lullaby, go ahead and clear it out
 	if (ISSET(ch->affected_by, AFF_NO_FLEE))
 	{
-		if (affected_by_spell(ch, SPELL_IRON_ROOTS))
+		if (ch->affected_by_spell(SPELL_IRON_ROOTS))
 		{
 			ch->sendln("The roots bracing your legs keep you from moving!");
 			return eFAILURE;
@@ -971,7 +971,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 			{
 				if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
 				{
-					if (affected_by_spell(k->follower, SPELL_IRON_ROOTS))
+					if (k->follower->affected_by_spell(SPELL_IRON_ROOTS))
 						k->follower->sendln("The roots bracing your legs make it impossible to run!");
 					else
 						k->follower->sendln("Your legs are too tired for running away!");
@@ -1106,7 +1106,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+	if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
 	{
 		ch->sendln("You bravely attempt to plunge through the portal - let's hope you have gills!");
 		return eSUCCESS;
@@ -1147,13 +1147,13 @@ int do_enter(Character *ch, char *argument, int cmd)
 	}
 
 	// Thieves arent allowed through cleric portals
-	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->isPortalTypePlayer())
+	if (ch->isPlayerObjectThief() && portal->isPortalTypePlayer())
 	{
 		ch->sendln("Your attempt to transport stolen goods through planes of magic fails!");
 		return eFAILURE;
 	}
 
-	if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) && (DC::isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+	if (!IS_MOB(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (DC::isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
 	{
 		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);

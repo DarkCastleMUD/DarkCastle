@@ -52,7 +52,7 @@ int do_boot(Character *ch, char *arg, int cmd)
     }
     if (IS_AFFECTED(victim, AFF_CANTQUIT))
     {
-      if (affected_by_spell(victim, FUCK_PTHIEF))
+      if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
       {
         act("$N is a thief.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
         return eFAILURE;

@@ -3,7 +3,7 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include "spells.h" // FUCK_CANTQUIT
+#include "spells.h" // Character::PLAYER_CANTQUIT
 #include "mobile.h"
 #include "handler.h"
 #include "room.h"
@@ -399,10 +399,10 @@ int do_pardon(Character *ch, char *argument, int cmd)
 
   if (!str_cmp("thief", flag))
   {
-    if (affected_by_spell(victim, FUCK_PTHIEF))
+    if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
     {
       ch->sendln("Thief flag removed.");
-      affect_from_char(victim, FUCK_PTHIEF);
+      affect_from_char(victim, Character::PLAYER_OBJECT_THIEF);
       victim->sendln("A nice god has pardoned you of your thievery.");
     }
     else
@@ -416,7 +416,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
     if (ISSET(victim->affected_by, AFF_CANTQUIT))
     {
       ch->sendln("Killer flag removed.");
-      affect_from_char(victim, FUCK_CANTQUIT);
+      affect_from_char(victim, Character::PLAYER_CANTQUIT);
       victim->sendln("A nice god has pardoned you of your murdering.");
     }
     else

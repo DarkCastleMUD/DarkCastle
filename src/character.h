@@ -857,7 +857,11 @@ public:
     command_return_t do_track(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_hit(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_ambush(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
+    void show_obj_to_char(Object *object, int mode);
+    void list_obj_to_char(Object *list, int mode, bool show);
     command_return_t do_botcheck(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    void list_char_to_char(Character *list, int mode);
     command_return_t do_mpsettemp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_bestow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t check_pursuit(Character *victim, QString dircommand);
@@ -931,6 +935,16 @@ public:
     affected_type *affected_by_spell(uint32_t skill);
     bool skill_success(Character *victim, int skillnum, int mod = 0);
     int skillmax(int skill, int eh);
+    char charthing(int known, int skill, int maximum);
+    void output_praclist(class_skill_defines *skilllist);
+    int skills_guild(const char *arg, Character *owner);
+    int get_stat(attribute_t stat);
+    int get_stat_bonus(int stat);
+    void skill_increase_check(int skill, int learned, int difficulty);
+    void verify_max_stats(void);
+    int get_max(int skill);
+    void check_maxes(void);
+    int learn_skill(int skill, int amount, int maximum);
     class_skill_defines *get_skill_list(void);
     Character *get_char_room_vis(QString name);
     Character *get_rand_other_char_room_vis(void);
@@ -962,18 +976,56 @@ public:
     void add_memory(QString victim_name, char type);
     void swap_hate_memory(void);
     bool can_use_command(int cmdnum);
-
+    void do_inate_race_abilities(void);
+    Object *clan_altar(void);
+    void do_on_login_stuff(void);
+    void roll_and_display_stats(void);
+    void check_hw(void);
+    void set_hw(void);
+    void add_to_bard_list(void);
+    void remove_from_bard_list(void);
+    int64_t moves_exp_spent(void);
+    int64_t moves_plats_spent(void);
+    int64_t hps_exp_spent(void);
+    int64_t hps_plats_spent(void);
+    int64_t mana_exp_spent(void);
+    int64_t mana_plats_spent(void);
+    int meta_get_stat_exp_cost(attribute_t stat);
+    int meta_get_stat_plat_cost(attribute_t targetstat);
+    void meta_list_stats(void);
+    quint64 meta_get_moves_exp_cost(void);
+    quint64 meta_get_moves_plat_cost(int amount);
+    quint64 meta_get_hps_exp_cost(void);
+    quint64 meta_get_hps_plat_cost(int amount);
+    quint64 meta_get_mana_exp_cost(void);
+    quint64 meta_get_mana_plat_cost(int amount);
+    quint64 meta_get_ki_plat_cost(void);
+    int meta_get_ki_exp_cost(void);
+    void undo_race_saves(void);
+    bool is_race_applicable(int race);
+    bool would_die(void);
+    void set_heightweight(void);
+    char *race_message(int race);
+    int hands_are_free(int number);
+    int recheck_height_wears(void);
+    void heightweight(bool add);
     static const QStringList class_names;
     static const QStringList race_names;
     static const QStringList position_types;
+    static constexpr quint64 PLAYER_OBJECT_THIEF = 297ULL;
+    static constexpr quint64 PLAYER_GOLD_THIEF = 298ULL;
+    static constexpr quint64 PLAYER_CANTQUIT = 299ULL;
+    bool isPlayerObjectThief(void) { return affected_by_spell(PLAYER_OBJECT_THIEF); }
+    bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
+    bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
 
 private:
     gold_t gold_ = {}; /* Money carried */
     level_t level_ = {};
     bool debug_ = false;
     move_t move_ = {};
-    QString name_;             // Keyword 'kill X'
-    position_t position_ = {}; // Standing, sitting, fighting
+    QString name_; // Keyword 'kill X'
+    position_t position_ = {};
 };
 
 class communication

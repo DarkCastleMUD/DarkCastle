@@ -15,8 +15,6 @@
 #include "game_portal.h"
 #include "const.h"
 
-
-
 int get_number(char **name);
 
 int do_zoneexits(Character *ch, char *argument, int cmd)
@@ -165,7 +163,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
   class Object *k;
   int j, nIndex = 0;
 
-  if (!ch->has_skill( COMMAND_PURLOIN))
+  if (!ch->has_skill(COMMAND_PURLOIN))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -281,8 +279,6 @@ int do_set(Character *ch, char *argument, int cmd)
   //      return;
   //    }
 
-  void add_to_bard_list(Character * ch);
-
   /* from spell_parser.c */
 
   const char *values[] = {
@@ -298,7 +294,7 @@ int do_set(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!ch->has_skill( COMMAND_SET))
+  if (!ch->has_skill(COMMAND_SET))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -454,7 +450,7 @@ int do_set(Character *ch, char *argument, int cmd)
       break;
     case 'd':
       vict->c_class = CLASS_BARD;
-      add_to_bard_list(vict);
+      vict->add_to_bard_list();
       break;
     case 'u':
       vict->c_class = CLASS_DRUID;

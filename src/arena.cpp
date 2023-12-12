@@ -160,7 +160,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("You have been banned from arenas.");
     return eFAILURE;
   }
-  if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+  if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
   {
     ch->sendln("They don't allow criminals in the arena.");
     return eFAILURE;
@@ -201,7 +201,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   for (af = ch->affected; af; af = next_af)
   {
     next_af = af->next;
-    if (af->type != FUCK_CANTQUIT)
+    if (af->type != Character::PLAYER_CANTQUIT)
       affect_remove(ch, af, SUPPRESS_ALL);
   }
 

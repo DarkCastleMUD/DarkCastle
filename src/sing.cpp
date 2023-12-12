@@ -1005,7 +1005,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 	}
 	if (learned > 85)
 	{
-		if (affected_by_spell(victim, KI_STANCE + KI_OFFSET))
+		if (victim->affected_by_spell(KI_STANCE + KI_OFFSET))
 		{
 			act("Your limerick breaks $S stance!", ch, 0, victim, TO_CHAR, 0);
 			act("$n's limerick causes you to break your stance!", ch, 0, victim, TO_VICT, 0);
@@ -1649,7 +1649,7 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
 		ch->songs.clear();
 	}
 
-	skill_increase_check(ch, SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num), SKILL_INCREASE_EASY);
+	ch->skill_increase_check(SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num), SKILL_INCREASE_EASY);
 
 	ch->sendln("You finish off your music with a flourish...");
 	act("$n finishes $s music in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
@@ -1706,7 +1706,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	if (affected_by_spell(victim, FUCK_PTHIEF))
+	if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
 	{
 		victim->sendln("Your attempt to transport stolen goods through the astral planes fails!");
 		return;
@@ -2058,7 +2058,7 @@ int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character
 			continue;
 		}
 
-		if (affected_by_spell(victim, SKILL_INSANE_CHANT))
+		if (victim->affected_by_spell(SKILL_INSANE_CHANT))
 		{
 			affect_from_char(victim, SKILL_INSANE_CHANT);
 		}
@@ -2100,13 +2100,13 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
 
-		if (affected_by_spell(tmp_char, SPELL_FLY))
+		if (tmp_char->affected_by_spell(SPELL_FLY))
 		{
 			affect_from_char(tmp_char, SPELL_FLY);
 			tmp_char->send("Your fly spell dissipates.");
 		}
 
-		if (affected_by_spell(tmp_char, SKILL_SONG_FLIGHT_OF_BEE))
+		if (tmp_char->affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE))
 		{
 			affect_from_char(tmp_char, SKILL_SONG_FLIGHT_OF_BEE);
 		}
@@ -2162,7 +2162,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 		ch->sendln("Your song fades away, its search unfinished.");
 		return eFAILURE;
 	}
-	if (affected_by_spell(target, SKILL_INNATE_EVASION) || DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
+	if (target->affected_by_spell(SKILL_INNATE_EVASION) || DC::isSet(DC::getInstance()->world[target->in_room].room_flags, NO_KI))
 	{
 		ch->sendln("Something blocks your vision.");
 		return eFAILURE;
@@ -2198,7 +2198,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 		break;
 	}
 
-	if (affected_by_spell(target, SPELL_DETECT_MAGIC) && affected_by_spell(target, SPELL_DETECT_MAGIC)->modifier > 80)
+	if (target->affected_by_spell(SPELL_DETECT_MAGIC) && target->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
 		target->sendln("You sense you are the target of scrying.");
 
 	sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
@@ -2322,18 +2322,18 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
 		if (tmp_char == ch)
 			continue;
 
-		if (affected_by_spell(tmp_char, SPELL_HASTE))
+		if (tmp_char->affected_by_spell(SPELL_HASTE))
 		{
 			affect_from_char(tmp_char, SPELL_HASTE);
 			tmp_char->sendln("Your limbs slow back to normal.");
 		}
 
-		if (affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY))
+		if (tmp_char->affected_by_spell(SKILL_SONG_JIG_OF_ALACRITY))
 		{
 			affect_from_char(tmp_char, SKILL_SONG_JIG_OF_ALACRITY);
 		}
 
-		if (!affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY))
+		if (!tmp_char->affected_by_spell(SKILL_SONG_JIG_OF_ALACRITY))
 		{
 			affect_to_char(tmp_char, &af);
 			tmp_char->sendln("Your dance quickens your pulse!");
@@ -2392,13 +2392,13 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
 
-		if (affected_by_spell(tmp_char, SKILL_SONG_FANATICAL_FANFARE))
+		if (tmp_char->affected_by_spell(SKILL_SONG_FANATICAL_FANFARE))
 		{
 			tmp_char->sendln("You manage to get far enough away to avoid being poked again!");
 			continue;
 		}
 
-		if (affected_by_spell(tmp_char, SPELL_INSOMNIA))
+		if (tmp_char->affected_by_spell(SPELL_INSOMNIA))
 		{
 			affect_from_char(tmp_char, SPELL_INSOMNIA);
 			tmp_char->sendln("Your mind returns to its normal state.");
@@ -2451,13 +2451,13 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
 
-		if (affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))
+		if (tmp_char->affected_by_spell(SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(tmp_char, SKILL_SONG_MKING_CHARGE);
 			tmp_char->sendln("You lose the inspiration.");
 		}
 
-		if (!affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))
+		if (!tmp_char->affected_by_spell(SKILL_SONG_MKING_CHARGE))
 		{
 			affect_to_char(tmp_char, &af);
 
@@ -2531,7 +2531,7 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
 	{
 		if (origsing && origsing != fvictim->follower)
 			continue;
-		if (ISSET(fvictim->follower->affected_by, AFF_HASTE) && !affected_by_spell(fvictim->follower, SPELL_HASTE))
+		if (ISSET(fvictim->follower->affected_by, AFF_HASTE) && !fvictim->follower->affected_by_spell(SPELL_HASTE))
 		{
 			REMBIT(fvictim->follower->affected_by, AFF_HASTE);
 			fvictim->follower->sendln("Your limbs slow back to normal.");
@@ -2539,7 +2539,7 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
 	}
 
 	if (!origsing || origsing == master)
-		if (ISSET(master->affected_by, AFF_HASTE) && !affected_by_spell(master, SPELL_HASTE))
+		if (ISSET(master->affected_by, AFF_HASTE) && !master->affected_by_spell(SPELL_HASTE))
 		{
 			REMBIT(master->affected_by, AFF_HASTE);
 			master->sendln("Your limbs slow back to normal.");
@@ -2560,7 +2560,7 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 	{
 		if (origsing && origsing != fvictim->follower)
 			continue;
-		if (ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) && !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
+		if (ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) && !fvictim->follower->affected_by_spell(SPELL_INSOMNIA))
 		{
 			REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
 			fvictim->follower->sendln("Your mind returns to its normal state.");
@@ -2572,7 +2572,7 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 	}
 
 	if (!origsing || origsing == master)
-		if (ISSET(master->affected_by, AFF_INSOMNIA) && !affected_by_spell(master, SPELL_INSOMNIA))
+		if (ISSET(master->affected_by, AFF_INSOMNIA) && !master->affected_by_spell(SPELL_INSOMNIA))
 		{
 			REMBIT(master->affected_by, AFF_INSOMNIA);
 			master->sendln("Your mind returns to its normal state.");
@@ -2598,7 +2598,7 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
 	{
 		if (origsing && origsing != fvictim->follower)
 			continue;
-		if (affected_by_spell(fvictim->follower, SKILL_SONG_MKING_CHARGE))
+		if (fvictim->follower->affected_by_spell(SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(fvictim->follower, SKILL_SONG_MKING_CHARGE);
 			fvictim->follower->sendln("You lose the inspiration.");
@@ -2606,7 +2606,7 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
 	}
 
 	if (!origsing || origsing == master)
-		if (affected_by_spell(master, SKILL_SONG_MKING_CHARGE))
+		if (master->affected_by_spell(SKILL_SONG_MKING_CHARGE))
 		{
 			affect_from_char(master, SKILL_SONG_MKING_CHARGE);
 			master->sendln("You lose the inspiration.");
@@ -2784,7 +2784,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
 		return eFAILURE;
 	}
-	if (!affected_by_spell(target, SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
+	if (!target->affected_by_spell(SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
 	{
 		ch->sendln("As far as you can tell, they are not loyal to anyone.");
 		return eFAILURE;
@@ -3091,7 +3091,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
 		if (!ARE_GROUPED(ch, tmp_char))
 			continue;
 
-		if (affected_by_spell(tmp_char, SKILL_SONG_VIGILANT_SIREN))
+		if (tmp_char->affected_by_spell(SKILL_SONG_VIGILANT_SIREN))
 		{
 			affect_from_char(tmp_char, SKILL_SONG_VIGILANT_SIREN);
 		}
@@ -3422,13 +3422,13 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 		if (ch->in_room != fvictim->follower->in_room)
 			continue;
 
-		if (affected_by_spell(fvictim->follower, SPELL_WATER_BREATHING))
+		if (fvictim->follower->affected_by_spell(SPELL_WATER_BREATHING))
 		{
 			affect_from_char(fvictim->follower, SPELL_WATER_BREATHING);
 			fvictim->follower->send("Your magical gills disappear.");
 		}
 
-		if (affected_by_spell(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM))
+		if (fvictim->follower->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM))
 			affect_from_char(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM);
 
 		affect_to_char(fvictim->follower, &af);
@@ -3437,7 +3437,7 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 
 	if (ch->in_room == master->in_room)
 	{
-		if (affected_by_spell(master, SKILL_SONG_SUBMARINERS_ANTHEM))
+		if (master->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM))
 			affect_from_char(master, SKILL_SONG_SUBMARINERS_ANTHEM);
 		affect_to_char(master, &af);
 		master->sendln("Your lungs absorb oxygen from any fluid!");

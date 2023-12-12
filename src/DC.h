@@ -116,6 +116,7 @@ typedef QList<QString> hints_t;
 #include "Database.h"
 #include "interp.h"
 #include "Command.h"
+#include "clan.h"
 
 class Connection;
 
@@ -226,6 +227,8 @@ public:
   zones_t zones = {};
   QMap<room_t, Room> rooms;
   class World world;
+  clan_data *clan_list{};
+  clan_data *end_clan_list{};
 
   static QString getBuildVersion();
   static QString getBuildTime();

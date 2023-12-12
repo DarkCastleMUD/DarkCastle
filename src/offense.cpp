@@ -39,7 +39,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
     ch->sendln("You can't do that in the arena.");
     return eFAILURE;
   }
-  if (affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF)))
+  if (ch->isPlayerObjectThief()|| (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
     return eFAILURE;

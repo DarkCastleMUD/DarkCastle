@@ -54,7 +54,6 @@ void barb_magic_resist(Character *ch, int old, int nw);
 struct skill_quest *find_sq(int sq);
 struct skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
-void check_maxes(Character *ch);
 
 /*
  * Spell numbers are well known.
@@ -266,10 +265,6 @@ void check_maxes(Character *ch);
 #define MAX_KI_LIST 10
 #define KI_OFFSET 250 // why this is done differently than the rest, I have no
                       // idea....ki skills are 250-296.  -pir
-
-#define FUCK_PTHIEF 297
-#define FUCK_GTHIEF 298
-#define FUCK_CANTQUIT 299
 
 #define SKILL_BASE 300
 #define SKILL_TRIP 300

@@ -251,7 +251,7 @@ int do_vault(Character *ch, char *argument, int cmd)
 
   half_chop(argument, arg, arg1);
 
-  if (affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF)))
+  if (ch->isPlayerObjectThief()|| (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
     return eFAILURE;

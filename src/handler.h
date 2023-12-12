@@ -29,7 +29,6 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type = DC::PULSE_TIME);
 void affect_from_char(Character *ch, int skill, int flags = 0);
 void affect_remove(Character *ch, struct affected_type *af, int flags);
-affected_type *affected_by_spell(Character *ch, uint32_t skill);
 void affect_join(Character *ch, struct affected_type *af,
 				 bool avg_dur, bool avg_mod);
 affected_type *affected_by_random(Character *ch);
@@ -151,7 +150,6 @@ bool objExists(Object *obj);
 bool charge_moves(Character *ch, int skill, double modifier = 1);
 
 void die_follower(Character *ch);
-void remove_from_bard_list(Character *ch);
 void stop_guarding_me(Character *victim);
 void stop_guarding(Character *guard);
 void remove_memory(Character *ch, char type);

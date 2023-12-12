@@ -630,7 +630,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   fwrite_var_string(this->title, fpsave);
 
   if (!has_skill(NEW_SAVE)) // New save.
-    learn_skill(this, NEW_SAVE, 1, 100);
+    learn_skill(NEW_SAVE, 1, 100);
 
   for (const auto &skill : this->skills)
   {

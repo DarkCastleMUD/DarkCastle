@@ -218,15 +218,10 @@ int main(int argc, char **argv)
 {
   DC debug(argc, argv);
 
-  char namelist[] = "chief enforcer bob";
-  qDebug() << isexact("enf", namelist) << ispartial("enf", namelist);
-
-  exit(1);
-
+  // char namelist[] = "chief enforcer bob";
+  // qDebug() << isexact("enf", namelist) << isprefix("enf", namelist);
   // debug.db().table("shops").column("name", "text").column("name2", "bigint");
-
   // exit(1);
-
   // testStrings();
 
   QString orig_cwd, dclib;
@@ -288,8 +283,19 @@ int main(int argc, char **argv)
   d->descriptor = 1;
   d->character = ch;
   d->output = {};
+
+  auto &character_list = DC::getInstance()->character_list;
+  character_list.insert(d->character);
+
+  d->character->do_on_login_stuff();
+
+  STATE(d) = Connection::states::PLAYING;
+
+  update_max_who();
+
   do_stand(ch, "", CMD_DEFAULT);
   process_output(d);
+
   char_to_room(ch, 3001);
   process_output(d);
   // ch->do_toggle({"pager"}, CMD_DEFAULT);

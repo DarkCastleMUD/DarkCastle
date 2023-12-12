@@ -339,7 +339,7 @@ void determine_trade_skill_increase(Character *ch, int skillnum, int learned, in
   // TODO - add other requirements when done debugging
 
   // learn a point
-  learn_skill(ch, skillnum, 1, 500);
+  ch->learn_skill(skillnum, 1, 500);
 }
 
 int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
@@ -464,7 +464,7 @@ int do_brew(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (affected_by_spell(ch, SKILL_BREW_TIMER))
+  if (ch->affected_by_spell(SKILL_BREW_TIMER))
   {
     ch->sendln("You aren't ready to brew anything again.");
     return eFAILURE;
@@ -971,7 +971,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (affected_by_spell(ch, SKILL_SCRIBE_TIMER))
+  if (ch->affected_by_spell(SKILL_SCRIBE_TIMER))
   {
     ch->sendln("You aren't ready to scribe anything again.");
     return eFAILURE;

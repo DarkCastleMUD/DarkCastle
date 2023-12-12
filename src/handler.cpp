@@ -71,11 +71,11 @@ int do_fall(Character *ch, short dir);
 
 bool isTimer(Character *ch, int spell)
 {
-	return affected_by_spell(ch, BASE_TIMERS + spell);
+	return ch->affected_by_spell(BASE_TIMERS + spell);
 }
 int timerLeft(Character *ch, int spell)
 {
-	struct affected_type *af = affected_by_spell(ch, BASE_TIMERS + spell);
+	struct affected_type *af = ch->affected_by_spell(BASE_TIMERS + spell);
 	if (af == nullptr)
 		return 0;
 	else
@@ -558,7 +558,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 				af.location = APPLY_NONE;
 				af.modifier = 0;
 				// By gawd, they just completed the set.
-				if (affected_by_spell(ch, BASE_SETS + z))
+				if (ch->affected_by_spell(BASE_SETS + z))
 					return;
 				if (!flag && set_list[z].Set_Wear_Message != nullptr)
 					send_to_char(set_list[z].Set_Wear_Message, ch);
@@ -878,12 +878,12 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 	{
 		if (loc == APPLY_LIGHTNING_SHIELD)
 		{
-			if (affected_by_spell(ch, SPELL_LIGHTNING_SHIELD))
+			if (ch->affected_by_spell(SPELL_LIGHTNING_SHIELD))
 			{
 				affect_from_char(ch, SPELL_LIGHTNING_SHIELD);
 			}
 
-			if (affected_by_spell(ch, SPELL_FIRESHIELD))
+			if (ch->affected_by_spell(SPELL_FIRESHIELD))
 			{
 				affect_from_char(ch, SPELL_FIRESHIELD);
 
@@ -897,7 +897,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 				}
 			}
 
-			if (affected_by_spell(ch, SPELL_ACID_SHIELD))
+			if (ch->affected_by_spell(SPELL_ACID_SHIELD))
 			{
 				affect_from_char(ch, SPELL_ACID_SHIELD);
 
@@ -2458,7 +2458,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 	}
 	if (IS_AFFECTED(ch, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
 	{ // best indentation ever
-		recheck_height_wears(ch);
+		ch->recheck_height_wears();
 		obj_to_char(obj, ch);
 		return 0;
 	}
@@ -2477,10 +2477,10 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) && IS_PC(ch))
 	{
-		if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj))
+		if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || ch->isPlayerObjectThief() || contains_no_trade_item(obj))
 		{
 			act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
-			recheck_height_wears(ch);
+			ch->recheck_height_wears();
 			obj_to_char(obj, ch);
 			if (pos == WIELD && ch->equipment[SECOND_WIELD])
 			{
@@ -2492,7 +2492,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		{
 			act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
 			act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
-			recheck_height_wears(ch);
+			ch->recheck_height_wears();
 			obj_to_room(obj, ch->in_room);
 			if (pos == WIELD && ch->equipment[SECOND_WIELD])
 			{
@@ -3902,7 +3902,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 
 	if (pull || isGolem)
 	{
-		remove_from_bard_list(ch);
+		ch->remove_from_bard_list();
 		auto &death_list = DC::getInstance()->death_list;
 		if (death_list.contains(ch))
 		{
@@ -4464,6 +4464,8 @@ Character *get_pc_vis(Character *ch, const char *name)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
 						  {
+								qDebug() << ch->getName() << "checking on " << i->getName();
+							
 		if(IS_PC(i) && CAN_SEE(ch, i))
 		{
 			if (isexact(name, GET_NAME(i)))
@@ -5130,7 +5132,7 @@ skill_results_t find_skills_by_name(std::string name)
 		break;
 
 	case 'c':
-		if (add_matching_results(results, name, "CANT_QUIT", FUCK_CANTQUIT) == MatchType::Exact)
+		if (add_matching_results(results, name, "CANT_QUIT", Character::PLAYER_CANTQUIT) == MatchType::Exact)
 		{
 			return results;
 		}
@@ -5153,7 +5155,7 @@ skill_results_t find_skills_by_name(std::string name)
 		break;
 
 	case 'd':
-		if (add_matching_results(results, name, "DIRTY_THIEF/CANT_QUIT", FUCK_PTHIEF) == MatchType::Exact)
+		if (add_matching_results(results, name, "DIRTY_THIEF/CANT_QUIT", Character::PLAYER_OBJECT_THIEF) == MatchType::Exact)
 		{
 			return results;
 		}
@@ -5164,7 +5166,7 @@ skill_results_t find_skills_by_name(std::string name)
 		break;
 
 	case 'g':
-		if (add_matching_results(results, name, "GOLD_THIEF/CANT_QUIT", FUCK_GTHIEF) == MatchType::Exact)
+		if (add_matching_results(results, name, "GOLD_THIEF/CANT_QUIT", Character::PLAYER_GOLD_THIEF) == MatchType::Exact)
 		{
 			return results;
 		}
@@ -5258,7 +5260,7 @@ int find_skill_num(char *name)
 		break;
 	case 'c':
 		if (name_length <= strlen("CANT_QUIT") && !str_n_nosp_cmp(name, "CANT_QUIT", name_length))
-			return FUCK_CANTQUIT;
+			return Character::PLAYER_CANTQUIT;
 		if (name_length <= strlen("clanarea claim timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
 			return SKILL_CLANAREA_CLAIM;
 		if (name_length <= strlen("clanarea challenge timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
@@ -5270,13 +5272,13 @@ int find_skill_num(char *name)
 		break;
 	case 'd':
 		if (name_length <= strlen("DIRTY_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "DIRTY_THIEF/CANT_QUIT", name_length))
-			return FUCK_PTHIEF;
+			return Character::PLAYER_OBJECT_THIEF;
 		if (name_length <= strlen("divine intervention timer") && !str_n_nosp_cmp(name, "divine intervention timer", name_length))
 			return SPELL_DIV_INT_TIMER;
 		break;
 	case 'g':
 		if (name_length <= strlen("GOLD_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "GOLD_THIEF/CANT_QUIT", name_length))
-			return FUCK_GTHIEF;
+			return Character::PLAYER_GOLD_THIEF;
 		break;
 	case 'h':
 		if (name_length <= strlen("harmtouch reuse timer") && !str_n_nosp_cmp(name, "harmtouch reuse timer", name_length))

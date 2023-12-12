@@ -254,11 +254,11 @@ room_track_data *Room::TrackItem(int nIndex)
 	return 0;
 }
 
-void add_to_bard_list(Character *ch)
+void Character::add_to_bard_list(void)
 {
 	pulse_data *curr = nullptr;
 
-	if (GET_CLASS(ch) != CLASS_BARD)
+	if (GET_CLASS(this) != CLASS_BARD)
 		return;
 
 #ifdef LEAK_CHECK
@@ -269,12 +269,12 @@ void add_to_bard_list(Character *ch)
 		dc_alloc(1, sizeof(struct pulse_data));
 #endif
 
-	curr->thechar = ch;
+	curr->thechar = this;
 	curr->next = bard_list;
 	bard_list = curr;
 }
 
-void remove_from_bard_list(Character *ch)
+void Character::remove_from_bard_list(void)
 {
 	pulse_data *curr = nullptr;
 	pulse_data *last = nullptr;
@@ -282,7 +282,7 @@ void remove_from_bard_list(Character *ch)
 	if (!bard_list)
 		return;
 
-	if (bard_list->thechar == ch)
+	if (bard_list->thechar == this)
 	{
 		curr = bard_list;
 		bard_list = bard_list->next;
@@ -293,7 +293,7 @@ void remove_from_bard_list(Character *ch)
 		last = bard_list;
 		for (curr = bard_list->next; curr; curr = curr->next)
 		{
-			if (curr->thechar == ch)
+			if (curr->thechar == this)
 			{
 				last->next = curr->next;
 				dc_free(curr);

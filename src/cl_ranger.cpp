@@ -181,7 +181,7 @@ int do_tame(Character *ch, char *arg, int cmd)
     return eFAILURE;
     /*   Character * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
-         if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+         if(IS_MOB(k->follower) &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
             vict = k->follower;
             break;
@@ -301,7 +301,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
   this->sendln("You search for signs of your quarry...\n\r");
 
   if (learned)
-    skill_increase_check(this, SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
+    skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
 
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
@@ -710,7 +710,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   class Object *new_obj = 0;
   struct affected_type af;
 
-  if (affected_by_spell(ch, SKILL_FORAGE))
+  if (ch->affected_by_spell(SKILL_FORAGE))
   {
     if (number(0, 1) == 0)
       ch->sendln("You already foraged recently.  Give mother nature a break!");
@@ -792,7 +792,7 @@ int do_forage(Character *ch, char *arg, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af, DC::PULSE_VIOLENCE);
 
-  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
+  ch->skill_increase_check(SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
   if (!new_obj)
   {
     act("$n forages around for some food, but turns up nothing.", ch, 0, 0, TO_ROOM, 0);
@@ -1316,7 +1316,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         }
       }
 
-      if (!victim && new_room && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0)
+      if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT)&& dir >= 0)
       {
         if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !DC::isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
@@ -1625,7 +1625,7 @@ int do_fire(Character *ch, char *arg, int cmd)
             TO_ROOM);
         retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW,
                         0);
-        skill_increase_check(ch, SKILL_FIRE_ARROW,
+        ch->skill_increase_check(SKILL_FIRE_ARROW,
                              ch->has_skill(SKILL_FIRE_ARROW),
                              get_difficulty(SKILL_FIRE_ARROW));
         enchantmentused = true;
@@ -1648,7 +1648,7 @@ int do_fire(Character *ch, char *arg, int cmd)
           WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
         retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
-        skill_increase_check(ch, SKILL_ICE_ARROW,
+        ch->skill_increase_check(SKILL_ICE_ARROW,
                              ch->has_skill(SKILL_ICE_ARROW),
                              get_difficulty(SKILL_ICE_ARROW));
         enchantmentused = true;
@@ -1668,7 +1668,7 @@ int do_fire(Character *ch, char *arg, int cmd)
             TO_ROOM);
         retval = damage(ch, victim, dam, TYPE_ENERGY,
                         SKILL_TEMPEST_ARROW, 0);
-        skill_increase_check(ch, SKILL_TEMPEST_ARROW,
+        ch->skill_increase_check(SKILL_TEMPEST_ARROW,
                              ch->has_skill(SKILL_TEMPEST_ARROW),
                              get_difficulty(SKILL_TEMPEST_ARROW));
         enchantmentused = true;
@@ -1697,7 +1697,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         }
         retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
                         0);
-        skill_increase_check(ch, SKILL_GRANITE_ARROW,
+        ch->skill_increase_check(SKILL_GRANITE_ARROW,
                              ch->has_skill(SKILL_GRANITE_ARROW),
                              get_difficulty(SKILL_GRANITE_ARROW));
         enchantmentused = true;
@@ -1804,13 +1804,13 @@ int do_natural_selection(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SPELL_NAT_SELECT_TIMER))
+  if (ch->affected_by_spell(SPELL_NAT_SELECT_TIMER))
   {
     ch->sendln("You cannot yet select a new enemy of choice.");
     return eFAILURE;
   }
 
-  cur = affected_by_spell(ch, SKILL_NAT_SELECT);
+  cur =ch->affected_by_spell( SKILL_NAT_SELECT);
 
   for (i = 1; i < 33; i++)
   {

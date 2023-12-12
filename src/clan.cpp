@@ -47,9 +47,6 @@ extern index_data *obj_index;
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);
 
-clan_data *clan_list = 0;
-clan_data *end_clan_list = 0;
-
 #define MAX_CLAN_DESC_LENGTH 1022
 
 const char *clan_rights[] = {
@@ -278,7 +275,7 @@ void save_clans(void)
     abort();
   }
 
-  for (pclan = clan_list; pclan; pclan = pclan->next)
+  for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
     // print normal data
     fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder, pclan->name,
@@ -396,7 +393,7 @@ void save_clans(void)
     return;
   }
 
-  for (pclan = clan_list; pclan; pclan = pclan->next)
+  for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
     fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
     fprintf(fl, "$3Contact Email$R:  %s\n"
@@ -449,7 +446,7 @@ void free_clans_from_memory(void)
   clan_data *currclan = nullptr;
   clan_data *nextclan = nullptr;
 
-  for (currclan = clan_list; currclan; currclan = nextclan)
+  for (currclan = DC::getInstance()->clan_list; currclan; currclan = nextclan)
   {
     nextclan = currclan->next;
     delete_clan(currclan);
@@ -461,7 +458,7 @@ void assign_clan_rooms()
   clan_data *clan = 0;
   struct clan_room_data *room = 0;
 
-  for (clan = clan_list; clan; clan = clan->next)
+  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     for (room = clan->rooms; room; room = room->next)
       if (-1 != real_room(room->room_number))
         if (!DC::isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
@@ -628,15 +625,15 @@ void add_clan(clan_data *new_new_clan)
   clan_data *pcurr = nullptr;
   clan_data *plast = nullptr;
 
-  if (!clan_list)
+  if (!DC::getInstance()->clan_list)
   {
-    clan_list = new_new_clan;
-    end_clan_list = new_new_clan;
+    DC::getInstance()->clan_list = new_new_clan;
+    DC::getInstance()->end_clan_list = new_new_clan;
     return;
   }
 
-  plast = clan_list;
-  pcurr = clan_list->next;
+  plast = DC::getInstance()->clan_list;
+  pcurr = DC::getInstance()->clan_list->next;
 
   while (pcurr)
     if (pcurr->number > new_new_clan->number)
@@ -651,8 +648,8 @@ void add_clan(clan_data *new_new_clan)
       pcurr = pcurr->next;
     }
 
-  end_clan_list->next = new_new_clan;
-  end_clan_list = new_new_clan;
+  DC::getInstance()->end_clan_list->next = new_new_clan;
+  DC::getInstance()->end_clan_list = new_new_clan;
 }
 
 void free_member(struct clan_member_data *member)
@@ -667,29 +664,29 @@ void delete_clan(clan_data *dead_clan)
   struct clan_room_data *room = 0;
   struct clan_room_data *nextroom = 0;
 
-  if (!clan_list)
+  if (!DC::getInstance()->clan_list)
     return;
   if (!dead_clan)
     return;
 
-  if (clan_list == dead_clan)
+  if (DC::getInstance()->clan_list == dead_clan)
   {
-    if (dead_clan == end_clan_list) // Only 1 clan total
-      end_clan_list = 0;
-    clan_list = dead_clan->next;
+    if (dead_clan == DC::getInstance()->end_clan_list) // Only 1 clan total
+      DC::getInstance()->end_clan_list = 0;
+    DC::getInstance()->clan_list = dead_clan->next;
     delete dead_clan;
     return;
   }
 
   // This works since the first clan is not the dead_clan
-  curr = clan_list;
+  curr = DC::getInstance()->clan_list;
   while (curr)
     if (curr == dead_clan)
     {
       last->next = curr->next;
 
-      if ((curr = end_clan_list))
-        end_clan_list = last;
+      if ((curr = DC::getInstance()->end_clan_list))
+        DC::getInstance()->end_clan_list = last;
 
       if (dead_clan->rooms)
       {
@@ -768,7 +765,7 @@ clan_data *get_clan(int nClan)
   if (nClan == 0)
     return nullptr;
 
-  for (clan = clan_list; clan; clan = clan->next)
+  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     if (nClan == clan->number)
       return clan;
 
@@ -784,7 +781,7 @@ clan_data *get_clan(Character *ch)
 
   clan_data *clan;
 
-  for (clan = clan_list; clan; clan = clan->next)
+  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     if (ch->clan == clan->number)
       return clan;
 
@@ -1635,7 +1632,7 @@ void do_clan_list(Character *ch)
   }
 
   std::locale("en_US.UTF-8");
-  for (clan = clan_list; clan; clan = clan->next)
+  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
   {
     if (ch->getLevel() > 103)
     {
@@ -2729,7 +2726,7 @@ int do_whoclan(Character *ch, char *arg, int cmd)
   if (buf2[0])
     clan_num = atoi(buf2);
 
-  for (clan = clan_list; clan; clan = clan->next)
+  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
   {
     found = 0;
     if (clan_num && clan->number != clan_num)
@@ -2820,7 +2817,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(FUCK_GTHIEF))
+  if (isPlayerGoldThief())
   {
     send("Launder your money elsewhere, thief!\r\n");
     return eFAILURE;

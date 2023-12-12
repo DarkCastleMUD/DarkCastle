@@ -38,6 +38,7 @@ std::tuple<std::string, std::string> half_chop(std::string arguments, const char
 std::tuple<std::string, std::string> half_chop(const char *c_arg, const char token = ' ');
 std::tuple<QString, QString> half_chop(QString arguments, const char token = ' ');
 void chop_half(char *str, char *arg1, char *arg2);
+void update_max_who(void);
 void nanny(class Connection *d, std::string arg = "");
 bool is_abbrev(QString abbrev, QString word);
 // bool is_abbrev(const std::string &abbrev, const std::string &word);

@@ -37,8 +37,6 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
   class Connection d;
   Character *new_new;
 
-  void add_to_bard_list(Character * ch);
-
   if (arguments.isEmpty())
   {
     this->sendln("Linkload whom?");
@@ -63,7 +61,7 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
   new_new->desc = 0;
   auto &character_list = DC::getInstance()->character_list;
   character_list.insert(new_new);
-  add_to_bard_list(new_new);
+  new_new->add_to_bard_list();
 
   redo_hitpoints(new_new);
   redo_mana(new_new);

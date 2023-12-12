@@ -34,8 +34,6 @@ extern "C"
 #include <algorithm>
 #include <fmt/format.h>
 
-
-
 extern Object *object_list;
 
 extern struct index_data *obj_index;
@@ -1217,7 +1215,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       return eFAILURE;
    if (!obj->table)
       create_table(obj);
-   if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
    {
       ch->sendln("You cannot play blackjack while you are flagged as naughty.");
       return eSUCCESS;
@@ -2326,7 +2324,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
    if (!ch || IS_NPC(ch))
       return eFAILURE;
 
-   if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
    {
       ch->sendln("You cannot play the slots while you are flagged as naughty.");
       return eSUCCESS;
@@ -2763,9 +2761,9 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       return eFAILURE;
    if (!obj->wheel)
       create_wheel(obj);
-   if (IS_AFFECTED(ch, AFF_CANTQUIT) ||
-       affected_by_spell(ch, FUCK_PTHIEF) ||
-       affected_by_spell(ch, FUCK_GTHIEF))
+   if (ch->isPlayerCantQuit() ||
+       ch->isPlayerObjectThief() ||
+       ch->isPlayerGoldThief())
    {
       ch->sendln("You cannot play roulette while you are flagged as naughty.");
       return eSUCCESS;

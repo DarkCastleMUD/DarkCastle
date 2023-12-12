@@ -1465,7 +1465,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    learn_skill(vict, skillnum, 1, 1);
+    vict->learn_skill(skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
@@ -1515,7 +1515,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    learn_skill(vict, skillnum, i, i);
+    vict->learn_skill(skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
     logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);

@@ -66,7 +66,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
+  if (ch->affected_by_spell(SKILL_HARM_TOUCH) && ch->getLevel()<= IMMORTAL)
   {
     ch->sendln("You have not spend enough time in devotion to your god to warrant such a favor yet.");
     return eFAILURE;
@@ -155,7 +155,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
   //     return eFAILURE;
   //   }
 
-  if (affected_by_spell(ch, SKILL_LAY_HANDS))
+  if (ch->affected_by_spell(SKILL_LAY_HANDS))
   {
     ch->sendln("You have not spent enough time in devotion to your god to warrant such a favor yet.");
     return eFAILURE;

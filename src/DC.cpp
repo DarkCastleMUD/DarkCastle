@@ -17,7 +17,7 @@ const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 extern struct index_data *obj_index;
 
 DC::DC(int &argc, char **argv)
-	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global())
+	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
 {
 	// ssh = QSharedPointer<SSH::SSH>(new SSH::SSH);
 }

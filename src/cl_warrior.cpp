@@ -94,8 +94,8 @@ int do_kick(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your kick coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's kick coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -259,8 +259,8 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -294,7 +294,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
-    if (affected_by_spell(ch, SPELL_IRON_ROOTS))
+    if (ch->affected_by_spell(SPELL_IRON_ROOTS))
       ch->sendln("The roots bracing your legs make it impossible to run!");
     else
       ch->sendln("Your legs are too tired for running away!");
@@ -511,7 +511,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_IRON_ROOTS))
+  if (victim->affected_by_spell(SPELL_IRON_ROOTS))
   {
     act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n bashes you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
@@ -564,7 +564,7 @@ int do_bash(Character *ch, char *argument, int cmd)
     break;
   }
 
-  int stat_mod = get_stat(ch, attribute_t::STRENGTH) - get_stat(victim, attribute_t::STRENGTH);
+  int stat_mod = ch->get_stat(attribute_t::STRENGTH) - victim->get_stat(attribute_t::STRENGTH);
   if (stat_mod > 10)
     stat_mod = 10;
   if (stat_mod < -10)
@@ -582,8 +582,8 @@ int do_bash(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       act("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_VICT, 0);
@@ -914,7 +914,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_BLADESHIELD) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_BLADESHIELD) && ch->getLevel() < IMMORTAL)
   {
     ch->sendln("Your body is still recovering from your last use of the blade shield technique.");
     return eFAILURE;
@@ -1129,7 +1129,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_TACTICS_TIMER))
+  if (ch->affected_by_spell(SKILL_TACTICS_TIMER))
   {
     ch->sendln("You will need more time to work out your tactics.");
     return eFAILURE;
@@ -1229,7 +1229,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (affected_by_spell(ch, SKILL_MAKE_CAMP_TIMER))
+  if (ch->affected_by_spell(SKILL_MAKE_CAMP_TIMER))
   {
     ch->sendln("You cannot make another camp so soon.");
     return eFAILURE;
@@ -1245,7 +1245,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   {
     next_i = i->next_in_room;
 
-    if (affected_by_spell(i, SKILL_MAKE_CAMP))
+    if (i->affected_by_spell(SKILL_MAKE_CAMP))
     {
       ch->sendln("There is already a camp setup here.");
       return eFAILURE;
@@ -1285,7 +1285,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     {
       next_i = i->next_in_room;
 
-      if (!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
+      if (!i->affected_by_spell(SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT))
       {
         af.type = SPELL_FARSIGHT;
         af.duration = -1;
@@ -1318,7 +1318,7 @@ int do_triage(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_TRIAGE_TIMER))
+  if (ch->affected_by_spell(SKILL_TRIAGE_TIMER))
   {
     ch->sendln("You cannot take care of your battle wounds again so soon.");
     return eFAILURE;
@@ -1443,7 +1443,7 @@ int do_smite(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_SMITE_TIMER))
+  if (ch->affected_by_spell(SKILL_SMITE_TIMER))
   {
     ch->sendln("You cannot smite your enemies again so soon.");
     return eFAILURE;
@@ -1507,7 +1507,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_LEADERSHIP))
+  if (ch->affected_by_spell(SKILL_LEADERSHIP))
   {
     ch->sendln("You and your followers are already inspired.");
     return eFAILURE;
@@ -1639,7 +1639,7 @@ int do_onslaught(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_ONSLAUGHT_TIMER))
+  if (ch->affected_by_spell(SKILL_ONSLAUGHT_TIMER))
   {
     ch->sendln("You have not yet recovered from your previous onslaught attempt.");
     return eFAILURE;

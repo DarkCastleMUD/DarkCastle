@@ -76,7 +76,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
   }
 
-  if ((IS_NPC(ch) || affected_by_spell(ch, OBJ_CHAMPFLAG_TIMER)) && obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
+  if ((IS_NPC(ch) || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER))&& obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
   {
     ch->sendln("No champion flag for you, two years!");
     return;
@@ -100,15 +100,15 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
-        pthiefaf.type = FUCK_PTHIEF;
+        pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
         pthiefaf.duration = 10;
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
 
-        if (affected_by_spell(ch, FUCK_PTHIEF))
+        if (ch->isPlayerObjectThief())
         {
-          affect_from_char(ch, FUCK_PTHIEF);
+          affect_from_char(ch, Character::PLAYER_OBJECT_THIEF);
           affect_to_char(ch, &pthiefaf);
         }
         else
@@ -121,7 +121,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       {
         struct affected_type pthiefaf;
 
-        pthiefaf.type = FUCK_GTHIEF;
+        pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
@@ -133,9 +133,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
         logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
 
-        if (affected_by_spell(ch, FUCK_GTHIEF))
+        if (ch->isPlayerGoldThief())
         {
-          affect_from_char(ch, FUCK_GTHIEF);
+          affect_from_char(ch, Character::PLAYER_GOLD_THIEF);
           affect_to_char(ch, &pthiefaf);
         }
         else
@@ -914,7 +914,7 @@ int do_get(Character *ch, char *argument, int cmd)
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
                     struct affected_type pthiefaf;
 
-                    pthiefaf.type = FUCK_PTHIEF;
+                    pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
                     pthiefaf.duration = 10;
                     pthiefaf.modifier = 0;
                     pthiefaf.location = APPLY_NONE;
@@ -922,9 +922,9 @@ int do_get(Character *ch, char *argument, int cmd)
 
                     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
                     ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
-                    if (affected_by_spell(ch, FUCK_PTHIEF))
+                    if (ch->isPlayerObjectThief())
                     {
-                      affect_from_char(ch, FUCK_PTHIEF);
+                      affect_from_char(ch, Character::PLAYER_OBJECT_THIEF);
                       affect_to_char(ch, &pthiefaf);
                     }
                     else
@@ -1122,7 +1122,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   if (is_number(arg))
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1181,7 +1181,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
-        if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+        if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1249,7 +1249,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       if (tmp_object)
       {
 
-        if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+        if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1615,7 +1615,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, FUCK_PTHIEF))
+  if (ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal actions prohibit it.");
     return eFAILURE;
@@ -1624,7 +1624,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1791,7 +1791,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1853,7 +1853,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc)
+  if (!IS_MOB(ch) && ch->isPlayerObjectThief()&& !vict->desc)
   {
     ch->sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;
@@ -2685,15 +2685,15 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
-        pthiefaf.type = FUCK_PTHIEF;
+        pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
         pthiefaf.duration = 10;
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
         pthiefaf.bitvector = -1;
 
-        if (affected_by_spell(ch, FUCK_PTHIEF))
+        if (ch->isPlayerObjectThief())
         {
-          affect_from_char(ch, FUCK_PTHIEF);
+          affect_from_char(ch, Character::PLAYER_OBJECT_THIEF);
           affect_to_char(ch, &pthiefaf);
         }
         else
@@ -2706,7 +2706,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       {
         struct affected_type pthiefaf;
 
-        pthiefaf.type = FUCK_GTHIEF;
+        pthiefaf.type = Character::PLAYER_GOLD_THIEF;
         pthiefaf.duration = 10;
         pthiefaf.modifier = 0;
         pthiefaf.location = APPLY_NONE;
@@ -2714,9 +2714,9 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
-        if (affected_by_spell(ch, FUCK_GTHIEF))
+        if (ch->isPlayerGoldThief())
         {
-          affect_from_char(ch, FUCK_GTHIEF);
+          affect_from_char(ch, Character::PLAYER_GOLD_THIEF);
           affect_to_char(ch, &pthiefaf);
         }
         else

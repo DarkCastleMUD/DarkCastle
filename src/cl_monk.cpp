@@ -131,7 +131,7 @@ int do_quivering_palm(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, SKILL_QUIVERING_PALM))
+  if (ch->affected_by_spell(SKILL_QUIVERING_PALM))
   {
     send_to_char("You can't perform such an ancient power more than "
                  "once a day!\n\r",
@@ -436,8 +436,8 @@ int do_stun(Character *ch, char *argument, int cmd)
     }
 
     act_return ar;
-    if (affected_by_spell(victim, SKILL_BATTLESENSE) &&
-        number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE)&&
+        number(1, 100) <victim->affected_by_spell( SKILL_BATTLESENSE)->modifier)
     {
       ar = act("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, TO_CHAR, 0);
       retval = ar.retval;

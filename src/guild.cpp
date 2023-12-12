@@ -19,11 +19,9 @@
 #include "sing.h"
 #include "handler.h"
 #include "const.h"
+#include "guild.h"
 
 extern std::vector<profession> professions;
-
-int get_max(Character *ch, int skill);
-int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 
 int do_practice(Character *ch, char *arg, int cmd)
 {
@@ -44,7 +42,7 @@ int do_practice(Character *ch, char *arg, int cmd)
 int do_profession(Character *ch, char *args, int cmdnum)
 {
   // Command is enabled by giving someone the profession skill
-  if (!ch->has_skill( SKILL_PROFESSION))
+  if (!ch->has_skill(SKILL_PROFESSION))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -180,17 +178,17 @@ char *how_good(int percent)
 
 // return a 1 if I just learned skill for first time
 // else 0
-int learn_skill(Character *ch, int skill, int amount, int maximum)
+int Character::learn_skill(int skill, int amount, int maximum)
 {
-  if (ch->skills.contains(skill))
+  if (skills.contains(skill))
   {
-    auto &learned = ch->getSkill(skill).learned;
+    auto &learned = getSkill(skill).learned;
     auto old = learned;
     learned += amount;
 
     if (skill == SKILL_MAGIC_RESIST)
     {
-      barb_magic_resist(ch, old, learned);
+      barb_magic_resist(this, old, learned);
     }
 
     if (learned > maximum)
@@ -202,10 +200,10 @@ int learn_skill(Character *ch, int skill, int amount, int maximum)
   {
     if (skill == SKILL_MAGIC_RESIST)
     {
-      barb_magic_resist(ch, 0, amount);
+      barb_magic_resist(this, 0, amount);
     }
-    ch->setSkill(skill, amount);
-    prepare_character_for_sixty(ch);
+    setSkill(skill, amount);
+    prepare_character_for_sixty(this);
     return true;
   }
 
@@ -273,11 +271,6 @@ class_skill_defines *Character::get_skill_list(void)
     break;
   }
   return skilllist;
-}
-
-class_skill_defines *get_skill_list(Character *ch)
-{
-  return ch->get_skill_list();
 }
 
 char *attrstring(int attr)
@@ -488,31 +481,26 @@ int Character::skillmax(int skill, int eh)
   return eh;
 }
 
-int skillmax(Character *ch, int skill, int eh)
+char Character::charthing(int known, int skill, int maximum)
 {
-  return ch->skillmax(skill, eh);
-}
-
-char charthing(Character *ch, int known, int skill, int maximum)
-{
-  if (get_max(ch, skill) <= known)
+  if (get_max(skill) <= known)
     return '*';
   if (known >= maximum / 2)
     return '=';
   return '+';
 }
 
-void output_praclist(Character *ch, class_skill_defines *skilllist)
+void Character::output_praclist(class_skill_defines *skilllist)
 {
   int known, last_profession = 0;
   char buf[MAX_STRING_LENGTH];
   for (int i = 0; *skilllist[i].skillname != '\n'; i++)
   {
-    known = ch->has_skill( skilllist[i].skillnum);
-    if (!known && ch->getLevel() < skilllist[i].levelavailable)
+    known = has_skill(skilllist[i].skillnum);
+    if (!known && getLevel() < skilllist[i].levelavailable)
       continue;
 
-    if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->player->profession)
+    if (IS_PC(this) && skilllist[i].group > 0 && skilllist[i].group != player->profession)
     {
       continue;
     }
@@ -521,169 +509,169 @@ void output_praclist(Character *ch, class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(ch, "\n\r$B%s Profession Skills:$R\n\r", find_profession(ch->c_class, skilllist[i].group));
-        ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
-        ch->sendln("--------------------------------------------------------------------------------");
+        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group));
+        sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+        sendln("--------------------------------------------------------------------------------");
       }
     }
 
     quint64 self_learn_max = skilllist[i].maximum * 0.5;
-    if (ch->getLevel() * 2 < self_learn_max)
+    if (getLevel() * 2 < self_learn_max)
     {
-      self_learn_max = ch->getLevel() * 2;
+      self_learn_max = getLevel() * 2;
     }
 
     sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
-            per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(ch, skilllist[i].skillnum));
-    ch->send(buf);
+            per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
+    send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
     {
-      if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
+      if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(this) == CLASS_CLERIC)
         sprintf(buf, "Mana: $B%3d$R ", 150);
       else
-        sprintf(buf, "Mana: $B%3d$R ", use_mana(ch, skilllist[i].skillnum));
-      ch->send(buf);
+        sprintf(buf, "Mana: $B%3d$R ", use_mana(this, skilllist[i].skillnum));
+      send(buf);
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
       extern struct song_info_type song_info[];
-      ch->send(QString("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski,3));
+      send(QString("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski, 3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
       extern struct ki_info_type ki_info[];
-      ch->send(QString("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski,3));
+      send(QString("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski, 3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {
-      ch->send(QString("Move: $B%1$R ").arg(2,3));
+      send(QString("Move: $B%1$R ").arg(2, 3));
     }
     else if (skilllist[i].skillnum == 320) // switch
     {
-      ch->send(QString("Move: $B%1$R ").arg(4,3));
+      send(QString("Move: $B%1$R ").arg(4, 3));
     }
     else if (skilllist[i].skillnum == 319) // consider
     {
-      ch->send(QString("Move: $B%1$R ").arg(5,3));
+      send(QString("Move: $B%1$R ").arg(5, 3));
     }
     else if (skilllist[i].skillnum == 368) // release
     {
-      ch->send(QString("Move: $B%1$R ").arg(25,3));
+      send(QString("Move: $B%1$R ").arg(25, 3));
     }
     else if (skilllist[i].skillnum == 380) // fire arrows
     {
-      ch->send(QString("Mana: $B%1$R ").arg(30,3));
+      send(QString("Mana: $B%1$R ").arg(30, 3));
     }
     else if (skilllist[i].skillnum == 381) // ice arrows
     {
-      ch->send(QString("Mana: $B%1$R ").arg(20,3));
+      send(QString("Mana: $B%1$R ").arg(20, 3));
     }
     else if (skilllist[i].skillnum == 382) // tempest arrows
     {
-      ch->send(QString("Mana: $B%1$R ").arg(10,3));
+      send(QString("Mana: $B%1$R ").arg(10, 3));
     }
     else if (skilllist[i].skillnum == 383) // granite arrows
     {
-      ch->send(QString("Mana: $B%1$R ").arg(40,3));
+      send(QString("Mana: $B%1$R ").arg(40, 3));
     }
     else if (skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
     {
-      ch->send(QString("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second,3));
+      send(QString("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
     }
     else
-      ch->send("          ");
+      send("          ");
     if (skilllist[i].attrs)
     {
       if (skilllist != g_skills)
       {
-        sprintf(buf, " %s", attrname(GET_CLASS(ch), skilllist[i].attrs));
-        ch->send(buf);
+        sprintf(buf, " %s", attrname(GET_CLASS(this), skilllist[i].attrs));
+        send(buf);
       }
       else
-        ch->send(" General");
+        send(" General");
     }
     if (skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK)
     {
-      ch->sendln("$B        #$R");
+      sendln("$B        #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE)
     {
-      ch->sendln("$B  #$R");
+      sendln("$B  #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG)
     {
-      ch->sendln("$B    #$R");
+      sendln("$B    #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN)
     {
-      ch->sendln("$B  #$R");
+      sendln("$B  #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE)
     {
-      ch->sendln("$B      #$R");
+      sendln("$B      #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY)
     {
-      ch->sendln("$B        #$R");
+      sendln("$B        #$R");
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO)
     {
-      ch->sendln("$B        #$R");
+      sendln("$B        #$R");
     }
     else
-      ch->sendln("");
+      sendln("");
   }
 }
 
-int skills_guild(Character *ch, const char *arg, Character *owner)
+int Character::skills_guild(const char *arg, Character *owner)
 {
   char buf[160];
   int known, x;
   int skillnumber;
   int percent;
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
     return eFAILURE;
 
-  class_skill_defines *skilllist = get_skill_list(ch);
+  class_skill_defines *skilllist = get_skill_list();
 
   if (!skilllist)
     return eFAILURE; // no skills to train
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
-    ch->send(buf);
-    ch->sendln("You can practice any of these skills:\n\r");
+    sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
+    send(buf);
+    sendln("You can practice any of these skills:\n\r");
 
-    ch->sendln("$BUniversal skills:$R");
-    ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
-    ch->sendln("--------------------------------------------------------------------------------");
-    output_praclist(ch, g_skills);
+    sendln("$BUniversal skills:$R");
+    sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+    sendln("--------------------------------------------------------------------------------");
+    output_praclist(g_skills);
 
-    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1 + pc_clss_types[GET_CLASS(ch)]));
-    ch->send(buf);
+    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
+    send(buf);
 
-    if (GET_CLASS(ch) != CLASS_MONK)
-      ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+    if (GET_CLASS(this) != CLASS_MONK)
+      sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
     else
-      ch->sendln(" Ability:                Current/Practice/Autolearn  Cost:     Style:");
+      sendln(" Ability:                Current/Practice/Autolearn  Cost:     Style:");
 
-    ch->sendln("--------------------------------------------------------------------------------");
+    sendln("--------------------------------------------------------------------------------");
 
-    output_praclist(ch, skilllist);
+    output_praclist(skilllist);
 
-    ch->sendln("");
+    sendln("");
 
-    if (GET_CLASS(ch) == CLASS_BARD)
-      ch->sendln("$B#$R denotes a song which requires an instrument.");
+    if (GET_CLASS(this) == CLASS_BARD)
+      sendln("$B#$R denotes a song which requires an instrument.");
 
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) == position_t::SLEEPING)
+  if (GET_POS(this) == position_t::SLEEPING)
   {
-    ch->sendln("You cannot practice in your sleep.");
+    sendln("You cannot practice in your sleep.");
     return eSUCCESS;
   }
   skillnumber = search_skills(arg, skilllist);
@@ -693,19 +681,19 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     return eFAILURE;
   }
 
-  if (ch->getLevel() < skilllist[skillnumber].levelavailable)
+  if (getLevel() < skilllist[skillnumber].levelavailable)
   {
-    ch->sendln("You aren't advanced enough for that yet.");
+    sendln("You aren't advanced enough for that yet.");
     return eSUCCESS;
   }
 
   x = skilllist[skillnumber].skillnum;
-  known = ch->has_skill( x);
+  known = has_skill(x);
 
   // we can only train them if they already know it, or if we're the trainer for that skill
   if (!known)
   {
-    if (GET_CLASS(ch) != GET_CLASS(owner))
+    if (GET_CLASS(this) != GET_CLASS(owner))
     {
       do_say(owner, "I am sorry, I cannot teach you that.  You will have to find another trainer.", 9);
       return eSUCCESS;
@@ -713,9 +701,9 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     else
     {
       struct skill_quest *sq;
-      if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && DC::isSet(sq->clas, 1 << (GET_CLASS(ch) - 1)))
+      if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && DC::isSet(sq->clas, 1 << (GET_CLASS(this) - 1)))
       {
-        mprog_driver(sq->message, owner, ch, nullptr, nullptr, nullptr, nullptr);
+        mprog_driver(sq->message, owner, this, nullptr, nullptr, nullptr, nullptr);
         switch (skillnumber)
         {
         case SPELL_VAMPIRIC_AURA:
@@ -740,19 +728,19 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
     }
 
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
-    if (skilllist[skillnumber].group && IS_PC(ch) && skilllist[skillnumber].group != ch->player->profession)
+    if (skilllist[skillnumber].group && IS_PC(this) && skilllist[skillnumber].group != player->profession)
     {
-      csendf(ch, "You must join the %s profession in order to learn that.\r\n", find_profession(ch->c_class, skilllist[skillnumber].group));
+      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
       return eSUCCESS;
     }
   }
-  if (ch->player->practices <= 0)
+  if (player->practices <= 0)
   {
-    ch->sendln("You do not seem to be able to practice now.");
+    sendln("You do not seem to be able to practice now.");
     return eSUCCESS;
   }
 
-  if (known >= get_max(ch, x))
+  if (known >= get_max(x))
   {
     do_emote(owner, "eyes you up and down.", CMD_DEFAULT);
     do_say(owner, "Taking into account your current attributes, your", 9);
@@ -762,20 +750,20 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    ch->sendln("You are already learned in this area.");
+    sendln("You are already learned in this area.");
     return eSUCCESS;
   }
   float maxlearn = (float)skilllist[skillnumber].maximum;
   maxlearn *= 0.5;
 
-  if (known >= (ch->getLevel() * 2))
+  if (known >= (getLevel() * 2))
   {
-    ch->sendln("You are not experienced enough to practice that any further right now.");
+    sendln("You are not experienced enough to practice that any further right now.");
     return eSUCCESS;
   }
   if (known >= maxlearn)
   {
-    ch->sendln("You cannot learn more here.. you need to go out into the world and use it.");
+    sendln("You cannot learn more here.. you need to go out into the world and use it.");
     return eSUCCESS;
   }
   switch (skillnumber)
@@ -799,7 +787,7 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
   }
 
   if (!known)
-    switch (GET_CLASS(ch))
+    switch (GET_CLASS(this))
     {
     case CLASS_WARRIOR:
       do_say(owner, "Yar! I can be teachin' ye that skill myself! It should only take but a moment.", 9);
@@ -836,24 +824,23 @@ int skills_guild(Character *ch, const char *arg, Character *owner)
       break;
     }
 
-  ch->sendln("You practice for a while...");
-  ch->player->practices--;
+  sendln("You practice for a while...");
+  player->practices--;
 
-  percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
+  percent = 1 + (int)int_app[GET_INT(this)].learn_bonus;
 
-  learn_skill(ch, x, percent, skilllist[skillnumber].maximum);
+  learn_skill(x, percent, skilllist[skillnumber].maximum);
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    ch->sendln("You are now learned in this area.");
+    sendln("You are now learned in this area.");
     return eSUCCESS;
   }
 
   return eSUCCESS;
 }
 
-int guild(Character *ch, class Object *obj, int cmd, const char *arg,
-          Character *owner)
+int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   int64_t exp_needed;
   int x = 0;
@@ -908,7 +895,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
         skl = SKILL_SONG_HYPNOTIC_HARMONY;
         break;
       }
-      if (!ch->has_skill( skl))
+      if (!ch->has_skill(skl))
       {
         ch->sendln("You need to learn your Quest Skill before you can progress further.");
         return eSUCCESS;
@@ -980,7 +967,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     }
 
     ch->sendln("Your profession skills have been reset.");
-    struct class_skill_defines *class_skills = get_skill_list(ch);
+    struct class_skill_defines *class_skills = ch->get_skill_list();
     struct char_skill_data *skill;
 
     for (int i = 0; *class_skills[i].skillname != '\n'; i++)
@@ -1016,28 +1003,27 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (!*arg)
   {
-    skills_guild(ch, arg, owner);
+    ch->skills_guild(arg, owner);
   }
   else
   {
-    if (DC::isSet(skills_guild(ch, arg, owner), eSUCCESS))
+    if (DC::isSet(ch->skills_guild(arg, owner), eSUCCESS))
       return eSUCCESS;
     else if (search_skills(arg, g_skills) != -1)
-      do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", CMD_DEFAULT);
+      do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn ch ability.", CMD_DEFAULT);
     else
-      ch->sendln("You do not know of this ability...");
+      ch->sendln("You do not know of ch ability...");
   }
 
   return eSUCCESS;
 }
 
-int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
-                 Character *invoker)
+int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
 {
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;
   int learned = 0;
-  class_skill_defines *skilllist = get_skill_list(ch);
+  class_skill_defines *skilllist = ch->get_skill_list();
 
   if (IS_MOB(ch))
   {
@@ -1110,7 +1096,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
       //     do_say(invoker,"Just \"buy questskill\" to obtain it.",9);
       return eSUCCESS;
     }
-    if (ch->has_skill( skl))
+    if (ch->has_skill(skl))
     {
       do_say(invoker, "I cannot teach you anything further.", 9);
       return eSUCCESS;
@@ -1122,7 +1108,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     }
     GET_PLATINUM(ch) -= 2000;
     do_say(invoker, "Okay, you've got a deal!", 9);
-    learn_skill(ch, skl, 1, 1);
+    ch->learn_skill(skl, 1, 1);
 
     extern void prepare_character_for_sixty(Character * ch);
     prepare_character_for_sixty(ch);
@@ -1132,7 +1118,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
-      learn_skill(ch, SPELL_RELEASE_ELEMENTAL, 1, 1);
+      ch->learn_skill(SPELL_RELEASE_ELEMENTAL, 1, 1);
       sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL));
       ch->send(buf);
       break;
@@ -1147,7 +1133,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     ch->sendln("You can practice any of these skills:");
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
     {
-      int known = ch->has_skill( g_skills[i].skillnum);
+      int known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
       sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
@@ -1165,7 +1151,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.", CMD_DEFAULT);
     else
-      ch->sendln("You do not know of this skill...");
+      ch->sendln("You do not know of ch skill...");
     return eSUCCESS;
   }
 
@@ -1174,11 +1160,11 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
     ch->sendln("You do not seem to be able to practice now.");
     return eSUCCESS;
   }
-  learned = ch->has_skill( g_skills[number].skillnum);
+  learned = ch->has_skill(g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
-    ch->sendln("You are already learned in this area.");
+    ch->sendln("You are already learned in ch area.");
     return eSUCCESS;
   }
   if (learned >= (ch->getLevel() * 3))
@@ -1192,74 +1178,74 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg,
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
 
-  learn_skill(ch, g_skills[number].skillnum, percent, g_skills[number].maximum);
-  learned = ch->has_skill( g_skills[number].skillnum);
+  ch->learn_skill(g_skills[number].skillnum, percent, g_skills[number].maximum);
+  learned = ch->has_skill(g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
-    ch->sendln("You are now learned in this area.");
+    ch->sendln("You are now learned in ch area.");
     return eSUCCESS;
   }
   return eSUCCESS;
 }
 
-int get_stat(Character *ch, attribute_t stat)
+int Character::get_stat(attribute_t stat)
 {
   switch (stat)
   {
   case attribute_t::STRENGTH:
-    return GET_RAW_STR(ch);
+    return GET_RAW_STR(this);
     break;
   case attribute_t::INTELLIGENCE:
-    return GET_RAW_INT(ch);
+    return GET_RAW_INT(this);
     break;
   case attribute_t::WISDOM:
-    return GET_RAW_WIS(ch);
+    return GET_RAW_WIS(this);
     break;
   case attribute_t::DEXTERITY:
-    return GET_RAW_DEX(ch);
+    return GET_RAW_DEX(this);
     break;
   case attribute_t::CONSTITUTION:
-    return GET_RAW_CON(ch);
+    return GET_RAW_CON(this);
     break;
   };
   return 0;
 }
 
-int get_stat_bonus(Character *ch, int stat)
+int Character::get_stat_bonus(int stat)
 {
   int bonus = 0;
   switch (stat)
   {
   case STRDEX:
-    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15);
+    bonus = MAX(0, get_stat(attribute_t::STRENGTH) - 15) + MAX(0, get_stat(attribute_t::DEXTERITY) - 15);
     break;
   case STRCON:
-    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15);
+    bonus = MAX(0, get_stat(attribute_t::STRENGTH) - 15) + MAX(0, get_stat(attribute_t::CONSTITUTION) - 15);
     break;
   case STRINT:
-    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(attribute_t::STRENGTH) - 15) + MAX(0, get_stat(attribute_t::INTELLIGENCE) - 15);
     break;
   case STRWIS:
-    bonus = MAX(0, get_stat(ch, attribute_t::STRENGTH) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
+    bonus = MAX(0, get_stat(attribute_t::STRENGTH) - 15) + MAX(0, get_stat(attribute_t::WISDOM) - 15);
     break;
   case DEXCON:
-    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15);
+    bonus = MAX(0, get_stat(attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(attribute_t::CONSTITUTION) - 15);
     break;
   case DEXINT:
-    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(attribute_t::INTELLIGENCE) - 15);
     break;
   case DEXWIS:
-    bonus = MAX(0, get_stat(ch, attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
+    bonus = MAX(0, get_stat(attribute_t::DEXTERITY) - 15) + MAX(0, get_stat(attribute_t::WISDOM) - 15);
     break;
   case CONINT:
-    bonus = MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15);
+    bonus = MAX(0, get_stat(attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(attribute_t::INTELLIGENCE) - 15);
     break;
   case CONWIS:
-    bonus = MAX(0, get_stat(ch, attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
+    bonus = MAX(0, get_stat(attribute_t::CONSTITUTION) - 15) + MAX(0, get_stat(attribute_t::WISDOM) - 15);
     break;
   case INTWIS:
-    bonus = MAX(0, get_stat(ch, attribute_t::INTELLIGENCE) - 15) + MAX(0, get_stat(ch, attribute_t::WISDOM) - 15);
+    bonus = MAX(0, get_stat(attribute_t::INTELLIGENCE) - 15) + MAX(0, get_stat(attribute_t::WISDOM) - 15);
     break;
   default:
     bonus = 0;
@@ -1274,37 +1260,37 @@ int get_stat_bonus(Character *ch, int stat)
 // object affects someone that doesn't have the skill is getting a
 // valid amount passed in.
 
-void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
+void Character::skill_increase_check(int skill, int learned, int difficulty)
 {
   int chance, maximum;
 
-  if (IS_MOB(ch))
+  if (IS_MOB(this))
   {
     return;
   }
 
-  if (ch->in_room < 1)
+  if (in_room < 1)
   {
     return;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
+  if (DC::isSet(DC::getInstance()->world[in_room].room_flags, NOLEARN))
   {
     return;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (DC::isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
   {
     return;
   }
 
   if (difficulty < 1)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
+    logf(IMMORTAL, LogChannels::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
-  if (skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  if (skill == SKILL_DODGE && affected_by_spell(SKILL_DEFENDERS_STANCE))
   {
     return;
   }
@@ -1314,7 +1300,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  learned = ch->has_skill( skill);
+  learned = has_skill(skill);
 
   // If we don't know the skill yet then we can't learn it any more
   if (learned < 1)
@@ -1323,12 +1309,12 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
   }
 
   // If we've already learned it 2*level or more then we can't learn it anymore until we gain more levels
-  if (learned >= (ch->getLevel() * 2))
+  if (learned >= (getLevel() * 2))
   {
     return;
   }
 
-  class_skill_defines *skilllist = get_skill_list(ch);
+  class_skill_defines *skilllist = get_skill_list();
   if (!skilllist)
   {
     return; // class has no skills by default
@@ -1367,7 +1353,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
 
   if (skilllist[i].attrs)
   {
-    percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
+    percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
   }
 
   percent = MIN(maximum, percent);
@@ -1399,7 +1385,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
       oi = 94;
     }
 
-    oi -= int_app[GET_INT(ch)].easy_bonus;
+    oi -= int_app[GET_INT(this)].easy_bonus;
     break;
   case SKILL_INCREASE_MEDIUM:
     if (oi == 101)
@@ -1407,7 +1393,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
       oi = 96;
     }
 
-    oi -= int_app[GET_INT(ch)].medium_bonus;
+    oi -= int_app[GET_INT(this)].medium_bonus;
     break;
   case SKILL_INCREASE_HARD:
     if (oi == 101)
@@ -1415,7 +1401,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
       oi = 98;
     }
 
-    oi -= int_app[GET_INT(ch)].hard_bonus;
+    oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
     logentry("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LogChannels::LOG_BUG);
@@ -1431,31 +1417,31 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
 
   if (!skillname)
   {
-    ch->send(QString("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
-    logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(ch), skill, learned, difficulty);
+    send(QString("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
+    logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }
 
   // increase the skill by one
-  learn_skill(ch, skill, 1, get_max(ch, skill));
-  learned = ch->has_skill( skill);
-  csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(ch, skill));
+  learn_skill(skill, 1, get_max(skill));
+  learned = has_skill(skill);
+  csendf(this, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(skill));
 }
 
-void verify_max_stats(Character *ch)
+void Character::verify_max_stats(void)
 {
-  for (auto &curr : ch->skills)
+  for (auto &curr : skills)
   {
-    if (get_max(ch, curr.first) && get_max(ch, curr.first) < curr.second.learned)
+    if (get_max(curr.first) && get_max(curr.first) < curr.second.learned)
     {
-      curr.second.learned = get_max(ch, curr.first);
+      curr.second.learned = get_max(curr.first);
     }
   }
 }
 
-int get_max(Character *ch, int skill)
+int Character::get_max(int skill)
 {
-  class_skill_defines *skilllist = get_skill_list(ch);
+  class_skill_defines *skilllist = get_skill_list();
   if (!skilllist)
     skilllist = g_skills;
 
@@ -1484,7 +1470,7 @@ int get_max(Character *ch, int skill)
   float percent = maximum * 0.75;
 
   if (maximum && skilllist[i].attrs)
-    percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
+    percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
 
   percent = MIN(maximum, percent);
   percent = MAX(maximum * 0.75, percent);
@@ -1492,10 +1478,10 @@ int get_max(Character *ch, int skill)
   return (int)percent;
 }
 
-void check_maxes(Character *ch)
+void Character::check_maxes(void)
 {
   int maximum;
-  class_skill_defines *skilllist = get_skill_list(ch);
+  class_skill_defines *skilllist = get_skill_list();
   if (!skilllist)
     return; // class has no skills by default
   maximum = 0;
@@ -1505,18 +1491,18 @@ void check_maxes(Character *ch)
     maximum = skilllist[i].maximum;
     float percent = maximum * 0.75;
     if (skilllist[i].attrs)
-      percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
+      percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
 
     percent = MIN(maximum, percent);
     percent = MAX(maximum * 0.75, percent);
 
     percent = (int)percent;
 
-    if (ch->has_skill( skilllist[i].skillnum) > percent)
+    if (has_skill(skilllist[i].skillnum) > percent)
     {
-      if (ch->skills.contains(skilllist[i].skillnum))
+      if (skills.contains(skilllist[i].skillnum))
       {
-        ch->skills[skilllist[i].skillnum].learned = (int)percent;
+        skills[skilllist[i].skillnum].learned = (int)percent;
       }
     }
   }
@@ -1527,18 +1513,18 @@ void check_maxes(Character *ch)
     maximum = skilllist[i].maximum;
     float percent = maximum * 0.75;
     if (skilllist[i].attrs)
-      percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
+      percent += maximum / 100.0 * get_stat_bonus(skilllist[i].attrs);
 
     percent = MIN(maximum, percent);
     percent = MAX(maximum * 0.75, percent);
 
     percent = (int)percent;
 
-    if (ch->has_skill( skilllist[i].skillnum) > percent)
+    if (has_skill(skilllist[i].skillnum) > percent)
     {
-      if (ch->skills.contains(skilllist[i].skillnum))
+      if (skills.contains(skilllist[i].skillnum))
       {
-        ch->skills[skilllist[i].skillnum].learned = (int)percent;
+        skills[skilllist[i].skillnum].learned = (int)percent;
       }
     }
   }

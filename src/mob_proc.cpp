@@ -209,8 +209,8 @@ void damage_all_players_in_room(Character *ch, int damage)
     if (vict->getLevel() >= IMMORTAL)
       continue;
 
-    if (affected_by_spell(vict, SPELL_DIVINE_INTER) && damage > affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier)
-      vict->removeHP(affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier);
+    if (vict->affected_by_spell(SPELL_DIVINE_INTER)&& damage >vict->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
+      vict->removeHP( vict->affected_by_spell( SPELL_DIVINE_INTER)->modifier);
     else
       vict->removeHP(damage); // Note -damage will HEAL the player
     update_pos(vict);
@@ -665,7 +665,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
           if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
         }
-        if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD))
+        if  (tch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
         {
           if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
@@ -917,7 +917,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       if (IS_IMMORTAL(ch))
       {
-        if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+        if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
         {
           ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
@@ -945,7 +945,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       else
       {
-        if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+        if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
         {
           act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
           ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
@@ -1100,7 +1100,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     }
   }
 
-  if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+  if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
   {
     act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
     ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
@@ -2021,7 +2021,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
       retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
       if (DC::isSet(retval, eCH_DIED))
         return retval;
-      if (!affected_by_spell(tmp_victim, SPELL_POISON))
+      if (!tmp_victim->affected_by_spell(SPELL_POISON))
         if (!DC::isSet(tmp_victim->immune, ISR_POISON))
         {
           af.type = SPELL_POISON;
@@ -2416,7 +2416,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
           if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
-        if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD))
+        if  (tch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
           if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
 

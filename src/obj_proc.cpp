@@ -764,8 +764,8 @@ int drainingstaff(Character *ch, class Object *obj, int cmd, char *arg,
     {
       dam = vict->getHP() - 1;
     }
-    if (affected_by_spell(vict, SPELL_DIVINE_FURY) && dam > affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier)
-      dam = affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier;
+    if (vict->affected_by_spell(SPELL_DIVINE_FURY)&& dam >vict->affected_by_spell( SPELL_DIVINE_FURY)->modifier)
+      dam =vict->affected_by_spell( SPELL_DIVINE_FURY)->modifier;
     vict->removeHP(dam);
     GET_MANA(ch) += dam;
   }
@@ -808,7 +808,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   /* deposit */
   if (cmd == CMD_DEPOSIT)
   {
-    if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
+    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1307,7 +1307,7 @@ int gazeofgaiot(Character *ch, class Object *obj, int cmd, const char *arg,
   if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
     return eFAILURE;
 
-  if (affected_by_spell(ch, SKILL_FEARGAZE))
+  if (ch->affected_by_spell(SKILL_FEARGAZE))
   {
     ch->sendln("You need to build up more hatred before you can unleash it again.");
     return eSUCCESS;
@@ -1361,9 +1361,6 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
   class Object *obj_object;
   int j;
 
-  class Object *get_object_in_equip_vis(Character * ch,
-                                        char *arg, class Object *equipment[], int *j, bool blindfighting);
-
   if (!cmd && obj) // This is where we recharge
     if (obj->obj_flags.value[3])
       obj->obj_flags.value[3]--;
@@ -1406,14 +1403,14 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     // changed to spell_type_potion so that the align check doesn't happen for this item
     //      cast_protection_from_evil(ch->getLevel(), ch, 0, SPELL_TYPE_POTION, ch, 0,
     // 50);
-    if (IS_AFFECTED(ch, AFF_PROTECT_EVIL) || affected_by_spell(ch, SPELL_PROTECT_FROM_GOOD))
+    if (IS_AFFECTED(ch, AFF_PROTECT_EVIL) ||ch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
     {
       ch->sendln("You already have alignment protection.");
       return eFAILURE;
     }
 
     struct affected_type af;
-    if (!affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL))
+    if (!ch->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     {
       af.type = SPELL_PROTECT_FROM_EVIL;
       af.duration = 5;
@@ -1429,7 +1426,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   else // cmd=69 (remove)
   {
-    obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, false);
+    obj_object = ch->get_object_in_equip_vis(arg1, ch->equipment, &j, false);
     if (!obj_object)
       return eFAILURE;
 
@@ -1439,7 +1436,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     if (obj_object->item_number != real_object(3611))
       return eFAILURE;
 
-    if (affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL))
+    if (ch->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
     {
       affect_from_char(ch, SPELL_PROTECT_FROM_EVIL);
       ch->sendln("The power drains away.");
@@ -1515,7 +1512,7 @@ void remove_eliara(Character *ch)
   if (!IS_AFFECTED(ch, AFF_SANCTUARY))
     return;
 
-  if (affected_by_spell(ch, SPELL_SANCTUARY))
+  if (ch->affected_by_spell(SPELL_SANCTUARY))
     return;
 
   act("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, TO_ROOM, 0);
@@ -3339,7 +3336,7 @@ int glove_combat_procs(Character *ch, class Object *obj, int cmd, char *arg,
       return eFAILURE;
     return spell_chill_touch(ch->getLevel(), ch, ch->fighting, nullptr, 50);
   case 21718:
-    if (affected_by_spell(ch, BASE_SETS + SET_SAIYAN))
+    if (ch->affected_by_spell(BASE_SETS + SET_SAIYAN))
     {
       if (number(0, 19))
         return eFAILURE;
@@ -4573,7 +4570,7 @@ int spellcraft_glyphs(Character *ch, class Object *obj, int cmd, const char *arg
     {
       send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
       ch->sendln("A beam of light hits you in the head!\n\rYou have learned spellcraft!");
-      learn_skill(ch, SKILL_SPELLCRAFT, 1, 1);
+      ch->learn_skill(SKILL_SPELLCRAFT, 1, 1);
     }
   }
   /*   if(ch->spellcraftglyph > 8) {
@@ -4669,8 +4666,8 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
 
   int dam = 100;
 
-  if (affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
-    dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
+  if (victim->affected_by_spell(SPELL_DIVINE_INTER)&& dam >victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
+    dam =victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier;
 
   victim->removeHP(dam, ch);
   ch->addHP(dam, victim);
@@ -4739,8 +4736,8 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
   Character *victim = ch->fighting;
   dam = number(50, dam);
 
-  if (affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
-    dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
+  if (victim->affected_by_spell(SPELL_DIVINE_INTER)&& dam >victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
+    dam =victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier;
   victim->removeHP(dam);
 
   update_pos(victim);
