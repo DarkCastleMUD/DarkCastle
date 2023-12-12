@@ -431,7 +431,7 @@ int do_get(Character *ch, char *argument, int cmd)
       // Ignore NO_TRADE items on a 'get all'
       if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < IMMORTAL)
       {
-        csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+        ch->send(QString("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
         continue;
       }
       if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
@@ -444,14 +444,14 @@ int do_get(Character *ch, char *argument, int cmd)
 
       if (obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
       {
-        csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+        ch->send(QString("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
         continue;
       }
 
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
-        csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+        ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
         continue;
       }
 
@@ -561,7 +561,7 @@ int do_get(Character *ch, char *argument, int cmd)
       if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
           !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
       {
-        csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+        ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
@@ -589,12 +589,12 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         if (ch->in_room != real_room(3099))
         {
-          csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+          ch->send(QString("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
           fail = true;
         }
         else
         {
-          csendf(ch, "The aura of the donation room allows you to pick up %s.\r\n", obj_object->short_description);
+          ch->send(QString("The aura of the donation room allows you to pick up %1.\r\n").arg(obj_object->short_description));
           get(ch, obj_object, sub_object, 0, cmd);
           ch->save(666);
           found = true;
@@ -698,14 +698,14 @@ int do_get(Character *ch, char *argument, int cmd)
           // Ignore NO_TRADE items on a 'get all'
           if (DC::isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
           {
-            csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+            ch->send(QString("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
             continue;
           }
 
           if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
               !isname(GET_NAME(ch), obj_object->name) && ch->getLevel() < IMPLEMENTER)
           {
-            csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+            ch->send(QString("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
             continue;
           }
 
@@ -733,7 +733,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   {
                     if (isname(obj_object->name, "thiefcorpse"))
                     {
-                      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+                      ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
                       extract_obj(obj_object);
                       continue;
                     }
@@ -751,7 +751,7 @@ int do_get(Character *ch, char *argument, int cmd)
 
                 if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
                 {
-                  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+                  ch->send(QString("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
                   continue;
                 }
 
@@ -871,7 +871,7 @@ int do_get(Character *ch, char *argument, int cmd)
 
           else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
           {
-            csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+            ch->send(QString("%1 is too powerful for you to possess.\r\n").arg(obj_object->short_description));
             fail = true;
           }
 
@@ -895,7 +895,7 @@ int do_get(Character *ch, char *argument, int cmd)
               {
                 if (isname("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isname("lootable", sub_object->name)))
                 {
-                  csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+                  ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
                   char log_buf[MAX_STRING_LENGTH] = {};
                   sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
@@ -1012,7 +1012,7 @@ int do_consent(Character *ch, char *arg, int cmd)
 
   if (!(vict = get_char_vis(ch, buf)))
   {
-    csendf(ch, "Consent whom?  You can't see any %s.\r\n", buf);
+    ch->send(QString("Consent whom?  You can't see any %1.\r\n").arg(buf));
     return eFAILURE;
   }
 
@@ -2372,7 +2372,7 @@ int do_open(Character *ch, char *argument, int cmd)
 
   if (found == false)
   {
-    csendf(ch, "I see no %s here.\r\n", type);
+    ch->send(QString("I see no %1 here.\r\n").arg(type));
   }
 
   // in case ch died or anything
@@ -2452,7 +2452,7 @@ int do_close(Character *ch, char *argument, int cmd)
 
   if (found == false)
   {
-    csendf(ch, "I see no %s here.\r\n", type);
+    ch->send(QString("I see no %1 here.\r\n").arg(type));
   }
 
   return eSUCCESS;

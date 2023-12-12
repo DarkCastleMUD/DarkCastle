@@ -1130,7 +1130,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 		{
 			if (tmp_char == ch)
 			{
-				csendf(ch, "You feel your Healing Melody soothing %d points of your health.\r\n", heal);
+				ch->send(QString("You feel your Healing Melody soothing %1 points of your health.\r\n").arg(heal));
 			}
 			else
 			{
@@ -1570,7 +1570,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
 		{
 			if (tmp_char == ch)
 			{
-				csendf(tmp_char, "You feel your Travelling March recover %d moves for you.\r\n", heal);
+				tmp_char->send(QString("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
 			}
 			else
 			{

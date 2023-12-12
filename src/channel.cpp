@@ -216,7 +216,7 @@ command_return_t do_psay(Character *ch, std::string argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
-    csendf(ch, "You see noone that goes by '%s' here.\r\n", vict);
+    ch->send(QString("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
     return eSUCCESS;
   }
 

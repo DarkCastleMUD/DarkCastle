@@ -98,7 +98,7 @@ int do_report(Character *ch, char *argument, int cmd)
       sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
-      csendf(ch, "You report: %s\n\r", report);
+      ch->send(QString("You report: %1\n\r").arg(report));
       return eSUCCESS;
     }
   }
@@ -121,7 +121,7 @@ int do_report(Character *ch, char *argument, int cmd)
   sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  csendf(ch, "You report: %s\n\r", report);
+  ch->send(QString("You report: %1\n\r").arg(report));
 
   return eSUCCESS;
 }

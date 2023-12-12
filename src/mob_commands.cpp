@@ -891,7 +891,7 @@ int do_mpxpreward(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-  csendf(vict, "You receive %d exps.\r\n", reward);
+  vict->send(QString("You receive %1 exps.\r\n").arg(reward));
   gain_exp(vict, reward);
   return eSUCCESS;
 }
@@ -1183,7 +1183,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
   int index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
-    csendf(victim, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
+    victim->send(QString("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
     return eFAILURE;
   }
 
@@ -2175,7 +2175,7 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   Character *vict;
   //  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
   //  vict = get_pc("Urizen");
-  //  if (vict) csendf(vict, "{%s}\r\n", arg);
+  //  if (vict) vict->send(QString("{%1}\r\n").arg(arg));
 
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];

@@ -284,17 +284,17 @@ int do_load(Character *ch, char *arg, int cmd)
 				Object *obj = (Object *)(obj_index[number].item);
 				if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
-					csendf(ch, "You cannot random load vnum %d because extra flag ITEM_SPECIAL is set.\r\n", num);
+					ch->send(QString("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 				else if (DC::isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
 				{
-					csendf(ch, "You cannnot random load vnum %d because extra flag ITEM_QUEST is set.\r\n", num);
+					ch->send(QString("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 				else if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
 				{
-					csendf(ch, "You cannot random load vnum %d because more flag ITEM_NO_CUSTOM is set.\r\n", num);
+					ch->send(QString("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 			}
@@ -1778,7 +1778,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 
-		csendf(ch, "$3Doors in game that use key %d$R:\r\n\r\n", count);
+		ch->send(QString("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
 		for (i = 0; i < top_of_world; i++)
 			for (nr = 0; nr < MAX_DIRS; nr++)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])

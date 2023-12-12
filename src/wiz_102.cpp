@@ -2507,10 +2507,10 @@ int do_oedit(Character *ch, char *argument, int cmd)
     x = create_blank_item(intval);
     if (x < 0)
     {
-      csendf(ch, "Could not create item '%d'.  Max index hit or obj already exists.\r\n", intval);
+      ch->send(QString("Could not create item '%1'.  Max index hit or obj already exists.\r\n").arg(intval));
       return eFAILURE;
     }
-    csendf(ch, "Item '%d' created successfully.\r\n", intval);
+    ch->send(QString("Item '%1' created successfully.\r\n").arg(intval));
     break;
   }
 
@@ -2780,7 +2780,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
 
     update_mobprog_bits(mob_num);
 
-    csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
+    ch->send(QString("New mobprog created as #%1.\r\n").arg(prog_num));
   }
   break;
 
@@ -4005,7 +4005,7 @@ int do_medit(Character *ch, char *argument, int cmd)
              intval);
       return eFAILURE;
     }
-    csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
+    ch->send(QString("Mobile '%1' created successfully.\r\n").arg(intval));
     ch->setPlayerLastMob(intval);
   }
   break;
@@ -4402,13 +4402,13 @@ int do_redit(Character *ch, char *argument, int cmd)
       if (create_one_room(ch, d))
       {
         c = real_room(d);
-        csendf(ch, "Creating room %d.\r\n", d);
+        ch->send(QString("Creating room %1.\r\n").arg(d));
       }
     }
 
     if (c == (-1))
     {
-      csendf(ch, "Error creating exit to room %d.\r\n", d);
+      ch->send(QString("Error creating exit to room %1.\r\n").arg(d));
       return eFAILURE;
     }
 
@@ -4477,7 +4477,7 @@ int do_redit(Character *ch, char *argument, int cmd)
             found = true;
             csendf(ch, "Extra description keywords:\r\n");
           }
-          csendf(ch, "%s\r\n", extra->keyword);
+          ch->send(QString("%1\r\n").arg(extra->keyword));
         }
       }
       if (found == false)
@@ -4510,7 +4510,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           {
             prev->next = extra->next;
           }
-          csendf(ch, "Extra description with keyword '%s' deleted.\r\n", extra->keyword);
+          ch->send(QString("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
           FREE(extra);
           deleted = true;
           // break out of for loop
@@ -4714,7 +4714,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         else
           DC::getInstance()->world[ch->in_room].denied = nd->next;
         dc_free(nd);
-        csendf(ch, "Mobile %d ALLOWED entrance.\r\n", mob);
+        ch->send(QString("Mobile %1 ALLOWED entrance.\r\n").arg(mob));
         done = true;
         break;
       }
@@ -4738,7 +4738,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     }
 
     DC::getInstance()->world[ch->in_room].denied = nd;
-    csendf(ch, "Mobile %d DENIED entrance.\r\n", mob);
+    ch->send(QString("Mobile %1 DENIED entrance.\r\n").arg(mob));
     break;
   }
   set_zone_modified_world(ch->in_room);
@@ -5488,7 +5488,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     if (a == 0)
       send_to_char("Mobiles Denied: ", ch);
     if (real_mobile(d->vnum) == -1)
-      csendf(ch, "UNKNOWN(%d)\r\n", d->vnum);
+      ch->send(QString("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
       csendf(ch, "%s(%d)\r\n", ((Character *)mob_index[real_mobile(d->vnum)].item)->short_desc, d->vnum);
     a++;

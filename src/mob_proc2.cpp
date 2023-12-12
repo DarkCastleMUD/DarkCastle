@@ -457,7 +457,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		cost = corpse_cost(ch);
 		cost /= 20000;
 		cost = MAX(cost, 30);
-		csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d platinum coins.\r\n", cost);
+		ch->send(QString("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
 		return eSUCCESS;
 	}
 

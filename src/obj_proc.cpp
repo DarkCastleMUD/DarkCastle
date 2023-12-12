@@ -465,7 +465,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     {
       if (tmp_char == ch)
       {
-        csendf(tmp_char, "You feel your Travelling March recover %d moves for you.\r\n", heal);
+        tmp_char->send(QString("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
       }
       else
       {
@@ -3285,7 +3285,7 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      csendf(obj->equipped_by, "The %s loses it's grip on your body.\r\n", obj->short_description);
+      obj->equipped_by->send(QString("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
     return eSUCCESS;
   }
   if (!cmd && obj->obj_flags.value[3] <= 0)
@@ -3299,7 +3299,7 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    csendf(obj->equipped_by, "The %s refuses to let you remove anything!\r\n", obj->short_description);
+    obj->equipped_by->send(QString("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
     return eSUCCESS;
   }
   return eFAILURE;
@@ -3560,7 +3560,7 @@ int eternitystaff(Character *ch, class Object *obj, int cmd, const char *arg,
     if (dam > 0)
     {
       GET_MANA(obj->equipped_by) -= dam;
-      csendf(obj->equipped_by, "Your body hemorrhages %d mana as you struggle to control The Eternity Staff.\r\n", dam);
+      obj->equipped_by->send(QString("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
 
       act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
     }

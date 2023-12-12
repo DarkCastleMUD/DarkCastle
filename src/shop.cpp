@@ -1337,7 +1337,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       *shop->sell_message = '\0';
     else
       strcpy(shop->sell_message, text);
-    csendf(ch, "Shop sell message changed to '%s'.\r\n", shop->sell_message);
+    ch->send(QString("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
     write_one_player_shop(shop); // save it
     break;
 
@@ -1404,9 +1404,9 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       count++;
       robj = real_object(item->item_vnum);
       if (robj < 0)
-        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, "INVALID ITEM NUMBER", item->price);
+        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
       else
-        csendf(ch, "%-3d$3)$R %-40s %d\r\n", count, ((Object *)obj_index[robj].item)->short_description, item->price);
+        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)obj_index[robj].item)->short_description, -40).arg(item->price));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))

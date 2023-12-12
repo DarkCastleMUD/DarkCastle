@@ -835,7 +835,7 @@ void mob_stat(Character *ch, Character *k)
 
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
-  csendf(ch, "$3Combat flags$R: %s\n\r", buf);
+  ch->send(QString("$3Combat flags$R: %1\n\r").arg(buf));
 
   if (!IS_MOB(k))
     display_punishes(ch, k);

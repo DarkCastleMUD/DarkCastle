@@ -85,11 +85,11 @@ char *Path::determineRoute(Character *ch, int from, int to)
   static char buf[MAX_STRING_LENGTH];
   buf[0] = 0;
   if (ch && ch->getLevel() >= 105)
-    csendf(ch, "# of steps: %d\r\n", i);
+    ch->send(QString("# of steps: %1\r\n").arg(i));
   resetPath();
   findRoom(from, to, 1, i, &buf[0]);
   if (ch && ch->getLevel() >= 105)
-    csendf(ch, "Best route: %s\r\n", buf);
+    ch->send(QString("Best route: %1\r\n").arg(buf));
 
   return &buf[0];
 }
@@ -285,7 +285,7 @@ int do_listPathsByZone(Character *ch, char *argument, int cmd)
     for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       if ((*iter).first >= low && (*iter).first <= high)
       {
-        csendf(ch, "Path '%s' connects to this zone.\r\n", p->name);
+        ch->send(QString("Path '%1' connects to this zone.\r\n").arg(p->name));
         struct path_data *pa;
         for (pa = p->p; pa; pa = pa->next)
           csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
@@ -305,7 +305,7 @@ int do_listAllPaths(Character *ch, char *argument, int cmd)
   bool found = false;
   for (p = mPathList; p; p = p->next)
   {
-    csendf(ch, "Path '%s'.\r\n", p->name);
+    ch->send(QString("Path '%1'.\r\n").arg(p->name));
     struct path_data *pa;
     for (pa = p->p; pa; pa = pa->next)
       csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
@@ -457,7 +457,7 @@ int do_pathpath(Character *ch, char *argument, int cmd)
   int i = 1000;
   leastPathSteps(pt, pt2, 1, &i);
 
-  csendf(ch, "Least # of steps: %d\r\n", i);
+  ch->send(QString("Least # of steps: %1\r\n").arg(i));
 
   if (i >= 50)
   {
@@ -565,7 +565,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   int i = 1000;
   leastPathSteps(start, stop, 1, &i);
 
-  csendf(ch, "Least # of steps: %d\r\n", i);
+  ch->send(QString("Least # of steps: %1\r\n").arg(i));
 
   if (i >= 50)
   {
@@ -609,7 +609,7 @@ int do_findpath(Character *ch, char *argument, int cmd)
     int i = atoi(arg1), z = atoi(arg2);
     if (!i || !z) { send_to_char("BLeh!\r\n",ch); return eFAILURE; }
     char *t =  findPath(i, z, ch);
-    csendf(ch, "Final Path: %s\r\n",t);
+    ch->send(QString("Final Path: %1\r\n").arg(t));
     return eSUCCESS;
   */
 }

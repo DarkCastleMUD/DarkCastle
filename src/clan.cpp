@@ -1858,7 +1858,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (get_clan(x) != nullptr)
     {
-      csendf(ch, "%d is an invalid clan number because it already exists.\r\n", x);
+      ch->send(QString("%1 is an invalid clan number because it already exists.\r\n").arg(x));
       return;
     }
 
@@ -2916,7 +2916,7 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
   }
   else
   {
-    csendf(ch, "You withdraw %d $B$5gold$R coins.\r\n", wdraw);
+    ch->send(QString("You withdraw %1 $B$5gold$R coins.\r\n").arg(wdraw));
   }
   save_clans();
   ch->save(0);

@@ -151,7 +151,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   // }
   // catch(char *errmsg)
   // {
-  //   csendf(ch, "Error encountered while finding zone exits:\r\n%s\r\n", errmsg);
+  //   ch->send(QString("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
   //   send_to_char("Ask Rubicon if it needs fixed...\r\n", ch);
   //   return eFAILURE;
   //}
@@ -259,7 +259,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
       }
       else
       {
-        csendf(ch, "You purloin %s.\r\n", k->short_description);
+        ch->send(QString("You purloin %1.\r\n").arg(k->short_description));
       }
       move_obj(k, ch);
       return eSUCCESS;

@@ -462,7 +462,7 @@ void meta_list_stats(Character *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::STRENGTH);
 	max_stat = get_max_stat(ch, attribute_t::STRENGTH);
 	if (ch->raw_str >= max_stat)
-		csendf(ch, "$B$31)$R Str:       Your strength is already %d.\r\n", max_stat);
+		ch->send(QString("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
 	else
 		csendf(ch, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
 			   (ch->raw_str + 1), xp_price, plat_cost);
@@ -471,7 +471,7 @@ void meta_list_stats(Character *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::DEXTERITY);
 	max_stat = get_max_stat(ch, attribute_t::DEXTERITY);
 	if (ch->raw_dex >= max_stat)
-		csendf(ch, "$B$32)$R Dex:       Your dexterity is already %d.\r\n", max_stat);
+		ch->send(QString("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
 	else
 		csendf(ch, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_dex + 1), xp_price, plat_cost);
@@ -480,7 +480,7 @@ void meta_list_stats(Character *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::CONSTITUTION);
 	max_stat = get_max_stat(ch, attribute_t::CONSTITUTION);
 	if (ch->raw_con >= max_stat)
-		csendf(ch, "$B$33)$R Con:       Your constitution is already %d.\r\n", max_stat);
+		ch->send(QString("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
 	else
 		csendf(ch, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_con + 1), xp_price, plat_cost);
@@ -489,7 +489,7 @@ void meta_list_stats(Character *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::INTELLIGENCE);
 	max_stat = get_max_stat(ch, attribute_t::INTELLIGENCE);
 	if (ch->raw_intel >= max_stat)
-		csendf(ch, "$B$34)$R Int:       Your intelligence is already %d.\r\n", max_stat);
+		ch->send(QString("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
 	else
 		csendf(ch, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_intel + 1), xp_price, plat_cost);
@@ -498,7 +498,7 @@ void meta_list_stats(Character *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, attribute_t::WISDOM);
 	max_stat = get_max_stat(ch, attribute_t::WISDOM);
 	if (ch->raw_wis >= max_stat)
-		csendf(ch, "$B$35)$R Wis:       Your wisdom is already %d.\r\n", max_stat);
+		ch->send(QString("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
 	else
 		csendf(ch, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_wis + 1), xp_price, plat_cost);
@@ -1708,7 +1708,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			}
 			else
 			{
-				csendf(ch, "$BYou must enter 'buy %d CONFIRM' if you are positive you wish to make this change!\r\n", choice);
+				ch->send(QString("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make this change!\r\n").arg(choice));
 				send_to_char("$4NOTE$R$B: Your attributes will be adjusted to fit this new race and then lowered by 2 points each.$R\r\n", ch);
 			}
 			return eSUCCESS;

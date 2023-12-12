@@ -31,7 +31,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
   if (!*buf)
     victim = ch;
   else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
-    csendf(ch, "Couldn't find '%s' anywhere.\r\n", argument);
+    ch->send(QString("Couldn't find '%1' anywhere.\r\n").arg(argument));
   if (victim)
   {
     for (af = victim->affected; af; af = afpk)
@@ -41,7 +41,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
       const char *aff_name = get_skill_name(af->type);
       if (aff_name)
       {
-        csendf(ch, "Removing %s affect.\r\n", aff_name);
+        ch->send(QString("Removing %1 affect.\r\n").arg(aff_name));
       }
       else
       {

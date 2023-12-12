@@ -201,7 +201,7 @@ int do_add_quest(Character *ch, char *name)
 
    quest_list.push_back(quest);
 
-   csendf(ch, "Quest number %d added.\n\r\n\r", quest->number);
+   ch->send(QString("Quest number %1 added.\n\r\n\r").arg(quest->number));
    show_quest_info(ch, quest->number);
 
    return eSUCCESS;
@@ -553,7 +553,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    price = quest->cost;
    if (GET_PLATINUM(ch) < price)
    {
-      csendf(ch, "You need %d platinum coins to start this quest, which you don't have!\n\r", price);
+      ch->send(QString("You need %1 platinum coins to start this quest, which you don't have!\n\r").arg(price));
       return eEXTRA_VAL2;
    }
 
@@ -773,7 +773,7 @@ void quest_update()
 
                      logf(IMMORTAL, LogChannels::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
-                     csendf(i, "Time has expired for %s.  This quest has ended.\r\n", quest->name);
+                     i->send(QString("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
                   }
                   i->player->quest_current_ticksleft[j]--;
                   break;
@@ -1364,53 +1364,53 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         csendf(ch, "Name changed from %s ", quest->name);
+         ch->send(QString("Name changed from %1 ").arg(quest->name));
          quest->name = str_hsh(field);
-         csendf(ch, "to %s.\r\n", quest->name);
+         ch->send(QString("to %1.\r\n").arg(quest->name));
       }
       break;
    case 1: // level
-      csendf(ch, "Level changed from %d ", quest->level);
+      ch->send(QString("Level changed from %1 ").arg(quest->level));
       quest->level = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->level);
+      ch->send(QString("to %1.\r\n").arg(quest->level));
       break;
    case 2: // objnum
-      csendf(ch, "Objnum changed from %d ", quest->objnum);
+      ch->send(QString("Objnum changed from %1 ").arg(quest->objnum));
       quest->objnum = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->objnum);
+      ch->send(QString("to %1.\r\n").arg(quest->objnum));
       break;
    case 3: // objshort
-      csendf(ch, "Objshort changed from %s ", quest->objshort);
+      ch->send(QString("Objshort changed from %1 ").arg(quest->objshort));
       sprintf(field, "%s %s", value, argument);
       quest->objshort = str_hsh(field);
-      csendf(ch, "to %s.\r\n", quest->objshort);
+      ch->send(QString("to %1.\r\n").arg(quest->objshort));
       break;
    case 4: // objlong
-      csendf(ch, "Objlong changed from %s ", quest->objlong);
+      ch->send(QString("Objlong changed from %1 ").arg(quest->objlong));
       sprintf(field, "%s %s", value, argument);
       quest->objlong = str_hsh(field);
-      csendf(ch, "to %s.\r\n", quest->objlong);
+      ch->send(QString("to %1.\r\n").arg(quest->objlong));
       break;
    case 5: // objkey
-      csendf(ch, "Objkey changed from %s ", quest->objkey);
+      ch->send(QString("Objkey changed from %1 ").arg(quest->objkey));
       sprintf(field, "%s %s", value, argument);
       quest->objkey = str_hsh(field);
-      csendf(ch, "to %s.\r\n", quest->objkey);
+      ch->send(QString("to %1.\r\n").arg(quest->objkey));
       break;
    case 6: // mobnum
-      csendf(ch, "Mobnum changed from %d ", quest->mobnum);
+      ch->send(QString("Mobnum changed from %1 ").arg(quest->mobnum));
       quest->mobnum = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->mobnum);
+      ch->send(QString("to %1.\r\n").arg(quest->mobnum));
       break;
    case 7: // timer
-      csendf(ch, "Timer changed from %d ", quest->timer);
+      ch->send(QString("Timer changed from %1 ").arg(quest->timer));
       quest->timer = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->timer);
+      ch->send(QString("to %1.\r\n").arg(quest->timer));
       break;
    case 8: // reward
-      csendf(ch, "Reward changed from %d ", quest->reward);
+      ch->send(QString("Reward changed from %1 ").arg(quest->reward));
       quest->reward = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->reward);
+      ch->send(QString("to %1.\r\n").arg(quest->reward));
       break;
    case 9: // hint1
       sprintf(field, "%s %s", value, argument);
@@ -1431,9 +1431,9 @@ int do_qedit(Character *ch, char *argument, int cmd)
       csendf(ch, "to %s.\r\n", quest->hint3);
       break;
    case 12: // cost
-      csendf(ch, "Cost changed from %d ", quest->cost);
+      ch->send(QString("Cost changed from %1 ").arg(quest->cost));
       quest->cost = atoi(value);
-      csendf(ch, "to %d.\r\n", quest->cost);
+      ch->send(QString("to %1.\r\n").arg(quest->cost));
       break;
    case 13: // brownie
       if (quest->brownie)

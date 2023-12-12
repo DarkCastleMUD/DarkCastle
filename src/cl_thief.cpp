@@ -1027,7 +1027,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
               (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
-            csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->short_description);
+            ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description));
             extract_obj(obj);
           }
           // check for no_trade inside containers

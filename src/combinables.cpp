@@ -191,7 +191,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   Object *reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  csendf(ch, "You succesfully make a %s!\r\n", reward->short_description);
+  ch->send(QString("You succesfully make a %1!\r\n").arg(reward->short_description));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return eSUCCESS;
@@ -233,7 +233,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   Object *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
-    csendf(ch, "You don't seem to have any %s.\r\n", vialarg);
+    ch->send(QString("You don't seem to have any %1.\r\n").arg(vialarg));
     return eFAILURE;
   }
 
@@ -247,7 +247,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 
   if (found < 0)
   {
-    csendf(ch, "The %s is not a valid weapon poison.\r\n", vial->short_description);
+    ch->send(QString("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
     return eFAILURE;
   }
 
@@ -278,7 +278,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 {
   if (!(container->contains))
   {
-    csendf(ch, "Your %s appears to be empty.\r\n", container->short_description);
+    ch->send(QString("Your %1 appears to be empty.\r\n").arg(container->short_description));
     return -2;
   }
 
@@ -391,7 +391,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
            break;
 
         default:
-           csendf(ch, "Unknown poison type %d.  Let a god know.\r\n", type);
+           ch->send(QString("Unknown poison type %1.  Let a god know.\r\n").arg(type));
            break;
      }
 
@@ -880,13 +880,13 @@ int Brew::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      csendf(ch, "Recipe # %d has been removed.\r\n", target);
+      ch->send(QString("Recipe # %1 has been removed.\r\n").arg(target));
 
       return eSUCCESS;
     }
   }
 
-  csendf(ch, "Recipe # %d not found.\r\n", target);
+  ch->send(QString("Recipe # %1 not found.\r\n").arg(target));
   return eFAILURE;
 }
 
@@ -1347,13 +1347,13 @@ int Scribe::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      csendf(ch, "Recipe # %d has been removed.\r\n", target);
+      ch->send(QString("Recipe # %1 has been removed.\r\n").arg(target));
 
       return eSUCCESS;
     }
   }
 
-  csendf(ch, "Recipe # %d not found.\r\n", target);
+  ch->send(QString("Recipe # %1 not found.\r\n").arg(target));
   return eFAILURE;
 }
 

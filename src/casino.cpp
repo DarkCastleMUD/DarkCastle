@@ -2374,7 +2374,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (obj->slot->bet == 1)
             send_to_char("You place only the minimum bet into the slot machine now.\r\n", ch);
          else
-            csendf(ch, "You now start placing %d times the base amount into the slot machine.\r\n", obj->slot->bet);
+            ch->send(QString("You now start placing %1 times the base amount into the slot machine.\r\n").arg(obj->slot->bet));
          return eSUCCESS;
       }
       send_to_char("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.\r\n", ch);

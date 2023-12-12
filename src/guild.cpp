@@ -920,7 +920,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       x = (int)(exp_needed - GET_EXP(ch));
 
-      csendf(ch, "You need %d experience to level.\r\n", x);
+      ch->send(QString("You need %1 experience to level.\r\n").arg(x));
       return eSUCCESS;
     }
 
@@ -1431,7 +1431,7 @@ void skill_increase_check(Character *ch, int skill, int learned, int difficulty)
 
   if (!skillname)
   {
-    csendf(ch, "Attempt to increase an unknown skill %d.  Tell a god. (bug)\r\n", skill);
+    ch->send(QString("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
     logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(ch), skill, learned, difficulty);
     return;
   }

@@ -851,7 +851,7 @@ void util_archive(const char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
-      csendf(caller, "%s\n\r", buf);
+      caller->send(QString("%1\n\r").arg(buf));
     else
       logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
@@ -861,7 +861,7 @@ void util_archive(const char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
-    csendf(caller, "%s\n\r", buf);
+    caller->send(QString("%1\n\r").arg(buf));
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
@@ -905,7 +905,7 @@ void util_unarchive(char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
-      csendf(caller, "%s\n\r", buf);
+      caller->send(QString("%1\n\r").arg(buf));
     else
       logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
@@ -915,7 +915,7 @@ void util_unarchive(char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
-    csendf(caller, "%s\n\r", buf);
+    caller->send(QString("%1\n\r").arg(buf));
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
@@ -1574,7 +1574,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (this->getGold() < (uint32_t)cost)
     {
-      csendf(this, "You don't have %d gold!\n\r", cost);
+      this->send(QString("You don't have %1 gold!\n\r").arg(cost));
       return eFAILURE;
     }
 

@@ -1025,20 +1025,20 @@ bool identify(Character *ch, Object *obj)
 
    if (obj->short_description)
    {
-      csendf(ch, "$3Short description: $R%s\r\n", obj->short_description);
+      ch->send(QString("$3Short description: $R%1\r\n").arg(obj->short_description));
    }
    else
    {
       csendf(ch, "$3Short description: $R\r\n");
    }
 
-   csendf(ch, "$3Keywords: '$R%s$3'$R\r\n", obj->name);
+   ch->send(QString("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name));
 
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    csendf(ch, "$3Item type: $R%s\r\n", buf2);
 
    sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-   csendf(ch, "$3Extra flags: $R%s\r\n", buf);
+   ch->send(QString("$3Extra flags: $R%1\r\n").arg(buf));
 
    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
@@ -1049,10 +1049,10 @@ bool identify(Character *ch, Object *obj)
    }
 
    sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-   csendf(ch, "$3Worn on: $R%s\r\n", buf);
+   ch->send(QString("$3Worn on: $R%1\r\n").arg(buf));
 
    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
-   csendf(ch, "$3Worn by: $R%s\r\n", buf);
+   ch->send(QString("$3Worn by: $R%1\r\n").arg(buf));
 
    csendf(ch, "$3Level: $R%d\n\r", obj->obj_flags.eq_level);
    csendf(ch, "$3Weight: $R%d\r\n", obj->obj_flags.weight);
@@ -1752,7 +1752,7 @@ int do_look(Character *ch, char *argument, int cmd)
             {
                sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
                          tempflag_buf);
-               csendf(ch, " [ %s]", tempflag_buf);
+               ch->send(QString(" [ %1]").arg(tempflag_buf));
             }
          }
 
