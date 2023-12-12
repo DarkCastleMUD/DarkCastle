@@ -1029,7 +1029,7 @@ bool identify(Character *ch, Object *obj)
    }
    else
    {
-      csendf(ch, "$3Short description: $R\r\n");
+      ch->sendln("$3Short description: $R");
    }
 
    ch->send(QString("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name));
@@ -1085,7 +1085,7 @@ bool identify(Character *ch, Object *obj)
          showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
          csendf(ch, ") ");
       }
-      csendf(ch, "$3spells of:$R\r\n");
+      ch->sendln("$3spells of:$R");
 
       if (obj->obj_flags.value[1] >= 1)
       {
@@ -1138,7 +1138,7 @@ bool identify(Character *ch, Object *obj)
          showStatDiff(ch, vobj->obj_flags.value[2], obj->obj_flags.value[2]);
          csendf(ch, ")");
       }
-      csendf(ch, "\r\n");
+      ch->sendln("");
 
       int get_weapon_damage_type(Object * wielded);
       bits = get_weapon_damage_type(obj) - 1000;
@@ -1496,7 +1496,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      }
                      else
                      {
-                        csendf(ch, ": \r\n");
+                        ch->sendln(": ");
                      }
 
                      list_obj_to_char(tmp_object->contains, ch, 2, true);
@@ -3140,7 +3140,7 @@ int do_consider(Character *ch, char *argument, int cmd)
       else if (GET_CLASS(victim))
          csendf(ch, "%s appears to have training, but you are unfamiliar with what.\r\n", GET_SHORT(victim));
       else
-         csendf(ch, "You've seen stray dogs that were better trained.\r\n");
+         ch->sendln("You've seen stray dogs that were better trained.");
    }
 
    return eSUCCESS;

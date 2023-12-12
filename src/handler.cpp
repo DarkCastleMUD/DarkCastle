@@ -4745,7 +4745,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find them in this room.\r\n");
+					ch->sendln("You find them in this room.");
 				}
 			}
 			return (FIND_CHAR_ROOM);
@@ -4769,7 +4769,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find them somewhere in the world.\r\n");
+					ch->sendln("You find them somewhere in the world.");
 				}
 			}
 			return (FIND_CHAR_WORLD);
@@ -4793,7 +4793,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find it in your inventory.\r\n");
+					ch->sendln("You find it in your inventory.");
 				}
 			}
 			return (FIND_OBJ_INV);
@@ -4824,7 +4824,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find it among your equipment.\r\n");
+					ch->sendln("You find it among your equipment.");
 				}
 			}
 			return (FIND_OBJ_EQUIP);
@@ -4848,7 +4848,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find it in this room.\r\n");
+					ch->sendln("You find it in this room.");
 				}
 			}
 			return (FIND_OBJ_ROOM);
@@ -4872,7 +4872,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else
 				{
-					csendf(ch, "You find it somewhere in the world\r\n");
+					ch->sendln("You find it somewhere in the world");
 				}
 			}
 			return (FIND_OBJ_WORLD);

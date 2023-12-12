@@ -54,7 +54,7 @@ int do_profession(Character *ch, char *args, int cmdnum)
   Character *victim = get_mob_room_vis(ch, "guildmaster");
   if (victim == nullptr)
   {
-    csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\r\n");
+    ch->sendln("You can't pick a profession here. You need to find a Guild Master.");
     return eFAILURE;
   }
 
@@ -96,7 +96,7 @@ int do_profession(Character *ch, char *args, int cmdnum)
       }
       else
       {
-        csendf(ch, "That profession is not available to your class.\r\n");
+        ch->sendln("That profession is not available to your class.");
         return eFAILURE;
       }
     }

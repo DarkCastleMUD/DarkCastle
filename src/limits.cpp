@@ -1036,7 +1036,7 @@ void prepare_character_for_sixty(Character *ch)
 			}
 			else if (ch->exp > 0)
 			{
-				csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.\r\n");
+				ch->sendln("Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.");
 			}
 			ch->exp = 0;
 		}

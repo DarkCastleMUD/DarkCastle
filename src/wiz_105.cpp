@@ -45,7 +45,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
       }
       else
       {
-        csendf(ch, "Removing unknown affect.\r\n");
+        ch->sendln("Removing unknown affect.");
       }
 
       affect_remove(victim, af, 0);
@@ -53,7 +53,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
 
     if (found == false)
     {
-      csendf(ch, "No affects found.\r\n");
+      ch->sendln("No affects found.");
     }
 
     //    ch->sendln("Done.");
@@ -288,12 +288,12 @@ int do_debug(Character *ch, char *args, int cmd)
         }
         else
         {
-          csendf(ch, "performance timer key not found\n\r");
+          ch->sendln("performance timer key not found");
         }
       }
       else
       {
-        csendf(ch, "Please specify a performance timer key. Run debug perf list\n\r");
+        ch->sendln("Please specify a performance timer key. Run debug perf list");
       }
     }
   }
@@ -363,10 +363,10 @@ int do_debug(Character *ch, char *args, int cmd)
   }
   else
   {
-    csendf(ch, "debug perf list\n\r");
-    csendf(ch, "      perf show <key>\n\r");
-    csendf(ch, "      perf set <key> <value>\n\r");
-    csendf(ch, "      charmie <name> [previous]\n\r");
+    ch->sendln("debug perf list");
+    ch->sendln("      perf show <key>");
+    ch->sendln("      perf set <key> <value>");
+    ch->sendln("      charmie <name> [previous]");
     ch->sendln("      player <name>");
     ch->sendln("      mobile <vnum>");
   }

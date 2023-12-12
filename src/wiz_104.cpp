@@ -2420,7 +2420,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	obj = clone_object(r1);
 	if (!obj)
 	{
-		csendf(ch, "Failure. Unable to clone item.\r\n");
+		ch->sendln("Failure. Unable to clone item.");
 		return eFAILURE;
 	}
 
@@ -2497,7 +2497,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	mob = clone_mobile(src);
 	if (!mob)
 	{
-		csendf(ch, "Failure. Unable to copy mobile.\r\n");
+		ch->sendln("Failure. Unable to copy mobile.");
 		return eFAILURE;
 	}
 

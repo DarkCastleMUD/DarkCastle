@@ -1139,7 +1139,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
 		}
 		else
 		{
-			csendf(tmp_char, "You feel a little better.\r\n");
+			tmp_char->sendln("You feel a little better.");
 		}
 
 		tmp_char->addHP(heal);

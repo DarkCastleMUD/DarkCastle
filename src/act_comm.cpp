@@ -66,9 +66,9 @@ int do_report(Character *ch, char *argument, int cmd)
     std::tie(arg1, remainder_args) = half_chop(std::string(argument));
     if (arg1 == "help")
     {
-      csendf(ch, "report       - Reports hps, mana, moves and ki. (default)\n\r");
-      csendf(ch, "report xp    - Reports current xp, xp till next level and levels to be gained.\r\n");
-      csendf(ch, "report help  - Shows different ways report can be used.\r\n");
+      ch->sendln("report       - Reports hps, mana, moves and ki. (default)");
+      ch->sendln("report xp    - Reports current xp, xp till next level and levels to be gained.");
+      ch->sendln("report help  - Shows different ways report can be used.");
       return eFAILURE;
     }
 

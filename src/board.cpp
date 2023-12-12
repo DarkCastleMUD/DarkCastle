@@ -1109,9 +1109,9 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
 
   act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  csendf(ch, "This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>\n\r");
+  ch->sendln("This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>");
   if (board->second.msgs.empty())
-    csendf(ch, "The board is empty.\r\n");
+    ch->sendln("The board is empty.");
   else
   {
     csendf(ch, "There are %d messages on the board.\r\n", board->second.msgs.size());

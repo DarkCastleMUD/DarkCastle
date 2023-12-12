@@ -1637,8 +1637,8 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd == CMD_LIST)
   {
     csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
-    csendf(ch, "  | Item                              | Cost                                   |\n\r");
-    csendf(ch, "--------------------------------------------------------------------------------\n\r");
+    ch->sendln("  | Item                              | Cost                                   |");
+    ch->sendln("--------------------------------------------------------------------------------");
     int last_vnum = 0;
     for (int i = 0; i < MAX_EDDIE_ITEMS; i++)
     {
@@ -1671,7 +1671,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
       {
-        csendf(ch, "--------------------------------------------------------------------------------\n\r");
+        ch->sendln("--------------------------------------------------------------------------------");
       }
 
       last_vnum = eddie[i].item_vnum;
@@ -1702,7 +1702,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
     }
-    csendf(ch, "--------------------------------------------------------------------------------\n\r");
+    ch->sendln("--------------------------------------------------------------------------------");
 
     /*
     ch->sendln(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.");
@@ -1805,7 +1805,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
         }
         else
         {
-          csendf(ch, "An error occured.\r\n");
+          ch->sendln("An error occured.");
           ch->save(666);
           return eSUCCESS;
         }
@@ -1829,7 +1829,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       else
       {
-        csendf(ch, "An error occured.\r\n");
+        ch->sendln("An error occured.");
         ch->save(666);
         return eSUCCESS;
       }

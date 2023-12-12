@@ -1223,12 +1223,12 @@ int do_assemble(Character *ch, char *argument, int cmd)
     // the item that needs to be assembled
     if (different_item_components)
     {
-      csendf(ch, "Assemble which object?\n\r");
+      ch->sendln("Assemble which object?");
       return eFAILURE;
     }
     else if (last_item_index == -1)
     {
-      csendf(ch, "You don't have anything that can be assembled.\r\n");
+      ch->sendln("You don't have anything that can be assembled.");
       return eFAILURE;
     }
     else
@@ -1258,7 +1258,7 @@ int do_assemble(Character *ch, char *argument, int cmd)
   // Object specified is not part of an item that can be assembled
   if (item_index == -1)
   {
-    csendf(ch, "That item can't be assembled into anything.\r\n");
+    ch->sendln("That item can't be assembled into anything.");
     return eFAILURE;
   }
 
@@ -3509,7 +3509,7 @@ int rubybrooch(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (obj->obj_flags.timer == 39)
   {
-    csendf(obj->equipped_by, "You feel the ruby brooch's grip upon your neck loosen slightly.\r\n");
+    obj->equipped_by->sendln("You feel the ruby brooch's grip upon your neck loosen slightly.");
   }
   ++obj->obj_flags.timer;
 

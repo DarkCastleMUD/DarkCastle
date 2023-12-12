@@ -750,42 +750,42 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 					   " Platinum coins.\r\n",
 				   hit_exp, hit_cost);
 		else
-			csendf(ch, "$B$36)$R Add to your hit points:   You cannot do this.\r\n");
+			ch->sendln("$B$36)$R Add to your hit points:   You cannot do this.");
 
 		if (hit_exp && hit_cost)
 			csendf(ch, "$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld"
 					   " Platinum coins.\r\n",
 				   (int64_t)(hit_exp / 5 * 1.1), (int64_t)(hit_cost / 5 * 1.1));
 		else
-			csendf(ch, "$B$37)$R Add to your hit points:   You cannot do this.\r\n");
+			ch->sendln("$B$37)$R Add to your hit points:   You cannot do this.");
 
 		if (mana_exp && mana_cost)
 			csendf(ch, "$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld"
 					   " Platinum coins.\r\n",
 				   mana_exp, mana_cost);
 		else
-			csendf(ch, "$B$38)$R Add to your mana points:  You cannot do this.\r\n");
+			ch->sendln("$B$38)$R Add to your mana points:  You cannot do this.");
 
 		if (mana_exp && mana_cost)
 			csendf(ch, "$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld"
 					   " Platinum coins.\r\n",
 				   (int64_t)(mana_exp / 5 * 1.1), (int64_t)(mana_cost / 5 * 1.1));
 		else
-			csendf(ch, "$B$39)$R Add to your mana points:   You cannot do this.\r\n");
+			ch->sendln("$B$39)$R Add to your mana points:   You cannot do this.");
 
 		if (move_exp && move_cost)
 			csendf(ch, "$B$310)$R Add 5 points to your movement points: %ld experience points and %ld"
 					   " Platinum coins.\r\n",
 				   move_exp, move_cost);
 		else
-			csendf(ch, "$B$310)$R Add to your movement points:  You cannot do this.\r\n");
+			ch->sendln("$B$310)$R Add to your movement points:  You cannot do this.");
 
 		if (move_exp && move_cost)
 			csendf(ch, "$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld"
 					   " Platinum coins.\r\n",
 				   (int64_t)(move_exp / 5 * 1.1), (int64_t)(move_cost / 5 * 1.1));
 		else
-			csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
+			ch->sendln("$B$311)$R Add to your movement points:   You cannot do this.");
 
 		ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
 
@@ -794,7 +794,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
 		}
 		else if (!IS_MOB(ch))
-			csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
+			ch->sendln("$B$312)$R Add a point of ki:        You cannot do this.");
 
 		ch->sendln("$BMonetary Exchange:$R");
 		send_to_char(

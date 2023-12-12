@@ -2513,7 +2513,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             }
             if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
             {
-              csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
+              ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
@@ -2556,7 +2556,7 @@ int do_remove(Character *ch, char *argument, int cmd)
           }
           if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
           {
-            csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
+            ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return eFAILURE;
           }
 

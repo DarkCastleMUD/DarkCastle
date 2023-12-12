@@ -599,7 +599,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
     }
 
     if (count == 0)
-      csendf(ch, "\n\rThere are no visible players in the arena.\r\n");
+      ch->sendln("\n\rThere are no visible players in the arena.");
 
     return eSUCCESS;
   }
@@ -626,7 +626,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   }
 
   if (count == 0)
-    csendf(ch, "\n\rThere are no visible players in the arena.\r\n");
+    ch->sendln("\n\rThere are no visible players in the arena.");
   return eSUCCESS;
 }
 

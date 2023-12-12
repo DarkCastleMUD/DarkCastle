@@ -1400,12 +1400,12 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 		{
 			if (DC::getInstance()->cf.leaderboard_check == "suspend")
 			{
-				csendf(ch, "Leaderboard writes already suspended.\r\n");
+				ch->sendln("Leaderboard writes already suspended.");
 			}
 			else
 			{
 				DC::getInstance()->cf.leaderboard_check = "suspend";
-				csendf(ch, "Leaderboard writes suspended.\r\n");
+				ch->sendln("Leaderboard writes suspended.");
 				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
 			}
 
@@ -1415,12 +1415,12 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 		{
 			if (DC::getInstance()->cf.leaderboard_check == "")
 			{
-				csendf(ch, "Leaderboard writes already resumed.\r\n");
+				ch->sendln("Leaderboard writes already resumed.");
 			}
 			else
 			{
 				DC::getInstance()->cf.leaderboard_check = "";
-				csendf(ch, "Leaderboard writes resumed.\r\n");
+				ch->sendln("Leaderboard writes resumed.");
 				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
 			}
 

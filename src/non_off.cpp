@@ -1451,11 +1451,11 @@ void CVoteData::DisplayResults(Character *ch)
   }
   char buf[MAX_STRING_LENGTH];
   std::vector<SVoteData>::iterator answer_it;
-  csendf(ch, "--Current Vote Results--\n\r");
+  ch->sendln("--Current Vote Results--");
   int percent;
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
-  csendf(ch, "\n\r");
+  ch->sendln("");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
     if (ch->getLevel() < IMMORTAL)
@@ -1466,7 +1466,7 @@ void CVoteData::DisplayResults(Character *ch)
     else
       csendf(ch, "%3d: %s\n\r", answer_it->votes, answer_it->answer.c_str());
   }
-  csendf(ch, "\n\r");
+  ch->sendln("");
 }
 
 void CVoteData::Reset(Character *ch)

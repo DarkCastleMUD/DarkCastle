@@ -4310,7 +4310,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         } // end of is_abbred for dirs
       }   // end of for loop through directions
 
-      csendf(ch, "Missing direction you want to delete.\r\n");
+      ch->sendln("Missing direction you want to delete.");
       return eFAILURE;
     } // end of delete
 
@@ -4461,14 +4461,14 @@ int do_redit(Character *ch, char *argument, int cmd)
           if (found == false)
           {
             found = true;
-            csendf(ch, "Extra description keywords:\r\n");
+            ch->sendln("Extra description keywords:");
           }
           ch->send(QString("%1\r\n").arg(extra->keyword));
         }
       }
       if (found == false)
       {
-        csendf(ch, "No extra description keywords found.\r\n");
+        ch->sendln("No extra description keywords found.");
       }
 
       return eSUCCESS;

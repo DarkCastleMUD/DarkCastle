@@ -370,7 +370,7 @@ void show_quest_footer(Character *ch)
           "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r",
           attempting, completed, total - completed - attempting, total);
 
-   csendf(ch, "[-----------------------------------------------------------------------------]\n\r");
+   ch->sendln("[-----------------------------------------------------------------------------]");
    return;
 }
 
@@ -813,7 +813,7 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       quest = get_quest_struct(name);
       if (quest == 0)
       {
-         csendf(ch, "That is not a valid quest name or number.\r\n");
+         ch->sendln("That is not a valid quest name or number.");
          return eFAILURE;
       }
    }
@@ -1057,20 +1057,20 @@ int do_quest(Character *ch, char *arg, int cmd)
 
       if (completed < 100)
       {
-         csendf(ch, "You will need to complete at least 100 quests before you can reset.\r\n");
+         ch->sendln("You will need to complete at least 100 quests before you can reset.");
          return eFAILURE;
       }
 
       if (GET_PLATINUM(ch) < 2000)
       {
-         csendf(ch, "You need 2000 platinum coins to reset all quests, which you don't have!\n\r");
+         ch->sendln("You need 2000 platinum coins to reset all quests, which you don't have!");
          return eEXTRA_VAL2;
       }
 
       Object *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
       if (!brownie)
       {
-         csendf(ch, "You need a brownie point to reset all quests!\n\r");
+         ch->sendln("You need a brownie point to reset all quests!");
          return eFAILURE;
       }
 
@@ -1145,11 +1145,11 @@ int do_qedit(Character *ch, char *argument, int cmd)
          ch->send(QString("%1\t").arg(*tmp));
          if (++i % 4 == 0)
          {
-            csendf(ch, "\n\r");
+            ch->sendln("");
          }
          tmp++;
       }
-      csendf(ch, "\n\r");
+      ch->sendln("");
 
       return eFAILURE;
    }
@@ -1438,12 +1438,12 @@ int do_qedit(Character *ch, char *argument, int cmd)
    case 13: // brownie
       if (quest->brownie)
       {
-         csendf(ch, "Brownie toggled to NOT required.\r\n");
+         ch->sendln("Brownie toggled to NOT required.");
          quest->brownie = 0;
       }
       else
       {
-         csendf(ch, "Brownie toggled to required.\r\n");
+         ch->sendln("Brownie toggled to required.");
          quest->brownie = 1;
       }
       break;
