@@ -57,7 +57,6 @@ namespace SSH
 
   int SSH::poll(void)
   {
-    ssh_bind_set_blocking(sshbind, false);
     sshsession = ssh_new();
     auto rc = ssh_bind_accept(sshbind, sshsession);
     return rc;

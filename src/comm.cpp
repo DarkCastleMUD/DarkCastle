@@ -906,17 +906,11 @@ void DC::game_loop_init(void)
   FD_ZERO(&null_set);
   init_heartbeat();
 
-  ssh.setup();
-
   gettimeofday(&last_time_, nullptr);
 
   QTimer *gameLoopTimer = new QTimer(this);
   connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);
   gameLoopTimer->start(1000 / DC::PASSES_PER_SEC);
-
-  // QTimer *sshLoopTimer = new QTimer(this);
-  // connect(sshLoopTimer, &QTimer::timeout, &ssh, &SSH::SSH::poll);
-  // sshLoopTimer->start();
 
   QHttpServer server(this);
   QStringList myData;
