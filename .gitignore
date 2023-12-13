@@ -16,4 +16,4 @@ lib/mobs/*.last
 lib/special.txt
 build/
 lib/wizlist.txt
-
+lib/ssh_host_rsa_key*
