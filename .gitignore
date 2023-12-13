@@ -5,6 +5,7 @@ src/libdcastle.a
 src/.sconsign.dblite
 src/*~
 src/buildinfo.h
+src/version.h
 *~
 lib/corpse.save
 lib/onlinewho.txt
