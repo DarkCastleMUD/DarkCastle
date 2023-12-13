@@ -1543,50 +1543,10 @@ void vault_get(Character *ch, QString object, QString owner)
       return;
     }
 
-    QTextStream ssin;
-    ssin << GET_OBJ_VNUM(obj);
-
-    if (ch->getLevel() < IMMORTAL)
-    {
-      sbuf = GET_NAME(ch);
-      sbuf += " removed ";
-      sbuf += GET_OBJ_SHORT(obj);
-      sbuf += " from ";
-      sbuf += owner;
-      sbuf += "'s vault.";
-    }
-    else
-    {
-      sbuf = GET_NAME(ch);
-      sbuf += " removed ";
-      sbuf += GET_OBJ_SHORT(obj);
-      sbuf += "[";
-      if (ssin.string())
-      {
-        sbuf += *ssin.string();
-      }
-      sbuf += "] from ";
-      sbuf += owner;
-      sbuf += "'s vault.";
-    }
-
+    sbuf = QString("%1 removed %2(v%3) from %4's vault.").arg(ch->getName()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
     vlog(sbuf, owner);
-    ch->send(QString("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
-
-    sbuf = GET_NAME(ch);
-    sbuf += " removed ";
-    sbuf += GET_OBJ_SHORT(obj);
-    sbuf += "[";
-    if (ssin.string())
-    {
-      sbuf += *ssin.string();
-    }
-
-    sbuf += "] from ";
-    sbuf += owner;
-    sbuf += "'s vault.";
-
     act(sbuf, ch, 0, 0, TO_ROOM, GODS);
+    ch->send(QString("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     item_remove(obj, vault);
 
@@ -2371,7 +2331,7 @@ void vlog(QString message, QString name)
     sprintf(hours, "%d", tm->tm_hour);
 
   sprintf(buf, "%s %d %s:%s", months[tm->tm_mon], tm->tm_mday, hours, mins);
-  fprintf(nfile, "%s :: %s\n", buf, message);
+  fprintf(nfile, "%s :: %s\n", buf, message.toStdString().c_str());
 
   get_line(ofile, line);
   while (*line != '$' && lines++ < 500)
