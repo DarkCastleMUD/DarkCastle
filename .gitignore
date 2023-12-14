@@ -4,7 +4,6 @@ scripts/*.o
 src/libdcastle.a
 src/.sconsign.dblite
 src/*~
-src/buildinfo.h
 src/version.h
 *~
 lib/corpse.save
@@ -17,3 +16,4 @@ lib/special.txt
 build/
 lib/wizlist.txt
 lib/ssh_host_rsa_key*
+src/buildinfo.h
