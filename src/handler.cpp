@@ -4034,16 +4034,16 @@ Character *Character::get_char_room_vis(QString name)
 	}
 
 	partial_match = 0;
-	quint64 number{};
+	quint64 number = 1;
 	if (name.contains("."))
 	{
 		bool ok = false;
-		number = name.split('.').value(0).toULongLong(&ok);
+		number = name.split('.').value(0).trimmed().toULongLong(&ok);
 		if (!ok)
 		{
-			return 0;
+			return nullptr;
 		}
-		name = name.split('.').value(1);
+		name = name.split('.').value(1).trimmed();
 	}
 
 	for (i = DC::getInstance()->world[in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
