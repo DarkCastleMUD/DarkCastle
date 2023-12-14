@@ -1128,10 +1128,6 @@ int do_drop(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    /*    if(strlen(arg) > 7) {
-          ch->sendln("Number field too big.");
-          return eFAILURE;
-        }*/
     amount = atoi(arg);
     argument = one_argument(argument, arg);
     if (str_cmp("coins", arg) && str_cmp("coin", arg) && str_cmp("gold", arg))
@@ -1273,8 +1269,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         {
           if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
-          sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-          ch->send(buffer);
+          ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
