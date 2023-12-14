@@ -76,7 +76,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
   }
 
-  if ((IS_NPC(ch) || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER))&& obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
+  if ((IS_NPC(ch) || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
   {
     ch->sendln("No champion flag for you, two years!");
     return;
@@ -853,7 +853,7 @@ int do_get(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
-        if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill( SKILL_BLINDFIGHTING))
+        if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && ch->has_skill(SKILL_BLINDFIGHTING))
         {
           obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains, true);
           blindlag = true;
@@ -1122,7 +1122,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   if (is_number(arg))
   {
-    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1181,7 +1181,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (DC::isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
-        if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1197,13 +1197,11 @@ int do_drop(Character *ch, char *argument, int cmd)
             ch->sendln("(This item is cursed, BTW.)");
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
-            sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-            ch->send(buffer);
+            ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
           }
           else if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
-            ch->send(buffer);
+            ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
             blindlag = true;
           }
           else
@@ -1249,7 +1247,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       if (tmp_object)
       {
 
-        if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1624,7 +1622,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1658,7 +1656,7 @@ int do_give(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!(vict = ch->get_char_room_vis( vict_name)))
+    if (!(vict = ch->get_char_room_vis(vict_name)))
     {
       ch->sendln("To whom?");
       return eFAILURE;
@@ -1756,7 +1754,7 @@ int do_give(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (!(vict = ch->get_char_room_vis( vict_name)))
+    if (!(vict = ch->get_char_room_vis(vict_name)))
     {
       ch->sendln("No one by that name around here.");
       return eFAILURE;
@@ -1791,7 +1789,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+  if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1853,7 +1851,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && ch->isPlayerObjectThief()&& !vict->desc)
+  if (!IS_MOB(ch) && ch->isPlayerObjectThief() && !vict->desc)
   {
     ch->sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;
@@ -2639,7 +2637,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 {
   char buffer[MAX_STRING_LENGTH];
 
-  if (!ch->has_skill( SKILL_PALM) && IS_PC(ch))
+  if (!ch->has_skill(SKILL_PALM) && IS_PC(ch))
   {
     ch->sendln("You aren't THAT slick there, pal.");
     return eFAILURE;
