@@ -19,3 +19,5 @@ src/Makefile
 src/version.h
 build/
 lib/wizlist.txt
+lib/ssh_host_rsa_key*
+src/buildinfo.h
