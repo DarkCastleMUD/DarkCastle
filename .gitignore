@@ -12,6 +12,7 @@ lib/objects/*.last
 lib/wizlist.txt
 lib/mobs/*.last
 lib/special.txt
+lib/zonefiles/*.zon.last
 src/debug
 src/dcastle.stable
 src/dcastle.master
