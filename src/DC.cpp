@@ -114,10 +114,7 @@ QString DC::getZoneName(zone_t zone_key)
 	{
 		if (dc->zones.contains(zone_key))
 		{
-			if (dc->zones.value(zone_key).name != nullptr)
-			{
-				return dc->zones.value(zone_key).name;
-			}
+			return dc->zones.value(zone_key).Name();
 		}
 	}
 

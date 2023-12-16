@@ -926,9 +926,9 @@ command_return_t zedit_name(Character *ch, QStringList arguments, Zone &zone)
     return eFAILURE;
   }
 
-  zone.name = arguments.join(' ');
+  zone.Name(arguments.join(' '));
 
-  ch->send(QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.name));
+  ch->send(QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.Name()));
 
   return eSUCCESS;
 }

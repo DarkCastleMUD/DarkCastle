@@ -2269,7 +2269,7 @@ void free_zones_from_memory()
 {
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		zone.name = {};
+		zone.Name(QString());
 		zone.cmd.empty();
 	}
 }
@@ -2278,7 +2278,7 @@ void Zone::write(FILE *fl)
 {
 	fprintf(fl, "V2\n");
 	fprintf(fl, "#%d\n", (id_ ? (bottom / 100) : 0));
-	fprintf(fl, "%s~\n", name);
+	fprintf(fl, "%s~\n", NameC());
 	fprintf(fl, "%d %d %d %ld %d\n", top,
 			lifespan,
 			reset_mode,
@@ -2404,7 +2404,7 @@ zone_t DC::read_one_zone(FILE *fl)
 	curr_type = "Zone";
 	curr_name = check;
 
-	zone.name = check;
+	zone.Name(check);
 	zone.setBottom(last_top_vnum + 1);
 	zone.setTop(fread_int(fl, 0, WORLD_MAX_ROOM));
 	last_top_vnum = zone.getTop();

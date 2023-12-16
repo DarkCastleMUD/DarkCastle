@@ -39,7 +39,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).name));
+  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
   for (low = curRoom; low > 0; low--)
   {
     if (!DC::getInstance()->rooms.contains(low - 1))
@@ -70,9 +70,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
       {
         if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
-          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n",
-                  i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone,
-                  DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).name);
+          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }
@@ -98,10 +96,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
         }
         else if (DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone != curZone)
         {
-          sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n",
-                  i, real_room(portal->obj_flags.value[0]),
-                  DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone,
-                  DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).name);
+          sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -117,10 +112,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
         }
         else if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
-          sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
-                  i, real_room(portal->getPortalDestinationRoom()),
-                  DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone,
-                  DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).name);
+          sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
 
           output += buf;
         }
@@ -135,10 +127,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
         {
           if (DC::getInstance()->world[real_room(portal->in_room)].zone != curZone)
           {
-            sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n",
-                    i, real_room(portal->in_room),
-                    DC::getInstance()->world[real_room(portal->in_room)].zone,
-                    DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).name);
+            sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
 
             output += buf;
           }
