@@ -2171,7 +2171,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name));
+    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name).toStdString().c_str());
     ch->send(buffer);
   }
   break;

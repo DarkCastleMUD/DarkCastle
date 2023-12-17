@@ -492,13 +492,13 @@ int do_get(Character *ch, char *argument, int cmd)
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
             !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
         {
-          sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+          sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           fail = true;
         }
         else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
-          sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+          sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           fail = true;
         }
@@ -566,14 +566,14 @@ int do_get(Character *ch, char *argument, int cmd)
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
       {
-        sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+        sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
         ch->send(buffer);
         fail = true;
       }
       else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                ch->getLevel() < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
-        sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+        sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
         ch->send(buffer);
         fail = true;
       }
@@ -663,7 +663,7 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
+          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name).toStdString().c_str());
           ch->send(buffer);
           return eFAILURE;
         }
@@ -714,7 +714,7 @@ int do_get(Character *ch, char *argument, int cmd)
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                 !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
             {
-              sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+              sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
               ch->send(buffer);
               fail = true;
             }
@@ -848,7 +848,7 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         if (DC::isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
         {
-          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
+          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name).toStdString().c_str());
           ch->send(buffer);
           return eFAILURE;
         }
@@ -877,7 +877,7 @@ int do_get(Character *ch, char *argument, int cmd)
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && ch->getLevel() < IMMORTAL))
           {
-            sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+            sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name).toStdString().c_str());
             ch->send(buffer);
             fail = true;
           }
@@ -956,7 +956,7 @@ int do_get(Character *ch, char *argument, int cmd)
           }
           else
           {
-            sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+            sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
             ch->send(buffer);
             fail = true;
           }
@@ -1225,7 +1225,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         {
           if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            sprintf(buffer, "You can't drop the %s, it must be CURSED!\r\n", fname(tmp_object->name));
+            sprintf(buffer, "You can't drop the %s, it must be CURSED!\r\n", fname(tmp_object->name).toStdString().c_str());
             ch->send(buffer);
             test = true;
           }
@@ -1315,7 +1315,7 @@ void do_putalldot(Character *ch, char *name, char *target, int cmd)
     next_object = tmp_object->next_content;
     if (!name && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", fname(tmp_object->name), target);
+      sprintf(buf, "%s %s", fname(tmp_object->name).toStdString().c_str(), target);
       buf[99] = 0;
       found = true;
       do_put(ch, buf, cmd);
@@ -1533,7 +1533,7 @@ int do_put(Character *ch, char *argument, int cmd)
           }
           else
           {
-            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name));
+            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
             ch->send(buffer);
           }
         }
@@ -1574,7 +1574,7 @@ void do_givealldot(Character *ch, char *name, char *target, int cmd)
     next_object = tmp_object->next_content;
     if (!name && CAN_SEE_OBJ(ch, tmp_object))
     {
-      sprintf(buf, "%s %s", fname(tmp_object->name), target);
+      sprintf(buf, "%s %s", fname(tmp_object->name).toStdString().c_str(), target);
       buf[99] = 0;
       found = true;
       do_give(ch, buf, cmd);

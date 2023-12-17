@@ -251,7 +251,7 @@ int do_vault(Character *ch, char *argument, int cmd)
 
   half_chop(argument, arg, arg1);
 
-  if (ch->isPlayerObjectThief()|| (ch->isPlayerGoldThief()))
+  if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
     return eFAILURE;
@@ -789,7 +789,7 @@ void testing_load_vaults(void)
     }
     else
     {
-      // sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname);
+      // sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname.toStdString().c_str());
       //       logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
     }
     QTextStream vault_file_stream(&vault_file);
@@ -870,7 +870,7 @@ void testing_load_vaults(void)
           items->next = vault->items;
           vault->items = items;
           /*
-          sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
+          sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname.toStdString().c_str());
           if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
                              (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
             logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
@@ -970,7 +970,7 @@ void load_vaults(void)
   FILE *fl = nullptr, *index = nullptr;
   int vnum = 0, full = 0, count = 0;
   uint64_t gold = 0;
-  char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, fname[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
+  char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = false;
   char src_filename[256] = {};
 
@@ -1006,17 +1006,17 @@ void load_vaults(void)
     saveChanges = false;
 
     *line = UPPER(*line);
-    sprintf(fname, "../vaults/%c/%s.vault", UPPER(*line), line);
-    if (!(fl = fopen(fname, "r")))
+    sprintf(filename, "../vaults/%c/%s.vault", UPPER(*line), line);
+    if (!(fl = fopen(filename, "r")))
     {
-      sprintf(buf, "boot_vaults: unable to open file [%s].", fname);
+      sprintf(buf, "boot_vaults: unable to open file [%s].", filename);
       logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
       fscanf(index, "%s\n", line);
       continue;
     }
     else
     {
-      sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname);
+      sprintf(buf, "boot_vaults: sucessfully opened file [%s].", filename);
       //      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
     }
 
@@ -1078,7 +1078,7 @@ void load_vaults(void)
         }
         else
         {
-          sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", fname, type);
+          sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", filename, type);
           logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
           break;
         }
@@ -1141,7 +1141,7 @@ void load_vaults(void)
           access->name = str_dup(value);
           access->next = vault->access;
           vault->access = access;
-          sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
+          sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, filename);
           //        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
         }
         else
@@ -1150,10 +1150,9 @@ void load_vaults(void)
           vlog(buf, vault->owner);
           saveChanges = true;
         }
-
         break;
       default:
-        sprintf(buf, "boot_vaults: unknown type in file [%s].", fname);
+        sprintf(buf, "boot_vaults: unknown type in file [%s].", filename);
         logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
         break;
       }
@@ -2142,8 +2141,7 @@ void add_new_vault(const char *name, int indexonly)
 {
   FILE *vfl, *tvfl, *pvfl;
   struct vault_data *vault;
-  char fname[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-
+  char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
     logentry("add_new_vault: error opening index file.", IMMORTAL, LogChannels::LOG_BUG);
@@ -2177,10 +2175,10 @@ void add_new_vault(const char *name, int indexonly)
 
   Character *ch = find_owner(name);
 
-  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
-  if (!(pvfl = fopen(fname, "w")))
+  sprintf(filename, "../vaults/%c/%s.vault", UPPER(*name), name);
+  if (!(pvfl = fopen(filename, "w")))
   {
-    logentry(QString("add_new_vault: error opening new vault file [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("add_new_vault: error opening new vault file [%1].").arg(filename), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 

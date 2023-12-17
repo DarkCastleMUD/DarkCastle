@@ -93,23 +93,21 @@ int do_batter(Character *ch, char *argument, int cmd)
 
     dam = number(100, 200) + 3 * (100 - skill);
 
-    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n",
-           fname(exit->keyword));
-    act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...",
-        ch, 0, exit->keyword, TO_ROOM, 0);
+    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n", fname(exit->keyword).toStdString().c_str());
+    act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
 
       sprintf(dammsg, "$B%d$R", dam);
-      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword));
-      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword));
+      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword).toStdString().c_str());
       send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword));
+      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword).toStdString().c_str());
       send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
 
-      sprintf(buf, "The %s survived, but you didn't...\r\n", fname(exit->keyword));
-      sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword));
+      sprintf(buf, "The %s survived, but you didn't...\r\n", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword).toStdString().c_str());
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
       if (SOMEONE_DIED(retval))
@@ -169,15 +167,15 @@ int do_batter(Character *ch, char *argument, int cmd)
       else
       {
         sprintf(dammsg, "$B%d$R", dam);
-        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword));
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword));
+        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword).toStdString().c_str());
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword).toStdString().c_str());
         send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword));
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword).toStdString().c_str());
         send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
       }
 
-      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword));
-      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword));
+      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword).toStdString().c_str());
 
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 

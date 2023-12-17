@@ -9493,7 +9493,7 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
     ;
   if (tar_obj)
   {
-    sprintf(buf1, "The %s says '%s'\n\r", fname(tar_obj->name), arg);
+    sprintf(buf1, "The %s says '%s'\n\r", fname(tar_obj->name).toStdString().c_str(), arg);
     sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n",
             fname(tar_obj->name), arg);
   }
