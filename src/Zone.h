@@ -70,7 +70,7 @@ public:
     static QStringList zone_bits;
 
     Zone(uint64_t zone_key = 0);
-    QString name = {};      /* name of this zone                  */
+
     uint64_t lifespan = {}; /* how long between resets (minutes)  */
     QDateTime last_full_reset = {};
     uint64_t age = {}; /* current age of ths zone (minutes) */
@@ -155,6 +155,23 @@ public:
         return id_;
     }
 
+    [[nodiscard]] inline QString Name() const
+    {
+
+        return name_;
+    }
+
+    [[nodiscard]] inline char *NameC() const
+    {
+        char *str_hsh(const char *);
+        return str_hsh(name_.toStdString().c_str());
+    }
+    inline void Name(const QString &name)
+    {
+
+        name_ = name;
+    }
+
 private:
     zone_t id_ = {};
     uint64_t died_this_tick = {}; // number of mobs that have died in this zone this pop
@@ -164,6 +181,7 @@ private:
     room_t top = {};              /* upper limit for room vnums in this zone */
     room_t bottom_rnum = {};
     room_t top_rnum = {};
+    QString name_ = {}; /* name of this zone                  */
 };
 
 bool isValidZoneKey(Character *ch, const zone_t zone_key);

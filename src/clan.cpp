@@ -3132,10 +3132,10 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
       //      DC::getInstance()->zones.value(zone).gold = 0;
       if (clan)
         sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
+                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
       else
         sprintf(buf, "\r\n##Clan %s's control of%s has been broken!\r\n",
-                get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
+                get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
 
       takeover_pause(clan2, zone);
     }
@@ -3144,17 +3144,17 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
       takeover_pause(clan2, zone);
       if (clan2)
         sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
+                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
       else
         sprintf(buf, "\r\n##Clan %s has defended their control of%s!\r\n",
-                get_clan(clan)->name, DC::getInstance()->zones.value(zone).name);
+                get_clan(clan)->name, DC::getInstance()->zones.value(zone).NameC());
     }
   }
   else
   {
     if (clan)
       sprintf(buf, "\r\n##%s has been claimed by clan %s!\r\n",
-              DC::getInstance()->zones.value(zone).name, get_clan(clan)->name);
+              DC::getInstance()->zones.value(zone).Name(), get_clan(clan)->name);
 
     //     DC::getInstance()->zones.value(zone).gold = 0;
   }
@@ -3250,8 +3250,7 @@ void check_quitter(varg_t arg1, void *arg2, void *arg3)
         {
           //			DC::getInstance()->zones.value(a].gold = 0;
           zone.clanowner = 0;
-          sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n",
-                  get_clan(clan)->name, zone.name);
+          sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n", get_clan(clan)->name, zone.NameC());
           send_info(buf);
           return;
         }
@@ -3354,7 +3353,7 @@ void pulse_takeover()
     {
       char buf[MAX_STRING_LENGTH];
       std::sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
-                   DC::getInstance()->zones.value(take->zone).name);
+                   DC::getInstance()->zones.value(take->zone).NameC());
       send_info(buf);
       DC::setZoneClanOwner(take->zone, 0);
       recycle_pulse_data(take);
@@ -3501,8 +3500,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
       }
     this->sendln("You yield the area on behalf of your clan.");
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n",
-            get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name);
+    sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
     DC::setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
 
@@ -3549,8 +3547,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
         if (++z == 1)
           csendf(this, "$BAreas Claimed by %s:$R\r\n",
                  get_clan(this)->name);
-        csendf(this, "%d)%s\r\n",
-               z, DC::getInstance()->zones.value(i).name);
+        csendf(this, "%d)%s\r\n", z, DC::getInstance()->zones.value(i).NameC());
       }
 
     if (z == 0)
@@ -3620,13 +3617,9 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
     pulse_list = pl;
     char buf[MAX_STRING_LENGTH];
     if (!clanless_challenge)
-      sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n",
-              get_clan(this)->name, get_clan(pl->clan1)->name,
-              DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name);
+      sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n", get_clan(this)->name, get_clan(pl->clan1)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     else
-      sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n",
-              get_clan(pl->clan1)->name,
-              DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).name);
+      sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n", get_clan(pl->clan1)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
     return eSUCCESS;
   }

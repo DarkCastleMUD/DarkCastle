@@ -449,7 +449,7 @@ int Zone::show_info(Character *ch)
 					 "$3Lifetime:$R  %8 $3Age:$R   %9     $3Left:$R   %10\r\n"
 					 "$3PC'sInZone:$R  %11 $3Mode:$R %12 $3Last full reset:$R %13 %14\r\n"
 					 "$3Flags:$R ")
-				 .arg(name)
+				 .arg(Name())
 				 .arg(filename)
 				 .arg(bottom, 6)
 				 .arg(top, 13)
@@ -1123,7 +1123,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				room_t range_end = zone.getTop();
 				int num = count_rooms(range_start, range_end);
 
-				ch->send(QString("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.name));
+				ch->send(QString("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
 			}
 			return eSUCCESS;
 		}
