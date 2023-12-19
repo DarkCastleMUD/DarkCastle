@@ -887,7 +887,7 @@ void testing_load_vaults(void)
           access->name = value;
           access->next = vault->access;
           vault->access = access;
-          // sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
+          // sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, filename);
           //         logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
         }
         else
