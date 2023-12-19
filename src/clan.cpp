@@ -589,15 +589,21 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   pcurr = theClan->members;
 
-  while (pcurr && pcurr->member_name != new_new_member->member_name)
+  bool member_found = false;
+  while (pcurr)
   {
+    if (pcurr->member_name == new_new_member->member_name)
+    {
+      member_found = true;
+      break;
+    }
     plast = pcurr;
     pcurr = pcurr->next;
   }
 
-  if (result == 0)
+  if (member_found)
   { // found um, get out
-    logentry(QString("Tried to add already existing clan member '%1'.  Possible memory leak.").arg(new_new_member->member_name), ANGEL, LogChannels::LOG_BUG);
+    logentry(QString("Tried to add already existing clan member '%1'.").arg(new_new_member->member_name), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
