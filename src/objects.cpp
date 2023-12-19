@@ -1696,16 +1696,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_FINGER_L])
         {
-          sprintf(buffer, "You put the %s on your right ring-finger.\r\n",
-                  fname(obj_object->name));
+          sprintf(buffer, "You put the %s on your right ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_R);
         }
         else
         {
-          sprintf(buffer, "You put the %s on your left ring-finger.\r\n",
-                  fname(obj_object->name));
+          sprintf(buffer, "You put the %s on your left ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_L);
@@ -1931,15 +1929,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_WRIST_L])
         {
-          sprintf(buffer, "You wear the %s around your right wrist.\r\n",
-                  fname(obj_object->name));
+          sprintf(buffer, "You wear the %s around your right wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           equip_char(ch, obj_object, WEAR_WRIST_R);
         }
         else
         {
-          sprintf(buffer, "You wear the %s around your left wrist.\r\n",
-                  fname(obj_object->name));
+          sprintf(buffer, "You wear the %s around your left wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           equip_char(ch, obj_object, WEAR_WRIST_L);
         }
@@ -2177,8 +2173,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   case -2:
   {
-    sprintf(buffer, "You can't wear the %s.\r\n",
-            fname(obj_object->name));
+    sprintf(buffer, "You can't wear the %s.\r\n", fname(obj_object->name).toStdString().c_str());
     ch->send(buffer);
   }
   break;

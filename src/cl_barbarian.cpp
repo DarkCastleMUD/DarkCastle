@@ -304,10 +304,8 @@ int do_brace(Character *ch, char *argument, int cmd)
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
       return eSUCCESS;
 
-    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n",
-           fname(exit->keyword));
-    act("$n leans heavily on the $F, bracing $s shoulder solidly against it...",
-        ch, 0, exit->keyword, TO_ROOM, 0);
+    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", fname(exit->keyword).toStdString().c_str());
+    act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {

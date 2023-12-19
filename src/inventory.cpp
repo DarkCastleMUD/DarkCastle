@@ -674,8 +674,7 @@ int do_get(Character *ch, char *argument, int cmd)
           next_obj = obj_object->next_content;
           if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
           {
-            csendf(ch, "%s : It seems magically attached to the corpse.\r\n",
-                   fname(obj_object->name));
+            csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
             continue;
           } /*
        class Object *temp,*next_contentthing;
@@ -769,8 +768,7 @@ int do_get(Character *ch, char *argument, int cmd)
               else
               {
                 sprintf(buffer,
-                        "%s : You can't carry that much weight.\r\n",
-                        fname(obj_object->name));
+                        "%s : You can't carry that much weight.\r\n", fname(obj_object->name).toStdString().c_str());
                 ch->send(buffer);
                 fail = true;
               }
@@ -786,8 +784,7 @@ int do_get(Character *ch, char *argument, int cmd)
       }
       else
       {
-        sprintf(buffer, "The %s is not a container.\r\n",
-                fname(sub_object->name));
+        sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
         ch->send(buffer);
         fail = true;
       }
@@ -962,8 +959,7 @@ int do_get(Character *ch, char *argument, int cmd)
         }
         else
         {
-          sprintf(buffer, "The %s does not contain the %s.\r\n",
-                  fname(sub_object->name), arg1);
+          sprintf(buffer, "The %s does not contain the %s.\r\n", fname(sub_object->name).toStdString().c_str(), arg1);
           ch->send(buffer);
           fail = true;
         }
@@ -2246,16 +2242,13 @@ int do_open(Character *ch, char *argument, int cmd)
       {
         if (EXIT(ch, door)->bracee->in_room == ch->in_room)
         {
-          csendf(ch, "%s is holding the %s shut.\r\n",
-                 EXIT(ch, door)->bracee->getNameC(), fname(EXIT(ch, door)->keyword));
-          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as %s attempts to force their way through.\r\n",
-                 fname(EXIT(ch, door)->keyword), ch);
+          csendf(ch, "%s is holding the %s shut.\r\n", EXIT(ch, door)->bracee->getNameC(), fname(EXIT(ch, door)->keyword).toStdString().c_str());
+          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as %s attempts to force their way through.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str(), ch);
         }
         else
         {
-          csendf(ch, "The %s seems to be barred from the other side.\r\n", fname(EXIT(ch, door)->keyword));
-          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as someone attempts to force their way through.\r\n",
-                 fname(EXIT(ch, door)->keyword));
+          csendf(ch, "The %s seems to be barred from the other side.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str());
+          csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as someone attempts to force their way through.\r\n", fname(EXIT(ch, door)->keyword).toStdString().c_str());
         }
       }
       else
@@ -2302,8 +2295,7 @@ int do_open(Character *ch, char *argument, int cmd)
             REMOVE_BIT(back->exit_info, EX_CLOSED);
             if ((back->keyword) && !DC::isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s is opened from the other side.\r\n",
-                      fname(back->keyword));
+              sprintf(buf, "The %s is opened from the other side.\r\n", fname(back->keyword).toStdString().c_str());
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else
@@ -2412,8 +2404,7 @@ int do_close(Character *ch, char *argument, int cmd)
             if ((back->keyword) &&
                 !DC::isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
-              sprintf(buf, "The %s closes quietly.\r\n",
-                      fname(back->keyword));
+              sprintf(buf, "The %s closes quietly.\r\n", fname(back->keyword).toStdString().c_str());
               send_to_room(buf, EXIT(ch, door)->to_room, true);
             }
             else

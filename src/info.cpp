@@ -423,11 +423,11 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$7aura! ";
    }
 
-   if (i->affected_by_spell( SPELL_PROTECT_FROM_EVIL))
+   if (i->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
    {
       strbuf = strbuf + "$R$6pulsing! ";
    }
-   else if (i->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
+   else if (i->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
    {
       strbuf = strbuf + "$R$6$Bpulsing! ";
    }
@@ -447,7 +447,7 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$B$2acid! ";
    }
 
-   if (i->affected_by_spell( SPELL_BARKSKIN))
+   if (i->affected_by_spell(SPELL_BARKSKIN))
    {
       strbuf = strbuf + "$R$5woody! ";
    }
@@ -462,7 +462,7 @@ void show_spells(Character *i, Character *ch)
       strbuf = strbuf + "$R$2paralyze! ";
    }
 
-   if (i->affected_by_spell(SPELL_STONE_SHIELD)||i->affected_by_spell( SPELL_GREATER_STONE_SHIELD))
+   if (i->affected_by_spell(SPELL_STONE_SHIELD) || i->affected_by_spell(SPELL_GREATER_STONE_SHIELD))
    {
       strbuf = strbuf + "$B$0stones! ";
    }
@@ -1380,8 +1380,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
             if (DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
             {
-               sprintf(buffer, "The %s is closed.\r\n",
-                       fname(EXIT(ch, keyword_no)->keyword));
+               sprintf(buffer, "The %s is closed.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
                ch->send(buffer);
             }
             else
@@ -1389,8 +1388,7 @@ int do_look(Character *ch, char *argument, int cmd)
                if (DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
                    EXIT(ch, keyword_no)->keyword)
                {
-                  sprintf(buffer, "The %s is open.\r\n",
-                          fname(EXIT(ch, keyword_no)->keyword));
+                  sprintf(buffer, "The %s is open.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
                   ch->send(buffer);
                }
             }
