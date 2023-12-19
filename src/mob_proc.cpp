@@ -209,8 +209,8 @@ void damage_all_players_in_room(Character *ch, int damage)
     if (vict->getLevel() >= IMMORTAL)
       continue;
 
-    if (vict->affected_by_spell(SPELL_DIVINE_INTER)&& damage >vict->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
-      vict->removeHP( vict->affected_by_spell( SPELL_DIVINE_INTER)->modifier);
+    if (vict->affected_by_spell(SPELL_DIVINE_INTER) && damage > vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+      vict->removeHP(vict->affected_by_spell(SPELL_DIVINE_INTER)->modifier);
     else
       vict->removeHP(damage); // Note -damage will HEAL the player
     update_pos(vict);
@@ -665,7 +665,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
           if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
         }
-        if  (tch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
+        if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
         {
           if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
@@ -917,7 +917,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     {
       if (IS_IMMORTAL(ch))
       {
-        if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
+        if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
         {
           ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
           return eFAILURE;
@@ -945,7 +945,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       else
       {
-        if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
+        if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
         {
           act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
           ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
@@ -1100,7 +1100,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     }
   }
 
-  if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
+  if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
     ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
@@ -1921,8 +1921,7 @@ int chain_gossips(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int fido(Character *ch, class Object *obj, int cmd, const char *arg,
-         Character *owner)
+int fido(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
   class Object *i, *temp, *next_obj, *deep, *next_deep;
 
@@ -1940,19 +1939,6 @@ int fido(Character *ch, class Object *obj, int cmd, const char *arg,
       for (temp = i->contains; temp; temp = next_obj)
       {
         next_obj = temp->next_content;
-        // don't trade no_trade items
-        if (DC::isSet(temp->obj_flags.more_flags, ITEM_NO_TRADE))
-        {
-          extract_obj(temp);
-          continue;
-        }
-        // take care of any no-trades inside the item
-        for (deep = temp->contains; deep; deep = next_deep)
-        {
-          next_deep = deep->next_content;
-          if (DC::isSet(deep->obj_flags.more_flags, ITEM_NO_TRADE))
-            extract_obj(deep);
-        }
         move_obj(temp, ch->in_room);
       }
       extract_obj(i);
@@ -2416,7 +2402,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
           if (IS_EVIL(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
-        if  (tch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
+        if (tch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
           if (IS_GOOD(ch) && (ch->getLevel() <= tch->getLevel()))
             continue;
 
