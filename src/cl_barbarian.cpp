@@ -153,7 +153,7 @@ int do_batter(Character *ch, char *argument, int cmd)
       {
         if (batterwins)
         {
-          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword));
+          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword).toStdString().c_str());
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
@@ -161,7 +161,7 @@ int do_batter(Character *ch, char *argument, int cmd)
         }
         else
         { // brace wins
-          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", fname(exit->keyword));
+          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
         }
       }
       else
@@ -287,15 +287,15 @@ int do_brace(Character *ch, char *argument, int cmd)
       {
         if (exit->bracee == ch)
         {
-          csendf(ch, "You are already bracing the %s shut!\n\r", fname(exit->keyword));
+          csendf(ch, "You are already bracing the %s shut!\n\r", fname(exit->keyword).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), fname(exit->keyword));
+          csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), fname(exit->keyword).toStdString().c_str());
         }
       }
       else
-        csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword));
+        csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
 
       return eFAILURE;
     }
