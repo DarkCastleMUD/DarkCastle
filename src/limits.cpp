@@ -734,7 +734,7 @@ void food_update(void)
 	const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
 	for (const auto &i : character_list)
 	{
-		if (i->affected_by_spell( SPELL_PARALYZE))
+		if (i->affected_by_spell(SPELL_PARALYZE))
 			continue;
 		int amt = -1;
 		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
@@ -744,7 +744,7 @@ void food_update(void)
 		{ // i'm hungry
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell( SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -760,7 +760,7 @@ void food_update(void)
 		{ // i'm thirsty
 			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell( SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -784,7 +784,7 @@ void point_update(void)
 	{
 		if (i->in_room == DC::NOWHERE)
 			continue;
-		if (i->affected_by_spell( SPELL_POISON))
+		if (i->affected_by_spell(SPELL_POISON))
 			continue;
 
 		int a;
@@ -911,14 +911,6 @@ void update_corpses_and_portals(void)
 					{
 						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
-							/*
-							if (next_thing == jj)
-								next_thing = jj->next;
-							while (next_thing && next_thing->in_obj == jj)
-								next_thing = next_thing->next;
-							log_sacrifice((Character *)j, jj, true);
-							extract_obj(jj);
-							*/
 							jj->setOwner(j->getOwner());
 						}
 
@@ -928,14 +920,6 @@ void update_corpses_and_portals(void)
 					{
 						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
-							/*
-							if (next_thing == jj)
-								next_thing = jj->next;
-							while (next_thing->in_obj == jj)
-								next_thing = next_thing->next;
-							log_sacrifice((Character *)j, jj, true);
-							extract_obj(jj);
-							*/
 							jj->setOwner(j->getOwner());
 						}
 
@@ -945,14 +929,6 @@ void update_corpses_and_portals(void)
 					{
 						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
-							/*
-							if (next_thing == jj)
-								next_thing = jj->next;
-							while (next_thing && next_thing->in_obj == jj)
-								next_thing = next_thing->next;
-							log_sacrifice((Character *)j, jj, true);
-							extract_obj(jj);
-							*/
 							jj->setOwner(j->getOwner());
 						}
 
