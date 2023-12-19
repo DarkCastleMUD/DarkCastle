@@ -779,8 +779,7 @@ int do_get(Character *ch, char *argument, int cmd)
         }
         if (!found && !fail)
         {
-          sprintf(buffer, "You do not see anything in the %s.\r\n",
-                  fname(sub_object->name));
+          sprintf(buffer, "You do not see anything in the %s.\r\n", fname(sub_object->name).toStdString().c_str());
           ch->send(buffer);
           fail = true;
         }
