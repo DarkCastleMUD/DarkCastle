@@ -4468,8 +4468,6 @@ Character *get_pc_vis(Character *ch, const char *name)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
 						  {
-								qDebug() << ch->getName() << "checking on " << i->getName();
-							
 		if(IS_PC(i) && CAN_SEE(ch, i))
 		{
 			if (isexact(name, GET_NAME(i)))
