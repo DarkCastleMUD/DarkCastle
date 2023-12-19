@@ -3111,7 +3111,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			if (!str_cmp(buf, "if"))
 			{
 				com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
-				if (DC::isSet(mprog_cur_result, eCH_DIED))
+				if (isSet(mprog_cur_result, eCH_DIED))
 					return null;
 				while (*cmnd == ' ')
 					cmnd++;
@@ -3178,29 +3178,29 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 #ifdef DEBUG_MPROG
 				if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821)
 				{
-					if (DC::isSet(mprog_cur_result, eFAILURE))
+					if (isSet(mprog_cur_result, eFAILURE))
 						fprintf(stderr, "eFAILURE ");
-					if (DC::isSet(mprog_cur_result, eSUCCESS))
+					if (isSet(mprog_cur_result, eSUCCESS))
 						fprintf(stderr, "eSUCCESS ");
-					if (DC::isSet(mprog_cur_result, eCH_DIED))
+					if (isSet(mprog_cur_result, eCH_DIED))
 						fprintf(stderr, "eCH_DIED ");
-					if (DC::isSet(mprog_cur_result, eVICT_DIED))
+					if (isSet(mprog_cur_result, eVICT_DIED))
 						fprintf(stderr, "eVICT_DIED ");
-					if (DC::isSet(mprog_cur_result, eINTERNAL_ERROR))
+					if (isSet(mprog_cur_result, eINTERNAL_ERROR))
 						fprintf(stderr, "eINTERNAL_ERROR ");
-					if (DC::isSet(mprog_cur_result, eEXTRA_VALUE))
+					if (isSet(mprog_cur_result, eEXTRA_VALUE))
 						fprintf(stderr, "eEXTRA_VALUE ");
-					if (DC::isSet(mprog_cur_result, eEXTRA_VAL2))
+					if (isSet(mprog_cur_result, eEXTRA_VAL2))
 						fprintf(stderr, "eEXTRA_VAL2 ");
-					if (DC::isSet(mprog_cur_result, eDELAYED_EXEC))
+					if (isSet(mprog_cur_result, eDELAYED_EXEC))
 						fprintf(stderr, "eDELAYED_EXEC ");
 
 					fprintf(stderr, "\n");
 				}
 #endif
-				if (DC::isSet(mprog_cur_result, eCH_DIED) ||
-					DC::isSet(mprog_cur_result, eDELAYED_EXEC) ||
-					DC::isSet(mprog_cur_result, eVICT_DIED))
+				if (isSet(mprog_cur_result, eCH_DIED) ||
+					isSet(mprog_cur_result, eDELAYED_EXEC) ||
+					isSet(mprog_cur_result, eVICT_DIED))
 					return null;
 			}
 			cmnd = com_list;
@@ -3264,7 +3264,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			{
 				com_list = mprog_process_if(morebuf, com_list, mob, actor,
 											obj, vo, rndm, thrw);
-				if (DC::isSet(mprog_cur_result, eCH_DIED))
+				if (isSet(mprog_cur_result, eCH_DIED))
 					return null;
 				while (*cmnd == ' ')
 					cmnd++;
@@ -3289,7 +3289,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
 			{
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
-				if (DC::isSet(mprog_cur_result, eCH_DIED) || DC::isSet(mprog_cur_result, eDELAYED_EXEC))
+				if (isSet(mprog_cur_result, eCH_DIED) || isSet(mprog_cur_result, eDELAYED_EXEC))
 					return null;
 			}
 			cmnd = com_list;
@@ -3964,7 +3964,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 		{
 			activePos = command_list = mprog_process_if(morebuf, command_list, mob,
 														actor, obj, vo, rndm, thrw);
-			if (DC::isSet(mprog_cur_result, eCH_DIED) || DC::isSet(mprog_cur_result, eDELAYED_EXEC))
+			if (isSet(mprog_cur_result, eCH_DIED) || isSet(mprog_cur_result, eDELAYED_EXEC))
 			{
 				activeActor = activeRndm = nullptr;
 				activeObj = nullptr;
@@ -3979,7 +3979,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 			if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
 			{
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
-				if (DC::isSet(mprog_cur_result, eCH_DIED) || selfpurge || DC::isSet(mprog_cur_result, eDELAYED_EXEC))
+				if (isSet(mprog_cur_result, eCH_DIED) || selfpurge || isSet(mprog_cur_result, eDELAYED_EXEC))
 				{
 					activeActor = activeRndm = nullptr;
 					activeObj = nullptr;
@@ -4069,7 +4069,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 					{
 						retval = 1;
 						mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
-						if (selfpurge || DC::isSet(mprog_cur_result, eCH_DIED))
+						if (selfpurge || isSet(mprog_cur_result, eCH_DIED))
 							return retval;
 						break;
 					}
@@ -4089,7 +4089,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 							retval = 1;
 							mprog_driver(mprg->comlist, mob, actor, obj, vo,
 										 nullptr, nullptr);
-							if (selfpurge || DC::isSet(mprog_cur_result, eCH_DIED))
+							if (selfpurge || isSet(mprog_cur_result, eCH_DIED))
 								return retval;
 							break;
 						}

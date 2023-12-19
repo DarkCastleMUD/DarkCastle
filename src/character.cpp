@@ -663,7 +663,7 @@ bool Character::isPlayer(void)
 
 bool Character::isNPC(void)
 {
-    return DC::isSet(misc, MISC_IS_MOB);
+    return isSet(misc, MISC_IS_MOB);
 }
 
 move_t Character::move_limit(void)

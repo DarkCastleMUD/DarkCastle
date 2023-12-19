@@ -21,6 +21,7 @@
 #include "common.h"
 #include "structs.h" // uint8_t
 #include "character.h"
+#include "DC.h"
 
 /* The following defs are for Object  */
 
@@ -357,6 +358,15 @@ public:
     int keywordfind(void);
     void setOwner(QString owner) { owner_ = owner; }
     QString getOwner(void) { return owner_; }
+
+    [[nodiscard]] inline bool isCorpse(void) const
+    {
+        return isSet(obj_flags.extra_flags, ITEM_PC_CORPSE) || isSet(obj_flags.extra_flags, ITEM_PC_CORPSE_LOOTED);
+    }
+    [[nodiscard]] inline bool isTradable(void) const
+    {
+        return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
+    }
 
 private:
     QString owner_;

@@ -261,7 +261,7 @@ int do_fighting(Character *ch, char *argument, int cmd)
   {
     // Don't show mobs fighting or people not in the arena when arena
     // keyword was specified.
-    if (IS_NPC(i) || (arenaONLY && !DC::isSet(DC::getInstance()->world[i->in_room].room_flags, ARENA)))
+    if (IS_NPC(i) || (arenaONLY && !isSet(DC::getInstance()->world[i->in_room].room_flags, ARENA)))
     {
       continue;
     }

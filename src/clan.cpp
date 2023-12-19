@@ -461,7 +461,7 @@ void assign_clan_rooms()
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
     for (room = clan->rooms; room; room = room->next)
       if (-1 != real_room(room->room_number))
-        if (!DC::isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
+        if (!isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
           SET_BIT(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 }
 
@@ -699,7 +699,7 @@ void delete_clan(clan_data *dead_clan)
         room = dead_clan->rooms;
         nextroom = room->next;
         if (real_room(room->room_number) != DC::NOWHERE)
-          if (DC::isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
+          if (isSet(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
             REMOVE_BIT(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 
         dc_free(room);
@@ -750,7 +750,7 @@ int has_right(Character *ch, uint32_t bit)
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
     return false;
 
-  return DC::isSet(pmember->member_rights, bit);
+  return isSet(pmember->member_rights, bit);
 }
 
 int num_clan_members(clan_data *clan)
@@ -1555,7 +1555,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!(DC::isSet(ch->misc, LogChannels::CHANNEL_CLAN)))
+  if (!(isSet(ch->misc, LogChannels::CHANNEL_CLAN)))
   {
     ch->sendln("You have that channel off!!");
     return eFAILURE;
@@ -1593,7 +1593,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     if (desc->connected || !(pch = desc->character))
       continue;
     if (pch == ch || pch->clan != ch->clan ||
-        !DC::isSet(pch->misc, LogChannels::CHANNEL_CLAN))
+        !isSet(pch->misc, LogChannels::CHANNEL_CLAN))
       continue;
     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->getLevel() <= DC::MAX_MORTAL_LEVEL)
       continue;
@@ -1736,7 +1736,7 @@ void do_clan_rights(Character *ch, char *arg)
     ch->send(buf);
     for (bit = 0; *clan_rights[bit] != '\n'; bit++)
     {
-      sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (DC::isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
+      sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
       ch->send(buf);
     }
     return;
@@ -1759,7 +1759,7 @@ void do_clan_rights(Character *ch, char *arg)
 
   TOGGLE_BIT(pmember->member_rights, 1 << bit);
 
-  if (DC::isSet(pmember->member_rights, 1 << bit))
+  if (isSet(pmember->member_rights, 1 << bit))
   {
     sprintf(buf, "%s toggled on.\r\n", clan_rights[bit]);
     sprintf(buf2, "%s has given you '%s' rights within your clan.\r\n", GET_SHORT(ch), clan_rights[bit]);
@@ -2084,7 +2084,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
     if (tarclan->rooms->room_number == skill)
     {
       if (-1 != real_room(skill))
-        if (DC::isSet(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM))
+        if (isSet(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM))
           REMOVE_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
       lastroom = tarclan->rooms;
       tarclan->rooms = tarclan->rooms->next;
@@ -2098,7 +2098,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
       if (newroom->room_number == skill)
       {
         if (-1 != real_room(skill))
-          if (DC::isSet(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM))
+          if (isSet(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM))
             REMOVE_BIT(DC::getInstance()->world[real_room(skill)].room_flags, CLAN_ROOM);
         lastroom->next = newroom->next;
         dc_free(newroom);
@@ -2412,7 +2412,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
     {
       // only show rights the player has.  Leader has all.
       if (!leader && right_required[i] &&
-          !DC::isSet(pmember->member_rights, right_required[i]))
+          !isSet(pmember->member_rights, right_required[i]))
         continue;
 
       sprintf(buf + strlen(buf), "%18s", mortal_values[i]);
@@ -2632,7 +2632,7 @@ int do_clans(Character *ch, char *arg, int cmd)
       ch->send(buf);
       for (bit = 0; *clan_rights[bit] != '\n'; bit++)
       {
-        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (DC::isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
+        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
         ch->send(buf);
       }
       return eSUCCESS;
@@ -2750,7 +2750,7 @@ int do_whoclan(Character *ch, char *arg, int cmd)
         ch->send(buf);
       }
       if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
-        sprintf(buf, "  %s %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), DC::isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
+        sprintf(buf, "  %s %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
       else
         sprintf(buf, "  %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
       ch->send(buf);
@@ -3650,7 +3650,7 @@ bool others_clan_room(Character *ch, Room *room)
   }
 
   // room is not a clan room
-  if (DC::isSet(room->room_flags, CLAN_ROOM) == false)
+  if (isSet(room->room_flags, CLAN_ROOM) == false)
   {
     return false;
   }

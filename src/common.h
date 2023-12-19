@@ -155,6 +155,11 @@ typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int
 typedef command_return_t (Character::*command_special_t)(QString arguments, int cmd);
 typedef quint64 level_t;
 
+[[nodiscard]] inline bool isSet(auto flag, auto bit)
+{
+    return flag & bit;
+};
+
 command_return_t do_mscore(Character *ch, char *argument, int cmd);
 command_return_t do_huntstart(Character *ch, char *argument, int cmd);
 command_return_t do_huntclear(Character *ch, char *argument, int cmd);

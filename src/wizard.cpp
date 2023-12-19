@@ -965,7 +965,7 @@ void obj_stat(Character *ch, class Object *j)
   int its;
 
   /*
-    if(DC::isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
+    if(isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return;
@@ -1977,11 +1977,11 @@ void pick_up_item(Character *ch, class Object *obj)
           sprintf(buf, "## %s turned into %s!\r\n",
                   obj->short_description, oitem->short_description);
           send_info(buf);
-          if (DC::isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
+          if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
             if (search_char_for_item(ch, oitem->item_number, false))
             {
-              if (DC::isSet(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
+              if (isSet(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
               {
                 ch->sendln("You already have this item - Timer has been reset!");
                 extract_obj(oitem);

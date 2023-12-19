@@ -165,7 +165,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
   }
   if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FORCE))
     return "";
-  if (DC::isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
+  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";
@@ -202,8 +202,8 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
               // std::cerr << "It's ansi or vt100 code" << std::endl;
 #endif
               if (IS_MOB(send_to) ||
-                  (DC::isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
-                  (DC::isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
+                  (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
+                  (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
               {
                 switch (current->GetBuf()[1])
                 {

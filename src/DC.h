@@ -243,8 +243,7 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
-  static Object *getObject(vnum_t vnum);
-  static bool isSet(auto flag, auto bit) { return flag & bit; };
+  static Object *getObject(vnum_t vnum);  
 
   explicit DC(int &argc, char **argv);
   DC(const DC &) = delete; // non-copyable

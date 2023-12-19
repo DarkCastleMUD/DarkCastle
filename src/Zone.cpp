@@ -42,7 +42,7 @@ void Zone::setDiedThisTick(uint64_t died)
 
 bool Zone::isModified(void)
 {
-    return DC::isSet(zone_flags, MODIFIED);
+    return isSet(zone_flags, MODIFIED);
 }
 
 void Zone::setModified(bool flag)
@@ -59,7 +59,7 @@ void Zone::setModified(bool flag)
 
 bool Zone::isTown(void)
 {
-    return DC::isSet(zone_flags, IS_TOWN);
+    return isSet(zone_flags, IS_TOWN);
 }
 
 void Zone::setTown(bool flag)
@@ -76,7 +76,7 @@ void Zone::setTown(bool flag)
 
 bool Zone::isNoTeleport(void)
 {
-    return DC::isSet(zone_flags, NO_TELEPORT);
+    return isSet(zone_flags, NO_TELEPORT);
 }
 
 void Zone::setNoTeleport(bool flag)
@@ -93,7 +93,7 @@ void Zone::setNoTeleport(bool flag)
 
 bool Zone::isNoClaim(void)
 {
-    return DC::isSet(zone_flags, NOCLAIM);
+    return isSet(zone_flags, NOCLAIM);
 }
 
 void Zone::setNoClaim(bool flag)
@@ -110,7 +110,7 @@ void Zone::setNoClaim(bool flag)
 
 bool Zone::isNoHunt(void)
 {
-    return DC::isSet(zone_flags, NOHUNT);
+    return isSet(zone_flags, NOHUNT);
 }
 
 void Zone::setNoHunt(bool flag)

@@ -68,7 +68,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -96,7 +96,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     if (ch->getLevel() < IMMORTAL)
     {
@@ -113,7 +113,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
   {
     ch->sendln("God, what a stupid fucking thing for you to do.");
     return eFAILURE;
@@ -138,7 +138,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return (eFAILURE);
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
+  if (isSet(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
   {
     act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR, 0);
     act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
@@ -183,7 +183,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   int room = 3099;
   int origin;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -220,7 +220,7 @@ int do_donate(Character *ch, char *argument, int cmd)
   // Handle yielding the champion flag
   if (GET_OBJ_VNUM(obj) == 45)
   {
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     {
       if (IS_AFFECTED(ch, AFF_CHAMPION))
       {
@@ -268,13 +268,13 @@ int do_donate(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     ch->sendln("Since you can't let go of it, how are you going to donate it?");
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     if (ch->getLevel() > IMMORTAL)
     {
@@ -300,7 +300,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("You can't donate godload equipment.");
     return eFAILURE;
@@ -346,7 +346,7 @@ int do_title(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOTITLE))
+  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOTITLE))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -407,10 +407,10 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
 
     for (const auto &t : Player::togglables)
     {
-      if (t.value_ != Player::PLR_GUIDE_TOG || (DC::isSet(player->toggles, Player::PLR_GUIDE)))
+      if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
         send(QString("%1 ").arg(t.name_, -11));
-        send(QString("%1\n\r").arg(DC::isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+        send(QString("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
     return eSUCCESS;
@@ -618,7 +618,7 @@ command_return_t Character::do_brief(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_BRIEF))
+  if (isSet(player->toggles, Player::PLR_BRIEF))
   {
     send("Brief mode $B$4off$R.\r\n");
     REMOVE_BIT(player->toggles, Player::PLR_BRIEF);
@@ -636,7 +636,7 @@ command_return_t Character::do_ansi(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_ANSI))
+  if (isSet(player->toggles, Player::PLR_ANSI))
   {
     this->sendln("ANSI COLOR $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_ANSI);
@@ -654,7 +654,7 @@ command_return_t Character::do_vt100(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_VT100))
+  if (isSet(player->toggles, Player::PLR_VT100))
   {
     this->sendln("VT100 $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_VT100);
@@ -672,7 +672,7 @@ command_return_t Character::do_compact(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_COMPACT))
+  if (isSet(player->toggles, Player::PLR_COMPACT))
   {
     this->sendln("Compact mode $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_COMPACT);
@@ -690,7 +690,7 @@ command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_SUMMONABLE))
+  if (isSet(player->toggles, Player::PLR_SUMMONABLE))
   {
     this->sendln("You may no longer be summoned by other players.");
     REMOVE_BIT(player->toggles, Player::PLR_SUMMONABLE);
@@ -710,7 +710,7 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_LFG))
+  if (isSet(player->toggles, Player::PLR_LFG))
   {
     this->sendln("You are no longer Looking For Group.");
     REMOVE_BIT(player->toggles, Player::PLR_LFG);
@@ -728,13 +728,13 @@ command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (!DC::isSet(player->toggles, Player::PLR_GUIDE))
+  if (!isSet(player->toggles, Player::PLR_GUIDE))
   {
     this->sendln("You must be assigned as a $BGuide$R by the gods before you can toggle it.");
     return eFAILURE;
   }
 
-  if (DC::isSet(player->toggles, Player::PLR_GUIDE_TOG))
+  if (isSet(player->toggles, Player::PLR_GUIDE_TOG))
   {
     this->sendln("You have hidden your $B(Guide)$R tag.");
     REMOVE_BIT(player->toggles, Player::PLR_GUIDE_TOG);
@@ -752,7 +752,7 @@ command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_NEWS))
+  if (isSet(player->toggles, Player::PLR_NEWS))
   {
     this->sendln("You now view news in an up-down fashion.");
     REMOVE_BIT(player->toggles, Player::PLR_NEWS);
@@ -771,7 +771,7 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_ASCII))
+  if (isSet(player->toggles, Player::PLR_ASCII))
   {
     REMOVE_BIT(player->toggles, Player::PLR_ASCII);
     this->sendln("Cards are now displayed through ASCII.");
@@ -790,7 +790,7 @@ command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_DAMAGE))
+  if (isSet(player->toggles, Player::PLR_DAMAGE))
   {
     REMOVE_BIT(player->toggles, Player::PLR_DAMAGE);
     this->sendln("Damage numbers will no longer be displayed in combat.");
@@ -809,7 +809,7 @@ command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_NOTAX))
+  if (isSet(player->toggles, Player::PLR_NOTAX))
   {
     this->sendln("You will now be taxed on all your loot.");
     REMOVE_BIT(player->toggles, Player::PLR_NOTAX);
@@ -828,7 +828,7 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_CHARMIEJOIN))
+  if (isSet(player->toggles, Player::PLR_CHARMIEJOIN))
   {
     this->sendln("Your followers will no longer automatically join you.");
     REMOVE_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
@@ -847,7 +847,7 @@ command_return_t Character::do_autoeat(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_AUTOEAT))
+  if (isSet(player->toggles, Player::PLR_AUTOEAT))
   {
     this->sendln("You no longer automatically eat and drink.");
     REMOVE_BIT(player->toggles, Player::PLR_AUTOEAT);
@@ -867,7 +867,7 @@ command_return_t Character::do_anonymous(QStringList arguments, int cmd)
     this->sendln("You are too inexperienced to disguise your profession.");
     return eSUCCESS;
   }
-  if (DC::isSet(player->toggles, Player::PLR_ANONYMOUS))
+  if (isSet(player->toggles, Player::PLR_ANONYMOUS))
   {
     this->sendln("Your class and level information is now public.");
   }
@@ -882,7 +882,7 @@ command_return_t Character::do_anonymous(QStringList arguments, int cmd)
 
 command_return_t Character::do_wimpy(QStringList arguments, int cmd)
 {
-  if (DC::isSet(player->toggles, Player::PLR_WIMPY))
+  if (isSet(player->toggles, Player::PLR_WIMPY))
   {
     this->sendln("You are no longer a wimp....maybe.");
     REMOVE_BIT(player->toggles, Player::PLR_WIMPY);
@@ -898,7 +898,7 @@ command_return_t Character::do_wimpy(QStringList arguments, int cmd)
 // If it's not set, we do.
 command_return_t Character::do_pager(QStringList arguments, int cmd)
 {
-  if (DC::isSet(player->toggles, Player::PLR_PAGER))
+  if (isSet(player->toggles, Player::PLR_PAGER))
   {
     this->sendln("You now page your strings in 24 line chunks.");
     REMOVE_BIT(player->toggles, Player::PLR_PAGER);
@@ -912,7 +912,7 @@ command_return_t Character::do_pager(QStringList arguments, int cmd)
 
 command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
 {
-  if (DC::isSet(player->toggles, Player::PLR_BARD_SONG))
+  if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
     this->sendln("Bard singing now in verbose mode.");
     REMOVE_BIT(player->toggles, Player::PLR_BARD_SONG);
@@ -926,7 +926,7 @@ command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
 
 command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
 {
-  if (DC::isSet(player->toggles, Player::PLR_NODUPEKEYS))
+  if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
     this->sendln("You will attach duplicate keys to keyrings.");
     REMOVE_BIT(player->toggles, Player::PLR_NODUPEKEYS);
@@ -943,7 +943,7 @@ command_return_t Character::do_beep_set(QStringList arguments, int cmd)
   if (IS_NPC(this))
     return eFAILURE;
 
-  if (DC::isSet(player->toggles, Player::PLR_BEEP))
+  if (isSet(player->toggles, Player::PLR_BEEP))
   {
     REMOVE_BIT(player->toggles, Player::PLR_BEEP);
     this->sendln("\r\nTell is now silent.");
@@ -1010,7 +1010,7 @@ int do_stand(Character *ch, char *argument, int cmd)
 int do_sit(Character *ch, char *argument, int cmd)
 {
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1064,7 +1064,7 @@ int do_sit(Character *ch, char *argument, int cmd)
 int do_rest(Character *ch, char *argument, int cmd)
 {
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1116,7 +1116,7 @@ int do_rest(Character *ch, char *argument, int cmd)
 int do_sleep(Character *ch, char *argument, int cmd)
 {
   struct affected_type *paf;
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1126,7 +1126,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
     ch->sendln("You are far too alert for that.");
     return eFAILURE;
   }
-  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
     if (!check_make_camp(ch->in_room))
     {
       ch->sendln("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!");
@@ -1687,7 +1687,7 @@ int do_random(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int i = 0;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;

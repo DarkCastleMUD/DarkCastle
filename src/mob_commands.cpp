@@ -587,7 +587,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (obj_index[obj->item_number].virt == 393 && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+  if (obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
   {
     return eFAILURE;
   }
@@ -841,7 +841,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
   char_to_room(ch, location);
   result = ch->command_interpreter(QString(argument));
 
-  if (DC::isSet(result, eCH_DIED))
+  if (isSet(result, eCH_DIED))
     return result;
 
   char_from_room(ch);
@@ -951,7 +951,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
       return eFAILURE | eINTERNAL_ERROR;
     }
 
-    if (DC::isSet(DC::getInstance()->world[location].room_flags, PRIVATE))
+    if (isSet(DC::getInstance()->world[location].room_flags, PRIVATE))
     {
       prog_error(ch, "Mptransfer - Private room.");
       return eFAILURE | eINTERNAL_ERROR;
@@ -1567,7 +1567,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
-        if (DC::isSet(retval, eCH_DIED))
+        if (isSet(retval, eCH_DIED))
         {
           return retval;
         }
@@ -1879,7 +1879,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (DC::isSet(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (isSet(DC::getInstance()->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     ch->sendln("You find yourself unable to.");
@@ -1914,14 +1914,14 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
       to_room = number<room_t>(1, top_of_world);
     }
   } while (!DC::getInstance()->rooms.contains(to_room) ||
-           DC::isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
-           DC::isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
-           DC::isSet(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
-           DC::isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
+           isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
+           isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
+           isSet(DC::getInstance()->world[to_room].room_flags, NO_TELEPORT) ||
+           isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
            (DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
            DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
            ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
-           (IS_AFFECTED(victim, AFF_CHAMPION) && (DC::isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
+           (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);

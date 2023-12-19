@@ -213,7 +213,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
    //   int percent;
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
-   if (mode == 0 && DC::isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
+   if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
        (this->player && !this->player->holyLite))
       return;
 
@@ -280,14 +280,14 @@ void Character::show_obj_to_char(class Object *object, int mode)
          strcat(flagbuf, "Humming");
          found++;
       }
-      if (mode == 0 && DC::isSet(object->obj_flags.more_flags, ITEM_NONOTICE))
+      if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE))
       {
          if (found)
             strcat(flagbuf, "$B/$R");
          strcat(flagbuf, "NO_NOTICE");
          found++;
       }
-      if (mode == 0 && DC::isSet(object->obj_flags.more_flags, ITEM_NOSEE))
+      if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NOSEE))
       {
          if (found)
             strcat(flagbuf, "$B/$R");
@@ -329,7 +329,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
                else strcat(buffer, " [$5Pile of Scraps$R]");
       */
       }
-      if (DC::isSet(object->obj_flags.more_flags, ITEM_24H_SAVE) && !DC::isSet(object->obj_flags.extra_flags, ITEM_NOSAVE))
+      if (isSet(object->obj_flags.more_flags, ITEM_24H_SAVE) && !isSet(object->obj_flags.extra_flags, ITEM_NOSAVE))
       {
          time_t now = time(nullptr);
          time_t expires = object->save_expiration;
@@ -353,7 +353,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
          }
       }
 
-      if (DC::isSet(object->obj_flags.more_flags, ITEM_24H_NO_SELL))
+      if (isSet(object->obj_flags.more_flags, ITEM_24H_NO_SELL))
       {
          time_t now = time(nullptr);
          time_t expires = object->no_sell_expiration;
@@ -392,7 +392,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
    for (i = list; i; i = i->next_content)
    {
       if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-          i->next_content->item_number == i->item_number && i->item_number != -1 && !DC::isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+          i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
       {
          number++;
          continue;
@@ -514,13 +514,13 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
             if (!i->desc)
                buffer = "*linkdead*  ";
-            if (DC::isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
+            if (isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
                buffer.append("$B$7(Guide)$B$3 ");
 
             buffer.append(GET_SHORT(i));
             if ((i->getLevel() < OVERSEER) && i->clan && (clan = get_clan(i)))
             {
-               if (IS_PC(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
+               if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
                   buffer.append(buf);
@@ -534,7 +534,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
+               if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -745,7 +745,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
          for (tmp_obj = i->carrying; tmp_obj;
               tmp_obj = tmp_obj->next_content)
          {
-            if ((DC::isSet(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
+            if ((isSet(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
                  ch->getLevel() > IMMORTAL) &&
                 CAN_SEE_OBJ(ch, tmp_obj) &&
                 number(0, MORTAL) < ch->getLevel())
@@ -931,7 +931,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
    sprintf(buf, "You attempt to peek into the %s.\r\n", cont->short_description);
    ch->send(buf);
 
-   if (DC::isSet(cont->obj_flags.value[1], CONT_CLOSED))
+   if (isSet(cont->obj_flags.value[1], CONT_CLOSED))
    {
       ch->sendln("It is closed.");
       return;
@@ -1014,7 +1014,7 @@ bool identify(Character *ch, Object *obj)
    int i = 0, value = 0, bits = 0;
    bool found = false;
 
-   if (DC::isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < IMMORTAL)
+   if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < IMMORTAL)
    {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return false;
@@ -1040,7 +1040,7 @@ bool identify(Character *ch, Object *obj)
    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
 
-   if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || DC::isSet(obj->obj_flags.more_flags, ITEM_NPC_CORPSE) || DC::isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE) || DC::isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED))
+   if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.more_flags, ITEM_NPC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED))
    {
       csendf(ch, "$3Owner: $R%s\r\n", obj->getOwner().toStdString().c_str());
    }
@@ -1168,7 +1168,7 @@ bool identify(Character *ch, Object *obj)
 
    case ITEM_ARMOR:
 
-      if (DC::isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
       {
          value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
       }
@@ -1183,7 +1183,7 @@ bool identify(Character *ch, Object *obj)
       {
          showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
       }
-      if (DC::isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
       {
          csendf(ch, "-%d", obj->obj_flags.value[1]);
       }
@@ -1378,14 +1378,14 @@ int do_look(Character *ch, char *argument, int cmd)
                ch->sendln("You see nothing special.");
             }
 
-            if (DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
+            if (isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
             {
                sprintf(buffer, "The %s is closed.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
                ch->send(buffer);
             }
             else
             {
-               if (DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !DC::isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
+               if (isSet(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
                    EXIT(ch, keyword_no)->keyword)
                {
                   sprintf(buffer, "The %s is open.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
@@ -1440,7 +1440,7 @@ int do_look(Character *ch, char *argument, int cmd)
                }
                else if (ARE_CONTAINERS(tmp_object))
                {
-                  if (!DC::isSet(tmp_object->obj_flags.value[1],
+                  if (!isSet(tmp_object->obj_flags.value[1],
                                  CONT_CLOSED))
                   {
                      send_to_char(fname(tmp_object->name), ch);
@@ -1753,7 +1753,7 @@ int do_look(Character *ch, char *argument, int cmd)
 
          ch->sendln("");
 
-         if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_BRIEF))
+         if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
             send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
@@ -1779,8 +1779,8 @@ int do_look(Character *ch, char *argument, int cmd)
 
             if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
                continue;
-            is_closed = DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
-            is_hidden = DC::isSet(EXIT(ch, door)->exit_info, EX_HIDDEN);
+            is_closed = isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
+            is_hidden = isSet(EXIT(ch, door)->exit_info, EX_HIDDEN);
 
             if (IS_MOB(ch) || ch->player->holyLite)
             {
@@ -1891,9 +1891,9 @@ int do_exits(Character *ch, char *argument, int cmd)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);
-      else if (DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
+      else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
       {
-         if (DC::isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
+         if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
             continue;
          else
             sprintf(buf + strlen(buf), "%s - (Closed)\n\r", exits[door]);
@@ -3183,7 +3183,7 @@ int do_scan(Character *ch, char *argument, int cmd)
          room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
          if (room == &DC::getInstance()->world[ch->in_room])
             continue;
-         if (DC::isSet(room->room_flags, NO_SCAN))
+         if (isSet(room->room_flags, NO_SCAN))
          {
             csendf(ch, "%35s -- a little bit %s\n\r", "It's too hard to see!",
                    possibilities[i]);
@@ -3215,7 +3215,7 @@ int do_scan(Character *ch, char *argument, int cmd)
          if (CAN_GO(ch, i))
          {
             room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
-            if (DC::isSet(room->room_flags, NO_SCAN))
+            if (isSet(room->room_flags, NO_SCAN))
             {
                csendf(ch, "%35s -- a ways off %s\n\r", "It's too hard to see!",
                       possibilities[i]);
@@ -3246,7 +3246,7 @@ int do_scan(Character *ch, char *argument, int cmd)
                if (CAN_GO(ch, i))
                {
                   room = &DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[i]->to_room];
-                  if (DC::isSet(room->room_flags, NO_SCAN))
+                  if (isSet(room->room_flags, NO_SCAN))
                   {
                      csendf(ch, "%35s -- extremely far off %s\n\r", "It's too hard to see!",
                             possibilities[i]);
@@ -3285,7 +3285,7 @@ int do_tick(Character *ch, char *argument, int cmd)
    int ntick;
    char buf[256];
 
-   if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
    {
       ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
       return 1;
@@ -3646,7 +3646,7 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_WEAR_FLAGS:
-      if (obj->obj_flags.wear_flags == obj_flags_.wear_flags || DC::isSet(obj->obj_flags.wear_flags, obj_flags_.wear_flags))
+      if (obj->obj_flags.wear_flags == obj_flags_.wear_flags || isSet(obj->obj_flags.wear_flags, obj_flags_.wear_flags))
       {
          return true;
       }
@@ -3656,7 +3656,7 @@ bool Search::operator==(const Object *obj)
       }
       break;
    case O_SIZE:
-      if (obj->obj_flags.size == obj_flags_.size || DC::isSet(obj->obj_flags.size, obj_flags_.size))
+      if (obj->obj_flags.size == obj_flags_.size || isSet(obj->obj_flags.size, obj_flags_.size))
       {
          return true;
       }
@@ -3695,7 +3695,7 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_MORE_FLAGS:
-      if (obj_flags_.more_flags == obj->obj_flags.more_flags || DC::isSet(obj->obj_flags.more_flags, obj_flags_.more_flags))
+      if (obj_flags_.more_flags == obj->obj_flags.more_flags || isSet(obj->obj_flags.more_flags, obj_flags_.more_flags))
       {
          return true;
       }
@@ -3705,7 +3705,7 @@ bool Search::operator==(const Object *obj)
       }
       break;
    case O_EXTRA_FLAGS:
-      if (obj->obj_flags.extra_flags == obj_flags_.extra_flags || DC::isSet(obj->obj_flags.extra_flags, obj_flags_.extra_flags))
+      if (obj->obj_flags.extra_flags == obj_flags_.extra_flags || isSet(obj->obj_flags.extra_flags, obj_flags_.extra_flags))
       {
          return true;
       }
@@ -4145,7 +4145,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
 
             // containers must be open to search them
-            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
+            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
             {
                // search inventory containers
                for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
@@ -4177,7 +4177,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                   obj_results.push_back({Search::locations::in_equipment, obj});
                }
 
-               if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER && !DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
+               if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
                {
                   for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
                   {
@@ -4206,7 +4206,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                obj_results.push_back({Search::locations::in_room, obj});
             }
 
-            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
+            if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
             {
                // search inventory containers
                for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)

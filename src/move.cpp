@@ -41,10 +41,10 @@ int move_player(Character *ch, int room)
 
 	retval = move_char(ch, room);
 
-	if (!DC::isSet(retval, eSUCCESS))
+	if (!isSet(retval, eSUCCESS))
 	{
 		retval = move_char(ch, real_room(START_ROOM));
-		if (!DC::isSet(retval, eSUCCESS))
+		if (!isSet(retval, eSUCCESS))
 			logentry("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
 					 IMMORTAL, LogChannels::LOG_BUG);
 	}
@@ -69,7 +69,7 @@ void move_player_home(Character *victim)
 	else if (DC::getInstance()->world[was_in].number == GET_HOME(victim) || IS_AFFECTED(victim, AFF_CHAMPION))
 		move_player(victim, real_room(START_ROOM));
 	// recalling into a clan room
-	else if (!DC::isSet(DC::getInstance()->world[real_room(GET_HOME(victim))].room_flags, CLAN_ROOM))
+	else if (!isSet(DC::getInstance()->world[real_room(GET_HOME(victim))].room_flags, CLAN_ROOM))
 		move_player(victim, real_room(GET_HOME(victim)));
 	// Clanroom else
 	else
@@ -228,10 +228,10 @@ int do_fall(Character *ch, short dir)
 
 	target = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+	if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 		return eFAILURE;
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
+	if (isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
 	{
 		int ppl = 0;
 		Character *k;
@@ -245,7 +245,7 @@ int do_fall(Character *ch, short dir)
 		}
 	}
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
+	if (isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
 	{
 		int ppl = 0;
 		Character *k;
@@ -295,7 +295,7 @@ int do_fall(Character *ch, short dir)
 
 	retval = move_char(ch, target);
 
-	if (!DC::isSet(retval, eSUCCESS))
+	if (!isSet(retval, eSUCCESS))
 	{
 		ch->sendln("You are miraculously upheld by divine powers!");
 		return retval;
@@ -315,7 +315,7 @@ int do_fall(Character *ch, short dir)
 		act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
 	}
 
-	if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
+	if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
 	{
 		return do_fall(ch, dir);
 	}
@@ -342,7 +342,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	 -pir 7/25/01
 	 // Check for special routines (North is 1)
 	 retval = special(ch, cmd+1, "");
-	 if(DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
+	 if(isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
 	 return retval;
 	 */
 
@@ -493,7 +493,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		// if I'm trying to go "up" into a "fall down" room, etc.
 		// it's OK to go east into a "fall north" room though
 		// not ok, if room we're going to is AIR though
-		if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == 0 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH)) || (cmd == 1 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST)) || (cmd == 2 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[2]->to_room].room_flags, FALL_NORTH)) || (cmd == 3 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[3]->to_room].room_flags, FALL_EAST)) || (cmd == 4 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[4]->to_room].room_flags, FALL_DOWN)) || (cmd == 5 && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[5]->to_room].room_flags, FALL_UP)) || DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_AIR))
+		if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == 0 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH)) || (cmd == 1 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST)) || (cmd == 2 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[2]->to_room].room_flags, FALL_NORTH)) || (cmd == 3 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[3]->to_room].room_flags, FALL_EAST)) || (cmd == 4 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[4]->to_room].room_flags, FALL_DOWN)) || (cmd == 5 && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[5]->to_room].room_flags, FALL_UP)) || DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_AIR))
 		{
 			ch->sendln("You would need to fly to go there!");
 			return eFAILURE;
@@ -533,7 +533,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	} // else if !FLYING
 
-	if (DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].room_flags, IMP_ONLY) &&
+	if (isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[cmd]->to_room].room_flags, IMP_ONLY) &&
 		ch->getLevel() < IMPLEMENTER)
 	{
 		ch->sendln("No.");
@@ -554,7 +554,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (DC::isSet(rm->room_flags, TUNNEL))
+	if (isSet(rm->room_flags, TUNNEL))
 	{
 		int ppl = 0;
 		Character *k;
@@ -590,7 +590,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (DC::isSet(rm->room_flags, PRIVATE))
+	if (isSet(rm->room_flags, PRIVATE))
 	{
 		int ppl = 0;
 		Character *k;
@@ -687,7 +687,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	// at this point we messaged that we are moving, but we haven't actually moved yet.  Check if ethereal focus keeps us from moving.
 	retval = check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
-	if (DC::isSet(retval, eFAILURE))
+	if (isSet(retval, eFAILURE))
 		return retval;
 
 	was_in = ch->in_room;
@@ -695,7 +695,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	retval = move_char(ch, DC::getInstance()->world[was_in].dir_option[cmd]->to_room);
 
-	if (DC::isSet(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
+	if (isSet(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
 	{
 		ch->sendln("Your crippled body responds slowly.");
 		WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -710,7 +710,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
 			ch->sendln("The noise around you returns as you leave the silenced area!");
 
-	if (!DC::isSet(retval, eSUCCESS))
+	if (!isSet(retval, eSUCCESS))
 	{
 		ch->sendln("You fail to move.");
 		return retval;
@@ -799,14 +799,14 @@ int do_simple_move(Character *ch, int cmd, int following)
 	}
 	// Elemental stuff ends HERE
 
-	if ((DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)))
+	if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)))
 	{
 		retval = do_fall(ch, dir);
 		if (SOMEONE_DIED(retval))
 			return eSUCCESS | eCH_DIED;
 	}
 
-	if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE))
+	if (isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE))
 	{
 		retval = do_unstable(ch);
 		if (SOMEONE_DIED(retval))
@@ -814,7 +814,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	}
 
 	/*
-	 if(DC::isSet(DC::getInstance()->world[ch->in_room].sector_type, SECT_FIELD) &&
+	 if(isSet(DC::getInstance()->world[ch->in_room].sector_type, SECT_FIELD) &&
 	 weather_info.sky == SKY_HEAVY_RAIN && !number(0,19)) {
 	 do_muddy(ch);
 	 }
@@ -828,7 +828,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 				continue;
 			if (tmp_ch->fighting)
 				continue;
-			if (DC::isSet(tmp_ch->immune, ISR_CHARM))
+			if (isSet(tmp_ch->immune, ISR_CHARM))
 				continue;
 			if (!number(0, 1))
 				continue;
@@ -880,9 +880,9 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		return eFAILURE;
 	}
 
-	if (DC::isSet(EXIT(ch, cmd)->exit_info, EX_CLOSED))
+	if (isSet(EXIT(ch, cmd)->exit_info, EX_CLOSED))
 	{
-		if (DC::isSet(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
+		if (isSet(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
 			ch->sendln("You can't go that way.");
 		else if (EXIT(ch, cmd)->keyword)
 			csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, cmd)->keyword));
@@ -909,11 +909,11 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 			return_val = eFAILURE;
 		}
 
-		if (SOMEONE_DIED(return_val) || !DC::isSet(return_val, eSUCCESS))
+		if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
 			return return_val;
 		if (!IS_AFFECTED(ch, AFF_SNEAK))
 			return_val = ambush(ch);
-		if (SOMEONE_DIED(return_val) || !DC::isSet(return_val, eSUCCESS))
+		if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
 			return return_val;
 		return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
 	}
@@ -952,7 +952,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 
 	// this may cause problems with leader being ambushed, dying, and group not moving
 	// but we have to be careful in case leader was a mob (no longer valid memory)
-	if (SOMEONE_DIED(return_val) || !DC::isSet(return_val, eSUCCESS))
+	if (SOMEONE_DIED(return_val) || !isSet(return_val, eSUCCESS))
 	{
 		/*
 		 sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
@@ -962,7 +962,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		return return_val;
 	}
 
-	if (ch->followers && !DC::isSet(ch->combat, COMBAT_FLEEING))
+	if (ch->followers && !isSet(ch->combat, COMBAT_FLEEING))
 	{
 		for (k = ch->followers; k; k = next_dude)
 		{ // no following a fleer
@@ -1012,7 +1012,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 	if (was_in != ch->in_room && !IS_AFFECTED(ch, AFF_SNEAK))
 		return_val = ambush(ch);
 
-	if (DC::isSet(return_val, eCH_DIED))
+	if (isSet(return_val, eCH_DIED))
 		return eSUCCESS | eCH_DIED;
 
 	return eSUCCESS;
@@ -1046,7 +1046,7 @@ int do_leave(Character *ch, char *arguement, int cmd)
 						ch->sendln("You exit the area.");
 						act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 						retval = move_char(ch, real_room(DC::getInstance()->world[k->in_room].number));
-						if (!DC::isSet(retval, eSUCCESS))
+						if (!isSet(retval, eSUCCESS))
 						{
 							ch->sendln("You attempt to leave, but the door slams in your face!");
 							act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -1112,7 +1112,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eSUCCESS;
 	}
 
-	if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && DC::isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
+	if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
 	{
 		ch->sendln("You may not enter a clanhall at your level.");
 		return eFAILURE;
@@ -1121,7 +1121,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8)
 	{
 		sesame = ch->master;
-		if (DC::isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+		if (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
 		{
 			// Is golem's master not a member of this clan
 			if (others_clan_room(sesame, &DC::getInstance()->world[real_room(portal->obj_flags.value[0])]) == true)
@@ -1139,7 +1139,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	}
 
 	// should probably just combine this with 'if' below it, but i'm lazy
-	if (DC::isSet(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
+	if (isSet(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
 	{
 		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
@@ -1153,7 +1153,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (!IS_MOB(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (DC::isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+	if (!IS_MOB(ch) && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
 	{
 		ch->sendln("The portal's destination rebels against you.");
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
@@ -1193,7 +1193,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 	if (SOMEONE_DIED(retval))
 		return retval;
 
-	if (!DC::isSet(retval, eSUCCESS))
+	if (!isSet(retval, eSUCCESS))
 	{
 		ch->sendln("You recoil in pain as the portal slams shut!");
 		act("$n recoils in pain as the portal slams shut!", ch, 0, 0, TO_ROOM, 0);
@@ -1325,7 +1325,7 @@ int ambush(Character *ch)
 		if (GET_POS(i) <= position_t::RESTING ||
 			GET_POS(i) == position_t::FIGHTING ||
 			IS_AFFECTED(i, AFF_PARALYSIS) ||
-			(DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
+			(isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
 			 !IS_AFFECTED(ch, AFF_CANTQUIT)))
 			continue;
 		if (!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
@@ -1353,11 +1353,11 @@ int ambush(Character *ch)
 				//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
 				//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
 				retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH, 0);
-				if (DC::isSet(retval, eVICT_DIED))
+				if (isSet(retval, eVICT_DIED))
 					return (eSUCCESS | eCH_DIED); // ch = damage vict
-				if (DC::isSet(retval, eCH_DIED))
+				if (isSet(retval, eCH_DIED))
 					return (eSUCCESS); // doesn't matter, but don't lag vict
-				if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_WIMPY))
+				if (!IS_MOB(i) && isSet(i->player->toggles, Player::PLR_WIMPY))
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 3);
 				else
 					WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);

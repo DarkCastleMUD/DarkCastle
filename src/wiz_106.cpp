@@ -192,39 +192,39 @@ command_return_t run_all_events(Character *ch = nullptr)
 QString rc_to_qstring(const command_return_t &rc)
 {
   QStringList strings;
-  if (DC::isSet(rc, eFAILURE))
+  if (isSet(rc, eFAILURE))
   {
     strings += "eFAILURE";
   }
-  if (DC::isSet(rc, eSUCCESS))
+  if (isSet(rc, eSUCCESS))
   {
     strings += "eSUCCESS ";
   }
-  if (DC::isSet(rc, eCH_DIED))
+  if (isSet(rc, eCH_DIED))
   {
     strings += "eCH_DIED ";
   }
-  if (DC::isSet(rc, eDELAYED_EXEC))
+  if (isSet(rc, eDELAYED_EXEC))
   {
     strings += "eDELAYED_EXEC ";
   }
-  if (DC::isSet(rc, eEXTRA_VAL2))
+  if (isSet(rc, eEXTRA_VAL2))
   {
     strings += "eEXTRA_VAL2 ";
   }
-  if (DC::isSet(rc, eEXTRA_VALUE))
+  if (isSet(rc, eEXTRA_VALUE))
   {
     strings += "eEXTRA_VALUE ";
   }
-  if (DC::isSet(rc, eIMMUNE_VICTIM))
+  if (isSet(rc, eIMMUNE_VICTIM))
   {
     strings += "eIMMUNE_VICTIM ";
   }
-  if (DC::isSet(rc, eINTERNAL_ERROR))
+  if (isSet(rc, eINTERNAL_ERROR))
   {
     strings += "eINTERNAL_ERROR ";
   }
-  if (DC::isSet(rc, eVICT_DIED))
+  if (isSet(rc, eVICT_DIED))
   {
     strings += "eVICT_DIED ";
   }

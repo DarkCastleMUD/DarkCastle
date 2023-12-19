@@ -2997,7 +2997,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     ch->desc->strnew = &(currprog->comlist);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-    if (DC::isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+    if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       ch->desc->web_connected = Connection::states::EDIT_MPROG;
     }
@@ -4276,7 +4276,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
           DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
-          if (IS_PC(ch) && !DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+          if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
           {
             // if the destination room has a reverse exit
             if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]])
@@ -4420,7 +4420,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     ch->sendln("Ok.");
 
-    if (!IS_MOB(ch) && !DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4865,13 +4865,13 @@ int do_oneway(Character *ch, char *arg, int cmd)
 
   if (cmd == 1)
   {
-    if (!DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (!isSet(ch->player->toggles, Player::PLR_ONEWAY))
       SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
     ch->sendln("You generate one-way exits.");
   }
   else
   {
-    if (DC::isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (isSet(ch->player->toggles, Player::PLR_ONEWAY))
       REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
     ch->sendln("You generate two-way exits.");
   }
@@ -4950,7 +4950,7 @@ int do_rsave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!DC::isSet(curr->flags, WORLD_FILE_MODIFIED))
+  if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   {
     ch->sendln("This range has not been modified.");
     return eFAILURE;
@@ -5008,7 +5008,7 @@ int do_msave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!DC::isSet(curr->flags, WORLD_FILE_MODIFIED))
+  if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   { // this is okay...world_file_saved is used in all
     ch->sendln("This range has not been modified.");
     return eFAILURE;
@@ -5063,7 +5063,7 @@ int do_osave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!DC::isSet(curr->flags, WORLD_FILE_MODIFIED))
+  if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   {
     ch->sendln("This range has not been modified.");
     return eFAILURE;
@@ -5166,12 +5166,12 @@ int do_instazone(Character *ch, char *arg, int cmd)
       if (!(DC::getInstance()->world[room].dir_option[door]))
         continue;
 
-      if (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
+      if (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
       {
-        if ((DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
+        if ((isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
                                                                                                              EX_LOCKED)))
           value = 2;
-        else if (DC::isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
+        else if (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
                            EX_CLOSED))
           value = 1;
         else
@@ -5420,7 +5420,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     }
     rm = &DC::getInstance()->world[loc];
   }
-  if (DC::isSet(rm->room_flags, CLAN_ROOM) && ch->getLevel() < PATRON)
+  if (isSet(rm->room_flags, CLAN_ROOM) && ch->getLevel() < PATRON)
   {
     ch->sendln("And you are rstating a clan room because?");
     sprintf(buf, "%s just rstat'd clan room %d.", GET_NAME(ch), rm->number);
@@ -5778,7 +5778,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "stupid", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_STUPID))
+    if (isSet(vict->player->punish, PUNISH_STUPID))
     {
       vict->sendln("You feel a sudden onslaught of wisdom!");
       ch->sendln("STUPID removed.");
@@ -5808,7 +5808,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "silence", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_SILENCED))
+    if (isSet(vict->player->punish, PUNISH_SILENCED))
     {
       vict->sendln("The gods take pity on you and lift your silence.");
       ch->sendln("SILENCE removed.");
@@ -5827,7 +5827,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "freeze", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_FREEZE))
+    if (isSet(vict->player->punish, PUNISH_FREEZE))
     {
       vict->sendln("You now can do things again.");
       ch->sendln("FREEZE removed.");
@@ -5846,7 +5846,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "noarena", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NOARENA))
+    if (isSet(vict->player->punish, PUNISH_NOARENA))
     {
       vict->sendln("Some kind god has let you join arenas again.");
       ch->sendln("NOARENA removed.");
@@ -5861,7 +5861,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "noemote", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NOEMOTE))
+    if (isSet(vict->player->punish, PUNISH_NOEMOTE))
     {
       vict->sendln("You can emote again.");
       ch->sendln("NOEMOTE removed.");
@@ -5876,7 +5876,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "notell", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NOTELL))
+    if (isSet(vict->player->punish, PUNISH_NOTELL))
     {
       vict->sendln("You can use telepatic communication again.");
       ch->sendln("NOTELL removed.");
@@ -5891,7 +5891,7 @@ int do_punish(Character *ch, char *arg, int cmd)
   }
   if (!strncasecmp(name, "noname", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NONAME))
+    if (isSet(vict->player->punish, PUNISH_NONAME))
     {
       vict->sendln("The gods grant you control over your name.");
       ch->sendln("NONAME removed.");
@@ -5907,7 +5907,7 @@ int do_punish(Character *ch, char *arg, int cmd)
 
   if (!strncasecmp(name, "notitle", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NOTITLE))
+    if (isSet(vict->player->punish, PUNISH_NOTITLE))
     {
       vict->sendln("The gods grant you control over your title.");
       ch->sendln("NOTITLE removed.");
@@ -5923,7 +5923,7 @@ int do_punish(Character *ch, char *arg, int cmd)
 
   if (!strncasecmp(name, "unlucky", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_UNLUCKY))
+    if (isSet(vict->player->punish, PUNISH_UNLUCKY))
     {
       if (!ch->player->stealth)
         vict->sendln("The gods remove your poor luck.");
@@ -5947,7 +5947,7 @@ int do_punish(Character *ch, char *arg, int cmd)
 
   if (!strncasecmp(name, "nopray", i) || !strncasecmp(name, "nemke", i))
   {
-    if (DC::isSet(vict->player->punish, PUNISH_NOPRAY))
+    if (isSet(vict->player->punish, PUNISH_NOPRAY))
     {
       vict->sendln("The gods will once again hear your prayers.");
       vict->sendln("But not necessarily answer them...");
@@ -5972,40 +5972,40 @@ void display_punishes(Character *ch, Character *vict)
   sprintf(buf, "$3Punishments for %s$R: ", GET_NAME(vict));
   ch->send(buf);
 
-  if (DC::isSet(vict->player->punish, PUNISH_NONAME))
+  if (isSet(vict->player->punish, PUNISH_NONAME))
     ch->send("noname ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_SILENCED))
+  if (isSet(vict->player->punish, PUNISH_SILENCED))
     ch->send("Silence ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_NOEMOTE))
+  if (isSet(vict->player->punish, PUNISH_NOEMOTE))
     ch->send("noemote ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_LOG) && ch->getLevel() > 108)
+  if (isSet(vict->player->punish, PUNISH_LOG) && ch->getLevel() > 108)
     ch->send("log ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_FREEZE))
+  if (isSet(vict->player->punish, PUNISH_FREEZE))
     ch->send("Freeze ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_SPAMMER))
+  if (isSet(vict->player->punish, PUNISH_SPAMMER))
     ch->send("Spammer ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_STUPID))
+  if (isSet(vict->player->punish, PUNISH_STUPID))
     ch->send("Stupid ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_NOTELL))
+  if (isSet(vict->player->punish, PUNISH_NOTELL))
     ch->send("notell ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_NOARENA))
+  if (isSet(vict->player->punish, PUNISH_NOARENA))
     ch->send("noarena ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_NOTITLE))
+  if (isSet(vict->player->punish, PUNISH_NOTITLE))
     ch->send("notitle ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_UNLUCKY))
+  if (isSet(vict->player->punish, PUNISH_UNLUCKY))
     ch->send("unlucky ");
 
-  if (DC::isSet(vict->player->punish, PUNISH_NOPRAY))
+  if (isSet(vict->player->punish, PUNISH_NOPRAY))
     ch->send("nopray ");
 
   ch->sendln("");

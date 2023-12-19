@@ -42,7 +42,7 @@ command_return_t Character::check_social(QString pcomm)
     return SOCIAL_false;
   }
 
-  if (isPlayer() && DC::isSet(player->punish, PUNISH_NOEMOTE))
+  if (isPlayer() && isSet(player->punish, PUNISH_NOEMOTE))
   {
     this->sendln("You are anti-social!");
     return SOCIAL_true;
@@ -63,7 +63,7 @@ command_return_t Character::check_social(QString pcomm)
     return SOCIAL_true;
   }
 
-  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))
   {
     this->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return SOCIAL_true;

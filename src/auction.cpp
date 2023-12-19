@@ -178,7 +178,7 @@ bool AuctionHouse::IsRace(int vnum, QString israce)
   if (!obj)
     return false;
 
-  if (DC::isSet(obj->obj_flags.size, SIZE_ANY))
+  if (isSet(obj->obj_flags.size, SIZE_ANY))
     return true;
 
   israce = israce.toLower();
@@ -187,28 +187,28 @@ bool AuctionHouse::IsRace(int vnum, QString israce)
     return true;
 
   if (israce == "ogre")
-    return DC::isSet(obj->obj_flags.size, SIZE_LARGE);
+    return isSet(obj->obj_flags.size, SIZE_LARGE);
 
   if (israce == "troll")
-    return DC::isSet(obj->obj_flags.size, SIZE_LARGE);
+    return isSet(obj->obj_flags.size, SIZE_LARGE);
 
   if (israce == "elf")
-    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_LARGE));
+    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_LARGE));
 
   if (israce == "orc")
-    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_LARGE));
+    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_LARGE));
 
   if (israce == "dwarf")
-    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_SMALL));
+    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_SMALL));
 
   if (israce == "gnome")
-    return (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM) || DC::isSet(obj->obj_flags.size, SIZE_SMALL));
+    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_SMALL));
 
   if (israce == "pixie")
-    return DC::isSet(obj->obj_flags.size, SIZE_SMALL);
+    return isSet(obj->obj_flags.size, SIZE_SMALL);
 
   if (israce == "hobbit")
-    return DC::isSet(obj->obj_flags.size, SIZE_SMALL);
+    return isSet(obj->obj_flags.size, SIZE_SMALL);
 
   return false;
 }
@@ -431,7 +431,7 @@ Is item type ok to sell?
 */
 bool AuctionHouse::IsOkToSell(Object *obj)
 {
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     return false;
   }
@@ -652,7 +652,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return DC::isSet(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -1155,13 +1155,13 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
   {
     ch->sendln("Why would you want another one of those?");
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     Object *no_trade_obj;
     int nr = real_object(27909);
@@ -1387,7 +1387,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       return;
     }
 
-    if (DC::isSet(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1631,13 +1631,13 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
     ch->sendln("You can't sell that item!");
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("You can't sell godload.");
     return;
@@ -1684,7 +1684,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     advertise = true;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
   {
     ch->send(QString("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
     return;

@@ -29,12 +29,12 @@ int do_suicide(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE; // just in case
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("This place is too peaceful for that.");
     return eFAILURE;
   }
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     ch->sendln("You can't do that in the arena.");
     return eFAILURE;

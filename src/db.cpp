@@ -1540,7 +1540,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 		if (room_nr)
 		{
 			DC::getInstance()->world[room_nr].room_flags = room_flags;
-			if (DC::isSet(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
+			if (isSet(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
 				REMOVE_BIT(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL);
 
 			// This bitvector is for runtime and not stored in the files, so just initialize it to 0
@@ -2770,30 +2770,30 @@ Character *read_mobile(int nr, FILE *fl)
 	for (i = 0; i <= SAVE_TYPE_MAX; i++)
 		mob->saves[i] = mob->getLevel() / 3;
 
-	if (DC::isSet(mob->resist, ISR_FIRE))
+	if (isSet(mob->resist, ISR_FIRE))
 		mob->saves[SAVE_TYPE_FIRE] += 50;
-	if (DC::isSet(mob->resist, ISR_ACID))
+	if (isSet(mob->resist, ISR_ACID))
 		mob->saves[SAVE_TYPE_ACID] += 50;
-	if (DC::isSet(mob->resist, ISR_POISON))
+	if (isSet(mob->resist, ISR_POISON))
 		mob->saves[SAVE_TYPE_POISON] += 50;
-	if (DC::isSet(mob->resist, ISR_COLD))
+	if (isSet(mob->resist, ISR_COLD))
 		mob->saves[SAVE_TYPE_COLD] += 50;
-	if (DC::isSet(mob->resist, ISR_ENERGY))
+	if (isSet(mob->resist, ISR_ENERGY))
 		mob->saves[SAVE_TYPE_ENERGY] += 50;
-	if (DC::isSet(mob->resist, ISR_MAGIC))
+	if (isSet(mob->resist, ISR_MAGIC))
 		mob->saves[SAVE_TYPE_MAGIC] += 50;
 
-	if (DC::isSet(mob->suscept, ISR_FIRE))
+	if (isSet(mob->suscept, ISR_FIRE))
 		mob->saves[SAVE_TYPE_FIRE] -= 50;
-	if (DC::isSet(mob->suscept, ISR_ACID))
+	if (isSet(mob->suscept, ISR_ACID))
 		mob->saves[SAVE_TYPE_ACID] -= 50;
-	if (DC::isSet(mob->suscept, ISR_POISON))
+	if (isSet(mob->suscept, ISR_POISON))
 		mob->saves[SAVE_TYPE_POISON] -= 50;
-	if (DC::isSet(mob->suscept, ISR_COLD))
+	if (isSet(mob->suscept, ISR_COLD))
 		mob->saves[SAVE_TYPE_COLD] -= 50;
-	if (DC::isSet(mob->suscept, ISR_ENERGY))
+	if (isSet(mob->suscept, ISR_ENERGY))
 		mob->saves[SAVE_TYPE_ENERGY] -= 50;
-	if (DC::isSet(mob->suscept, ISR_MAGIC))
+	if (isSet(mob->suscept, ISR_MAGIC))
 		mob->saves[SAVE_TYPE_MAGIC] -= 50;
 
 	mob->mobdata->nr = nr;
@@ -4431,7 +4431,7 @@ void write_bitvector_csv(uint32_t vector, QStringList names, std::ofstream &fout
 
 	for (uint32_t nr = 0; nr < names.size(); nr++)
 	{
-		if (DC::isSet(1, vector))
+		if (isSet(1, vector))
 		{
 			fout << names[nr].toStdString();
 		}
@@ -4448,7 +4448,7 @@ void write_bitvector_csv(uint32_t vector, const char *const *array, std::ofstrea
 	int nr = 0;
 	while (*array[nr] != '\n')
 	{
-		if (DC::isSet(1, vector))
+		if (isSet(1, vector))
 		{
 			fout << array[nr];
 		}
@@ -4592,7 +4592,7 @@ void randomize_object_affects(Object *obj)
 	}
 
 	// Don't alter godload
-	if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		return;
 	}
@@ -4689,7 +4689,7 @@ void randomize_object(Object *obj)
 	}
 
 	// NO_CUSTOM, QUEST or SPECIAL ("godload") items cannot be randomized
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM) || DC::isSet(obj->obj_flags.extra_flags, ITEM_QUEST) || DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM) || isSet(obj->obj_flags.extra_flags, ITEM_QUEST) || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 	{
 		return;
 	}
@@ -6850,7 +6850,7 @@ void copySaveData(Object *target, Object *source)
 		target->obj_flags.more_flags = source->obj_flags.more_flags;
 	}
 
-	bool custom = DC::isSet(source->obj_flags.more_flags, ITEM_CUSTOM);
+	bool custom = isSet(source->obj_flags.more_flags, ITEM_CUSTOM);
 	if (custom)
 	{
 		target->obj_flags.value[0] = source->obj_flags.value[0];
@@ -6904,12 +6904,12 @@ void copySaveData(Object *target, Object *source)
 		}
 	}
 
-	if (DC::isSet(source->obj_flags.more_flags, ITEM_24H_SAVE))
+	if (isSet(source->obj_flags.more_flags, ITEM_24H_SAVE))
 	{
 		target->save_expiration = source->save_expiration;
 	}
 
-	if (DC::isSet(source->obj_flags.more_flags, ITEM_24H_NO_SELL))
+	if (isSet(source->obj_flags.more_flags, ITEM_24H_NO_SELL))
 	{
 		target->no_sell_expiration = source->no_sell_expiration;
 	}
@@ -6939,12 +6939,12 @@ bool fullItemMatch(Object *obj, Object *obj2)
 		return false;
 	}
 
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.cost != obj2->obj_flags.cost)
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.cost != obj2->obj_flags.cost)
 	{
 		return false;
 	}
 
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != obj2->obj_flags.value[0])
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != obj2->obj_flags.value[0])
 	{
 		return false;
 	}
@@ -6954,28 +6954,28 @@ bool fullItemMatch(Object *obj, Object *obj2)
 		return false;
 	}
 
-	if ((DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON) && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
+	if ((isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON) && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
 	{
 		return false;
 	}
 
-	if ((DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && (obj->obj_flags.value[2] != obj2->obj_flags.value[2]))
+	if ((isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && (obj->obj_flags.value[2] != obj2->obj_flags.value[2]))
 	{
 		return false;
 	}
 
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != obj2->obj_flags.value[3])
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != obj2->obj_flags.value[3])
 	{
 		return false;
 	}
 
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->num_affects != obj2->num_affects)
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->num_affects != obj2->num_affects)
 	{
 		return false;
 	}
 
 	// check if any of the affects don't match
-	if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
+	if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
 	{
 		for (int i = 0; i < obj->num_affects; ++i)
 		{

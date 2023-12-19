@@ -74,7 +74,7 @@ int do_kick(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Kicking a bladeshielded opponent would be a good way to lose a leg!");
     return eFAILURE;
@@ -207,7 +207,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Stroking a bladeshielded opponent would be suicide!");
     return eFAILURE;
@@ -346,11 +346,11 @@ int do_retreat(Character *ch, char *argument, int cmd)
 
     // check for any spec procs
     retval = ch->special("", attempt + 1);
-    if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
+    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
       return retval;
 
     retval = attempt_move(ch, attempt + 1, 1);
-    if (DC::isSet(retval, eSUCCESS))
+    if (isSet(retval, eSUCCESS))
     {
       // They got away.  Stop fighting for everyone not in the new room from fighting
       for (chTemp = combat_list; chTemp; chTemp = loop_ch)
@@ -365,7 +365,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (!DC::isSet(retval, eCH_DIED))
+      if (!isSet(retval, eCH_DIED))
         act("$n tries to retreat, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       return retval;
     }
@@ -397,7 +397,7 @@ int do_hitall(Character *ch, char *argument, int cmd)
     return eSUCCESS;
 
   // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
-  if (DC::isSet(ch->combat, COMBAT_HITALL))
+  if (isSet(ch->combat, COMBAT_HITALL))
   {
     ch->sendln("You can't disengage!");
     return eFAILURE;
@@ -427,7 +427,7 @@ int do_hitall(Character *ch, char *argument, int cmd)
              {
 			if (vict && vict != (Character *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
 				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
-				if (DC::isSet(retval, eCH_DIED)) {
+				if (isSet(retval, eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
 					return false;
 				}
@@ -505,7 +505,7 @@ int do_bash(Character *ch, char *argument, int cmd)
 
   set_cantquit(ch, victim);
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Bashing a bladeshielded opponent would be suicide!");
     return eFAILURE;
@@ -535,7 +535,7 @@ int do_bash(Character *ch, char *argument, int cmd)
   {
     modifier = -20;
     // but 3/4 as accurate with a 2hander
-    if (ch->equipment[WIELD] && DC::isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
+    if (ch->equipment[WIELD] && isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
     {
       modifier += 10;
       // if the basher is a barb though, give them the full effect
@@ -730,7 +730,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Attempting to disarm a bladeshielded opponent would be suicide!");
     return eFAILURE;
@@ -775,13 +775,13 @@ int do_disarm(Character *ch, char *argument, int cmd)
     modifier = -(level_difference * 2);
 
   // Two handed weapons are twice as hard to disarm
-  if (DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
+  if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
     modifier -= 20;
 
   if (skill_success(ch, victim, SKILL_DISARM, modifier))
   {
 
-    if (((DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || DC::isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
+    if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
         (IS_PC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
          mob_index[victim->mobdata->nr].virt < 2300))
@@ -1208,10 +1208,10 @@ int do_make_camp(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE) ||
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) ||
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) ||
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) ||
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, UNSTABLE) ||
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_NORTH) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_SOUTH) ||
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_EAST) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_WEST) ||
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_UP) || isSet(DC::getInstance()->world[ch->in_room].room_flags, FALL_DOWN) ||
       DC::getInstance()->world[ch->in_room].sector_type == SECT_CITY || DC::getInstance()->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
     ch->sendln("Something about this area inherently prohibits a rugged camp.");
@@ -1501,7 +1501,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) || isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("Stop trying to show off.");
     return eFAILURE;

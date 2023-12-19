@@ -204,7 +204,7 @@ int do_tame(Character *ch, char *arg, int cmd)
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
-  if ((DC::isSet(victim->immune, ISR_CHARM)) ||
+  if ((isSet(victim->immune, ISR_CHARM)) ||
       !ISSET(victim->mobdata->actflags, ACT_CHARM))
   {
     act("$N is wilder than you thought.", ch, nullptr, victim, TO_CHAR, 0);
@@ -366,11 +366,11 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
         if (IS_NPC(this))
         {
           // temp disable tracking mobs into town
-          if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !DC::isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
+          if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
             this->mobdata->last_direction = y;
             retval = do_move(this, "", (y + 1));
-            if (DC::isSet(retval, eCH_DIED))
+            if (isSet(retval, eCH_DIED))
               return retval;
           }
 
@@ -398,7 +398,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
             return eFAILURE;
           }
 
-          if (!DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+          if (!isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
@@ -752,9 +752,9 @@ int do_forage(Character *ch, char *arg, int cmd)
   int cur_sector = DC::getInstance()->world[ch->in_room].sector_type;
 
   // If in a clan or safe room, set sector to inside so we fail forage
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, INDOORS))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, INDOORS))
   {
     cur_sector = SECT_INSIDE;
   }
@@ -970,7 +970,7 @@ int mob_arrow_response(Character *ch, Character *victim,
         {
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
                 DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
-              !DC::isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+              !isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
             /* send 1-6 since attempt move --cmd's it */
             return attempt_move(victim, dir2 + 1, 0);
         }
@@ -992,14 +992,14 @@ int mob_arrow_response(Character *ch, Character *victim,
       if (CAN_GO(ch, dir2))
         if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
               DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(victim, dir2)->to_room].zone).isTown()))
-          if (!DC::isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+          if (!isSet(DC::getInstance()->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */
             retval = attempt_move(victim, (dir2 + 1), 0);
             if (SOMEONE_DIED(retval))
               return retval;
 
-            if (DC::isSet(retval, eFAILURE)) // can't go after the archer
+            if (isSet(retval, eFAILURE)) // can't go after the archer
               return do_flee(victim, "", 0);
           }
     }
@@ -1173,7 +1173,7 @@ int do_fire(Character *ch, char *arg, int cmd)
   target[MAX_STRING_LENGTH - 1] = '\0';
 
   /* make safe rooms checks */
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("You can't shoot arrows if yer in a safe room silly.");
     return eFAILURE;
@@ -1273,10 +1273,10 @@ int do_fire(Character *ch, char *arg, int cmd)
     {
       if (dir >= 0)
       {
-        if (DC::getInstance()->world[cur_room].dir_option[dir] && !(DC::getInstance()->world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !DC::isSet(DC::getInstance()->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (DC::getInstance()->world[cur_room].dir_option[dir] && !(DC::getInstance()->world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = DC::getInstance()->world[cur_room].dir_option[dir]->to_room;
-          if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             return eFAILURE;
@@ -1295,11 +1295,11 @@ int do_fire(Character *ch, char *arg, int cmd)
 
       if (!victim && new_room && artype == 3 && dir >= 0)
       {
-        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !DC::isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = DC::getInstance()->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
@@ -1318,11 +1318,11 @@ int do_fire(Character *ch, char *arg, int cmd)
 
       if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT)&& dir >= 0)
       {
-        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !DC::isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = DC::getInstance()->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (DC::isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
+          if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
@@ -1468,7 +1468,7 @@ int do_fire(Character *ch, char *arg, int cmd)
 
     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
-    if (DC::isSet(retval, eVICT_DIED))
+    if (isSet(retval, eVICT_DIED))
     {
       switch (number(1, 3))
       {
@@ -1583,7 +1583,7 @@ int do_fire(Character *ch, char *arg, int cmd)
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
       // just in case
-      if (DC::isSet(retval, eCH_DIED))
+      if (isSet(retval, eCH_DIED))
       {
         Object *corpse, *next;
         for (corpse = object_list; corpse; corpse = next)

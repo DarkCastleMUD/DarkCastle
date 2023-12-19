@@ -86,7 +86,7 @@ char * innate_skills[] =
 int do_innate(Character *ch, char *arg, int cmd)
 {
   if(ch && ch->in_room > 0 &&
-     DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
+     isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
     ch->sendln("Cannot use innate skills within a potato arena.");
     return eFAILURE;
   }

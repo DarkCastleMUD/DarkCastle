@@ -263,7 +263,7 @@ int do_load(Character *ch, char *arg, int cmd)
 				return eFAILURE;
 			}
 			if ((ch->getLevel() < 108) &&
-				DC::isSet(((class Object *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+				isSet(((class Object *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
 				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
@@ -282,17 +282,17 @@ int do_load(Character *ch, char *arg, int cmd)
 			if (random[0] == 'r')
 			{
 				Object *obj = (Object *)(obj_index[number].item);
-				if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+				if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
 					ch->send(QString("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
 					return eFAILURE;
 				}
-				else if (DC::isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
+				else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
 				{
 					ch->send(QString("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
 					return eFAILURE;
 				}
-				else if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+				else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
 				{
 					ch->send(QString("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
 					return eFAILURE;
@@ -308,7 +308,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 		if ((ch->getLevel() < IMPLEMENTER) &&
-			DC::isSet(((class Object *)(obj_index[num].item))->obj_flags.extra_flags,
+			isSet(((class Object *)(obj_index[num].item))->obj_flags.extra_flags,
 					  ITEM_SPECIAL))
 		{
 			ch->sendln("Why would you want to load that?");
@@ -766,22 +766,22 @@ void show_legacy_files(Character *ch, world_file_list_item *head)
 	while (curr != nullptr)
 	{
 		QString file_in_progress, file_ready, file_approved, file_modified;
-		if (DC::isSet(curr->flags, WORLD_FILE_IN_PROGRESS))
+		if (isSet(curr->flags, WORLD_FILE_IN_PROGRESS))
 		{
 			file_in_progress = "$B$1*$R";
 		}
 
-		if (DC::isSet(curr->flags, WORLD_FILE_READY))
+		if (isSet(curr->flags, WORLD_FILE_READY))
 		{
 			file_ready = "$B$5*$R";
 		}
 
-		if (DC::isSet(curr->flags, WORLD_FILE_APPROVED))
+		if (isSet(curr->flags, WORLD_FILE_APPROVED))
 		{
 			file_approved = "$B$2*$R";
 		}
 
-		if (DC::isSet(curr->flags, WORLD_FILE_MODIFIED))
+		if (isSet(curr->flags, WORLD_FILE_MODIFIED))
 		{
 			file_modified = "MODIFIED";
 		}
@@ -1194,7 +1194,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (!DC::getInstance()->rooms.contains(i))
 				continue;
 			if (bits)
-				if (!DC::isSet(DC::getInstance()->world[i].room_flags, bits))
+				if (!isSet(DC::getInstance()->world[i].room_flags, bits))
 					continue;
 			if (sector)
 				if (DC::getInstance()->world[i].sector_type != sector)
@@ -1367,7 +1367,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 			}
 			if (immune)
-				if (!DC::isSet(((Character *)(mob_index[nr].item))->immune,
+				if (!isSet(((Character *)(mob_index[nr].item))->immune,
 							   immune))
 					continue;
 			if (clas)
@@ -1634,8 +1634,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				continue;
 			if (wear)
 				for (i = 0; i < 20; i++)
-					if (DC::isSet(wear, 1 << i))
-						if (!DC::isSet(
+					if (isSet(wear, 1 << i))
+						if (!isSet(
 								((class Object *)(obj_index[nr].item))->obj_flags.wear_flags,
 								1 << i))
 							goto endLoop;
@@ -1657,8 +1657,8 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 			if (size)
 				for (i = 0; i < 10; i++)
-					if (DC::isSet(size, 1 << i))
-						if (!DC::isSet(
+					if (isSet(size, 1 << i))
+						if (!isSet(
 								((class Object *)(obj_index[nr].item))->obj_flags.size,
 								1 << i))
 							goto endLoop;
@@ -1672,19 +1672,19 @@ int do_show(Character *ch, char *argument, int cmd)
 				continue;
 			if (extra)
 				for (i = 0; i < 30; i++)
-					if (DC::isSet(extra, 1 << i))
-						if (!DC::isSet(
+					if (isSet(extra, 1 << i))
+						if (!isSet(
 								((class Object *)(obj_index[nr].item))->obj_flags.extra_flags,
 								1 << i) &&
-							!(any && DC::isSet(
+							!(any && isSet(
 										 ((class Object *)(obj_index[nr].item))->obj_flags.extra_flags,
 										 1 << any)))
 							goto endLoop;
 
 			if (more)
 				for (i = 0; i < 10; i++)
-					if (DC::isSet(more, 1 << i))
-						if (!DC::isSet(
+					if (isSet(more, 1 << i))
+						if (!isSet(
 								((class Object *)(obj_index[nr].item))->obj_flags.more_flags,
 								1 << i))
 							goto endLoop;
@@ -1763,7 +1763,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			for (nr = 0; nr < MAX_DIRS; nr++)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
 				{
-					if (DC::isSet(DC::getInstance()->rooms[i].dir_option[nr]->exit_info,
+					if (isSet(DC::getInstance()->rooms[i].dir_option[nr]->exit_info,
 								  EX_ISDOOR) &&
 						DC::getInstance()->rooms[i].dir_option[nr]->key == count)
 					{
@@ -1908,7 +1908,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	} /* if */
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
+	if (isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
 	{
 		for (loop = 0, pers = DC::getInstance()->world[target].people; pers;
 			 pers = pers->next_in_room, loop++)
@@ -1920,13 +1920,13 @@ int do_teleport(Character *ch, char *argument, int cmd)
 		} /* if */
 	}	  /* if */
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+	if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 	{
 		ch->sendln("No.");
 		return eFAILURE;
 	}
 
-	if (DC::isSet(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
+	if (isSet(DC::getInstance()->world[target].room_flags, CLAN_ROOM) &&
 		ch->getLevel() < DEITY)
 	{
 		ch->sendln("No.");
@@ -2340,7 +2340,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		ch->desc->strnew = &(currprog->comlist);
 		ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-		if (DC::isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+		if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
 		{
 			ch->desc->web_connected = Connection::states::EDIT_MPROG;
 		}
@@ -2407,7 +2407,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 		char buf[30];
 		sprintf(buf, "new %d", v2);
 		int retval = do_oedit(ch, buf, CMD_DEFAULT);
-		if (!DC::isSet(retval, eSUCCESS))
+		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
 		r1 = real_object(v1);
 		r2 = real_object(v2);
@@ -2484,7 +2484,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 		char buf[30];
 		sprintf(buf, "new %d", vdst);
 		int retval = do_medit(ch, buf, CMD_DEFAULT);
-		if (!DC::isSet(retval, eSUCCESS))
+		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
 		dst = real_mobile(vdst);
 		src = real_mobile(vsrc);

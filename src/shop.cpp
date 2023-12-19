@@ -195,7 +195,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("The shop keeper changes his mind and refuses to sell such a special item.");
     return;
@@ -231,7 +231,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(ch, obj->item_number, false))
     {
@@ -302,7 +302,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     ch->sendln("It seems magically attached to you.");
     return;
@@ -319,7 +319,7 @@ void shopping_sell(const char *arg, Character *ch,
     }
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("That would be really fucking smart.");
     return;
@@ -1119,16 +1119,16 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   }
 
   // make sure it isn't NO_DROP, NO_TRADE, etc
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) ||
-      DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-      DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP) ||
-      DC::isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) ||
+      isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+      isSet(obj->obj_flags.extra_flags, ITEM_NODROP) ||
+      isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
     ch->sendln("You can't give that to the shop keeper to sell!");
     return;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
     ch->sendln("For now you can't sell unique items.");
     return;
@@ -1914,7 +1914,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
 
         if (isexact("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
             isexact("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+            isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
@@ -1927,7 +1927,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
           return eSUCCESS;
         }
 
-        if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+        if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
         {
           owner->tell(ch, "I can't reroll objects with the NO_CUSTOM flag set on them.");
           return eSUCCESS;

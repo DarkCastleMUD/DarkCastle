@@ -136,7 +136,7 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (!DC::isSet(victim->player->toggles, Player::PLR_GUIDE))
+  if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
     send(QString("%1 is now a guide.\r\n").arg(victim->getNameC()));
     victim->sendln("You have been selected to be a DC Guide!");

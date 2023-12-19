@@ -274,7 +274,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* a location has been found. */
-  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
+  if (isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) &&
       level_ < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
@@ -282,14 +282,14 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       level_ < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return eFAILURE;
   }
 
-  if ((DC::isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
+  if ((isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
   {
 
     for (i = 0, pers = DC::getInstance()->world[location].people; pers;
@@ -514,14 +514,14 @@ int do_at(Character *ch, char *argument, int cmd)
   }
 
   /* a location has been found. */
-  if (DC::isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
     return eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
     ch->sendln("For your protection, 104-'s may not be in clanhalls.");
@@ -648,7 +648,7 @@ int do_nohassle(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (DC::isSet(ch->player->toggles, Player::PLR_NOHASSLE))
+  if (isSet(ch->player->toggles, Player::PLR_NOHASSLE))
   {
     REMOVE_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
     ch->sendln("Mobiles can bother you again.");

@@ -331,7 +331,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     if (IS_PC(ch) || IS_PC(vict))
     {
       wielded = vict->equipment[WIELD];
-      if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
         {
@@ -657,7 +657,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return eFAILURE;
 
-        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_MOB(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -1961,9 +1961,9 @@ int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
 
   for (i = DC::getInstance()->world[ch->in_room].contents; i; i = i->next_content)
   {
-    if (DC::isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
+    if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
-        !DC::isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
+        !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
         obj_index[i->item_number].virt != CHAMPION_ITEM)
     {
       act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
@@ -2005,10 +2005,10 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
       act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
           TO_ROOM, 0);
       retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
-      if (DC::isSet(retval, eCH_DIED))
+      if (isSet(retval, eCH_DIED))
         return retval;
       if (!tmp_victim->affected_by_spell(SPELL_POISON))
-        if (!DC::isSet(tmp_victim->immune, ISR_POISON))
+        if (!isSet(tmp_victim->immune, ISR_POISON))
         {
           af.type = SPELL_POISON;
           af.duration = ch->getLevel() * 2;
@@ -2396,7 +2396,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_MOB(tch) && DC::isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_MOB(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -2512,7 +2512,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
   if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
   {
     retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
-    if (DC::isSet(retval, eCH_DIED))
+    if (isSet(retval, eCH_DIED))
       return retval;
 
     act("Your bash at $N sends $M sprawling.", ch, nullptr, vict, TO_CHAR, 0);
@@ -2611,8 +2611,8 @@ int doorcloser(Character *ch, class Object *obj, int cmd, const char *arg,
   if (number(0, 1))
     return eFAILURE;
 
-  if ((EXIT(ch, 1) && !DC::isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
-      (EXIT(ch, 3) && !DC::isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
+  if ((EXIT(ch, 1) && !isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
+      (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
       do_say(ch, "How the hell do these doors keep opening?", CMD_DEFAULT);
@@ -2654,8 +2654,8 @@ int panicprisoner(Character *ch, class Object *obj, int cmd, const char *arg,
   if (number(0, 2))
     return eFAILURE;
 
-  if ((EXIT(ch, 1) && DC::isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
-      (EXIT(ch, 3) && DC::isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
+  if ((EXIT(ch, 1) && isSet(EXIT(ch, 1)->exit_info, EX_CLOSED)) ||
+      (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
       do_say(ch, "I must free my fellow prisoners!", CMD_DEFAULT);
@@ -2773,7 +2773,7 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (ch->equipment[WIELD] && vict->equipment[WIELD])
     if (IS_PC(ch) || IS_PC(vict))
-      if ((!DC::isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && ch->getLevel() > 9 && number(0, 2) == 0)
         {
@@ -2861,7 +2861,7 @@ int iasenko_combat(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   retval = protect(ch, 8543); // rescue Koban if he's fighting
-  if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
+  if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
     return retval;
 
   switch (number(1, 3))
@@ -3008,7 +3008,7 @@ int kogiro_combat(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   retval = protect(ch, 8605); // rescue Takahashi if he's fighting
-  if (SOMEONE_DIED(retval) || DC::isSet(retval, eSUCCESS))
+  if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
     return retval;
 
   switch (number(1, 3))
@@ -3085,7 +3085,7 @@ int askari_combat(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   retval = protect(ch, 8646); // rescue Surimoto if he's fighting
-  if (SOMEONE_DIED(retval) || DC::isSet(retval, eSUCCESS))
+  if (SOMEONE_DIED(retval) || isSet(retval, eSUCCESS))
     return retval;
 
   switch (number(1, 2))
@@ -3254,7 +3254,7 @@ int arena_only(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd || ch->fighting)
     return eFAILURE;
 
-  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     do_gossip(ch, "My life has no meaning outside of glorious arena combat!", 0);
     act("$n goes out in a blaze of glory!", ch, 0, 0, TO_ROOM, NOTVICT);

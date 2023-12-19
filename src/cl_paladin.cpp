@@ -93,7 +93,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     dam = 750;
     retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH, 0);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    if (DC::isSet(retval, eVICT_DIED) && !DC::isSet(retval, eCH_DIED))
+    if (isSet(retval, eVICT_DIED) && !isSet(retval, eCH_DIED))
     {
       if (ch->has_skill( SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
@@ -217,7 +217,7 @@ int do_behead(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD] || !DC::isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
+  if (!ch->equipment[WIELD] || !isSet(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
   {
     ch->sendln("You need to be wielding a two handed sword to behead!");
     return eFAILURE;
@@ -237,7 +237,7 @@ int do_behead(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
     return eFAILURE;
 
-  if (DC::isSet(vict->combat, COMBAT_BLADESHIELD1) || DC::isSet(vict->combat, COMBAT_BLADESHIELD2))
+  if (isSet(vict->combat, COMBAT_BLADESHIELD1) || isSet(vict->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("You can't behead a bladeshielded opponent!");
     return eFAILURE;
@@ -285,7 +285,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   // csendf(ch, "behead chance: %d, enemy hp%: %f\r\n", chance, enemy_hp);
 
-  if ((number(0, 99) < chance) && !DC::isSet(vict->immune, ISR_SLASH) && !DC::isSet(vict->immune, ISR_PHYSICAL))
+  if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
             (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) || (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&

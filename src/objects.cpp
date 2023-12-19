@@ -215,7 +215,7 @@ int do_switch(Character *ch, char *arg, int cmd)
 {
   class Object *between;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -313,7 +313,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!ch->fighting && DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (!ch->fighting && isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -338,10 +338,10 @@ int do_quaff(Character *ch, char *argument, int cmd)
         retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
       }
     }
-    if (DC::isSet(retval, eCH_DIED))
+    if (isSet(retval, eCH_DIED))
       break;
   }
-  if (!is_mob || !DC::isSet(retval, eCH_DIED)) // it's already been free'd when mob died
+  if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
       unequip_char(ch, pos, 1);
@@ -361,7 +361,7 @@ int do_recite(Character *ch, char *argument, int cmd)
   int is_mob = IS_MOB(ch);
   int lvl;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
     return eFAILURE;
@@ -388,7 +388,7 @@ int do_recite(Character *ch, char *argument, int cmd)
       }
     }
   }
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     act("Your magic is muffled by greater beings.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -463,7 +463,7 @@ int do_recite(Character *ch, char *argument, int cmd)
       }
     }
   }
-  if (!is_mob || !DC::isSet(retval, eCH_DIED)) // it's already been free'd when mob died
+  if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
       unequip_char(ch, pos, 1);
@@ -552,12 +552,12 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
     return false;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("In the rear with the gear huh?  Maybe use this somewhere in the field.");
     return false;
   }
-  if (CAN_GO(ch, dir) && DC::isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
+  if (CAN_GO(ch, dir) && isSet(DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
   {
     ch->sendln("Firing it into a safe room seems wasteful.");
     return false;
@@ -707,13 +707,13 @@ int do_use(Character *ch, char *argument, int cmd)
   int lvl;
   int bits;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
   {
     ch->sendln("Your magic is muffled by greater beings.");
     return eFAILURE;
@@ -810,7 +810,7 @@ int do_name(Character *ch, char *arg, int cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NONAME))
+  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -902,7 +902,7 @@ int do_drink(Character *ch, char *argument, int cmd)
   struct affected_type af;
   int amount;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1053,7 +1053,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   class Object *temp;
   struct affected_type af;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1121,7 +1121,7 @@ int do_pour(Character *ch, char *argument, int cmd)
   class Object *to_obj;
   int amount;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1236,7 +1236,7 @@ int do_sip(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   class Object *temp;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1298,7 +1298,7 @@ int do_taste(Character *ch, char *argument, int cmd)
   char arg[MAX_STRING_LENGTH];
   class Object *temp;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1490,7 +1490,7 @@ int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
 
 int size_restricted(Character *ch, class Object *obj)
 {
-  if (DC::isSet(obj->obj_flags.size, SIZE_ANY))
+  if (isSet(obj->obj_flags.size, SIZE_ANY))
     return false;
 
   if (GET_RACE(ch) == RACE_HUMAN) // human can wear all sizes
@@ -1501,7 +1501,7 @@ int size_restricted(Character *ch, class Object *obj)
 
   if (GET_HEIGHT(ch) < 42)
   {
-    if (DC::isSet(obj->obj_flags.size, SIZE_SMALL))
+    if (isSet(obj->obj_flags.size, SIZE_SMALL))
       return false;
     else
       return true;
@@ -1509,7 +1509,7 @@ int size_restricted(Character *ch, class Object *obj)
 
   if (GET_HEIGHT(ch) < 66)
   {
-    if (DC::isSet(obj->obj_flags.size, SIZE_SMALL) || DC::isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->obj_flags.size, SIZE_SMALL) || isSet(obj->obj_flags.size, SIZE_MEDIUM))
       return false;
     else
       return true;
@@ -1517,7 +1517,7 @@ int size_restricted(Character *ch, class Object *obj)
 
   if (GET_HEIGHT(ch) < 79)
   {
-    if (DC::isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->obj_flags.size, SIZE_MEDIUM))
       return false;
     else
       return true;
@@ -1525,13 +1525,13 @@ int size_restricted(Character *ch, class Object *obj)
 
   if (GET_HEIGHT(ch) < 103)
   {
-    if (DC::isSet(obj->obj_flags.size, SIZE_LARGE) || DC::isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->obj_flags.size, SIZE_LARGE) || isSet(obj->obj_flags.size, SIZE_MEDIUM))
       return false;
     else
       return true;
   }
 
-  if (DC::isSet(obj->obj_flags.size, SIZE_LARGE))
+  if (isSet(obj->obj_flags.size, SIZE_LARGE))
     return false;
 
   return true;
@@ -1666,7 +1666,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
        return;
     }*/
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
       !isexact(GET_NAME(ch), obj->name) && ch->getLevel() < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
@@ -1980,7 +1980,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         act("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, TO_CHAR, 0);
 
       else if ((!ch->hands_are_free(2)) &&
-               (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
         ch->sendln("You need both hands for this weapon.");
       else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
@@ -2015,7 +2015,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
       }
       else if ((!ch->hands_are_free(2)) &&
-               (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this shield.");
       }
@@ -2044,7 +2044,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
       else if ((!ch->hands_are_free(2)) &&
-               (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this item.");
       }
@@ -2108,7 +2108,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
     else if ((!ch->hands_are_free(2)) &&
-             (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+             (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
     {
       ch->sendln("You need both hands for this light.");
     }
@@ -2259,7 +2259,7 @@ int do_wear(Character *ch, char *argument, int cmd)
       "primary",
       "\n"};
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -2335,7 +2335,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   bool blindlag = false;
   int keyword = 12;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -2384,7 +2384,7 @@ int do_grab(Character *ch, char *argument, int cmd)
   class Object *obj_object;
   bool blindlag = false;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -2430,7 +2430,7 @@ int Character::hands_are_free(int number)
   wielded = this->equipment[WIELD];
 
   if (wielded)
-    if (DC::isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(this->affected_by, AFF_POWERWIELD))
+    if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(this->affected_by, AFF_POWERWIELD))
       hands = 2;
 
   if (this->equipment[WIELD])
@@ -2440,21 +2440,21 @@ int Character::hands_are_free(int number)
 
   if (this->equipment[WEAR_SHIELD])
   {
-    if (DC::isSet(this->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(this->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
   if (this->equipment[HOLD])
   {
-    if (DC::isSet(this->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(this->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
   if (this->equipment[WEAR_LIGHT])
   {
-    if (DC::isSet(this->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(this->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(this->affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
@@ -2477,7 +2477,7 @@ int do_remove(Character *ch, char *argument, int cmd)
   bool blindlag = false;
   int j;
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -2496,7 +2496,7 @@ int do_remove(Character *ch, char *argument, int cmd)
           if (ch->equipment[j] && CAN_SEE_OBJ(ch, ch->equipment[j]))
           {
             obj_object = ch->equipment[j];
-            if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
+            if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
               sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
               send_to_char(arg1, ch);
@@ -2539,7 +2539,7 @@ int do_remove(Character *ch, char *argument, int cmd)
       {
         if (CAN_CARRY_N(ch) != IS_CARRYING_N(ch))
         {
-          if (DC::isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
+          if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
             sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
             send_to_char(arg1, ch);
@@ -2638,17 +2638,17 @@ bool fullSave(Object *obj)
     return 0;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     return 1;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
     return 1;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+  if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
   {
     return 1;
   }
@@ -2724,7 +2724,7 @@ int obj_from(Object *obj)
 
 bool Object::isDark(void)
 {
-  return DC::isSet(obj_flags.extra_flags, ITEM_DARK);
+  return isSet(obj_flags.extra_flags, ITEM_DARK);
 }
 
 uint64_t Object::getLevel(void)
@@ -2734,10 +2734,10 @@ uint64_t Object::getLevel(void)
 
 bool Object::hasPortalFlagNoLeave(void)
 {
-  return DC::isSet(getPortalFlags(), Object::portal_flags_t::No_Leave);
+  return isSet(getPortalFlags(), Object::portal_flags_t::No_Leave);
 }
 
 bool Object::hasPortalFlagNoEnter(void)
 {
-  return DC::isSet(getPortalFlags(), Object::portal_flags_t::No_Enter);
+  return isSet(getPortalFlags(), Object::portal_flags_t::No_Enter);
 }

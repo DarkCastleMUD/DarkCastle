@@ -508,7 +508,7 @@ void sprintbit(uint value[], const char *names[], char *result)
   for (i = 0; *names[i] != '\n'; i++)
   {
     int a = i / ASIZE;
-    if (DC::isSet(value[a], 1 << (i - a * 32)))
+    if (isSet(value[a], 1 << (i - a * 32)))
     {
       if (!strcmp(names[i], "UNUSED"))
         continue;
@@ -530,7 +530,7 @@ std::string sprintbit(uint value[], const char *names[])
   for (i = 0; *names[i] != '\n'; i++)
   {
     int a = i / ASIZE;
-    if (DC::isSet(value[a], 1 << (i - a * 32)))
+    if (isSet(value[a], 1 << (i - a * 32)))
     {
       if (!strcmp(names[i], "UNUSED"))
       {
@@ -568,7 +568,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
 
   for (nr = 0; vektor; vektor >>= 1)
   {
-    if (DC::isSet(1, vektor))
+    if (isSet(1, vektor))
     {
       if (!strcmp(names[nr], "unused"))
         continue;
@@ -602,7 +602,7 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
 
   for (nr = 0; vektor; vektor >>= 1)
   {
-    if (DC::isSet(1, vektor))
+    if (isSet(1, vektor))
     {
       if (names[nr].compare("unused", Qt::CaseInsensitive) == 0)
         continue;
@@ -633,7 +633,7 @@ QString sprintbit(uint32_t vektor, QStringList names)
 
   for (nr = 0; vektor; vektor >>= 1)
   {
-    if (DC::isSet(1, vektor))
+    if (isSet(1, vektor))
     {
       if (names[nr].compare("unused", Qt::CaseInsensitive) == 0)
         continue;
@@ -669,7 +669,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   for (nr = 0; vektor; vektor >>= 1)
   {
-    if (DC::isSet(1, vektor))
+    if (isSet(1, vektor))
     {
       if (!strcmp(names[nr], "unused"))
       {
@@ -946,10 +946,10 @@ int DARK_AMOUNT(int room)
       DC::getInstance()->world[room].sector_type == SECT_CITY)
     glow += 3;
 
-  if (DC::isSet(DC::getInstance()->world[room].room_flags, DARK))
+  if (isSet(DC::getInstance()->world[room].room_flags, DARK))
     glow -= 2;
 
-  if (DC::isSet(DC::getInstance()->world[room].room_flags, LIGHT_ROOM))
+  if (isSet(DC::getInstance()->world[room].room_flags, LIGHT_ROOM))
     glow += 2;
 
   if (weather_info.sunlight == SUN_DARK)
@@ -1011,12 +1011,12 @@ int SWAP_CH_VICT(int value)
 {
   int newretval = 0;
 
-  if (DC::isSet(value, eCH_DIED))
+  if (isSet(value, eCH_DIED))
     SET_BIT(newretval, eVICT_DIED);
   else
     REMOVE_BIT(newretval, eVICT_DIED);
 
-  if (DC::isSet(value, eVICT_DIED))
+  if (isSet(value, eVICT_DIED))
     SET_BIT(newretval, eCH_DIED);
   else
     REMOVE_BIT(newretval, eCH_DIED);
@@ -1026,7 +1026,7 @@ int SWAP_CH_VICT(int value)
 
 bool SOMEONE_DIED(int value)
 {
-  if (DC::isSet(value, eCH_DIED) || DC::isSet(value, eVICT_DIED))
+  if (isSet(value, eCH_DIED) || isSet(value, eVICT_DIED))
     return true;
   return false;
 }
@@ -1066,9 +1066,9 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   if (!noprog && IS_NPC(obj))
   {
     int prog = mprog_can_see_trigger(sub, obj);
-    if (DC::isSet(prog, eEXTRA_VALUE))
+    if (isSet(prog, eEXTRA_VALUE))
       return true;
-    else if (DC::isSet(prog, eEXTRA_VAL2))
+    else if (isSet(prog, eEXTRA_VAL2))
       return false;
   }
   if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->getLevel() < IMMORTAL)
@@ -1135,9 +1135,9 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
     return true;
 
   int prog = oprog_can_see_trigger(sub, obj);
-  if (DC::isSet(prog, eEXTRA_VALUE))
+  if (isSet(prog, eEXTRA_VALUE))
     return true;
-  else if (DC::isSet(prog, eEXTRA_VAL2))
+  else if (isSet(prog, eEXTRA_VAL2))
     return false;
 
   skill = 0;
@@ -1167,7 +1167,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_MAGIC)))
     skill = (int)cur_af->modifier;
 
-  if (GET_ITEM_TYPE(obj) == ITEM_BEACON && DC::isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+  if (GET_ITEM_TYPE(obj) == ITEM_BEACON && isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
   {
     if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC))
     {
@@ -1222,7 +1222,7 @@ int do_order(Character *ch, char *argument, int cmd)
 
   half_chop(argument, name, message);
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eFAILURE;
@@ -1274,7 +1274,7 @@ int do_order(Character *ch, char *argument, int cmd)
             {
               found = true;
               retval = k->follower->command_interpreter(message);
-              if (DC::isSet(retval, eCH_DIED))
+              if (isSet(retval, eCH_DIED))
                 break; // k is no longer valid if it was a mob(always), get out now
             }
         }
@@ -1412,20 +1412,20 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   if (IS_AFFECTED(this, AFF_CHARM))
     return eFAILURE;
 
-  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, ARENA))
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, ARENA))
   {
     this->sendln("TYou can't recall while in the arena.");
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, NO_MAGIC))
   {
     this->sendln("You can't use magic here.");
     return eFAILURE;
   }
 
-  if (DC::isSet(this->combat, COMBAT_BASH1) ||
-      DC::isSet(this->combat, COMBAT_BASH2))
+  if (isSet(this->combat, COMBAT_BASH1) ||
+      isSet(this->combat, COMBAT_BASH2))
   {
     this->sendln("You can't, you're bashed!");
     return eFAILURE;
@@ -1508,7 +1508,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[location].room_flags, NOHOME))
+    if (isSet(DC::getInstance()->world[location].room_flags, NOHOME))
     {
       victim->sendln("The gods reset your home.");
       location = real_room(START_ROOM);
@@ -1517,7 +1517,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     // make sure they arne't recalling into someone's chall
 
-    if (DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
+    if (isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -1547,7 +1547,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((DC::isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if ((isSet(DC::getInstance()->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln("No recalling into a clan hall whilst Champion, go to the Tavern!.");
     location = real_room(START_ROOM);
@@ -1599,7 +1599,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   is_mob = IS_MOB(victim);
   retval = move_char(victim, location);
 
-  if (!is_mob && !DC::isSet(retval, eCH_DIED))
+  if (!is_mob && !isSet(retval, eCH_DIED))
   { // if it was a mob, we might have died moving
     act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     do_look(victim, "", 0);
@@ -1637,7 +1637,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && ch->getLevel() < IMMORTAL)
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && ch->getLevel() < IMMORTAL)
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return eFAILURE;
@@ -1660,7 +1660,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       }
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
     {
       ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
       return eFAILURE;
@@ -1678,7 +1678,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if ((ch->isPlayerCantQuit()&& cmd != 666) ||
+    if ((ch->isPlayerCantQuit() && cmd != 666) ||
         ch->isPlayerObjectThief() ||
         ch->isPlayerGoldThief())
     {
@@ -1686,19 +1686,19 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
     {
       ch->sendln("Something about this room makes it seem like a bad place to quit.");
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
     {
       ch->sendln("Don't make me zap you.....");
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1883,8 +1883,8 @@ int do_home(Character *ch, char *argument, int cmd)
 
   if (ch->isMortal())
   {
-    if (!DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-        DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+    if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
+        isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
     {
       send_to_char("This place doesn't sit right with you...not enough "
                    "security.\r\n",
@@ -1892,7 +1892,7 @@ int do_home(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NOHOME))
     {
       ch->sendln("Something prevents it.");
       return eFAILURE;
@@ -1905,7 +1905,7 @@ int do_home(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM))
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -2080,7 +2080,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
   {
     if (bits.value(x) != "unused" && is_abbrev(arg1, bits.value(x)))
     {
-      if (DC::isSet(value, (1 << x)))
+      if (isSet(value, (1 << x)))
       {
         REMOVE_BIT(value, (1 << x));
         if (ch != nullptr)
@@ -2142,7 +2142,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         continue;
       if (is_abbrev(arg1.c_str(), bits[x]))
       {
-        if (DC::isSet(value, (1 << x)))
+        if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
           csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
@@ -2203,7 +2203,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
 
       if (is_abbrev(arg1.c_str(), bits[x]))
       {
-        if (DC::isSet(value, (1 << x)))
+        if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
           csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
@@ -2686,7 +2686,7 @@ void unique_scan(Character *victim)
   {
     if (victim->equipment[k])
     {
-      if (DC::isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
+      if (isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
       {
         if (virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->item_number].virt))
           virtnums[obj_index[victim->equipment[k]->item_number].virt] = 1;
@@ -2697,7 +2697,7 @@ void unique_scan(Character *victim)
       { // search inside
         for (j = victim->equipment[k]->contains; j; j = j->next_content)
         {
-          if (DC::isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
+          if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
             if (virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
               virtnums[obj_index[j->item_number].virt] = 1;
@@ -2711,7 +2711,7 @@ void unique_scan(Character *victim)
 
   for (i = victim->carrying; i; i = i->next_content)
   {
-    if (DC::isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
+    if (isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
     {
       if (virtnums.end() == virtnums.find(obj_index[i->item_number].virt))
         virtnums[obj_index[i->item_number].virt] = 1;
@@ -2724,7 +2724,7 @@ void unique_scan(Character *victim)
     { // search inside
       for (j = i->contains; j; j = j->next_content)
       {
-        if (DC::isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
+        if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
         {
           if (virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
             virtnums[obj_index[j->item_number].virt] = 1;
@@ -2812,7 +2812,7 @@ bool champion_can_go(int room)
     }
 
     // Champions can't enter clan rooms
-    if (DC::isSet(DC::getInstance()->world[room].room_flags, CLAN_ROOM))
+    if (isSet(DC::getInstance()->world[room].room_flags, CLAN_ROOM))
     {
       return false;
     }
@@ -2939,7 +2939,7 @@ const char *find_profession(int c_class, uint8_t profession)
 
 std::string get_isr_string(uint32_t isr, int8_t loc)
 {
-  if (!DC::isSet(isr, 1 << loc))
+  if (!isSet(isr, 1 << loc))
   {
     return std::string();
   }
@@ -3220,3 +3220,4 @@ int len_cmp(QString s1, QString s2)
 
   return 0;
 }
+

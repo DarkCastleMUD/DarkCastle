@@ -155,7 +155,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("The arena is not open for anyone your level.");
     return eFAILURE;
   }
-  if (!IS_MOB(ch) && DC::isSet(ch->player->punish, PUNISH_NOARENA))
+  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOARENA))
   {
     ch->sendln("You have been banned from arenas.");
     return eFAILURE;
@@ -170,7 +170,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("Only clan members may join this arena.");
     return eFAILURE;
   }
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     ch->sendln("You are already there!");
     return eFAILURE;

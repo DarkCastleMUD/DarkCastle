@@ -73,7 +73,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
   if (!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Trying to eyegouge a bladeshielded opponent would be suicide!");
     return eFAILURE;
@@ -97,7 +97,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
       act("$N's heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
       level = 0;
     }
-    else if (!DC::isSet(victim->immune, TYPE_PIERCE))
+    else if (!isSet(victim->immune, TYPE_PIERCE))
     {
       SETBIT(victim->affected_by, AFF_BLIND);
       SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
@@ -113,7 +113,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
     retval = damage(ch, victim, level * 2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
-  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_WIMPY)))
+  if (!SOMEONE_DIED(retval) || (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY)))
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   return retval | eSUCCESS;
 }
@@ -256,7 +256,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   }
   // success
   else if (
-      ((victim->getLevel() < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= this->getLevel() + 19) && ((IS_PC(this) && this->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && DC::isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((this->equipment[WIELD]->obj_flags.value[3] == 11 && !DC::isSet(victim->immune, ISR_PIERCE)) || (this->equipment[WIELD]->obj_flags.value[3] == 9 && !DC::isSet(victim->immune, ISR_STING))))
+      ((victim->getLevel() < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= this->getLevel() + 19) && ((IS_PC(this) && this->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((this->equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (this->equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -556,7 +556,7 @@ int do_trip(Character *ch, char *argument, int cmd)
   if (!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
 
-  if (DC::isSet(victim->combat, COMBAT_BLADESHIELD1) || DC::isSet(victim->combat, COMBAT_BLADESHIELD2))
+  if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Tripping a bladeshielded opponent would be impossible!");
     return eFAILURE;
@@ -618,7 +618,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   affected_type af;
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -730,7 +730,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -789,7 +789,7 @@ int max_level(Character *ch)
   int i = 0, lvl = 0;
   for (; i < MAX_WEAR; i++)
     if (ch->equipment[i] && (GET_ITEM_TYPE(ch->equipment[i]) == ITEM_ARMOR || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_WEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_INSTRUMENT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_FIREWEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_LIGHT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_CONTAINER) &&
-        !DC::isSet(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
+        !isSet(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
       lvl = MAX(lvl, ch->equipment[i]->obj_flags.eq_level);
   if (lvl < 20)
     lvl = 20;
@@ -856,7 +856,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
     return eFAILURE;
@@ -868,7 +868,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;
@@ -903,12 +903,12 @@ int do_steal(Character *ch, char *argument, int cmd)
   if ((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying)))
   {
     chance -= GET_OBJ_WEIGHT(obj);
-    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       ch->sendln("That item is protected by the gods.");
       return eFAILURE;
     }
-    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NEWBIE))
+    if (isSet(obj->obj_flags.extra_flags, ITEM_NEWBIE))
     {
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return eFAILURE;
@@ -1024,8 +1024,8 @@ int do_steal(Character *ch, char *argument, int cmd)
             has_item = search_char_for_item(ch, obj->item_number, false);
             obj_to_char(obj, ch);
           }
-          if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-              (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+          if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+              (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
             ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description));
             extract_obj(obj);
@@ -1038,8 +1038,8 @@ int do_steal(Character *ch, char *argument, int cmd)
               // has already been extracted
               next_obj = loop_obj->next_content;
 
-              if (DC::isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-                  (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+              if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+                  (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
               {
                 csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
                        loop_obj->short_description, obj->short_description);
@@ -1119,7 +1119,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         return eFAILURE;
       };
       wakey -= GET_DEX(ch) / 2;
-      if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+      if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("That item is protected by the gods.");
         return eFAILURE;
@@ -1220,8 +1220,8 @@ int do_steal(Character *ch, char *argument, int cmd)
         has_item = search_char_for_item(ch, obj->item_number, false);
         obj_to_char(obj, ch);
 
-        if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-            (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+        if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+            (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
         {
           ch->sendln("Whoa! It poofed into thin air!");
           extract_obj(obj);
@@ -1233,8 +1233,8 @@ int do_steal(Character *ch, char *argument, int cmd)
             // has already been extracted
             next_obj = loop_obj->next_content;
 
-            if (DC::isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-                (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+            if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+                (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
             {
               csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n",
                      loop_obj->short_description, obj->short_description);
@@ -1316,7 +1316,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("No stealing permitted in safe areas!");
     return eFAILURE;
@@ -1328,7 +1328,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;
@@ -1492,13 +1492,13 @@ int do_pick(Character *ch, char *argument, int cmd)
 
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (!DC::isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSED))
       ch->sendln("Silly, it's not even closed!");
     else if (obj->obj_flags.value[2] < 0)
       ch->sendln("Odd, you can't seem to find a keyhole.");
-    else if (!DC::isSet(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (!isSet(obj->obj_flags.value[1], CONT_LOCKED))
       ch->sendln("Oh-ho! This thing is not even locked!");
-    else if (DC::isSet(obj->obj_flags.value[1], CONT_PICKPROOF))
+    else if (isSet(obj->obj_flags.value[1], CONT_PICKPROOF))
       ch->sendln("The lock resists even your best attempts to pick it.");
     else
     {
@@ -1521,11 +1521,11 @@ int do_pick(Character *ch, char *argument, int cmd)
   {
     // this is a door
 
-    if (!DC::isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
+    if (!isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
     {
       ch->sendln("That's absurd.");
     }
-    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
+    else if (!isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
       ch->sendln("You realize that the door is already open!");
     }
@@ -1533,11 +1533,11 @@ int do_pick(Character *ch, char *argument, int cmd)
     {
       ch->sendln("You can't seem to spot any lock to pick.");
     }
-    else if (!DC::isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
+    else if (!isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
     {
       ch->sendln("Oh...it wasn't locked at all.");
     }
-    else if (DC::isSet(EXIT(ch, door)->exit_info, EX_PICKPROOF))
+    else if (isSet(EXIT(ch, door)->exit_info, EX_PICKPROOF))
     {
       ch->sendln("You seem to be unable to pick this lock.");
     }
@@ -1746,19 +1746,19 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("That sure would be a stupid thing to do.");
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
     ch->sendln("You can't seem to get the item to leave you.");
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
     if (ch->getLevel() < DEITY)
     {
@@ -1785,7 +1785,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       ch->sendln("That's not a container.");
       return eFAILURE;
     }
-    if (DC::isSet(container->obj_flags.value[1], CONT_CLOSED))
+    if (isSet(container->obj_flags.value[1], CONT_CLOSED))
     {
       ch->sendln("It seems to be closed.");
       return eFAILURE;
@@ -1851,7 +1851,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
@@ -1958,7 +1958,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
   // this means you can use it once per tick
 
   int length = 9 - ch->has_skill(SKILL_VITAL_STRIKE) / 10;
-  if (!DC::isSet(ch->combat, COMBAT_VITAL_STRIKE))
+  if (!isSet(ch->combat, COMBAT_VITAL_STRIKE))
     length /= 2;
   if (length < 1)
     length = 1;
@@ -2186,7 +2186,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   // if the victim died and the character did not die
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
-    if (IS_PC(ch) && DC::isSet(ch->player->toggles, Player::PLR_WIMPY))
+    if (IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     return retval;
   }

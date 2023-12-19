@@ -458,7 +458,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   for (unsigned iWear = 0; iWear < MAX_WEAR; iWear++)
   {
     if (victim->equipment[iWear] &&
-        DC::isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
+        isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp(victim->equipment[iWear]->name);
       qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
@@ -474,7 +474,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     {
       for (Object *obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
-        if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp(obj->name);
           qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
@@ -492,7 +492,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   Object *obj = victim->carrying;
   while (obj)
   {
-    if (DC::isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = QString("%1").arg(obj->name);
       qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
@@ -508,7 +508,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       Object *obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
-        if (DC::isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = QString("%1").arg(obj2->name);
           qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;

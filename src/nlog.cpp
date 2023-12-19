@@ -173,7 +173,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_MOB(ch) || DC::isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (IS_MOB(ch) || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {
@@ -287,7 +287,7 @@ QByteArray handle_ansi(QByteArray haystack, Character *ch)
   {
     if (code == true)
     {
-      if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && DC::isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
+      if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
       {
         if (rep.contains(c))
         {

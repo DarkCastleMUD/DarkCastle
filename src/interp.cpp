@@ -105,13 +105,13 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   QString buf;
 
   // Handle logged players.
-  if (isPlayer() && DC::isSet(player->punish, PUNISH_LOG))
+  if (isPlayer() && isSet(player->punish, PUNISH_LOG))
   {
     logentry(QString("Log %1: %2").arg(getName()).arg(pcomm), 110, LogChannels::LOG_PLAYER);
   }
 
   // Implement freeze command.
-  if (isPlayer() && DC::isSet(player->punish, PUNISH_FREEZE) && pcomm != "quit")
+  if (isPlayer() && isSet(player->punish, PUNISH_FREEZE) && pcomm != "quit")
   {
     sendln("You've been frozen by an immortal.");
     return eSUCCESS;
@@ -123,7 +123,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   }
 
   // Berserk checks
-  if (DC::isSet(combat, COMBAT_BERSERK))
+  if (isSet(combat, COMBAT_BERSERK))
   {
     if (fighting)
     {
@@ -169,7 +169,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   if (!pcomm.isEmpty())
   {
     retval = oprog_command_trigger(command, command_arguments);
-    if (SOMEONE_DIED(retval) || DC::isSet(retval, eEXTRA_VALUE))
+    if (SOMEONE_DIED(retval) || isSet(retval, eEXTRA_VALUE))
       return retval;
   }
 
@@ -289,7 +289,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->getNumber() != CMD_GTELL && found->getNumber() != CMD_CTELL && found->getNumber() != CMD_SAY && found->getNumber() != CMD_TELL && found->getNumber() != CMD_WHISPER && found->getNumber() != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && DC::isSet(this->player->punish, PUNISH_LOG) == false)
+        if (found->getNumber() != CMD_GTELL && found->getNumber() != CMD_CTELL && found->getNumber() != CMD_SAY && found->getNumber() != CMD_TELL && found->getNumber() != CMD_WHISPER && found->getNumber() != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && isSet(this->player->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LogChannels::LOG_PLAYER, this);
         }
@@ -297,7 +297,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // We're going to execute, check for usable special proc.
       retval = special(command_arguments, found->getNumber());
-      if (DC::isSet(retval, eSUCCESS) || DC::isSet(retval, eCH_DIED))
+      if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
         return retval;
 
       switch (found->getType())
@@ -1031,7 +1031,7 @@ command_return_t Character::special(QString arguments, int cmd)
       if (obj_index[this->equipment[j]->item_number].non_combat_func)
       {
         retval = ((*obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
-        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
+        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
 
@@ -1041,7 +1041,7 @@ command_return_t Character::special(QString arguments, int cmd)
       if (obj_index[i->item_number].non_combat_func)
       {
         retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
-        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
+        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
 
@@ -1053,14 +1053,14 @@ command_return_t Character::special(QString arguments, int cmd)
       if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
-        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
+        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
       else if (mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*mob_index[k->mobdata->nr].non_combat_func)(this, 0,
                                                                cmd, arguments.toStdString().c_str(), k));
-        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
+        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
     }
@@ -1072,7 +1072,7 @@ command_return_t Character::special(QString arguments, int cmd)
       if (obj_index[i->item_number].non_combat_func)
       {
         retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
-        if (DC::isSet(retval, eCH_DIED) || DC::isSet(retval, eSUCCESS))
+        if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
 

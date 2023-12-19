@@ -166,7 +166,7 @@ int Character::mana_gain_lookup(void)
 	if (this->mana_regen > 0)
 		gain += this->mana_regen;
 	if (this->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.25);
 
 	if (this->mana_regen < 0)
@@ -252,7 +252,7 @@ int Character::hit_gain(position_t position, bool improve)
 		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
 	if (this->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.5);
 	if (this->hit_regen < 0)
 		gain += this->hit_regen;
@@ -317,7 +317,7 @@ int Character::move_gain_lookup(int extra)
 		gain = (int)((float)gain * (2.0 - (float)this->getLevel() / 50.0));
 
 	if (this->in_room >= 0)
-		if (DC::isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+		if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
 			gain = (int)(gain * 1.5);
 	if (this->move_regen < 0)
 		gain += this->move_regen;
@@ -579,7 +579,7 @@ void advance_level(Character *ch, int is_conversion)
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (ch->getLevel() > 10 && !DC::isSet(ch->player->toggles, Player::PLR_REMORTED))
+	if (ch->getLevel() > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
 	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
@@ -742,7 +742,7 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_MOB(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
@@ -758,7 +758,7 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && DC::isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_MOB(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
@@ -900,7 +900,7 @@ void update_corpses_and_portals(void)
 						{
 							oon = oo->next_content;
 
-							if (DC::isSet(oo->obj_flags.more_flags, ITEM_NO_TRADE))
+							if (isSet(oo->obj_flags.more_flags, ITEM_NO_TRADE))
 							{
 								log_sacrifice((Character *)j, oo, true);
 								extract_obj(oo);
@@ -909,7 +909,7 @@ void update_corpses_and_portals(void)
 					}
 					if (j->in_obj)
 					{
-						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
 							jj->setOwner(j->getOwner());
 						}
@@ -918,7 +918,7 @@ void update_corpses_and_portals(void)
 					}
 					else if (j->carried_by)
 					{
-						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
 							jj->setOwner(j->getOwner());
 						}
@@ -927,7 +927,7 @@ void update_corpses_and_portals(void)
 					}
 					else if (j->in_room != DC::NOWHERE)
 					{
-						if (DC::isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
 						{
 							jj->setOwner(j->getOwner());
 						}
@@ -1001,7 +1001,7 @@ void prepare_character_for_sixty(Character *ch)
 			skl = SKILL_SONG_HYPNOTIC_HARMONY;
 			break;
 		}
-		if (ch->has_skill(skl) && !DC::isSet(ch->player->toggles, Player::PLR_50PLUS))
+		if (ch->has_skill(skl) && !isSet(ch->player->toggles, Player::PLR_50PLUS))
 		{
 			SET_BIT(ch->player->toggles, Player::PLR_50PLUS);
 			int i = (ch->exp / 100000000) * 500000;

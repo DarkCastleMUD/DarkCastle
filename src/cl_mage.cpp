@@ -158,8 +158,8 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(ch->in_room && (DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) 
-                     || DC::isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))) 
+  if(ch->in_room && (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) 
+                     || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))) 
   {
     ch->sendln("Something about this room prohibits your magical imbuement.");
     return eFAILURE;
@@ -288,7 +288,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
   // we can.  We do this by checking if the room has a flag or not
   // NOTICE:  This is a TEMP_room_flag
-  if(!DC::isSet(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
+  if(!isSet(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
     return eSUCCESS;
 
   // loop through the room to find the caster. It should only be possible for a single
@@ -318,7 +318,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     if(  GET_POS(i) <= position_t::RESTING || 
          GET_POS(i) == position_t::FIGHTING || i->fighting ||
          IS_AFFECTED(i, AFF_PARALYSIS) ||
-         ( DC::isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit())
+         ( isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit())
       )
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
@@ -335,9 +335,9 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
-      if(DC::isSet(retval, eVICT_DIED))
+      if(isSet(retval, eVICT_DIED))
         return (eFAILURE|eCH_DIED);  // dead target, so spell ends
-      if(DC::isSet(retval, eCH_DIED))
+      if(isSet(retval, eCH_DIED))
         return (eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
       retval = eFAILURE;
     }
@@ -374,7 +374,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED); 
-          if(DC::isSet(retval, eVICT_DIED))
+          if(isSet(retval, eVICT_DIED))
             return (eFAILURE|eCH_DIED);  // ch = damage vict, return since they are dead
 	} else { // trigger_type == ETHEREAL_FOCUS_TRIGGER_ACT
           // TODO - i don't currently do this anywhere because of the concerns below
