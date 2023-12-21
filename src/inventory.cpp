@@ -52,7 +52,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You cannot get that item.");
         return;
       }
-      else if (obj_object->getOwner() != GET_NAME(ch))
+      else if (!obj_object->getOwner().isEmpty() && obj_object->getOwner() != GET_NAME(ch))
       {
         ch->send(QString("You cannot get that item because it's marked NO_TRADE and owned by %1\r\n").arg(obj_object->getOwner()));
         return;
