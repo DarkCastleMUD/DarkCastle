@@ -393,13 +393,17 @@ void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
 qsizetype fread_to_tilde(FILE *fpsave)
 {
   qsizetype characters_read{};
+  QString buffer;
   char a;
   while (characters_read++ < 160)
   {
     fread(&a, 1, 1, fpsave);
+    buffer += a;
     if (a == '~')
       break;
   }
+  if (characters_read >= 160)
+    qDebug() << "fread_to_tilde: " << buffer;
   return characters_read;
 }
 
