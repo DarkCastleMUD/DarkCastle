@@ -8,6 +8,7 @@
 */
 
 #include <stddef.h>
+#include <QString>
 
 constexpr size_t MAX_CLAN_LEN = 15;
 #define CLAN_RIGHTS_ACCEPT 1
@@ -33,21 +34,98 @@ struct clan_room_data
   struct clan_room_data *next;
 };
 
-struct clan_member_data
+class ClanMember
 {
-  QString member_name;
-  uint32_t member_rights;
-  int32_t member_rank;
+public:
+  ClanMember(class Character *ch = nullptr);
+  ClanMember *next;
 
-  int32_t unused1;
-  int32_t unused2;
-  uint32_t unused3;
-  QString unused4; // this is saved as a variable length std::string
+  [[nodiscard]] inline auto Name() const
+  {
+    return name_;
+  }
+  [[nodiscard]] inline auto Unused1() const
+  {
+    return unused1_;
+  }
+  [[nodiscard]] inline auto Unused2() const
+  {
+    return unused2_;
+  }
+  [[nodiscard]] inline auto Unused3() const
+  {
+    return unused3_;
+  }
+  [[nodiscard]] inline auto Unused4() const
+  {
+    return unused4_;
+  }
+  [[nodiscard]] inline auto Rights() const
+  {
+    return rights_;
+  }
+  [[nodiscard]] inline auto Rank() const
+  {
+    return rank_;
+  }
+  [[nodiscard]] inline auto TimeJoined() const
+  {
+    return time_joined_;
+  }
 
-  //  I'd like to put "time joined" here for CC purposes
-  uint32_t time_joined;
+  [[nodiscard]] inline char *NameC() const
+  {
+    char *str_hsh(const char *);
+    return str_hsh(name_.toStdString().c_str());
+  }
+  [[nodiscard]] inline char *Unused4C() const
+  {
+    char *str_hsh(const char *);
+    return str_hsh(unused4_.toStdString().c_str());
+  }
 
-  struct clan_member_data *next;
+  inline void Name(const QString &name)
+  {
+    name_ = name;
+  }
+  inline void Unused1(const auto &unused1)
+  {
+    unused1_ = unused1;
+  }
+  inline void Unused2(const auto &unused2)
+  {
+    unused2_ = unused2;
+  }
+  inline void Unused3(const auto &unused3)
+  {
+    unused3_ = unused3;
+  }
+  inline void Unused4(const auto &unused4)
+  {
+    unused4_ = unused4;
+  }
+  inline void Rights(const auto &rights)
+  {
+    rights_ = rights;
+  }
+  inline void Rank(const auto &rank)
+  {
+    rank_ = rank;
+  }
+  inline void TimeJoined(const auto &time_joined)
+  {
+    time_joined_ = time_joined;
+  }
+
+private:
+  QString name_;
+  qint64 unused1_;
+  qint64 unused2_;
+  quint64 unused3_;
+  QString unused4_;
+  uint32_t rights_;
+  int32_t rank_;
+  uint32_t time_joined_;
 };
 
 class clan_data
@@ -66,7 +144,7 @@ public:
   uint16_t number;
   uint16_t amt;
   clan_room_data *rooms;
-  clan_member_data *members;
+  ClanMember *members;
   clan_data *next;
   struct vault_access_data *acc;
   clan_data(void);
@@ -98,12 +176,12 @@ char *get_clan_name(clan_data *clan);
 void save_clans();
 int plr_rights(Character *ch);
 void add_clan(clan_data *new_new_clan);
-void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member);
+void add_clan_member(clan_data *theClan, ClanMember *new_new_member);
 void add_clan_member(clan_data *theClan, Character *ch);
 void remove_clan_member(clan_data *theClan, Character *ch);
 void remove_clan_member(int clannumber, Character *ch);
-void free_member(struct clan_member_data *member);
-struct clan_member_data *get_member(QString strName, int nClanId);
+void free_member(ClanMember *member);
+ClanMember *get_member(QString strName, int nClanId);
 void show_clan_log(Character *ch);
 void clan_death(Character *ch, Character *killer);
 

@@ -74,7 +74,7 @@ void boot_clans(void)
   char buf[1024];
   clan_data *new_new_clan = nullptr;
   clan_room_data *new_new_room = nullptr;
-  clan_member_data *new_new_member = nullptr;
+  ClanMember *new_new_member = nullptr;
   int tempint;
   bool skip_clan = false, changes_made = false;
 
@@ -212,20 +212,15 @@ void boot_clans(void)
       }
       case 'M':
       { // read a member
-#ifdef LEAK_CHECK
-        new_new_member = (struct clan_member_data *)calloc(1, sizeof(struct clan_member_data));
-#else
-        new_new_member = (struct clan_member_data *)dc_alloc(1,
-                                                             sizeof(struct clan_member_data));
-#endif
-        new_new_member->member_name = fread_string(fl, 0);
-        new_new_member->member_rights = fread_int(fl, 0, 2147483467);
-        new_new_member->member_rank = fread_int(fl, 0, 2147483467);
-        new_new_member->unused1 = fread_int(fl, 0, 2147483467);
-        new_new_member->unused2 = fread_int(fl, 0, 2147483467);
-        new_new_member->unused3 = fread_int(fl, 0, 2147483467);
-        new_new_member->time_joined = fread_int(fl, 0, 2147483467);
-        new_new_member->unused4 = fread_string(fl, 0);
+        new_new_member = new ClanMember;
+        new_new_member->Name(fread_string(fl, 0));
+        new_new_member->Rights(fread_int(fl, 0, 2147483467));
+        new_new_member->Rank(fread_int(fl, 0, 2147483467));
+        new_new_member->Unused1(fread_int(fl, 0, 2147483467));
+        new_new_member->Unused2(fread_int(fl, 0, 2147483467));
+        new_new_member->Unused3(fread_int(fl, 0, 2147483467));
+        new_new_member->TimeJoined(fread_int(fl, 0, 2147483467));
+        new_new_member->Unused4(fread_string(fl, 0));
 
         // add it to the member linked list
         add_clan_member(new_new_clan, new_new_member);
@@ -264,7 +259,7 @@ void save_clans(void)
   FILE *fl;
   clan_data *pclan = nullptr;
   struct clan_room_data *proom = nullptr;
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
   char buf[MAX_STRING_LENGTH];
   char *x;
   char *targ;
@@ -366,11 +361,11 @@ void save_clans(void)
 
     for (pmember = pclan->members; pmember; pmember = pmember->next)
     {
-      fprintf(fl, "M\n%s~\n", pmember->member_name);
-      fprintf(fl, "%d %d %d %d %d %d\n", pmember->member_rights,
-              pmember->member_rank, pmember->unused1, pmember->unused2,
-              pmember->unused3, pmember->time_joined);
-      fprintf(fl, "%s~\n", pmember->unused4);
+      fprintf(fl, "M\n%s~\n", pmember->NameC());
+      fprintf(fl, "%d %d %d %d %d %d\n", pmember->Rights(),
+              pmember->Rank(), pmember->Unused1(), pmember->Unused2(),
+              pmember->Unused3(), pmember->TimeJoined());
+      fprintf(fl, "%s~\n", pmember->Unused4C());
     }
 
     // terminate clan
@@ -413,8 +408,8 @@ void delete_clan(const clan_data *currclan)
 {
   struct clan_room_data *curr_room = nullptr;
   struct clan_room_data *next_room = nullptr;
-  struct clan_member_data *curr_member = nullptr;
-  struct clan_member_data *next_member = nullptr;
+  ClanMember *curr_member = nullptr;
+  ClanMember *next_member = nullptr;
 
   for (curr_room = currclan->rooms; curr_room; curr_room = next_room)
   {
@@ -465,16 +460,16 @@ void assign_clan_rooms()
           SET_BIT(DC::getInstance()->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 }
 
-struct clan_member_data *get_member(QString strName, int nClanId)
+ClanMember *get_member(QString strName, int nClanId)
 {
   clan_data *theClan = nullptr;
 
   if (!(theClan = get_clan(nClanId)) || strName.isEmpty())
     return nullptr;
 
-  struct clan_member_data *pcurr = theClan->members;
+  ClanMember *pcurr = theClan->members;
 
-  while (pcurr && strName != pcurr->member_name)
+  while (pcurr && strName != pcurr->Name())
     pcurr = pcurr->next;
 
   return pcurr;
@@ -482,11 +477,11 @@ struct clan_member_data *get_member(QString strName, int nClanId)
 
 bool is_in_clan(clan_data *theClan, Character *ch)
 {
-  struct clan_member_data *pcurr = theClan->members;
+  ClanMember *pcurr = theClan->members;
 
   while (pcurr)
   {
-    if (pcurr->member_name == ch->getName())
+    if (pcurr->Name() == ch->getName())
     {
       return true;
     }
@@ -508,12 +503,12 @@ void remove_clan_member(int clannumber, Character *ch)
 
 void remove_clan_member(clan_data *theClan, Character *ch)
 {
-  struct clan_member_data *pcurr = nullptr;
-  struct clan_member_data *plast = nullptr;
+  ClanMember *pcurr = nullptr;
+  ClanMember *plast = nullptr;
 
   pcurr = theClan->members;
 
-  while (pcurr && pcurr->member_name != ch->getName())
+  while (pcurr && pcurr->Name() != ch->getName())
   {
     plast = pcurr;
     pcurr = pcurr->next;
@@ -533,7 +528,7 @@ void remove_clan_member(clan_data *theClan, Character *ch)
 // Add someone.  Just makes the struct, fills it, then calls the other add_clan_member
 void add_clan_member(clan_data *theClan, Character *ch)
 {
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
 
   if (!ch || !theClan)
   {
@@ -541,31 +536,16 @@ void add_clan_member(clan_data *theClan, Character *ch)
     return;
   }
 
-#ifdef LEAK_CHECK
-  pmember = (struct clan_member_data *)calloc(1, sizeof(struct clan_member_data));
-#else
-  pmember = (struct clan_member_data *)dc_alloc(1, sizeof(struct clan_member_data));
-#endif
-
-  pmember->member_name = str_dup(GET_NAME(ch));
-  pmember->member_rights = 0;
-  pmember->member_rank = 0;
-  pmember->unused1 = 0;
-  pmember->unused2 = 0;
-  pmember->unused3 = 0;
-  pmember->time_joined = 0;
-  pmember->unused4 = str_dup("");
-  pmember->next = nullptr;
-
+  pmember = new ClanMember(ch);
   add_clan_member(theClan, pmember);
 }
 
 // This should really be done as a binary tree, but I'm lazy, and this doesn't get used
 // very often, so it's just a linked list sorted by member name
-void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member)
+void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 {
-  struct clan_member_data *pcurr = nullptr;
-  struct clan_member_data *plast = nullptr;
+  ClanMember *pcurr = nullptr;
+  ClanMember *plast = nullptr;
   int result = 0;
 
   if (!new_new_member || !theClan)
@@ -574,7 +554,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
     return;
   }
 
-  if (new_new_member->member_name.isEmpty())
+  if (new_new_member->Name().isEmpty())
   {
     logentry("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
     return;
@@ -592,7 +572,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
   bool member_found = false;
   while (pcurr)
   {
-    if (pcurr->member_name == new_new_member->member_name)
+    if (pcurr->Name() == new_new_member->Name())
     {
       member_found = true;
       break;
@@ -603,7 +583,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (member_found)
   { // found um, get out
-    logentry(QString("Tried to add already existing clan member '%1'.").arg(new_new_member->member_name), ANGEL, LogChannels::LOG_BUG);
+    logentry(QString("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -658,7 +638,7 @@ void add_clan(clan_data *new_new_clan)
   DC::getInstance()->end_clan_list = new_new_clan;
 }
 
-void free_member(struct clan_member_data *member)
+void free_member(ClanMember *member)
 {
   dc_free(member);
 }
@@ -734,29 +714,29 @@ void delete_clan(clan_data *dead_clan)
 
 int plr_rights(Character *ch)
 {
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
     return false;
 
-  return pmember->member_rights;
+  return pmember->Rights();
 }
 
 // see if ch has rights to 'bit' in his clan
 int has_right(Character *ch, uint32_t bit)
 {
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
     return false;
 
-  return isSet(pmember->member_rights, bit);
+  return isSet(pmember->Rights(), bit);
 }
 
 int num_clan_members(clan_data *clan)
 {
   int i = 0;
-  for (struct clan_member_data *pmem = clan->members;
+  for (ClanMember *pmem = clan->members;
        pmem;
        pmem = pmem->next)
     i++;
@@ -1654,7 +1634,7 @@ void do_clan_list(Character *ch)
 
 void do_clan_member_list(Character *ch)
 {
-  struct clan_member_data *pmember = 0;
+  ClanMember *pmember = 0;
   clan_data *pclan = 0;
   int column = 1;
   char buf[200], buf2[200];
@@ -1670,7 +1650,7 @@ void do_clan_member_list(Character *ch)
 
   for (pmember = pclan->members; pmember; pmember = pmember->next)
   {
-    sprintf(buf2, "%-20s  ", pmember->member_name);
+    sprintf(buf2, "%-20s  ", pmember->NameC());
     send_to_char(buf2, ch);
 
     if (0 == (column % 3))
@@ -1703,7 +1683,7 @@ int is_clan_leader(Character *ch)
 
 void do_clan_rights(Character *ch, char *arg)
 {
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
   Character *victim = nullptr;
   // extern char * clan_rights[]~;
 
@@ -1732,11 +1712,11 @@ void do_clan_rights(Character *ch, char *arg)
 
   if (!*last)
   { // diag
-    sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->member_name);
+    sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->NameC());
     ch->send(buf);
     for (bit = 0; *clan_rights[bit] != '\n'; bit++)
     {
-      sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
+      sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
       ch->send(buf);
     }
     return;
@@ -1757,9 +1737,11 @@ void do_clan_rights(Character *ch, char *arg)
     return;
   }
 
-  TOGGLE_BIT(pmember->member_rights, 1 << bit);
+  auto r = pmember->Rights();
+  TOGGLE_BIT(r, 1 << bit);
+  pmember->Rights(r);
 
-  if (isSet(pmember->member_rights, 1 << bit))
+  if (isSet(pmember->Rights(), 1 << bit))
   {
     sprintf(buf, "%s toggled on.\r\n", clan_rights[bit]);
     sprintf(buf2, "%s has given you '%s' rights within your clan.\r\n", GET_SHORT(ch), clan_rights[bit]);
@@ -1771,7 +1753,7 @@ void do_clan_rights(Character *ch, char *arg)
   }
   ch->send(buf);
 
-  if ((victim = get_char(pmember->member_name)))
+  if ((victim = get_char(pmember->Name())))
   {
     send_to_char(buf2, victim);
   }
@@ -2348,7 +2330,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
 void do_leader_clans(Character *ch, char *arg, int cmd)
 {
-  struct clan_member_data *pmember = 0;
+  ClanMember *pmember = 0;
   //  clan_data * tarclan = 0;
   //  struct clan_room_data * newroom = 0;
   //  struct clan_room_data * lastroom = 0;
@@ -2412,7 +2394,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
     {
       // only show rights the player has.  Leader has all.
       if (!leader && right_required[i] &&
-          !isSet(pmember->member_rights, right_required[i]))
+          !isSet(pmember->Rights(), right_required[i]))
         continue;
 
       sprintf(buf + strlen(buf), "%18s", mortal_values[i]);
@@ -2620,7 +2602,7 @@ int do_clans(Character *ch, char *arg, int cmd)
     if (!*buf) // only do this if they want clan rights on themselves
     {
       int bit = -1;
-      struct clan_member_data *pmember = nullptr;
+      ClanMember *pmember = nullptr;
 
       if (!(pmember = get_member(ch->getNameC(), ch->clan)))
       {
@@ -2628,11 +2610,11 @@ int do_clans(Character *ch, char *arg, int cmd)
         return eSUCCESS;
       }
 
-      sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->member_name);
+      sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->NameC());
       ch->send(buf);
       for (bit = 0; *clan_rights[bit] != '\n'; bit++)
       {
-        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->member_rights, 1 << bit) ? "on" : "off"));
+        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (isSet(pmember->Rights(), 1 << bit) ? "on" : "off"));
         ch->send(buf);
       }
       return eSUCCESS;
@@ -3715,4 +3697,13 @@ void clan_data::cwithdraw(const uint64_t &withdraw)
 void clan_data::setBalance(const uint64_t &value)
 {
   balance = value;
+}
+
+ClanMember::ClanMember(Character *ch)
+    : next(nullptr), name_(QString()), unused1_(0), unused2_(0), unused3_(0), unused4_(QString()), rights_(0), rank_(0), time_joined_(0)
+{
+  if (ch)
+  {
+    name_ = ch->getName();
+  }
 }

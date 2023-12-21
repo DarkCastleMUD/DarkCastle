@@ -582,15 +582,15 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   }
   do_name(victim, " %", CMD_DEFAULT);
 
-  struct clan_member_data *pmember = nullptr;
+  ClanMember *pmember = nullptr;
 
   if (clan)
   {
     clan_data *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(victim->getNameC(), this->clan)))
-      pmember->member_rights = rights;
+    if ((pmember = get_member(victim->getName(), this->clan)))
+      pmember->Rights(rights);
     add_totem_stats(victim);
   }
   rename_vault_owner(oldname, newname);
