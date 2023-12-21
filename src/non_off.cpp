@@ -1266,14 +1266,14 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     }
 
     act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
-    tmp_char->setSitting();
+    tmp_char->setStanding();
     act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
     act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
     affect_from_char(tmp_char, INTERNAL_SLEEPING);
     return eSUCCESS;
   }
 
-  tmp_char->setSitting();
+  tmp_char->setStanding();
   affect_from_char(tmp_char, INTERNAL_SLEEPING);
   if (tmp_char != this)
   {
