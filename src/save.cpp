@@ -390,15 +390,17 @@ void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
   fwrite("STP", sizeof(char), 3, fpsave);
 }
 
-void fread_to_tilde(FILE *fpsave)
+qsizetype fread_to_tilde(FILE *fpsave)
 {
+  qsizetype characters_read{};
   char a;
-  while (true)
+  while (characters_read++ < 160)
   {
     fread(&a, 1, 1, fpsave);
     if (a == '~')
       break;
   }
+  return characters_read;
 }
 
 void read_Player(Character *ch, FILE *fpsave)
@@ -416,7 +418,13 @@ void read_Player(Character *ch, FILE *fpsave)
   fread(i->pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   i->alias = read_char_aliases(fpsave);
   if (ch->has_skill(NEW_SAVE))
-    fread_to_tilde(fpsave);
+  {
+    if (fread_to_tilde(fpsave) >= 160)
+    {
+      buglog(QString("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
+      return;
+    }
+  }
   fread(&(i->rdeaths), sizeof(i->rdeaths), 1, fpsave);
   fread(&(i->pdeaths), sizeof(i->pdeaths), 1, fpsave);
   fread(&(i->pkills), sizeof(i->pkills), 1, fpsave);
