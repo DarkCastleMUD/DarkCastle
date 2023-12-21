@@ -240,11 +240,11 @@ int do_brace(Character *ch, char *argument, int cmd)
     {
       if (cmd == 0)
       {
-        csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword));
+        csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
       }
       else
       {
-        csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword));
+        csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
         act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
       }
       ch->brace_at->bracee = nullptr;

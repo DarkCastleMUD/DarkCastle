@@ -2180,7 +2180,7 @@ void update_characters()
          }
          else
          {
-            csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword));
+            csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword).toStdString().c_str());
             act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
          }
       }

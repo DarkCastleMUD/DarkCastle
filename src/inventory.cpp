@@ -736,7 +736,7 @@ int do_get(Character *ch, char *argument, int cmd)
                       extract_obj(obj_object);
                       continue;
                     }
-                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
+                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
                     continue;
                   }
                 }
@@ -929,7 +929,7 @@ int do_get(Character *ch, char *argument, int cmd)
                 }
                 else
                 {
-                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
+                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name).toStdString().c_str());
                   fail = true;
                 }
               }

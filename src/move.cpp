@@ -868,7 +868,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 
 	if (ch->brace_at)
 	{
-		csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword));
+		csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
 		return eFAILURE;
 	}
 
@@ -885,7 +885,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		if (isSet(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
 			ch->sendln("You can't go that way.");
 		else if (EXIT(ch, cmd)->keyword)
-			csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, cmd)->keyword));
+			csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, cmd)->keyword).toStdString().c_str());
 		else
 			ch->sendln("It seems to be closed.");
 		return eFAILURE;
