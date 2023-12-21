@@ -125,7 +125,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit()&& !IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -211,7 +211,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit()&& !IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1132,7 +1132,7 @@ int do_sleep(Character *ch, char *argument, int cmd)
       ch->sendln("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!");
     }
 
-  if ((paf = ch->affected_by_spell(SPELL_SLEEP))&&
+  if ((paf = ch->affected_by_spell(SPELL_SLEEP)) &&
       paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
     paf->modifier = 0;
 
@@ -1203,87 +1203,86 @@ command_return_t Character::wake(Character *victim)
 
 command_return_t Character::do_wake(QStringList arguments, int cmd)
 {
-  Character *tmp_char{};
-
-  QString arg1 = arguments.value(0);
-  if (!arg1.isEmpty())
+  if (isSleeping())
   {
-    if (isSleeping())
+    act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  Character *tmp_char{};
+  QString arg1 = arguments.value(0);
+  if (arg1.isEmpty())
+  {
+    tmp_char = this;
+  }
+  else
+  {
+    tmp_char = get_char_room_vis(arg1);
+  }
+
+  if (!tmp_char)
+  {
+    this->sendln("You do not see that person here.");
+    return eFAILURE;
+  }
+
+  if (GET_POS(tmp_char) != position_t::SLEEPING)
+  {
+    if (tmp_char == this)
     {
-      act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
+      act("You are already awake.", this, 0, tmp_char, TO_CHAR, 0);
     }
     else
     {
-      tmp_char = get_char_room_vis(arg1);
-      if (tmp_char)
-      {
-        if (tmp_char == this)
-        {
-          act("If you want to wake yourself up, just type 'wake'", this, 0, 0, TO_CHAR, 0);
-        }
-        else
-        {
-          if (GET_POS(this) == position_t::FIGHTING)
-          {
-            if (GET_POS(tmp_char) == position_t::SLEEPING)
-            {
-              if (number(1, 100) > GET_DEX(this))
-              {
-                act("You cannot meneuver yourself over to $M!", this, 0, tmp_char, TO_CHAR, 0);
-                act("$n tries to move the flow of battle towards $N but is unable.",
-                    this, 0, tmp_char, TO_ROOM, 0);
-                return eSUCCESS;
-              }
-              auto af = tmp_char->affected_by_spell(SPELL_SLEEP);
-              if (af && af->modifier == 1)
-              {
-                act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
-              }
-              else
-              {
-                act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
-                tmp_char->setSitting();
-                act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
-                act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
-                affect_from_char(tmp_char, INTERNAL_SLEEPING);
-              }
-            }
-            else
-            {
-              act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
-            }
-          }
-          else
-          {
-            if (GET_POS(tmp_char) == position_t::SLEEPING)
-            {
-              auto af = tmp_char->affected_by_spell(SPELL_SLEEP);
-              if (af && af->modifier == 1)
-              {
-                act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
-              }
-              else
-              {
-                act("You wake $M up.", this, 0, tmp_char, TO_CHAR, 0);
-                act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
-                tmp_char->setSitting();
-                act("You are awakened by $n.", this, 0, tmp_char, TO_VICT, 0);
-                affect_from_char(tmp_char, INTERNAL_SLEEPING);
-              }
-            }
-            else
-            {
-              act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
-            }
-          }
-        }
-      }
-      else
-      {
-        this->sendln("You do not see that person here.");
-      }
+      act("$N is already awake.", this, 0, tmp_char, TO_CHAR, 0);
     }
+    return eFAILURE;
   }
+
+  auto af = tmp_char->affected_by_spell(SPELL_SLEEP);
+  if (af && af->modifier == 1)
+  {
+    if (tmp_char == this)
+    {
+      act("You can not wake yourself up!", this, 0, tmp_char, TO_CHAR, 0);
+    }
+    else
+    {
+      act("You can not wake $M up!", this, 0, tmp_char, TO_CHAR, 0);
+    }
+    return eFAILURE;
+  }
+
+  if (GET_POS(this) == position_t::FIGHTING)
+  {
+    if (number(1, 100) > GET_DEX(this) && tmp_char != this)
+    {
+      act("You cannot meneuver yourself over to $M!", this, 0, tmp_char, TO_CHAR, 0);
+      act("$n tries to move the flow of battle towards $N but is unable.", this, 0, tmp_char, TO_ROOM, 0);
+      return eSUCCESS;
+    }
+
+    act("You manage to give $M a swift kick in the ribs.", this, 0, tmp_char, TO_CHAR, 0);
+    tmp_char->setSitting();
+    act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+    act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", this, 0, tmp_char, TO_VICT, 0);
+    affect_from_char(tmp_char, INTERNAL_SLEEPING);
+    return eSUCCESS;
+  }
+
+  if (tmp_char != this)
+  {
+    act("You wake $M up.", this, 0, tmp_char, TO_CHAR, 0);
+    act("$n awakens $N.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+    act("You are awakened by $n.", this, 0, tmp_char, TO_VICT, 0);
+  }
+  else
+  {
+    act("You wake yourself up.", this, 0, tmp_char, TO_CHAR, 0);
+    act("$N awakens.", this, 0, tmp_char, TO_ROOM, NOTVICT);
+  }
+  tmp_char->setSitting();
+  affect_from_char(tmp_char, INTERNAL_SLEEPING);
 
   return eSUCCESS;
 }
@@ -1298,7 +1297,7 @@ int do_tag(Character *ch, char *argument, int cmd)
 
   one_argument(name, argument);
 
-  if (!*name || !(victim = ch->get_char_room_vis( name)))
+  if (!*name || !(victim = ch->get_char_room_vis(name)))
   {
     ch->sendln("Tag who?");
     return eFAILURE;
