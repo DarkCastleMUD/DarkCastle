@@ -403,7 +403,7 @@ qsizetype fread_to_tilde(FILE *fpsave)
   return characters_read;
 }
 
-void read_Player(Character *ch, FILE *fpsave)
+bool read_Player(Character *ch, FILE *fpsave)
 {
   char typeflag[4] = {};
   class Player *i = ch->player;
@@ -422,7 +422,7 @@ void read_Player(Character *ch, FILE *fpsave)
     if (fread_to_tilde(fpsave) >= 160)
     {
       buglog(QString("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
-      return;
+      return false;
     }
   }
   fread(&(i->rdeaths), sizeof(i->rdeaths), 1, fpsave);
@@ -577,6 +577,7 @@ void read_Player(Character *ch, FILE *fpsave)
   // Any future additions to this read file will need to be placed LAST
 
   // at this point, typeflag should = "STP", and we're done reading mob data
+  return true;
 }
 
 int save_pc_or_mob_data(Character *ch, FILE *fpsave, struct time_data tmpage)
@@ -589,7 +590,7 @@ int save_pc_or_mob_data(Character *ch, FILE *fpsave, struct time_data tmpage)
   return 1;
 }
 
-int read_pc_or_mob_data(Character *ch, FILE *fpsave)
+bool read_pc_or_mob_data(Character *ch, FILE *fpsave)
 {
   if (IS_MOB(ch))
   {
@@ -605,9 +606,12 @@ int read_pc_or_mob_data(Character *ch, FILE *fpsave)
   {
     ch->mobdata = nullptr;
     ch->player = new Player;
-    read_Player(ch, fpsave);
+    if (!read_Player(ch, fpsave))
+    {
+      return false;
+    }
   }
-  return 1;
+  return true;
 }
 
 // return 1 on success
@@ -1021,7 +1025,10 @@ bool load_char_obj(class Connection *d, QString name)
 
   store_to_char(&uchar, ch);
   ch->store_to_char_variable_data(fpsave);
-  read_pc_or_mob_data(ch, fpsave);
+  if (!read_pc_or_mob_data(ch, fpsave))
+  {
+    return false;
+  }
 
   if (IS_PC(ch) && ch->player->time.logon < 1117527906)
   {
