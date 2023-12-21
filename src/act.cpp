@@ -26,8 +26,6 @@
 #include "spells.h"
 #include "returnvals.h"
 
-
-
 extern bool MOBtrigger;
 
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)

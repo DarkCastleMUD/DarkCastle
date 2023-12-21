@@ -1203,12 +1203,6 @@ command_return_t Character::wake(Character *victim)
 
 command_return_t Character::do_wake(QStringList arguments, int cmd)
 {
-  if (isSleeping())
-  {
-    act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
-  }
-
   Character *tmp_char{};
   QString arg1 = arguments.value(0);
   if (arg1.isEmpty())
@@ -1224,6 +1218,15 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
   {
     this->sendln("You do not see that person here.");
     return eFAILURE;
+  }
+
+  if (tmp_char != this)
+  {
+    if (isSleeping())
+    {
+      act("You can't wake people up if you are asleep yourself!", this, 0, 0, TO_CHAR, 0);
+      return eFAILURE;
+    }
   }
 
   if (GET_POS(tmp_char) != position_t::SLEEPING)
@@ -1270,6 +1273,8 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     return eSUCCESS;
   }
 
+  tmp_char->setSitting();
+  affect_from_char(tmp_char, INTERNAL_SLEEPING);
   if (tmp_char != this)
   {
     act("You wake $M up.", this, 0, tmp_char, TO_CHAR, 0);
@@ -1278,11 +1283,9 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
   }
   else
   {
-    act("You wake yourself up.", this, 0, tmp_char, TO_CHAR, 0);
+    act("You wake yourself up.", this, 0, 0, TO_CHAR, 0);
     act("$N awakens.", this, 0, tmp_char, TO_ROOM, NOTVICT);
   }
-  tmp_char->setSitting();
-  affect_from_char(tmp_char, INTERNAL_SLEEPING);
 
   return eSUCCESS;
 }
