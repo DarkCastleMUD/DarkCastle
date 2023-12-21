@@ -2268,7 +2268,7 @@ int do_open(Character *ch, char *argument, int cmd)
         if (EXIT(ch, door)->keyword)
         {
           act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-          csendf(ch, "You reveal a hidden %s!\r\n", fname((char *)EXIT(ch, door)->keyword));
+          csendf(ch, "You reveal a hidden %s!\r\n", fname((char *)EXIT(ch, door)->keyword).toStdString().c_str());
         }
         else
         {
