@@ -5168,18 +5168,20 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
       if (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_ISDOOR))
       {
-        if ((isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
-                                                                                                             EX_LOCKED)))
+        if ((isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED)) && (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_LOCKED)))
+        {
           value = 2;
-        else if (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info,
-                           EX_CLOSED))
+        }
+        else if (isSet(DC::getInstance()->world[room].dir_option[door]->exit_info, EX_CLOSED))
+        {
           value = 1;
+        }
         else
+        {
           value = 0;
+        }
 
-        fprintf(fl, "D 0 %d %d %d\n", DC::getInstance()->world[room].number,
-                DC::getInstance()->world[DC::getInstance()->world[room].dir_option[door]->to_room].number,
-                value);
+        fprintf(fl, "D 0 %d %d %d\n", DC::getInstance()->world[room].number, DC::getInstance()->world[DC::getInstance()->world[room].dir_option[door]->to_room].number, value);
       }
     }
   } /*  Ok.. all door state info written...  */

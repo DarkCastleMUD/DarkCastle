@@ -548,9 +548,8 @@ void weather_and_time(int mode);
 void night_watchman(void);
 int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
-bool load_char_obj(class Connection *d, QString name);
+load_status_t load_char_obj(class Connection *d, QString name);
 void save_char_obj(Character *ch);
-bool load_char_obj(class Connection *d, QString name);
 
 #ifdef USE_SQL
 void save_char_obj_db(Character *ch);

@@ -148,6 +148,17 @@ enum class search_error
     not_found
 };
 
+enum class load_status_t
+{
+    unknown,  // default unknown value
+    success,  // successfully loaded something
+    missing,  // not found
+    error,    // error loading
+    bad_input // bad input
+};
+
+bool operator!(load_status_t ls);
+
 typedef int command_return_t;
 typedef int (*command_gen1_t)(class Character *ch, char *argument, int cmd);
 typedef command_return_t (*command_gen2_t)(class Character *ch, std::string argument, int cmd);

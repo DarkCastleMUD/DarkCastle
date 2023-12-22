@@ -976,7 +976,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 }
 
 // Load a char and inventory into a new_new ch structure.
-bool load_char_obj(class Connection *d, QString name)
+load_status_t load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
   QString strsave;
@@ -985,7 +985,7 @@ bool load_char_obj(class Connection *d, QString name)
   Character *ch;
 
   if (name.isEmpty())
-    return false;
+    return load_status_t::bad_input;
   name[0] = name[0].toUpper();
 
   ch = new Character;
@@ -1017,12 +1017,12 @@ bool load_char_obj(class Connection *d, QString name)
   //  Should be much faster and save our HD from turning itself to mush -pir
 
   if ((fpsave = fopen(strsave.toStdString().c_str(), "rb")) == nullptr)
-    return false;
+    return load_status_t::missing;
 
   if (fread(&uchar, sizeof(uchar), 1, fpsave) == 0)
   {
     load_char_obj_error(fpsave, strsave);
-    return false;
+    return load_status_t::error;
   }
 
   reset_char(ch);
@@ -1031,7 +1031,7 @@ bool load_char_obj(class Connection *d, QString name)
   ch->store_to_char_variable_data(fpsave);
   if (!read_pc_or_mob_data(ch, fpsave))
   {
-    return false;
+    return load_status_t::error;
   }
 
   if (IS_PC(ch) && ch->player->time.logon < 1117527906)
@@ -1054,7 +1054,7 @@ bool load_char_obj(class Connection *d, QString name)
 
   if (fpsave != nullptr)
     fclose(fpsave);
-  return true;
+  return load_status_t::success;
 }
 
 // read data from file for an item.

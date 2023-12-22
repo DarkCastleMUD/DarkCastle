@@ -3221,3 +3221,7 @@ int len_cmp(QString s1, QString s2)
   return 0;
 }
 
+bool operator!(load_status_t ls)
+{
+  return ls != load_status_t::success;
+}

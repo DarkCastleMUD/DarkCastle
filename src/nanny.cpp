@@ -810,7 +810,6 @@ void nanny(class Connection *d, std::string arg)
    std::stringstream str_tmp;
    char tmp_name[20];
    char *password;
-   bool fOld;
    Character *ch;
    int y;
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
@@ -835,6 +834,7 @@ void nanny(class Connection *d, std::string arg)
       return;
    }
 
+   load_status_t ls{};
    switch (STATE(d))
    {
 
@@ -938,8 +938,8 @@ void nanny(class Connection *d, std::string arg)
       //    logentry(str_tmp, 0, LogChannels::LOG_MISC);
 
       // ch is allocated in load_char_obj
-      fOld = load_char_obj(d, tmp_name);
-      if (!fOld)
+      ls = load_char_obj(d, tmp_name);
+      if (ls == load_status_t::missing)
       {
          str_tmp << "../archive/" << tmp_name << ".gz";
          if (file_exists(str_tmp.str().c_str()))
@@ -961,16 +961,14 @@ void nanny(class Connection *d, std::string arg)
       // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
       // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
-      if (check_reconnect(d, tmp_name, false))
-         fOld = true;
-      else if ((wizlock) && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
+      if (!check_reconnect(d, tmp_name, false) && wizlock && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
       {
          SEND_TO_Q("The game is wizlocked.\r\n", d);
          close_socket(d);
          return;
       }
 
-      if (fOld)
+      if (ls == load_status_t::success)
       {
          /* Old player */
          SEND_TO_Q("Password: ", d);
@@ -978,7 +976,7 @@ void nanny(class Connection *d, std::string arg)
          STATE(d) = Connection::states::GET_OLD_PASSWORD;
          return;
       }
-      else
+      else if (ls == load_status_t::missing)
       {
          if (DC::getInstance()->cf.bport)
          {
@@ -990,6 +988,12 @@ void nanny(class Connection *d, std::string arg)
          SEND_TO_Q(buf, d);
          telnet_ga(d);
          STATE(d) = Connection::states::CONFIRM_NEW_NAME;
+         return;
+      }
+      else
+      {
+         SEND_TO_Q(QString("There was an error loading %1").arg(tmp_name), d);
+         close_socket(d);
          return;
       }
       break;

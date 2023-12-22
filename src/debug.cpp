@@ -516,9 +516,9 @@ int main(int argc, char **argv)
     try
     {
       Object *obj;
-      if (load_char_obj(d, argv[1]) == false)
+      if (load_char_obj(d, argv[1]) != load_status_t::success)
       {
-        // std::cerr << "Unable to load " << argv[1] << std::endl;
+        std::cerr << "Unable to load " << argv[1] << std::endl;
         exit(1);
       }
       else
