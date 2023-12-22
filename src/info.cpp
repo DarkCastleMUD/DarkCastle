@@ -1440,8 +1440,7 @@ int do_look(Character *ch, char *argument, int cmd)
                }
                else if (ARE_CONTAINERS(tmp_object))
                {
-                  if (!isSet(tmp_object->obj_flags.value[1],
-                                 CONT_CLOSED))
+                  if (!isSet(tmp_object->obj_flags.value[1], CONT_CLOSED))
                   {
                      send_to_char(fname(tmp_object->name), ch);
                      switch (bits)
@@ -2067,9 +2066,11 @@ int do_score(Character *ch, char *argument, int cmd)
 
       for (; aff; aff = aff->next)
       {
-
-         if (aff->bitvector)
+         if (aff->bitvector >= 0 && aff->bitvector <= AFF_MAX)
+         {
+            assert(aff->bitvector >= 0 && aff->bitvector <= AFF_MAX);
             affect_found[aff->bitvector] = true;
+         }
          scratch = frills[level];
          modifyOutput = false;
 
