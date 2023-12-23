@@ -8,7 +8,7 @@
 #ifndef COMMANDSTACK_H_
 #define COMMANDSTACK_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 class CommandStack
 {

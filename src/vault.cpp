@@ -1,8 +1,6 @@
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <string>

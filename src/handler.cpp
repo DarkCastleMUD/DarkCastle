@@ -20,7 +20,7 @@
 #include <cctype>
 #include <cassert>
 
-#include <sys/time.h>
+#include <ctime>
 #include <algorithm>
 #include <iostream>
 #include <sstream>

@@ -1,6 +1,6 @@
 #
-#include <ctype.h>
-#include <string.h>
+#include <cctype>
+#include <cstring>
 
 #include <string>
 #include <map>
@@ -16,7 +16,7 @@
 #include "character.h"
 #include "room.h"
 #include "utility.h"
-#include "assert.h"
+#include "cassert"
 #include "db.h"
 #include "vault.h"
 #include "returnvals.h"

@@ -10,8 +10,8 @@
 
 #include <string>
 #include <map>
-#include <sys/time.h>
-#include <stdint.h>
+#include <ctime>
+#include <cstdint>
 #include <iostream>
 
 

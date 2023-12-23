@@ -29,6 +29,7 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
+qsizetype fread_to_tilde(FILE * fpsave);
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave);
 void load_vaults();
 

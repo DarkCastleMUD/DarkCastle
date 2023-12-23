@@ -13,11 +13,9 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 #include <cstdlib>
 #include "structs.h"
 #include "room.h"

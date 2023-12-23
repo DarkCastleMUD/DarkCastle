@@ -8,8 +8,8 @@
  *                      from charmies                                         *
  ******************************************************************************/
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
 #include "character.h"
 #include "affect.h"

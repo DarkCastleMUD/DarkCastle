@@ -25,7 +25,7 @@
 #include "act.h"
 #include "race.h" // RACE_FISH
 #include "clan.h" // clan_room_data
-#include <string.h>
+#include <cstring>
 #include "returnvals.h"
 #include "game_portal.h"
 #include "innate.h"

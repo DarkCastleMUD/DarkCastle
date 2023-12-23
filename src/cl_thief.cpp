@@ -19,7 +19,7 @@
 #include "interp.h"
 #include "act.h"
 #include "db.h"
-#include <string.h>
+#include <cstring>
 #include "returnvals.h"
 #include "clan.h"
 #include "arena.h"

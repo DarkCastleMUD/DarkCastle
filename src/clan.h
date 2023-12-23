@@ -7,7 +7,7 @@
 | Description:  Header information for clans.
 */
 
-#include <stddef.h>
+#include <cstddef>
 #include <QString>
 
 constexpr size_t MAX_CLAN_LEN = 15;

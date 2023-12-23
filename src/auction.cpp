@@ -15,7 +15,7 @@ void load_auction_tickets()
 
 */
 
-#include <ctype.h>
+#include <cctype>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -28,7 +28,7 @@ void load_auction_tickets()
 #include "character.h"
 #include "room.h"
 #include "utility.h"
-#include <assert.h>
+#include <cassert>
 #include "db.h"
 #include "vault.h"
 #include "returnvals.h"
@@ -37,7 +37,7 @@ void load_auction_tickets()
 #include <map>
 #include <queue>
 #include "fileinfo.h"
-#include <errno.h>
+#include <cerrno>
 #include "const.h"
 #include "inventory.h"
 #include "const.h"

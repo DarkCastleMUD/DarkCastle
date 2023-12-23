@@ -4,8 +4,8 @@
 |
 | Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
-#include <ctype.h>
-#include <string.h>
+#include <cctype>
+#include <cstring>
 
 #include <queue>
 

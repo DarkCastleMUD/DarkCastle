@@ -3,9 +3,9 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-#include <ctype.h>
-#include <string.h>
-#include <ctype.h>
+#include <cctype>
+#include <cstring>
+#include <cctype>
 
 #include <string>
 

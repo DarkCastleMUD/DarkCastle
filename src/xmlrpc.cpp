@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "dc_xmlrpc.h"
-#include <string.h>
+#include <cstring>
 
 #include "character.h"
 #include "handler.h"

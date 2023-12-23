@@ -5,11 +5,9 @@
 
 
 */
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 #include "structs.h"
 #include "room.h"
 #include "character.h"

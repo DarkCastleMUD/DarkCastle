@@ -2,7 +2,7 @@
 | cl_mage.C
 | Description:  Commands for the mage class.
 */
-#include <string.h>
+#include <cstring>
 
 #include "structs.h"
 #include "player.h"

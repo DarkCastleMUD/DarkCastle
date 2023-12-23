@@ -16,8 +16,8 @@
 #ifndef DB_H_
 #define DB_H_
 
-#include <stdio.h>
-#include <time.h>
+#include <cstdio>
+#include <ctime>
 
 #include <string>
 #include <vector>

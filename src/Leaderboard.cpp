@@ -5,10 +5,8 @@
  *      Author: jhhudso
  */
 
-extern "C"
-{
-#include <string.h>
-}
+
+#include <cstring>
 #include <sstream>
 
 #include "Leaderboard.h"
@@ -17,7 +15,7 @@ extern "C"
 #include "fileinfo.h"
 #include "connect.h"
 #include "levels.h"
-#include <limits.h>
+#include <climits>
 #include "db.h"
 #include "interp.h"
 #include "returnvals.h"

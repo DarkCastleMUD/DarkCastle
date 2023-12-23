@@ -1,7 +1,5 @@
-extern "C" {
-#include <stdio.h>
-#include <stdlib.h>
-}
+ #include <cstdio>
+#include <cstdlib>
 #ifdef LEAK_CHECK
 
 #endif

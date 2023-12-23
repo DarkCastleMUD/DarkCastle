@@ -17,15 +17,13 @@
  *                        coded list.                                      *
  ***************************************************************************/
 /* $Id: nanny.cpp,v 1.198 2015/05/26 08:55:40 zen Exp $ */
-extern "C"
-{
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 // #include <arpa/telnet.h>
 #include <unistd.h>
-}
-#include <string.h>
+#include <cstring>
 #include <queue>
 #include <fmt/format.h>
 

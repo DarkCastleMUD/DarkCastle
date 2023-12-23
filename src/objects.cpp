@@ -4,11 +4,9 @@
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
 */
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 #include "obj.h"
 #include "connect.h"
 #include "utility.h"
@@ -23,7 +21,7 @@ extern "C"
 #include "act.h"
 #include "structs.h"
 #include "db.h"
-#include <assert.h>
+#include <cassert>
 #include "mobile.h" // ACT_ISNPC
 #include "race.h"
 #include "returnvals.h"

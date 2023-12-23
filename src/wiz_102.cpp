@@ -12,7 +12,7 @@
 /*                      skills                                               */
 /*****************************************************************************/
 
-#include <ctype.h> // isspace
+#include <cctype> // isspace
 
 #include <string>
 #include <vector>

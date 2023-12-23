@@ -26,11 +26,9 @@
  *  such installation can be found in INSTALL.  Enjoy........    N'Atas-Ha *
  ***************************************************************************/
 
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 
 #include <sys/types.h>
 #include <cstdio>

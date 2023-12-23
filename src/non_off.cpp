@@ -7,11 +7,9 @@
 /* Revision History                                                          */
 /* 12/08/2003   Onager   Revised do_tap() to prevent sacrifices in donations */
 /*****************************************************************************/
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
+
+#include <cctype>
+#include <cstring>
 #include "connect.h"
 #include "character.h"
 #include "room.h"

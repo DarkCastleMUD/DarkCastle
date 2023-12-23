@@ -14,15 +14,12 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
 #include <signal.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-#include <stdlib.h>
-}
+#include <cstdio>
+#include <cctype>
+#include <cstring>
+#include <ctime>
+#include <cstdlib>
 
 #include "connect.h" // Connection
 #include "utility.h"

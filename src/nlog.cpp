@@ -1,10 +1,10 @@
 /* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
+#include <ctime>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 #include <stdarg.h>
 
 #include "connect.h"

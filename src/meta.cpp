@@ -13,8 +13,8 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 #include "character.h"
 #include "structs.h"

@@ -4,7 +4,7 @@
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
 
-#include <string.h> //strstr()
+#include <cstring> //strstr()
 #include <cctype>
 #include <string>
 #include <sstream>

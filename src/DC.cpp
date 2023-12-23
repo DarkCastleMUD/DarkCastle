@@ -6,7 +6,7 @@
  *      Based on http://www.cplusplus.com/forum/beginner/152735/#msg792909
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "DC.h"
 #include "db.h"

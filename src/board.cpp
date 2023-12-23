@@ -40,12 +40,10 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 
-extern "C"
-{
-#include <stdio.h>  // FILE *
-#include <string.h> // memset()
-#include <ctype.h>  // isspace(), isdigit()
-}
+#include <cstdio>  // FILE *
+#include <cstring> // memset()
+#include <cctype>  // isspace(), isdigit()
+
 #include "room.h"
 #include "obj.h"
 #include "player.h"   // MAX_*

@@ -21,7 +21,7 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <string.h>
+#include <cstring>
 
 #include <cstdio>
 

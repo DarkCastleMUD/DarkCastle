@@ -5,12 +5,10 @@
  */
 /* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-}
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fmt/format.h>
 
 #include "ki.h"

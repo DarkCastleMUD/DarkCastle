@@ -5,12 +5,12 @@
 /* 11/10/2003    Onager     Removed clan size limit                    */
 /***********************************************************************/
 #define __STDC_LIMIT_MACROS
-#include <stdint.h>
+#include <cstdint>
 uint64_t i = UINT64_MAX;
 
-#include <string.h> // strcat
-#include <stdio.h>  // FILE *
-#include <ctype.h>  // isspace..
+#include <cstring> // strcat
+#include <cstdio>  // FILE *
+#include <cctype>  // isspace..
 #include <netinet/in.h>
 
 #include <fstream>

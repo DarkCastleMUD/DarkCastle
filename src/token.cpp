@@ -8,13 +8,11 @@
 */
 // Standard header files
 
-extern "C"
-{
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-}
+
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
+#include <cstdio>
 // DarkCastle header files
 #include "db.h"
 #include "room.h"

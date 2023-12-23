@@ -1,11 +1,9 @@
 // social.C
 // Description:  Anything to do with socials
 
-extern "C"
-{
-#include <string.h>
-#include <stdlib.h> // qsort()
-}
+#include <cstring>
+#include <cstdlib> // qsort()
+
 #include "fileinfo.h" // SOCIAL_FILE
 #include "structs.h"  // MAX_INPUT_LENGTH
 #include "room.h"

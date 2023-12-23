@@ -3,7 +3,7 @@
    Separated all this from the rest(by putting it in save.cpp,
    magic.cpp, etc) to have all the golem code in one place.
 */
-#include <string.h>
+#include <cstring>
 
 
 

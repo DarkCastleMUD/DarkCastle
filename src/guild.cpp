@@ -11,7 +11,7 @@
 #include "player.h"
 #include "db.h" // exp_table
 #include "interp.h"
-#include <string.h>
+#include <cstring>
 #include "returnvals.h"
 #include "ki.h"
 #include "mobile.h"

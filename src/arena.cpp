@@ -9,7 +9,7 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#include <string.h>
+#include <cstring>
 
 #include "room.h"   // Room
 #include "db.h"     // real_room()

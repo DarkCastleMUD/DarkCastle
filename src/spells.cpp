@@ -22,13 +22,11 @@
  ***************************************************************************/
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
-extern "C"
-{
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-}
+
+#include <cstring>
+#include <cstdio>
+#include <cassert>
+#include <cstdlib>
 
 #include "character.h"
 #include "race.h"

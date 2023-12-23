@@ -23,7 +23,7 @@
  * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <cstdio>
 #include <cstring>

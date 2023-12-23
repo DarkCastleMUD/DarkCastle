@@ -12,8 +12,8 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 #include <cstdint>
 
 #include <fmt/format.h>

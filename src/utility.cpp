@@ -20,19 +20,19 @@
  ***************************************************************************/
 /* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <sys/time.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cctype>
+#include <cstdlib>
+#include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>

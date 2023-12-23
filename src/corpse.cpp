@@ -14,11 +14,11 @@
  ***********************************************************************/
 
 /* The standard includes */
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstring>
+#include <cstdlib>
 #include "returnvals.h"
-#include <errno.h>
+#include <cerrno>
 
 #include "obj.h"
 #include "connect.h"
@@ -34,7 +34,7 @@
 #include "act.h"
 #include "structs.h"
 #include "db.h"
-#include <assert.h>
+#include <cassert>
 #include "mobile.h" // ACT_ISNPC
 #include "race.h"
 #include <cstddef>

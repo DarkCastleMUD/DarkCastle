@@ -18,7 +18,7 @@ one liner quest shit
 #include "quest.h"
 #include "spells.h"
 #include <vector>
-#include <string.h>
+#include <cstring>
 #include "room.h"
 #include "inventory.h"
 

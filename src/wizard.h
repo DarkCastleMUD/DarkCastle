@@ -7,13 +7,11 @@
 |   for the wiz_1*.C files to consolidate the header files they
 |   need.
 */
-extern "C"
-{
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-}
+
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
 
 #include "character.h"
 #include "act.h"
@@ -29,7 +27,7 @@ extern "C"
 #include "terminal.h"
 #include "player.h"
 #include "connect.h"
-#include "time.h"
+#include "ctime"
 #include "db.h"
 
 /* Function headers */

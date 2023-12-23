@@ -18,11 +18,11 @@
 /***************************************************************************/
 /* $Id: interp.cpp,v 1.200 2015/06/14 02:38:12 pirahna Exp $ */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <cassert>
 
 #include <string>
 #include <tuple>

@@ -13,7 +13,7 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
-#include <string.h>
+#include <cstring>
 
 #include <fmt/format.h>
 

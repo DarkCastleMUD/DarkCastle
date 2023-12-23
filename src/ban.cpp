@@ -1,5 +1,5 @@
 #include <arpa/inet.h>
-#include <string.h>
+#include <cstring>
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 

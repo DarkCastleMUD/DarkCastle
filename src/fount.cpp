@@ -10,12 +10,10 @@
  ***************************************************************************/
 /* $Id: fount.cpp,v 1.6 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-}
+
+#include <cstring>
+#include <cstdio>
+#include <cctype>
 
 #include "room.h"
 #include "obj.h"

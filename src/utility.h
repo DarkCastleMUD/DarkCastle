@@ -21,9 +21,9 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
 
-#include <time.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include <ctime>
+#include <cstdlib>
+#include <cstdint>
 
 #include <string>
 #include <vector>

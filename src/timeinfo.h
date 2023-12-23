@@ -5,7 +5,7 @@
 | timeinfo.h
 | Description:  Declares the information for handling time in the game.
 */
-#include <time.h>
+#include <ctime>
 
 #include <cstdint>
 

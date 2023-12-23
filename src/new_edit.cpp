@@ -1,9 +1,9 @@
 #include <signal.h>
-#include <stdio.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cctype>
 #include <cstring>
-#include <time.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdlib>
 
 #include "connect.h" // Connection
 #include "character.h"
