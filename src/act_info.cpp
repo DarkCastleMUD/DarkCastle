@@ -12,11 +12,9 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-extern "C"
-{
-  #include <string.h>
-  #include <ctype.h>
-}
+#include <cstring>
+#include <cctype>
+
 #include "obj.h"
 #include "mobile.h"
 #include "character.h"
@@ -41,11 +39,13 @@ int max_who = 0;
 
 void page_string(class Connection *d, const char *str, int keep_internal);
 
-int do_levels(Character *ch, char *argument, int cmd) {
+int do_levels(Character *ch, char *argument, int cmd)
+{
 	int i;
 	char buf[MAX_STRING_LENGTH];
 
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch))
+	{
 		ch->sendln("You ain't nothin' but a hound-dog.");
 		return eSUCCESS;
 	}
@@ -58,5 +58,3 @@ int do_levels(Character *ch, char *argument, int cmd) {
 	page_string(ch->desc, buf, 1);
 	return eSUCCESS;
 }
-
-
