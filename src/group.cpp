@@ -3,10 +3,8 @@
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
-extern "C"
-{
-#include <ctype.h> // isspace()
-}
+
+#include <cctype>
 
 #include "character.h"
 #include "room.h"
@@ -21,7 +19,7 @@ extern "C"
 #include "db.h"
 #include "player.h"
 #include "sing.h" // stop_grouped_bards
-#include <string.h>
+#include <cstring>
 #include "returnvals.h"
 #include "spells.h"
 #include "terminal.h"
@@ -362,7 +360,7 @@ int do_group(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(victim = ch->get_char_room_vis( name)))
+  if (!(victim = ch->get_char_room_vis(name)))
     ch->sendln("No one here by that name.");
 
   else
@@ -456,7 +454,7 @@ int do_promote(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(new_new_leader = ch->get_char_room_vis( name)))
+  if (!(new_new_leader = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
     return eFAILURE;
@@ -602,7 +600,7 @@ int do_disband(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (!(adios = ch->get_char_room_vis( name)))
+  if (!(adios = ch->get_char_room_vis(name)))
   {
     ch->sendln("I see no person by that name here!");
     return eFAILURE;
