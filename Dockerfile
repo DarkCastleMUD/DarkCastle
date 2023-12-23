@@ -13,6 +13,7 @@ RUN git clone https://github.com/DarkCastleMUD/DarkCastle.git
 WORKDIR /srv/dcastle2/git/DarkCastle
 RUN cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
 RUN ninja -C build package
+RUN zypper -n in --allow-unsigned-rpm build/dc*rpm
 
 WORKDIR /srv/dcastle2/git/DarkCastle/lib
 CMD ["/srv/dcastle2/git/DarkCastle/build/dcastle", "-P"]
