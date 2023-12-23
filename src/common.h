@@ -165,6 +165,7 @@ typedef command_return_t (*command_gen2_t)(class Character *ch, std::string argu
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
 typedef command_return_t (Character::*command_special_t)(QString arguments, int cmd);
 typedef quint64 level_t;
+typedef QMap<QString, QString> aliases_t;
 
 [[nodiscard]] inline bool isSet(auto flag, auto bit)
 {
@@ -187,7 +188,6 @@ command_return_t do_addRoom(Character *ch, char *argument, int cmd);
 command_return_t do_advance(Character *ch, char *argument, int cmd);
 command_return_t do_areastats(Character *ch, char *argument, int cmd);
 command_return_t do_awaymsgs(Character *ch, char *argument, int cmd);
-command_return_t do_alias(Character *ch, char *argument, int cmd);
 command_return_t do_archive(Character *ch, char *argument, int cmd);
 command_return_t do_autojoin(Character *ch, std::string argument, int cmd);
 command_return_t do_unban(Character *ch, char *argument, int cmd);

@@ -49,7 +49,7 @@ const QList<Command> Commands::commands_ =
         {"orchestrate", do_sing, nullptr, nullptr, position_t::RESTING, 0, CMD_ORCHESTRATE, 0, 0, CommandType::all},
 
         // Informational commands
-        {"alias", do_alias, nullptr, nullptr, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"alias", nullptr, nullptr, &Character::do_alias, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"toggle", nullptr, nullptr, &Character::do_toggle, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"consider", do_consider, nullptr, nullptr, position_t::RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"configure", nullptr, nullptr, &Character::do_config, position_t::DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},

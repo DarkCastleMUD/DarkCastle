@@ -52,17 +52,17 @@ QString Character::getSetting(QString key, QString defaultValue)
     return defaultValue;
 }
 
-void mob_data::setObject(Object *o)
+void Mobile::setObject(Object *o)
 {
     object = o;
 }
 
-Object *mob_data::getObject(void)
+Object *Mobile::getObject(void)
 {
     return object;
 }
 
-bool mob_data::isObject(void)
+bool Mobile::isObject(void)
 {
     return object != nullptr;
 }

@@ -15,12 +15,13 @@
  ***************************************************************************/
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cctype>
+#include <cstring>
 
 #include <fmt/format.h>
+#include <memory>
 
 #include "obj.h"
 #include "room.h"
@@ -53,130 +54,97 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void restore_weight(class Object *obj);
 void store_to_char(struct char_file_u4 *st, Character *ch);
-char *fread_alias_string(FILE *fpsave);
+QString fread_alias_string(FILE *fpsave);
 
 // return 1 on success
 // return 0 on failure
 // donno where it would fail off hand though unless we ran out of HD space
 // or had a failure.  I'm just not willing to code that much fault protection in
 // -pir
-int save_char_aliases(char_player_alias *alias, FILE *fpsave)
+void Player::save_char_aliases(FILE *fpsave)
 {
-  uint32_t tmp_size = 0;
-  char_player_alias *curr;
-
-  // count up the number of aliases
-  for (curr = alias; curr; curr = curr->next)
-    tmp_size++;
-
-  // write out how many
+  uint32_t tmp_size = aliases_.size();
   fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
 
   // write the aliases out
-  for (curr = alias; curr; curr = curr->next)
+  for (const auto [alias, command] : aliases_.asKeyValueRange())
   {
     // note that we save the number of characters in tmp_size
-    tmp_size = strlen(curr->keyword);
-    if (tmp_size < 1) // minimal error checking:)
-      continue;
+    tmp_size = alias.length();
     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
     // but we actually write tmp_size +1 to get the trailing \0
-    fwrite(curr->keyword, sizeof(char), (tmp_size + 1), fpsave);
+    fwrite(alias.toStdString().c_str(), sizeof(char), (tmp_size + 1), fpsave);
 
-    tmp_size = strlen(curr->command);
+    tmp_size = command.length();
     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
-    fwrite(curr->command, sizeof(char), (tmp_size + 1), fpsave);
+    fwrite(command.toStdString().c_str(), sizeof(char), (tmp_size + 1), fpsave);
   }
-  return 1;
 }
 
 // return pointer to aliases or nullptr
-struct char_player_alias *read_char_aliases(FILE *fpsave)
+aliases_t read_char_aliases(FILE *fpsave)
 {
-  uint32_t total, x;
-  struct char_player_alias *top = nullptr;
-  struct char_player_alias *curr = nullptr;
-
+  uint32_t total{};
   fread(&total, sizeof(total), 1, fpsave);
 
-  if (total < 1)
-    return nullptr;
-
-  for (x = 0; x < total; x++)
+  aliases_t aliases;
+  for (auto x = 0; x < total; x++)
   {
-#ifdef LEAK_CHECK
-    curr = (char_player_alias *)calloc(1, sizeof(char_player_alias));
-#else
-    curr = (char_player_alias *)dc_alloc(1, sizeof(char_player_alias));
-#endif
+    QString keyword = fread_alias_string(fpsave);
+    QString command = fread_alias_string(fpsave);
+    qDebug() << x + 1 << "/" << total << "[" << keyword << "]"
+             << "[" << command << "]";
+    if (keyword.isEmpty() || command.isEmpty())
+    {
+      continue;
+    }
 
-    curr->keyword = fread_alias_string(fpsave);
-    curr->command = fread_alias_string(fpsave);
-    if (curr->keyword == nullptr || curr->command == nullptr)
-    {
-      if (curr->keyword == nullptr && curr->command)
-        dc_free(curr->command);
-      if (curr->command == nullptr && curr->keyword)
-        dc_free(curr->keyword);
-      dc_free(curr);
-    }
-    else
-    {
-      curr->next = top;
-      top = curr;
-    }
+    aliases[keyword] = command;
   }
-  return top;
+
+  return aliases;
 }
 
-char *fread_alias_string(FILE *fpsave)
+QString fread_alias_string(FILE *fpsave)
 {
-  uint32_t tmp_size;
-  char *buf = nullptr;
+  uint32_t tmp_size{};
+  size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
+  if (read_count != 1)
+  {
+    logentry(QString("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    return QString();
+  }
 
-  fread(&tmp_size, sizeof tmp_size, 1, fpsave);
   if (tmp_size > 0)
   {
-    if (tmp_size > MAX_INPUT_LENGTH)
-    {
-      /* std::flush this std::string and continue on with the next */
-      while (fgetc(fpsave))
-        ;
-    }
-    else
-    {
-#ifdef LEAK_CHECK
-      buf = (char *)calloc(tmp_size + 1, sizeof(char));
-#else
-      buf = (char *)dc_alloc(tmp_size + 1, sizeof(char));
-#endif
-      fread(buf, sizeof(char), (tmp_size + 1), fpsave);
-    }
+    std::unique_ptr<char[]> buffer(new char[tmp_size + 1]);
+    assert(buffer);
+    fread(buffer.get(), sizeof(char), (tmp_size + 1), fpsave);
+    return QString(buffer.get());
   }
-  return (buf);
+  return QString();
 }
 
-void fwrite_var_string(const char *string, FILE *fpsave)
+void fwrite_var_string(const char *str, FILE *fpsave)
 {
-  uint16_t tmp_size;
+  uint16_t tmp_size{};
 
-  if (string)
+  if (str)
   {
-    tmp_size = strlen(string);
-    tmp_size++; // count the null terminator
-    fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
-    fwrite(string, sizeof(char), (tmp_size), fpsave);
+    tmp_size = strlen(str) + 1; // count the null terminator
   }
-  else
+
+  fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
+
+  if (str)
   {
-    tmp_size = 0;
-    fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
+    fwrite(str, sizeof(char), (tmp_size), fpsave);
   }
 }
 
-void fwrite_var_string(QString string, FILE *fpsave)
+void fwrite_var_string(QString str, FILE *fpsave)
 {
-  fwrite_var_string(string.toStdString().c_str(), fpsave);
+  fwrite_var_string(str.toStdString().c_str(), fpsave);
 }
 
 char *fread_var_string(FILE *fpsave)
@@ -188,6 +156,7 @@ char *fread_var_string(FILE *fpsave)
   if (tmp_size > 0 && records_read > 0)
   {
     tmp_str = (char *)dc_alloc(tmp_size, sizeof(char));
+    assert(tmp_str);
     if (tmp_str == nullptr)
     {
       return nullptr;
@@ -204,14 +173,14 @@ char *fread_var_string(FILE *fpsave)
   return nullptr;
 }
 
-void save_mob_data(struct mob_data *i, FILE *fpsave)
+void Mobile::save(FILE *fpsave)
 {
-  fwrite(&(i->nr), sizeof(i->nr), 1, fpsave);
-  fwrite(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
-  fwrite(&(i->attack_type), sizeof(i->attack_type), 1, fpsave);
-  fwrite(&(i->actflags), sizeof(i->actflags), 1, fpsave);
-  fwrite(&(i->damnodice), sizeof(i->damnodice), 1, fpsave);
-  fwrite(&(i->damsizedice), sizeof(i->damsizedice), 1, fpsave);
+  fwrite(&(nr), sizeof(nr), 1, fpsave);
+  fwrite(&(default_pos), sizeof(default_pos), 1, fpsave);
+  fwrite(&(attack_type), sizeof(attack_type), 1, fpsave);
+  fwrite(&(actflags), sizeof(actflags), 1, fpsave);
+  fwrite(&(damnodice), sizeof(damnodice), 1, fpsave);
+  fwrite(&(damsizedice), sizeof(damsizedice), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -219,18 +188,16 @@ void save_mob_data(struct mob_data *i, FILE *fpsave)
   fwrite("STP", sizeof(char), 3, fpsave);
 }
 
-void read_mob_data(struct mob_data *i, FILE *fpsave)
+void Mobile::read(FILE *fpsave)
 {
-  char typeflag[4];
+  fread(&(nr), sizeof(nr), 1, fpsave);
+  fread(&(default_pos), sizeof(default_pos), 1, fpsave);
+  fread(&(attack_type), sizeof(attack_type), 1, fpsave);
+  fread(&(actflags), sizeof(actflags), 1, fpsave);
+  fread(&(damnodice), sizeof(damnodice), 1, fpsave);
+  fread(&(damsizedice), sizeof(damsizedice), 1, fpsave);
 
-  fread(&(i->nr), sizeof(i->nr), 1, fpsave);
-  fread(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
-  fread(&(i->attack_type), sizeof(i->attack_type), 1, fpsave);
-  fread(&(i->actflags), sizeof(i->actflags), 1, fpsave);
-  fread(&(i->damnodice), sizeof(i->damnodice), 1, fpsave);
-  fread(&(i->damsizedice), sizeof(i->damsizedice), 1, fpsave);
-
-  typeflag[3] = '\0';
+  char typeflag[4] = {};
   fread(&typeflag, sizeof(char), 3, fpsave);
 
   // Add new items in this format
@@ -251,113 +218,113 @@ void fwrite_string_tilde(FILE *fpsave)
   strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
+void Player::save(FILE *fpsave, struct time_data tmpage)
 {
-  fwrite(i->pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
-  save_char_aliases(i->alias, fpsave);
+  fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  save_char_aliases(fpsave);
 
   fwrite_string_tilde(fpsave);
-  fwrite(&(i->rdeaths), sizeof(i->rdeaths), 1, fpsave);
-  fwrite(&(i->pdeaths), sizeof(i->pdeaths), 1, fpsave);
-  fwrite(&(i->pkills), sizeof(i->pkills), 1, fpsave);
-  fwrite(&(i->pklvl), sizeof(i->pklvl), 1, fpsave);
+  fwrite(&(rdeaths), sizeof(rdeaths), 1, fpsave);
+  fwrite(&(pdeaths), sizeof(pdeaths), 1, fpsave);
+  fwrite(&(pkills), sizeof(pkills), 1, fpsave);
+  fwrite(&(pklvl), sizeof(pklvl), 1, fpsave);
   // we save tmpage cause it was calculated when all eq was off
   fwrite(&(tmpage), sizeof(time_data), 1, fpsave);
-  fwrite(&(i->bad_pw_tries), sizeof(i->bad_pw_tries), 1, fpsave);
-  fwrite(&(i->practices), sizeof(i->practices), 1, fpsave);
-  fwrite(&(i->bank), sizeof(i->bank), 1, fpsave);
-  fwrite(&(i->toggles), sizeof(i->toggles), 1, fpsave);
-  fwrite(&(i->punish), sizeof(i->punish), 1, fpsave);
-  fwrite_var_string(i->last_site, fpsave);
-  fwrite_var_string(i->poofin, fpsave);
-  fwrite_var_string(i->poofout, fpsave);
-  fwrite_var_string(i->prompt, fpsave);
+  fwrite(&(bad_pw_tries), sizeof(bad_pw_tries), 1, fpsave);
+  fwrite(&(practices), sizeof(practices), 1, fpsave);
+  fwrite(&(bank), sizeof(bank), 1, fpsave);
+  fwrite(&(toggles), sizeof(toggles), 1, fpsave);
+  fwrite(&(punish), sizeof(punish), 1, fpsave);
+  fwrite_var_string(last_site, fpsave);
+  fwrite_var_string(poofin, fpsave);
+  fwrite_var_string(poofout, fpsave);
+  fwrite_var_string(prompt, fpsave);
   fwrite_var_string("NewSaveType", fpsave);
 
   // Quest bitvector one
-  if (i->quest_bv1)
+  if (quest_bv1)
   {
     fwrite("QS1", sizeof(char), 3, fpsave);
-    fwrite(&(i->quest_bv1), sizeof(i->quest_bv1), 1, fpsave);
+    fwrite(&(quest_bv1), sizeof(quest_bv1), 1, fpsave);
   }
 
   // Saving throw mods
   fwrite("SVM", sizeof(char), 3, fpsave);
-  fwrite(&(i->saves_mods), sizeof(i->saves_mods[0]), SAVE_TYPE_MAX + 1, fpsave); // Write the whole array
+  fwrite(&(saves_mods), sizeof(saves_mods[0]), SAVE_TYPE_MAX + 1, fpsave); // Write the whole array
 
   // Specializations
   fwrite("SPC", sizeof(char), 3, fpsave);
-  fwrite(&(i->specializations), sizeof(i->specializations), 1, fpsave);
+  fwrite(&(specializations), sizeof(specializations), 1, fpsave);
 
   // Stat metas
-  if (i->statmetas)
+  if (statmetas)
   {
     fwrite("STM", sizeof(char), 3, fpsave);
-    fwrite(&(i->statmetas), sizeof(i->statmetas), 1, fpsave);
+    fwrite(&(statmetas), sizeof(statmetas), 1, fpsave);
   }
 
   // Ki metas
-  if (i->kimetas)
+  if (kimetas)
   {
     fwrite("KIM", sizeof(char), 3, fpsave);
-    fwrite(&(i->kimetas), sizeof(i->kimetas), 1, fpsave);
+    fwrite(&(kimetas), sizeof(kimetas), 1, fpsave);
   }
   // autojoinin'
-  if (!i->joining.empty())
+  if (!joining.empty())
   {
     fwrite("JIN", sizeof(char), 3, fpsave);
-    fwrite_var_string(i->getJoining(), fpsave);
+    fwrite_var_string(getJoining(), fpsave);
   }
 
   fwrite("QST", sizeof(char), 3, fpsave);
-  fwrite(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
+  fwrite(&(quest_points), sizeof(quest_points), 1, fpsave);
   for (int j = 0; j < QUEST_CANCEL; j++)
-    fwrite(&(i->quest_cancel[j]), sizeof(i->quest_cancel[j]), 1, fpsave);
+    fwrite(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
-    fwrite(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
-  if (i->buildLowVnum)
+    fwrite(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
+  if (buildLowVnum)
   {
     fwrite("BLO", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildLowVnum), sizeof(i->buildLowVnum), 1, fpsave);
+    fwrite(&(buildLowVnum), sizeof(buildLowVnum), 1, fpsave);
   }
-  if (i->buildHighVnum)
+  if (buildHighVnum)
   {
     fwrite("BHI", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildHighVnum), sizeof(i->buildHighVnum), 1, fpsave);
+    fwrite(&(buildHighVnum), sizeof(buildHighVnum), 1, fpsave);
   }
-  if (i->buildMLowVnum)
+  if (buildMLowVnum)
   {
     fwrite("BMO", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildMLowVnum), sizeof(i->buildMLowVnum), 1, fpsave);
+    fwrite(&(buildMLowVnum), sizeof(buildMLowVnum), 1, fpsave);
   }
-  if (i->buildMHighVnum)
+  if (buildMHighVnum)
   {
     fwrite("BMI", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildMHighVnum), sizeof(i->buildMHighVnum), 1, fpsave);
+    fwrite(&(buildMHighVnum), sizeof(buildMHighVnum), 1, fpsave);
   }
-  if (i->buildOLowVnum)
+  if (buildOLowVnum)
   {
     fwrite("BOO", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildOLowVnum), sizeof(i->buildOLowVnum), 1, fpsave);
+    fwrite(&(buildOLowVnum), sizeof(buildOLowVnum), 1, fpsave);
   }
-  if (i->buildOHighVnum)
+  if (buildOHighVnum)
   {
     fwrite("BOI", sizeof(char), 3, fpsave);
-    fwrite(&(i->buildOHighVnum), sizeof(i->buildOHighVnum), 1, fpsave);
+    fwrite(&(buildOHighVnum), sizeof(buildOHighVnum), 1, fpsave);
   }
-  if (i->profession)
+  if (profession)
   {
     fwrite("PRO", sizeof(char), 3, fpsave);
-    fwrite(&(i->profession), sizeof(i->profession), 1, fpsave);
+    fwrite(&(profession), sizeof(profession), 1, fpsave);
   }
-  if (i->wizinvis)
+  if (wizinvis)
   {
     fwrite("WIZ", sizeof(char), 3, fpsave);
-    fwrite(&(i->wizinvis), sizeof(i->wizinvis), 1, fpsave);
+    fwrite(&(wizinvis), sizeof(wizinvis), 1, fpsave);
   }
-  if (i->config != nullptr)
+  if (config != nullptr)
   {
-    for (auto setting = i->config->constBegin(); setting != i->config->constEnd(); ++setting)
+    for (auto setting = config->constBegin(); setting != config->constEnd(); ++setting)
     {
       if (setting.key() == "color.good" ||
           setting.key() == "color.bad" ||
@@ -371,9 +338,9 @@ void save_Player(class Player *i, FILE *fpsave, struct time_data tmpage)
       }
     }
   }
-  if (i->ignoring.empty() == false)
+  if (ignoring.empty() == false)
   {
-    for (const auto &name : i->ignoring)
+    for (const auto &name : ignoring)
     {
       if (name.second.ignore)
       {
@@ -407,20 +374,23 @@ qsizetype fread_to_tilde(FILE *fpsave)
   return characters_read;
 }
 
-bool read_Player(Character *ch, FILE *fpsave)
+bool Player::read(FILE *fpsave, Character *ch)
 {
+  if (!ch)
+  {
+    return false;
+  }
+
   char typeflag[4] = {};
-  class Player *i = ch->player;
-
-  i->golem = 0;
-  i->quest_points = 0;
+  golem = 0;
+  quest_points = 0;
   for (int j = 0; j < QUEST_CANCEL; j++)
-    i->quest_cancel[j] = 0;
+    quest_cancel[j] = 0;
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
-    i->quest_complete[j] = 0;
+    quest_complete[j] = 0;
 
-  fread(i->pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
-  i->alias = read_char_aliases(fpsave);
+  fread(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  aliases_ = read_char_aliases(fpsave);
   if (ch->has_skill(NEW_SAVE))
   {
     if (fread_to_tilde(fpsave) >= 160)
@@ -429,20 +399,20 @@ bool read_Player(Character *ch, FILE *fpsave)
       return false;
     }
   }
-  fread(&(i->rdeaths), sizeof(i->rdeaths), 1, fpsave);
-  fread(&(i->pdeaths), sizeof(i->pdeaths), 1, fpsave);
-  fread(&(i->pkills), sizeof(i->pkills), 1, fpsave);
-  fread(&(i->pklvl), sizeof(i->pklvl), 1, fpsave);
-  fread(&(i->time), sizeof(time_data), 1, fpsave);
-  fread(&(i->bad_pw_tries), sizeof(i->bad_pw_tries), 1, fpsave);
-  fread(&(i->practices), sizeof(i->practices), 1, fpsave);
-  fread(&(i->bank), sizeof(i->bank), 1, fpsave);
-  fread(&(i->toggles), sizeof(i->toggles), 1, fpsave);
-  fread(&(i->punish), sizeof(i->punish), 1, fpsave);
-  i->last_site = fread_var_string(fpsave);
-  i->poofin = fread_var_string(fpsave);
-  i->poofout = fread_var_string(fpsave);
-  i->prompt = fread_var_string(fpsave);
+  fread(&(rdeaths), sizeof(rdeaths), 1, fpsave);
+  fread(&(pdeaths), sizeof(pdeaths), 1, fpsave);
+  fread(&(pkills), sizeof(pkills), 1, fpsave);
+  fread(&(pklvl), sizeof(pklvl), 1, fpsave);
+  fread(&(time), sizeof(time_data), 1, fpsave);
+  fread(&(bad_pw_tries), sizeof(bad_pw_tries), 1, fpsave);
+  fread(&(practices), sizeof(practices), 1, fpsave);
+  fread(&(bank), sizeof(bank), 1, fpsave);
+  fread(&(toggles), sizeof(toggles), 1, fpsave);
+  fread(&(punish), sizeof(punish), 1, fpsave);
+  last_site = fread_var_string(fpsave);
+  poofin = fread_var_string(fpsave);
+  poofout = fread_var_string(fpsave);
+  prompt = fread_var_string(fpsave);
 
   char *tmp = fread_var_string(fpsave);
   if (!tmp || str_cmp(tmp, "NewSaveType"))
@@ -450,108 +420,108 @@ bool read_Player(Character *ch, FILE *fpsave)
     tmp = fread_var_string(fpsave);
     tmp = fread_var_string(fpsave);
   }
-  i->skillchange = 0;
+  skillchange = 0;
 
   fread(&typeflag, sizeof(char), 3, fpsave);
 
   if (!strcmp("QS1", typeflag))
   {
-    fread(&i->quest_bv1, sizeof(i->quest_bv1), 1, fpsave);
+    fread(&quest_bv1, sizeof(quest_bv1), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if (!strcmp("SVM", typeflag))
   {
-    fread(&(i->saves_mods), sizeof(i->saves_mods[0]), SAVE_TYPE_MAX + 1, fpsave); // read the whole array
+    fread(&(saves_mods), sizeof(saves_mods[0]), SAVE_TYPE_MAX + 1, fpsave); // read the whole array
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if (!strcmp("SPC", typeflag))
   {
-    fread(&(i->specializations), sizeof(i->specializations), 1, fpsave);
+    fread(&(specializations), sizeof(specializations), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if (!strcmp("STM", typeflag))
   {
-    fread(&i->statmetas, sizeof(i->statmetas), 1, fpsave);
+    fread(&statmetas, sizeof(statmetas), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if (!strcmp("KIM", typeflag))
   {
-    fread(&i->kimetas, sizeof(i->kimetas), 1, fpsave);
+    fread(&kimetas, sizeof(kimetas), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
-  i->joining = {};
+  joining = {};
 
   if (!strcmp("JIN", typeflag))
   {
     QString buffer = fread_var_string(fpsave);
-    i->setJoining(buffer);
+    setJoining(buffer);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("QST", typeflag))
   {
-    fread(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
+    fread(&(quest_points), sizeof(quest_points), 1, fpsave);
     for (int j = 0; j < QUEST_CANCEL; j++)
-      fread(&(i->quest_cancel[j]), sizeof(i->quest_cancel[j]), 1, fpsave);
+      fread(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
     for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
-      fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
+      fread(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BLO", typeflag))
   {
-    fread(&i->buildLowVnum, sizeof(i->buildLowVnum), 1, fpsave);
+    fread(&buildLowVnum, sizeof(buildLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BHI", typeflag))
   {
-    fread(&i->buildHighVnum, sizeof(i->buildHighVnum), 1, fpsave);
+    fread(&buildHighVnum, sizeof(buildHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BMO", typeflag))
   {
-    fread(&i->buildMLowVnum, sizeof(i->buildMLowVnum), 1, fpsave);
+    fread(&buildMLowVnum, sizeof(buildMLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BMI", typeflag))
   {
-    fread(&i->buildMHighVnum, sizeof(i->buildMHighVnum), 1, fpsave);
+    fread(&buildMHighVnum, sizeof(buildMHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BOO", typeflag))
   {
-    fread(&i->buildOLowVnum, sizeof(i->buildOLowVnum), 1, fpsave);
+    fread(&buildOLowVnum, sizeof(buildOLowVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("BOI", typeflag))
   {
-    fread(&i->buildOHighVnum, sizeof(i->buildOHighVnum), 1, fpsave);
+    fread(&buildOHighVnum, sizeof(buildOHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("PRO", typeflag))
   {
-    fread(&i->profession, sizeof(i->profession), 1, fpsave);
+    fread(&profession, sizeof(profession), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("WIZ", typeflag))
   {
-    fread(&i->wizinvis, sizeof(i->wizinvis), 1, fpsave);
+    fread(&wizinvis, sizeof(wizinvis), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   while (!strcmp("OPT", typeflag))
   {
-    if (i->config == nullptr)
+    if (config == nullptr)
     {
-      i->config = new PlayerConfig();
+      config = new PlayerConfig();
     }
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
     if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale" || key == "mode")
     {
-      i->config->insert(key, value);
+      config->insert(key, value);
     }
 
     fread(&typeflag, sizeof(char), 3, fpsave);
@@ -566,14 +536,14 @@ bool read_Player(Character *ch, FILE *fpsave)
       {
         ignore_entry ie = {true, 0};
         fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
-        i->ignoring[name] = ie;
+        ignoring[name] = ie;
       }
     }
 
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
-  i->skillchange = 0;
+  skillchange = 0;
   // Add new items in this format
   //  if(!strcmp(typeflag, "XXX"))
   //    do_something
@@ -584,14 +554,21 @@ bool read_Player(Character *ch, FILE *fpsave)
   return true;
 }
 
-int save_pc_or_mob_data(Character *ch, FILE *fpsave, struct time_data tmpage)
+bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
 {
-  if (IS_MOB(ch))
-    save_mob_data(ch->mobdata, fpsave);
-  else
-    save_Player(ch->player, fpsave, tmpage);
+  if (isNPC())
+  {
+    mobdata->save(fpsave);
+    return true;
+  }
+  else if (isPlayer())
+  {
+    player->save(fpsave, tmpage);
+    return true;
+  }
 
-  return 1;
+  buglog(QString("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
+  return false;
 }
 
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave)
@@ -600,17 +577,17 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave)
   {
     ch->player = nullptr;
 #ifdef LEAK_CHECK
-    ch->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
+    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
 #else
-    ch->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
+    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
 #endif
-    read_mob_data(ch->mobdata, fpsave);
+    ch->mobdata->read(fpsave);
   }
   else
   {
     ch->mobdata = nullptr;
     ch->player = new Player;
-    if (!read_Player(ch, fpsave))
+    if (!ch->player->read(fpsave, ch))
     {
       return false;
     }
@@ -843,7 +820,7 @@ void save_char_obj_db(Character *ch)
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
-     (save_pc_or_mob_data(ch, fpsave, tmpage))                &&
+     (ch->save_pc_or_mob_data(fpsave, tmpage))                &&
      (obj_to_store (this->carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
@@ -937,7 +914,7 @@ void save_char_obj(Character *ch)
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
       (ch->char_to_store_variable_data(fpsave)) &&
-      (save_pc_or_mob_data(ch, fpsave, tmpage)) &&
+      (ch->save_pc_or_mob_data(fpsave, tmpage)) &&
       (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
       (store_worn_eq(ch, fpsave)))
   {

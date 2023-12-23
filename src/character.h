@@ -6,8 +6,8 @@
 | Description: This file contains the header information for the character
 |   class implementation.
 */
-#include <sys/time.h>
-#include <stdint.h>
+#include <ctime>
+#include <cstdint>
 #include <strings.h>
 
 #include <queue>
@@ -297,8 +297,6 @@ public:
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */
 
-    struct char_player_alias *alias = {}; /* Aliases */
-
     uint32_t totalpkills = {};   // total number of pkills THIS LOGIN
     uint32_t totalpkillslv = {}; // sum of levels of pkills THIS LOGIN
     uint32_t pdeathslogin = {};  // pdeaths THIS LOGIN
@@ -376,8 +374,12 @@ public:
     QString getJoining(void);
     void setJoining(QString list);
     void toggleJoining(QString key);
+    void save_char_aliases(FILE *fpsave);
+    QString perform_alias(QString orig);
+    void save(FILE *fpsave, time_data tmpage);
+    bool read(FILE *fpsave, Character *ch);
 
-private:
+    aliases_t aliases_; /* Aliases */
 };
 
 enum mob_type_t
@@ -396,7 +398,7 @@ struct mob_flag_data
     mob_type_t type;               /* Type of mobile                     */
 };
 
-struct mob_data
+class Mobile
 {
 public:
     int32_t nr = {};
@@ -423,6 +425,8 @@ public:
     void setObject(Object *);
     Object *getObject(void);
     bool isObject(void);
+    void save(FILE *fpsave);
+    void read(FILE *fpsave);
 
 private:
     Object *object = {};
@@ -450,7 +454,7 @@ public:
     static const QList<int> wear_to_item_wear;
     static bool validateName(QString name);
 
-    struct mob_data *mobdata = nullptr;
+    class Mobile *mobdata = nullptr;
     class Player *player = nullptr;
     class Object *objdata = nullptr;
 
@@ -803,6 +807,30 @@ public:
     time_t last_damage = {};
     uint64_t damage_per_second = {};
 
+    bool addGold(uint64_t gold);
+    bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
+    void add_command_lag(int cmdnum, int lag);
+    bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
+    int char_to_store_variable_data(FILE *fpsave);
+    void display_string_list(QStringList list);
+    void display_string_list(const char **list);
+    bool charge_moves(int skill, double modifier = 1);
+    void check_maxes(void);
+    int check_charmiejoin(void);
+    struct time_info_data age(void);
+    void add_memory(QString victim_name, char type);
+    bool can_use_command(int cmdnum);
+    Object *clan_altar(void);
+    void do_inate_race_abilities(void);
+    void do_on_login_stuff(void);
+    void check_hw(void);
+    void add_to_bard_list(void);
+
+    command_return_t check_pursuit(Character *victim, QString dircommand);
+    command_return_t check_social(QString pcomm);
+    command_return_t command_interpreter(QString argument, bool procced = 0);
+    Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
+
     command_return_t do_clanarea(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_config(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_experience(QStringList arguments = {}, int cmd = CMD_DEFAULT);
@@ -857,24 +885,22 @@ public:
     command_return_t do_track(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_hit(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_ambush(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
-    void show_obj_to_char(Object *object, int mode);
-    void list_obj_to_char(Object *list, int mode, bool show);
     command_return_t do_botcheck(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    void list_char_to_char(Character *list, int mode);
     command_return_t do_mpsettemp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_bestow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
-    command_return_t check_pursuit(Character *victim, QString dircommand);
-    command_return_t save(int cmd = CMD_DEFAULT);
+    command_return_t do_alias(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+
     command_return_t wake(Character *victim = nullptr);
-    command_return_t check_social(QString pcomm);
-    command_return_t command_interpreter(QString argument, bool procced = 0);
     command_return_t oprog_command_trigger(QString command, QString arguments);
+    command_return_t save(int cmd = CMD_DEFAULT);
     command_return_t special(QString arg, int cmd = CMD_DEFAULT);
-    void add_command_lag(int cmdnum, int lag);
+
+    void show_obj_to_char(Object *object, int mode);
+    void list_obj_to_char(Object *list, int mode, bool show);
+    void list_char_to_char(Character *list, int mode);
+
     bool mprog_seval(QString lhs, QString opr, QString rhs);
     QString getTemp(QString name);
-    bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
 
     QString get_random_hate(void);
     Character *getVisiblePlayer(QString name);
@@ -922,15 +948,12 @@ public:
     uint64_t getGold(void);
     uint64_t &getGoldReference(void);
     void setGold(uint64_t gold);
-    bool addGold(uint64_t gold);
+
     bool multiplyGold(double mult);
     bool removeGold(uint64_t gold);
     int store_to_char_variable_data(FILE *fpsave);
-    int char_to_store_variable_data(FILE *fpsave);
+
     bool load_charmie_equipment(QString name, bool previous = false);
-    void display_string_list(QStringList list);
-    void display_string_list(const char **list);
-    bool charge_moves(int skill, double modifier = 1);
     int has_skill(skill_t skill);
     affected_type *affected_by_spell(uint32_t skill);
     bool skill_success(Character *victim, int skillnum, int mod = 0);
@@ -943,7 +966,6 @@ public:
     void skill_increase_check(int skill, int learned, int difficulty);
     void verify_max_stats(void);
     int get_max(int skill);
-    void check_maxes(void);
     int learn_skill(int skill, int amount, int maximum);
     class_skill_defines *get_skill_list(void);
     Character *get_char_room_vis(QString name);
@@ -970,19 +992,10 @@ public:
     {
         return position_to_string(getPosition());
     }
-    int check_charmiejoin(void);
-    struct time_info_data age(void);
     Character *get_active_pc_vis(QString name);
-    void add_memory(QString victim_name, char type);
     void swap_hate_memory(void);
-    bool can_use_command(int cmdnum);
-    void do_inate_race_abilities(void);
-    Object *clan_altar(void);
-    void do_on_login_stuff(void);
-    void roll_and_display_stats(void);
-    void check_hw(void);
     void set_hw(void);
-    void add_to_bard_list(void);
+    void roll_and_display_stats(void);
     void remove_from_bard_list(void);
     int64_t moves_exp_spent(void);
     int64_t moves_plats_spent(void);

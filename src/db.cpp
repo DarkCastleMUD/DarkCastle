@@ -21,12 +21,12 @@
 
 int load_debug = 0;
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <ctime>
+#include <cstdlib>
 
 #include <sstream>
 #include <limits>
@@ -2617,9 +2617,9 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->title = 0;
 
 #ifdef LEAK_CHECK
-	mob->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
+	mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
 #else
-	mob->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
+	mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
 #endif
 	mob->mobdata->reset = {};
 	/* *** Numeric data *** */
@@ -3352,9 +3352,9 @@ Character *clone_mobile(int nr)
 
 	*mob = *old;
 
-	mob->mobdata = new mob_data;
+	mob->mobdata = new Mobile;
 
-	memcpy(mob->mobdata, old->mobdata, sizeof(mob_data));
+	memcpy(mob->mobdata, old->mobdata, sizeof(Mobile));
 
 	for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
 		mob->equipment[i] = 0;
@@ -3554,9 +3554,9 @@ int create_blank_mobile(int nr)
 	mob->height = 198;
 	mob->weight = 200;
 #ifdef LEAK_CHECK
-	mob->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
+	mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
 #else
-	mob->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
+	mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
 #endif
 	int i;
 	for (i = 0; i < ACT_MAX / ASIZE + 1; i++)
@@ -6007,16 +6007,6 @@ void free_char(Character *ch, Trace trace)
 			if (ch->player->golem)
 				logentry("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
 			/* Free aliases... (I was to lazy to do before. ;) */
-			for (x = ch->player->alias; x; x = next)
-			{
-				next = x->next;
-				if (x->keyword)
-					dc_free(x->keyword);
-				if (x->command)
-					dc_free(x->command);
-				dc_free(x);
-			}
-
 			ch->player->away_msgs.clear();
 
 			if (ch->player->lastseen)

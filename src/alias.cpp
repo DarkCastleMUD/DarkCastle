@@ -3,10 +3,8 @@
 | alias.C
 | Description:  Commands for the alias processor.
 */
-extern "C"
-{
-  #include <string.h>
-}
+#include <cstring>
+
 #include "character.h"
 #include "utility.h"
 #include "levels.h"
@@ -14,208 +12,96 @@ extern "C"
 #include "returnvals.h"
 #include "interp.h"
 
-int do_alias(Character *ch, char *arg, int cmd)
+command_return_t Character::do_alias(QStringList arguments, int cmd)
 {
-  int x,y;
-  int z=0;
-  char *buf, *buf1;
-  char outbuf[MAX_STRING_LENGTH];
-  char tmp[2];
-  int found;
-  int nokey;
-  int count = 0;
-  struct char_player_alias * curr = nullptr;
-  struct char_player_alias * next = nullptr;
-
-  if(IS_MOB(ch))
-    return eFAILURE;
-
-  if (!*arg) 
+  if (!player)
   {
-    curr = ch->player->alias;
-    if(!curr) {
-      ch->sendln("No aliases defined.");
-      return eSUCCESS;
-    }
-    for (x = 1; curr; curr = curr->next, x++)
+    return eFAILURE;
+  }
+
+  if (arguments.isEmpty())
+  {
+    if (player->aliases_.isEmpty())
     {
-      sprintf(outbuf, "Alias %2d:  %s == %s\n\r", x, 
-              curr->keyword, curr->command);
-      ch->send(outbuf);
-    }
-  } else {
-    if (strlen(arg) > MAX_INPUT_LENGTH - 10) {
-      ch->sendln("That's a little to long for an alias. Try something shorter. ");
+      sendln("No aliases defined.");
       return eSUCCESS;
     }
-    nokey = 0;
-    found = 0;
-    for (x=0; x <= (signed)strlen(arg); x++)
+
+    uint64_t x{};
+    sendln("Aliases:");
+    for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
-      if (arg[x] == '=') {
-        found = 1;
-        z = x+1;
-        break;
-      }
-      if (arg[x] != ' ')
-        nokey = 1;
+      sendln(QString("%2=%3").arg(alias).arg(command));
     }
-	
-    if (nokey == 0) {        /* No keyword to grab.. exit now...  */
-      ch->sendln("You need more than just a space for a keyword.");
-      return eSUCCESS;
+    return eSUCCESS;
+  }
+
+  QString arg1 = arguments.value(0).trimmed();
+  QString arg2 = arguments.value(1).trimmed();
+
+  // Alias assignment
+  if (arg1.contains("=") || arg2.contains("="))
+  {
+    auto new_alias_arguments = arguments.join(' ').trimmed().split('=');
+    auto alias = new_alias_arguments.value(0).trimmed().toLower();
+    auto command = new_alias_arguments.value(1).trimmed();
+
+    if (alias == "alias" || alias == "deleteall")
+    {
+      sendln("You cannot create a command alias named 'alias' or 'deleteall'.");
+      return eFAILURE;
     }
-	
-    if (found == 1)  {    /*  = sign found.. assign an alias  */
-      y = (strlen(arg) - z);
 
-#ifdef LEAK_CHECK
-      buf  = (char*) calloc(z+1, sizeof(char));
-      buf1 = (char*) calloc(y+2, sizeof(char));
-#else	    
-      buf  = (char*) dc_alloc(z+1, sizeof(char));
-      buf1 = (char*) dc_alloc(y+2, sizeof(char));
-#endif	    
-
-      tmp[1] = '\0';
-	    
-      for (x=1; x < z-1; x++) {
-        tmp[0] = arg[x];
-        strcat(buf, tmp);
-      }
-	    
-      /*   Use only first word for keyword  */
-      one_argument(buf,buf);
-    
-      for ( x = z; arg[x] == ' '; x++)
-        z++;
-
-      for (x = z; x <= (signed)strlen(arg); x++)
-      {
-        tmp[0] = arg[x];
-        strcat(buf1, tmp);
-      }
-
-      /*
-       * alias is a bad alias to have! waz
-     */       
-      if (!str_cmp(buf, "alias")) {
-          sprintf(outbuf, "Setting 'alias' as an alias would be silly!\n\r");
-          ch->send(outbuf);
-          dc_free(buf);
-          dc_free(buf1);
-          return eSUCCESS;
-      }
-      if (!str_cmp(buf, "deleteall")) {
-          sprintf(outbuf, "Setting 'deleteall' as an alias would be silly!\n\r");
-          ch->send(outbuf);
-          dc_free(buf);
-          dc_free(buf1);
-          return eSUCCESS;
-      }
-	    
-      /*   Check for keyword match...
-       *   If match found, replace command with command...
-       */
-      for (x = 1, curr = ch->player->alias; curr; curr = curr->next, x++)  
-      {
-          if (!str_cmp(curr->keyword, buf)) {
-            sprintf(outbuf, "Alias %d: %s == %s    REPLACED with '%s'.\r\n", x,
-               buf, curr->command, buf1);
-            ch->send(outbuf);
-            dc_free (curr->command);
-            curr->command = str_dup(buf1);
-            dc_free(buf);
-            dc_free(buf1);
-            return eSUCCESS;
-          }
-      }
-
-      /*  If no match found, add a new alias! :) */
-      curr = ch->player->alias;
-      while(curr) {
-        curr = curr->next;
-        count++;
-      }
-
-      if(count > 24) {
-        ch->sendln("You can only have 25 aliases, sorry.  Go get tintin or something.");
-        dc_free(buf);
-        dc_free(buf1);
-        return eSUCCESS;
-      }
-
-#ifdef LEAK_CHECK
-      curr = (char_player_alias *)calloc(1, sizeof(struct char_player_alias));
-#else
-      curr = (char_player_alias *)dc_alloc(1, sizeof(struct char_player_alias));
-#endif
-      curr->keyword = str_dup(buf);
-      curr->command = str_dup(buf1);
-      ch->sendln("New Alias Defined.");
-      curr->next = ch->player->alias;
-      ch->player->alias = curr;
-      dc_free(buf);
-      dc_free(buf1);
-      return eSUCCESS;
-
-    }  else {       /*  only 1 arg passed... delete the shit... */
-	    
-      x = strlen(arg);
-
-      // need the +1 here.  Otherwise, we end up overrunning our buffer with
-      // the \0 character at the end from one_argument
-#ifdef LEAK_CHECK
-      buf = (char*) calloc(x+1, sizeof(char));
-#else
-      buf = (char*) dc_alloc(x+1, sizeof(char));
-#endif	    
-      one_argument(arg, buf);
-	    
-      if(!str_cmp(buf, "deleteall"))
-      {
-         for (curr = ch->player->alias; curr; curr = next)
-         {
-            next = curr->next;
-            dc_free (curr->keyword);
-            dc_free (curr->command);
-            dc_free (curr);
-         }
-         ch->player->alias = nullptr;
-         ch->sendln("All aliases deleted.");
-         dc_free(buf);
-         return eSUCCESS;
-      }
-      int o = 1;
-      for (curr = ch->player->alias; curr; curr = curr->next,o++)
-      {
-	  
-          if (!str_cmp(buf, curr->keyword)) {
-            sprintf(outbuf,"Alias %2d: %s == %s DELETED.\r\n",o, 
-                   curr->keyword, curr->command);
-            ch->send(outbuf);
-            // if we're first, reassign the chain
-            if(curr == ch->player->alias)
-              ch->player->alias = curr->next;
-            else {
-              // loop through the chain
-              next = ch->player->alias;
-              while(next->next != curr)
-                next = next->next;
-              // we should now be pointing at curr, or the world will blow up
-              // remove curr from the chain
-              next->next = curr->next;
-            }
-            dc_free (curr->keyword);
-            dc_free (curr->command);
-            dc_free (curr);
-            dc_free(buf);
-            return eSUCCESS;
-          }
-      }
-      ch->sendln("Alias not found to delete.");
-      dc_free(buf);
+    if (command.isEmpty())
+    {
+      sendln("You need to specify a command for your alias.");
+      return eFAILURE;
     }
-  } 
-  return eSUCCESS;
+
+    if (player->aliases_.contains(alias) && player->aliases_[alias] == command)
+    {
+      sendln(QString("Alias '%1' with command '%2' already set.").arg(alias).arg(command));
+      return eFAILURE;
+    }
+    else if (player->aliases_.contains(alias))
+    {
+      sendln(QString("Alias '%1' with command '%2' replaced with '%3'.").arg(alias).arg(player->aliases_[alias]).arg(command));
+    }
+    else
+    {
+      sendln(QString("Alias '%1' defined with command '%2'.").arg(alias).arg(command));
+    }
+    player->aliases_[alias] = command;
+    save();
+    return eSUCCESS;
+  }
+
+  if (arg1 == "deleteall")
+  {
+    if (player->aliases_.isEmpty())
+    {
+      sendln("No aliases defined.");
+      return eFAILURE;
+    }
+
+    for (const auto [alias, command] : player->aliases_.asKeyValueRange())
+    {
+      sendln(QString("Removed alias %2=%3").arg(alias).arg(command));
+    }
+
+    player->aliases_.clear();
+    save();
+    return eSUCCESS;
+  }
+
+  if (!player->aliases_.contains(arg1))
+  {
+    sendln(QString("Alias '%1' not found to delete.").arg(arg1));
+    return eFAILURE;
+  }
+
+  player->aliases_.remove(arg1);
+  sendln(QString("Alias '%1' deleted.").arg(arg1));
+  save();
+  return eFAILURE;
 }

@@ -8,13 +8,13 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/resource.h>
-#include <sys/time.h>
+#include <ctime>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/telnet.h>
@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <ctype.h>
+#include <cctype>
 
 #include <sstream>
 #include <iostream>
@@ -63,6 +63,7 @@
 #include "DC.h"
 #include "CommandStack.h"
 #include "SSH.h"
+#include "character.h"
 
 struct multiplayer
 {
@@ -148,7 +149,7 @@ int process_output(class Connection *t);
 int process_input(class Connection *t);
 void flush_queues(class Connection *d);
 int perform_subst(class Connection *t, char *orig, char *subst);
-std::string perform_alias(class Connection *d, std::string orig);
+
 void check_idle_passwords(void);
 void init_heartbeat();
 void heartbeat();
@@ -717,7 +718,7 @@ void DC::game_loop(void)
                  maxdesc = fd;
                } });
 
-  for (d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (d = descriptor_list; d; d = d->next)
   {
     if (d->descriptor > maxdesc)
       maxdesc = d->descriptor;
@@ -746,7 +747,7 @@ void DC::game_loop(void)
                } });
 
   // close the weird descriptors in the exception set
-  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
+  for (d = descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if (FD_ISSET(d->descriptor, &exc_set))
@@ -758,7 +759,7 @@ void DC::game_loop(void)
   }
 
   /* process descriptors with input pending */
-  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
+  for (d = descriptor_list; d; d = next_d)
   {
     next_d = d->next;
     if (FD_ISSET(d->descriptor, &input_set))
@@ -777,7 +778,7 @@ void DC::game_loop(void)
   }
 
   /* process commands we just read from process_input */
-  for (d = DC::getInstance()->descriptor_list; d; d = next_d)
+  for (d = descriptor_list; d; d = next_d)
   {
     if (d->character != nullptr)
     {
@@ -832,9 +833,9 @@ void DC::game_loop(void)
       {              /* else: we're playing normally */
         if (aliased) /* to prevent recursive aliases */
           d->prompt_mode = 0;
-        else
+        else if (d && d->character && d->character->player)
         {
-          comm = perform_alias(d, comm);
+          comm = d->character->player->perform_alias(comm.c_str()).toStdString();
         }
         PerfTimers["command"].start();
         // Azrack's a chode.  Don't forget to check
@@ -3331,36 +3332,21 @@ int is_busy(Character *ch)
   return (0);
 }
 
-std::string perform_alias(class Connection *d, std::string orig)
+QString Player::perform_alias(QString orig)
 {
-  std::string first_arg, remainder, new_buf;
-  // ptr = any_one_arg(orig, first_arg);
-  std::tie(first_arg, remainder) = half_chop(orig);
-  struct char_player_alias *x = nullptr;
-  int lengthpre;
-  int lengthpost;
+  auto arguments = orig.split(' ');
+  auto arg1 = arguments.value(0);
 
-  if (first_arg.empty())
+  if (arg1.isEmpty() || aliases_.isEmpty() || !aliases_.contains(arg1))
   {
     return orig;
   }
-  if (IS_MOB(d->character) || !d->character->player->alias)
-    return orig;
 
-  for (x = d->character->player->alias; x; x = x->next)
-  {
-    if (x->keyword)
-    {
-      if (x->keyword == first_arg)
-      {
-        new_buf = std::string(x->command);
-        new_buf += " " + remainder;
-        return new_buf;
-      }
-    }
-  }
+  auto command = aliases_[arg1];
+  arguments.pop_front();
+  arguments.push_front(command);
 
-  return orig;
+  return arguments.join(' ');
 }
 
 void skip_spaces(char **string)
