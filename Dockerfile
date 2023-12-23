@@ -2,17 +2,19 @@
 FROM opensuse/tumbleweed
 
 #RUN zypper mr -a -e -f
-RUN zypper -n in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel
+RUN zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
+    qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild
+RUN zypper -n dup --auto-agree-with-licenses
 
 RUN mkdir -p /srv/dcastle2/git
 WORKDIR /srv/dcastle2/git
 RUN git clone https://github.com/DarkCastleMUD/DarkCastle.git
 
 WORKDIR /srv/dcastle2/git/DarkCastle
-RUN cmake -S src -B build
-RUN make -C build -j 128
+RUN cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
+RUN ninja -C build package
 
 WORKDIR /srv/dcastle2/git/DarkCastle/lib
 CMD ["/srv/dcastle2/git/DarkCastle/build/dcastle", "-P"]
 
-LABEL Name=darkcastle Version=0.0.2
+LABEL Name=darkcastle Version=0.0.3
