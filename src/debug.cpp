@@ -29,11 +29,10 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
-qsizetype fread_to_tilde(FILE * fpsave);
+qsizetype fread_to_tilde(FILE *fpsave);
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave);
 void load_vaults();
 
-extern struct index_data *obj_index;
 extern struct vault_data *vault_table;
 extern Leaderboard leaderboard;
 
@@ -143,7 +142,7 @@ QString showObjectAffects(Object *obj)
 
 QString showObjectVault(Object *obj)
 {
-  // std::cerr <<  obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
   QString buffer = sprintbit(obj->obj_flags.wear_flags, Object::wear_bits);
   // std::cerr <<  buf << ":";
 
@@ -164,7 +163,7 @@ QString showObjectVault(Object *obj)
 
 void showObject(Character *ch, Object *obj)
 {
-  // std::cerr <<  obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
   char buf[255];
 
   sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
@@ -249,10 +248,10 @@ int main(int argc, char **argv)
   renum_world();
 
   logentry("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
-  generate_obj_indices(&top_of_objt, obj_index);
+  generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
 
   logentry("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
-  generate_mob_indices(&top_of_mobt, mob_index);
+  generate_mob_indices(&top_of_mobt, DC::getInstance()->mob_index);
 
   logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
   renum_zone_table();
@@ -417,7 +416,7 @@ int main(int argc, char **argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -427,7 +426,7 @@ int main(int argc, char **argv)
 
               for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
+                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -436,7 +435,7 @@ int main(int argc, char **argv)
                 {
                   for (Object *container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && obj_index[container->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].virt == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -501,7 +500,7 @@ int main(int argc, char **argv)
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
         {
           ch->send(showObjectVault(obj));
         }

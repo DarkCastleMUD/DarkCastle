@@ -40,11 +40,11 @@
 #include "const.h"
 #include "wizard.h"
 
-extern struct index_data *mob_index;
+
 
 struct player_shop *g_playershops;
 
-extern struct index_data *obj_index;
+
 
 extern struct time_info_data time_info;
 
@@ -331,9 +331,9 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  int virt = obj_index[obj->item_number].virt;
+  int virt = DC::getInstance()->obj_index[obj->item_number].virt;
   if (virt >= 13400 && virt <= 13707 &&
-      mob_index[keeper->mobdata->nr].virt != 13416)
+      DC::getInstance()->mob_index[keeper->mobdata->nr].virt != 13416)
   {
     keeper->do_tell(QString("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
@@ -407,7 +407,7 @@ void shopping_value(const char *arg, Character *ch,
     }
   }
 
-  if (mob_index[keeper->mobdata->nr].virt == 3003)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -456,7 +456,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.", CMD_DEFAULT);
   }
-  if (mob_index[keeper->mobdata->nr].virt == 3004)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -500,7 +500,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I deal with armor exclusively.", CMD_DEFAULT);
   }
-  if (mob_index[keeper->mobdata->nr].virt == 3000)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -557,7 +557,7 @@ void shopping_value(const char *arg, Character *ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", CMD_DEFAULT);
   }
 
-  if (mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
@@ -640,7 +640,7 @@ void shopping_list(const char *arg, Character *ch,
 
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_buy);
 
-    int vnum = obj_index[obj->item_number].virt;
+    int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
     bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
@@ -648,12 +648,12 @@ void shopping_list(const char *arg, Character *ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = obj_index[obj->item_number].virt;
+      done[i++] = DC::getInstance()->obj_index[obj->item_number].virt;
     else
       break;
     a = 0;
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (obj_index[tobj->item_number].virt == obj_index[obj->item_number].virt)
+      if (DC::getInstance()->obj_index[tobj->item_number].virt == DC::getInstance()->obj_index[obj->item_number].virt)
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
@@ -689,7 +689,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( IS_MOB(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -846,7 +846,7 @@ void assign_the_shopkeepers()
   int shop_nr;
 
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
-    mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
+    DC::getInstance()->mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
 
   return;
 }
@@ -864,7 +864,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (IS_MOB(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -1136,7 +1136,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   // add it to list
   player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
-  newitem->item_vnum = obj_index[obj->item_number].virt;
+  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1406,7 +1406,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       if (robj < 0)
         ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
       else
-        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)obj_index[robj].item)->short_description, -40).arg(item->price));
+        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(item->price));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
@@ -1553,7 +1553,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
 */
 void assign_the_player_shopkeepers()
 {
-  mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
+  DC::getInstance()->mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
 }
 
 void redo_shop_profit()
@@ -1647,7 +1647,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, ((Object *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+        strncpy(item_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
       }
       else
       {
@@ -1656,7 +1656,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, ((Object *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+        strncpy(cost_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1912,16 +1912,16 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
           return eSUCCESS;
         }
 
-        if (isexact("godload", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            isexact("gl", ((Object *)(obj_index[obj->item_number].item))->name) ||
+        if (isexact("godload", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
+            isexact("gl", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
             isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isexact("quest", ((Object *)(obj_index[obj->item_number].item))->name) ||
-            obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3128)
+        if (isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
+            DC::getInstance()->obj_index[obj->item_number].virt >= 3124 && DC::getInstance()->obj_index[obj->item_number].virt <= 3128)
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
           return eSUCCESS;

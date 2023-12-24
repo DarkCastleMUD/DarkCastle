@@ -89,7 +89,7 @@ int do_log(Character *ch, char *argument, int cmd)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
-  if (IS_MOB(ch) || !ch->has_skill( COMMAND_LOG))
+  if (IS_MOB(ch) || !ch->has_skill(COMMAND_LOG))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -341,7 +341,7 @@ int do_debug(Character *ch, char *args, int cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && mob_index[c->mobdata->nr].virt == vnum)
+          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == vnum)
           {
             if (!first_npc_found)
             {
@@ -524,7 +524,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
       "list",
       "save",
       "\n"};
-  if (!ch->has_skill( COMMAND_SQEDIT))
+  if (!ch->has_skill(COMMAND_SQEDIT))
   {
     ch->sendln("You are unable to do so.");
     return eFAILURE;
@@ -803,7 +803,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   {
     if (real_object(i) < 0)
       continue;
-    obj = (Object *)obj_index[real_object(i)].item;
+    obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
@@ -819,7 +819,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = obj_index[obj->item_number].virt;
+              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].virt;
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -833,7 +833,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
               for (v = 0; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = obj_index[obj->item_number].virt;
+                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].virt;
                   break;
                 }
             }
@@ -856,7 +856,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -966,19 +966,19 @@ int do_listproc(Character *ch, char *argument, int a)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !mob_index[real_mobile(i)].mobprogs))
+    if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[real_mobile(i)].mobprogs))
       continue;
-    else if (!mob && (real_object(i) < 0 || !obj_index[real_object(i)].mobprogs))
+    else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
       continue;
     if (tot++ > 100)
       break;
     if (mob)
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Character *)mob_index[real_mobile(i)].item)->getNameC());
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Character *)DC::getInstance()->mob_index[real_mobile(i)].item)->getNameC());
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)obj_index[real_object(i)].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)DC::getInstance()->obj_index[real_object(i)].item)->name);
     }
   }
   ch->send(buf);

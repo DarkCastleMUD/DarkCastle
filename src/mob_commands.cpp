@@ -58,7 +58,7 @@
 
 // external vars
 
-extern struct index_data *mob_index;
+
 
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -70,7 +70,7 @@ extern Object *activeObj;
 extern void *activeVo;
 
 extern room_t top_of_world;
-extern struct index_data *obj_index;
+
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
 
@@ -145,7 +145,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
-          victim->getNameC(), mob_index[victim->mobdata->nr].virt);
+          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -153,13 +153,13 @@ void mpstat(Character *ch, Character *victim)
           victim->long_desc ? victim->long_desc : "(nullptr)");
   ch->send(buf);
 
-  if (!(mob_index[victim->mobdata->nr].progtypes))
+  if (!(DC::getInstance()->mob_index[victim->mobdata->nr].progtypes))
   {
     ch->sendln("That mob has no programs set.");
     return;
   }
 
-  for (mprg = mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
+  for (mprg = DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
@@ -561,7 +561,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   char arg2[MAX_INPUT_LENGTH] = {0};
   Object *obj;
   int realnum;
-  extern struct index_data *obj_index;
+  
 
   if (IS_PC(ch))
   {
@@ -585,7 +585,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
   {
     return eFAILURE;
   }
@@ -1244,7 +1244,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   {
     if (IS_NPC(this))
     {
-      int num = mob_index[this->mobdata->nr].virt;
+      int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
 
       logentry(QString("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
@@ -1807,7 +1807,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 
   if (IS_MOB(ch))
   {
-    throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
+    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -2250,19 +2250,19 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   {
     *lvali = i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2287,13 +2287,13 @@ void prog_error(Character *ch, char *format, ...)
   if (ch && IS_OBJ(ch))
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Obj %d, com %d, line %d: %s",
-         obj_index[ch->objdata->item_number].virt, mprog_command_num,
+         DC::getInstance()->obj_index[ch->objdata->item_number].virt, mprog_command_num,
          mprog_line_num, buffer);
   }
   else if (ch && IS_MOB(ch))
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d, com %d, line %d: %s",
-         mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
+         DC::getInstance()->mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
          buffer);
   }
   else

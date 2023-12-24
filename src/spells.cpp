@@ -65,7 +65,7 @@ extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct song_info_type song_info[];
 extern char *spell_wear_off_msg[];
-extern struct index_data *obj_index;
+
 
 // Functions used in spells.C
 int spl_lvl(int lev);
@@ -73,7 +73,7 @@ int spl_lvl(int lev);
 // Extern procedures
 void make_dust(Character *ch);
 int say_spell(Character *ch, int si, int room = 0);
-extern struct index_data *mob_index;
+
 
 #if (0)
 uint8_t beats;               /* Waiting time after spell     */
@@ -1840,7 +1840,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
       return eFAILURE;
@@ -2063,8 +2063,8 @@ int do_cast(Character *ch, char *argument, int cmd)
             return eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
-              mob_index[tar_char->mobdata->nr].virt <= 2399)
+          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].virt >= 2300 &&
+              DC::getInstance()->mob_index[tar_char->mobdata->nr].virt <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);

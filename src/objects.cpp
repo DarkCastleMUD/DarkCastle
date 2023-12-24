@@ -32,8 +32,8 @@ extern const char *dirs[];
 extern int drink_aff[][3];
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
+
+
 
 void add_obj_affect(Object *obj, int loc, int mod)
 {
@@ -136,7 +136,7 @@ void eq_remove_damage(Object *obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(Object *obj)
 {
-  if (obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (DC::getInstance()->obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -165,13 +165,13 @@ void object_activity(uint64_t pulse_type)
   {
     int32_t item_number = obj->item_number;
 
-    if (obj_index[item_number].non_combat_func)
+    if (DC::getInstance()->obj_index[item_number].non_combat_func)
     {
-      obj_index[item_number].non_combat_func(nullptr, obj, 0, "", nullptr);
+      DC::getInstance()->obj_index[item_number].non_combat_func(nullptr, obj, 0, "", nullptr);
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = ((Object *)DC::getInstance()->obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_description->description, obj->in_room, true);
     }
     else
@@ -443,7 +443,7 @@ int do_recite(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
         {
-          logf(100, LogChannels::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", obj_index[scroll->item_number].virt, i, i);
+          logf(100, LogChannels::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
           continue;
         }
         else
@@ -1442,7 +1442,7 @@ int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
   return false; // sigh, work for nohin'
   if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
-    int vnum = mob_index[ch->mobdata->nr].virt;
+    int vnum = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1649,7 +1649,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   }
   else
   {
-    if (mob_index[ch->mobdata->nr].virt != 8)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].virt != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
         sprintf(buffer, "You must be level %d to use $p.",
@@ -1658,8 +1658,8 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         return;
       }
   }
-  /*  if (IS_NPC(ch) && (mob_index[ch->mobdata->nr].virt < 22394 &&
-    mob_index[ch->mobdata->nr].virt > 22388))
+  /*  if (IS_NPC(ch) && (DC::getInstance()->mob_index[ch->mobdata->nr].virt < 22394 &&
+    DC::getInstance()->mob_index[ch->mobdata->nr].virt > 22388))
     {
        return;
     }*/
@@ -2500,13 +2500,13 @@ int do_remove(Character *ch, char *argument, int cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+            if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
-            if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2543,7 +2543,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             send_to_char(arg1, ch);
             return eFAILURE;
           }
-          if (obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+          if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return eFAILURE;
@@ -2560,7 +2560,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
-          else if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);

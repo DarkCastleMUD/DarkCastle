@@ -878,7 +878,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
   char buf[MAX_STRING_LENGTH];
   for (r = 0; r < top_of_objt; r++)
   {
-    obj = (Object *)obj_index[r].item;
+    obj = (Object *)DC::getInstance()->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -888,7 +888,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, obj_index[r].virt, ac);
+            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].virt, ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -995,7 +995,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     {
       for (int x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv((Object *)obj_index[x].item, fout);
+        write_object_csv((Object *)DC::getInstance()->obj_index[x].item, fout);
       }
       curr = curr->next;
     }

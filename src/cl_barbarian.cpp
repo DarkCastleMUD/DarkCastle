@@ -25,7 +25,7 @@
 #include "inventory.h"
 #include "move.h"
 
-extern struct index_data *obj_index;
+
 extern int rev_dir[];
 
 int do_batter(Character *ch, char *argument, int cmd)
@@ -753,7 +753,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
+          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);

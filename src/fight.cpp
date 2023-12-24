@@ -64,9 +64,6 @@
 
 extern room_t top_of_world;
 
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-
 Character *combat_list = nullptr, *combat_next_dude = nullptr;
 
 char *champ_death_messages[] =
@@ -242,7 +239,7 @@ void perform_violence(void)
     int last_virt = -1;
     int last_class = GET_CLASS(ch);
     if (IS_MOB(ch))
-      last_virt = mob_index[ch->mobdata->nr].virt;
+      last_virt = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     // DEBUG CODE
     if (!ch->fighting)
       continue;
@@ -286,9 +283,9 @@ void perform_violence(void)
       is_mob = IS_MOB(ch);
       if (is_mob)
       {
-        if ((mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
+        if ((DC::getInstance()->mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
         {
-          retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, 0, "", ch));
+          retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, 0, "", ch));
           if (SOMEONE_DIED(retval))
             continue;
           // Check if we're still fighting someone
@@ -672,8 +669,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
-      if ((ch->equipment[WIELD] && obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
-          (ch->equipment[SECOND_WIELD] && obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+      if ((ch->equipment[WIELD] && DC::getInstance()->obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
+          (ch->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
         chance = 101;
       if (chance > number(1, 100))
       {
@@ -744,8 +741,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
         chance = 33;
       else
         chance = 66; // eq/bard is 66%
-      if ((ch->equipment[WIELD] && obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
-          (ch->equipment[SECOND_WIELD] && obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+      if ((ch->equipment[WIELD] && DC::getInstance()->obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
+          (ch->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
         chance = 101;
 
       if (chance > number(1, 100))
@@ -1495,7 +1492,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
     w_type = get_weapon_damage_type(wielded);
 
-  if (wielded && obj_index[wielded->item_number].virt == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && DC::getInstance()->obj_index[wielded->item_number].virt == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
   {                     // Durendal - changes damage type and other stuff
     w_type = TYPE_FIRE; // no skill bonus
   }
@@ -1534,7 +1531,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
 
-  if (wielded && obj_index[wielded->item_number].virt == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && DC::getInstance()->obj_index[wielded->item_number].virt == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
   {
     dam = dam * 85 / 100;
     dam = dam + (getRealSpellDamage(ch) / 2);
@@ -1592,7 +1589,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
-    int a = mob_index[ch->mobdata->nr].virt;
+    int a = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     switch (a)
     {
     case 88:
@@ -1630,9 +1627,9 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         return debug_retval(ch, vict, retval) | eSUCCESS;
       }
 
-      if (ch->equipment[weapon] && obj_index[ch->equipment[weapon]->item_number].combat_func)
+      if (ch->equipment[weapon] && DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)
       {
-        retval = ((*obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
+        retval = ((*DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1649,8 +1646,8 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
-        if (obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
-          retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
+        if (DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
+          retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1667,8 +1664,8 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
         if (ch->equipment[HOLD]->item_number >= 0)
         {
-          if (obj_index[ch->equipment[HOLD]->item_number].combat_func != nullptr)
-            retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
+          if (DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func != nullptr)
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1687,8 +1684,8 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
         if (ch->equipment[HOLD2]->item_number >= 0)
         {
-          if (obj_index[ch->equipment[HOLD2]->item_number].combat_func != nullptr)
-            retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
+          if (DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func != nullptr)
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1832,7 +1829,7 @@ void eq_damage(Character *ch, Character *victim,
     if (!obj)
       return;
 
-    if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
+    if (DC::getInstance()->obj_index[obj->item_number].progtypes & ARMOUR_PROG)
       oprog_armour_trigger(victim, obj);
     // determine if time to scrap it
     if (eqdam >= eq_max_damage(obj))
@@ -1861,7 +1858,7 @@ void eq_damage(Character *ch, Character *victim,
     if (!obj)
       return;
 
-    if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
+    if (DC::getInstance()->obj_index[obj->item_number].progtypes & ARMOUR_PROG)
       oprog_armour_trigger(victim, obj);
 
     // determine if time to scrap it
@@ -2530,7 +2527,7 @@ int damage(Character *ch, Character *victim,
             int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
             if (victim->equipment[WEAR_SHIELD])
             {
-              if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
+              if (DC::getInstance()->obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
                 oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
               if (eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
                 eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
@@ -2717,7 +2714,7 @@ int damage(Character *ch, Character *victim,
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92) || attacktype == SKILL_FLAMESLASH)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt > 87 && DC::getInstance()->mob_index[ch->mobdata->nr].virt < 92) || attacktype == SKILL_FLAMESLASH)
   {
     if (ch->equipment[weapon] == nullptr)
     {
@@ -3138,10 +3135,10 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
     return;
 
   if (IS_NPC(ch))
-    ch_vnum = mob_index[ch->mobdata->nr].virt;
+    ch_vnum = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
 
   if (IS_NPC(vict))
-    vict_vnum = mob_index[vict->mobdata->nr].virt;
+    vict_vnum = DC::getInstance()->mob_index[vict->mobdata->nr].virt;
 
   if (IS_NPC(ch) && (IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR) || ch_vnum == 8) && ch->master && ch->master->in_room == ch->in_room)
     realch = ch->master;
@@ -3242,7 +3239,7 @@ QString translate_name(const Character *ch)
 {
   if (IS_NPC(ch))
   {
-    return QString("%1(v%2)").arg(GET_NAME(ch)).arg(mob_index[ch->mobdata->nr].virt);
+    return QString("%1(v%2)").arg(GET_NAME(ch)).arg(DC::getInstance()->mob_index[ch->mobdata->nr].virt);
   }
   return GET_NAME(ch);
 }
@@ -5203,8 +5200,8 @@ int do_behead_skill(Character *ch, Character *vict)
         chance = number(0, 101);
         if (chance > (2 * percent) && !isSet(vict->immune, ISR_SLASH) && skill_success(ch, vict, SKILL_BEHEAD))
         {
-          if (((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-               (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+          if (((vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+               (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
               !number(0, 1))
           { // tarrasque's leash..
             act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
@@ -5464,7 +5461,7 @@ void raw_kill(Character *ch, Character *victim)
       GET_RACE(victim) == RACE_ELEMENT ||
       GET_RACE(victim) == RACE_ASTRAL ||
       GET_RACE(victim) == RACE_SLIME ||
-      (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt == 8))
+      (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].virt == 8))
     make_dust(victim);
   else
     make_corpse(victim);
@@ -5594,7 +5591,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), mob_index[ch->mobdata->nr].virt,
+        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].virt,
                 GET_NAME(ch));
       }
       else
@@ -5943,7 +5940,7 @@ void group_gain(Character *ch, Character *victim)
     // this loops the followers (cut and pasted above)
     tmp_ch = loop_followers(&f);
   } while (tmp_ch);
-  getAreaData(DC::getInstance()->world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, victim->getGold());
+  getAreaData(DC::getInstance()->world[victim->in_room].zone, DC::getInstance()->mob_index[victim->mobdata->nr].virt, total_share, victim->getGold());
 }
 
 /* find the highest level present at the kill */
@@ -6204,7 +6201,7 @@ void dam_message(int dam, Character *ch, Character *victim,
 
   // Custom damage messages.
   if (IS_NPC(ch))
-    switch (mob_index[ch->mobdata->nr].virt)
+    switch (DC::getInstance()->mob_index[ch->mobdata->nr].virt)
     {
     case 13434:
       attack = "$2poison$R";
@@ -6363,7 +6360,7 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (!attack)
         attack = races[GET_RACE(ch)].unarmed;
       int a;
-      if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
+      if (IS_NPC(ch) && (a = DC::getInstance()->mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
@@ -7061,12 +7058,12 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Golem cannot attack players
-  if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8 && IS_PC(vict))
+  if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8 && IS_PC(vict))
     return false;
 
   if (IS_NPC(vict))
   {
-    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8 || vict->affected_by_spell(SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
+    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || DC::getInstance()->mob_index[vict->mobdata->nr].virt == 8 || vict->affected_by_spell(SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
         vict->master &&
         vict->fighting != ch &&
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
@@ -7119,7 +7116,7 @@ int can_be_attacked(Character *ch, Character *vict)
         return true;
     }
     /* Allow players to continue fighting if they have a cantquit */
-    if (ch->isPlayerCantQuit()|| IS_AFFECTED(ch, AFF_CHAMPION))
+    if (ch->isPlayerCantQuit() || IS_AFFECTED(ch, AFF_CHAMPION))
     {
       if (ch->fighting == vict)
         return true;
@@ -7328,7 +7325,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
       // Don't want to log this since a non-spell affect is going to happen all
       // the time (like SAVE_VS_FIRE or HIT-N-DAM for example) -pir
       // logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
-      //     current_affect, obj_index[ch->equipment[weapon]->item_number].virt);
+      //     current_affect, DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].virt);
       break;
     } /* switch statement */
     if (SOMEONE_DIED(retval))
@@ -7336,7 +7333,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
 
   } /* for loop */
 
-  if (obj_index[weap->item_number].progtypes & WEAPON_PROG)
+  if (DC::getInstance()->obj_index[weap->item_number].progtypes & WEAPON_PROG)
     oprog_weapon_trigger(ch, weap);
 
   return eSUCCESS;
@@ -7766,7 +7763,7 @@ void remove_active_potato(Character *vict)
   for (obj = vict->carrying; obj; obj = next_obj)
   {
     next_obj = obj->next_content;
-    if (obj_index[obj->item_number].virt == 393 && obj->obj_flags.value[3] > 0)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && obj->obj_flags.value[3] > 0)
     {
       extract_obj(obj);
     }

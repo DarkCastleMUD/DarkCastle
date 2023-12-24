@@ -50,8 +50,6 @@ void load_auction_tickets()
 struct AuctionTicket;
 Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
-extern struct index_data *obj_index;
-
 enum ListOptions
 {
   LIST_ALL = 0,
@@ -173,7 +171,7 @@ bool AuctionHouse::IsRace(int vnum, QString israce)
   if (nr < 0)
     return false;
 
-  Object *obj = (class Object *)(obj_index[nr].item);
+  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -223,7 +221,7 @@ bool AuctionHouse::IsClass(int vnum, QString isclass)
   if (nr < 0)
     return false;
 
-  Object *obj = (class Object *)(obj_index[nr].item);
+  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -553,7 +551,7 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
   if (nr < 0)
     return true;
 
-  Object *obj = (class Object *)(obj_index[nr].item);
+  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
   switch (keyword)
   {
   case 0:
@@ -626,7 +624,7 @@ bool AuctionHouse::IsWearable(Character *ch, int vnum)
   if (nr < 0)
     return true;
 
-  Object *obj = (class Object *)(obj_index[nr].item);
+  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
   return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
 }
 
@@ -652,7 +650,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return isSet(((class Object *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -673,7 +671,7 @@ bool AuctionHouse::IsLevel(unsigned int to, unsigned int from, int vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((class Object *)(obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -683,7 +681,7 @@ SEARCH BY NAME
 */
 bool AuctionHouse::IsName(QString name, int vnum)
 {
-  Object *obj = DC::getObject(vnum);
+  Object *obj = DC::getInstance()->getObject(vnum);
   if (!obj)
   {
     return false;
@@ -1171,7 +1169,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((class Object *)(obj_index[nr].item))->short_description);
+        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
       return;
     }
     else
@@ -1387,7 +1385,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       return;
     }
 
-    if (isSet(((class Object *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((class Object *)(DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1587,7 +1585,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     if (nr >= 0)
     {
       sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
-              ((class Object *)(obj_index[nr].item))->short_description);
+              ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
@@ -1684,13 +1682,13 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     advertise = true;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
+  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), DC::getInstance()->obj_index[obj->item_number].virt))
   {
     ch->send(QString("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
     return;
   }
 
-  if (strcmp(obj->short_description, ((class Object *)(obj_index[obj->item_number].item))->short_description))
+  if (strcmp(obj->short_description, ((class Object *)(DC::getInstance()->obj_index[obj->item_number].item))->short_description))
   {
     ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;
@@ -1725,7 +1723,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   ItemsActive += 1;
 
   AuctionTicket NewTicket;
-  NewTicket.vitem = obj_index[obj->item_number].virt;
+  NewTicket.vitem = DC::getInstance()->obj_index[obj->item_number].virt;
   NewTicket.price = price;
   NewTicket.state = AUC_FOR_SALE;
   NewTicket.end_time = time(0) + auction_duration;

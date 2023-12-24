@@ -14,7 +14,6 @@
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
-extern struct index_data *obj_index;
 
 DC::DC(int &argc, char **argv)
 	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
@@ -281,7 +280,7 @@ Object *DC::getObject(vnum_t vnum)
 		return nullptr;
 	}
 
-	return static_cast<Object *>(obj_index[rnum].item);
+	return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
 }
 
 void close_file(std::FILE *fp)

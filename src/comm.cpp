@@ -98,7 +98,7 @@ extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
 
-extern struct index_data *obj_index;
+
 
 void check_champion_and_website_who_list(void);
 void save_slot_machines(void);

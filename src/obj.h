@@ -22,6 +22,7 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 #include "DC.h"
+#include "casino.h"
 
 /* The following defs are for Object  */
 
@@ -185,19 +186,13 @@
 #define CONT_CLOSED 4
 #define CONT_LOCKED 8
 
-struct tab_data;
-struct table_data;
-struct machine_data;
-struct wheel_data;
-class Object;
-class Character;
 typedef uint64_t vnum_t;
 typedef uint64_t room_t;
 
-struct active_object
+class active_object
 {
     class Object *obj = {};
-    struct active_object *next = {};
+    active_object *next = {};
 };
 
 #define OBJ_NOTIMER -7000000
@@ -278,8 +273,8 @@ public:
     Object *next = {};         /* For the object list              */
     Object *next_skill = {};
     table_data *table = {};
-    machine_data *slot = {};
-    wheel_data *wheel = {};
+    class machine_data *slot = {};
+    class wheel_data *wheel = {};
     time_t save_expiration = {};
     time_t no_sell_expiration = {};
 

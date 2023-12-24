@@ -42,7 +42,7 @@ uint64_t i = UINT64_MAX;
 #include "Trace.h"
 #include "clan.h"
 
-extern index_data *obj_index;
+
 
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);
@@ -1521,7 +1521,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
       return eFAILURE;
@@ -1579,7 +1579,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
       continue;
 
     for (tmp_obj = DC::getInstance()->world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
         yes = true;
         break;

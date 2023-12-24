@@ -21,8 +21,8 @@
 typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
 
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
+
+
 void boot_the_shops();
 void boot_player_shops();
 void assign_the_shopkeepers();
@@ -61,7 +61,7 @@ void assign_one_mob_non(int vnum, special_function func)
 
   if (rnum >= 0)
   {
-    mob_index[rnum].non_combat_func = func;
+    DC::getInstance()->mob_index[rnum].non_combat_func = func;
   }
 }
 
@@ -76,7 +76,7 @@ void assign_one_mob_com(int vnum, special_function func)
 
   if (rnum >= 0)
   {
-    mob_index[rnum].combat_func = func;
+    DC::getInstance()->mob_index[rnum].combat_func = func;
   }
 }
 
@@ -91,7 +91,7 @@ void assign_one_obj_non(int vnum, special_function func)
 
   if (rnum >= 0)
   {
-    obj_index[rnum].non_combat_func = func;
+    DC::getInstance()->obj_index[rnum].non_combat_func = func;
   }
 }
 
@@ -106,7 +106,7 @@ void assign_one_obj_com(int vnum, special_function func)
 
   if (rnum >= 0)
   {
-    obj_index[rnum].combat_func = func;
+    DC::getInstance()->obj_index[rnum].combat_func = func;
   }
 }
 

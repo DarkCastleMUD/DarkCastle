@@ -119,6 +119,7 @@ typedef QList<QString> hints_t;
 #include "clan.h"
 
 class Connection;
+class index_data;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
 void close_file(std::FILE *fp);
@@ -141,6 +142,21 @@ typedef uint64_t gold_t;
 typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
+
+/* element in monster and object index-tables   */
+class index_data
+{
+public:
+  int virt;                                                                            /* virt number of ths mob/obj           */
+  int number;                                                                          /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
+  int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
+  void *item;                                                                          /* the mobile/object itself                 */
+
+  struct mob_prog_data *mobprogs;
+  mob_prog_data *mobspec;
+  int progtypes;
+};
 
 class World
 {
@@ -229,6 +245,11 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
+  class index_data obj_index_array[MAX_INDEX];
+  class index_data *obj_index = obj_index_array;
+
+  class index_data mob_index_array[MAX_INDEX];
+  class index_data *mob_index = mob_index_array;
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -243,7 +264,7 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
-  static Object *getObject(vnum_t vnum);  
+  Object *getObject(vnum_t vnum);
 
   explicit DC(int &argc, char **argv);
   DC(const DC &) = delete; // non-copyable
@@ -306,10 +327,10 @@ union varg_t
 {
   Character *ch;
   clan_t clan;
-  struct player_data *player;
-  struct table_data *table;
-  struct machine_data *machine;
-  struct wheel_data *wheel;
+  class player_data *player;
+  class table_data *table;
+  class machine_data *machine;
+  class wheel_data *wheel;
 };
 
 typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);

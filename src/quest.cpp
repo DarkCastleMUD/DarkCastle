@@ -43,8 +43,8 @@ char *valid_fields[] = {
     nullptr};
 
 extern void wear(Character *, Object *, int);
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
+
+
 extern char *gl_item(Object *obj, int number, Character *ch, bool platinum);
 
 int load_quests(void)
@@ -262,7 +262,7 @@ void show_quest_info(Character *ch, int num)
                 quest->number, quest->name, quest->level, quest->cost,
                 quest->brownie ? "Required" : "Not Required",
                 quest->reward, quest->timer, quest->mobnum,
-                real_mobile(quest->mobnum) > 0 ? ((Character *)(mob_index[real_mobile(quest->mobnum)].item))->short_desc : "no current mob",
+                real_mobile(quest->mobnum) > 0 ? ((Character *)(DC::getInstance()->mob_index[real_mobile(quest->mobnum)].item))->short_desc : "no current mob",
                 quest->objnum, quest->objkey,
                 quest->objshort, quest->objlong, quest->hint1, quest->hint2, quest->hint3);
          return;
@@ -1490,7 +1490,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1500,7 +1500,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1510,7 +1510,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1520,7 +1520,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1643,15 +1643,15 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (!isexact("quest", ((Object *)(obj_index[obj->item_number].item))->name) &&
-          obj_index[obj->item_number].virt != 3124 &&
-          obj_index[obj->item_number].virt != 3125 &&
-          obj_index[obj->item_number].virt != 3126 &&
-          obj_index[obj->item_number].virt != 3127 &&
-          obj_index[obj->item_number].virt != 3128 &&
-          obj_index[obj->item_number].virt != 27997 &&
-          obj_index[obj->item_number].virt != 27998 &&
-          obj_index[obj->item_number].virt != 27999)
+      if (!isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 3124 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 3125 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 3126 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 3127 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 3128 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 27997 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 27998 &&
+          DC::getInstance()->obj_index[obj->item_number].virt != 27999)
       {
          owner->do_tell(QString("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;

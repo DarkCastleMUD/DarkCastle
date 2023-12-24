@@ -56,7 +56,7 @@ bool is_r_denied(Character *ch, int room)
   if (IS_PC(ch))
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (mob_index[ch->mobdata->nr].virt == d->vnum)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].virt == d->vnum)
       return true;
   return false;
 }
@@ -114,11 +114,11 @@ void mobile_activity(void)
       continue;
     }
 
-    if (mob_index[ch->mobdata->nr].non_combat_func)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
+      retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || isNowhere(ch))
@@ -680,7 +680,7 @@ void scavenge(Character *ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

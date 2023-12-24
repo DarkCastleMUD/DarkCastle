@@ -634,7 +634,7 @@ void gain_exp(Character *ch, int64_t gain)
 	if (IS_PC(ch) && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->player->golem, gain);
 
-	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
+	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8) // it's a golem
 		golem_gain_exp(ch);
 
 	if (IS_NPC(ch))
@@ -737,7 +737,7 @@ void food_update(void)
 		if (i->affected_by_spell(SPELL_PARALYZE))
 			continue;
 		int amt = -1;
-		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
+		if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
 			amt = -3;
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)

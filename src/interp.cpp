@@ -55,8 +55,8 @@
 int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
+
+
 
 void update_wizlist(Character *ch);
 // int system(const char *);
@@ -1028,9 +1028,9 @@ command_return_t Character::special(QString arguments, int cmd)
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
     if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (obj_index[this->equipment[j]->item_number].non_combat_func)
+      if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1038,9 +1038,9 @@ command_return_t Character::special(QString arguments, int cmd)
   /* special in inventory? */
   for (i = carrying; i; i = i->next_content)
     if (i->item_number >= 0)
-      if (obj_index[i->item_number].non_combat_func)
+      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1050,15 +1050,15 @@ command_return_t Character::special(QString arguments, int cmd)
   {
     if (IS_MOB(k))
     {
-      if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
-      else if (mob_index[k->mobdata->nr].non_combat_func)
+      else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       {
-        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(this, 0,
+        retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
                                                                cmd, arguments.toStdString().c_str(), k));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
@@ -1069,9 +1069,9 @@ command_return_t Character::special(QString arguments, int cmd)
   /* special in object present? */
   for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
-      if (obj_index[i->item_number].non_combat_func)
+      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
       {
-        retval = ((*obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }

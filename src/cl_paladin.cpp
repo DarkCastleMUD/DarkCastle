@@ -208,7 +208,7 @@ int do_behead(Character *ch, char *argument, int cmd)
   int retval = eSUCCESS;
   char buf[MAX_STRING_LENGTH];
   Character *vict;
-  extern struct index_data *obj_index;
+  
 
   one_argument(argument, buf);
 
@@ -288,7 +288,7 @@ int do_behead(Character *ch, char *argument, int cmd)
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) || (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) || (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);

@@ -56,8 +56,8 @@
 /* extern variables */
 
 extern class Object *object_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
+
+
 extern char credits[MAX_STRING_LENGTH];
 extern char info[MAX_STRING_LENGTH];
 extern char story[MAX_STRING_LENGTH];
@@ -850,8 +850,8 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 
       if (nr >= 0)
       {
-         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, mob_index[nr].virt,
-                ((Character *)(mob_index[nr].item))->short_desc);
+         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].virt,
+                ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       }
    }
 
@@ -1058,13 +1058,13 @@ bool identify(Character *ch, Object *obj)
    const Object *vobj = nullptr;
    if (obj->item_number >= 0)
    {
-      const int vnum = obj_index[obj->item_number].virt;
+      const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
       if (vnum >= 0)
       {
          const int rn_of_vnum = real_object(vnum);
          if (rn_of_vnum >= 0)
          {
-            vobj = (Object *)obj_index[rn_of_vnum].item;
+            vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
          }
       }
    }
@@ -1265,7 +1265,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
          send("Invalid VNUM.\r\n");
          return eFAILURE;
       }
-      obj = (Object *)obj_index[rnum].item;
+      obj = (Object *)DC::getInstance()->obj_index[rnum].item;
 
       if (isMortal() && obj->isDark())
       {
@@ -1424,7 +1424,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      {
                         logf(IMMORTAL, LogChannels::LOG_WORLD,
                              "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                             obj_index[tmp_object->item_number].virt,
+                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
@@ -1460,7 +1460,7 @@ int do_look(Character *ch, char *argument, int cmd)
                      {
 
                         int weight_in(class Object * obj);
-                        if (obj_index[tmp_object->item_number].virt == 536)
+                        if (DC::getInstance()->obj_index[tmp_object->item_number].virt == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
                            temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1479,7 +1479,7 @@ int do_look(Character *ch, char *argument, int cmd)
                         temp = 3;
                         logf(IMMORTAL, LogChannels::LOG_WORLD,
                              "Bug in object %d. Weight: %d v1: %d",
-                             obj_index[tmp_object->item_number].virt,
+                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
                      }
@@ -4376,7 +4376,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    }
    else
    {
-      for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
+      for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].virt; ++vnum)
       {
          int rnum = 0;
          // real_object returns -1 for missing VNUMs
@@ -4384,7 +4384,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          {
             continue;
          }
-         Object *obj = static_cast<Object *>(obj_index[rnum].item);
+         Object *obj = static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
          if (obj == nullptr)
          {
             continue;
@@ -4582,13 +4582,13 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       const Object *vobj = nullptr;
       if (obj->item_number >= 0)
       {
-         const int vnum = obj_index[obj->item_number].virt;
+         const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
          if (vnum >= 0)
          {
             const int rn_of_vnum = real_object(vnum);
             if (rn_of_vnum >= 0)
             {
-               vobj = (Object *)obj_index[rn_of_vnum].item;
+               vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
             }
          }
       }

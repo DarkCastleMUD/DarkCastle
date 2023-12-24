@@ -41,8 +41,8 @@
 
 /*   external vars  */
 
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
+
+
 
 int check_components(Character *ch, int destroy, int item_one = 0,
                      int item_two = 0, int item_three = 0, int item_four = 0,
@@ -1035,7 +1035,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   int clan_num = ch->clan;
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
   {
-    int b = mob_index[ch->mobdata->nr].virt;
+    int b = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     switch (b)
     {
     case 8:     // golem
@@ -1964,7 +1964,7 @@ int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
     if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        obj_index[i->item_number].virt != CHAMPION_ITEM)
+        DC::getInstance()->obj_index[i->item_number].virt != CHAMPION_ITEM)
     {
       act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
       move_obj(i, ch);
@@ -3588,7 +3588,7 @@ int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  switch (mob_index[ch->mobdata->nr].virt)
+  switch (DC::getInstance()->mob_index[ch->mobdata->nr].virt)
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

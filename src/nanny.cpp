@@ -80,7 +80,7 @@ extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 
 extern Object *object_list;
-extern struct index_data *obj_index;
+
 
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
@@ -2272,7 +2272,7 @@ void check_silence_beacons(void)
    for (obj = object_list; obj; obj = tmp_obj)
    {
       tmp_obj = obj->next;
-      if (obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if (DC::getInstance()->obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
          if (obj->obj_flags.value[0] == 0)
             extract_obj(obj);
@@ -2296,7 +2296,7 @@ void checkConsecrate(int pulseType)
       for (obj = object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+         if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             obj->obj_flags.value[1]--;
@@ -2361,7 +2361,7 @@ void checkConsecrate(int pulseType)
       for (obj = object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
-         if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+         if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
             if (charExists(obj->obj_flags.origin))

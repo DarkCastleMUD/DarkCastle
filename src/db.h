@@ -35,7 +35,6 @@
 extern class Object *object_list;
 extern room_t top_of_world;
 
-struct index_data;
 struct error_eof
 {
 };
@@ -149,7 +148,7 @@ int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
 index_data *generate_obj_indices(int *top, index_data *index);
-index_data *generate_mob_indices(int *top, struct index_data *index);
+index_data *generate_mob_indices(int *top, index_data *index);
 
 extern struct skill_quest *skill_list;
 extern index_data mob_index_array[MAX_INDEX];
@@ -181,20 +180,6 @@ struct pulse_data
 { /* list for keeping tract of 'pulsing' chars */
   Character *thechar;
   pulse_data *next;
-};
-
-/* element in monster and object index-tables   */
-struct index_data
-{
-  int virt;                                                                            /* virt number of ths mob/obj           */
-  int number;                                                                          /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
-  int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
-  void *item;                                                                          /* the mobile/object itself                 */
-
-  mob_prog_data *mobprogs;
-  mob_prog_data *mobspec;
-  int progtypes;
 };
 
 struct help_index_element

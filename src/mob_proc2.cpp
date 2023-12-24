@@ -38,7 +38,7 @@
 
 
 extern class Object *object_list;
-extern struct index_data *obj_index;
+
 extern int class_restricted(Character *ch, class Object *obj);
 extern int size_restricted(Character *ch, class Object *obj);
 
@@ -667,8 +667,8 @@ const struct platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538
 // Apoc enjoys the dirty mooselove. Honest.
 int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
-	extern struct index_data *mob_index;
-	int mobvnum = mob_index[owner->mobdata->nr].virt;
+	
+	int mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].virt;
 	int o;
 	char buf[MAX_STRING_LENGTH];
 	//  return eFAILURE; //disabled for now
@@ -692,7 +692,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
-			char *tmp = gl_item((Object *)obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+			char *tmp = gl_item((Object *)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
 			ch->send(tmp);
 			dc_free(tmp);
 		}

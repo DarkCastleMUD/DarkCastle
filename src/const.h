@@ -42,8 +42,6 @@ extern bool wizlock;
 
 extern Character *character_list;
 extern Character *combat_list;
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 extern char *ban_list[30];
 extern char *nonew_new_list[30];
 extern const char *zone_modes[];
@@ -72,9 +70,6 @@ extern const char *connected_types[];
 extern const char *mob_types[];
 extern const char *exit_bits[];
 extern int mob_race_mod[][5];
-
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
 
 extern const char *race_abbrev[];
 

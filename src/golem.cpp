@@ -5,8 +5,6 @@
 */
 #include <cstring>
 
-
-
 #include "character.h"
 #include "structs.h"
 #include "spells.h"
@@ -110,7 +108,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      int vnum = obj_index[curr->item_number].virt;
+      int vnum = DC::getInstance()->obj_index[curr->item_number].virt;
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -128,7 +126,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == obj_index[curr->item_number].virt)
+      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].virt)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
@@ -566,7 +564,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
+    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

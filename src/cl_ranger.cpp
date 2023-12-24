@@ -39,7 +39,7 @@ extern int rev_dir[];
 
 int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
 void check_eq(Character *ch);
-extern struct index_data *mob_index;
+
 int get_difficulty(int);
 
 int charm_space(int level)
@@ -1411,7 +1411,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300 && mob_index[victim->mobdata->nr].virt <= 2399)
+  if (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].virt >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].virt <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);

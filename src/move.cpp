@@ -703,11 +703,11 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	Object *tmp_obj;
 	for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
 			ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
 
 	for (tmp_obj = DC::getInstance()->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
 			ch->sendln("The noise around you returns as you leave the silenced area!");
 
 	if (!isSet(retval, eSUCCESS))
@@ -770,7 +770,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 	// Elemental stuff goes HERE
 	if (IS_NPC(ch))
 	{
-		int a = mob_index[ch->mobdata->nr].virt;
+		int a = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
 		// code a bit repeaty, but whatever ;)
 		if (a == 88 && DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
 		{
@@ -1118,7 +1118,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8)
+	if (IS_NPC(ch) && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].virt == 8)
 	{
 		sesame = ch->master;
 		if (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
@@ -1289,7 +1289,7 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	if (real_room(dest) < 0)
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->item_number].virt);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].virt);
 		ch->sendln("You can't climb that.");
 		return eFAILURE | eINTERNAL_ERROR;
 	}

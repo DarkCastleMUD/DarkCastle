@@ -28,8 +28,8 @@
 
 extern int rev_dir[];
 
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
+
+
 extern room_t top_of_world;
 
 int find_door(Character *ch, char *type, char *dir);
@@ -811,7 +811,7 @@ int do_steal(Character *ch, char *argument, int cmd)
   Object *has_item = nullptr;
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
-  extern struct index_data *obj_index;
+  
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);
@@ -913,7 +913,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return eFAILURE;
     }
-    if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
@@ -1010,15 +1010,15 @@ int do_steal(Character *ch, char *argument, int cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
-                    obj_index[obj->item_number].virt, victim->getNameC());
+                    DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
             logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(ANGEL, LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
-                   obj_index[loop_obj->item_number].virt);
+                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
           }
-          if (obj_index[obj->item_number].virt != 76)
+          if (DC::getInstance()->obj_index[obj->item_number].virt != 76)
           {
             obj_from_char(obj);
             has_item = search_char_for_item(ch, obj->item_number, false);
@@ -1473,7 +1473,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   //      has_lockpicks = true;
 
   for (j = 0; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || obj_index[ch->equipment[j]->item_number].virt == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->item_number].virt == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1792,7 +1792,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (obj_index[container->item_number].virt != 536 ||
+        (DC::getInstance()->obj_index[container->item_number].virt != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
@@ -1807,7 +1807,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (obj_index[container->item_number].virt != 536)
+    if (DC::getInstance()->obj_index[container->item_number].virt != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
@@ -1819,7 +1819,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_NPC(vict) && mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (IS_NPC(vict) && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;
@@ -1864,7 +1864,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (obj_index[obj->item_number].virt == 393)
+    if (DC::getInstance()->obj_index[obj->item_number].virt == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
       return eFAILURE;

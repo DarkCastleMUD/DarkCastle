@@ -118,7 +118,7 @@ void do_mload(Character *ch, int rnum, int cnt)
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
-               mob_index[rnum].virt,
+               DC::getInstance()->mob_index[rnum].virt,
                mob->short_desc,
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
@@ -128,7 +128,7 @@ void do_mload(Character *ch, int rnum, int cnt)
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
-               mob_index[rnum].virt,
+               DC::getInstance()->mob_index[rnum].virt,
                mob->short_desc,
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
@@ -140,7 +140,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d at room %d (%s).",
              GET_NAME(ch),
              cnt,
-             mob_index[rnum].virt,
+             DC::getInstance()->mob_index[rnum].virt,
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
     logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
@@ -286,7 +286,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
-          (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+          (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->nr].virt : 0),
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
@@ -368,12 +368,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (IS_MOB(k))
   {
-    if (mob_index[k->mobdata->nr].non_combat_func)
+    if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       strcpy(buf2, "Exists");
     else
       strcpy(buf2, "None");
 
-    if (mob_index[k->mobdata->nr].combat_func)
+    if (DC::getInstance()->mob_index[k->mobdata->nr].combat_func)
       strcpy(buf3, "Exists");
     else
       strcpy(buf3, "None");
@@ -590,7 +590,7 @@ void mob_stat(Character *ch, Character *k)
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
-            (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+            (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->nr].virt : 0),
             (IS_NPC(k) ? k->mobdata->nr : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
@@ -655,7 +655,7 @@ void mob_stat(Character *ch, Character *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
+    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(DC::getInstance()->mob_index[k->mobdata->nr].mobspec), DC::getInstance()->mob_index[k->mobdata->nr].progtypes);
     ch->send(buf);
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
@@ -749,13 +749,13 @@ void mob_stat(Character *ch, Character *k)
   if (IS_MOB(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
     ch->send(buf);
     strcpy(buf, "$3Combat Special Proc$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].combat_func ? "Exists  " : "None  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "Exists  " : "None  "));
     ch->send(buf);
     strcpy(buf, "$3Mob Progs$R: ");
-    strcat(buf, (mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
     ch->send(buf);
   }
 
@@ -972,7 +972,7 @@ void obj_stat(Character *ch, class Object *j)
     }
 */
 
-  virt = (j->item_number >= 0) ? obj_index[j->item_number].virt : 0;
+  virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].virt : 0;
   sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
           j->name, j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
@@ -1295,13 +1295,13 @@ void obj_stat(Character *ch, class Object *j)
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
   strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
@@ -1693,9 +1693,9 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1706,7 +1706,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -1895,25 +1895,25 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
     while (1)
     {
       mob = number(1, top_of_mobt);
-      int vnum = mob_index[mob].virt; // debug
-      if (!(mob_index[mob].virt > 300 &&
-            (mob_index[mob].virt < 2300 || mob_index[mob].virt > 2499) &&
-            (mob_index[mob].virt < 29200 || mob_index[mob].virt > 29299) &&
-            (mob_index[mob].virt < 5600 || mob_index[mob].virt > 5699) &&
-            (mob_index[mob].virt < 16200 || mob_index[mob].virt > 16399) &&
-            (mob_index[mob].virt < 1900 || mob_index[mob].virt > 1999) &&
-            (mob_index[mob].virt < 10500 || mob_index[mob].virt > 10622) &&
-            (mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699)))
+      int vnum = DC::getInstance()->mob_index[mob].virt; // debug
+      if (!(DC::getInstance()->mob_index[mob].virt > 300 &&
+            (DC::getInstance()->mob_index[mob].virt < 2300 || DC::getInstance()->mob_index[mob].virt > 2499) &&
+            (DC::getInstance()->mob_index[mob].virt < 29200 || DC::getInstance()->mob_index[mob].virt > 29299) &&
+            (DC::getInstance()->mob_index[mob].virt < 5600 || DC::getInstance()->mob_index[mob].virt > 5699) &&
+            (DC::getInstance()->mob_index[mob].virt < 16200 || DC::getInstance()->mob_index[mob].virt > 16399) &&
+            (DC::getInstance()->mob_index[mob].virt < 1900 || DC::getInstance()->mob_index[mob].virt > 1999) &&
+            (DC::getInstance()->mob_index[mob].virt < 10500 || DC::getInstance()->mob_index[mob].virt > 10622) &&
+            (DC::getInstance()->mob_index[mob].virt < 8500 || DC::getInstance()->mob_index[mob].virt > 8699)))
         continue;
 
       // Skip mobs marked NO_HUNT
-      Character *m = static_cast<Character *>(mob_index[mob].item);
+      Character *m = static_cast<Character *>(DC::getInstance()->mob_index[mob].item);
       if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
       {
         continue;
       }
 
-      if (mob_index[mob].number <= 0)
+      if (DC::getInstance()->mob_index[mob].number <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
@@ -1955,7 +1955,7 @@ void pick_up_item(Character *ch, class Object *obj)
         p->next = in;
       else
         hunt_items_list = in;
-      int vnum = obj_index[obj->item_number].virt;
+      int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
               obj->short_description, i->mobname, ch->getNameC());
       send_info(buf);
@@ -2007,7 +2007,7 @@ void pick_up_item(Character *ch, class Object *obj)
           ch->sendln("Brick turned into a non-existent item. Tell an imm.");
           break;
         }
-        if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
+        if (DC::getInstance()->obj_index[oitem->item_number].virt < 27915 || DC::getInstance()->obj_index[oitem->item_number].virt > 27918)
           break;
         else
           obj = oitem; // Gold! Continue on to the next cases.
@@ -2088,11 +2088,11 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     int itemsleft = 0;

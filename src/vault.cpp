@@ -59,7 +59,7 @@ void vault_log(Character *ch, char *owner);
 QString clanVName(uint64_t clan_id);
 void vault_search_usage(Character *ch);
 
-extern struct index_data *obj_index;
+
 extern class Object *object_list;
 
 struct vault_data *has_vault(QString name)
@@ -2129,7 +2129,7 @@ void vault_list(Character *ch, QString owner)
 
     if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
     {
-      ch->send(QString(" [%1]").arg(obj_index[obj->item_number].virt));
+      ch->send(QString(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].virt));
     }
     ch->send("\r\n");
   }
@@ -2697,7 +2697,7 @@ int vault_search(Character *ch, const char *args)
 
         if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
         {
-          ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
+          ch->send(fmt::format(" [{}]", DC::getInstance()->obj_index[obj->item_number].virt));
         }
         ch->send("\r\n");
       } // for loop of objects

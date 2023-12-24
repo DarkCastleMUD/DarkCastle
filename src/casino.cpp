@@ -29,74 +29,27 @@
 #include "returnvals.h"
 #include "timeinfo.h"
 #include "DC.h"
+#include "casino.h"
 #include <algorithm>
 #include <fmt/format.h>
 
-extern Object *object_list;
-
-extern struct index_data *obj_index;
-
-void pulse_table_bj(struct table_data *tbl, int recall = 0);
-void reset_table(struct table_data *tbl);
-void nextturn(struct table_data *tbl);
+void pulse_table_bj(table_data *tbl, int recall = 0);
+void reset_table(table_data *tbl);
+void nextturn(table_data *tbl);
 void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
-void add_timer_bj_dealer(struct table_data *tbl);
-struct table_data;
+void add_timer_bj_dealer(table_data *tbl);
 void addtimer(struct timer_data *add);
-int hand_number(struct player_data *plr);
-int hands(struct player_data *plr);
+int hand_number(player_data *plr);
+int hands(player_data *plr);
 bool charExists(Character *ch);
 void reel_spin(varg_t, void *, void *);
 
 /*
    BLACKJACK!
 */
-
-struct player_data
+cDeck *create_deck(int decks)
 {
-   struct player_data *next;
-   struct table_data *table;
-   Character *ch;
-   int hand_data[21];
-   // theoretical cardmax is lower than 21, but whatever
-   int bet;
-   bool insurance;
-   bool doubled;
-   int state;
-};
-
-struct cDeck
-{
-   struct table_data *table;
-   int *cards;
-   int pos;
-   int decks;
-};
-
-struct table_data
-{
-   class Object *obj; // linked to obj
-   struct cDeck *deck;
-   struct player_data *plr;
-   struct player_data *cr; // current
-   bool gold;
-   int options;
-   Character *dealer;
-   int hand_data[21]; // dealer
-   int handnr;
-   int state;
-   int won;
-   int lost;
-};
-
-struct cDeck *create_deck(int decks)
-{
-   struct cDeck *Deck;
-#ifdef LEAK_CHECK
-   Deck = (struct cDeck *)calloc(1, sizeof(struct cDeck));
-#else
-   Deck = (struct cDeck *)dc_alloc(1, sizeof(struct cDeck));
-#endif
+   cDeck *Deck = new cDeck;
    Deck->cards = new int[decks * 52 + 1];
    Deck->decks = decks;
    Deck->pos = 0;
@@ -110,23 +63,23 @@ struct cDeck *create_deck(int decks)
    return Deck;
 }
 
-void freeDeck(struct cDeck *deck)
+void freeDeck(cDeck *deck)
 {
    delete[] deck->cards;
    dc_free(deck);
 }
 
-void switch_cards(struct cDeck *tDeck, int pos1, int pos2)
+void switch_cards(cDeck *tDeck, int pos1, int pos2)
 {
    int b = tDeck->cards[pos1];
    tDeck->cards[pos1] = tDeck->cards[pos2];
    tDeck->cards[pos2] = b;
 }
 
-void free_player(struct player_data *plr)
+void free_player(player_data *plr)
 {
-   struct player_data *tmp, *prev = nullptr;
-   struct table_data *tbl = plr->table;
+   player_data *tmp, *prev = nullptr;
+   table_data *tbl = plr->table;
    for (tmp = tbl->plr; tmp; tmp = tmp->next)
    {
       if (tmp == plr)
@@ -156,7 +109,7 @@ void free_player(struct player_data *plr)
    dc_free(plr);
 }
 
-void nextturn(struct table_data *tbl)
+void nextturn(table_data *tbl)
 {
    if (!tbl->plr)
    {
@@ -176,9 +129,9 @@ void nextturn(struct table_data *tbl)
    }
 }
 
-void send_to_table(QString msg, struct table_data *tbl, struct player_data *plrSilent = nullptr)
+void send_to_table(QString msg, table_data *tbl, player_data *plrSilent = nullptr)
 {
-   //  struct player_data *plr;
+   //  player_data *plr;
    /*  for (plr = tbl->plr ; plr ; plr = plr->next)
       if (verify(plr) && plrSilent != plr)
         plr->ch->send(msg);
@@ -203,7 +156,7 @@ bool charExists(Character *ch)
    }
 }
 
-bool verify(struct player_data *plr)
+bool verify(player_data *plr)
 {
    // make sure player didn't quit, die, or whatever
    // Character *ch;
@@ -233,10 +186,10 @@ bool verify(struct player_data *plr)
    return true;
 }
 
-void shuffle_deck(struct cDeck *tDeck)
+void shuffle_deck(cDeck *tDeck)
 { // this would not hold up to a test of true randomization, but then
    // neither would a real dealer shuffling a deck
-   struct player_data *plr;
+   player_data *plr;
    int pos = 0, i, v;
    if (tDeck->pos) // new deck otherwise
       for (plr = tDeck->table->plr; plr; plr = plr->next)
@@ -322,7 +275,7 @@ char *valstri(int card)
    }
 }
 
-bool canInsurance(struct player_data *plr)
+bool canInsurance(player_data *plr)
 {
    if (val(plr->table->hand_data[0]) == 1 &&
        plr->table->hand_data[2] == 0 &&
@@ -333,7 +286,7 @@ bool canInsurance(struct player_data *plr)
    return false;
 }
 
-bool canSplit(struct player_data *plr)
+bool canSplit(player_data *plr)
 {
    if (plr->hand_data[0] && val(plr->hand_data[0]) == val(plr->hand_data[1]) && !plr->hand_data[2] && plr->table->cr == plr)
       return true;
@@ -341,13 +294,13 @@ bool canSplit(struct player_data *plr)
    return false;
 }
 
-struct player_data *createPlayer(Character *ch, struct table_data *tbl, int noadd = 0)
+player_data *createPlayer(Character *ch, table_data *tbl, int noadd = 0)
 {
-   struct player_data *plr;
+   player_data *plr = new player_data;
 #ifdef LEAK_CHECK
-   plr = (struct player_data *)calloc(1, sizeof(struct player_data));
+   plr = (player_data *)calloc(1, sizeof(player_data));
 #else
-   plr = (struct player_data *)dc_alloc(1, sizeof(struct player_data));
+   plr = (player_data *)dc_alloc(1, sizeof(player_data));
 #endif
    plr->table = tbl;
    plr->ch = ch;
@@ -358,7 +311,7 @@ struct player_data *createPlayer(Character *ch, struct table_data *tbl, int noad
    plr->state = 0;
    if (!noadd)
    {
-      struct player_data *tmp;
+      player_data *tmp;
       for (tmp = tbl->plr; tmp; tmp = tmp->next)
          if (tmp->next == nullptr)
             break;
@@ -372,7 +325,7 @@ struct player_data *createPlayer(Character *ch, struct table_data *tbl, int noad
    return plr;
 }
 
-int pickCard(struct cDeck *deck)
+int pickCard(cDeck *deck)
 {
    if (deck->pos >= deck->decks * 52 - 1)
       shuffle_deck(deck);
@@ -380,14 +333,14 @@ int pickCard(struct cDeck *deck)
    return deck->cards[deck->pos++];
 }
 
-void freeHand(struct player_data *plr)
+void freeHand(player_data *plr)
 {
    int i;
    for (i = 0; i < 21; i++)
       plr->hand_data[i] = 0;
 }
 
-int hand_strength(struct player_data *plr)
+int hand_strength(player_data *plr)
 {
    int i, z = 0;
    for (i = 0; plr->hand_data[i] != 0; i++)
@@ -425,7 +378,7 @@ int hand_strength(struct player_data *plr)
    return z;
 }
 
-int hand_strength(struct table_data *tbl)
+int hand_strength(table_data *tbl)
 {
    int i, z = 0;
    for (i = 0; tbl->hand_data[i] != 0; i++)
@@ -453,7 +406,7 @@ int hand_strength(struct table_data *tbl)
    return z;
 }
 
-void dealcard(struct player_data *plr)
+void dealcard(player_data *plr)
 {
    // functions calling this should verify that the player can be dealt a card
    int i = 0;
@@ -465,9 +418,9 @@ void dealcard(struct player_data *plr)
 
 void check_active(varg_t arg1, void *arg2, void *arg3)
 {
-   struct player_data *plr = arg1.player;
-   struct table_data *tbl = (struct table_data *)arg3;
-   struct player_data *ptmp = nullptr;
+   player_data *plr = arg1.player;
+   table_data *tbl = (table_data *)arg3;
+   player_data *ptmp = nullptr;
    for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
       if (ptmp == plr)
          break;
@@ -497,13 +450,13 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
    }
    if ((uint64_t)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
    { // inactive
-      struct table_data *tbl = plr->table;
+      table_data *tbl = plr->table;
       Character *ch = plr->ch;
 
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Security removes a sleepy %s from the table.\r\n", GET_NAME(plr->ch));
       send_to_table(buf, tbl, plr);
-      struct player_data *tmp, *tnext;
+      player_data *tmp, *tnext;
       for (tmp = tbl->plr; tmp; tmp = tnext)
       {
          tnext = tmp->next;
@@ -530,7 +483,7 @@ void addtimer(struct timer_data *add)
    timer_list = add;
 }
 
-void add_timer(struct player_data *plr)
+void add_timer(player_data *plr)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -550,12 +503,12 @@ void add_timer(struct player_data *plr)
 
 void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
 { // hack so I don't have to bother
-   struct table_data *tbl = arg1.table;
+   table_data *tbl = arg1.table;
    tbl->state = 2;
    bj_dealer_ai(arg1, arg2, arg3);
 }
 
-void add_timer_bj_dealer(struct table_data *tbl)
+void add_timer_bj_dealer(table_data *tbl)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -573,7 +526,7 @@ void add_timer_bj_dealer(struct table_data *tbl)
    addtimer(timer);
 }
 
-void add_timer_bj_dealer2(struct table_data *tbl, int time = 10)
+void add_timer_bj_dealer2(table_data *tbl, int time = 10)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -591,12 +544,12 @@ void add_timer_bj_dealer2(struct table_data *tbl, int time = 10)
 }
 void bj_finish(varg_t arg1, void *arg2, void *arg3)
 {
-   struct table_data *tbl = arg1.table;
+   table_data *tbl = arg1.table;
    send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n", tbl->obj->in_room, true);
    tbl->state = 0;
 }
 
-void add_new_bets(struct table_data *tbl)
+void add_new_bets(table_data *tbl)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -610,7 +563,7 @@ void add_new_bets(struct table_data *tbl)
    addtimer(timer);
 }
 
-void reset_table(struct table_data *tbl)
+void reset_table(table_data *tbl)
 { // called both on error and regular reset
    while (tbl->plr)
       free_player(tbl->plr);
@@ -620,10 +573,10 @@ void reset_table(struct table_data *tbl)
       tbl->hand_data[i] = 0;
 }
 
-void check_winner(struct table_data *tbl)
+void check_winner(table_data *tbl)
 {
    int dealer = hand_strength(tbl);
-   struct player_data *plr, *next;
+   player_data *plr, *next;
    if (tbl->hand_data[2] == 0)
    {
       char buf[MAX_STRING_LENGTH];
@@ -697,7 +650,7 @@ void check_winner(struct table_data *tbl)
 
 void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
 {
-   struct table_data *tbl = arg1.table;
+   table_data *tbl = arg1.table;
    int a = (int64_t)arg2;
    char buf[MAX_STRING_LENGTH];
    if (a && tbl->handnr != a)
@@ -713,7 +666,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
               suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
               NTEXT);
       send_to_table(buf, tbl);
-      struct player_data *plr, *pnext;
+      player_data *plr, *pnext;
       for (plr = tbl->plr; plr; plr = pnext)
       { // check if all players have busted
          pnext = plr->next;
@@ -763,10 +716,10 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
    };
 }
 
-void check_blackjacks(struct table_data *tbl)
+void check_blackjacks(table_data *tbl)
 {
    std::string buf;
-   struct player_data *plr, *next;
+   player_data *plr, *next;
    if (hand_strength(tbl) == 21)
    {
       send_to_table("The dealer blackjacked!\r\n", tbl);
@@ -826,7 +779,7 @@ void check_blackjacks(struct table_data *tbl)
 
 void check_insurance2(varg_t arg1, void *arg2, void *arg3)
 {
-   struct table_data *tbl = arg1.table;
+   table_data *tbl = arg1.table;
 
    if (hand_strength(tbl) == 21)
    { // dealer blackjacked
@@ -842,7 +795,7 @@ void check_insurance2(varg_t arg1, void *arg2, void *arg3)
    }
 }
 
-void check_insurance(struct table_data *tbl)
+void check_insurance(table_data *tbl)
 {
    if (val(tbl->hand_data[0]) == 1)
    { // ace showing
@@ -867,7 +820,7 @@ void check_insurance(struct table_data *tbl)
       pulse_table_bj(tbl);
    }
 }
-char *hand_thing(struct player_data *plr)
+char *hand_thing(player_data *plr)
 {
    if (hands(plr) <= 1)
       return "";
@@ -876,7 +829,7 @@ char *hand_thing(struct player_data *plr)
    return &buf[0];
 }
 
-void pulse_table_bj(struct table_data *tbl, int recall)
+void pulse_table_bj(table_data *tbl, int recall)
 {
    /*  if (tbl->state)
      {
@@ -899,7 +852,7 @@ void pulse_table_bj(struct table_data *tbl, int recall)
       // new hand
       tbl->handnr++;
       send_to_table("The dealer passes out cards to everyone at the table.\r\n", tbl);
-      struct player_data *plr, *pnext;
+      player_data *plr, *pnext;
       for (plr = tbl->plr; plr; plr = pnext)
       {
          pnext = plr->next;
@@ -918,11 +871,11 @@ void pulse_table_bj(struct table_data *tbl, int recall)
 
 void create_table(class Object *obj)
 {
-   struct table_data *table;
+   table_data *table;
 #ifdef LEAK_CHECK
-   table = (struct table_data *)calloc(1, sizeof(struct table_data));
+   table = (table_data *)calloc(1, sizeof(table_data));
 #else
-   table = (struct table_data *)dc_alloc(1, sizeof(struct table_data));
+   table = (table_data *)dc_alloc(1, sizeof(table_data));
 #endif
    table->obj = obj;
    if (obj->obj_flags.value[2])
@@ -941,16 +894,16 @@ void create_table(class Object *obj)
    obj->table = table;
 }
 
-void destroy_table(struct table_data *tbl)
+void destroy_table(table_data *tbl)
 {
    tbl->obj->table = nullptr;
    reset_table(tbl);
    dc_free(tbl);
 }
 
-bool playing(Character *ch, struct table_data *tbl)
+bool playing(Character *ch, table_data *tbl)
 {
-   struct player_data *plr;
+   player_data *plr;
    for (plr = tbl->plr; plr; plr = plr->next)
       if (plr->ch == ch)
          return true;
@@ -958,9 +911,9 @@ bool playing(Character *ch, struct table_data *tbl)
    return false;
 }
 
-struct player_data *getPlayer(Character *ch, struct table_data *tbl)
+player_data *getPlayer(Character *ch, table_data *tbl)
 {
-   struct player_data *plr;
+   player_data *plr;
    if (tbl->cr && tbl->cr->ch == ch)
       return tbl->cr; // priority on current hand
    for (plr = tbl->plr; plr; plr = plr->next)
@@ -969,9 +922,9 @@ struct player_data *getPlayer(Character *ch, struct table_data *tbl)
    return nullptr;
 }
 
-int players(struct table_data *tbl)
+int players(table_data *tbl)
 {
-   struct player_data *plr;
+   player_data *plr;
    int i = 0;
    for (plr = tbl->plr; plr; plr = plr->next)
       i++;
@@ -1024,11 +977,11 @@ char *show_hand(int hand_data[21], int hide, bool ascii)
    return &buf[0];
 }
 
-// int hand_number(struct player_data *plr)
-int hands(struct player_data *plr)
+// int hand_number(player_data *plr)
+int hands(player_data *plr)
 {
    int i = 0;
-   for (struct player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
+   for (player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
    {
       if (plr->ch == ptmp->ch)
          i++;
@@ -1036,10 +989,10 @@ int hands(struct player_data *plr)
    return i;
 }
 
-int hand_number(struct player_data *plr)
+int hand_number(player_data *plr)
 {
    int i = 0;
-   for (struct player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
+   for (player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
    {
       if (plr->ch == ptmp->ch)
          i++;
@@ -1068,7 +1021,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    buf[0] = '\0';
    lineTwo[0] = '\0';
    lineTop[0] = '\0';
-   struct player_data *plr, *pnext;
+   player_data *plr, *pnext;
    for (plr = obj->table->plr; plr; plr = pnext)
    {
       pnext = plr->next;
@@ -1219,7 +1172,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
    }
 
-   struct player_data *plr = getPlayer(ch, obj->table);
+   player_data *plr = getPlayer(ch, obj->table);
 
    if (cmd == 189) // bet
    {
@@ -1310,7 +1263,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          {
             struct timer_data *tmr;
             for (tmr = timer_list; tmr; tmr = tmr->next)
-               if ((struct table_data *)tmr->arg1.table == obj->table)
+               if ((table_data *)tmr->arg1.table == obj->table)
                   tmr->timeleft = 1;
          }
       }
@@ -1451,7 +1404,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
          ch->removeGold(plr->bet);
       else
          GET_PLATINUM(ch) -= plr->bet;
-      struct player_data *nw = createPlayer(ch, plr->table, 1);
+      player_data *nw = createPlayer(ch, plr->table, 1);
       nw->next = plr->next;
       plr->next = nw;
       nw->bet = plr->bet;
@@ -1546,7 +1499,7 @@ struct tplayer
 
 struct ttable
 {
-   struct cDeck *deck;
+   cDeck *deck;
    struct pot *pots;
    struct tplayer *player[6];
    int cards[5]; // cards on the table
@@ -1979,8 +1932,9 @@ void pulse_holdem(struct ttbl *tbl)
 
 /* Slot Machines! */
 
-struct machine_data
+class machine_data
 {
+public:
    Object *obj;
    Character *prch;
    Character *ch;
@@ -2090,7 +2044,7 @@ void save_slot_machines()
    }
 
    for (int x = curr->firstnum; x <= curr->lastnum; x++)
-      write_object((Object *)obj_index[x].item, f);
+      write_object((Object *)DC::getInstance()->obj_index[x].item, f);
 
    // end file
    fprintf(f, "$~\n");
@@ -2100,11 +2054,11 @@ void save_slot_machines()
 
 void create_slot(Object *obj)
 {
-   struct machine_data *slot;
+   machine_data *slot;
 #ifdef LEAK_CHECK
-   slot = (struct machine_data *)calloc(1, sizeof(struct machine_data));
+   slot = (machine_data *)calloc(1, sizeof(machine_data));
 #else
-   slot = (struct machine_data *)dc_alloc(1, sizeof(struct machine_data));
+   slot = (machine_data *)dc_alloc(1, sizeof(machine_data));
 #endif
 
    slot->obj = obj;
@@ -2124,7 +2078,7 @@ void create_slot(Object *obj)
    obj->slot = slot;
 }
 
-bool verify_slot(struct machine_data *machine)
+bool verify_slot(machine_data *machine)
 {
    if (machine->ch->in_room == machine->obj->in_room)
       return true;
@@ -2132,7 +2086,7 @@ bool verify_slot(struct machine_data *machine)
    return false;
 }
 
-void update_linked_slots(struct machine_data *machine)
+void update_linked_slots(machine_data *machine)
 {
    char ldesc[MAX_STRING_LENGTH];
 
@@ -2144,7 +2098,7 @@ void update_linked_slots(struct machine_data *machine)
    // Find all the slot machines
    for (int i = 21906; i < 21918; i++)
    {
-      Object *slot_obj = (Object *)obj_index[real_object(i)].item;
+      Object *slot_obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
 
       // Find all the slot machines linked to the same slot machine as us
       // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2174,7 +2128,7 @@ void update_linked_slots(struct machine_data *machine)
    }
 }
 
-void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
+void slot_timer(machine_data *machine, int stop1, int stop2, int delay)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -2193,7 +2147,7 @@ void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
 
 void reel_spin(varg_t arg1, void *arg2, void *arg3)
 {
-   struct machine_data *machine = arg1.machine;
+   machine_data *machine = arg1.machine;
    int stop1 = (int64_t)arg2;
    int stop2 = (int64_t)arg3;
 
@@ -2250,13 +2204,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            ((Object *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            if (!ishashed(((Object *)obj_index[machine->obj->item_number].item)->description))
-               dc_free(((Object *)obj_index[machine->obj->item_number].item)->description);
-            ((Object *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            if (!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
+               dc_free(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description);
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
 
@@ -2280,13 +2234,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            ((Object *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            // if(!ishashed(((Object *)obj_index[machine->obj->item_number].item)->description))
+            // if(!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
             //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->description);
-            ((Object *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
       else if (payout)
@@ -2453,8 +2407,9 @@ struct roulette_player
    uint32_t bet_array[48];
 };
 
-struct wheel_data
+class wheel_data
 {
+public:
    Object *obj;
    struct roulette_player *plr[6];
    int countdown;
@@ -2463,11 +2418,11 @@ struct wheel_data
 
 void create_wheel(Object *obj)
 {
-   struct wheel_data *wheel;
+   wheel_data *wheel;
 #ifdef LEAK_CHECK
-   wheel = (struct wheel_data *)calloc(1, sizeof(struct wheel_data));
+   wheel = (wheel_data *)calloc(1, sizeof(wheel_data));
 #else
-   wheel = (struct wheel_data *)dc_alloc(1, sizeof(struct wheel_data));
+   wheel = (wheel_data *)dc_alloc(1, sizeof(wheel_data));
 #endif
    wheel->obj = obj;
    for (int i = 0; i < 6; i++)
@@ -2486,7 +2441,7 @@ void create_wheel(Object *obj)
    obj->wheel = wheel;
 }
 
-void send_wheel_bets(Character *ch, struct wheel_data *wheel)
+void send_wheel_bets(Character *ch, wheel_data *wheel)
 {
    int i, j;
    bool found = false;
@@ -2623,7 +2578,7 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
    return winnings;
 }
 
-void send_roulette_message(struct wheel_data *wheel)
+void send_roulette_message(wheel_data *wheel)
 {
    char buf[MAX_STRING_LENGTH];
 
@@ -2653,7 +2608,7 @@ void send_roulette_message(struct wheel_data *wheel)
    }
 }
 
-void wheel_stop(struct wheel_data *wheel)
+void wheel_stop(wheel_data *wheel)
 {
    int num = number(0, 36);
    uint32_t payout = 0;
@@ -2692,7 +2647,7 @@ void wheel_stop(struct wheel_data *wheel)
 
 void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
 
-void roulette_timer(struct wheel_data *wheel, int spin)
+void roulette_timer(wheel_data *wheel, int spin)
 {
    struct timer_data *timer;
 #ifdef LEAK_CHECK
@@ -2710,7 +2665,7 @@ void roulette_timer(struct wheel_data *wheel, int spin)
 
 void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
 {
-   struct wheel_data *wheel = arg1.wheel;
+   wheel_data *wheel = arg1.wheel;
    int spin = (int64_t)arg2;
    char buf[MAX_STRING_LENGTH];
 
