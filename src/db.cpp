@@ -3435,7 +3435,7 @@ int create_blank_item(int nr)
 	obj->name = str_hsh("empty obj");
 	obj->short_description = str_hsh("An empty obj");
 	obj->description = str_hsh("An empty obj sits here dejectedly.");
-	obj->action_description = str_hsh("Fixed.");
+	obj->ActionDescription("Fixed.");
 	obj->in_room = DC::NOWHERE;
 	obj->next_content = 0;
 	obj->next_skill = 0;
@@ -3840,12 +3840,12 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 
 	obj->description = fread_string(fl, 1);
 
-	obj->action_description = fread_string(fl, 1);
+	obj->ActionDescription(fread_string(fl, 1));
 	fl.skipWhiteSpace();
-	if (obj->action_description && obj->action_description[0] && (obj->action_description[0] < ' ' || obj->action_description[0] > '~'))
+	if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
 	{
-		logentry(QString("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->action_description));
-		obj->action_description[0] = '\0';
+		logentry(QString("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
+		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
 	curr_virtno = nr;
@@ -3873,7 +3873,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->num_affects = 0;
 	/* *** other flags *** */
 
-	if (nr == 2866 && obj->action_description && *obj->action_description && QString(obj->action_description).at(0) == 'P')
+	if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
 	{
 		qDebug("Debug point");
 	}
@@ -4000,11 +4000,11 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	}
 
 	obj->description = fread_string(fl, 1);
-	obj->action_description = fread_string(fl, 1);
-	if ((obj->action_description && (obj->action_description[0] < ' ' || obj->action_description[0] > '~')) && obj->action_description[0] != '\0')
+	obj->ActionDescription(fread_string(fl, 1));
+	if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->action_description);
-		obj->action_description[0] = '\0';
+		logf(IMMORTAL, LogChannels::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->ActionDescription().toStdString().c_str());
+		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
 	curr_virtno = nr;
@@ -4148,7 +4148,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 		obj->short_description = tmpptr;
 	}
 	obj->description = fread_string(in, 1);
-	obj->action_description = fread_string(in, 1);
+	obj->ActionDescription(fread_string(in, 1));
 	obj->table = 0;
 	curr_virtno = nr;
 	curr_name = obj->name;
@@ -4243,7 +4243,7 @@ void write_object(Object *obj, QTextStream &fl)
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->description);
-	string_to_file(fl, obj->action_description);
+	string_to_file(fl, obj->ActionDescription());
 
 	fl << obj->obj_flags.type_flag << " " << obj->obj_flags.extra_flags << " " << obj->obj_flags.wear_flags << " " << obj->obj_flags.size << "\n";
 	fl << obj->obj_flags.value[0] << " " << obj->obj_flags.value[1] << " " << obj->obj_flags.value[2] << " " << obj->obj_flags.value[3] << " " << obj->obj_flags.eq_level << "\n";
@@ -4284,7 +4284,7 @@ void write_object(Object *obj, FILE *fl)
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->description);
-	string_to_file(fl, obj->action_description);
+	string_to_file(fl, obj->ActionDescription());
 
 	fprintf(fl, "%d %d %d %d\n"
 				"%d %d %d %d %llu\n"
@@ -4334,7 +4334,7 @@ std::ofstream &operator<<(std::ofstream &out, Object *obj)
 	string_to_file(out, obj->name);
 	string_to_file(out, obj->short_description);
 	string_to_file(out, obj->description);
-	string_to_file(out, obj->action_description);
+	string_to_file(out, obj->ActionDescription());
 
 	out << int(obj->obj_flags.type_flag) << " "
 		<< obj->obj_flags.extra_flags << " "
@@ -4454,7 +4454,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 		fout << "\"" << obj->name << "\",";
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
 		fout << "\"" << quotequotes(obj->description) << "\",";
-		fout << "\"" << quotequotes(obj->action_description) << "\",";
+		fout << "\"" << quotequotes(obj->ActionDescription().toStdString().c_str()) << "\",";
 		fout << item_types[obj->obj_flags.type_flag].toStdString() << ",";
 		fout << obj->obj_flags.size << ",";
 		fout << obj->obj_flags.value[0] << ",";
@@ -6229,7 +6229,7 @@ void clear_object(class Object *obj)
 	obj->name = nullptr;
 	obj->description = nullptr;
 	obj->short_description = nullptr;
-	obj->action_description = nullptr;
+	obj->ActionDescription(QString());
 	obj->ex_description = nullptr;
 	obj->carried_by = nullptr;
 	obj->equipped_by = nullptr;

@@ -48,8 +48,6 @@
 extern Database db;
 #endif
 
-
-
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void restore_weight(class Object *obj);
@@ -1202,7 +1200,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
-    obj->action_description = str_hsh(buf);
+    obj->ActionDescription(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("COS", mod_type))
@@ -1496,12 +1494,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->short_description, sizeof(char), length, fpsave);
   }
-  if (obj->action_description && strcmp(obj->action_description, standard_obj->action_description))
+  if (!obj->ActionDescription().isEmpty() && obj->ActionDescription() != standard_obj->ActionDescription())
   {
     fwrite("ADE", sizeof(char), 3, fpsave);
-    length = strlen(obj->action_description);
+    length = obj->ActionDescription().length();
     fwrite(&length, sizeof(length), 1, fpsave);
-    fwrite(obj->action_description, sizeof(char), length, fpsave);
+    fwrite(obj->ActionDescription().toStdString().c_str(), sizeof(char), length, fpsave);
   }
 
   if (obj->obj_flags.cost != standard_obj->obj_flags.cost)

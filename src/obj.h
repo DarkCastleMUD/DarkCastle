@@ -261,7 +261,6 @@ public:
 
     char *description = {};                       /* When in room                     */
     char *short_description = {};                 /* when worn/carry/in cont.         */
-    char *action_description = {};                /* What to write when used          */
     struct extra_descr_data *ex_description = {}; /* extra descriptions     */
     Character *carried_by = {};                   /* Carried by :NULL in room/conta   */
     Character *equipped_by = {};                  /* so I can access the player :)    */
@@ -362,9 +361,15 @@ public:
     {
         return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
     }
+    void ActionDescription(QString action_description)
+    {
+        action_description_ = action_description;
+    }
+    QString ActionDescription(void) { return action_description_; }
 
 private:
     QString owner_;
+    QString action_description_ = {}; /* What to write when used          */
 };
 
 /* For 'equipment' */

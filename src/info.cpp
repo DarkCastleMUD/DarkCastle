@@ -57,7 +57,6 @@
 
 extern class Object *object_list;
 
-
 extern char credits[MAX_STRING_LENGTH];
 extern char info[MAX_STRING_LENGTH];
 extern char story[MAX_STRING_LENGTH];
@@ -227,10 +226,10 @@ void Character::show_obj_to_char(class Object *object, int mode)
    {
       if (object->obj_flags.type_flag == ITEM_NOTE)
       {
-         if (object->action_description)
+         if (!object->ActionDescription().isEmpty())
          {
-            strcpy(buffer, "There is something written upon it:\n\r\n\r");
-            strcat(buffer, object->action_description);
+            strncpy(buffer, "There is something written upon it:\n\r\n\r", sizeof(buffer) - 1);
+            strncat(buffer, object->ActionDescription().toStdString().c_str(), sizeof(buffer) - 1);
             page_string(this->desc, buffer, 1);
          }
          else

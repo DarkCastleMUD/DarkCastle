@@ -2191,7 +2191,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->action_description = str_hsh(buf4);
+    ((Object *)DC::getInstance()->obj_index[rnum].item)->ActionDescription(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }

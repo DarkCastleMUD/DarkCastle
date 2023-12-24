@@ -559,7 +559,7 @@ int do_write(Character *ch, char *argument, int cmd)
   {
     act("You can't write on $p.", ch, paper, 0, TO_CHAR, 0);
   }
-  else if (paper->action_description)
+  else if (!paper->ActionDescription().isEmpty())
     /*    else if (paper->item_number != real_object(1205) )  */
     ch->sendln("There's something written on it already.");
   else
@@ -568,7 +568,8 @@ int do_write(Character *ch, char *argument, int cmd)
 
     ch->sendln("Ok.. go ahead and write.. end the note with a \\@.");
     act("$n begins to jot down a note.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    ch->desc->strnew = &paper->action_description;
+    // TODO BROKEN
+    // ch->desc->strnew = &paper->ActionDescription();
     ch->desc->max_str = MAX_NOTE_LENGTH;
   }
   return eSUCCESS;
@@ -585,7 +586,7 @@ int do_insult(Character *ch, char *argument, int cmd)
 
   if (*arg)
   {
-    if (!(victim = ch->get_char_room_vis( arg)))
+    if (!(victim = ch->get_char_room_vis(arg)))
     {
       ch->sendln("Can't hear you!");
     }

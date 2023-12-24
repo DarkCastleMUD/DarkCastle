@@ -47,7 +47,7 @@
 /* External Structures / Variables */
 extern class Object *object_list;
 class Object *obj_proto;
- /* index table for object file   */
+/* index table for object file   */
 int16_t frozen_start_room = 1;
 
 /* Local Function Declerations */
@@ -127,12 +127,12 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 
 	int counter;
 	struct extra_descr_data *ex_desc;
-	char buf1[MAX_STRING_LENGTH + 1];
+	char buf1[MAX_STRING_LENGTH + 1]{};
 	// char buf2[256];
 
-	if (obj->action_description)
+	if (!obj->ActionDescription().isEmpty())
 	{
-		strcpy(buf1, obj->action_description);
+		strncpy(buf1, obj->ActionDescription().toStdString().c_str(), sizeof(buf1) - 1);
 		clean_string(buf1);
 	}
 	else
@@ -388,15 +388,16 @@ void load_corpses(void)
 					}
 				}
 
-				if ((temp->action_description = fread_string_new(fp, buf2)) == nullptr)
+				temp->ActionDescription(fread_string_new(fp, buf2));
+				if (temp->ActionDescription().isEmpty())
 				{
-					temp->action_description = "undefined";
+					temp->ActionDescription("undefined");
 				}
 				else
 				{
 					if (debug == 1)
 					{
-						sprintf(buf3, "   -ACT_DESC: %s\n", temp->action_description);
+						snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", temp->ActionDescription().toStdString().c_str());
 						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
