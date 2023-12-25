@@ -111,7 +111,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (ch->getLevel() < IMMORTAL)
+    if (ch->isMortal())
       ch->send(new_help);
     else
       ch->send(new_ihelp);

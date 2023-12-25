@@ -563,7 +563,7 @@ int do_highfive(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (victim->getLevel() < IMMORTAL)
+  if (victim->isMortal())
   {
     ch->sendln("What you wanna give a mortal a high-five for?! *smirk* ");
     return eFAILURE;

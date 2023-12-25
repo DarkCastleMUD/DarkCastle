@@ -1010,7 +1010,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
     {
       vch_next = vch->next_in_room;
 
-      if (vch->getLevel() < IMMORTAL && CAN_SEE(ch, vch))
+      if (vch->isMortal() && CAN_SEE(ch, vch))
       {
         vch->command_interpreter(QString(argument));
       }
@@ -1034,7 +1034,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 
     if (CAN_SEE(ch, victim))
     {
-      if (victim->getLevel() < IMMORTAL)
+      if (victim->isMortal())
         victim->command_interpreter(QString(argument));
       else
       {

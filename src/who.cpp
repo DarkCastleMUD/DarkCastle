@@ -589,7 +589,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
       {
         if (isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA) && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
-          if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->getLevel() < IMMORTAL)
+          if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortal())
             csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
           else
             csendf(ch, "%-20s\n\r", GET_NAME(tmp));
@@ -612,7 +612,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
     {
       if (isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
       {
-        if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->getLevel() < IMMORTAL)
+        if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortal())
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
                  GET_NAME(tmp),
                  tmp->getLevel(), tmp->getHP(), tmp->in_room, clan->name);

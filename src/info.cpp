@@ -1013,7 +1013,7 @@ bool identify(Character *ch, Object *obj)
    int i = 0, value = 0, bits = 0;
    bool found = false;
 
-   if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < IMMORTAL)
+   if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->isMortal())
    {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return false;

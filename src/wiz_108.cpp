@@ -263,7 +263,7 @@ int do_set(Character *ch, char *argument, int cmd)
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(Character *ch, char *argument, int cmd);
   //
-  //    if(ch->getLevel() < IMMORTAL || IS_NPC(ch)) {
+  //    if(ch->isMortal() || IS_NPC(ch)) {
   //      do_mortal_set(ch, argument, cmd);
   //      return;
   //    }

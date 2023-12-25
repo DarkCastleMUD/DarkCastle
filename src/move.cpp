@@ -513,7 +513,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 					if (ch->equipment[x])
 						if (ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
 							has_boat = true;
-			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && ch->getLevel() < IMMORTAL &&
+			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && ch->isMortal() &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
 				ch->sendln("You need a boat to go there.");
@@ -568,7 +568,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (ch->getLevel() < IMMORTAL)
+	if (ch->isMortal())
 	{
 		bool classRestrictions = false;
 		// Determine if any class restrictions are in place
@@ -643,7 +643,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (ch->getLevel() < IMMORTAL && IS_PC(ch))
+	if (ch->isMortal() && IS_PC(ch))
 		ch->decrementMove(need_movement);
 
 	// Everyone

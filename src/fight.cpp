@@ -1417,7 +1417,7 @@ int get_monk_bare_damage(Character *ch)
     dam = dice(5, 5);
   else if (ch->getLevel() < 61)
     dam = dice(6, 5);
-  else if (ch->getLevel() < IMMORTAL)
+  else if (ch->isMortal())
     dam = dice(10, 6);
   else if (ch->getLevel() < IMPLEMENTER)
     dam = dice(10, 10);
@@ -2548,7 +2548,7 @@ int damage(Character *ch, Character *victim,
   int pre_stoneshield_dam = 0;
   std::stringstream string1;
   struct affected_type *pspell = nullptr;
-  if (victim->getLevel() < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
+  if (victim->isMortal() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
   {
@@ -5614,7 +5614,7 @@ void raw_kill(Character *ch, Character *victim)
     GET_RDEATHS(victim) += 1;
 
     /* gods don't suffer from stat loss */
-    if (victim->getLevel() < IMMORTAL && victim->getLevel() > 19)
+    if (victim->isMortal() && victim->getLevel() > 19)
     {
       /* New death system... dying is a BITCH!  */
       // thief + mob kill = stat loss
@@ -6869,9 +6869,9 @@ void arena_kill(Character *ch, Character *victim, int type)
     affect_remove(victim, victim->affected, SUPPRESS_ALL);
   if (ch && arena.type == CHAOS)
   {
-    if (ch && ch->clan && ch->getLevel() < IMMORTAL)
+    if (ch && ch->clan && ch->isMortal())
       ch_clan = get_clan(ch);
-    if (victim->clan && victim->getLevel() < IMMORTAL)
+    if (victim->clan && victim->isMortal())
       victim_clan = get_clan(victim);
 
     if (type == KILL_BINGO)
@@ -6935,7 +6935,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     {
 
       if (isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
-        if (victim->clan == tmp->clan && victim != tmp && tmp->getLevel() < IMMORTAL)
+        if (victim->clan == tmp->clan && victim != tmp && tmp->isMortal())
           eliminated = 0;
     }
     if (eliminated)

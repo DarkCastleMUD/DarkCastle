@@ -283,7 +283,7 @@ int do_channel(Character *ch, char *arg, int cmd)
   {
     //    ch->sendln("");
 
-    if (ch->getLevel() < IMMORTAL)
+    if (ch->isMortal())
     {
       for (x = 7; x <= 14; x++)
       {
@@ -348,7 +348,7 @@ int do_channel(Character *ch, char *arg, int cmd)
       break;
   }
 
-  if (ch->getLevel() < IMMORTAL &&
+  if (ch->isMortal() &&
       (x < 7 || (x > 14 && x < 22)))
   {
     ch->sendln("That type was not found.");

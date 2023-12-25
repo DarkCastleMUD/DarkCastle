@@ -1002,7 +1002,7 @@ int do_drink(Character *ch, char *argument, int cmd)
         ch->addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (ch->getLevel() < IMMORTAL))
+      if (temp->obj_flags.value[3] && (ch->isMortal()))
       {
         /* The shit was poisoned ! */
         act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
@@ -1065,7 +1065,7 @@ int do_eat(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (ch->getLevel() < IMMORTAL))
+  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (ch->isMortal()))
   {
     act("Your stomach refuses to eat that!?!", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -1085,7 +1085,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   if (GET_COND(ch, FULL) > 20)
     act("You are full.", ch, 0, 0, TO_CHAR, 0);
 
-  if (temp->obj_flags.value[3] && (ch->getLevel() < IMMORTAL))
+  if (temp->obj_flags.value[3] && (ch->isMortal()))
   {
     /* The shit was poisoned ! */
     act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);

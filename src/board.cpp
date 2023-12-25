@@ -730,7 +730,7 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
       return;
     }
   }
-  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->isMortal() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
     return;
@@ -831,7 +831,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
       return eSUCCESS;
     }
   }
-  else if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  else if (board->second.type == CLASS_BOARD && ch->isMortal() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;
@@ -1016,7 +1016,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
       return eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->isMortal() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;
@@ -1089,7 +1089,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
       return eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && ch->getLevel() < IMMORTAL && GET_CLASS(ch) != board->second.owner)
+  if (board->second.type == CLASS_BOARD && ch->isMortal() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
     return eSUCCESS;

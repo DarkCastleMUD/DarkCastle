@@ -745,7 +745,7 @@ void update_wizlist(Character *ch)
 	{
 		if (wizlist[x].name[0] == '@')
 		{
-			if (ch->getLevel() < IMMORTAL)
+			if (ch->isMortal())
 				return;
 			dc_free(wizlist[x].name);
 			wizlist[x].name = str_dup(GET_NAME(ch));

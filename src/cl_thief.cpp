@@ -256,7 +256,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   }
   // success
   else if (
-      ((victim->getLevel() < IMMORTAL && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= this->getLevel() + 19) && ((IS_PC(this) && this->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((this->equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (this->equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
+      ((victim->isMortal() && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= this->getLevel() + 19) && ((IS_PC(this) && this->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((this->equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (this->equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -1916,7 +1916,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && ch->isMortal())
   {
     ch->sendln("Your body is still recovering from your last vitalstrike technique.");
     return eFAILURE;
@@ -2055,7 +2055,7 @@ int do_jab(Character *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if (ch->affected_by_spell(SKILL_JAB) && ch->getLevel() < IMMORTAL)
+  if (ch->affected_by_spell(SKILL_JAB) && ch->isMortal())
   {
     ch->sendln("Your arm is still sore from your last attempt.");
     return eFAILURE;
@@ -2386,7 +2386,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((ch->getLevel() < IMMORTAL) || IS_NPC(ch))
+  if ((ch->isMortal()) || IS_NPC(ch))
     if (!can_attack(ch) || !can_be_attacked(ch, vict))
       return eFAILURE;
 

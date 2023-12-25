@@ -398,7 +398,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   /* Drown BINGO Effect */
   if (skill > 80)
   {
-    if (number(1, 100) == 1 && victim->getLevel() < IMMORTAL)
+    if (number(1, 100) == 1 && victim->isMortal())
     {
       dam = victim->getHP() * 5 + 20;
       sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
@@ -4297,7 +4297,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   assert(ch && victim);
 
   if (isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
-      (victim->getLevel() >= IMMORTAL && ch->getLevel() < IMMORTAL))
+      (victim->getLevel() >= IMMORTAL && ch->isMortal()))
   {
     ch->sendln("Your vision is too clouded to make out anything.");
     return eFAILURE;
@@ -4350,7 +4350,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   }
 
   if (!OUTSIDE(victim) ||
-      (victim->getLevel() >= IMMORTAL && ch->getLevel() < IMMORTAL))
+      (victim->getLevel() >= IMMORTAL && ch->isMortal()))
   {
     ch->sendln("Your eagle cannot scan the area.");
     return eFAILURE;
@@ -11391,7 +11391,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
 
   if (bingo > 0)
   {
-    if (number(1, 100) <= bingo && victim->getLevel() < IMMORTAL)
+    if (number(1, 100) <= bingo && victim->isMortal())
     {
       dam = 9999999;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "

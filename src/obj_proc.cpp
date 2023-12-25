@@ -39,8 +39,6 @@
 
 #define EMOTING_FILE "emoting-objects.txt"
 
-
-
 extern class Object *object_list;
 
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -764,8 +762,8 @@ int drainingstaff(Character *ch, class Object *obj, int cmd, char *arg,
     {
       dam = vict->getHP() - 1;
     }
-    if (vict->affected_by_spell(SPELL_DIVINE_FURY)&& dam >vict->affected_by_spell( SPELL_DIVINE_FURY)->modifier)
-      dam =vict->affected_by_spell( SPELL_DIVINE_FURY)->modifier;
+    if (vict->affected_by_spell(SPELL_DIVINE_FURY) && dam > vict->affected_by_spell(SPELL_DIVINE_FURY)->modifier)
+      dam = vict->affected_by_spell(SPELL_DIVINE_FURY)->modifier;
     vict->removeHP(dam);
     GET_MANA(ch) += dam;
   }
@@ -808,7 +806,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   /* deposit */
   if (cmd == CMD_DEPOSIT)
   {
-    if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1403,7 +1401,7 @@ int pfe_word(Character *ch, class Object *obj, int cmd, const char *arg,
     // changed to spell_type_potion so that the align check doesn't happen for this item
     //      cast_protection_from_evil(ch->getLevel(), ch, 0, SPELL_TYPE_POTION, ch, 0,
     // 50);
-    if (IS_AFFECTED(ch, AFF_PROTECT_EVIL) ||ch->affected_by_spell( SPELL_PROTECT_FROM_GOOD))
+    if (IS_AFFECTED(ch, AFF_PROTECT_EVIL) || ch->affected_by_spell(SPELL_PROTECT_FROM_GOOD))
     {
       ch->sendln("You already have alignment protection.");
       return eFAILURE;
@@ -2047,7 +2045,7 @@ int portal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("magiskhal", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2108,7 +2106,7 @@ int full_heal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("heltlaka", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2190,7 +2188,7 @@ int fireshield_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("feuerschild", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2245,7 +2243,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("sbiadirsivia", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2313,7 +2311,7 @@ int alignment_word(Character *ch, class Object *obj, int cmd, char *arg,
 
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'moralevalore' into your hands.");
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2373,7 +2371,7 @@ int protection_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("protezione", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->getLevel() < IMMORTAL)
+  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
   {
     ch->sendln("The item seems to be recharging.");
     return true;
@@ -3824,35 +3822,38 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
   if (obj->obj_flags.value[3] < 0) // not active yet:)
     return eFAILURE;
 
-  if (cmd == CMD_SLIP)
+  if (vict->isMortal())
   {
-    vict->sendln("You can't slip anything when you have a hot potato! (sorry)");
-    return eSUCCESS;
-  }
-  if (cmd == CMD_DROP)
-  {
-    vict->sendln("You can't drop anything when you have a hot potato!");
-    return eSUCCESS;
-  }
-  if (cmd == CMD_DONATE)
-  {
-    vict->sendln("You can't donate anything when you have a hot potato!");
-    return eSUCCESS;
-  }
-  if (cmd == CMD_QUIT)
-  {
-    vict->sendln("You can't quit when you have a hot potato!");
-    return eSUCCESS;
-  }
-  if (cmd == CMD_SACRIFICE)
-  {
-    vict->sendln("You can't junk stuff when you have a hot potato!");
-    return eSUCCESS;
-  }
-  if (cmd == CMD_PUT)
-  {
-    vict->sendln("You can't 'put' stuff when you have a hot potato!");
-    return eSUCCESS;
+    if (cmd == CMD_SLIP)
+    {
+      vict->sendln("You can't slip anything when you have a hot potato! (sorry)");
+      return eSUCCESS;
+    }
+    if (cmd == CMD_DROP)
+    {
+      vict->sendln("You can't drop anything when you have a hot potato!");
+      return eSUCCESS;
+    }
+    if (cmd == CMD_DONATE)
+    {
+      vict->sendln("You can't donate anything when you have a hot potato!");
+      return eSUCCESS;
+    }
+    if (cmd == CMD_QUIT)
+    {
+      vict->sendln("You can't quit when you have a hot potato!");
+      return eSUCCESS;
+    }
+    if (cmd == CMD_SACRIFICE)
+    {
+      vict->sendln("You can't junk stuff when you have a hot potato!");
+      return eSUCCESS;
+    }
+    if (cmd == CMD_PUT)
+    {
+      vict->sendln("You can't 'put' stuff when you have a hot potato!");
+      return eSUCCESS;
+    }
   }
 
   if (cmd == CMD_GIVE)
@@ -3864,13 +3865,13 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     Character *give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
       return eFAILURE; // Not giving to char/mob, so ok
-    if (IS_MOB(give_vict))
+    if (IS_MOB(give_vict) && vict->isMortal())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && vict->getLevel() < IMMORTAL)
+        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && vict->isMortal())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
       return eSUCCESS;
@@ -4666,8 +4667,8 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
 
   int dam = 100;
 
-  if (victim->affected_by_spell(SPELL_DIVINE_INTER)&& dam >victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
-    dam =victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier;
+  if (victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+    dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   victim->removeHP(dam, ch);
   ch->addHP(dam, victim);
@@ -4736,8 +4737,8 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
   Character *victim = ch->fighting;
   dam = number(50, dam);
 
-  if (victim->affected_by_spell(SPELL_DIVINE_INTER)&& dam >victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier)
-    dam =victim->affected_by_spell( SPELL_DIVINE_INTER)->modifier;
+  if (victim->affected_by_spell(SPELL_DIVINE_INTER) && dam > victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier)
+    dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
   victim->removeHP(dam);
 
   update_pos(victim);
