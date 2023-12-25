@@ -136,7 +136,7 @@ void send_to_table(QString msg, table_data *tbl, player_data *plrSilent = nullpt
       if (verify(plr) && plrSilent != plr)
         plr->ch->send(msg);
      */
-   if (tbl->obj->in_room)
+   if (tbl && tbl->obj && tbl->obj->in_room)
    {
       send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
    }
