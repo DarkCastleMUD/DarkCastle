@@ -691,7 +691,88 @@ char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);
 void make_prompt(class Connection *d, std::string &prompt);
-std::string remove_all_codes(std::string input);
+
+template <typename T>
+T remove_all_codes(T input)
+{
+   size_t pos = 0, found_pos = 0, skip = 0;
+   while ((found_pos = input.find("$", pos)) != input.npos)
+   {
+      skip = 1;
+
+      if (found_pos + 1 <= input.length())
+      {
+         try
+         {
+            input.replace(found_pos, 1, "$$");
+            skip = 2;
+         }
+         catch (...)
+         {
+         }
+      }
+      pos = found_pos + skip;
+   }
+
+   return input;
+}
+
+template <typename T>
+T remove_non_color_codes(T input)
+{
+   T output = {};
+   size_t pos = 0, found_pos = 0;
+
+   try
+   {
+      while ((found_pos = input.find("$")) != input.npos)
+      {
+         if (found_pos + 1 == input.length())
+         {
+            output += input.substr(0, found_pos + 1);
+            output += "$";
+            input.erase(0, found_pos + 1);
+            output += input;
+            return output;
+         }
+
+         char code = input.at(found_pos + 1);
+         switch (code)
+         {
+         case '0':
+         case '1':
+         case '2':
+         case '3':
+         case '4':
+         case '5':
+         case '6':
+         case '7':
+         case '8':
+         case '9':
+         case 'I':
+         case 'L':
+         case '*':
+         case 'R':
+         case 'B':
+            output += input.substr(0, found_pos + 2);
+            input.erase(0, found_pos + 2);
+            break;
+         default:
+            output += input.substr(0, found_pos + 1);
+            output += "$";
+            input.erase(0, found_pos + 1);
+            break;
+         }
+      }
+      output += input;
+   }
+   catch (...)
+   {
+   }
+
+   return output;
+}
+
 void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
 bool str_infix(QString astr, QString bstr);
