@@ -7588,8 +7588,10 @@ int do_flee(Character *ch, char *argument, int cmd)
 
           // Since the move stops the fight between ch and ch->fighting we have to check_pursuit
           // against it separate than the combat_list loop
-          if (cmd == CMD_FLEE)
+          if (cmd == CMD_FLEE && last_fighting)
+          {
             last_fighting->check_pursuit(ch, tempcommand);
+          }
 
           // They got away.  Stop fighting for everyone not in the new room from fighting
           for (chTemp = combat_list; chTemp; chTemp = loop_ch)
