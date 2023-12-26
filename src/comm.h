@@ -6,7 +6,6 @@
 
 #include <string>
 
-
 typedef int socket_t;
 
 #define SEND_TO_Q(messg, desc) write_to_output((messg), desc)
@@ -68,6 +67,5 @@ void telnet_ga(Connection *d);
 void telnet_sga(Connection *d);
 void telnet_echo_off(class Connection *d);
 void telnet_echo_on(class Connection *d);
-std::string remove_non_color_codes(std::string input);
 
 #endif
