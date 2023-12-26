@@ -692,11 +692,23 @@ size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);
 void make_prompt(class Connection *d, std::string &prompt);
 
+qsizetype find(QString haystack, auto needle, qsizetype pos)
+{
+   return haystack.indexOf(needle, pos);
+}
+
+std::string::size_type find(std::string haystack, auto needle, std::string::size_type pos)
+{
+   return haystack.find(needle, pos);
+}
+
 template <typename T>
 T remove_all_codes(T input)
 {
-   size_t pos = 0, found_pos = 0, skip = 0;
-   while ((found_pos = input.find("$", pos)) != input.npos)
+   auto found_pos = find(input, "$", 0);
+   decltype(found_pos) pos{}, skip{};
+
+   while (found_pos != -1)
    {
       skip = 1;
 
@@ -704,7 +716,7 @@ T remove_all_codes(T input)
       {
          try
          {
-            input.replace(found_pos, 1, "$$");
+            input = input.replace(found_pos, 1, "$$");
             skip = 2;
          }
          catch (...)
@@ -712,6 +724,7 @@ T remove_all_codes(T input)
          }
       }
       pos = found_pos + skip;
+      found_pos = find(input, "$", pos);
    }
 
    return input;
@@ -720,55 +733,51 @@ T remove_all_codes(T input)
 template <typename T>
 T remove_non_color_codes(T input)
 {
+   auto found_pos = find(input, "$", 0);
+   decltype(found_pos) pos{};
+
    T output = {};
-   size_t pos = 0, found_pos = 0;
-
-   try
+   while (found_pos != -1)
    {
-      while ((found_pos = input.find("$")) != input.npos)
+      if (found_pos + 1 == input.length())
       {
-         if (found_pos + 1 == input.length())
-         {
-            output += input.substr(0, found_pos + 1);
-            output += "$";
-            input.erase(0, found_pos + 1);
-            output += input;
-            return output;
-         }
-
-         char code = input.at(found_pos + 1);
-         switch (code)
-         {
-         case '0':
-         case '1':
-         case '2':
-         case '3':
-         case '4':
-         case '5':
-         case '6':
-         case '7':
-         case '8':
-         case '9':
-         case 'I':
-         case 'L':
-         case '*':
-         case 'R':
-         case 'B':
-            output += input.substr(0, found_pos + 2);
-            input.erase(0, found_pos + 2);
-            break;
-         default:
-            output += input.substr(0, found_pos + 1);
-            output += "$";
-            input.erase(0, found_pos + 1);
-            break;
-         }
+         output += input.sliced(0, found_pos + 1);
+         output += "$";
+         input = input.remove(0, found_pos + 1);
+         output += input;
+         return output;
       }
-      output += input;
+
+      QChar code = input.at(found_pos + 1);
+      switch (code.toLatin1())
+      {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'I':
+      case 'L':
+      case '*':
+      case 'R':
+      case 'B':
+         output += input.sliced(0, found_pos + 2);
+         input = input.remove(0, found_pos + 2);
+         break;
+      default:
+         output += input.sliced(0, found_pos + 1);
+         output += "$";
+         input = input.remove(0, found_pos + 1);
+         break;
+      }
+      found_pos = find(input, "$", 0);
    }
-   catch (...)
-   {
-   }
+   output += input;
 
    return output;
 }
