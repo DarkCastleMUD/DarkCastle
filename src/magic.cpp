@@ -68,8 +68,6 @@ void update_pos(Character *victim);
 bool many_charms(Character *ch);
 bool ARE_GROUPED(Character *sub, Character *obj);
 
-
-
 bool player_resist_reallocation(Character *victim, int skill)
 {
   int savebonus = 0;
@@ -398,14 +396,24 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   /* Drown BINGO Effect */
   if (skill > 80)
   {
-    if (number(1, 100) == 1 && victim->isMortal())
+    if (number(1, 100) == 1)
     {
-      dam = victim->getHP() * 5 + 20;
-      sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
-      victim->send(buf);
-      act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
-      act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-      return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+      if (victim->isMortal())
+      {
+        dam = victim->getHP() * 5 + 20;
+        sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
+        victim->send(buf);
+        act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
+        act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
+        return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+      }
+      else if (victim->isImmortal())
+      {
+        victim->sendln(QString("%1 attempts to tear you apart with a watery blast but fails because you are an Immortal.").arg(ch->getName()));
+        act("$n attempts to tear $N apart with a watery blast but fails because they are an Immortal.", ch, 0, victim, TO_ROOM, NOTVICT);
+        act("$N is not torn apart by the force of your watery blast because they are an Immortal.", ch, 0, victim, TO_CHAR, 0);
+        return eSUCCESS;
+      }
     }
   }
   return eSUCCESS;
@@ -15579,8 +15587,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags,
-                CLAN_ROOM) ||
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
       isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
       isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
@@ -15739,8 +15746,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     ch->send("You manifest the missing components.\r\n");
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags,
-                CLAN_ROOM) ||
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) ||
       isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
       isSet(DC::getInstance()->world[ch->in_room].room_flags, NOLEARN))
   {
