@@ -259,9 +259,6 @@ int do_fall(Character *ch, short dir)
 		}
 	}
 
-	sprintf(damage, "%s falls from %d and sustains %d damage.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, dam);
-	logentry(damage, IMMORTAL, LogChannels::LOG_MORTAL);
-
 	switch (dir)
 	{
 	case 0:

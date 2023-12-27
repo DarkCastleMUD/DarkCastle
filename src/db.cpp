@@ -6024,7 +6024,7 @@ void free_char(Character *ch, Trace trace)
 	}
 	else
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, QString("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
+		// logf(IMMORTAL, LogChannels::LOG_BUG, QString("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
 	}
 
 	if (ch->title)
