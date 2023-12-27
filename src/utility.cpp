@@ -488,6 +488,11 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     send_to_gods(str, god_level, type);
 }
 
+void socketlog(QString message)
+{
+  logentry(message, IMMORTAL, LOG_SOCKET);
+}
+
 void buglog(QString message)
 {
   logentry(message, IMMORTAL, LOG_BUG);

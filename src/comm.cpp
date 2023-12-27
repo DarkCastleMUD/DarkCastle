@@ -2699,11 +2699,15 @@ int close_socket(class Connection *d)
         do_sing(d->character, "stop", CMD_DEFAULT);
 
       act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
-      sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
-              DC::getInstance()->world[d->character->in_room].number);
+
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
-        sprintf(buf, "%s with CQ.", buf);
-      logentry(buf, d->character->getLevel() > SERAPH ? d->character->getLevel() : SERAPH, LogChannels::LOG_SOCKET);
+      {
+        socketlog(QString("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+      }
+      else
+      {
+        socketlog(QString("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+      }
       d->character->desc = nullptr;
     }
     else
