@@ -367,7 +367,6 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
 
 int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
-  char buf[256];
   int dam, retval;
   int weap_spell = obj ? WIELD : 0;
 
@@ -390,9 +389,15 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
     return retval;
 
   if (isSet(retval, eEXTRA_VAL2))
+  {
     victim = ch;
+  }
+
   if (isSet(retval, eEXTRA_VALUE))
+  {
     return retval;
+  }
+
   /* Drown BINGO Effect */
   if (skill > 80)
   {
@@ -401,8 +406,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
       if (victim->isMortal())
       {
         dam = victim->getHP() * 5 + 20;
-        sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
-        victim->send(buf);
+        victim->sendln(QString("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
         act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
         return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
