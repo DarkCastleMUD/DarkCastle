@@ -926,7 +926,7 @@ void DC::game_loop_init(void)
                  return QHttpServerResponse(QString("str:%1 str2:%2\r\n").arg(str).arg(str2));
                });
 
-  server.route("/test", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
+  server.route("/test", [&dc](const QHttpServerRequest &request)
                {
     if (!dc->authenticate(request))
     {
@@ -939,6 +939,24 @@ void DC::game_loop_init(void)
     {
       // QJsonArray array = QJsonArray::fromStringList(myData);
 
+      return QHttpServerResponse(QString("Success.\r\n"));
+    }
+    else
+    {
+      return QHttpServerResponse("Failed.\r\n");
+    } });
+
+  server.route("/", [&dc](const QHttpServerRequest &request)
+               {
+    if (!dc->authenticate(request))
+    {
+      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+    }
+
+    auto future = QtConcurrent::run([]() {});
+
+    if (future.isValid())
+    {
       return QHttpServerResponse(QString("Success.\r\n"));
     }
     else
@@ -979,6 +997,16 @@ void DC::game_loop_init(void)
 
                  return QHttpServerResponse("Rebooting.\r\n"); });
 
+  server.afterRequest([](QHttpServerResponse &&resp, const QHttpServerRequest &request)
+                      { return std::move(resp); });
+
+  server.afterRequest([](const QHttpServerRequest &request, QHttpServerResponse &&resp)
+                      { return std::move(resp); });
+
+  server.afterRequest([](QHttpServerResponse &&resp)
+                      { return std::move(resp); });
+
+  QLoggingCategory::setFilterRules("qt.httpserver=true");
   server.listen(QHostAddress::LocalHost, 6980);
 
   exec();
