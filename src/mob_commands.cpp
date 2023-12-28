@@ -26,7 +26,6 @@
  *  such installation can be found in INSTALL.  Enjoy........    N'Atas-Ha *
  ***************************************************************************/
 
-
 #include <cctype>
 #include <cstring>
 
@@ -57,8 +56,6 @@
 #include "guild.h"
 
 // external vars
-
-
 
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
@@ -561,7 +558,6 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   char arg2[MAX_INPUT_LENGTH] = {0};
   Object *obj;
   int realnum;
-  
 
   if (IS_PC(ch))
   {
@@ -1240,7 +1236,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   QString temp = arguments.value(1);
   QString arg2 = arguments.value(2);
   QString arg3 = arguments.value(3);
-  if (arg[0] == '\0' || temp[0] == '\0' || arg2[0] == '\0')
+  if (arg.isEmpty() || temp.isEmpty() || arg2.isEmpty())
   {
     if (IS_NPC(this))
     {
