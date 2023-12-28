@@ -225,6 +225,11 @@ int main(int argc, char **argv)
   assert(remove_non_color_codes(QString("$B123$R")) == "$B123$R");
   assert(nocolor_strlen(QString("$B123$R")) == 3);
 
+  char arg[] = " start 1";
+  char name[MAX_STRING_LENGTH] = {};
+  half_chop(arg, arg, name);
+  assert(!strcmp(arg, "start"));
+  assert(!strcmp(name, "1"));
   exit(0);
   // char namelist[] = "chief enforcer bob";
   // qDebug() << isexact("enf", namelist) << isprefix("enf", namelist);
