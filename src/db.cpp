@@ -74,11 +74,6 @@ void write_wizlist(std::stringstream &filename);
 void write_wizlist(std::string filename);
 void write_wizlist(const char filename[]);
 
-/* load stuff */
-QString curr_type;
-QString curr_name;
-vnum_t curr_virtno;
-
 /**************************************************************************
  *  declarations of most of the 'global' variables                         *
  ************************************************************************ */
@@ -1023,7 +1018,7 @@ index_data *generate_mob_indices(int *top, index_data *index)
 					index[i].mobprogs = nullptr;
 					index[i].mobspec = nullptr;
 					index[i].progtypes = 0;
-					curr_virtno = index[i].virt;
+					DC::getInstance()->currentVNUM(index[i].virt);
 					if (!(index[i].item = (Character *)read_mobile(i, fl)))
 					{
 
@@ -1453,9 +1448,9 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		if (room_nr)
 		{
-			curr_virtno = room_nr;
-			curr_type = "Room";
-			curr_name = temp;
+			DC::getInstance()->currentVNUM(room_nr);
+			DC::getInstance()->currentType("Room");
+			DC::getInstance()->currentName(temp);
 
 			/* a new_new record to be read */
 
@@ -2385,9 +2380,9 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	// logentry("Reading zone", 0, LogChannels::LOG_BUG);
 
-	curr_virtno = tmp;
-	curr_type = "Zone";
-	curr_name = check;
+	DC::getInstance()->currentVNUM(tmp);
+	DC::getInstance()->currentType("Zone");
+	DC::getInstance()->currentName(check);
 
 	zone.Name(check);
 	zone.setBottom(last_top_vnum + 1);
@@ -2600,8 +2595,8 @@ Character *read_mobile(int nr, FILE *fl)
 
 	mob->setName(fread_string(fl, 1));
 	/* set up the fread debug stuff */
-	curr_type = "Mob";
-	curr_name = mob->getName();
+	DC::getInstance()->currentType("Mob");
+	DC::getInstance()->currentName(mob->getName());
 	mob->short_desc = fread_string(fl, 1);
 	mob->long_desc = fread_string(fl, 1);
 	mob->description = fread_string(fl, 1);
@@ -3848,9 +3843,9 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
-	curr_virtno = nr;
-	curr_name = obj->name;
-	curr_type = "Object";
+	DC::getInstance()->currentVNUM(nr);
+	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentType("Object");
 	obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
 	obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(fl);
 	obj->obj_flags.wear_flags = fread_int<decltype(obj->obj_flags.wear_flags)>(fl);
@@ -4007,9 +4002,9 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
-	curr_virtno = nr;
-	curr_name = obj->name;
-	curr_type = "Object";
+	DC::getInstance()->currentVNUM(nr);
+	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentType("Object");
 
 	/* *** numeric data *** */
 
@@ -4150,9 +4145,9 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	obj->description = fread_string(in, 1);
 	obj->ActionDescription(fread_string(in, 1));
 	obj->table = 0;
-	curr_virtno = nr;
-	curr_name = obj->name;
-	curr_type = "Object";
+	DC::getInstance()->currentVNUM(nr);
+	DC::getInstance()->currentName(obj->name);
+	DC::getInstance()->currentType("Object");
 
 	// numeric data
 
@@ -5495,7 +5490,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			qWarning() << QString("Reading %1").arg(DC::getInstance()->current());
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5517,8 +5512,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			sprintf(buf, "Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-			logentry(buf, 0, LogChannels::LOG_MISC);
+			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5537,8 +5531,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		}
 		else
 		{
-			sprintf(buf, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
-			logentry(buf, 0, LogChannels::LOG_MISC);
+			misclog(QString("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
 			perror("fread_bitvector: illegal character");
 			abort();
 		}
@@ -5599,8 +5592,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 			}
 			else
 			{
-				logf(IMMORTAL, LogChannels::LOG_BUG, "fread_bitvector: illegal character");
-				logf(IMMORTAL, LogChannels::LOG_BUG, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
+				buglog("fread_bitvector: illegal character");
+				buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 				throw;
 			}
 
@@ -5611,8 +5604,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 	}
 	catch (...)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "fread_bitvector: unknown error");
-		logf(IMMORTAL, LogChannels::LOG_BUG, "Reading %s: %s, %d", curr_type, curr_name, curr_virtno);
+		buglog("fread_bitvector: unknown error");
+		buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 		throw;
 	}
 	in.exceptions(orig_exceptions);
@@ -5631,7 +5624,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	{
 		if (ch == EOF)
 		{
-			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_int: premature EOF");
 			abort();
 		}
@@ -5644,8 +5637,6 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		// std::cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << std::endl;
-		// std::cerr << "fread_int: Bad value - < 0 on positive only num" << std::endl;
 		while (isdigit(getc(fl)))
 		{
 		}
@@ -5682,10 +5673,8 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 				else
 				{
 					printf("Buffer: '%s'\n", buf);
-					printf("Reading %s: %s, %d\n", curr_type, curr_name,
-						   curr_virtno);
-					printf("fread_int: Bad value for range %ld - %ld: %ld\n",
-						   beg_range, end_range, i);
+					buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					throw error_range_int();
 				}
@@ -5792,7 +5781,7 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 	{
 		if (ch == EOF)
 		{
-			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			qWarning() << "Reading" << DC::getInstance()->current();
 			perror("fread_int: premature EOF");
 			abort();
 		}
@@ -5805,8 +5794,6 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 
 	if (ch == '-' && beg_range >= 0)
 	{
-		// std::cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << std::endl;
-		// std::cerr << "fread_int: Bad value - < 0 on positive only num" << std::endl;
 		while (isdigit(getc(fl)))
 		{
 		}
@@ -5843,10 +5830,8 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 				else
 				{
 					printf("Buffer: '%s'\n", buf);
-					printf("Reading %s: %s, %d\n", curr_type, curr_name,
-						   curr_virtno);
-					printf("fread_int: Bad value for range %ld - %ld: %ld\n",
-						   beg_range, end_range, i);
+					buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					if (i < beg_range)
 					{
@@ -5876,7 +5861,7 @@ char fread_char(QTextStream &fl)
 {
 	if (fl.atEnd())
 	{
-		logentry(QString("Reading %1: %2, %3\n").arg(curr_type).arg(curr_name).arg(curr_virtno));
+		buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 		perror("fread_char: premature EOF");
 		abort();
 	}
@@ -5895,7 +5880,7 @@ char fread_char(FILE *fl)
 	{
 		if (ch == EOF)
 		{
-			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_char: premature EOF");
 			abort();
 		}

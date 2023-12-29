@@ -5,7 +5,6 @@
  *      Author: jhhudso
  */
 
-
 #include <cstring>
 #include <sstream>
 
@@ -19,8 +18,6 @@
 #include "db.h"
 #include "interp.h"
 #include "returnvals.h"
-
-
 
 Leaderboard::Leaderboard()
 {
@@ -64,13 +61,10 @@ void Leaderboard::check(void)
 	// check online players to the file and make sure the file is up to date
 	class Connection *d;
 	int i, j, k;
-	extern char *curr_type;
-	extern char *curr_name;
-	extern int curr_virtno;
 
-	curr_type = "leaderboard";
-	curr_name = "NA";
-	curr_virtno = 0;
+	DC::getInstance()->currentType("leaderboard");
+	DC::getInstance()->currentName("NA");
+	DC::getInstance()->currentVNUM(0);
 
 	read_file();
 
@@ -603,13 +597,10 @@ void Leaderboard::check_offline(void)
 {
 	Character *ch;
 	int i, j, k;
-	extern char *curr_type;
-	extern char *curr_name;
-	extern int curr_virtno;
 
-	curr_type = "leaderboard";
-	curr_name = "NA";
-	curr_virtno = 0;
+	DC::getInstance()->currentType("leaderboard");
+	DC::getInstance()->currentName("NA");
+	DC::getInstance()->currentVNUM(0);
 
 	for (const auto &ch : DC::getInstance()->character_list)
 	{

@@ -294,6 +294,23 @@ public:
   command_lag *getCommandLag(void) const { return command_lag_list_; }
   void setCommandLag(command_lag *cl) { command_lag_list_ = cl; }
 
+  [[nodiscard]] inline QString currentType(void) { return current_type_; }
+  void currentType(QString current_type) { current_type_ = current_type; }
+
+  [[nodiscard]] inline QString currentName(void) { return current_name_; }
+  void currentName(QString current_name) { current_name_ = current_name; }
+
+  [[nodiscard]] inline vnum_t currentVNUM(void) { return current_VNUM_; }
+  void currentVNUM(vnum_t current_VNUM) { current_VNUM_ = current_VNUM; }
+
+  void current(QString current_type, QString current_name, vnum_t current_VNUM)
+  {
+    currentType(current_type);
+    currentName(current_name);
+    currentVNUM(current_VNUM);
+  }
+  [[nodiscard]] inline QString current(void) { return QString("%1: %2, %3").arg(currentType()).arg(currentName()).arg(currentVNUM()); }
+
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
   CVoteData DCVote;
@@ -310,6 +327,9 @@ private:
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
   Database database_;
   command_lag *command_lag_list_{};
+  QString current_type_;
+  QString current_name_;
+  vnum_t current_VNUM_;
 
   void game_loop_init(void);
   void game_loop(void);
