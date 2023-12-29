@@ -44,7 +44,6 @@ char *valid_fields[] = {
 
 extern void wear(Character *, Object *, int);
 
-
 extern char *gl_item(Object *obj, int number, Character *ch, bool platinum);
 
 int load_quests(void)
@@ -961,7 +960,14 @@ int do_quest(Character *ch, char *arg, int cmd)
 {
    int retval = 0;
    char name[MAX_STRING_LENGTH];
+   char new_arg[MAX_STRING_LENGTH] = " ";
    Character *qmaster = get_mob_vnum(QUEST_MASTER);
+
+   if (arg && strlen(arg) > 0 && arg[0] != ' ')
+   {
+      strncat(new_arg, arg, sizeof(new_arg) - 1);
+      arg = new_arg;
+   }
 
    half_chop(arg, arg, name);
 
