@@ -409,7 +409,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     return eSUCCESS;
   }
   // Check social table
-  if ((retval = this->check_social(command)))
+  if ((retval = this->check_social(pcomm)))
   {
     if (SOCIAL_true_WITH_NOISE == retval)
       return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
@@ -1059,7 +1059,7 @@ command_return_t Character::special(QString arguments, int cmd)
       else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       {
         retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
-                                                               cmd, arguments.toStdString().c_str(), k));
+                                                                                  cmd, arguments.toStdString().c_str(), k));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
