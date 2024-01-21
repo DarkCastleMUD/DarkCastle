@@ -94,7 +94,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   else
   {
     // 1% bingo chance
-    if (number(1, 100) == 1 && victim->isMortal())
+    if (number(1, 100) == 1 && victim->isNPC())
     {
       time(&time_raw_format);
       ptr_time = localtime(&time_raw_format);
@@ -436,8 +436,8 @@ int do_stun(Character *ch, char *argument, int cmd)
     }
 
     act_return ar;
-    if (victim->affected_by_spell(SKILL_BATTLESENSE)&&
-        number(1, 100) <victim->affected_by_spell( SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
+        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
       ar = act("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, TO_CHAR, 0);
       retval = ar.retval;
