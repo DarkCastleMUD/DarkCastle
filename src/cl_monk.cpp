@@ -94,7 +94,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   else
   {
     // 1% bingo chance
-    if (number(1, 100) == 1 && victim->isNPC())
+    if (number(1, 100) == 1 && (victim->isNPC() || victim->isMortal()))
     {
       time(&time_raw_format);
       ptr_time = localtime(&time_raw_format);
