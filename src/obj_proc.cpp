@@ -330,7 +330,7 @@ int pushwand(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
   if (cmd == CMD_PUSH)
   {
-    if (str_cmp(arg, " wand") && str_cmp(arg, " ivory") && str_cmp(arg, " ebony"))
+    if (str_cmp(arg, "wand") && str_cmp(arg, "ivory") && str_cmp(arg, "ebony"))
       return eFAILURE;
     if (GET_STR(ch) < 20)
     {
@@ -362,7 +362,7 @@ int pushwand(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   else if (cmd == CMD_SAY)
   {
-    if (str_cmp(arg, " recharge"))
+    if (str_cmp(arg, "recharge"))
       return eFAILURE;
     class Object *curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
@@ -562,13 +562,13 @@ int orrowand(Character *ch, class Object *obj, int cmd, const char *arg, Charact
   switch (cmd)
   {
   case CMD_SAY:
-    if (str_cmp(arg, " recharge"))
+    if (str_cmp(arg, "recharge"))
     {
       return eFAILURE;
     }
     break;
   case CMD_PUSH:
-    if (str_cmp(arg, " button"))
+    if (str_cmp(arg, "button"))
     {
       return eFAILURE;
     }
@@ -1525,7 +1525,7 @@ int dancevest(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     return eFAILURE;
   }
-  do_say(ch, " just dance", CMD_SAY);
+  do_say(ch, "just dance", CMD_SAY);
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("The vest remains silent.");
@@ -1583,7 +1583,7 @@ int durendal(Character *ch, class Object *obj, int cmd, const char *arg,
     return eSUCCESS;
   }
 
-  if (cmd != CMD_SAY || !ch || !ch->in_room || str_cmp(arg, " Gods forgive me") || obj->equipped_by != ch)
+  if (cmd != CMD_SAY || !ch || !ch->in_room || str_cmp(arg, "Gods forgive me") || obj->equipped_by != ch)
   {
     return eFAILURE;
   }
