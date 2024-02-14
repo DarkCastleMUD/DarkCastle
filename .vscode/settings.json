@@ -74,7 +74,11 @@
         "span": "cpp",
         "format": "cpp",
         "stdfloat": "cpp",
-        "expected": "cpp"
+        "expected": "cpp",
+        "*.inc": "cpp",
+        "qtconcurrentdepends": "cpp",
+        "qtcoredepends": "cpp",
+        "qtdbusdepends": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
