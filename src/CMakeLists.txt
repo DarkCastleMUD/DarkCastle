@@ -135,7 +135,6 @@ add_library(DC SHARED
     act.h
     affect.h
     alias.h
-    arena.h
     bandwidth.h
     buildinfo.h
     character.h

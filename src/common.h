@@ -197,7 +197,6 @@ command_return_t do_assemble(Character *ch, char *argument, int cmd);
 command_return_t do_release(Character *ch, char *argument, int cmd);
 command_return_t do_jab(Character *ch, char *argument, int cmd);
 command_return_t do_areas(Character *ch, char *argument, int cmd);
-command_return_t do_arena(Character *ch, char *argument, int cmd);
 command_return_t do_ask(Character *ch, char *argument, int cmd);
 command_return_t do_at(Character *ch, char *argument, int cmd);
 command_return_t do_auction(Character *ch, char *argument, int cmd);

@@ -50,7 +50,6 @@
 #include "comm.h"
 #include "returnvals.h"
 #include "innate.h"
-#include "arena.h"
 #include "race.h"
 #include "const.h"
 #include "guild.h"
@@ -554,6 +553,7 @@ int do_mpmload(Character *ch, char *argument, int cmd)
 
 int do_mpoload(Character *ch, char *argument, int cmd)
 {
+  auto &arena = DC::getInstance()->arena_;
   char arg1[MAX_INPUT_LENGTH] = {0};
   char arg2[MAX_INPUT_LENGTH] = {0};
   Object *obj;
@@ -581,7 +581,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen())
   {
     return eFAILURE;
   }

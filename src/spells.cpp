@@ -22,7 +22,6 @@
  ***************************************************************************/
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
-
 #include <cstring>
 #include <cstdio>
 #include <cassert>
@@ -47,7 +46,6 @@
 #include "returnvals.h"
 #include "ki.h"
 #include "sing.h"
-#include "arena.h"
 #include "clan.h"
 
 // Global data
@@ -66,14 +64,12 @@ extern struct class_skill_defines m_skills[];
 extern struct song_info_type song_info[];
 extern char *spell_wear_off_msg[];
 
-
 // Functions used in spells.C
 int spl_lvl(int lev);
 
 // Extern procedures
 void make_dust(Character *ch);
 int say_spell(Character *ch, int si, int room = 0);
-
 
 #if (0)
 uint8_t beats;               /* Waiting time after spell     */
@@ -1240,7 +1236,7 @@ void die_follower(Character *ch)
     zombie = k->follower;
     if (!ISSET(zombie->affected_by, AFF_GOLEM))
     {
-      if  (zombie->affected_by_spell( SPELL_CHARM_PERSON))
+      if (zombie->affected_by_spell(SPELL_CHARM_PERSON))
         affect_from_char(zombie, SPELL_CHARM_PERSON);
       stop_follower(zombie, STOP_FOLLOW);
     }
@@ -1547,7 +1543,7 @@ int do_release(Character *ch, char *argument, int cmd)
       if (aff->type > MAX_SPL_LIST)
         continue;
       if (!isSet(spell_info[aff->type].targets,
-                     TAR_SELF_DEFAULT) &&
+                 TAR_SELF_DEFAULT) &&
           aff->type != SPELL_HOLY_AURA)
         continue;
       if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
@@ -1800,7 +1796,7 @@ bool check_conc_loss(Character *ch, int spl)
 {
   struct affected_type *af;
   int afspl;
-  if (!(af =ch->affected_by_spell( CONC_LOSS_FIXER)))
+  if (!(af = ch->affected_by_spell(CONC_LOSS_FIXER)))
     return false;
 
   afspl = af->modifier;
@@ -1928,7 +1924,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     ch->sendln("Your lips do not move, no magic appears.");
     return eFAILURE;
   }
-  if (spl == SPELL_DIVINE_INTER &&ch->affected_by_spell( SPELL_DIV_INT_TIMER))
+  if (spl == SPELL_DIVINE_INTER && ch->affected_by_spell(SPELL_DIV_INT_TIMER))
   {
     ch->sendln("The gods are unwilling to intervene on your behalf again so soon.");
     return eFAILURE;
@@ -2076,7 +2072,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Reduce timer on paralyze even the victim is hit by a lightning bolt
           affected_type *af;
-          if ((af = tar_char->affected_by_spell(SPELL_PARALYZE))!= nullptr)
+          if ((af = tar_char->affected_by_spell(SPELL_PARALYZE)) != nullptr)
           {
             af->duration--;
             if (af->duration <= 0)
@@ -2427,8 +2423,8 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (check_conc_loss(ch, spl))
           chance = 99;
 
-        if (IS_AFFECTED(ch, AFF_CRIPPLE) &&ch->affected_by_spell( SKILL_CRIPPLE))
-          chance -= 1 +ch->affected_by_spell( SKILL_CRIPPLE)->modifier / 10;
+        if (IS_AFFECTED(ch, AFF_CRIPPLE) && ch->affected_by_spell(SKILL_CRIPPLE))
+          chance -= 1 + ch->affected_by_spell(SKILL_CRIPPLE)->modifier / 10;
 
         if (ch->isMortal() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
@@ -2449,7 +2445,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           return eSUCCESS;
         }
 
-        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) &&ch->affected_by_spell( SPELL_INVISIBLE))
+        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && ch->affected_by_spell(SPELL_INVISIBLE))
         {
           act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
           affect_from_char(ch, SPELL_INVISIBLE);
@@ -2506,7 +2502,8 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Prize Arena
-          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
+          auto &arena = DC::getInstance()->arena_;
+          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPrize() && spl != 88)
           {
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
@@ -2534,7 +2531,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Clan Chaos
-          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
+          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isChaos() && spl != 88)
           {
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
@@ -2607,7 +2604,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           argument = strdup("communegroupspell");
           argument_ptr = argument;
         }
-        else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY)&&tar_char->affected_by_spell( SPELL_IMMUNITY)->modifier == spl - 1)
+        else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
         {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);

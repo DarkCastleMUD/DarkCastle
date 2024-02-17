@@ -268,6 +268,7 @@ const QList<Command> Commands::commands_ =
         {"vote", do_vote, nullptr, nullptr, position_t::RESTING, 0, CMD_VOTE, 0, 0, CommandType::all},
         {"huntitems", do_showhunt, nullptr, nullptr, position_t::RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"random", do_random, nullptr, nullptr, position_t::RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
+        {"arena", nullptr, nullptr, &Character::do_arena, position_t::DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::players_only},
         // Special procedure commands
 
         {"vend", do_vend, nullptr, nullptr, position_t::STANDING, 2, CMD_VEND, 0, 0, CommandType::all},
@@ -361,7 +362,6 @@ const QList<Command> Commands::commands_ =
         {"log", do_log, nullptr, nullptr, position_t::DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"snoop", nullptr, nullptr, &Character::do_snoop, position_t::DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"pview", do_pview, nullptr, nullptr, position_t::DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"arena", do_arena, nullptr, nullptr, position_t::DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"load", do_load, nullptr, nullptr, position_t::DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"prize", do_load, nullptr, nullptr, position_t::DEAD, GIFTED_COMMAND, CMD_PRIZE, 0, 1, CommandType::all},
         {"test", nullptr, nullptr, &Character::do_test, position_t::DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},

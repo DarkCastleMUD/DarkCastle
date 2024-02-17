@@ -50,10 +50,8 @@
 #include "db.h"
 #include "act.h"
 #include "clan.h"
-#include "arena.h"
 #include "innate.h"
 #include "returnvals.h"
-#include "arena.h"
 #include "const.h"
 #include "inventory.h"
 #include "obj.h"
@@ -1680,6 +1678,7 @@ int spell_divine_fury(uint8_t level, Character *ch, Character *victim, class Obj
 // TODO - make this spell have an effect based on skill level
 int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
+  auto &arena = DC::getInstance()->arena_;
   room_t to_room;
   char buf[100];
   extern room_t top_of_world; /* ref to the top element of world */
@@ -1691,7 +1690,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
   {
     ch->sendln("You can't teleport in potato arenas!");
     return eFAILURE;
@@ -1717,9 +1716,9 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
   {
     // If the ch is in a general arena and self-teleporting, there's a 25% chance they will teleport to the deathtrap.
-    if (ch == victim && ch->in_room >= ARENA_LOW && ch->in_room <= ARENA_HIGH && number(1, 4) == 1)
+    if (ch == victim && ch->in_room >= Arena::ARENA_LOW && ch->in_room <= Arena::ARENA_HIGH && number(1, 4) == 1)
     {
-      to_room = real_room(ARENA_DEATHTRAP);
+      to_room = real_room(Arena::ARENA_DEATHTRAP);
     }
     else
     {
@@ -2274,6 +2273,7 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
 
 int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
+  auto &arena = DC::getInstance()->arena_;
   struct affected_type af;
   int retval;
 
@@ -2299,7 +2299,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       return eFAILURE;
 
     // Curse in a prize arena follows rules of offensive spells
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.isPrize() || arena.isChaos()))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -2386,7 +2386,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     }
 
     // Curse in a prize arena follows rules of offensive spells
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS))
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.isPrize() || arena.isChaos()))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;

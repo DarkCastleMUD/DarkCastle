@@ -11,6 +11,7 @@
 #include "DC.h"
 #include "db.h"
 #include "Version.h"
+#include "character.h"
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
@@ -303,4 +304,88 @@ auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_co
 		}
 	}
 	return std::unexpected(search_error::not_found);
+}
+
+command_return_t Character::do_arena_info(QStringList arguments)
+{
+	sendln("Arena info:");
+	return command_return_t();
+}
+
+command_return_t Character::do_arena_start(QStringList arguments)
+{
+	/*
+	if (*arg4)
+  {
+	if (!strcmp(arg4, "chaos"))
+	{
+	  arena.type = CHAOS; // -2
+	  sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
+	  send_info(buf);
+	  logf(IMMORTAL, LogChannels::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
+	}
+
+	if (!strcmp(arg4, "potato"))
+	{
+	  arena.type = POTATO; // -3
+	  sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
+	  send_info(buf);
+	}
+
+	if (!strcmp(arg4, "prize"))
+	{
+	  arena.type = PRIZE; // -3
+	  sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
+	  send_info(buf);
+	}
+
+	if (!strcmp(arg4, "hp"))
+	{
+	  if (*arg5)
+	  {
+		arena.hplimit = atoi(arg5);
+		if (arena.hplimit <= 0)
+		  arena.hplimit = 1000;
+	  }
+	  else
+		arena.hplimit = 1000;
+
+	  arena.type = HP; // -4
+	  sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
+	  send_info(buf);
+	}
+  }
+  else
+  {
+	arena.type = NORMAL;
+  }
+	ch->sendln("The Arena has been opened for the specified levels.");
+  */
+	sendln("Arena start:");
+	return command_return_t();
+}
+
+command_return_t Character::do_arena_join(QStringList arguments)
+{
+	sendln("Arena join:");
+	return command_return_t();
+}
+
+command_return_t Character::do_arena_cancel(QStringList arguments)
+{
+	sendln("Arena cancel:");
+	return command_return_t();
+}
+
+command_return_t Character::do_arena_usage(QStringList arguments)
+{
+	sendln("Usage:");
+	sendln("arena info          - Shows current arena status");
+	sendln("arena start         - Start an arena open to anyone for free");
+	sendln("arena start # gold  - Start an arena open to anyone whom pays # gold. Winner takes all.");
+	sendln("arena join          - Join an arena that's free to play");
+	sendln("arena join # gold   - Join an arena by paying the entrance fee of # gold");
+	sendln("arena cancel        - Cancel an arena");
+
+	return command_return_t();
 }

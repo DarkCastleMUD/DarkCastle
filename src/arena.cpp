@@ -21,124 +21,47 @@
 #include "act.h"
 #include "punish.h"
 #include "player.h"
-#include "arena.h"
+
 #include "returnvals.h"
 #include "levels.h"
 
-struct _arena arena;
-
-int do_arena(Character *ch, char *argument, int cmd)
+command_return_t Character::do_arena(QStringList arguments, int cmd)
 {
-  char arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], buf[256];
-  int low, high;
-
-  if (!ch->has_skill(COMMAND_ARENA))
+  auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
+  if (isMortal() && !rufus)
   {
-    ch->sendln("Huh?");
+    sendln("You must be in the same room as Rufus the Arena-keeper to use this command.");
     return eFAILURE;
   }
 
-  argument = one_argument(argument, arg1);
-  argument = one_argument(argument, arg2);
-  argument = one_argument(argument, arg3);
-  argument = one_argument(argument, arg4);
-  one_argument(argument, arg5);
-
-  if (!*arg1 || !*arg2)
+  QString arg1 = arguments.value(0);
+  if (arg1.isEmpty())
   {
-    sprintf(buf, "Currently open for levels: %d %d\n\r", arena.low, arena.high);
-    ch->send(buf);
-    send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type] [hp limit if applicable]\n\r"
-                 "Valid types: chaos, potato, prize, hp\n\r"
-                 "Use -1 for no limit on number of mortals.\r\n"
-                 "Use arena 0 0 to close the arena.\r\n"
-                 "Do *NOT* leave the arena open, people will be stuck there forever!\n\r"
-                 "Also the arena can be opened without specifying the number"
-                 " of mortals allowed to join.\r\n",
-                 ch);
-    return eSUCCESS;
+    return do_arena_usage(arguments);
   }
+  arguments.pop_front();
 
-  if (!(low = atoi(arg1)) || !(high = atoi(arg2)) || low > high)
+  if (arg1 == "info")
   {
-    arena.low = 0;
-    arena.high = 0;
-    arena.status = CLOSED;
-    ch->sendln("Closing the arena.");
-    send_info("## The Arena has been CLOSED!\n\r");
-    return eSUCCESS;
+    return do_arena_info(arguments);
   }
-
-  arena.low = low;
-  arena.high = high;
-  arena.status = OPENED;
-  sprintf(buf, "## The Arena has been OPENED for levels %d - %d.\r\n"
-               "## Type JOINARENA to enter the Bloodbath!\n\r",
-          low, high);
-  send_info(buf);
-
-  if (*arg3)
+  else if (arg1 == "start")
   {
-    arena.num = atoi(arg3);
-    if (arena.num > 0)
-    {
-      sprintf(buf, "## Only %d can join the bloodbath!\n\r", arena.num);
-      send_info(buf);
-    }
+    return do_arena_start(arguments);
+  }
+  else if (arg1 == "join")
+  {
+    return do_arena_join(arguments);
+  }
+  else if (arg1 == "cancel")
+  {
+    return do_arena_cancel(arguments);
   }
   else
   {
-    arena.num = 0;
+    return do_arena_usage(arguments);
   }
 
-  arena.cur_num = 0;
-
-  if (*arg4)
-  {
-    if (!strcmp(arg4, "chaos"))
-    {
-      arena.type = CHAOS; // -2
-      sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
-      send_info(buf);
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
-    }
-
-    if (!strcmp(arg4, "potato"))
-    {
-      arena.type = POTATO; // -3
-      sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
-      send_info(buf);
-    }
-
-    if (!strcmp(arg4, "prize"))
-    {
-      arena.type = PRIZE; // -3
-      sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
-      send_info(buf);
-    }
-
-    if (!strcmp(arg4, "hp"))
-    {
-      if (*arg5)
-      {
-        arena.hplimit = atoi(arg5);
-        if (arena.hplimit <= 0)
-          arena.hplimit = 1000;
-      }
-      else
-        arena.hplimit = 1000;
-
-      arena.type = HP; // -4
-      sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
-      send_info(buf);
-    }
-  }
-  else
-  {
-    arena.type = NORMAL;
-  }
-
-  ch->sendln("The Arena has been opened for the specified levels.");
   return eSUCCESS;
 }
 
@@ -150,7 +73,8 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   int pot_low = 6362;
   int pot_hi = 6379;
 
-  if (arena.low > ch->getLevel() || arena.high < ch->getLevel())
+  auto &arena = DC::getInstance()->arena_;
+  if (arena.Low() > ch->getLevel() || arena.High() < ch->getLevel())
   {
     ch->sendln("The arena is not open for anyone your level.");
     return eFAILURE;
@@ -160,13 +84,12 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("You have been banned from arenas.");
     return eFAILURE;
   }
-
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     ch->sendln("They don't allow criminals in the arena.");
     return eFAILURE;
   }
-  if (arena.type == CHAOS && !ch->clan)
+  if (arena.isChaos() && !ch->clan)
   {
     ch->sendln("Only clan members may join this arena.");
     return eFAILURE;
@@ -176,12 +99,12 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("You are already there!");
     return eFAILURE;
   }
-  if (arena.cur_num >= arena.num && arena.num > 0)
+  if (arena.CurrentNumber() >= arena.Number() && arena.Number() > 0)
   {
     ch->sendln("The arena is already full!");
     return eFAILURE;
   }
-  if (arena.type == HP && GET_RAW_HIT(ch) > arena.hplimit)
+  if (arena.isHP() && GET_RAW_HIT(ch) > arena.HPLimit())
   {
     ch->sendln("You are too strong for this arena!");
     return eFAILURE;
@@ -198,7 +121,7 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->wake();
   }
 
-  arena.cur_num++;
+  arena.IncrementCurrentNumber();
   for (af = ch->affected; af; af = next_af)
   {
     next_af = af->next;
@@ -217,13 +140,13 @@ int do_joinarena(Character *ch, char *arg, int cmd)
   act("$n disappears in a glorious flash of heroism.", ch, 0, 0, TO_ROOM, 0);
   while (send_to == DC::NOWHERE)
   {
-    if (arena.type == POTATO)
+    if (arena.isPotato())
     { // potato arena
       send_to = real_room(number(pot_low, pot_hi));
     }
     else
     {
-      send_to = real_room(number(ARENA_LOW, ARENA_HIGH - 1));
+      send_to = real_room(number(Arena::ARENA_LOW, Arena::ARENA_HIGH - 1));
     }
   }
   if (move_char(ch, send_to) == 0)
@@ -237,7 +160,8 @@ int do_joinarena(Character *ch, char *arg, int cmd)
 
 bool ArenaIsOpen()
 {
-  if (arena.status == OPENED)
+  auto &arena = DC::getInstance()->arena_;
+  if (arena.isOpened())
     return true;
   else
     return false;

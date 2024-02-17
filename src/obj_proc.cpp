@@ -30,7 +30,6 @@
 #include "spells.h"
 #include "returnvals.h"
 #include "set.h"
-#include "arena.h"
 #include "race.h"
 #include "const.h"
 #include "inventory.h"
@@ -3784,6 +3783,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
 int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *invoker)
 {
+  auto &arena = DC::getInstance()->arena_;
   extern room_t top_of_world;
   int dropped = 0;
   Character *vict = nullptr;
@@ -3809,7 +3809,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen())
+        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen())
     {
       vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
       return eSUCCESS;
@@ -3871,7 +3871,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && vict->isMortal())
+        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen() && vict->isMortal())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
       return eSUCCESS;
@@ -3943,7 +3943,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     extract_obj(obj);
     if (!isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA))
       fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
-    else if (arena.type == POTATO)
+    else if (arena.isPotato())
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
     else
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);

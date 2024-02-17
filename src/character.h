@@ -889,6 +889,12 @@ public:
     command_return_t do_mpsettemp(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_bestow(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_alias(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_arena(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_arena_info(QStringList arguments);
+    command_return_t do_arena_start(QStringList arguments);
+    command_return_t do_arena_join(QStringList arguments);
+    command_return_t do_arena_cancel(QStringList arguments);
+    command_return_t do_arena_usage(QStringList arguments);
 
     command_return_t wake(Character *victim = nullptr);
     command_return_t oprog_command_trigger(QString command, QString arguments);

@@ -21,7 +21,6 @@
 #include <cstring> // strstr()
 #include "returnvals.h"
 #include "interp.h"
-#include "arena.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // external vars
@@ -81,8 +80,9 @@ char *innate_skills[] =
 // command functions
 int do_innate(Character *ch, char *arg, int cmd)
 {
+  auto &arena = DC::getInstance()->arena_;
   if (ch && ch->in_room > 0 &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
   {
     ch->sendln("Cannot use innate skills within a potato arena.");
     return eFAILURE;

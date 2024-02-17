@@ -22,7 +22,6 @@
 #include <cstring>
 #include "returnvals.h"
 #include "clan.h"
-#include "arena.h"
 #include "const.h"
 #include "inventory.h"
 
@@ -613,10 +612,11 @@ int do_trip(Character *ch, char *argument, int cmd)
 
 int do_sneak(Character *ch, char *argument, int cmd)
 {
+
+  auto &arena = DC::getInstance()->arena_;
   affected_type af;
 
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -719,7 +719,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
 
 int do_hide(Character *ch, char *argument, int cmd)
 {
-
+  auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
   {
     if (cmd != 12)
@@ -728,7 +728,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;

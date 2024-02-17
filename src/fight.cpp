@@ -55,7 +55,6 @@
 #include "innate.h"
 #include "token.h"
 #include "vault.h"
-#include "arena.h"
 #include "const.h"
 #include "corpse.h"
 #include "stat.h"
@@ -6867,7 +6866,9 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   while (victim->affected)
     affect_remove(victim, victim->affected, SUPPRESS_ALL);
-  if (ch && arena.type == CHAOS)
+
+  auto &arena = DC::getInstance()->arena_;
+  if (ch && arena.isChaos())
   {
     if (ch && ch->clan && ch->isMortal())
       ch_clan = get_clan(ch);
@@ -6922,13 +6923,13 @@ void arena_kill(Character *ch, Character *victim, int type)
   }
   send_info(killer_message);
 
-  if (ch && victim && (arena.type == PRIZE || arena.type == CHAOS))
+  if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
     logf(IMMORTAL, LogChannels::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
   }
 
   // if it's a chaos, see if the clan was eliminated
-  if (victim && arena.type == CHAOS && victim_clan)
+  if (victim && arena.isChaos() && victim_clan)
   {
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &tmp : character_list)
@@ -6982,8 +6983,9 @@ int can_attack(Character *ch)
     return false;
   }
 
+  auto &arena = DC::getInstance()->arena_;
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
+      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
   {
     ch->sendln("You can't attack in a potato arena, go find a potato would ya?!");
     return false;
@@ -7019,7 +7021,8 @@ int can_be_attacked(Character *ch, Character *vict)
     }
 
   // Prize Arena
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict))
+  auto &arena = DC::getInstance()->arena_;
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPrize() && IS_PC(ch) && IS_PC(vict))
   {
 
     if (ch->fighting && ch->fighting != vict)
@@ -7039,7 +7042,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Clan Chaos Arena
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict))
+  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isChaos() && IS_PC(ch) && IS_PC(vict))
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {

@@ -27,7 +27,6 @@
 #include "returnvals.h"
 #include "spells.h"
 #include "clan.h"
-#include "arena.h"
 #include "inventory.h"
 #include "corpse.h"
 
@@ -1587,6 +1586,7 @@ void do_givealldot(Character *ch, char *name, char *target, int cmd)
 
 int do_give(Character *ch, char *argument, int cmd)
 {
+  auto &arena = DC::getInstance()->arena_;
   char obj_name[MAX_INPUT_LENGTH + 1], vict_name[MAX_INPUT_LENGTH + 1], buf[200];
   char arg[80], allbuf[80];
   int64_t amount;
@@ -1854,9 +1854,10 @@ int do_give(Character *ch, char *argument, int cmd)
     }
     else
     {
+      auto &arena = DC::getInstance()->arena_;
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
           isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
-          arena.type == POTATO)
+          arena.isPotato())
       {
         ;
       }
@@ -1877,9 +1878,10 @@ int do_give(Character *ch, char *argument, int cmd)
     }
     else
     {
+      auto &arena = DC::getInstance()->arena_;
       if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
           isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) &&
-          arena.type == POTATO)
+          arena.isPotato())
       {
         ;
       }
@@ -1923,7 +1925,7 @@ int do_give(Character *ch, char *argument, int cmd)
          DC::getInstance()->obj_index[loop_obj->item_number].virt);
 
   if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && vict->isMortal() &&
-      isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && DC::getInstance()->obj_index[obj->item_number].virt == 393)
+      isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].virt == 393)
   {
     vict->sendln("Here, have some for some potato lag!!");
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);

@@ -180,6 +180,63 @@ public:
   int cmd_number;
   int lag;
 };
+
+class Arena
+{
+public:
+  static constexpr room_t ARENA_LOW = 14600;
+  static constexpr room_t ARENA_HIGH = 14680;
+  static constexpr room_t ARENA_DEATHTRAP = 14680;
+
+  enum class Types
+  {
+    NORMAL,
+    CHAOS,
+    POTATO,
+    PRIZE,
+    HP,
+    PLAYER_FREE,
+    PLAYER_NOT_FREE
+  };
+
+  enum class Statuses
+  {
+    CLOSED,
+    OPENED
+  };
+
+  auto Low(void) const -> level_t { return low_; }
+  auto High(void) const -> level_t { return high_; }
+  auto Number(void) const -> quint64 { return number_; }
+  auto CurrentNumber(void) const -> quint64 { return current_number_; }
+  auto IncrementCurrentNumber(void) -> void { current_number_++; }
+  auto HPLimit(void) const -> quint64 { return hp_limit_; }
+  auto Type(void) const -> Types { return type_; }
+  auto Status(void) const -> Statuses { return status_; }
+  auto EntryFee(void) const -> gold_t { return entry_fee_; }
+
+  auto isNormal(void) const -> bool { Type() == Types::NORMAL; }
+  auto isChaos(void) const -> bool { Type() == Types::CHAOS; }
+  auto isPotato(void) const -> bool { Type() == Types::POTATO; }
+  auto isPrize(void) const -> bool { Type() == Types::PRIZE; }
+  auto isHP(void) const -> bool { Type() == Types::HP; }
+  auto isPlayerFree(void) const -> bool { Type() == Types::PLAYER_FREE; }
+  auto isPlayerNotFree(void) const -> bool { Type() == Types::PLAYER_NOT_FREE; }
+
+  auto isOpened(void) const -> bool { Status() == Statuses::OPENED; }
+  auto isClosed(void) const -> bool { Status() == Statuses::CLOSED; }
+
+private:
+  level_t low_{};
+  level_t high_{};
+  quint64 number_{};
+  quint64 current_number_{};
+  quint64 hp_limit_{};
+  Types type_{};
+  Statuses status_{};
+  gold_t entry_fee_{};
+};
+
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -319,6 +376,7 @@ public:
   QString last_char_name = {};
   room_t last_char_room = {};
   Commands CMD_;
+  Arena arena_;
 
 private:
   struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
