@@ -28,8 +28,6 @@
 
 extern int rev_dir[];
 
-
-
 extern room_t top_of_world;
 
 int find_door(Character *ch, char *type, char *dir);
@@ -811,7 +809,6 @@ int do_steal(Character *ch, char *argument, int cmd)
   Object *has_item = nullptr;
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
-  
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);

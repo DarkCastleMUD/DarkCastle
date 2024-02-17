@@ -458,7 +458,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       {
         if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
         {
-          ch->send(QString("%1 ").arg(r,5));
+          ch->send(QString("%1 ").arg(r, 5));
 
           count++;
           cols++;

@@ -33,8 +33,6 @@
 
 /* extern variables */
 
-
-
 extern class Object *object_list;
 extern int rev_dir[];
 

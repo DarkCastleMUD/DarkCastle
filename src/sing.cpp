@@ -4,7 +4,6 @@
  *                                                                        *
  **************************************************************************/
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -31,7 +30,6 @@
 #include "const.h"
 #include "inventory.h"
 #include "handler.h"
-
 
 Character *origsing = nullptr;
 

@@ -32,7 +32,7 @@ int do_arena(Character *ch, char *argument, int cmd)
   char arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], buf[256];
   int low, high;
 
-  if (!ch->has_skill( COMMAND_ARENA))
+  if (!ch->has_skill(COMMAND_ARENA))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -160,7 +160,8 @@ int do_joinarena(Character *ch, char *arg, int cmd)
     ch->sendln("You have been banned from arenas.");
     return eFAILURE;
   }
-  if (ch->isPlayerObjectThief()||ch->isPlayerGoldThief())
+
+  if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     ch->sendln("They don't allow criminals in the arena.");
     return eFAILURE;

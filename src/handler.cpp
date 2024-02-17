@@ -56,8 +56,6 @@
 
 extern class Object *object_list;
 
-
-
 void huntclear_item(class Object *obj);
 
 #ifdef WIN32
