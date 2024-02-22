@@ -27,6 +27,12 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
       return eSUCCESS;
     }
 
+    auto removed_count = player->aliases_.remove("");
+    if (removed_count)
+    {
+      sendln("Removed an alias with an empty alias.");
+    }
+
     uint64_t x{};
     sendln("Aliases:");
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
@@ -49,6 +55,12 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
     if (alias == "alias" || alias == "deleteall")
     {
       sendln("You cannot create a command alias named 'alias' or 'deleteall'.");
+      return eFAILURE;
+    }
+
+    if (alias.isEmpty())
+    {
+      sendln("You need to specify an alias.");
       return eFAILURE;
     }
 
