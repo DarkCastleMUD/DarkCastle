@@ -90,10 +90,9 @@ aliases_t read_char_aliases(FILE *fpsave)
   {
     QString keyword = fread_alias_string(fpsave);
     QString command = fread_alias_string(fpsave);
-    qDebug() << x + 1 << "/" << total << "[" << keyword << "]"
-             << "[" << command << "]";
     if (keyword.isEmpty() || command.isEmpty())
     {
+      logentry(QString("Removing command alias [%1] because it's missing a keyword.").arg(command));
       continue;
     }
 
@@ -113,7 +112,13 @@ QString fread_alias_string(FILE *fpsave)
     return QString();
   }
 
-  if (tmp_size > 0)
+  if (!tmp_size)
+  {
+    fseek(fpsave, 1, SEEK_CUR);
+    qDebug() << "fread_alias_string: tmp_size=" << tmp_size << " forwarding FILE* 1 byte.";
+    return QString();
+  }
+  else
   {
     std::unique_ptr<char[]> buffer(new char[tmp_size + 1]);
     assert(buffer);
