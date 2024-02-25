@@ -7,7 +7,7 @@ level characters wait pathetically in the $BChamber of Charity$R, which sits
 just below the $Bmorgue$R, to the east.  Some stairs lead upwards, where the
 sounds of busy students from the $BDC Academy$R can be heard.
 ~
-28 67110124 0
+29 67110124 0
 D0
 You see a small corner near the rear of the tavern.  Looks discreet.
 ~
@@ -53,7 +53,7 @@ wall, stretching from the tiled floor to the plaster ceiling.  From its center,
 a huge face gazes at you dispassionately, as though judging your worthiness and
 finding you slightly lacking.
 ~
-28 33563784 0
+29 33563784 0
 D1
 You see your favorite place, the bar of divination.
 ~
@@ -80,7 +80,7 @@ gods currently in disfavor.  Another wall holds a set of shelves which bear a
 number of tiny statues, many with aromatic incense smouldering in dishes in
 front of them.
 ~
-28 33562764 0
+29 33562764 0
 D2
 You see the entrance.
 ~
@@ -114,7 +114,7 @@ healers that are innundated with requests from a never-ending flow of ill and
 injured unfortunates.  To the north stands a two-story wood building that holds
 the Sorpigal Cleric's guild.
 ~
-28 67110996 1
+29 67110996 1
 D0
 ~
 ~
@@ -133,7 +133,7 @@ Sorpigal Gold Depository~
    The chamber walls have been panelled in a deep-grained, polished wood.  The
 effect is unique and opulent.  You feel safe leaving your money here.
 ~
-28 67110116 1
+29 67110116 1
 D1
 ~
 ~
@@ -148,7 +148,7 @@ and faded to read.  A small staircase twists its way up to the Dark Castle
 Souvenir Shoppe, while you can hear the clatter of mugs and shouts of toasts
 being offered from the large room to your east.
 ~
-28 8 0
+29 8 0
 D1
 Surprise! You see the bar.
 ~
@@ -174,7 +174,7 @@ against the western wall leaps with flames of purple, green and gold.  Several
 barmaids argue about their tips in one corner in fierce whispers, while the
 bartender polishes the small brass sign fastened to the front of the bar.
 ~
-28 204 0
+29 204 0
 D1
 ~
 ~
@@ -204,7 +204,7 @@ manners of Dark Castle paraphernalia.  A wire rack against one wall holds maps
 to various sites on the mud, while a display case is filled with snow globes
 depicting scenes of lamias and enfans cavorting in blizzards.
 ~
-28 1096 0
+29 1096 0
 D5
 You see the entrance hall.
 ~
@@ -219,7 +219,7 @@ glass walled counter.  A rack along the east wall holds an assortment of smoked
 fish and frozen pizzas.  A small sign sits on the counter, next to the large
 brass-keyed cash register, which gleams beneath its dusting of flour.
 ~
-28 1256 0
+29 1256 0
 D2
 You see Sativa Street, filled with busy pedestrians.
 ~
@@ -251,7 +251,7 @@ the topmost shelves, in search of mice or very small dragons.  The shopkeeper
 looks at you and points at the small $Bnote$R hanging on the wall above the
 counter.
 ~
-28 1256 0
+29 1256 0
 D0
 ~
 ~
@@ -274,7 +274,7 @@ eye with their sultry gleam.  A couple of assassins lean over one case,
 morbidly eying several knives and discussing the applicability of poisons in
 whispers.  A small sign is propped against the cash box.
 ~
-28 200 0
+29 200 0
 D2
 ~
 ~
@@ -297,7 +297,7 @@ you walk along.  The traffic here is moving overwhelmingly from the gate-tower
 eastward, where you can hear the shouts and cries of the traders at Stonewitch.
 Shops line both sides of Sativa Street.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -324,7 +324,7 @@ Sativa Street has developed into a farmer's market.  You're likely to find
 everything you need for survival here, but you should look elsewhere in the
 city if you're looking for a more exotic purchase.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -351,7 +351,7 @@ just to the north, and Indica Way travels south.  Sativa Street stretches to
 the east and west.  There is a statue here of a tall, dark, shadowy figure.
 Its vacant gaze betrays no life.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -380,7 +380,7 @@ Sativa Street~
 leatherworks shop sits on the southern curb, while the armory is to the north.
 A weapons shop sits across from the warrior's guild just to the east.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -407,7 +407,7 @@ while a sullen guard stands in front of the Guild of Warriors to the south.
 The city gate towers in the east, and the road leads west, in the direction of
 Stonewitch.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -434,7 +434,7 @@ lazily through the air, apparently abandoned by their users.  Embroidered
 cloaks, their folds edged with violet and crimson glows of mystic energy, have
 been hung on the coat rack.  The room is badly lit and feels cramped.
 ~
-28 33554574 0
+29 33554574 0
 D0
 ~
 ~
@@ -454,7 +454,7 @@ tables, occasionally colliding.  The lights flicker and dim in an odd rhythm,
 and a band in the corner plays discordant music which most of the patrons seem
 to totally ignore.
 ~
-28 33563790 0
+29 33563790 0
 D1
 You see the laboratory.
 ~
@@ -473,7 +473,7 @@ pipes and flasks.  The floor is covered with half-erased pentagrams and even
 weirder symbols, and a blackboard in a dark corner has only been partially
 cleaned, some painful-looking letters faintly visible.
 ~
-28 33563790 0
+29 33563790 0
 D3
 You see the bar.
 ~
@@ -488,7 +488,7 @@ jumbled heap of chainmail paraphernalia.  Another set of shelves holds metal
 polish and mystic waxes guaranteed to keep your armor looking like new.  A
 small note has been tacked to the wall over the bored proprietor's head.
 ~
-28 200 0
+29 200 0
 D2
 ~
 ~
@@ -512,7 +512,7 @@ is set up in one corner for the convenience of those whose weapons have been
 dulled by battle.  To the east come raucous shouts from the bar, while Sativa
 Street lies to your north.
 ~
-28 100663436 0
+29 100663436 0
 D0
 You see Sativa Street, filled with hurrying pedestrians.
 ~
@@ -534,7 +534,7 @@ hearty aroma of cooking meat.  The floor is sticky with spilled ale.  You can
 glimpse a practice yard through the south archway, and the entrance to the
 guildhall lies to the west.
 ~
-28 33563788 0
+29 33563788 0
 D2
 You see the practice yard.
 ~
@@ -554,7 +554,7 @@ arrows.  The earth floor is dusty, and only a few blades of yellow grass have
 dared to sprout here and there along the edges of the clay walls.  You can hear
 the noise of the bar to your north.
 ~
-28 33563784 0
+29 33563784 0
 D0
 You see the bar.
 ~
@@ -570,7 +570,7 @@ gutters for food, snarling at each other over a scrap of discarded fish.  An
 alleyway leads east towards the wharf, and Arcanus Lane goes west.  A breeze
 carries a waft of fresh air to you from the south.
 ~
-28 67108868 1
+29 67108868 1
 D0
 ~
 ~
@@ -595,7 +595,7 @@ a couple of street urchins sit against a curb, playing mumblety-peg.
 Northward, you see a small shack at the edge of a small shanty town.  The
 Antipaladins guild lies just south of here.
 ~
-28 0 1
+29 0 1
 D1
 The alley continues east.
 ~
@@ -617,7 +617,7 @@ lead under the north wall of the city of Sorpigal.  This must be the secret
 passage that Sorpigal's "less desireable" elements utilize to travel unnoticed
 past the prying eyes of the law.
 ~
-28 100663437 0
+29 100663437 0
 D0
 The wall seems worn to the north here.
 ~
@@ -639,7 +639,7 @@ chairs and tables scattered throughout.  A bookcase with various manuals and
 diagrams of safes and locks leans crookedly against the wall.  Perhaps it
 conceals something beyond?
 ~
-28 100672652 0
+29 100672652 0
 D0
 The bookcase seems to be a bit askew.
 ~
@@ -658,7 +658,7 @@ the south, you see a mossy bridge, leading across the Anfract River, which cuts
 through the center of Sorpigal, toward the promenade and Sorpigal's Public
 Gardens.  There appears to be some kind of fire to the east.
 ~
-28 67108864 2
+29 67108864 2
 D0
 ~
 ~
@@ -678,7 +678,7 @@ have any crackers in your pockets.  In the back, a wall of aquariums bubbles
 gently next to a rack draped with leashes and collars.  A small sign hangs on
 the wall next to the front door.
 ~
-28 8328 0
+29 8328 0
 D0
 ~
 ~
@@ -710,7 +710,7 @@ Pet Shop Store~
 It is vital that this room's virtual number is exactly one larger than the
 Pet Shop number. If you are a player and in here report it IMMEDIATELY.
 ~
-28 33581185 0
+29 33581185 0
 E
 no_tele~
 ~
@@ -724,7 +724,7 @@ advertises a blue light special on yellow potions in Aisle 12.  A large cash
 register sits near the entrance, a small sign sitting next to the larger one
 that reads "We take SorpigalCard."
 ~
-28 1260 0
+29 1260 0
 D0
 ~
 ~
@@ -753,7 +753,7 @@ emanating from the small silver oil lamps on the walls is reflected in the
 polished surface of the massive mahogany desk that stands in the center of the
 room.  A small sign, lettered in golden cursive, sits on the desk.
 ~
-28 204 0
+29 204 0
 D3
 ~
 ~
@@ -784,7 +784,7 @@ iron pot with boiling water, several hides bobbing here and there in its
 depths.  In the middle of the room is a large oak table.  A wooden sign hangs
 above the fireplace.
 ~
-28 136 0
+29 136 0
 D0
 ~
 ~
@@ -818,7 +818,7 @@ A grungy little alleyway~
 alleycats stalk rats through the shadows.  High stone walls tower all around,
 closing off sight.
 ~
-28 8 1
+29 8 1
 D1
 ~
 ~
@@ -834,7 +834,7 @@ A grungy little alleyway~
 alleycats stalk rats through the shadows.  High stone walls tower all around,
 closing off sight.
 ~
-28 8 1
+29 8 1
 D1
 ~
 ~
@@ -852,7 +852,7 @@ whistles sharply.  One wall of the alley appears to have a strange shimmer.
 There is a fairly shabby looking shack to the north, cleverly tucked away
 from prying eyes.
 ~
-28 8 1
+29 8 1
 D0
 ~
 ~
@@ -872,7 +872,7 @@ A grungy little alley~
 Sorpigal.  Moisture beads and clings to almost every surface and slime covers
 the rounded surfaces of the cobblestones.
 ~
-28 8 1
+29 8 1
 D0
 ~
 ~
@@ -897,7 +897,7 @@ is a footbridge across the heavy wooden gate.  Sativa Street leads east, and
 Tanj Avenue extends south from here.  To the north is the entrance to the
 Paladin's guild.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -951,7 +951,7 @@ connected with a footbridge across the heavy wooden gate.  Sativa Street leads
 west from here.  North of here is the entrance to the Barbarian's guild.
 South of here is the wharf, but it looks dirty and not too safe.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1004,7 +1004,7 @@ well-guarded City Gates, while the road continues to your south.  A large
 statue has been set into an alcove in the city wall.  Finger's Repair Shop is
 just east of here.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1041,7 +1041,7 @@ Tanj Avenue~
 is a bit off to the north, and the Quester's Haven Inn sits innocuously off to
 the east.  You can journey farther south into Skunk Corner.
 ~
-28 67108864 1
+29 67108864 1
 D0
 The road continues further north.
 ~
@@ -1056,6 +1056,10 @@ The road continues further south.
 ~
 ~
 0 -1 3047
+D3
+~
+door~
+7 -1 3044
 E
 wall~
 It is built from large grey rocks that have been fastened to each other with
@@ -1068,6 +1072,29 @@ seen Kildoc?'  'Galdus was here'  'Wanted: one Longsword of Legend, will
 pay top price'
 ~
 S
+#3044
+The Arena entrace - under construction~
+The room is large with a long wooden counter at one end.  There's a white sign
+on the front of the counter.  There are ropes forming a line that snakes from
+the left to the right amd back again until the counter is reached.  behind the
+counter is a window that shows a large arena behind it.    
+~
+29 33565726 0
+D1
+~
+~
+0 -1 3043
+E
+sign~
+To start an area type $Barena start$R or $Barena start x gold$R where x is the
+amount of gold you want to wager.  The arena will automatically start two
+minutes after the second player joins the arena.  To join an area type $Barena
+join$R or $Barena join x gold$R.  To cancel an arean type $Barena cancel$R.  
+The winner of the arena gets all the gold.  The arena can only be canceled
+before a second player joins.  If canceled, your gold will be returned.  To
+find out about the current arena type $Barena info$R.    
+~
+S
 #3045
 Alley at Levee~
    Full of gloom and menacing shadows, the alley leads west and east, towards
@@ -1076,7 +1103,7 @@ you lies the levee.  Beggars convene on one corner, comparing methods and
 glancing at you appraisingly.
 $B$1A small plaque has been embedded into the cobblestones here.$R
 ~
-28 160 1
+29 160 1
 D0
 ~
 ~
@@ -1111,7 +1138,7 @@ seabird breaks the silence, and a cold wind makes its way over the waters of
 the bay.  An alley leads into town to the west, and the wharf extends further
 north.  Just south of here is an abandoned, three-story warehouse.
 ~
-28 0 1
+29 0 1
 D0
 ~
 ~
@@ -1135,7 +1162,7 @@ to the western city gate.  You can follow Wall Road to the south.  To the west
 the sounds of raucous laughter and partying can be heard from the legendary
 $BPlatinum Strip$R.
 ~
-28 67108864 1
+29 67108864 1
 D0
 You see the road.
 ~
@@ -1168,7 +1195,7 @@ roof, and a rat runs across a roof beam in search of food scraps.  The smell of
 unwashed people and ancient beer hits you in the face in a dizzying wave of
 stench.
 ~
-28 9452 0
+29 9452 0
 D3
 ~
 ~
@@ -1183,7 +1210,7 @@ tied up to the pier.  As you look down into the dark water, an enormous pike
 surfaces, its long white teeth glimmering as it searches for the little
 freshwater crabs that scavenge along the water's edge.
 ~
-28 67108992 1
+29 67108992 1
 D0
 You see the Alley.
 ~
@@ -1204,7 +1231,7 @@ heads upwards towards another, better constructed level of the warehouse.  A
 suprisingly well-tended stairway leads down into the basement.  A small sign
 has been affixed to a chain and placed across the stairway.
 ~
-28 67108940 0
+29 67108940 0
 D0
 The southern end of the Wharf lies to the north, running all the way to the East Gate.
 ~
@@ -1226,7 +1253,7 @@ some unknown fine-grained wood, it is patterned with serpents and flowering
 vines.  It sits against the western city wall, and you can see the water of the
 river flowing west through an opening in the wall ten feet below the bridge.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1259,7 +1286,7 @@ Outside the West Gate of Sorpigal~
 connected with a footbridge across the heavy wooden gate.  To the west you can
 see the edge of a big forest.  A small dusty trail leads north along the wall.
 ~
-28 4 1
+29 4 1
 D0
 The trail continues around the City of Sorpigal.
 ~
@@ -1304,7 +1331,7 @@ connected with a footbridge across the heavy wooden gate.  To the east the
 plains stretch out in the distance.  To the north a small dusty trail follow
 the city wall.
 ~
-28 4 1
+29 4 1
 D0
 The trail continues around the City of Sorpigal.
 ~
@@ -1348,7 +1375,11 @@ here, and the conversation is quieter.  Who knows what plots may have hatched
 here?  As they say, "God is in the shadows".  There is a small sign affixed to
 the wall here.  A small archway leads east into shadows.
 ~
-28 67110124 0
+29 67110124 0
+D0
+~
+~
+0 -1 3074
 D1
 ~
 ~
@@ -1384,7 +1415,7 @@ chairs are against the northern wall of this room, but are not often used.
 Several large candles are lit providing just enough light to see who is in the
 room, but not enough to get a good look at anyone.
 ~
-28 33563836 0
+29 33563836 0
 D3
 ~
 ~
@@ -1400,7 +1431,7 @@ aspirations to the office of mayor after facing numerous obstacles and red
 tape, Uncle Juan has apparently returned to his peaceful life of burritos and
 chimichangas.
 ~
-28 1260 0
+29 1260 0
 D1
 ~
 ~
@@ -1411,7 +1442,7 @@ A grungy little alley~
    Barely lit by what light manages to make its way in from the main street, a
 narrow little alley leads north and south between larger buildings.
 ~
-28 8 1
+29 8 1
 D0
 ~
 ~
@@ -1429,7 +1460,7 @@ trees grow in large blue marble planters here and there.  A narrow alleyway
 lies to the north.  While a smell of wood drifts from the fletcher's shop to
 the south.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1455,7 +1486,7 @@ you presume must hold the intangible wares in which the Meta-Physician deals.
 Sleeping and resting adventurers slump along one wall, comparing old scars and
 betting on the size and the shape of the next.
 ~
-28 1276 0
+29 1276 0
 D0
 ~
 ~
@@ -1474,7 +1505,7 @@ leather quivers in the center of the shop.  A chair sits square in front of a
 complicated device.  A small area in the back of the store is closed off with a
 curtain.  The smell of wood permeates the air here.
 ~
-28 200 0
+29 200 0
 D0
 The busy street of Sativa bustles with activity.
 ~
@@ -1499,7 +1530,7 @@ Arcanus Way~
 wharf.  The Mage's guild is just to the north, and there is a bridge to the
 south which crosses into the southern district.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1524,7 +1555,7 @@ towards each other tentatively, criss-crossing and caressing like young lovers.
 Arcanus Lane ends abruptly to the east at Midwitch, and the Magic Shoppe lies
 to the south.  The Healer's Plaza can be found to the north.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1548,7 +1579,7 @@ Indica Way~
 Bank are to the east and west, respectively, and most traffic seems to be
 moving from the southern parts of Sorpigal towards Stonewitch, to the north.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1574,7 +1605,7 @@ also goes north, where you can follow it straight to the Albatross, a popular
 pub in town.  The Healer's Plaza is just to the west.  A large temple is under
 construction to the east.
 ~
-28 67108864 1
+29 67108864 1
 D0
 ~
 ~
@@ -1599,7 +1630,7 @@ The Wharf~
 up shop at random intervals, tactfully avoiding the occasional body sprawled in
 the street.  There appears to be a small shanty town just to the west.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1620,7 +1651,7 @@ Spartan, wood and tar shacks have been piled on top of each other by the whims
 of the city's unfortunate inhabitants.  A small shack rests undisturbed just to
 the west, and there is a small alley to the south.  The wharf is east of here.
 ~
-28 12 0
+29 12 0
 D1
 ~
 ~
@@ -1636,7 +1667,7 @@ The Wharf~
 operates the finest eating establishment in all of Sorpigal.  It appears to be
 the only bright spot of the wharf, which extends further north and south.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1657,7 +1688,7 @@ Built along the bay shores, the wharf is prime ground for trading and rumor-
 mongering.  There is a small inn by the water, just to the east, and the wharf
 extends to the south.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1679,7 +1710,7 @@ can see the vault models on the showroom floor inside.  Decorating the walls
 are a few sales award plaques and a rather large moose head hangs above the
 plaques, its antlers nearly scraping the ceiling.
 ~
-28 1252 0
+29 1252 0
 D1
 ~
 ~
@@ -1694,7 +1725,7 @@ The grungy alleyway ends~
 high at its corners.  The cobblestones appear to be kept clear of this debris
 however, and you can see a run-down shack just to the north.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1712,7 +1743,7 @@ bridge leads out onto the promenade which overlooks the river and then into the
 windy roads of South Sorpigal.  To the north a small lane leads up into North
 Sorpigal.
 ~
-28 67108996 2
+29 67108996 2
 D0
 ~
 ~
@@ -1731,7 +1762,7 @@ pieces of material, metal, gems, or armour to fix even the most devastated
 piece of equipment.  A small sign rests on the counter, and appears to be the
 only clean space in the entire shop.
 ~
-28 128 0
+29 128 0
 D3
 ~
 ~
@@ -1757,7 +1788,7 @@ armourer and as such, is the only person in the realms with the capabilities to
 repair the powerful "godload".  A small sign sits atop the countertop providing
 information.
 ~
-28 100672740 0
+29 100672740 0
 D1
 ~
 ~
@@ -1773,15 +1804,31 @@ Thank you.
 The Management.
 ~
 S
+#3074
+A secluded reflecting pool~
+   Away from the hectic bustle of everyday life in Sorpigal stands this quiet
+glade.  Large interlaced stone cathedral arches stretch overhead and out of
+sight letting magical ever-present sunlight lazily glitter through the
+darkness.  Cobbled stone benches flank the sides of the pool providing respite
+for those who wish to pay their respects or simply need a quiet place to think.
+In the dim light outside the circle of benches, a ring of polished obsidian
+statues stand silent watch over the pool.
+~
+29 67120364 0
+D2
+~
+~
+0 -1 3054
+S
 #3084
 The kitchen~
 The room is small.  Along one wall, there is a sink and countertop.  There is
 an old stove on the other side of the room.  On the stove, there is a pot with
 liquid in it that is steaming.  There is smoke coming from the oven, causing an
 acrid smell in the air.  There is blood on the floor and walls.  Something died
-here and not necessarily for dinner.    
+here and not necessarily for dinner.
 ~
-28 0 0
+29 0 0
 D2
 ~
 ~
@@ -1790,9 +1837,9 @@ S
 #3085
 The dining room~
 It looks like no one has dined in this room in a long time.  The walls are all
-wood paneling.  The floor is hardwood.    
+wood paneling.  The floor is hardwood.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1806,9 +1853,9 @@ S
 A bedroom~
 The overhead light has burnt out.  The only light comes through the doorway to
 the living room.  There's not enough light to see the color of the walls.  The
-shadows are long in this room and possibly are obscuring things best unseen.  
+shadows are long in this room and possibly are obscuring things best unseen.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1817,9 +1864,9 @@ S
 #3087
 The living room~
 The room is spacious.  Despite its name, there's not much living here.  The
-walls were painted gray or maybe just white and became dingy over time.    
+walls were painted gray or maybe just white and became dingy over time.
 ~
-28 0 0
+29 0 0
 D1
 ~
 ~
@@ -1834,9 +1881,9 @@ The front porch~
 The darkened wood has weathered with age and neglect.  To the east is the front
 door of this old house.  There are two windows, but thick wooden shutters
 obscure them.  The porch smells of old wood and dampness.  There are cobwebs
-stretched between the rafters.    
+stretched between the rafters.
 ~
-28 67108868 1
+29 67108868 1
 D1
 ~
 door~
@@ -1851,9 +1898,9 @@ The foyer~
 The light in the room is dim and comes from a single overhead bulb.  The walls
 are made of wood paneling and partly covered in yellowing wallpaper.  The
 wooden floor has a dark red stain on it.  There's a layer of dust on
-everything.  It looks like no one has cleaned this room in a while.    
+everything.  It looks like no one has cleaned this room in a while.
 ~
-28 0 0
+29 0 0
 D0
 ~
 ~
@@ -1875,9 +1922,9 @@ S
 The study~
 The light in this room is brighter than in the other rooms.  The ceiling is
 angled upwards with wooden rafters showing.  The walls, like the other rooms,
-are partly covered with wallpaper.    
+are partly covered with wallpaper.
 ~
-28 0 0
+29 0 0
 D2
 ~
 ~
@@ -1893,7 +1940,7 @@ construction crews work feverishly.  The one feature that does appear to
 immediately draw your attention is a polished marble dais and altar.  Through
 all the bustle it exudes an aura of calm and serenity.
 ~
-28 1073742956 0
+29 1073742956 0
 D3
 The street of Indica.
 ~
@@ -1910,7 +1957,7 @@ The Void~
    You step out into ......  You don't think that you are not floating in
 nothing.
 ~
-28 538191884 1
+29 538191884 1
 D4
 ~
 ~
@@ -1942,7 +1989,7 @@ the walls and ceiling.  The northern wall is covered by a row of metal
 cabinets, each one chill and ominous.  A few of the shelves have been opened in
 a hurry, spilling the contents onto the floor in piles.
 ~
-28 100672756 0
+29 100672756 0
 D1
 ~
 cabinet~
@@ -1967,7 +2014,7 @@ Builders' Room~
    A small room set aside for builders of DC++ to exchange information with the
 implementors and with each other.
 ~
-28 33563820 0
+29 33563820 0
 D1
 You see the Reading Room.
 ~
@@ -1980,7 +2027,7 @@ Chamber of Current Events~
 world come here to write on the magical stone.  This is a spiritual room, so I
 would be cautious when starting trouble.
 ~
-28 33686764 0
+29 33686764 0
 D1
 You see the Albatross Tavern.
 ~
@@ -1996,7 +2043,7 @@ into your eye.  You notice fresh drops of blood on most of the equipment
 scattered across the floor.  You wonder how there can be such a bloodbath
 upstairs without making any sound.
 ~
-28 67110124 0
+29 67110124 0
 D1
 A breath of wind comes in through the archway.
 ~

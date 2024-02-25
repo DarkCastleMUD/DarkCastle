@@ -12,7 +12,7 @@ ago fought for Sorpigal.
 Occasionally, you catch a look in his face as though hes reminiscing of an
 age long past, when he was still a young wizard adventuring across the realms.
 ~
-296774 0 -1
+296770 0 -1
 35913896 0 0 -1
 900 1 101
 -29 -50 12001d1+0 20d30+900
@@ -122,8 +122,8 @@ looking over at him.  He dusts off his hands as he walks over and asks if you
 would like to see the "showcase" of his wares or if you'd like to "come on
 down" and buy something should price be right.  Bob certainly is strange!
 ~
-134514502 0 -1
-19136640 0 0 -1
+134514498 0 -1
+287572096 0 0 -1
 900 1 101
 2 2 300d1+0 20d30+900
 1200 80000
@@ -154,7 +154,7 @@ Martha, the Grocer stands at the counter with a slightly impatient look on her f
 Despite a recent stint in the Sorpigal Jail, Martha is looking as
 hale and hearty as ever and has plenty of goods for sale.
 ~
-426822 0 -1
+426818 0 -1
 18874496 0 0 -1
 900 1 101
 -10 2 9001d1+0 5d8+45
@@ -174,7 +174,7 @@ Chuck, the Weaponsmith doesn't really need any weapons to kill you, but sells th
 ~
 A young weaponsmith, who still has lots to learn.
 ~
-821062 0 -1
+821058 0 -1
 18874496 0 0 -1
 900 1 101
 -10 2 9001d1+0 8d8+75
@@ -199,7 +199,7 @@ He has long hair held back with a clasp and a braided-grizzly beard with
 a red-dyed tip.  Sweat drips off his brow as he pounds a piece of metal
 with a hammer, shaping it into what looks like a breastplate.
 ~
-821062 0 -1
+821058 0 -1
 18874496 0 0 -1
 900 1 101
 -10 2 9001d1+0 6d8+75
@@ -580,7 +580,7 @@ This Captain has eaten more sharks than you have killed peas.
 Not to mention that he and Sadus were clearing monsters
 to build this city.
 ~
-34630 0 -1
+34626 0 -1
 18874496 0 0 -1
 900 1 101
 -40 -50 10000d1+0 10d5+50
@@ -642,7 +642,7 @@ A Pet Shop Boy is here looking for a west-end girl.
 ~
 He is young and close-cropped and looks quite happy.
 ~
-296774 0 -1
+296770 0 -1
 18874496 0 0 -1
 900 1 101
 -10 2 9001d1+0 5d8+50
@@ -666,7 +666,7 @@ Aaron, the Jeweler is waiting for some customers to snatch up his goods.
 ~
 He is fat and has a content although watchful look on his face.
 ~
-295750 0 -1
+295746 0 -1
 18874496 0 0 -1
 900 1 101
 -10 -10 9001d1+0 5d8+50
@@ -687,7 +687,7 @@ Andie, the Leather Worker is holding a whip and looking like she knows more than
 Andie appears to be a bit naughty, but nonetheless has some very fancy
 "leather" goods for sale.  Perhaps you'd like a demonstration?
 ~
-426822 0 -1
+426818 0 -1
 18874496 0 0 -1
 900 1 101
 -10 2 9001d1+0 5d8+50
@@ -714,7 +714,7 @@ constantly seeks new and filthy ways to abuse the human body.  He does
 sell a variety of useful and informative goods, though it might be best to
 wash them thoroughly and not get too close to Sam when you pay him.
 ~
-296774 0 -1
+296770 0 -1
 18874496 0 0 -1
 0 1 101
 -10 -10 9001d1+0 6d10+50
@@ -775,6 +775,20 @@ say You are unable to learn.
 ~
 |
 S
+#3014
+rufus~
+Rufus, the Arena-keeper~
+Rufus the Arena-keeper stands here judging you.
+~
+~
+1073741826 0 -1
+0 0 0 -1
+0 1 100
+20 10 0d1+0 1d1+0
+0 0
+8 8 1 0 0 0
+C 4
+S
 #3015
 -----~
 ------------~
@@ -825,7 +839,7 @@ executioner~
 The Executioner (currently non-loading)~
 The executioner is here polishing his blade.
 ~
-““““““““““““““““““““““““““““““““““““““““““““““““““““““×~
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½~
 788294 0 -1
 2621448 0 0 -1
 920 1 50
@@ -1241,7 +1255,7 @@ Shane, the Bartender watches you calmly, trying to save up tips for his hundreds
 ~
 A tired looking Bartender who hates trouble in his bar.
 ~
-262982 0 -1
+262978 0 -1
 2097152 0 0 -1
 900 1 101
 -15 2 8001d1+0 5d8+50
@@ -1340,7 +1354,7 @@ Quark looks real, ehm, ugly. He waters down and over charges his
 drinks, but over all he likes to keep his customers happy.  He has
 the biggest looking ears you have EVER seen.
 ~
-394054 0 -1
+394050 0 -1
 18874496 0 0 -1
 600 1 101
 -10 -40 19038d1+0 12d7+70
@@ -2022,8 +2036,12 @@ if cansee($n)
   say here is a medal from the Sorpigal town council.
   MPOLOAD 189
   give medal $n
-  if level($n) == 50
+  if level($n) == 60
     MPXPREWARD $n 5000000
+  endif
+  if carries($i) keep 189
+    say I would like to give you your reward, unfortunately I was unable to.
+    drop medal
   endif
 else
   say I would like to give you your reward, unfortunately I cannot see you.
