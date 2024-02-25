@@ -55,9 +55,6 @@
 int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
-
-
-
 void update_wizlist(Character *ch);
 // int system(const char *);
 
@@ -176,7 +173,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   auto found = DC::getInstance()->CMD_.find(command);
   if (found.has_value())
   {
-    if (getLevel() >= found->getMinimumLevel() && (found->getFunction1() != nullptr || found->getFunction2() != nullptr || found->getFunction3() != nullptr))
+    if (getLevel() >= found->getMinimumLevel() && (found->getFunction1() != nullptr || found->getFunction1b() != nullptr || found->getFunction2() != nullptr || found->getFunction3() != nullptr))
     {
       if (found->getMinimumLevel() == GIFTED_COMMAND)
       {
@@ -351,6 +348,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         auto c = strdup(command_arguments.toStdString().c_str());
         retval = (*(found->getFunction1()))(this, c, found->getNumber());
+        free(c);
+      }
+      else if (found->getFunction1b())
+      {
+        auto c = strdup(command_arguments.toStdString().c_str());
+        retval = (*(found->getFunction1b()))(this, c, found->getNumber());
         free(c);
       }
       else if (found->getFunction2())
