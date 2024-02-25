@@ -550,7 +550,7 @@ void Character::display_string_list(const char *list[])
         sprintf(buf + strlen(buf), "%18s", list[i - 1]);
         if (!(i % 4))
         {
-            strcat(buf, "\r\n");
+            strlcat(buf, "\r\n", MAX_STRING_LENGTH);
             this->send(buf);
             *buf = '\0';
         }
