@@ -80,5 +80,11 @@
         "qtcoredepends": "cpp",
         "qtdbusdepends": "cpp"
     },
-    "cmake.sourceDirectory": "${workspaceFolder}/src"
+    "editor.renderWhitespace": "all",
+    "C_Cpp.default.cppStandard": "c++23",
+    "C_Cpp.default.cStandard": "c23",
+    "C_Cpp.codeAnalysis.clangTidy.args": [
+        "-extra-arg=-std=c++23",
+        "-extra-arg=-stdlib=libc++"
+    ]
 }
