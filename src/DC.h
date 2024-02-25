@@ -215,16 +215,16 @@ public:
   auto Status(void) const -> Statuses { return status_; }
   auto EntryFee(void) const -> gold_t { return entry_fee_; }
 
-  auto isNormal(void) const -> bool { Type() == Types::NORMAL; }
-  auto isChaos(void) const -> bool { Type() == Types::CHAOS; }
-  auto isPotato(void) const -> bool { Type() == Types::POTATO; }
-  auto isPrize(void) const -> bool { Type() == Types::PRIZE; }
-  auto isHP(void) const -> bool { Type() == Types::HP; }
-  auto isPlayerFree(void) const -> bool { Type() == Types::PLAYER_FREE; }
-  auto isPlayerNotFree(void) const -> bool { Type() == Types::PLAYER_NOT_FREE; }
+  auto isNormal(void) const -> bool { return Type() == Types::NORMAL; }
+  auto isChaos(void) const -> bool { return Type() == Types::CHAOS; }
+  auto isPotato(void) const -> bool { return Type() == Types::POTATO; }
+  auto isPrize(void) const -> bool { return Type() == Types::PRIZE; }
+  auto isHP(void) const -> bool { return Type() == Types::HP; }
+  auto isPlayerFree(void) const -> bool { return Type() == Types::PLAYER_FREE; }
+  auto isPlayerNotFree(void) const -> bool { return Type() == Types::PLAYER_NOT_FREE; }
 
-  auto isOpened(void) const -> bool { Status() == Statuses::OPENED; }
-  auto isClosed(void) const -> bool { Status() == Statuses::CLOSED; }
+  auto isOpened(void) const -> bool { return Status() == Statuses::OPENED; }
+  auto isClosed(void) const -> bool { return Status() == Statuses::CLOSED; }
 
 private:
   level_t low_{};
