@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra")
@@ -37,6 +38,10 @@ project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES 
 configure_file(buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/buildinfo.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
+
+find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
+set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++23" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
+
 add_library(DC SHARED
     act_comm.cpp
     act.cpp
@@ -203,6 +208,7 @@ add_library(DC SHARED
     wizard.h
     Zone.h
 )
+set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
 target_compile_definitions(DC PRIVATE
   $<$<CONFIG:Debug>:testttt>
