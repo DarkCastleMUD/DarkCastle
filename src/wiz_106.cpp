@@ -232,7 +232,7 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen1_t function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, auto *function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
