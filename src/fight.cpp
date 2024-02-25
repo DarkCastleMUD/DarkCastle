@@ -1775,7 +1775,7 @@ void eq_damage(Character *ch, Character *victim,
   class Object *obj;
   int pos;
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
+  if (ch->room().isArena()) // Don't damage eq in arena
     return;
   if (IS_PC(victim) && IS_PC(ch)) // Don't damage eq on pc->pc fights
     return;
@@ -5429,7 +5429,7 @@ void raw_kill(Character *ch, Character *victim)
     return;
   }
 
-  if (isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+  if (victim->room().isArena())
   {
     fight_kill(ch, victim, TYPE_ARENA_KILL, 0);
     return;
@@ -6935,7 +6935,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     for (const auto &tmp : character_list)
     {
 
-      if (isSet(DC::getInstance()->world[tmp->in_room].room_flags, ARENA))
+      if (tmp->room().isArena())
         if (victim->clan == tmp->clan && victim != tmp && tmp->isMortal())
           eliminated = 0;
     }
@@ -6976,8 +6976,7 @@ int is_stunned(Character *ch)
 
 int can_attack(Character *ch)
 {
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
+  if (ch->room().isArena() && ch->room().arena().isOpened())
   {
     ch->sendln("Wait until it closes!");
     return false;
@@ -6985,7 +6984,7 @@ int can_attack(Character *ch)
 
   auto &arena = DC::getInstance()->arena_;
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
+      ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't attack in a potato arena, go find a potato would ya?!");
     return false;
@@ -7022,7 +7021,7 @@ int can_be_attacked(Character *ch, Character *vict)
 
   // Prize Arena
   auto &arena = DC::getInstance()->arena_;
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPrize() && IS_PC(ch) && IS_PC(vict))
+  if (ch->room().isArena() && arena.isPrize() && IS_PC(ch) && IS_PC(vict))
   {
 
     if (ch->fighting && ch->fighting != vict)
@@ -7042,7 +7041,7 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Clan Chaos Arena
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isChaos() && IS_PC(ch) && IS_PC(vict))
+  if (ch->room().isArena() && arena.isChaos() && IS_PC(ch) && IS_PC(vict))
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {

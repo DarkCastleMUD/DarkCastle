@@ -1757,7 +1757,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 	}
 	else if (isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_PORTAL) ||
 			 DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).isNoTeleport() ||
-			 isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+			 victim->room().isArena())
 	{
 		ch->sendln("A mystical force seems to be keeping you out.");
 		status = eFAILURE;

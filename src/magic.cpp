@@ -1690,7 +1690,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
+      ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't teleport in potato arenas!");
     return eFAILURE;
@@ -1713,7 +1713,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->room().isArena())
   {
     // If the ch is in a general arena and self-teleporting, there's a 25% chance they will teleport to the deathtrap.
     if (ch == victim && ch->in_room >= Arena::ARENA_LOW && ch->in_room <= Arena::ARENA_HIGH && number(1, 4) == 1)
@@ -2299,7 +2299,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
       return eFAILURE;
 
     // Curse in a prize arena follows rules of offensive spells
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.isPrize() || arena.isChaos()))
+    if (ch->room().isArena() && (arena.isPrize() || arena.isChaos()))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -2386,7 +2386,7 @@ int spell_curse(uint8_t level, Character *ch, Character *victim, class Object *o
     }
 
     // Curse in a prize arena follows rules of offensive spells
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && (arena.isPrize() || arena.isChaos()))
+    if (ch->room().isArena() && (arena.isPrize() || arena.isChaos()))
     {
       if (!can_be_attacked(ch, victim) || !can_attack(ch))
         return eFAILURE;
@@ -4166,7 +4166,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
     return eFAILURE;
   }
   assert(victim);
-  if (isSet(DC::getInstance()->world[victim->in_room].room_flags, ARENA))
+  if (victim->room().isArena())
   {
     ch->sendln("To the DEATH you wimp!");
     return eFAILURE;
@@ -12491,10 +12491,10 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     return eFAILURE;
   }
 
-  if ((!isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
-       isSet(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)) ||
-      (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) &&
-       !isSet(DC::getInstance()->world[ch->beacon->in_room].room_flags, ARENA)))
+  if ((!ch->room().isArena() &&
+       ch->beacon->room().isArena()) ||
+      (ch->room().isArena() &&
+       !ch->beacon->room().isArena()))
   {
     ch->sendln("Your beacon cannot take you into or out of the arena!");
     return eFAILURE;

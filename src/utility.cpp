@@ -1417,7 +1417,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   if (IS_AFFECTED(this, AFF_CHARM))
     return eFAILURE;
 
-  if (isSet(DC::getInstance()->world[this->in_room].room_flags, ARENA))
+  if (this->room().isArena())
   {
     this->sendln("TYou can't recall while in the arena.");
     return eFAILURE;
@@ -1697,7 +1697,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+    if (ch->room().isArena())
     {
       ch->sendln("Don't make me zap you.....");
       return eFAILURE;
@@ -1889,7 +1889,7 @@ int do_home(Character *ch, char *argument, int cmd)
   if (ch->isMortal())
   {
     if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
-        isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+        ch->room().isArena())
     {
       send_to_char("This place doesn't sit right with you...not enough "
                    "security.\r\n",

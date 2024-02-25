@@ -41,9 +41,6 @@
 
 /*   external vars  */
 
-
-
-
 int check_components(Character *ch, int destroy, int item_one = 0,
                      int item_two = 0, int item_three = 0, int item_four = 0,
                      bool silent = false);
@@ -3254,7 +3251,7 @@ int arena_only(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd || ch->fighting)
     return eFAILURE;
 
-  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (!ch->room().isArena())
   {
     do_gossip(ch, "My life has no meaning outside of glorious arena combat!", 0);
     act("$n goes out in a blaze of glory!", ch, 0, 0, TO_ROOM, NOTVICT);

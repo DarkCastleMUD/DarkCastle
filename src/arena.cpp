@@ -83,7 +83,7 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
     ch->sendln("Only clan members may join this arena.");
     return eFAILURE;
   }
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->room().isArena())
   {
     ch->sendln("You are already there!");
     return eFAILURE;
@@ -145,13 +145,4 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
   send_info(buf);
   do_look(ch, "", 8);
   return eSUCCESS;
-}
-
-bool ArenaIsOpen()
-{
-  auto &arena = DC::getInstance()->arena_;
-  if (arena.isOpened())
-    return true;
-  else
-    return false;
 }

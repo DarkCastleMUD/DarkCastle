@@ -581,7 +581,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen())
+  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return eFAILURE;
   }

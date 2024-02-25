@@ -666,6 +666,11 @@ bool Character::isNPC(void)
     return isSet(misc, MISC_IS_MOB);
 }
 
+auto Entity::room(void) -> Room &
+{
+    return DC::getInstance()->world[in_room];
+}
+
 move_t Character::move_limit(void)
 {
     move_t max;

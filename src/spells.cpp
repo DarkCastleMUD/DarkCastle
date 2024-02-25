@@ -2503,7 +2503,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           // Wizard's eye (88) is ok to cast
           // Prize Arena
           auto &arena = DC::getInstance()->arena_;
-          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPrize() && spl != 88)
+          if (ch->room().isArena() && arena.isPrize() && spl != 88)
           {
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
@@ -2531,7 +2531,7 @@ int do_cast(Character *ch, char *argument, int cmd)
 
           // Wizard's eye (88) is ok to cast
           // Clan Chaos
-          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isChaos() && spl != 88)
+          if (ch->room().isArena() && arena.isChaos() && spl != 88)
           {
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {

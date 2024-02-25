@@ -23,6 +23,7 @@
 #include "character.h"
 #include "DC.h"
 #include "casino.h"
+#include "room.h"
 
 /* The following defs are for Object  */
 
@@ -224,7 +225,7 @@ struct obj_affected_type
 };
 
 /* ======================== Structure for object ========================= */
-class Object
+class Object : public Entity
 {
 public:
     enum class portal_types_t
@@ -249,7 +250,6 @@ public:
     static const QStringList apply_types;
 
     int32_t item_number = {};     /* Where in data-base               */
-    room_t in_room = {};          /* In what room -1 when conta/carr  */
     int vroom = {};               /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};

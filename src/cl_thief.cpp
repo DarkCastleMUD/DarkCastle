@@ -616,7 +616,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   auto &arena = DC::getInstance()->arena_;
   affected_type af;
 
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
+  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -728,7 +728,7 @@ int do_hide(Character *ch, char *argument, int cmd)
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-      isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA) && arena.isPotato())
+      ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -865,7 +865,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->room().isArena())
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;
@@ -1325,7 +1325,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->room().isArena())
   {
     ch->sendln("Do what!? This is an Arena, go kill someone!");
     return eFAILURE;

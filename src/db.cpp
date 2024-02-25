@@ -199,6 +199,20 @@ void Room::FreeTracks()
 	nTracks = 0;
 }
 
+auto Room::arena() -> class Arena &
+{
+	static Arena generic_arena;
+	if (isArena())
+	{
+		return DC::getInstance()->arena_;
+	}
+	else
+	{
+		generic_arena = {};
+		return generic_arena;
+	}
+}
+
 // add new tracks to the head of the list. When the list
 // gets longer than 11, remove the tail and delete it.
 void Room::AddTrackItem(room_track_data *newTrack)

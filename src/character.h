@@ -35,6 +35,7 @@ class Character;
 #include "interp.h"
 #include "utility.h"
 #include "Zone.h"
+#include "room.h"
 
 typedef uint64_t gold_t;
 
@@ -439,7 +440,7 @@ typedef int32_t move_t;
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
-class Character
+class Character : public Entity
 {
 
 public:
@@ -634,10 +635,8 @@ public:
 
     int16_t hometown = {}; /* PC/NPC home town */
 
-    uint32_t plat = {}; /* Platinum                                */
-    int64_t exp = {};   /* The experience of the player            */
-    int32_t in_room = {};
-
+    uint32_t plat = {};                    /* Platinum                                */
+    int64_t exp = {};                      /* The experience of the player            */
     uint32_t immune = {};                  // Bitvector of damage types I'm immune to
     uint32_t resist = {};                  // Bitvector of damage types I'm resistant to
     uint32_t suscept = {};                 // Bitvector of damage types I'm susceptible to

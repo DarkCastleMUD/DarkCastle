@@ -3809,7 +3809,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen())
+        vict->room().isArena() && arena.isPotato() && arena.isOpened())
     {
       vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
       return eSUCCESS;
@@ -3871,7 +3871,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA) && arena.isPotato() && ArenaIsOpen() && vict->isMortal())
+        vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortal())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
       return eSUCCESS;
@@ -3941,7 +3941,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                  "You have been KILLED!\n\r",
                  vict);
     extract_obj(obj);
-    if (!isSet(DC::getInstance()->world[vict->in_room].room_flags, ARENA))
+    if (!vict->room().isArena())
       fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
     else if (arena.isPotato())
       fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);

@@ -34,12 +34,12 @@ int do_suicide(Character *ch, char *argument, int cmd)
     ch->sendln("This place is too peaceful for that.");
     return eFAILURE;
   }
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, ARENA))
+  if (ch->room().isArena())
   {
     ch->sendln("You can't do that in the arena.");
     return eFAILURE;
   }
-  if (ch->isPlayerObjectThief()|| (ch->isPlayerGoldThief()))
+  if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
     ch->sendln("You're too busy running from the law!");
     return eFAILURE;

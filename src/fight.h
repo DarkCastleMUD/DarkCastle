@@ -77,7 +77,6 @@ void raw_kill(Character *ch, Character *victim);
 void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker = false);
 void arena_kill(Character *ch, Character *victim, int type);
 void do_dead(Character *ch, Character *victim);
-bool ArenaIsOpen();
 void eq_destroyed(Character *ch, Object *obj, int pos);
 int is_stunned(Character *ch);
 void update_flags(Character *vict);

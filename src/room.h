@@ -8,10 +8,11 @@
 */
 
 #include <QSharedPointer>
-
+#include <expected>
 #include "structs.h" // uint8_t
 #include "class.h"
 #include "Zone.h"
+#include "common.h"
 
 /* Bitvector For 'room_flags' */
 
@@ -152,8 +153,42 @@ public:
     struct extra_descr_data *ex_description = {};   // for examine/look
     room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
     uint32_t room_flags = {};                       // DEATH, DARK ... etc
-    uint32_t temp_room_flags = {};                  // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
-    int16_t light = {};                             // Light factor of room
+    constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
+    constexpr auto isNoHome() const -> bool { return isSet(room_flags, NOHOME); }
+    constexpr auto isNoMob() const -> bool { return isSet(room_flags, NO_MOB); }
+    constexpr auto isIndoors() const -> bool { return isSet(room_flags, INDOORS); }
+    constexpr auto isTeleportBlocked() const -> bool { return isSet(room_flags, TELEPORT_BLOCK); }
+    constexpr auto isNoKi() const -> bool { return isSet(room_flags, NO_KI); }
+    constexpr auto isNoLearn() const -> bool { return isSet(room_flags, NOLEARN); }
+    constexpr auto isNoMagic() const -> bool { return isSet(room_flags, NO_MAGIC); }
+    constexpr auto isTunnel() const -> bool { return isSet(room_flags, TUNNEL); }
+    constexpr auto isPrivate() const -> bool { return isSet(room_flags, PRIVATE); }
+    constexpr auto isSafe() const -> bool { return isSet(room_flags, SAFE); }
+    constexpr auto isNoSummon() const -> bool { return isSet(room_flags, NO_SUMMON); }
+    constexpr auto isNoAstral() const -> bool { return isSet(room_flags, NO_ASTRAL); }
+    constexpr auto isNoPortal() const -> bool { return isSet(room_flags, NO_PORTAL); }
+    constexpr auto isImpOnly() const -> bool { return isSet(room_flags, IMP_ONLY); }
+    constexpr auto isFallDown() const -> bool { return isSet(room_flags, FALL_DOWN); }
+    constexpr auto isArena() const -> bool { return isSet(room_flags, ARENA); }
+    constexpr auto isQuiet() const -> bool { return isSet(room_flags, QUIET); }
+    constexpr auto isUnstable() const -> bool { return isSet(room_flags, UNSTABLE); }
+    constexpr auto isNoQuit() const -> bool { return isSet(room_flags, NO_QUIT); }
+    constexpr auto isFallUp() const -> bool { return isSet(room_flags, FALL_UP); }
+    constexpr auto isFallEast() const -> bool { return isSet(room_flags, FALL_EAST); }
+    constexpr auto isFallWest() const -> bool { return isSet(room_flags, FALL_WEST); }
+    constexpr auto isFallSouth() const -> bool { return isSet(room_flags, FALL_SOUTH); }
+    constexpr auto isFallNorth() const -> bool { return isSet(room_flags, FALL_NORTH); }
+    constexpr auto isNoTeleport() const -> bool { return isSet(room_flags, NO_TELEPORT); }
+    constexpr auto isNoTrack() const -> bool { return isSet(room_flags, NO_TRACK); }
+    constexpr auto isClanRoom() const -> bool { return isSet(room_flags, CLAN_ROOM); }
+    constexpr auto isNoScan() const -> bool { return isSet(room_flags, NO_SCAN); }
+    constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
+    constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
+
+    auto arena() -> class Arena &;
+
+    uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
+    int16_t light = {};            // Light factor of room
 
     int (*funct)(Character *, int, const char *) = {}; // special procedure
 
@@ -170,6 +205,12 @@ public:
     void AddTrackItem(room_track_data *newTrack);
     room_track_data *TrackItem(int nIndex);
     void FreeTracks();
+};
+
+struct Entity
+{
+    auto room(void) -> Room &;
+    room_t in_room = {};
 };
 
 #endif // __ROOM_H__

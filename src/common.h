@@ -168,7 +168,7 @@ typedef command_return_t (Character::*command_special_t)(QString arguments, int 
 typedef quint64 level_t;
 typedef QMap<QString, QString> aliases_t;
 
-[[nodiscard]] inline bool isSet(auto flag, auto bit)
+[[nodiscard]] inline constexpr bool isSet(auto flag, auto bit)
 {
     return flag & bit;
 };
