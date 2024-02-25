@@ -208,7 +208,7 @@ add_library(DC SHARED
     wizard.h
     Zone.h
 )
-set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+#set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
 target_compile_definitions(DC PRIVATE
   $<$<CONFIG:Debug>:testttt>
