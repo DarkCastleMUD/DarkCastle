@@ -227,6 +227,13 @@ public:
     | Player vectors
     | Character->player->toggles
     */
+    char *last_site = {};     /* Last login from.. */
+    char *poofin = {};        /* poofin message */
+    char *poofout = {};       /* poofout message */
+    char *prompt = {};        /* Sadus' disguise.. unused */
+    Object *skillchange = {}; /* Skill changing equipment. */
+    Character *golem = {};    // CURRENT golem.
+
     constexpr static uint32_t PLR_BRIEF = 1U;
     constexpr static uint32_t PLR_BRIEF_BIT = 0;
     constexpr static uint32_t PLR_COMPACT = 1U << 1;
@@ -309,7 +316,6 @@ public:
     uint32_t grpplvl = {};      // sum of levels of group pkill victims
     uint32_t group_kills = {};  // # of kills for group
 
-    char *last_site = {};       /* Last login from.. */
     struct time_data time = {}; // PC time data.  logon, played, birth
 
     uint32_t bad_pw_tries = {}; // How many times people have entered bad pws
@@ -331,14 +337,9 @@ public:
     uint32_t punish = {};    // flags for punishments
     uint32_t quest_bv1 = {}; // 1st bitvector for quests
 
-    char *poofin = {};  /* poofin message */
-    char *poofout = {}; /* poofout message */
-    char *prompt = {};  /* Sadus' disguise.. unused */
-
     int16_t buildLowVnum = {}, buildHighVnum = {};
     int16_t buildMLowVnum = {}, buildMHighVnum = {};
     int16_t buildOLowVnum = {}, buildOHighVnum = {};
-    Object *skillchange = {}; /* Skill changing equipment. */
 
     int32_t last_mob_edit = {}; // vnum of last mob edited
     vnum_t last_obj_vnum = {};  // vnum of last obj edited
@@ -351,9 +352,8 @@ public:
     bool stealth = {};   // If on, you are more stealth then norm. (god)
     bool incognito = {}; // invis imms will be seen by people in same room
 
-    bool possesing = {};   /*  is the person possessing? */
-    bool unjoinable = {};  // Do NOT autojoin
-    Character *golem = {}; // CURRENT golem.
+    bool possesing = {};  /*  is the person possessing? */
+    bool unjoinable = {}; // Do NOT autojoin
     bool hide[MAX_HIDE] = {};
     Character *hiding_from[MAX_HIDE] = {};
     QQueue<QString> away_msgs = {};
