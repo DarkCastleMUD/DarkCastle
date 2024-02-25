@@ -14,7 +14,7 @@
 #include "spells.h" // INTERNAL_SLEEPING
 #include "act.h"    // TO_ROOM
 
-command_return_t Character::do_arena(QStringList arguments, int cmd)
+auto Character::do_arena(QStringList arguments, int cmd) -> command_return_t
 {
   auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
   if (isMortal() && !rufus)
@@ -54,7 +54,7 @@ command_return_t Character::do_arena(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_joinarena(Character *ch, char *arg, int cmd)
+auto do_joinarena(Character *ch, char *arg, int cmd) -> int
 {
   char buf[256];
   int send_to = DC::NOWHERE;

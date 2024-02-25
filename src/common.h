@@ -323,7 +323,7 @@ command_return_t do_innate(Character *ch, char *argument, int cmd);
 command_return_t do_instazone(Character *ch, char *argument, int cmd);
 command_return_t do_insult(Character *ch, char *argument, int cmd);
 command_return_t do_inventory(Character *ch, char *argument, int cmd);
-command_return_t do_joinarena(Character *ch, char *argument, int cmd);
+auto do_joinarena(Character *ch, char *argument, int cmd) -> command_return_t;
 command_return_t do_ki(Character *ch, char *argument, int cmd);
 command_return_t do_kick(Character *ch, char *argument, int cmd);
 command_return_t do_kill(Character *ch, char *argument, int cmd);

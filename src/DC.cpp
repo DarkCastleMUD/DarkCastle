@@ -306,13 +306,13 @@ auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_co
 	return std::unexpected(search_error::not_found);
 }
 
-command_return_t Character::do_arena_info(QStringList arguments)
+auto Character::do_arena_info(QStringList arguments) -> command_return_t
 {
 	sendln("Arena info:");
 	return command_return_t();
 }
 
-command_return_t Character::do_arena_start(QStringList arguments)
+auto Character::do_arena_start(QStringList arguments) -> command_return_t
 {
 	/*
 	if (*arg4)
@@ -365,19 +365,19 @@ command_return_t Character::do_arena_start(QStringList arguments)
 	return command_return_t();
 }
 
-command_return_t Character::do_arena_join(QStringList arguments)
+auto Character::do_arena_join(QStringList arguments) -> command_return_t
 {
 	sendln("Arena join:");
 	return command_return_t();
 }
 
-command_return_t Character::do_arena_cancel(QStringList arguments)
+auto Character::do_arena_cancel(QStringList arguments) -> command_return_t
 {
 	sendln("Arena cancel:");
 	return command_return_t();
 }
 
-command_return_t Character::do_arena_usage(QStringList arguments)
+auto Character::do_arena_usage(QStringList arguments) -> command_return_t
 {
 	sendln("Usage:");
 	sendln("arena info          - Shows current arena status");
