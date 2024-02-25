@@ -4155,8 +4155,6 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   struct clan_room_data *room;
   int found = 0;
 
-  int do_look(Character * ch, char *argument, int cmd);
-
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     ch->sendln("You find yourself unable to.");

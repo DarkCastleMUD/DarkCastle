@@ -4092,7 +4092,7 @@ Character *get_char_room_vis(Character *ch, QString name)
 	return ch->get_char_room_vis(name);
 }
 
-Character *get_mob_room_vis(Character *ch, char *name)
+Character *get_mob_room_vis(Character *ch, const char *name)
 {
 	Character *i;
 	Character *partial_match;

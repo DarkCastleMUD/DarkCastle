@@ -107,7 +107,7 @@ int get_saves(Character *ch, int savetype)
 
 /* Procedures related to 'look' */
 
-void argument_split_3(char *argument, char *first_arg, char *second_arg, char *third_arg)
+void argument_split_3(const char *argument, char *first_arg, char *second_arg, char *third_arg)
 {
    int look_at, begin;
    begin = 0;
@@ -1293,7 +1293,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
    return eFAILURE;
 }
 
-int do_look(Character *ch, char *argument, int cmd)
+int do_look(Character *ch, const char *argument, int cmd)
 {
    char buffer[MAX_STRING_LENGTH] = {0};
    char arg1[MAX_STRING_LENGTH] = {0};

@@ -161,6 +161,7 @@ bool operator!(load_status_t ls);
 
 typedef int command_return_t;
 typedef int (*command_gen1_t)(class Character *ch, char *argument, int cmd);
+typedef int (*command_gen1b_t)(class Character *ch, const char *argument, int cmd);
 typedef command_return_t (*command_gen2_t)(class Character *ch, std::string argument, int cmd);
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, int cmd);
 typedef command_return_t (Character::*command_special_t)(QString arguments, int cmd);
@@ -351,7 +352,7 @@ command_return_t do_eqmax(Character *ch, char *argument, int cmd);
 command_return_t do_opstat(Character *ch, char *argument, int cmd);
 command_return_t do_lock(Character *ch, char *argument, int cmd);
 command_return_t do_log(Character *ch, char *argument, int cmd);
-command_return_t do_look(Character *ch, char *argument, int cmd);
+command_return_t do_look(Character *ch, const char *argument, int cmd);
 command_return_t do_make_camp(Character *ch, char *argument, int cmd);
 command_return_t do_matrixinfo(Character *ch, char *argument, int cmd);
 command_return_t do_maxes(Character *ch, char *argument, int cmd);

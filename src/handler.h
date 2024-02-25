@@ -102,7 +102,7 @@ Character *get_pc_vis(Character *ch, QString name);
 Character *get_pc_vis_exact(Character *ch, const char *name);
 Character *get_mob_vis(Character *ch, char *name);
 Character *get_random_mob_vnum(int vnum);
-Character *get_mob_room_vis(Character *ch, char *name);
+Character *get_mob_room_vis(Character *ch, const char *name);
 Character *get_mob_vnum(int vnum);
 Object *get_obj_vnum(int vnum);
 class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool bf = false);
