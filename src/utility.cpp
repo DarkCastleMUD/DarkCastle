@@ -2382,7 +2382,7 @@ void produce_coredump(void *ptr)
   return;
 }
 
-char *pluralize(int qty, char *ending)
+const char *pluralize(int qty, const char *ending)
 {
   if (qty == 0 || qty > 1)
   {

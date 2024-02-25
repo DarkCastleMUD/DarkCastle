@@ -688,7 +688,7 @@ int oprog_load_trigger(Object *item);
 int oprog_can_see_trigger(Character *ch, Object *item);
 bool is_in_game(Character *ch);
 int get_stat(Character *ch, attribute_t stat);
-char *pluralize(int qty, char ending[] = "s");
+const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);
 void make_prompt(class Connection *d, std::string &prompt);
