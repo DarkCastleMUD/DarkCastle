@@ -9,21 +9,10 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#include <cstring>
-
-#include "room.h"   // Room
-#include "db.h"     // real_room()
-#include "interp.h" // do_look()
 #include "character.h"
-#include "utility.h" // send_to_char, etc..
-#include "spells.h"
-#include "handler.h"
-#include "act.h"
-#include "punish.h"
-#include "player.h"
-
-#include "returnvals.h"
-#include "levels.h"
+#include "db.h"     // get_mob_room_vis
+#include "spells.h" // INTERNAL_SLEEPING
+#include "act.h"    // TO_ROOM
 
 command_return_t Character::do_arena(QStringList arguments, int cmd)
 {
