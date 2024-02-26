@@ -17,7 +17,7 @@
 
 struct ban_list_element *ban_list = nullptr;
 
-char *ban_types[] = {
+const char *ban_types[] = {
     "no",
     "new",
     "select",
@@ -98,8 +98,7 @@ void _write_one_node(FILE *fp, struct ban_list_element *node)
   if (node)
   {
     _write_one_node(fp, node->next);
-    fprintf(fp, "%s %s %ld %s\n", ban_types[node->type],
-            node->site, (int32_t)node->date, node->name);
+    fprintf(fp, "%s %s %d %s\n", ban_types[node->type], node->site, (int32_t)node->date, node->name);
   }
 }
 

@@ -2499,13 +2499,13 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name);
+    logf(108, LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
   for (int i = 0; i < MAX_GOLEMS; i++)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, name[0], name, i);
+    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, name.toStdString().c_str()[0], name.toStdString().c_str(), i);
 
     if (0 == stat(src_filename, &statbuf))
     {

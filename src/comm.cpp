@@ -369,7 +369,7 @@ int load_hotboot_descs()
 
       if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
       {
-        sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr, desc);
+        sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr.c_str(), desc);
         logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         delete d;
@@ -383,7 +383,7 @@ int load_hotboot_descs()
       // we need a second to be sure
       if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"))
       {
-        sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr, desc);
+        sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr.c_str(), desc);
         logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
@@ -420,7 +420,7 @@ void finish_hotboot()
 
     if (!load_char_obj(d, d->output.c_str()))
     {
-      sprintf(buf, "Could not load char '%s' in hotboot.", d->output);
+      sprintf(buf, "Could not load char '%s' in hotboot.", d->output.c_str());
       logentry(buf, 0, LogChannels::LOG_MISC);
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
@@ -3180,7 +3180,7 @@ void send_to_all(QString message)
   }
 }
 
-void ansi_color(char *txt, Character *ch)
+void ansi_color(const char *txt, Character *ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)

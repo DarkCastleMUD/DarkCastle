@@ -4608,7 +4608,7 @@ void show_obj_class_size_mini(Object *obj, Character *ch)
 {
   for (int i = 12; i < 23; i++)
     if (isSet(obj->obj_flags.extra_flags, 1 << i))
-      csendf(ch, " %s", Object::extra_bits[i]);
+      csendf(ch, " %s", Object::extra_bits[i].toStdString().c_str());
 }
 
 /* IDENFITY */

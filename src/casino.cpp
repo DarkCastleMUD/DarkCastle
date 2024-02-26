@@ -219,7 +219,7 @@ char suit(int card)
       return 's';
 }
 
-char *suitcol(int card)
+const char *suitcol(int card)
 {
    if (card < 14)
       return BOLD RED;
@@ -297,15 +297,13 @@ bool canSplit(player_data *plr)
 player_data *createPlayer(Character *ch, table_data *tbl, int noadd = 0)
 {
    player_data *plr = new player_data;
-#ifdef LEAK_CHECK
-   plr = (player_data *)calloc(1, sizeof(player_data));
-#else
-   plr = (player_data *)dc_alloc(1, sizeof(player_data));
-#endif
    plr->table = tbl;
    plr->ch = ch;
    for (int i = 0; i < 21; i++)
+   {
       plr->hand_data[i] = 0;
+   }
+
    plr->bet = 0;
    plr->insurance = plr->doubled = false;
    plr->state = 0;

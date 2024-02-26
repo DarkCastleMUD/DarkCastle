@@ -964,7 +964,7 @@ int do_get(Character *ch, char *argument, int cmd)
       else
       {
         sprintf(buffer,
-                "The %s is not a container.\r\n", fname(sub_object->name));
+                "The %s is not a container.\r\n", fname(sub_object->name).toStdString().c_str());
         ch->send(buffer);
         fail = true;
       }
