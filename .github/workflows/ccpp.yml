@@ -11,7 +11,7 @@ jobs:
       - name: install dependencies
         run: |
           zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
-            qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild
+            qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild clang-tidy
           zypper -n dup --auto-agree-with-licenses
       
       - name: make
@@ -21,3 +21,9 @@ jobs:
           cd DarkCastle
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja
           ninja -C build package
+
+      - name: test
+        run: |
+          set -x
+          cd lib
+          ./dcastle -tv
