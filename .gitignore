@@ -20,3 +20,4 @@ lib/special.txt
 lib/ssh_host_rsa_key*
 lib/wizlist.txt
 build/
+lib/gmon.out
