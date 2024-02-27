@@ -363,7 +363,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "(:)====================(:)==========(:)====================================(:)\r\n",
           k->timer,
           (IS_PC(ch) ? k->hometown : -1),
-          buf2);         /* buf is the sex... */
+          buf2); /* buf is the sex... */
   ch->send(buf); /* THIRD sprintf */
 
   if (IS_MOB(k))
@@ -1352,10 +1352,10 @@ void do_start(Character *ch)
   }
 
   sprintf(buf, "%s appears with an ear-splitting bang!", GET_SHORT(ch));
-  ch->player->poofin = str_dup(buf);
+  ch->player->poofin = buf;
 
   sprintf(buf, "%s disappears in a puff of smoke.", GET_SHORT(ch));
-  ch->player->poofout = str_dup(buf);
+  ch->player->poofout = buf;
 
   ch->raw_hit = 10;
   ch->max_hit = 10;

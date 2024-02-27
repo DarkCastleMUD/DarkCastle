@@ -454,15 +454,11 @@ int do_poof(Character *ch, char *arg, int cmd)
 
   if (inout[0] == 'i')
   {
-    if (ch->player->poofin)
-      dc_free(ch->player->poofin);
-    ch->player->poofin = str_dup(buf);
+    ch->player->poofin = buf;
   }
   else
   {
-    if (ch->player->poofout)
-      dc_free(ch->player->poofout);
-    ch->player->poofout = str_dup(buf);
+    ch->player->poofout = buf;
   }
 
   ch->sendln("Ok.");

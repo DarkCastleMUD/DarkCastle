@@ -229,8 +229,8 @@ public:
     | Character->player->toggles
     */
     char *last_site = {};     /* Last login from.. */
-    char *poofin = {};        /* poofin message */
-    char *poofout = {};       /* poofout message */
+    QString poofin;           /* poofin message */
+    QString poofout;          /* poofout message */
     char *prompt = {};        /* Sadus' disguise.. unused */
     Object *skillchange = {}; /* Skill changing equipment. */
     Character *golem = {};    // CURRENT golem.

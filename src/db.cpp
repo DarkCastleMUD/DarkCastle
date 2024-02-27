@@ -5980,10 +5980,6 @@ void free_char(Character *ch, Trace trace)
 				dc_free(ch->player->last_site);
 			if (!ch->player->ignoring.empty())
 				ch->player->ignoring.clear();
-			if (ch->player->poofin)
-				dc_free(ch->player->poofin);
-			if (ch->player->poofout)
-				dc_free(ch->player->poofout);
 			if (ch->player->prompt)
 				dc_free(ch->player->prompt);
 			if (ch->player->last_prompt)
