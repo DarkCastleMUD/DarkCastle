@@ -25,5 +25,5 @@ jobs:
       - name: test
         run: |
           set -x
-          cd lib
+          cd DarkCastle/lib
           ./dcastle -tv
