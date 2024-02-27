@@ -508,7 +508,7 @@ int main(int argc, char **argv)
     }
     do_look(ch, "", CMD_LOOK);
     process_output(d);
-    do_force(ch, "all save", CMD_FORCE);
+    do_force(ch, "all save");
     process_output(d);
   }
   else

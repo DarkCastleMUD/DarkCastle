@@ -1060,24 +1060,30 @@ void game_test_init(void)
 
   update_max_who();
 
+  do_restore(ch, "debugimp", CMD_DEFAULT);
+
   do_stand(ch, "", CMD_DEFAULT);
   process_output(d);
 
   char_to_room(ch, 3001);
   process_output(d);
-  // ch->do_toggle({"pager"}, CMD_DEFAULT);
-  // ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  // ch->do_toggle({}, CMD_DEFAULT);
-  //  do_goto(ch, "23", CMD_DEFAULT);
-  // do_score(ch, "", CMD_DEFAULT);
-  // process_output(d);
+  ch->do_toggle({"pager"}, CMD_DEFAULT);
+  ch->do_toggle({"ansi"}, CMD_DEFAULT);
+  ch->do_toggle({}, CMD_DEFAULT);
+  ch->do_goto({"23"});
+  do_score(ch, "", CMD_DEFAULT);
+  process_output(d);
 
-  // do_load(ch, "m 23", CMD_DEFAULT);
-  // process_output(d);
+  do_load(ch, "m 23", CMD_DEFAULT);
+  process_output(d);
+
   do_look(ch, "debugimp", CMD_LOOK);
   process_output(d);
 
   ch->do_bestow({"debugimp", "load"});
+  process_output(d);
+
+  do_load(ch, "m 23", CMD_DEFAULT);
   process_output(d);
 
   ch->do_test({"all"});

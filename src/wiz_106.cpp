@@ -51,7 +51,7 @@ int do_plats(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_force(Character *ch, std::string argument, int cmd = CMD_FORCE)
+int do_force(Character *ch, std::string argument, int cmd)
 {
   class Connection *i = {};
   class Connection *next_i = {};
