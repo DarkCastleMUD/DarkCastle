@@ -26,4 +26,4 @@ jobs:
         run: |
           set -x
           cd DarkCastle/lib
-          ./dcastle -tv
+          ../build/dcastle -tv
