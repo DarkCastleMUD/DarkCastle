@@ -115,27 +115,27 @@ typedef std::map<skill_t, struct char_skill_data> skill_list_t;
 
 struct tempvariable
 {
-    struct tempvariable *next;
+    struct tempvariable *next{};
     QString name;
     QString data;
-    int16_t save; // save or not
+    int16_t save{}; // save or not
 };
 
 struct mob_prog_act_list
 {
-    mob_prog_act_list *next;
-    char *buf;
-    Character *ch;
-    Object *obj;
-    void *vo;
+    mob_prog_act_list *next{};
+    char *buf{};
+    Character *ch{};
+    Object *obj{};
+    void *vo{};
 };
 
 struct mob_prog_data
 {
-    mob_prog_data *next;
-    int type;
-    char *arglist;
-    char *comlist;
+    mob_prog_data *next{};
+    int type{};
+    char *arglist{};
+    char *comlist{};
 };
 
 #define ERROR_PROG -1
@@ -799,7 +799,7 @@ public:
         debug_ = state;
     }
 
-    struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
+    struct room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};

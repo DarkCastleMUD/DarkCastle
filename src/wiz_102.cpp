@@ -2639,15 +2639,15 @@ void update_mobprog_bits(int mob_num)
 
 int do_procedit(Character *ch, char *argument, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
-  char buf2[MAX_INPUT_LENGTH];
-  char buf3[MAX_STRING_LENGTH];
-  char buf4[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH]{};
+  char buf2[MAX_INPUT_LENGTH]{};
+  char buf3[MAX_STRING_LENGTH]{};
+  char buf4[MAX_INPUT_LENGTH]{};
   int mob_num = -1;
   int intval = 0;
-  int x, i;
-  mob_prog_data *prog;
-  mob_prog_data *currprog;
+  int x{}, i{};
+  mob_prog_data *prog{};
+  mob_prog_data *currprog{};
 
   void mpstat(Character * ch, Character * victim);
 
@@ -2751,11 +2751,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
                    ch);
       return eFAILURE;
     }
-#ifdef LEAK_CHECK
-    prog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
-#else
-    prog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
-#endif
+    prog = new mob_prog_data;
     prog->type = GREET_PROG;
     prog->arglist = strdup("80");
     prog->comlist = strdup("say This is my new mob prog!\n\r");

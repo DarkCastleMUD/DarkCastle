@@ -429,12 +429,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
 
    if ((int64_t)arg2 == plr->table->handnr || (int64_t)arg2 == (plr->table->handnr + 100) * 2)
    {
-      struct timer_data *timer;
-#ifdef LEAK_CHECK
-      timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-      timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+      struct timer_data *timer = new timer_data;
       timer->arg1.player = plr;
       timer->arg2 = (void *)(((int64_t)arg2 + 100) * 2);
       timer->arg3 = (void *)plr->table;
@@ -483,12 +478,7 @@ void addtimer(struct timer_data *add)
 
 void add_timer(player_data *plr)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+   timer_data *timer = new timer_data;
    timer->arg1.player = plr;
    timer->arg2 = (void *)(int64_t)plr->table->handnr;
    timer->arg3 = (void *)plr->table;
@@ -508,12 +498,7 @@ void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
 
 void add_timer_bj_dealer(table_data *tbl)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+   struct timer_data *timer = new timer_data;
    timer->arg1.table = tbl;
    timer->arg2 = 0;
    if (tbl->state != 3)
@@ -526,12 +511,7 @@ void add_timer_bj_dealer(table_data *tbl)
 
 void add_timer_bj_dealer2(table_data *tbl, int time = 10)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+   struct timer_data *timer = new timer_data;
    timer->arg1.table = tbl;
    timer->arg2 = (void *)(int64_t)(++tbl->handnr);
    if (tbl->handnr == 0) // not plausible, but possible
@@ -549,12 +529,7 @@ void bj_finish(varg_t arg1, void *arg2, void *arg3)
 
 void add_new_bets(table_data *tbl)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+   struct timer_data *timer = new timer_data;
    timer->arg1.table = tbl;
    timer->function = bj_finish;
    timer->timeleft = 2;
@@ -799,12 +774,7 @@ void check_insurance(table_data *tbl)
    { // ace showing
       tbl->state = 1;
       send_to_table("$B$7The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'$R\r\n", tbl);
-      struct timer_data *timer;
-#ifdef LEAK_CHECK
-      timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-      timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+      struct timer_data *timer = new timer_data;
       timer->arg1.table = tbl;
       timer->arg2 = 0;
       timer->function = check_insurance2;

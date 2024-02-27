@@ -309,7 +309,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		}
 		if ((ch->getLevel() < IMPLEMENTER) &&
 			isSet(((class Object *)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
-					  ITEM_SPECIAL))
+				  ITEM_SPECIAL))
 		{
 			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
@@ -1017,7 +1017,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 
 				if (isexact(name,
-						   ((class Object *)(DC::getInstance()->obj_index[nr].item))->name))
+							((class Object *)(DC::getInstance()->obj_index[nr].item))->name))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
@@ -1368,7 +1368,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 			if (immune)
 				if (!isSet(((Character *)(DC::getInstance()->mob_index[nr].item))->immune,
-							   immune))
+						   immune))
 					continue;
 			if (clas)
 				if (((Character *)(DC::getInstance()->mob_index[nr].item))->c_class != clas)
@@ -1764,7 +1764,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
 				{
 					if (isSet(DC::getInstance()->rooms[i].dir_option[nr]->exit_info,
-								  EX_ISDOOR) &&
+							  EX_ISDOOR) &&
 						DC::getInstance()->rooms[i].dir_option[nr]->key == count)
 					{
 						csendf(ch,
@@ -2055,9 +2055,9 @@ void opstat(Character *ch, int vnum)
 		return;
 	}
 	ch->sendln("");
-	mob_prog_data *mprg;
-	int i;
-	char buf2[MAX_STRING_LENGTH];
+	mob_prog_data *mprg{};
+	int i{};
+	char buf2[MAX_STRING_LENGTH]{};
 	for (mprg = DC::getInstance()->obj_index[num].mobprogs, i = 1; mprg != nullptr;
 		 i++, mprg = mprg->next)
 	{
@@ -2148,7 +2148,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		opstat(ch, vnum);
 		return eSUCCESS;
 	  }*/
-	mob_prog_data *prog, *currprog;
+	mob_prog_data *prog{}, *currprog{};
 	if (!str_cmp(arg, "add"))
 	{
 		argument = one_argument(argument, arg);
@@ -2159,11 +2159,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 						 ch);
 			return eFAILURE;
 		}
-#ifdef LEAK_CHECK
-		prog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
-#else
-		prog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
-#endif
+		prog = new mob_prog_data;
 		prog->type = ALL_GREET_PROG;
 		prog->arglist = strdup("80");
 		prog->comlist = strdup("say This is my new obj prog!\n\r");
@@ -2176,7 +2172,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 			currprog->next = prog;
 		}
 		else
-	DC::getInstance()->obj_index[num].mobprogs = prog;
+			DC::getInstance()->obj_index[num].mobprogs = prog;
 		update_objprog_bits(num);
 		ch->sendln("New obj proc created.");
 		return eSUCCESS;
@@ -2206,7 +2202,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		if (prog)
 			prog->next = currprog->next;
 		else
-	DC::getInstance()->obj_index[num].mobprogs = currprog->next;
+			DC::getInstance()->obj_index[num].mobprogs = currprog->next;
 
 		currprog->type = 0;
 		dc_free(currprog->arglist);

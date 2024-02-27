@@ -1085,7 +1085,7 @@ void add_mobspec(int i)
 		return;
 
 	int mob = 0;
-	mob_prog_data *mprg;
+	mob_prog_data *mprg{};
 
 	switch (a->c_class)
 	{
@@ -6531,11 +6531,11 @@ int mprog_name_to_type(QString name)
 
 void mprog_file_read(char *f, int32_t i)
 {
-	mob_prog_data *mprog;
-	FILE *fp;
-	char letter;
-	char name[128];
-	int type;
+	mob_prog_data *mprog{};
+	FILE *fp{};
+	char letter{};
+	char name[128]{};
+	int type{};
 
 	sprintf(name, "%s%s", MOB_DIR, f);
 	if (!(fp = fopen(name, "r")))
@@ -6562,11 +6562,7 @@ void mprog_file_read(char *f, int32_t i)
 			return;
 		default:
 			SET_BIT(DC::getInstance()->mob_index[i].progtypes, type);
-#ifdef LEAK_CHECK
-			mprog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
-#else
-			mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
-#endif
+			mprog = new mob_prog_data;
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, 0);
 			mprog->comlist = fread_string(fp, 0);
@@ -6607,7 +6603,7 @@ void load_mobprogs(FILE *fp)
 
 void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 {
-	mob_prog_data *mprog;
+	mob_prog_data *mprog{};
 	char letter;
 	int type;
 	mob_prog_data lmprog;
@@ -6640,11 +6636,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 			}
 			if (!ignore)
 			{
-#ifdef LEAK_CHECK
-				mprog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
-#else
-				mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
-#endif
+				mprog = new mob_prog_data;
 			}
 			else
 				mprog = &lmprog;
@@ -6672,7 +6664,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 
 void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 {
-	mob_prog_data *mprog;
+	mob_prog_data *mprog{};
 	char letter;
 	int type;
 	mob_prog_data lmprog;
@@ -6709,11 +6701,7 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 			}
 			if (!ignore)
 			{
-#ifdef LEAK_CHECK
-				mprog = (mob_prog_data *)calloc(1, sizeof(mob_prog_data));
-#else
-				mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
-#endif
+				mprog = new mob_prog_data;
 			}
 			else
 				mprog = &lmprog;

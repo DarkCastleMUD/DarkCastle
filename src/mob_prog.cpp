@@ -61,8 +61,6 @@
 
 // Extern variables
 
-
-
 Character *rndm2;
 extern class Object *object_list;
 
@@ -4014,18 +4012,18 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
-	char temp1[MAX_STRING_LENGTH];
-	char temp2[MAX_STRING_LENGTH];
-	char word[MAX_INPUT_LENGTH];
-	mob_prog_data *mprg;
-	mob_prog_data *next;
-	char *list;
-	char *start;
-	char *dupl;
-	char *end;
-	int i;
-	int retval = 0;
-	bool done = false;
+	char temp1[MAX_STRING_LENGTH]{};
+	char temp2[MAX_STRING_LENGTH]{};
+	char word[MAX_INPUT_LENGTH]{};
+	mob_prog_data *mprg{};
+	mob_prog_data *next{};
+	char *list{};
+	char *start{};
+	char *dupl{};
+	char *end{};
+	int i{};
+	int retval{};
+	bool done{};
 	//  for ( mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs; mprg != nullptr; mprg
 	//= next )
 	mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
@@ -4112,8 +4110,8 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 void mprog_percent_check(Character *mob, Character *actor, Object *obj,
 						 void *vo, int type)
 {
-	mob_prog_data *mprg;
-	mob_prog_data *next;
+	mob_prog_data *mprg{};
+	mob_prog_data *next{};
 	bool done = false;
 	mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
 	if (!mprg)
@@ -4333,8 +4331,8 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 {
 
 	char buf[MAX_INPUT_LENGTH];
-	mob_prog_data *mprg;
-	mob_prog_data *next;
+	mob_prog_data *mprg{};
+	mob_prog_data *next{};
 	bool done = false, okay = false;
 	if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
 	{
@@ -4406,8 +4404,8 @@ int mprog_greet_trigger(Character *ch)
 
 int mprog_hitprcnt_trigger(Character *mob, Character *ch)
 {
-	mob_prog_data *mprg;
-	mob_prog_data *next;
+	mob_prog_data *mprg{};
+	mob_prog_data *next{};
 	bool done = false;
 
 	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
@@ -4526,8 +4524,8 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 		return eFAILURE;
 	}
 
-	mob_prog_data *mprg;
-	mob_prog_data *next;
+	mob_prog_data *mprg{};
+	mob_prog_data *next{};
 	int curr_catch;
 	bool done = false;
 	mprog_cur_result = eFAILURE;
@@ -4830,7 +4828,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
 {
-	mob_prog_data *mprg;
+	mob_prog_data *mprg{};
 	int curr_catch;
 	mprog_cur_result = eFAILURE;
 	Character *vmob;
