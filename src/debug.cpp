@@ -218,19 +218,6 @@ int main(int argc, char **argv)
 {
   DC debug(argc, argv);
 
-  assert(remove_all_codes(QString("$B")) == "$$B");
-  assert(remove_non_color_codes(QString("$B")) == "$B");
-  assert(nocolor_strlen(QString("$B")) == 0);
-  assert(remove_all_codes(QString("$B123$R")) == "$$B123$$R");
-  assert(remove_non_color_codes(QString("$B123$R")) == "$B123$R");
-  assert(nocolor_strlen(QString("$B123$R")) == 3);
-
-  char arg[] = " start 1";
-  char name[MAX_STRING_LENGTH] = {};
-  half_chop(arg, arg, name);
-  assert(!strcmp(arg, "start"));
-  assert(!strcmp(name, "1"));
-  exit(0);
   // char namelist[] = "chief enforcer bob";
   // qDebug() << isexact("enf", namelist) << isprefix("enf", namelist);
   // debug.db().table("shops").column("name", "text").column("name2", "bigint");

@@ -21,6 +21,11 @@ DC::DC(int &argc, char **argv)
 {
 }
 
+DC::DC(config c)
+	: QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
+{
+}
+
 void DC::removeDead(void)
 {
 	for (auto &node : death_list)

@@ -147,15 +147,15 @@ typedef QMap<zone_t, Zone> zones_t;
 class index_data
 {
 public:
-  int virt;                                                                            /* virt number of ths mob/obj           */
-  int number;                                                                          /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *); // non Combat special proc
-  int (*combat_func)(Character *, class Object *, int, const char *, Character *);     // combat special proc
-  void *item;                                                                          /* the mobile/object itself                 */
+  int virt{};                                                                            /* virt number of ths mob/obj           */
+  int number{};                                                                          /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
+  int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
+  void *item{};                                                                          /* the mobile/object itself                 */
 
-  struct mob_prog_data *mobprogs;
-  mob_prog_data *mobspec;
-  int progtypes;
+  struct mob_prog_data *mobprogs{};
+  mob_prog_data *mobspec{};
+  int progtypes{};
 };
 
 class World
@@ -244,6 +244,8 @@ class DC_EXPORT DC : public QCoreApplication
 public:
   struct config
   {
+    config(int argc = {}, char **argv = {})
+        : argc_(argc), argv_(argv) {}
     port_list_t ports;
     bool allow_imp_password = false;
     bool verbose_mode = false;
@@ -255,9 +257,12 @@ public:
     bool stderr_timestamp = true;
     bool allow_multi = false;
     bool allow_newstatsys = false;
+    bool testing = false;
     QString library_directory = DEFAULT_LIBRARY_PATH;
     QString leaderboard_check;
     QString implementer;
+    int argc_{};
+    char **argv_{};
   } cf;
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
@@ -324,6 +329,7 @@ public:
   Object *getObject(vnum_t vnum);
 
   explicit DC(int &argc, char **argv);
+  explicit DC(config c);
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
   DC &operator=(const DC &) = delete;
@@ -415,13 +421,13 @@ typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
 
 struct timer_data
 {
-  int timeleft;
-  struct timer_data *next;
-  varg_t arg1;
-  QVariant var_arg1;
-  void *arg2;
-  void *arg3;
-  TIMER_FUNC *function;
+  int timeleft{};
+  struct timer_data *next{};
+  varg_t arg1{};
+  QVariant var_arg1{};
+  void *arg2{};
+  void *arg3{};
+  TIMER_FUNC *function{};
 };
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3);

@@ -5,12 +5,14 @@
 #include <cstring>
 #include <QCoreApplication>
 #include "DC.h"
+#include "handler.h"
+#include <iostream>
 
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 
 void init_game(void);
 void backup_executable(char *const argv[]);
-DC::config parse_arguments(int argc, char *const argv[]);
+DC::config parse_arguments(int argc, char **argv);
 
 /**********************************************************************
  *  main game loop and related stuff                                  *
@@ -18,11 +20,8 @@ DC::config parse_arguments(int argc, char *const argv[]);
 
 int main(int argc, char **argv)
 {
-  DC dcastle(argc, argv);
+  DC dcastle(parse_arguments(argc, argv));
   QThread::currentThread()->setObjectName("Main Thread");
-
-  // DC *dc = dynamic_cast<DC *>(DC::instance());
-  dcastle.cf = parse_arguments(argc, argv);
 
   logentry(QString("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
   backup_executable(argv);
@@ -87,16 +86,18 @@ void backup_executable(char *const argv[])
   return;
 }
 
-DC::config parse_arguments(int argc, char *const argv[])
+DC::config parse_arguments(int argc, char **argv)
 {
   char opt;
   uint32_t port;
-  DC::config cf;
+  DC::config cf(argc, argv);
 
-  while ((opt = getopt(argc, argv, "vp:Pmbd:shwcn?i:")) != -1)
+  while ((opt = getopt(argc, argv, "tvp:Pmbd:shwcn?i:")) != -1)
   {
     switch (opt)
     {
+    case 't':
+      cf.testing = true;
     case 'i':
       cf.implementer = optarg;
       break;
@@ -148,7 +149,8 @@ DC::config parse_arguments(int argc, char *const argv[])
     default:
     case 'h':
     case '?':
-      fprintf(stderr, "Usage: %s [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P] [-i playername]\n"
+      fprintf(stderr, "Usage: %s [-t] [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P] [-i playername]\n"
+                      "-t\t\tTesting mode\n"
                       "-v\t\tVerbose mode\n"
                       "-h\t\tUsage information\n"
                       "-w\t\tWorld testing mode\n"

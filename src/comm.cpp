@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <cctype>
+#include <sys/time.h>
 
 #include <sstream>
 #include <iostream>
@@ -169,6 +170,7 @@ void weather_update();
 void send_hint();
 extern void pulse_command_lag();
 void checkConsecrate(int);
+void game_test_init(void);
 
 // extern char greetings1[MAX_STRING_LENGTH];
 // extern char greetings2[MAX_STRING_LENGTH];
@@ -528,7 +530,16 @@ void DC::init_game(void)
   {
     do_not_save_corpses = 0;
   }
-  game_loop_init();
+
+  if (cf.testing)
+  {
+    game_test_init();
+  }
+  else
+  {
+    game_loop_init();
+  }
+
   do_not_save_corpses = 1;
 
   logentry("Closing all sockets.", 0, LogChannels::LOG_MISC);
@@ -1012,6 +1023,69 @@ void DC::game_loop_init(void)
   exec();
 
   ssh.close();
+}
+
+void game_test_init(void)
+{
+  assert(remove_all_codes(QString("$B")) == "$$B");
+  assert(remove_non_color_codes(QString("$B")) == "$B");
+  assert(nocolor_strlen(QString("$B")) == 0);
+  assert(remove_all_codes(QString("$B123$R")) == "$$B123$$R");
+  assert(remove_non_color_codes(QString("$B123$R")) == "$B123$R");
+  assert(nocolor_strlen(QString("$B123$R")) == 3);
+
+  char arg[] = " start 1";
+  char name[MAX_STRING_LENGTH] = {};
+  half_chop(arg, arg, name);
+  assert(!strcmp(arg, "start"));
+  assert(!strcmp(name, "1"));
+
+  auto d = new Connection;
+  Character *ch = new Character;
+  ch->setName("Debugimp");
+  ch->player = new Player;
+
+  ch->desc = d;
+  ch->setLevel(110);
+  d->descriptor = 1;
+  d->character = ch;
+  d->output = {};
+
+  auto &character_list = DC::getInstance()->character_list;
+  character_list.insert(d->character);
+
+  d->character->do_on_login_stuff();
+
+  STATE(d) = Connection::states::PLAYING;
+
+  update_max_who();
+
+  do_stand(ch, "", CMD_DEFAULT);
+  process_output(d);
+
+  char_to_room(ch, 3001);
+  process_output(d);
+  // ch->do_toggle({"pager"}, CMD_DEFAULT);
+  // ch->do_toggle({"ansi"}, CMD_DEFAULT);
+  // ch->do_toggle({}, CMD_DEFAULT);
+  //  do_goto(ch, "23", CMD_DEFAULT);
+  // do_score(ch, "", CMD_DEFAULT);
+  // process_output(d);
+
+  // do_load(ch, "m 23", CMD_DEFAULT);
+  // process_output(d);
+  do_look(ch, "debugimp", CMD_LOOK);
+  process_output(d);
+
+  ch->do_bestow({"debugimp", "load"});
+  process_output(d);
+
+  ch->do_test({"all"});
+  process_output(d);
+
+  std::cout << std::endl;
+  std::cerr << std::endl;
+  exit(EXIT_SUCCESS);
 }
 
 extern void pulse_hunts();

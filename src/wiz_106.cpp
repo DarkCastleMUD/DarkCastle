@@ -436,12 +436,22 @@ command_return_t Character::do_test(QStringList arguments, int cmd)
     }
     return eSUCCESS;
   }
-
-  if (tests.contains(arg1))
+  else if (arg1 == "all")
+  {
+    sendln("Running all tests.");
+    command_return_t rc{};
+    for (auto &test : tests)
+    {
+      send(QString("Running %1..").arg(test.getName()));
+      rc = test.run(this) & rc;
+      sendln(QString("Return code is %1 (%2)").arg(rc).arg(rc_to_qstring(rc)));
+    }
+    return rc;
+  }
+  else if (tests.contains(arg1))
   {
     auto rc = tests[arg1].run(this);
     send(QString("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
-
     return rc;
   }
 
