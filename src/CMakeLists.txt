@@ -1,14 +1,35 @@
 cmake_minimum_required(VERSION 3.14)
+#set these two options to ON when using tracy
+option(TRACY_ENABLE "" OFF)
+option(TRACY_NO_EXIT "" OFF)
+#option(TRACY_ON_DEMAND "" ON)
+#option(TRACY_ONLY_LOCALHOST "" ON)
+#option(TRACY_ONLY_IPV4 "" ON)
+include(FetchContent)
+FetchContent_Declare(
+  tracy
+  GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+  GIT_TAG master
+  GIT_SHALLOW TRUE
+  GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable (tracy)
+set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
+add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
+
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/")
+# -DTRACY_ENABLE -DTRACY_NO_EXIT
+# -p    prof
+# -pg   gprof
+# -fsanitize=address
+# -Og
+# -Wdangling-gsl for clang
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra")
-# -fsanitize=address -Og
-# -Wdangling-gsl for clang
-#set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -O3")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${BUILD_VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR RPM)
 set(CPACK_THREADS 0)
@@ -211,7 +232,7 @@ add_library(DC SHARED
 #set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
 target_compile_definitions(DC PRIVATE
-  $<$<CONFIG:Debug>:testttt>
+  $<$<CONFIG:Debug>:DEBUG_BUILD>
 )
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -220,14 +241,13 @@ qt_add_executable(dcastle dcastle.cpp)
 target_compile_definitions(dcastle PRIVATE
   $<$<CONFIG:Debug>:DEBUG_BUILD>
 )
-target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
 
 qt_add_executable(debug debug.cpp)
 target_compile_definitions(debug PRIVATE
   $<$<CONFIG:Debug>:DEBUG_BUILD>
 )
-target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql)
-
+target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
 
 install (TARGETS dcastle debug
 BUNDLE DESTINATION .
