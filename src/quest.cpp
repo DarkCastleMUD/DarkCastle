@@ -53,7 +53,7 @@ int load_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "r")))
    {
-      logentry("Failed to open quest file for reading!", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open quest file for reading!"), 0, LogChannels::LOG_MISC);
       return eFAILURE;
    }
 
@@ -98,7 +98,7 @@ int save_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "w")))
    {
-      logentry("Failed to open quest file for writing!", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open quest file for writing!"), 0, LogChannels::LOG_MISC);
       return eFAILURE;
    }
 
@@ -393,7 +393,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
          if (!amount)
          {
-            logentry("Somebody passed a quest into here that they don't really have.", IMMORTAL, LogChannels::LOG_BUG);
+            logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, LogChannels::LOG_BUG);
          }
 
          csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\r\n\r",
@@ -906,7 +906,7 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       }
       break;
    default:
-      logentry("Bug in quest_handler, how'd they get here?", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, LogChannels::LOG_BUG);
       return eFAILURE;
    }
    return retval;
@@ -1452,7 +1452,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       break;
    default:
-      logentry("Screw up in do_edit_quest, whatsamaddahyou?", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, LogChannels::LOG_BUG);
       return eFAILURE;
    }
    return eSUCCESS;

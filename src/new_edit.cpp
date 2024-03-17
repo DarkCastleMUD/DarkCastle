@@ -20,8 +20,6 @@
 #include <string>
 #include <fmt/format.h>
 
-
-
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(Character *ch, int abort);
 void format_text(char **ptr_string, int mode, class Connection *d, int maxlen);
@@ -494,7 +492,7 @@ void parse_action(int command, char *str, class Connection *d)
       break;
    default:
       SEND_TO_Q("Invalid option.\r\n", d);
-      logentry("SYSERR: invalid command passed to parse_action", OVERSEER, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, LogChannels::LOG_MISC);
       return;
    }
 }

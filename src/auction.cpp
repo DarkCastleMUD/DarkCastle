@@ -868,7 +868,7 @@ void AuctionHouse::Save()
 
   if (DC::getInstance()->cf.bport)
   {
-    logentry("Unable to save auction files because this is the testport!", ANGEL, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, LogChannels::LOG_MISC);
     return;
   }
   QString temp_file_name = file_name + ".temp";
@@ -1252,7 +1252,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   }
   else
   {
-    logentry("bport mode: Not saving auction file to web dir.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("bport mode: Not saving auction file to web dir."), 0, LogChannels::LOG_MISC);
   }
 }
 
@@ -1431,7 +1431,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   }
   break;
   default:
-    logentry("Default case reached in Removeticket, contact a coder!", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, LogChannels::LOG_BUG);
     break;
   }
 

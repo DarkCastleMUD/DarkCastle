@@ -132,7 +132,7 @@ char *fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    logentry("Fread_social_string - unexpected EOF.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, LogChannels::LOG_BUG);
     exit(0);
   }
 

@@ -267,7 +267,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     Character *charmie = clone_mobile(real_mobile(8));
     if (charmie == nullptr)
     {
-        logentry("Error. clone_mobile(real_mobile(8)) returned nullptr.");
+        logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
         return false;
     }
     charmie->setLevel(1);

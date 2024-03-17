@@ -59,7 +59,6 @@ void vault_log(Character *ch, char *owner);
 QString clanVName(uint64_t clan_id);
 void vault_search_usage(Character *ch);
 
-
 extern class Object *object_list;
 
 struct vault_data *has_vault(QString name)
@@ -751,7 +750,7 @@ void testing_load_vaults(void)
   QFile vault_index_file(VAULT_INDEX_FILE);
   if (!vault_index_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
   {
-    logentry("boot_vaults: could not open vault index file, probably doesn't exist.");
+    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."));
     return;
   }
   QTextStream vault_index_stream(&vault_index_file);
@@ -974,7 +973,7 @@ void load_vaults(void)
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   fscanf(index, "%s\n", line);
@@ -994,7 +993,7 @@ void load_vaults(void)
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -2142,13 +2141,13 @@ void add_new_vault(const char *name, int indexonly)
   char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry("add_new_vault: error opening index file.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
   {
-    logentry("add_new_vault: error opening temp index file.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_new_vault: error opening temp index file."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 

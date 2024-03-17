@@ -441,7 +441,7 @@ void load_skillquests()
 
 	if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
 	{
-		logentry("Cannot open skill quest file.", 0, LogChannels::LOG_MISC);
+		logentry(QStringLiteral("Cannot open skill quest file."), 0, LogChannels::LOG_MISC);
 		abort();
 	}
 
@@ -486,10 +486,10 @@ void DC::boot_db(void)
 
 	reset_time();
 
-	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
-	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_MISC);
-	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_WORLD);
-	logentry("Reading aux files.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_SOCKET);
+	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_WORLD);
+	logentry(QStringLiteral("Reading aux files."), 0, LogChannels::LOG_MISC);
 	file_to_string(WEBPAGE_FILE, webpage);
 	file_to_string(GREETINGS1_FILE, greetings1);
 	file_to_string(GREETINGS2_FILE, greetings2);
@@ -507,16 +507,16 @@ void DC::boot_db(void)
 	funny_boot_message();
 
 	do_godlist();
-	logentry("Godlist done!", 0, LogChannels::LOG_MISC);
-	logentry("Booting clans...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Godlist done!"), 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Booting clans..."), 0, LogChannels::LOG_MISC);
 
 	boot_clans();
 
-	logentry("Loading new news file.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading new news file."), 0, LogChannels::LOG_MISC);
 	extern void loadnews();
 	loadnews();
 
-	logentry("Loading new help file.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading new help file."), 0, LogChannels::LOG_MISC);
 
 	// new help file stuff
 	if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
@@ -537,7 +537,7 @@ void DC::boot_db(void)
 	fclose(new_help_fl);
 	// end new help files
 
-	logentry("Opening help file.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Opening help file."), 0, LogChannels::LOG_MISC);
 
 	if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
 	{
@@ -547,61 +547,61 @@ void DC::boot_db(void)
 
 	help_index = build_help_index(help_fl, &top_of_helpt);
 
-	logentry("Loading the zones", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading the zones"), 0, LogChannels::LOG_MISC);
 	boot_zones();
 
-	logentry("Loading the world.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading the world."), 0, LogChannels::LOG_MISC);
 	top_of_world_alloc = 2000;
 
 	funny_boot_message();
 
 	boot_world();
 
-	logentry("Renumbering the world.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Renumbering the world."), 0, LogChannels::LOG_MISC);
 	renum_world();
 
 	funny_boot_message();
 
-	logentry("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, LogChannels::LOG_MISC);
 	generate_mob_indices(&top_of_mobt, mob_index);
 
-	logentry("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Generating object indices/loading all objects"), 0, LogChannels::LOG_MISC);
 	generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
 
 	funny_boot_message();
 
-	logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("renumbering zone table"), 0, LogChannels::LOG_MISC);
 	renum_zone_table();
 
-	logentry("Looking for unordered mobiles...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Looking for unordered mobiles..."), 0, LogChannels::LOG_MISC);
 	find_unordered_mobiles();
 
-	logentry("Looking for unordered objects...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Looking for unordered objects..."), 0, LogChannels::LOG_MISC);
 	find_unordered_objects();
 
 	if (cf.bport == false)
 	{
-		logentry("Loading Corpses.", 0, LogChannels::LOG_MISC);
+		logentry(QStringLiteral("Loading Corpses."), 0, LogChannels::LOG_MISC);
 		load_corpses();
 	}
 
-	logentry("Loading messages.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading messages."), 0, LogChannels::LOG_MISC);
 	load_messages(MESS_FILE);
 	load_messages(MESS2_FILE, 2000);
 
-	logentry("Loading socials.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading socials."), 0, LogChannels::LOG_MISC);
 	boot_social_messages();
 
-	logentry("Processing game portals...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Processing game portals..."), 0, LogChannels::LOG_MISC);
 	load_game_portals();
 
-	logentry("Loading emoting objects...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading emoting objects..."), 0, LogChannels::LOG_MISC);
 	load_emoting_objects();
 
-	logentry("Adding clan room flags to rooms...", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Adding clan room flags to rooms..."), 0, LogChannels::LOG_MISC);
 	assign_clan_rooms();
 
-	logentry("Assigning function pointers.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Assigning function pointers."), 0, LogChannels::LOG_MISC);
 	assign_mobiles();
 	assign_objects();
 	assign_rooms();
@@ -628,28 +628,28 @@ void DC::boot_db(void)
 		fprintf(stderr, "\n");
 	}
 
-	logentry("Loading banned list", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading banned list"), 0, LogChannels::LOG_MISC);
 	load_banned();
 
-	logentry("Loading skill quests.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading skill quests."), 0, LogChannels::LOG_MISC);
 	load_skillquests();
 
-	logentry("Assigning inventory to shopkeepers", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Assigning inventory to shopkeepers"), 0, LogChannels::LOG_MISC);
 	fix_shopkeepers_inventory();
 
-	logentry("Turning on MOB Progs", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Turning on MOB Progs"), 0, LogChannels::LOG_MISC);
 	MOBtrigger = true;
 
-	logentry("Loading quest one liners.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading quest one liners."), 0, LogChannels::LOG_MISC);
 	load_quests();
 
-	logentry("Loading vaults.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading vaults."), 0, LogChannels::LOG_MISC);
 	load_vaults();
 
-	logentry("Loading player hints.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading player hints."), 0, LogChannels::LOG_MISC);
 	load_hints();
 
-	logentry("Loading auction tickets.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Loading auction tickets."), 0, LogChannels::LOG_MISC);
 	load_auction_tickets();
 }
 
@@ -668,11 +668,11 @@ void do_godlist()
 	int x;
 	FILE *fl;
 
-	logentry("Doing wizlist...db.c\n\r", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Doing wizlist...db.c\n\r"), 0, LogChannels::LOG_MISC);
 
 	if (!(fl = fopen("../lib/wizlist.txt", "r")))
 	{
-		logentry("db.c: error reading wizlist.txt", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("db.c: error reading wizlist.txt"), ANGEL, LogChannels::LOG_BUG);
 		perror("db.c...error reading wizlist.txt: ");
 		fclose(fl);
 		return;
@@ -692,7 +692,7 @@ void do_godlist()
 		wizlist[x].level = atoi(buf3);
 	}
 
-	logentry("Done!\n\r", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Done!\n\r"), 0, LogChannels::LOG_MISC);
 	fclose(fl);
 }
 
@@ -969,12 +969,12 @@ index_data *generate_mob_indices(int *top, index_data *index)
 	struct world_file_list_item *pItem = nullptr;
 	//  extern short code_testing_mode;
 
-	logentry("Opening mobile file index.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Opening mobile file index."), 0, LogChannels::LOG_MISC);
 	if (DC::getInstance()->cf.test_mobs)
 	{
 		if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
 		{
-			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
+			logentry(QStringLiteral("Could not open index file."), 0, LogChannels::LOG_MISC);
 			abort();
 		}
 	}
@@ -982,12 +982,12 @@ index_data *generate_mob_indices(int *top, index_data *index)
 	{
 		if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
 		{
-			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
+			logentry(QStringLiteral("Could not open index file."), 0, LogChannels::LOG_MISC);
 			abort();
 		}
 	}
 
-	logentry("Opening object files.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Opening object files."), 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
 	for (temp = read_next_worldfile_name(flMobIndex);
@@ -1285,18 +1285,18 @@ index_data *generate_obj_indices(int *top,
 
 	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
 	{
-		logentry("Cannot open object file index.", 0, LogChannels::LOG_MISC);
+		logentry(QStringLiteral("Cannot open object file index."), 0, LogChannels::LOG_MISC);
 		abort();
 	}
 	/*
 	 } else {
 	 if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-	 logentry("Cannot open object file index.(tiny).",0,LogChannels::LOG_MISC);
+	 logentry(QStringLiteral("Cannot open object file index.(tiny)."),0,LogChannels::LOG_MISC);
 	 abort();
 	 }
 	 }
 	 */
-	logentry("Opening object files.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Opening object files."), 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
 	for (temp = read_next_worldfile_name(flObjIndex);
@@ -1314,7 +1314,7 @@ index_data *generate_obj_indices(int *top,
 
 		if (!(fl = fopen(endfile, "r")))
 		{
-			logentry("generate_obj_indices: could not open obj file.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, LogChannels::LOG_BUG);
 			logentry(temp, 0, LogChannels::LOG_BUG);
 			abort();
 		}
@@ -1515,7 +1515,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			{
 				QString error = QString("Room %1 is outside of any zone.").arg(room_nr);
 				logentry(error);
-				logentry("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
+				logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LogChannels::LOG_BUG);
 			}
 			else
 			{
@@ -1753,7 +1753,7 @@ void set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		logentry("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -1795,7 +1795,7 @@ void set_zone_saved(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		logentry("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -1970,7 +1970,7 @@ void DC::boot_world(void)
 		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE_TINY, "r")))
 		{
 			perror("fopen");
-			logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
@@ -1979,12 +1979,12 @@ void DC::boot_world(void)
 		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE, "r")))
 		{
 			perror("fopen");
-			logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("boot_world: could not open world index file."), 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
 
-	logentry("Booting individual world files", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Booting individual world files"), 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
@@ -2003,7 +2003,7 @@ void DC::boot_world(void)
 		if (!(fl = fopen(endfile, "r")))
 		{
 			perror("fopen");
-			logentry("boot_world: could not open world file.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("boot_world: could not open world file."), 0, LogChannels::LOG_BUG);
 			logentry(temp, 0, LogChannels::LOG_BUG);
 			abort();
 		}
@@ -2025,7 +2025,7 @@ void DC::boot_world(void)
 
 		fclose(fl);
 	}
-	logentry("World Boot done.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("World Boot done."), 0, LogChannels::LOG_MISC);
 	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
@@ -2252,7 +2252,7 @@ void renum_zone_table(void)
 				// J = junk.  Just a temp holder for an empty command, ignore it
 				break;
 			default:
-				logentry("Illegal char hit in renum_zone_table", 0, LogChannels::LOG_WORLD);
+				logentry(QStringLiteral("Illegal char hit in renum_zone_table"), 0, LogChannels::LOG_WORLD);
 				break;
 			}
 		}
@@ -2392,7 +2392,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	Zone zone(new_zone_key);
 
-	// logentry("Reading zone", 0, LogChannels::LOG_BUG);
+	// logentry(QStringLiteral("Reading zone"), 0, LogChannels::LOG_BUG);
 
 	DC::getInstance()->currentVNUM(tmp);
 	DC::getInstance()->currentType("Zone");
@@ -2537,17 +2537,17 @@ void DC::boot_zones(void)
 		if (!(flZoneIndex = fopen(ZONE_INDEX_FILE, "r")))
 		{
 			perror("fopen");
-			logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("boot_world: could not open world index file."), 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
 	else if (!(flZoneIndex = fopen(ZONE_INDEX_FILE_TINY, "r")))
 	{
 		perror("fopen");
-		logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, LogChannels::LOG_BUG);
 		abort();
 	}
-	logentry("Booting individual zone files", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Booting individual zone files"), 0, LogChannels::LOG_MISC);
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
 		 temp.isEmpty() == false;
@@ -2576,7 +2576,7 @@ void DC::boot_zones(void)
 		fclose(fl);
 	}
 
-	logentry("Zone Boot done.", 0, LogChannels::LOG_MISC);
+	logentry(QStringLiteral("Zone Boot done."), 0, LogChannels::LOG_MISC);
 
 	fclose(flZoneIndex);
 
@@ -5021,11 +5021,11 @@ void Zone::reset(ResetType reset_type)
 					// so we don't see unnecessary errors when a zone reset tries to reequip a mob
 					if (mob == nullptr)
 					{
-						logentry("nullptr mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
+						logentry(QStringLiteral("nullptr mob in reset_zone()!"), ANGEL, LogChannels::LOG_BUG);
 					}
 					else if (cmd[cmd_no]->arg3 < 0 || cmd[cmd_no]->arg3 >= MAX_WEAR)
 					{
-						logentry("Invalid eq position in Zone::reset()!", ANGEL, LogChannels::LOG_BUG);
+						logentry(QStringLiteral("Invalid eq position in Zone::reset()!"), ANGEL, LogChannels::LOG_BUG);
 					}
 					else if (mob->equipment[cmd[cmd_no]->arg3] == 0)
 					{
@@ -5985,7 +5985,7 @@ void free_char(Character *ch, Trace trace)
 			if (ch->player->last_prompt)
 				dc_free(ch->player->last_prompt);
 			if (ch->player->golem)
-				logentry("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
+				logentry(QStringLiteral("Error, golem not released properly"), ANGEL, LogChannels::LOG_BUG);
 			/* Free aliases... (I was to lazy to do before. ;) */
 			ch->player->away_msgs.clear();
 
@@ -6074,7 +6074,7 @@ int file_to_string(const char *name, char *buf)
 		{
 			if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
 			{
-				logentry("fl->strng: std::string too big (db.c, file_to_string)",
+				logentry(QStringLiteral("fl->strng: std::string too big (db.c, file_to_string)"),
 						 0, LogChannels::LOG_BUG);
 				*buf = '\0';
 				return (-1);

@@ -215,7 +215,7 @@ int do_string(Character *ch, char *arg, int cmd)
 			}
 
 			ch->sendln("This is broken.");
-			logentry("do_string: broken");
+			logentry(QStringLiteral("do_string: broken"));
 			/*
 			TODO
 			if (IS_NPC(mob))
@@ -573,7 +573,7 @@ const char *next_page(const char *str)
 		{
 			if (*(str + 1) == '\0')
 			{ // this should never happen
-				logentry("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
+				logentry(QStringLiteral("String ended in $ in next_page"), ANGEL, LogChannels::LOG_BUG);
 				//*str = '\0'; // overwrite the $ so it doesn't mess up anything
 				return nullptr;
 			}

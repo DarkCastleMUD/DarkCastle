@@ -280,7 +280,7 @@ void load_corpses(void)
 		get_line_new(fp, line);
 	}
 	else
-		logentry("No corpses in file to load", 0, LogChannels::LOG_MISC);
+		logentry(QStringLiteral("No corpses in file to load"), 0, LogChannels::LOG_MISC);
 
 	while (!feof(fp) && !end)
 	{
@@ -348,7 +348,7 @@ void load_corpses(void)
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					logentry("XAP Found", 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("XAP Found"), 0, LogChannels::LOG_MISC);
 				if ((temp->name = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->name = "undefined";
@@ -404,7 +404,7 @@ void load_corpses(void)
 				if (!get_line_new(fp, line) ||
 					(sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
 				{
-					logentry("load_corpses: Format error in first numeric line (expecting 5 args)", 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, LogChannels::LOG_MISC);
 				}
 				else
 				{
@@ -491,7 +491,7 @@ void load_corpses(void)
 					continue;
 				}
 				if (debug == 1)
-					logentry("XAP NOT Found", 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("XAP NOT Found"), 0, LogChannels::LOG_MISC);
 			}
 			if (temp != nullptr)
 			{

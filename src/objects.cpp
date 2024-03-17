@@ -33,8 +33,6 @@ extern int drink_aff[][3];
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
-
-
 void add_obj_affect(Object *obj, int loc, int mod)
 {
   obj->num_affects++;
@@ -2177,7 +2175,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   default:
   {
-    logentry("Unknown type called in wear.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unknown type called in wear."), ANGEL, LogChannels::LOG_BUG);
   }
   break;
   }

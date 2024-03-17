@@ -1690,7 +1690,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 
 		if (hjp->next != af)
 		{
-			logentry("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, LogChannels::LOG_BUG);
 			sprintf(buf, "Problem With: %s    Affect type: %d", ch->getNameC(), af->type);
 			logentry(buf, ANGEL, LogChannels::LOG_BUG);
 			return;
@@ -2331,7 +2331,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	if (DC::getInstance()->world[room].people == ch)
 	{
-		logentry("Error: DC::getInstance()->world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2440,12 +2440,12 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (!ch || !obj)
 	{
-		logentry("Null ch or obj in equip_char()!", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Null ch or obj in equip_char()!"), ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
 	{
-		logentry("Invalid eq position in equip_char!", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (ch->equipment[pos])
@@ -2463,13 +2463,13 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (obj->carried_by)
 	{
-		logentry("EQUIP: Obj is carried_by when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
 	if (obj->in_room != DC::NOWHERE)
 	{
-		logentry("EQUIP: Obj is in_room when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2500,7 +2500,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		}
 		else
 		{
-			logentry("ch->in_room = DC::NOWHERE when equipping char.", 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("ch->in_room = DC::NOWHERE when equipping char."), 0, LogChannels::LOG_BUG);
 		}
 	}
 
@@ -2983,7 +2983,7 @@ int move_obj(Object *obj, int dest)
 
 	if (!obj)
 	{
-		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3072,7 +3072,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (!obj)
 	{
-		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3159,7 +3159,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (!obj)
 	{
-		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3299,7 +3299,7 @@ int obj_from_char(class Object *object)
 
 	if (!object->carried_by)
 	{
-		logentry("Obj_from_char called on an object no one is carrying!", OVERSEER,
+		logentry(QStringLiteral("Obj_from_char called on an object no one is carrying!"), OVERSEER,
 				 LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3424,7 +3424,7 @@ int obj_from_room(class Object *object)
 
 	if (object->in_room == DC::NOWHERE)
 	{
-		logentry("obj_from_room called on an object that isn't in a room!", OVERSEER,
+		logentry(QStringLiteral("obj_from_room called on an object that isn't in a room!"), OVERSEER,
 				 LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3501,7 +3501,7 @@ int obj_from_obj(class Object *obj)
 
 	if (!obj->in_obj)
 	{
-		logentry("obj_from_obj called on an item that isn't inside another item.",
+		logentry(QStringLiteral("obj_from_obj called on an item that isn't inside another item."),
 				 OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3725,7 +3725,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 	if (ch->in_room == DC::NOWHERE)
 	{
-		logentry("Extract_char: DC::NOWHERE", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -4640,7 +4640,7 @@ class Object *create_money(int amount)
 
 	if (amount <= 0)
 	{
-		logentry("ERROR: Try to create negative money.", ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, LogChannels::LOG_BUG);
 		return (0);
 	}
 

@@ -91,7 +91,7 @@ void rebuild_rnum_references(int startAt, int type)
       case 'J':
         break;
       default:
-        logentry("Illegal char hit in rebuild_rnum_references", 0, LogChannels::LOG_WORLD);
+        logentry(QStringLiteral("Illegal char hit in rebuild_rnum_references"), 0, LogChannels::LOG_WORLD);
         break;
       }
     }
@@ -263,7 +263,7 @@ int do_find(Character *ch, char *arg, int cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_find.");
-    logentry("Default in do_find...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name, CMD_DEFAULT);
@@ -335,7 +335,7 @@ int do_stat(Character *ch, char *arg, int cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_stat.");
-    logentry("Default in do_stat...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     if ((vict = get_mob_vis(ch, name)))

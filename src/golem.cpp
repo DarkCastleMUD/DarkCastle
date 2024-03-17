@@ -159,7 +159,7 @@ void save_golem_data(Character *ch)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, LogChannels::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.

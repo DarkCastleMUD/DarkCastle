@@ -1041,7 +1041,7 @@ void isr_set(Character *ch)
 
   if (!ch)
   {
-    logentry("nullptr ch in isr_set!", 0, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, LogChannels::LOG_BUG);
     return;
   }
 
@@ -1129,7 +1129,7 @@ void stop_follower(Character *ch, int cmd)
 
   if (ch->master == nullptr)
   {
-    logentry("Stop_follower: null ch_master!", ARCHANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, LogChannels::LOG_BUG);
     return;
   }
   /*

@@ -235,25 +235,25 @@ int main(int argc, char **argv)
     }
   }
 
-  logentry("Loading the zones", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Loading the zones"), 0, LogChannels::LOG_MISC);
   DC::getInstance()->boot_zones();
 
-  logentry("Loading the world.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Loading the world."), 0, LogChannels::LOG_MISC);
   extern room_t top_of_world_alloc;
   top_of_world_alloc = 2000;
 
   DC::getInstance()->boot_world();
 
-  logentry("Renumbering the world.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Renumbering the world."), 0, LogChannels::LOG_MISC);
   renum_world();
 
-  logentry("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Generating object indices/loading all objects"), 0, LogChannels::LOG_MISC);
   generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
 
-  logentry("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, LogChannels::LOG_MISC);
   generate_mob_indices(&top_of_mobt, DC::getInstance()->mob_index);
 
-  logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("renumbering zone table"), 0, LogChannels::LOG_MISC);
   renum_zone_table();
 
   class Connection *d = new Connection;

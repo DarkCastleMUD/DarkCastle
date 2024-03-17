@@ -780,7 +780,7 @@ int cast_stone_shield(uint8_t level, Character *ch, char *arg, int type, Charact
     return spell_stone_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in stone_shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -850,7 +850,7 @@ int cast_iridescent_aura(uint8_t level, Character *ch, char *arg, int type, Char
     return spell_iridescent_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in iridesent_aura!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in iridesent_aura!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -919,7 +919,7 @@ int cast_greater_stone_shield(uint8_t level, Character *ch, char *arg, int type,
     return spell_greater_stone_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in stone_shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in stone_shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -1102,7 +1102,7 @@ void do_solar_blind(Character *ch, Character *tmp_victim, int skill)
   struct affected_type af;
   if (!ch || !tmp_victim)
   {
-    logentry("Null ch or vict in solar_blind", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict in solar_blind"), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   if (tmp_victim->in_room != ch->in_room)
@@ -1309,7 +1309,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
     {
       if (!tmp_victim)
       {
-        logentry("Bad character in character_list in magic.c in group-recall!", ANGEL, LogChannels::LOG_BUG);
+        logentry(QStringLiteral("Bad character in character_list in magic.c in group-recall!"), ANGEL, LogChannels::LOG_BUG);
         return eFAILURE | eINTERNAL_ERROR;
       }
       if (number(1, 101) > chance)
@@ -1342,7 +1342,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Objec
     {
       if (!tmp_victim)
       {
-        logentry("Bad tmp_victim in character_list in group fly!", ANGEL, LogChannels::LOG_BUG);
+        logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, LogChannels::LOG_BUG);
         return eFAILURE;
       }
       spell_fly(level, ch, tmp_victim, obj, skill);
@@ -1402,7 +1402,7 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
     {
       if (!tmp_victim)
       {
-        logentry("Bad tmp_victim in character_list in group fly!", ANGEL, LogChannels::LOG_BUG);
+        logentry(QStringLiteral("Bad tmp_victim in character_list in group fly!"), ANGEL, LogChannels::LOG_BUG);
         return eFAILURE | eINTERNAL_ERROR;
       }
       spell_sanctuary(level, ch, tmp_victim, obj, skill);
@@ -1685,7 +1685,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
 
   if (!victim)
   {
-    logentry("Null victim sent to teleport!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to teleport!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1771,7 +1771,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
   struct affected_type af;
   if (!ch && (!victim || !obj))
   {
-    logentry("Null ch or victim and obj in bless.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1882,7 +1882,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
   if (IS_NPC(victim) && (victim->getLevel() == 0))
   {
-    logentry("Null victim level in spell_paralyze.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim level in spell_paralyze."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2045,7 +2045,7 @@ int spell_create_water(uint8_t level, Character *ch, Character *victim, class Ob
   int water;
   if (!ch || !obj)
   {
-    logentry("Null ch or obj in create_water.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or obj in create_water."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -2079,7 +2079,7 @@ int spell_remove_paralysis(uint8_t level, Character *ch, Character *victim, clas
 {
   if (!victim)
   {
-    logentry("Null victim in remove_paralysis!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim in remove_paralysis!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2102,7 +2102,7 @@ int spell_remove_blind(uint8_t level, Character *ch, Character *victim, class Ob
 {
   if (!victim)
   {
-    logentry("Null victim in remove_blind!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim in remove_blind!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2154,7 +2154,7 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!victim)
   {
-    logentry("Null victim in cure_critic.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim in cure_critic."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2218,7 +2218,7 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!ch || !victim)
   {
-    logentry("Null ch or victim in cure_light!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim in cure_light!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2406,7 +2406,7 @@ int spell_detect_evil(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!victim)
   {
-    logentry("Null victim in detect evil!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim in detect evil!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2439,7 +2439,7 @@ int spell_detect_good(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!victim)
   {
-    logentry("Null victim sent to detect_good.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2472,7 +2472,7 @@ int spell_true_sight(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!victim)
   {
-    logentry("Null victim sent to detect_good.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2501,7 +2501,7 @@ int spell_detect_invisibility(uint8_t level, Character *ch, Character *victim, c
 
   if (!victim)
   {
-    logentry("Null victim sent to detect_good.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2532,7 +2532,7 @@ int spell_infravision(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!victim)
   {
-    logentry("Null victim sent to detect_good.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to detect_good."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2564,7 +2564,7 @@ int spell_detect_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (!victim)
   {
-    logentry("Null victim sent to detect_magic.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to detect_magic."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2592,7 +2592,7 @@ int spell_haste(uint8_t level, Character *ch, Character *victim, class Object *o
 
   if (!victim)
   {
-    logentry("Null victim sent to haste", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to haste"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2620,7 +2620,7 @@ int spell_detect_poison(uint8_t level, Character *ch, Character *victim, class O
 {
   if (!ch && (!victim || !obj))
   {
-    logentry("Null ch or victim and obj in bless.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim and obj in bless."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2699,7 +2699,7 @@ int spell_enchant_weapon(uint8_t level, Character *ch, Character *victim, class 
 {
   if (!ch || !obj)
   {
-    logentry("Null ch or obj in enchant_weapon!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or obj in enchant_weapon!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -2763,7 +2763,7 @@ int spell_mana(uint8_t level, Character *ch, Character *victim, class Object *ob
 
   if (!victim)
   {
-    logentry("Null victim sent to mana!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to mana!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   mana = victim->getLevel() * 4;
@@ -2786,7 +2786,7 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *ob
 
   if (!victim)
   {
-    logentry("Null victim sent to heal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to heal!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   /* Adding paladin ability to heal others back in.
@@ -2852,7 +2852,7 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!victim)
   {
-    logentry("Null victim sent to power heal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to power heal!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -3577,7 +3577,7 @@ int cast_camouflague(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in cast_camouflague!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_camouflague!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -3615,7 +3615,7 @@ int cast_farsight(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in cast_farsight!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_farsight!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eSUCCESS;
@@ -3654,7 +3654,7 @@ int cast_freefloat(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in cast_freefloat!", ANGEL, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Serious screw-up in cast_freefloat!"), ANGEL, LogChannels::LOG_MISC);
     break;
   }
   return eFAILURE;
@@ -3691,7 +3691,7 @@ int cast_insomnia(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in cast_insomnia!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_insomnia!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -3729,7 +3729,7 @@ int cast_shadowslip(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serios screw-up in cast_shadowslip!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serios screw-up in cast_shadowslip!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -3815,7 +3815,7 @@ int cast_sanctuary(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in sanctuary!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in sanctuary!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -5145,7 +5145,7 @@ int spell_refresh(uint8_t level, Character *ch, Character *victim, class Object 
   int dam;
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to spell_refresh!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to spell_refresh!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5177,7 +5177,7 @@ int spell_fly(uint8_t level, Character *ch, Character *victim, class Object *obj
 
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to spell_fly!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to spell_fly!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5210,7 +5210,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!ch)
   {
-    logentry("nullptr ch sent to cont_light!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch sent to cont_light!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5387,7 +5387,7 @@ int spell_know_alignment(uint8_t level, Character *ch, Character *victim, class 
 
   if (!ch)
   {
-    logentry("nullptr ch sent to know_alignment!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch sent to know_alignment!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5474,7 +5474,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
   int spell = (int64_t)obj;
   if (!ch || !victim)
   {
-    logentry("Null ch or victim sent to dispel_minor!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim sent to dispel_minor!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5723,7 +5723,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (!ch || !victim)
   {
-    logentry("Null ch or victim sent to dispel_magic!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim sent to dispel_magic!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5961,7 +5961,7 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
 
   if (!ch || !victim)
   {
-    logentry("Null ch or victim sent to cure_serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim sent to cure_serious!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6024,7 +6024,7 @@ int spell_cause_light(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!ch || !victim)
   {
-    logentry("Null ch or victim sent to cause_light", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or victim sent to cause_light"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6042,7 +6042,7 @@ int spell_cause_critical(uint8_t level, Character *ch, Character *victim, class 
 
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to cause_critical!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to cause_critical!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6060,7 +6060,7 @@ int spell_cause_serious(uint8_t level, Character *ch, Character *victim, class O
   int dam;
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to cause_serious!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6080,7 +6080,7 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
 
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to flamestrike!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to flamestrike!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6288,7 +6288,7 @@ int spell_stone_skin(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!ch)
   {
-    logentry("nullptr ch sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch sent to cause_serious!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6320,7 +6320,7 @@ int spell_shield(uint8_t level, Character *ch, Character *victim, class Object *
 
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to shield!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6360,7 +6360,7 @@ int spell_weaken(uint8_t level, Character *ch, Character *victim, class Object *
 
   if (!ch || !victim)
   {
-    logentry("nullptr ch or victim sent to weaken!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch or victim sent to weaken!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6482,7 +6482,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
 
   if (!ch)
   {
-    logentry("nullptr ch sent to mass_invis!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch sent to mass_invis!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6762,7 +6762,7 @@ int cast_burning_hands(uint8_t level, Character *ch, char *arg, int type,
       return spell_burning_hands(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in burning hands!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in burning hands!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6816,7 +6816,7 @@ int cast_call_lightning(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in call lightning!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in call lightning!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6844,7 +6844,7 @@ int cast_chill_touch(uint8_t level, Character *ch, char *arg, int type,
       return spell_chill_touch(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in chill touch!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in chill touch!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6871,7 +6871,7 @@ int cast_shocking_grasp(uint8_t level, Character *ch, char *arg, int type,
       return spell_shocking_grasp(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in shocking grasp!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in shocking grasp!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6898,7 +6898,7 @@ int cast_colour_spray(uint8_t level, Character *ch, char *arg, int type,
       return spell_colour_spray(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in colour spray!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in colour spray!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6927,7 +6927,7 @@ int cast_drown(uint8_t level, Character *ch, char *arg, int type,
       return spell_drown(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in drown!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in drown!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6946,7 +6946,7 @@ int cast_earthquake(uint8_t level, Character *ch, char *arg, int type,
     return spell_earthquake(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in earthquake!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in earthquake!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6965,7 +6965,7 @@ int cast_life_leech(uint8_t level, Character *ch, char *arg, int type,
     return spell_life_leech(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_life_leach!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_life_leach!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -6986,7 +6986,7 @@ int cast_heroes_feast(uint8_t level, Character *ch, char *arg, int type,
     return spell_heroes_feast(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_heroes_feast!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_heroes_feast!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7005,7 +7005,7 @@ int cast_heal_spray(uint8_t level, Character *ch, char *arg, int type,
     return spell_heal_spray(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_heal_spray!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_heal_spray!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7024,7 +7024,7 @@ int cast_group_sanc(uint8_t level, Character *ch, char *arg, int type,
     return spell_group_sanc(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_group_sanc!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_group_sanc!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7043,7 +7043,7 @@ int cast_group_recall(uint8_t level, Character *ch, char *arg, int type,
     return spell_group_recall(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_group_recall!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_group_recall!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7062,7 +7062,7 @@ int cast_group_fly(uint8_t level, Character *ch, char *arg, int type,
     return spell_group_fly(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_group_fly!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_group_fly!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7081,7 +7081,7 @@ int cast_firestorm(uint8_t level, Character *ch, char *arg, int type,
     return spell_firestorm(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_firestorm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7100,7 +7100,7 @@ int cast_solar_gate(uint8_t level, Character *ch, char *arg, int type,
     return spell_solar_gate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_firestorm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_firestorm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7147,7 +7147,7 @@ int cast_energy_drain(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in energy drain!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in energy drain!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7194,7 +7194,7 @@ int cast_souldrain(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in souldrain!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in souldrain!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7221,7 +7221,7 @@ int cast_vampiric_touch(uint8_t level, Character *ch, char *arg, int type,
       return spell_vampiric_touch(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in vampiric touch!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in vampiric touch!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7248,7 +7248,7 @@ int cast_meteor_swarm(uint8_t level, Character *ch, char *arg, int type,
       return spell_meteor_swarm(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in meteor swarm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in meteor swarm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7275,7 +7275,7 @@ int cast_fireball(uint8_t level, Character *ch, char *arg, int type,
       return spell_fireball(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in fireball!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in fireball!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7302,7 +7302,7 @@ int cast_sparks(uint8_t level, Character *ch, char *arg, int type,
       return spell_sparks(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in sparks!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in sparks!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7329,7 +7329,7 @@ int cast_howl(uint8_t level, Character *ch, char *arg, int type,
       return spell_howl(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in howl!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in howl!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7372,7 +7372,7 @@ int cast_harm(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in harm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in harm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7420,7 +7420,7 @@ int cast_power_harm(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in power_harm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in power_harm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7457,7 +7457,7 @@ int cast_divine_fury(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in divine fury!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in divine fury!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7484,7 +7484,7 @@ int cast_lightning_bolt(uint8_t level, Character *ch, char *arg, int type,
       return spell_lightning_bolt(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in lightning bolt!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in lightning bolt!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7511,7 +7511,7 @@ int cast_magic_missile(uint8_t level, Character *ch, char *arg, int type,
       return spell_magic_missile(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in magic missile!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in magic missile!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7595,7 +7595,7 @@ int cast_armor(uint8_t level, Character *ch, char *arg, int type,
     return spell_armor(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in armor!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in armor!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7631,7 +7631,7 @@ int cast_aegis(uint8_t level, Character *ch, char *arg, int type,
     return spell_aegis(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in aegis!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in aegis!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7684,7 +7684,7 @@ int cast_teleport(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   default:
-    logentry("Serious screw-up in teleport!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in teleport!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7816,7 +7816,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in bless!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in bless!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7880,7 +7880,7 @@ int cast_paralyze(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in paralyze!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in paralyze!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7948,7 +7948,7 @@ int cast_blindness(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in blindness!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in blindness!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -7988,7 +7988,7 @@ int cast_control_weather(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in control weather!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in control weather!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8019,7 +8019,7 @@ int cast_create_food(uint8_t level, Character *ch, char *arg, int type,
     return spell_create_food(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in create food!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in create food!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8054,7 +8054,7 @@ int cast_create_water(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   default:
-    logentry("Serious screw-up in create water!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in create water!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8096,7 +8096,7 @@ int cast_remove_paralysis(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in remove paralysis!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in remove paralysis!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8129,7 +8129,7 @@ int cast_remove_blind(uint8_t level, Character *ch, char *arg, int type,
       spell_remove_blind(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw up in remove blind!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw up in remove blind!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8201,7 +8201,7 @@ int cast_cure_critic(uint8_t level, Character *ch, char *arg, int type,
       spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cure critic!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cure critic!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8275,7 +8275,7 @@ int cast_cure_light(uint8_t level, Character *ch, char *arg, int type,
       spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cure light!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cure light!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8335,7 +8335,7 @@ int cast_curse(uint8_t level, Character *ch, char *arg, int type,
       }
     break;
   default:
-    logentry("Serious screw-up in curse!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in curse!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8366,7 +8366,7 @@ int cast_detect_evil(uint8_t level, Character *ch, char *arg, int type,
       spell_detect_evil(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in detect evil!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in detect evil!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8400,7 +8400,7 @@ int cast_true_sight(uint8_t level, Character *ch, char *arg, int type,
       spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in true sight!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in true sight!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8431,7 +8431,7 @@ int cast_detect_good(uint8_t level, Character *ch, char *arg, int type,
       spell_detect_good(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in detect good!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in detect good!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8504,7 +8504,7 @@ int cast_detect_invisibility(uint8_t level, Character *ch, char *arg, int type,
       spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in detect invisibility!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in detect invisibility!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8574,7 +8574,7 @@ int cast_detect_magic(uint8_t level, Character *ch, char *arg, int type,
       spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in detect magic!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in detect magic!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8613,7 +8613,7 @@ int cast_haste(uint8_t level, Character *ch, char *arg, int type,
         spell_haste(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in haste!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in haste!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8679,7 +8679,7 @@ int cast_detect_poison(uint8_t level, Character *ch, char *arg, int type,
     return spell_detect_poison(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in detect poison!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in detect poison!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8736,7 +8736,7 @@ int cast_dispel_evil(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   default:
-    logentry("Serious screw-up in dispel evil!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dispel evil!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8792,7 +8792,7 @@ int cast_dispel_good(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in dispel good!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dispel good!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8813,7 +8813,7 @@ int cast_enchant_armor(uint8_t level, Character *ch, char *arg, int type,
     return spell_enchant_armor(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry("Serious screw-up in enchant weapon!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8834,7 +8834,7 @@ int cast_enchant_weapon(uint8_t level, Character *ch, char *arg, int type,
     return spell_enchant_weapon(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry("Serious screw-up in enchant weapon!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in enchant weapon!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8864,7 +8864,7 @@ int cast_mana(uint8_t level, Character *ch, char *arg, int type,
       spell_mana(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in mana!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in mana!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8899,7 +8899,7 @@ int cast_heal(uint8_t level, Character *ch, char *arg, int type,
       spell_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in heal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in heal!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8934,7 +8934,7 @@ int cast_power_heal(uint8_t level, Character *ch, char *arg, int type,
       spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in power_heal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in power_heal!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -8962,7 +8962,7 @@ int cast_full_heal(uint8_t level, Character *ch, char *arg, int type,
       spell_full_heal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in full_heal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in full_heal!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9020,7 +9020,7 @@ int cast_invisibility(uint8_t level, Character *ch, char *arg, int type,
       spell_invisibility(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in invisibility!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in invisibility!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9040,7 +9040,7 @@ int cast_locate_object(uint8_t level, Character *ch, char *arg, int type,
     return spell_locate_object(level, ch, arg, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in locate object!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in locate object!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9085,7 +9085,7 @@ int cast_poison(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   default:
-    logentry("Serious screw-up in poison!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in poison!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9174,7 +9174,7 @@ int cast_protection_from_evil(uint8_t level, Character *ch, char *arg, int type,
       spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   default:
-    logentry("Serious screw-up in protection from evil!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in protection from evil!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9262,7 +9262,7 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
       spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   default:
-    logentry("Serious screw-up in protection from good!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in protection from good!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9304,7 +9304,7 @@ int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
       spell_remove_curse(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in remove curse!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in remove curse!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9363,7 +9363,7 @@ int cast_remove_poison(uint8_t level, Character *ch, char *arg, int type,
       spell_remove_poison(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in remove poison!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in remove poison!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -9396,7 +9396,7 @@ int cast_fireshield(uint8_t level, Character *ch, char *arg, int type,
       spell_fireshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in fireshield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in fireshield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9448,7 +9448,7 @@ int cast_sleep(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in sleep!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in sleep!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9480,7 +9480,7 @@ int cast_strength(uint8_t level, Character *ch, char *arg, int type,
       spell_strength(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in strength!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in strength!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9496,7 +9496,7 @@ int cast_ventriloquate(uint8_t level, Character *ch, char *arg, int type,
 
   if (type != SPELL_TYPE_SPELL)
   {
-    logentry("Attempt to ventriloquate by non-cast-spell.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Attempt to ventriloquate by non-cast-spell."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   for (; *arg && (*arg == ' '); arg++)
@@ -9580,7 +9580,7 @@ int cast_word_of_recall(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in word of recall!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in word of recall!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9595,7 +9595,7 @@ int cast_wizard_eye(uint8_t level, Character *ch, char *arg, int type,
     return spell_wizard_eye(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in wizard eye!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in wizard eye!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9610,7 +9610,7 @@ int cast_eagle_eye(uint8_t level, Character *ch, char *arg, int type,
     return spell_eagle_eye(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in eagle eye!",
+    logentry(QStringLiteral("Serious screw-up in eagle eye!"),
              ANGEL, LogChannels::LOG_BUG);
     break;
   }
@@ -9626,7 +9626,7 @@ int cast_summon(uint8_t level, Character *ch, char *arg, int type,
     return spell_summon(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in summon!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in summon!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9664,7 +9664,7 @@ int cast_charm_person(uint8_t level, Character *ch, char *arg, int type,
     break;
 
   default:
-    logentry("Serious screw-up in charm person!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in charm person!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9694,7 +9694,7 @@ int cast_sense_life(uint8_t level, Character *ch, char *arg, int type,
       spell_sense_life(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in sense life!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in sense life!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9712,7 +9712,7 @@ int cast_identify(uint8_t level, Character *ch, char *arg, int type,
     return spell_identify(level, ch, tar_ch, tar_obj, skill);
     break;
   default:
-    logentry("Serious screw-up in identify!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in identify!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9727,7 +9727,7 @@ int cast_frost_breath(uint8_t level, Character *ch, char *arg, int type,
     return spell_frost_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry("Serious screw-up in frostbreath!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in frostbreath!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9742,7 +9742,7 @@ int cast_acid_breath(uint8_t level, Character *ch, char *arg, int type,
     return spell_acid_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry("Serious screw-up in acidbreath!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in acidbreath!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9758,7 +9758,7 @@ int cast_fire_breath(uint8_t level, Character *ch, char *arg, int type,
     break;
     /* THIS ONE HURTS!! */
   default:
-    logentry("Serious screw-up in firebreath!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in firebreath!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9774,7 +9774,7 @@ int cast_gas_breath(uint8_t level, Character *ch, char *arg, int type,
     break;
     /* THIS ONE HURTS!! */
   default:
-    logentry("Serious screw-up in gasbreath!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in gasbreath!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9789,7 +9789,7 @@ int cast_lightning_breath(uint8_t level, Character *ch, char *arg, int type,
     return spell_lightning_breath(level, ch, tar_ch, 0, skill);
     break; /* It's a spell.. But people can't cast it! */
   default:
-    logentry("Serious screw-up in lightningbreath!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in lightningbreath!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9839,7 +9839,7 @@ int cast_fear(uint8_t level, Character *ch, char *arg, int type,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in fear!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in fear!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9916,7 +9916,7 @@ int cast_refresh(uint8_t level, Character *ch, char *arg, int type,
       spell_refresh(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in refresh!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in refresh!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -9993,7 +9993,7 @@ int cast_fly(uint8_t level, Character *ch, char *arg, int type,
       spell_fly(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in fly!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in fly!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10011,7 +10011,7 @@ int cast_cont_light(uint8_t level, Character *ch, char *arg, int type,
     return spell_cont_light(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry("Serious screw-up in cont_light", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cont_light"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10048,7 +10048,7 @@ int cast_know_alignment(uint8_t level, Character *ch, char *arg, int type,
       spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in know alignment!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in know alignment!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10108,7 +10108,7 @@ int cast_dispel_magic(uint8_t level, Character *ch, char *arg, int type,
       spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in dispel magic!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dispel magic!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10167,7 +10167,7 @@ int cast_dispel_minor(uint8_t level, Character *ch, char *arg, int type,
       spell_dispel_minor(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in dispel minor!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dispel minor!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10452,7 +10452,7 @@ int cast_cure_serious(uint8_t level, Character *ch, char *arg, int type,
     return spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cure serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cure serious!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10502,7 +10502,7 @@ int cast_cause_light(uint8_t level, Character *ch, char *arg, int type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cause light!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cause light!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10552,7 +10552,7 @@ int cast_cause_critical(uint8_t level, Character *ch, char *arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cause critical!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cause critical!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10602,7 +10602,7 @@ int cast_cause_serious(uint8_t level, Character *ch, char *arg,
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cause serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cause serious!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10649,7 +10649,7 @@ int cast_flamestrike(uint8_t level, Character *ch, char *arg,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in flamestrike!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in flamestrike!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10676,7 +10676,7 @@ int cast_resist_cold(uint8_t level, Character *ch, char *arg,
     return spell_resist_cold(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in resist_cold!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in resist_cold!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10703,7 +10703,7 @@ int cast_staunchblood(uint8_t level, Character *ch, char *arg, int type,
     return spell_staunchblood(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_staunchblood!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_staunchblood!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10729,7 +10729,7 @@ int cast_resist_energy(uint8_t level, Character *ch, char *arg, int type,
     return spell_resist_energy(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in resist energy!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in resist energy!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10756,7 +10756,7 @@ int cast_resist_fire(uint8_t level, Character *ch, char *arg,
     return spell_resist_fire(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in resist_fire!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in resist_fire!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10822,7 +10822,7 @@ int cast_resist_magic(uint8_t level, Character *ch, char *arg,
     return spell_resist_magic(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in resist_magic!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in resist_magic!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10849,7 +10849,7 @@ int cast_stone_skin(uint8_t level, Character *ch, char *arg,
     return spell_stone_skin(level, tar_ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in stone skin!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in stone skin!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10887,7 +10887,7 @@ int cast_shield(uint8_t level, Character *ch, char *arg,
       spell_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10947,7 +10947,7 @@ int cast_weaken(uint8_t level, Character *ch, char *arg,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in weaken!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in weaken!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -10971,7 +10971,7 @@ int cast_mass_invis(uint8_t level, Character *ch, char *arg,
     return spell_mass_invis(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in mass invis!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in mass invis!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11026,7 +11026,7 @@ int cast_acid_blast(uint8_t level, Character *ch, char *arg,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in acid blast!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in acid blast!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11075,7 +11075,7 @@ int cast_hellstream(uint8_t level, Character *ch, char *arg,
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in hell stream!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in hell stream!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11105,7 +11105,7 @@ int cast_portal(uint8_t level, Character *ch, char *arg,
     return spell_portal(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in portal!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in portal!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11144,7 +11144,7 @@ int cast_infravision(uint8_t level, Character *ch, char *arg,
       spell_infravision(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in infravision!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in infravision!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11165,7 +11165,7 @@ int cast_animate_dead(uint8_t level, Character *ch, char *arg, int type,
     return spell_animate_dead(level, ch, 0, tar_obj, skill);
     break;
   default:
-    logentry("Serious screw-up in Animate Dead!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in Animate Dead!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11232,7 +11232,7 @@ int cast_bee_sting(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_bee_sting(level, ch, ch, 0, skill);
   default:
-    logentry("Serious screw-up in bee sting!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in bee sting!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11263,7 +11263,7 @@ int cast_bee_swarm(uint8_t level, Character *ch, char *arg, int type,
       return spell_bee_swarm(level, ch, ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in bee swarm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in bee swarm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11440,7 +11440,7 @@ int cast_barkskin(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_barkskin(level, ch, ch, 0, skill);
   default:
-    logentry("Serious screw-up in barkskin!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in barkskin!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11774,7 +11774,7 @@ int cast_entangle(uint8_t level, Character *ch, char *arg, int type,
       return spell_entangle(level, ch, ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in entangle!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in entangle!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11838,7 +11838,7 @@ int cast_eyes_of_the_owl(uint8_t level, Character *ch, char *arg, int type,
       return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in eyes of the owl!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in eyes of the owl!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11892,7 +11892,7 @@ int cast_feline_agility(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_feline_agility(level, ch, ch, 0, skill);
   default:
-    logentry("Serious screw-up in feline agility!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in feline agility!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -11952,7 +11952,7 @@ int cast_oaken_fortitude(uint8_t level, Character *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_oaken_fortitude(level, ch, ch, 0, skill);
   default:
-    logentry("Serious screw-up in oaken fortitude!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in oaken fortitude!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -12168,7 +12168,7 @@ int check_components(Character *ch, int destroy, int item_one = 0,
 
   if (!ch)
   {
-    logentry("No ch sent to check spell components", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("No ch sent to check spell components"), ANGEL, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -12424,7 +12424,7 @@ int cast_create_golem( uint8_t level, Character *ch, char *arg, int type,
       return spell_create_golem(level, ch, tar_ch, 0, skill);
       break;
     default :
-      logentry("Serious screw-up in create golem!", ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Serious screw-up in create golem!"), ANGEL, LogChannels::LOG_BUG);
       break;
   }
   return eFAILURE;
@@ -12801,19 +12801,19 @@ int cast_summon_familiar(uint8_t level, Character *ch, char *arg, int type,
     return spell_summon_familiar(level, ch, arg, SPELL_TYPE_SPELL, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
-    logentry("Serious screw-up in summon_familiar(potion)!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
     break;
   case SPELL_TYPE_SCROLL:
-    logentry("Serious screw-up in summon_familiar(potion)!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
     break;
   case SPELL_TYPE_WAND:
-    logentry("Serious screw-up in summon_familiar(potion)!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in summon_familiar(potion)!"), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
     break;
   default:
-    logentry("Serious screw-up in summon_familiar!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in summon_familiar!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -12880,7 +12880,7 @@ int cast_lighted_path(uint8_t level, Character *ch, char *arg, int type,
     return spell_lighted_path(level, ch, "", SPELL_TYPE_SPELL, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in lighted_path! (unknown)", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in lighted_path! (unknown)"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -12937,7 +12937,7 @@ int cast_resist_acid(uint8_t level, Character *ch, char *arg, int type,
     return spell_resist_acid(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in resist acid!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in resist acid!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13015,7 +13015,7 @@ int cast_sun_ray(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   default:
-    logentry("Serious screw-up in sun ray!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in sun ray!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13092,7 +13092,7 @@ int cast_rapid_mend(uint8_t level, Character *ch, char *arg, int type,
     return spell_rapid_mend(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in rapid_mend!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in rapid_mend!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13156,7 +13156,7 @@ int cast_iron_roots(uint8_t level, Character *ch, char *arg, int type,
     return spell_iron_roots(level, tar_ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in iron_roots!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in iron_roots!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13219,7 +13219,7 @@ int cast_acid_shield(uint8_t level, Character *ch, char *arg, int type, Characte
       spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in acid shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in acid shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13273,7 +13273,7 @@ int cast_water_breathing(uint8_t level, Character *ch, char *arg, int type, Char
       spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in water breathing!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in water breathing!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13366,7 +13366,7 @@ int cast_globe_of_darkness(uint8_t level, Character *ch, char *arg, int type, Ch
       spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in globe_of_darkness!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in globe_of_darkness!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13394,7 +13394,7 @@ int cast_eyes_of_the_eagle(uint8_t level, Character *ch, char *arg, int type, Ch
   case SPELL_TYPE_STAFF:
     break;
   default:
-    logentry("Serious screw-up in eyes_of_the_eagle!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in eyes_of_the_eagle!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13507,7 +13507,7 @@ int cast_icestorm(uint8_t level, Character *ch, char *arg, int type, Character *
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in icestorm!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in icestorm!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13562,7 +13562,7 @@ int cast_lightning_shield(uint8_t level, Character *ch, char *arg, int type, Cha
       spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in lightning shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in lightning shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13659,7 +13659,7 @@ int cast_blue_bird(uint8_t level, Character *ch, char *arg, int type, Character 
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in blue_bird!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in blue_bird!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13782,7 +13782,7 @@ int cast_debility(uint8_t level, Character *ch, char *arg, int type, Character *
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in debility!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in debility!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13904,7 +13904,7 @@ int cast_attrition(uint8_t level, Character *ch, char *arg, int type, Character 
     return eSUCCESS;
     break;
   default:
-    logentry("Serious screw-up in attrition!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in attrition!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -13969,7 +13969,7 @@ int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Charac
       spell_vampiric_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in vampiric aura!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in vampiric aura!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14063,7 +14063,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
 
     break;
   default:
-    logentry("Serious screw-up in holy aura!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in holy aura!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14122,7 +14122,7 @@ int cast_dismiss_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
       spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in dismiss_familiar!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dismiss_familiar!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14179,7 +14179,7 @@ int cast_dismiss_corpse(uint8_t level, Character *ch, char *arg, int type, Chara
       spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in dismiss_corpse!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in dismiss_corpse!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14221,7 +14221,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
     act("Rocks fly everywhere as $n returns to its own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     break;
   default:
-    logentry("Serious screw-up in spell_release_elemental!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in spell_release_elemental!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -14254,7 +14254,7 @@ int cast_release_elemental(uint8_t level, Character *ch, char *arg, int type, Ch
       spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in cast_release_elemental!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in cast_release_elemental!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14305,7 +14305,7 @@ int cast_visage_of_hate(uint8_t level, Character *ch, char *arg, int type, Chara
     return spell_visage_of_hate(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in visage_of_hate!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in visage_of_hate!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14356,7 +14356,7 @@ int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Charact
     return spell_blessed_halo(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in blessed_halo!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in blessed_halo!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14454,7 +14454,7 @@ int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character
     return spell_ghost_walk(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in ghost_walk!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14589,7 +14589,7 @@ int cast_mend_golem(uint8_t level, Character *ch, char *arg, int type, Character
     return spell_mend_golem(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in ghost_walk!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in ghost_walk!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14637,7 +14637,7 @@ int cast_divine_intervention(uint8_t level, Character *ch, char *arg, int type, 
     return spell_divine_intervention(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in divine intervention!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in divine intervention!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14709,7 +14709,7 @@ int cast_wrath_of_god(uint8_t level, Character *ch, char *arg, int type, Charact
     return spell_wrath_of_god(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in wrath of god!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in wrath of god!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14755,7 +14755,7 @@ int cast_atonement(uint8_t level, Character *ch, char *arg, int type, Character 
     return spell_atonement(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in atonement!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in atonement!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14800,7 +14800,7 @@ int cast_silence(uint8_t level, Character *ch, char *arg, int type, Character *t
     return spell_silence(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in silence!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in silence!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14855,7 +14855,7 @@ int cast_immunity(uint8_t level, Character *ch, char *arg, int type, Character *
     return spell_immunity(level, ch, (Character *)arg, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in immunity!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in immunity!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14897,7 +14897,7 @@ int cast_boneshield(uint8_t level, Character *ch, char *arg, int type, Character
     return spell_boneshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in boneshield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in boneshield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -14938,7 +14938,7 @@ int cast_channel(uint8_t level, Character *ch, char *arg, int type, Character *t
     return spell_channel(level, ch, tar_ch, 0, skill, atoi(arg));
     break;
   default:
-    logentry("Serious screw-up in channel!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in channel!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15062,7 +15062,7 @@ int cast_solidity(uint8_t level, Character *ch, char *arg,
       spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in solidity!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in solidity!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15113,7 +15113,7 @@ int cast_stability(uint8_t level, Character *ch, char *arg,
       tar_ch = ch;
     return spell_stability(level, ch, tar_ch, 0, skill);
   default:
-    logentry("Serious screw-up in stability!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in stability!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15162,7 +15162,7 @@ int cast_frostshield(uint8_t level, Character *ch, char *arg, int type, Characte
     return spell_frostshield(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in frostshield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in frostshield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15378,7 +15378,7 @@ int cast_wild_magic(uint8_t level, Character *ch, char *arg,
   if (spell_to_cast)
     return (*spell_to_cast)(level, ch, arg, type, tar_ch, tar_obj, skill);
 
-  logentry("Null spell passed to cast_wild_magic. Needs fixed asap.", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Null spell passed to cast_wild_magic. Needs fixed asap."), ANGEL, LogChannels::LOG_BUG);
   return eFAILURE;
 }
 
@@ -15431,7 +15431,7 @@ int cast_spirit_shield(uint8_t level, Character *ch, char *arg, int type, Charac
     return spell_spirit_shield(level, ch, victim, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in spirit shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in spirit shield!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15484,7 +15484,7 @@ int cast_villainy(uint8_t level, Character *ch, char *arg, int type, Character *
     return spell_villainy(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in villainy!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in villainy!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15537,7 +15537,7 @@ int cast_heroism(uint8_t level, Character *ch, char *arg, int type, Character *t
     return spell_heroism(level, ch, tar_ch, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in heroism!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in heroism!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15692,7 +15692,7 @@ int cast_consecrate(uint8_t level, Character *ch, char *arg, int type,
     return spell_consecrate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in consecrate!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in consecrate!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -15853,7 +15853,7 @@ int cast_desecrate(uint8_t level, Character *ch, char *arg, int type,
     return spell_desecrate(level, ch, 0, 0, skill);
     break;
   default:
-    logentry("Serious screw-up in desecrate!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in desecrate!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -15879,7 +15879,7 @@ int cast_elemental_wall(uint8_t level, Character *ch, char *arg, int type, Chara
   case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_POTION:
   default:
-    logentry("Serious screw-up in elemental_wall!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in elemental_wall!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;
@@ -15940,7 +15940,7 @@ int cast_ethereal_focus(uint8_t level, Character *ch, char *arg, int type, Chara
   case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_WAND:
   default:
-    logentry("Serious screw-up in ethereal_focus!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in ethereal_focus!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;

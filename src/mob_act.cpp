@@ -158,7 +158,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      logentry("error in mobile_activity. dumping core.", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, LogChannels::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -350,7 +350,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              logentry("Null ch or tmp_ch in mobile_action()", IMMORTAL, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, LogChannels::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -364,7 +364,7 @@ void mobile_activity(void)
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
             if ((!IS_MOB(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                                  isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
+                                                                                              isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -937,7 +937,7 @@ void scavenge(Character *ch)
             break;
 
           default:
-            logentry("Bad switch in mob_act.C", 0, LogChannels::LOG_BUG);
+            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, LogChannels::LOG_BUG);
             break;
 
           } /* end switch */

@@ -13,7 +13,6 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
-
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
@@ -75,7 +74,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    logentry("Cannot open news file.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Cannot open news file."), 0, LogChannels::LOG_MISC);
     abort();
   }
   struct news_data *tmpnews;
@@ -90,7 +89,7 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    logentry("Cannot save news file to web dir.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Cannot save news file to web dir."), 0, LogChannels::LOG_MISC);
 }
 
 void loadnews()
@@ -98,7 +97,7 @@ void loadnews()
   FILE *fl;
   if (!(fl = fopen("news.data", "r")))
   {
-    logentry("Cannot open news file.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Cannot open news file."), 0, LogChannels::LOG_MISC);
     return;
   }
   int i;

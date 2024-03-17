@@ -220,7 +220,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   if (!arg1 || !arg2)
   {
-    logentry("nullptr args sent to str_cmp in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr args sent to str_cmp in utility.c!"), ANGEL, LogChannels::LOG_BUG);
     return 0;
   }
 
@@ -848,7 +848,7 @@ void util_archive(const char *char_name, Character *caller)
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      logentry("Attempt to archive a non-existent char.", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Attempt to archive a non-existent char."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   sprintf(buf, "%s -9 %s/%c/%s", GZIP, SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -1043,7 +1043,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!sub || !obj)
   {
-    logentry("Invalid pointer passed to CAN_SEE!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -1635,7 +1635,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   */
   if (ch == 0)
   {
-    logentry("do_quit received null char - problem!", OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -2321,7 +2321,7 @@ bool is_in_game(Character *ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    logentry("nullptr args sent to is_pc_playing in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -3163,7 +3163,7 @@ void special_log(char *arg)
 
   if (!(fl = fopen("../lib/special.txt", "a")))
   {
-    logentry("Unable to open SPECIAL LOG FILE in special_log.", IMPLEMENTER, LogChannels::LOG_GOD);
+    logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, LogChannels::LOG_GOD);
     return;
   }
 

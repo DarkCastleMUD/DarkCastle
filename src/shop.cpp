@@ -40,11 +40,7 @@
 #include "const.h"
 #include "wizard.h"
 
-
-
 struct player_shop *g_playershops;
-
-
 
 extern struct time_info_data time_info;
 
@@ -182,7 +178,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+  if (!IS_MOB(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -290,7 +286,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) &&ch->affected_by_spell( Character::PLAYER_OBJECT_THIEF))
+  if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -697,7 +693,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -707,7 +703,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  logentry("Shop_keeper: shop_nr not found.", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, LogChannels::LOG_BUG);
   return eFAILURE;
 
 LFound2:
@@ -1419,7 +1415,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
 
   if (!(keeper = invoker))
   {
-    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 

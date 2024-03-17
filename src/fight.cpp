@@ -101,7 +101,7 @@ void do_champ_flag_death(Character *victim)
   }
   else
   {
-    logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, LogChannels::LOG_BUG);
   }
 }
 
@@ -230,7 +230,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
 
@@ -353,7 +353,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry("Error in perform_violence(), part2!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
     bool over = false;
@@ -540,7 +540,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   if (!ch || !vict)
   {
-    logentry("nullptr Victim or Ch sent to attack!  This crashes us!", -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, LogChannels::LOG_BUG);
     produce_coredump();
 
     return eINTERNAL_ERROR;
@@ -548,7 +548,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    logentry("Dead ch sent to attack. Wtf ;)", -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, LogChannels::LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
 
@@ -919,7 +919,7 @@ bool do_frostshield(Character *ch, Character *vict)
 {
   if (!ch || !vict)
   {
-    logentry("Null ch or vict sent to do_frostshield", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, LogChannels::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -946,7 +946,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict)
   {
-    logentry("Null ch or vict sent to do_lightning_shield", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -1028,7 +1028,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1061,7 +1061,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_fireshield!", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1150,7 +1150,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_acidshield!", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1235,7 +1235,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_boneshield!", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1455,7 +1455,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (!vict || !ch)
   {
-    logentry("Null victim or char in one_hit!  This Crashes us!", -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim or char in one_hit!  This Crashes us!"), -1, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -3186,7 +3186,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
 {
   if (!vict)
   {
-    logentry("Null vict sent to fight_kill()!", -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, LogChannels::LOG_BUG);
     return;
   }
   bool vict_is_attacker = false;
@@ -3547,7 +3547,7 @@ int checkCounterStrike(Character *ch, Character *victim)
     act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -3591,7 +3591,7 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
     act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -4045,7 +4045,7 @@ void load_messages(char *file, int base)
     //	 produce_coredump();
     if (i >= MAX_MESSAGES)
     {
-      logentry("Too many combat messages.", ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Too many combat messages."), ANGEL, LogChannels::LOG_BUG);
       exit(0);
     }
 
@@ -4237,7 +4237,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   if (!ch)
   {
-    logentry("Null ch in stop_fighting.  This would have crashed us.", IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, LogChannels::LOG_BUG);
     return;
   }
 
@@ -4344,7 +4344,7 @@ void stop_fighting(Character *ch, int clearlag)
       ;
     if (!tmp)
     {
-      logentry("Stop_fighting: char not found", ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Stop_fighting: char not found"), ANGEL, LogChannels::LOG_BUG);
       // abort();
       return;
     }
@@ -5425,7 +5425,7 @@ void raw_kill(Character *ch, Character *victim)
 
   if (!victim)
   {
-    logentry("Error in raw_kill()!  Null victim!", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -6189,7 +6189,7 @@ void dam_message(int dam, Character *ch, Character *victim,
     w_type -= TYPE_HIT;
     if (((unsigned)w_type) >= sizeof(attack_table))
     {
-      logentry("Dam_message: bad w_type", ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, LogChannels::LOG_BUG);
       w_type = 0;
     }
   }
@@ -6478,7 +6478,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
 
   if (!victim)
   {
-    logentry("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -6802,7 +6802,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     Object *obj = nullptr;
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
-      logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
     if (IS_NPC(ch) && ch->master)
@@ -6843,7 +6843,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (!victim)
   {
-    logentry("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7164,7 +7164,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
 
   if (!ch || !vict)
   {
-    logentry("Null ch or vict sent to weapon spells!", -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
   if (!weapon)
@@ -7725,7 +7725,7 @@ void remove_nosave(Character *vict)
 
   if (!vict)
   {
-    logentry("Null victim sent to remove_nosave!", OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7760,7 +7760,7 @@ void remove_active_potato(Character *vict)
 
   if (!vict)
   {
-    logentry("Null victim sent to remove_active_potato!", OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, LogChannels::LOG_BUG);
     return;
   }
 

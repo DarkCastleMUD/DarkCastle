@@ -518,7 +518,7 @@ void advance_level(Character *ch, int is_conversion)
 		break;
 
 	default:
-		logentry("Unknown class in advance level?", OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -936,7 +936,7 @@ void update_corpses_and_portals(void)
 					}
 					else
 					{
-						logentry("BIIIG problem in limits.c!", OVERSEER, LogChannels::LOG_BUG);
+						logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, LogChannels::LOG_BUG);
 						return;
 					}
 				}

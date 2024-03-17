@@ -8,7 +8,6 @@
 */
 // Standard header files
 
-
 #include <cstring>
 #include <cctype>
 #include <cstdlib>
@@ -508,7 +507,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             }    /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
-              logentry("TokenList::Interpret() sent bad Token!", OVERSEER, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, LogChannels::LOG_BUG);
             }
 #ifdef DEBUG_TOKEN
             // std::cerr << "Output after this loop: " << interp << std::endl;

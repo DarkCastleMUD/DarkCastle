@@ -3392,7 +3392,7 @@ void check_champion_and_website_who_list()
       }
       else
       {
-         logentry("CHAMPION_ITEM obj not found. Please create one.", 0, LogChannels::LOG_MISC);
+         logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, LogChannels::LOG_MISC);
       }
    }
 

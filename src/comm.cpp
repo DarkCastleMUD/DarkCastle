@@ -202,7 +202,7 @@ int write_hotboot_file(char **new_argv)
 
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
-    logentry("Hotboot failed, unable to open hotboot file.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, LogChannels::LOG_MISC);
     return 0;
   }
 
@@ -262,7 +262,7 @@ int write_hotboot_file(char **new_argv)
     }
   }
   fclose(fp);
-  logentry("Hotboot descriptor file successfully written.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, LogChannels::LOG_MISC);
 
   chdir("../bin/");
 
@@ -332,7 +332,7 @@ int load_hotboot_descs()
   {
     ifs.open("hotboot");
     unlink("hotboot");
-    logentry("Hotboot, reloading characters.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot, reloading characters."), 0, LogChannels::LOG_MISC);
 
     for_each(dc->cf.ports.begin(), dc->cf.ports.end(), [&dc, &ifs](in_port_t &port)
              {
@@ -400,14 +400,14 @@ int load_hotboot_descs()
   }
   catch (...)
   {
-    logentry("Hotboot file missing/unopenable.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot file missing/unopenable."), 0, LogChannels::LOG_MISC);
     return false;
   }
 
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  logentry("Successful hotboot file read.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Successful hotboot file read."), 0, LogChannels::LOG_MISC);
   return 1;
 }
 
@@ -481,17 +481,17 @@ void DC::init_game(void)
     fclose(fp);
   }
 
-  logentry("Attempting to load hotboot file.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Attempting to load hotboot file."), 0, LogChannels::LOG_MISC);
 
   if (load_hotboot_descs())
   {
-    logentry("Hotboot Loading complete.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot Loading complete."), 0, LogChannels::LOG_MISC);
     was_hotboot = 1;
   }
   else
   {
-    logentry("Hotboot failed.  Starting regular sockets.", 0, LogChannels::LOG_MISC);
-    logentry("Opening mother connections.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot failed.  Starting regular sockets."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Opening mother connections."), 0, LogChannels::LOG_MISC);
 
     for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
              {
@@ -512,17 +512,17 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    logentry("Connecting hotboot characters to their descriptiors", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Connecting hotboot characters to their descriptiors"), 0, LogChannels::LOG_MISC);
     finish_hotboot();
   }
 
-  logentry("Signal trapping.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Signal trapping."), 0, LogChannels::LOG_MISC);
   signal_setup();
 
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  logentry("Entering game loop.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Entering game loop."), 0, LogChannels::LOG_MISC);
 
   unlink("died_in_bootup");
 
@@ -542,7 +542,7 @@ void DC::init_game(void)
 
   do_not_save_corpses = 1;
 
-  logentry("Closing all sockets.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Closing all sockets."), 0, LogChannels::LOG_MISC);
   while (DC::getInstance()->descriptor_list)
   {
     close_socket(DC::getInstance()->descriptor_list);
@@ -554,47 +554,47 @@ void DC::init_game(void)
              CLOSE_SOCKET(fd); });
 #ifdef LEAK_CHECK
 
-  logentry("Freeing all mobs in world.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing all mobs in world."), 0, LogChannels::LOG_MISC);
   remove_all_mobs_from_world();
-  logentry("Freeing all objs in world.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing all objs in world."), 0, LogChannels::LOG_MISC);
   remove_all_objs_from_world();
-  logentry("Freeing socials from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing socials from memory."), 0, LogChannels::LOG_MISC);
   clean_socials_from_memory();
-  logentry("Freeing zones data.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing zones data."), 0, LogChannels::LOG_MISC);
   free_zones_from_memory();
-  logentry("Freeing clan data.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing clan data."), 0, LogChannels::LOG_MISC);
   free_clans_from_memory();
-  logentry("Freeing the world.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing the world."), 0, LogChannels::LOG_MISC);
   free_world_from_memory();
-  logentry("Freeing mobs from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing mobs from memory."), 0, LogChannels::LOG_MISC);
   free_mobs_from_memory();
-  logentry("Freeing objs from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing objs from memory."), 0, LogChannels::LOG_MISC);
   free_objs_from_memory();
-  logentry("Freeing messages from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing messages from memory."), 0, LogChannels::LOG_MISC);
   free_messages_from_memory();
-  logentry("Freeing hash tree from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing hash tree from memory."), 0, LogChannels::LOG_MISC);
   free_hsh_tree_from_memory();
-  logentry("Freeing wizlist from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing wizlist from memory."), 0, LogChannels::LOG_MISC);
   free_wizlist_from_memory();
-  logentry("Freeing help index.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing help index."), 0, LogChannels::LOG_MISC);
   free_help_from_memory();
-  logentry("Freeing shops from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing shops from memory."), 0, LogChannels::LOG_MISC);
   free_shops_from_memory();
-  logentry("Freeing emoting objects from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing emoting objects from memory."), 0, LogChannels::LOG_MISC);
   free_emoting_objects_from_memory();
-  logentry("Freeing game portals from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing game portals from memory."), 0, LogChannels::LOG_MISC);
   free_game_portals_from_memory();
-  logentry("Freeing command radix from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing command radix from memory."), 0, LogChannels::LOG_MISC);
   free_command_radix_nodes(cmd_radix_);
-  logentry("Freeing ban list from memory.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing ban list from memory."), 0, LogChannels::LOG_MISC);
   free_ban_list_from_memory();
-  logentry("Freeing the bufpool.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Freeing the bufpool."), 0, LogChannels::LOG_MISC);
   free_buff_pool_from_memory();
   DC::getInstance()->removeDead();
 #endif
 
-  logentry("Goodbye.", 0, LogChannels::LOG_MISC);
-  logentry("Normal termination of game.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Goodbye."), 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Normal termination of game."), 0, LogChannels::LOG_MISC);
 }
 
 /*
@@ -989,7 +989,7 @@ void DC::game_loop_init(void)
                  QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
                  logentry(buf, ANGEL, LogChannels::LOG_GOD);
-                 logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+                 logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
 
                  for (const auto &ch : dc->character_list)
                  {
@@ -1002,7 +1002,7 @@ void DC::game_loop_init(void)
                  char **argv = nullptr;
                  if (!write_hotboot_file(argv))
                  {
-                   logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+                   logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
                    return QHttpServerResponse("Failed.\r\n");
                  }
 
@@ -2290,7 +2290,7 @@ int write_to_descriptor(int desc, std::string txt)
 #endif /* EWOULDBLOCK */
       if (errno == EAGAIN)
       {
-        // logentry("process_output: socket write would block",
+        // logentry(QStringLiteral("process_output: socket write would block"),
         //     0, LogChannels::LOG_MISC);
       }
       else
@@ -2834,7 +2834,7 @@ int close_socket(class Connection *d)
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    logentry("Losing descriptor without char.", ANGEL, LogChannels::LOG_SOCKET);
+  //    logentry(QStringLiteral("Losing descriptor without char."), ANGEL, LogChannels::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
@@ -2903,7 +2903,7 @@ void checkpointing(int sig)
 {
   if (!tics)
   {
-    logentry("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("SYSERR: CHECKPOINT shutdown: tics not updated"), ANGEL, LogChannels::LOG_BUG);
     abort();
   }
   else
@@ -2937,10 +2937,10 @@ void crash_hotboot()
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    logentry("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, LogChannels::LOG_BUG);
     write_hotboot_file(0);
     // we shouldn't return from there unless we failed
-    logentry("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, LogChannels::LOG_BUG);
     for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
@@ -2956,18 +2956,18 @@ void crash_hotboot()
 void crashill(int sig)
 {
   report_debug_logging();
-  logentry("Recieved SIGFPE (Illegal Instruction)", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(int sig)
 {
   report_debug_logging();
-  logentry("Recieved SIGFPE (Arithmetic Error)", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2981,13 +2981,13 @@ void crashsig(int sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    logentry("Hit 'died_from_sigsegv > 2'", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Hit 'died_from_sigsegv > 2'"), ANGEL, LogChannels::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  logentry("Recieved SIGSEGV (Segmentation fault)", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Recieved SIGSEGV (Segmentation fault)"), ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  logentry("Mud exiting from SIGSEGV.", ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Mud exiting from SIGSEGV."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2996,7 +2996,7 @@ void unrestrict_game(int sig)
   extern struct ban_list_element *ban_list;
   extern int num_invalid;
 
-  logentry("Received SIGUSR2 - completely unrestricting game (emergent)",
+  logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
            ANGEL, LogChannels::LOG_GOD);
   ban_list = nullptr;
   restrict = 0;
@@ -3005,7 +3005,7 @@ void unrestrict_game(int sig)
 
 void hupsig(int sig)
 {
-  logentry("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down..."), 0, LogChannels::LOG_MISC);
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -3013,10 +3013,10 @@ void hupsig(int sig)
 void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
-  logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+  logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
   if (!write_hotboot_file(nullptr))
   {
-    logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
   }
 }
 
@@ -3066,10 +3066,10 @@ void signal_handler(int signal, siginfo_t *si, void *)
     do_not_save_corpses = 1;
     send_to_all(buf.data());
     logentry(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
-    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
     if (!write_hotboot_file(new_argv))
     {
-      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
     }
   }
 }

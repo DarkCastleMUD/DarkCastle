@@ -301,7 +301,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
   {
     if (reload == 1)
     {
-      logentry("Error in verion number in help file.\r\n", OVERSEER, LogChannels::LOG_HELP);
+      logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, LogChannels::LOG_HELP);
       return eFAILURE;
     }
     else
@@ -683,7 +683,7 @@ int do_reload_help(Character *ch, char *argument, int cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
+    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, LogChannels::LOG_HELP);
     return eFAILURE;
   }
 
@@ -692,7 +692,7 @@ int do_reload_help(Character *ch, char *argument, int cmd)
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    logentry("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
+    logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, LogChannels::LOG_HELP);
     return eFAILURE;
   }
 

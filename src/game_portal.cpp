@@ -197,7 +197,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   if (from_room == to_room)
   {
     dc_free(from_portal);
-    logentry("Arbitrary portal made to itself!", OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, LogChannels::LOG_BUG);
     return (0);
   }
 

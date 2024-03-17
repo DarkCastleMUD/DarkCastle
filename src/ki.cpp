@@ -5,7 +5,6 @@
  */
 /* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -269,7 +268,7 @@ int do_ki(Character *ch, char *argument, int cmd)
     if (!isSet(ki_info[spl].targets, TAR_IGNORE))
       if (!tar_char)
       {
-        logentry("Dammit Morc, fix that null tar_char thing in ki", IMPLEMENTER,
+        logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
                  LogChannels::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
@@ -415,7 +414,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry("Serious problem in ki blast!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -430,7 +429,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   else
     success -= 20; /* more than 300 pounds?! */
 
-  if (number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS))/* 101 is complete failure */
+  if (number(1, 101) > success || vict->affected_by_spell(SPELL_IRON_ROOTS)) /* 101 is complete failure */
   {
     act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
@@ -610,11 +609,11 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry("Null victim sent to ki speed", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
-  if ( vict->affected_by_spell( SPELL_HASTE))
+  if (vict->affected_by_spell(SPELL_HASTE))
     return eSUCCESS;
 
   af.type = SPELL_HASTE;
@@ -641,7 +640,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logentry("Null victim sent to ki purify", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
   if (!arg)
@@ -651,7 +650,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   if (!str_cmp(arg, "poison"))
   {
-    if ( vict->affected_by_spell( SPELL_POISON))
+    if (vict->affected_by_spell(SPELL_POISON))
       affect_from_char(vict, SPELL_POISON);
     else
     {
@@ -662,7 +661,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   else if (!str_cmp(arg, "blindness"))
   {
-    if ( vict->affected_by_spell( SPELL_BLINDNESS))
+    if (vict->affected_by_spell(SPELL_BLINDNESS))
       affect_from_char(vict, SPELL_BLINDNESS);
     else
     {
@@ -673,7 +672,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   }
   else if (!str_cmp(arg, "weaken"))
   {
-    if ( vict->affected_by_spell( SPELL_WEAKEN))
+    if (vict->affected_by_spell(SPELL_WEAKEN))
       affect_from_char(vict, SPELL_WEAKEN);
     else
     {
@@ -704,7 +703,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   if (!victim)
   {
-    logentry("Serious problem in ki disrupt!", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -793,7 +792,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Check if caster gets a bonus against this victim
-  affected_type *af =victim->affected_by_spell( KI_DISRUPT + KI_OFFSET);
+  affected_type *af = victim->affected_by_spell(KI_DISRUPT + KI_OFFSET);
   if (af)
   {
     // We've KI_DISRUPTED the victim and failed before so we get a bonus
@@ -861,7 +860,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   // Disrupt bingo chance
   if (disrupt_bingo)
   {
-    if (victim->affected_by_spell(SPELL_SANCTUARY)||
+    if (victim->affected_by_spell(SPELL_SANCTUARY) ||
         IS_AFFECTED(victim, AFF_SANCTUARY))
     {
       affect_from_char(victim, SPELL_SANCTUARY);
@@ -911,7 +910,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (victim->affected_by_spell(SPELL_FIRESHIELD)|| IS_AFFECTED(victim, AFF_FIRESHIELD))
+    if (victim->affected_by_spell(SPELL_FIRESHIELD) || IS_AFFECTED(victim, AFF_FIRESHIELD))
     {
       REMBIT(victim->affected_by, AFF_FIRESHIELD);
       affect_from_char(victim, SPELL_FIRESHIELD);

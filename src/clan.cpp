@@ -42,8 +42,6 @@ uint64_t i = UINT64_MAX;
 #include "Trace.h"
 #include "clan.h"
 
-
-
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);
 
@@ -227,7 +225,7 @@ void boot_clans(void)
         break;
       }
       default:
-        logentry("Illegal switch hit in boot_clans.", 0, LogChannels::LOG_MISC);
+        logentry(QStringLiteral("Illegal switch hit in boot_clans."), 0, LogChannels::LOG_MISC);
         logentry(buf, 0, LogChannels::LOG_MISC);
         break;
       }
@@ -532,7 +530,7 @@ void add_clan_member(clan_data *theClan, Character *ch)
 
   if (!ch || !theClan)
   {
-    logentry("add_clan_member(clan, ch) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_clan_member(clan, ch) called with a null."), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -550,13 +548,13 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (!new_new_member || !theClan)
   {
-    logentry("add_clan_member(clan, member) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_clan_member(clan, member) called with a null."), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
   if (new_new_member->Name().isEmpty())
   {
-    logentry("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Attempt to add a blank member name to a clan."), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 

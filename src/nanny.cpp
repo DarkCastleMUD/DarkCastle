@@ -81,7 +81,6 @@ extern char imotd[MAX_STRING_LENGTH];
 
 extern Object *object_list;
 
-
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
 void update_wizlist(Character *ch);
@@ -837,7 +836,7 @@ void nanny(class Connection *d, std::string arg)
    {
 
    default:
-      logentry("Nanny: illegal STATE(d)", 0, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Nanny: illegal STATE(d)"), 0, LogChannels::LOG_BUG);
       close_socket(d);
       return;
 
@@ -2507,7 +2506,7 @@ bool on_forbidden_name_list(const char *name)
    nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      logentry("Failed to open forbidden name file!", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open forbidden name file!"), 0, LogChannels::LOG_MISC);
       return false;
    }
    else

@@ -45,7 +45,7 @@ int move_player(Character *ch, int room)
 	{
 		retval = move_char(ch, real_room(START_ROOM));
 		if (!isSet(retval, eSUCCESS))
-			logentry("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
+			logentry(QStringLiteral("Error in move_player(), Failure moving ch to start room. move_player_home_nofail"),
 					 IMMORTAL, LogChannels::LOG_BUG);
 	}
 
@@ -286,7 +286,7 @@ int do_fall(Character *ch, short dir)
 		ch->sendln("You fall...");
 		break;
 	default:
-		logentry("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
+		logentry(QStringLiteral("Default hit in do_fall"), IMMORTAL, LogChannels::LOG_MORTAL);
 		break;
 	}
 
@@ -1223,7 +1223,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 {
 	if (!ch)
 	{
-		logentry("Error in move_char(), nullptr character", OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Error in move_char(), nullptr character"), OVERSEER, LogChannels::LOG_BUG);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1234,7 +1234,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 		// Couldn't move char from the room
 		if (char_from_room(ch, stop_all_fighting) == 0)
 		{
-			logentry("Error in move_char(), character not DC::NOWHERE, but couldn't be moved.",
+			logentry(QStringLiteral("Error in move_char(), character not DC::NOWHERE, but couldn't be moved."),
 					 OVERSEER, LogChannels::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}

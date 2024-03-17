@@ -34,8 +34,6 @@
 #include <map>
 #include <set>
 
-
-
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 {
@@ -1496,7 +1494,7 @@ void CVoteData::OutToFile()
 
   if (!the_file)
   {
-    logentry("Unable to open/create save file for vote data", ANGEL,
+    logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
              LogChannels::LOG_BUG);
     return;
   }
@@ -1581,7 +1579,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    logentry("Error reading question from vote file.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Error reading question from vote file."), 0, LogChannels::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = 0;
@@ -1595,7 +1593,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry("Error reading answers from vote file.", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading answers from vote file."), 0, LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1613,7 +1611,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry("Error reading ip addresses from vote file.", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1628,7 +1626,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry("Error reading char names from vote file.", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading char names from vote file."), 0, LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }

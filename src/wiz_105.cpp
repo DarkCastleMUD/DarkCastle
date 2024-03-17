@@ -715,7 +715,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    logentry("Incorrect -i- in do_sqedit", 0, LogChannels::LOG_WORLD);
+    logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, LogChannels::LOG_WORLD);
     return eFAILURE;
   }
   return eSUCCESS;

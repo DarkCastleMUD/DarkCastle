@@ -90,7 +90,7 @@ int do_processes(Character *ch, char *arg, int cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    logentry("Unable to open whassup.txt for adding in do_processes!", IMPLEMENTER,
+    logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
              LogChannels::LOG_BUG);
     return eFAILURE;
   }
@@ -105,7 +105,7 @@ int do_processes(Character *ch, char *arg, int cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    logentry("Unable to open whassup.txt for reading in do_processes!", IMPLEMENTER,
+    logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
              LogChannels::LOG_BUG);
     return eFAILURE;
   }
@@ -438,11 +438,11 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     QString buffer = QString("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, LogChannels::LOG_GOD);
-    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
     do_force(this, "all save");
     if (!write_hotboot_file(new_argv))
     {
-      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
       this->sendln("Hot reboot failed.");
     }
   }
@@ -471,7 +471,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    logentry("Corefile produced.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Corefile produced."), IMMORTAL, LogChannels::LOG_BUG);
   }
   else if (arg1 == "die")
   {
