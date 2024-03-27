@@ -86,5 +86,6 @@
     "C_Cpp.codeAnalysis.clangTidy.args": [
         "-extra-arg=-std=c++23",
         "-extra-arg=-stdlib=libc++"
-    ]
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/src"
 }
