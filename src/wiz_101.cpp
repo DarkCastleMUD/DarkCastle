@@ -822,8 +822,8 @@ int do_varstat(Character *ch, char *argument, int cmd)
   struct tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
-    sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
-            eh->name, eh->data);
+    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n",
+             eh->name.toStdString().c_str(), eh->data.toStdString().c_str());
     ch->send(buf);
   }
   if (buf[0] == '\0')

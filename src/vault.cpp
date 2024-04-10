@@ -482,8 +482,8 @@ void vault_stats(Character *ch, char *name)
       accesses++;
     }
 
-    sprintf(buf1, "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
-            count, vault->owner, vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
+    snprintf(buf1, sizeof(buf1), "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
+             count, vault->owner.toStdString().c_str(), vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
     if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH * 4)
       strcat(buf, buf1);
     else
@@ -626,11 +626,11 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     break;
   default:
     logf(108, LogChannels::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
-         name);
+         name.toStdString().c_str());
     break;
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name[0], name);
+  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name.at(0), name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -645,7 +645,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0], name);
+  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0], name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -660,7 +660,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0], name);
+  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0], name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -684,11 +684,11 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   char buf[MAX_INPUT_LENGTH];
   char h[MAX_INPUT_LENGTH];
 
-  sprintf(h, "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, name, VAULT_INDEX_FILE_TMP);
+  snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, name.toStdString().c_str(), VAULT_INDEX_FILE_TMP);
   system(h);
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
-  sprintf(buf, "Deleting %s's vault.", name);
+  snprintf(buf, sizeof(buf), "Deleting %s's vault.", name.toStdString().c_str());
   logentry(buf, ANGEL, LogChannels::LOG_VAULT);
 
   if (!(vault = has_vault(name)))
@@ -907,7 +907,7 @@ void testing_load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -1106,8 +1106,8 @@ void load_vaults(void)
             }
           }
 
-          sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
-                  vault->owner);
+          snprintf(buf, sizeof(buf), "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
+                   vault->owner.toStdString().c_str());
           logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
           saveChanges = true;
         }
@@ -1138,12 +1138,12 @@ void load_vaults(void)
           access->name = str_dup(value);
           access->next = vault->access;
           vault->access = access;
-          sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, filename);
+          snprintf(buf, sizeof(buf), "boot_vaults: got access [%s] from file [%s].", access->name.toStdString().c_str(), filename);
           //        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
         }
         else
         {
-          sprintf(buf, "Invalid access entry found. Removing %s's access to %s.", value, vault->owner);
+          snprintf(buf, sizeof(buf), "Invalid access entry found. Removing %s's access to %s.", value, vault->owner.toStdString().c_str());
           vlog(buf, vault->owner);
           saveChanges = true;
         }
@@ -1163,7 +1163,7 @@ void load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -2592,7 +2592,7 @@ int vault_search(Character *ch, const char *args)
           parameter.type = vault_search_type::MAX_LEVEL;
           search.push_back(parameter);
         } // end of level range parsing
-      }   // end of level parsing
+      } // end of level parsing
     }
     else
     {
@@ -2700,8 +2700,8 @@ int vault_search(Character *ch, const char *args)
         }
         ch->send("\r\n");
       } // for loop of objects
-    }   // if we have access to vault
-  }     // for loop of vaults
+    } // if we have access to vault
+  } // for loop of vaults
 
   ch->send(QString("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 

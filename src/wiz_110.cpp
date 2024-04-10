@@ -262,20 +262,20 @@ int do_revoke(Character *ch, char *arg, int cmd)
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
-    sprintf(buf, "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name);
+    snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), DC::bestowable_god_commands[i].name.toStdString().c_str());
     ch->send(buf);
     return eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
-  sprintf(buf, "%s has had %s revoked.\r\n", GET_NAME(vict),
-          DC::bestowable_god_commands[i].name);
+  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict),
+           DC::bestowable_god_commands[i].name.toStdString().c_str());
   ch->send(buf);
-  sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict),
-          DC::bestowable_god_commands[i].name, GET_NAME(ch));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict),
+           DC::bestowable_god_commands[i].name.toStdString().c_str(), GET_NAME(ch));
   logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
-  sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch),
-          DC::bestowable_god_commands[i].name);
+  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch),
+           DC::bestowable_god_commands[i].name.toStdString().c_str());
   vict->send(buf);
   return eSUCCESS;
 }

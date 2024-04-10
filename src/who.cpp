@@ -171,7 +171,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
             add_to_who(tempbuffer);
           }
       } // for f = k->followers
-    }   //  ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)) )
+    } //  ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)) )
 
     // if we're searching (target exists) and we didn't find it, clear out
     // the buffer cause we only want the target's group.
@@ -252,7 +252,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
                   IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         add_to_who(tempbuffer);
       } // if is affected by group
-  }     // End For Loop.
+  } // End For Loop.
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->desc, gWhoBuffer, 1);
@@ -648,7 +648,7 @@ int do_where(Character *ch, char *argument, int cmd)
         if (d->original)
         { // If switched
           csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
-                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()));
+                 DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
         {
