@@ -4,7 +4,6 @@
 #ifndef SHOPS_H
 #define SHOPS_H
 
-#include <QObject>
 #include <QFile>
 typedef uint64_t room_t;
 

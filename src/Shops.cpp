@@ -2,7 +2,6 @@
 // Licensed under LGPL
 //
 
-#include <QObject>
 #include <QSqlError>
 #include <QSqlRelationalTableModel>
 #include <QSqlQuery>
