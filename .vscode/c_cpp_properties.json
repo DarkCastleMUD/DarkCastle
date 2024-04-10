@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "/usr/include/qt6/**"
             ],
-            "compilerPath": "/usr/bin/clang++",
+            "compilerPath": "/usr/bin/clang++-17",
             "compilerArgs": [
                 "-std=c++23",
                 "-stdlib=libc++"
