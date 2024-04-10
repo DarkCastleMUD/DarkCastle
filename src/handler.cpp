@@ -27,6 +27,7 @@
 #include <map>
 
 #include <QString>
+#include <QStringList>
 
 #include "magic.h"
 #include "spells.h"
@@ -267,6 +268,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 24;
 		case attribute_t::CONSTITUTION:
 			return 23;
+		default:
+			return 0;
 		}
 		break;
 	case RACE_TROLL:
@@ -282,6 +285,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 22;
 		case attribute_t::CONSTITUTION:
 			return 30;
+		default:
+			return 0;
 		}
 		break;
 
@@ -298,6 +303,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 26;
 		case attribute_t::CONSTITUTION:
 			return 28;
+		default:
+			return 0;
 		}
 		break;
 
@@ -314,6 +321,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 25;
 		case attribute_t::CONSTITUTION:
 			return 23;
+		default:
+			return 0;
 		}
 		break;
 
@@ -330,6 +339,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 27;
 		case attribute_t::CONSTITUTION:
 			return 20;
+		default:
+			return 0;
 		}
 		break;
 
@@ -346,6 +357,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 23;
 		case attribute_t::CONSTITUTION:
 			return 27;
+		default:
+			return 0;
 		}
 		break;
 
@@ -362,6 +375,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 30;
 		case attribute_t::CONSTITUTION:
 			return 24;
+		default:
+			return 0;
 		}
 		break;
 
@@ -378,6 +393,8 @@ int get_max_stat(Character *ch, attribute_t stat)
 			return 23;
 		case attribute_t::CONSTITUTION:
 			return 26;
+		default:
+			return 0;
 		}
 		break;
 
@@ -5104,9 +5121,9 @@ skill_results_t find_skills_by_name(std::string name)
 	}
 
 	// try songs
-	for (auto i = 0; *songs[i] != '\n'; i++)
+	for (auto i = 0; i < Character::song_names.length(); ++i)
 	{
-		if (add_matching_results(results, name, songs[i], i + SKILL_SONG_BASE) == MatchType::Exact)
+		if (add_matching_results(results, name, Character::song_names[i].toStdString(), i + SKILL_SONG_BASE) == MatchType::Exact)
 		{
 			return results;
 		}
@@ -5243,8 +5260,8 @@ int find_skill_num(char *name)
 			return (i + SKILL_BASE);
 
 	// try songs
-	for (i = 0; *songs[i] != '\n'; i++)
-		if (name_length <= strlen(songs[i]) && !str_n_nosp_cmp(name, songs[i], name_length))
+	for (i = 0; i < Character::song_names.length(); i++)
+		if (name_length <= Character::song_names.value(i).length() && !str_n_nosp_cmp(name, Character::song_names.value(i).toStdString().c_str(), name_length))
 			return (i + SKILL_SONG_BASE);
 
 	// sets?

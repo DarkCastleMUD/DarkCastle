@@ -44,6 +44,7 @@
 
 #include <fmt/format.h>
 #include <QRandomGenerator>
+#include <QString>
 
 #include "innate.h"
 #include "structs.h"
@@ -83,7 +84,7 @@ struct timer_data *timer_list = nullptr;
 // local funcs
 void update_wizlist(Character *ch);
 
-size_t nocolor_strlen(QString str)
+std::size_t nocolor_strlen(QString str)
 {
   return nocolor_strlen(str.toStdString().c_str());
 }
@@ -633,7 +634,7 @@ QString sprintbit(uint32_t vektor, QStringList names)
   if (vektor < 0)
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
-    return QString();
+    return {};
   }
 
   for (nr = 0; vektor; vektor >>= 1)
@@ -1960,11 +1961,11 @@ int do_beep(Character *ch, char *argument, int cmd)
 }
 
 // if a skill has a valid name, return it, else nullptr
-const char *get_skill_name(int skillnum)
+QString get_skill_name(int skillnum)
 {
 
   if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
-    return songs[skillnum - SKILL_SONG_BASE];
+    return Character::song_names.value(skillnum - SKILL_SONG_BASE);
   else if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
     return skills[skillnum - SKILL_BASE];
   else if (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET + MAX_KI_LIST))
@@ -1977,7 +1978,7 @@ const char *get_skill_name(int skillnum)
     return set_list[skillnum - BASE_SETS].SetName;
   else if (skillnum >= RESERVED_BASE && skillnum <= RESERVED_MAX)
     return reserved[skillnum - RESERVED_BASE];
-  return nullptr;
+  return {};
 }
 
 std::string double_dollars(std::string source)

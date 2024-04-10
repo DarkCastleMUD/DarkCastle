@@ -454,6 +454,35 @@ int old_search_block(const char *arg, const char **list, bool exact)
   return (-1);
 }
 
+int old_search_block(const char *arg, const QStringList list, bool exact)
+{
+  if (arg == nullptr)
+  {
+    return -1;
+  }
+
+  int i = 0;
+  int l = strlen(arg);
+
+  if (exact)
+  {
+    for (i = 0; i < list.length(); i++)
+      if (!strcasecmp(arg, list.value(i).toStdString().c_str()))
+        return (i);
+  }
+  else
+  {
+    if (!l)
+      // Avoid "" to match the first available std::string
+      l = 1;
+    for (i = 0; list.length(); i++)
+      if (!strncasecmp(arg, list.value(i).toStdString().c_str(), l))
+        return (i);
+  }
+
+  return (-1);
+}
+
 int search_block(const char *orig_arg, const char **list, bool exact)
 {
   int i;
@@ -532,6 +561,41 @@ int do_boss(Character *ch, char *arg, int cmd)
   }
 
   return eSUCCESS;
+}
+
+int old_search_block(const char *argument, int begin, int length, const QStringList list, int mode)
+{
+  int guess, found, search;
+
+  // If the word contains 0 letters, a match is already found
+  found = (length < 1);
+  guess = 0;
+
+  // Search for a match
+  if (mode)
+    while (!found && *(list.value(guess).toStdString().c_str()) != '\n')
+    {
+      found = ((unsigned)length == strlen(list.value(guess).toStdString().c_str()));
+      for (search = 0; search < length && found; search++)
+      {
+        found = (*(argument + begin + search) == *(list.value(guess).toStdString().c_str() + search));
+      }
+      guess++;
+    }
+  else
+  {
+    while (!found && *(list.value(guess).toStdString().c_str()) != '\n')
+    {
+      found = 1;
+      for (search = 0; (search < length && found); search++)
+      {
+        found = (*(argument + begin + search) == *(list.value(guess).toStdString().c_str() + search));
+      }
+      guess++;
+    }
+  }
+
+  return (found ? guess : -1);
 }
 
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode)

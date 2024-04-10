@@ -3139,8 +3139,8 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   else
   {
     if (clan)
-      sprintf(buf, "\r\n##%s has been claimed by clan %s!\r\n",
-              DC::getInstance()->zones.value(zone).Name(), get_clan(clan)->name);
+      snprintf(buf, sizeof(buf), "\r\n##%s has been claimed by clan %s!\r\n",
+               DC::getInstance()->zones.value(zone).Name().toStdString().c_str(), get_clan(clan)->name);
 
     //     DC::getInstance()->zones.value(zone).gold = 0;
   }

@@ -501,51 +501,51 @@ int do_golem_score(Character *ch, char *argument, int cmd)
     {
       scratch = frills[level];
       // figure out the name of the affect (if any)
-      const char *aff_name = get_skill_name(aff->type);
+      QString aff_name = get_skill_name(aff->type);
       switch (aff->type)
       {
       case Character::PLAYER_CANTQUIT:
-        aff_name = "Can't Quit";
+        aff_name = QStringLiteral("Can't Quit");
         break;
       case Character::PLAYER_OBJECT_THIEF:
-        aff_name = "DIRTY_DIRTY_THIEF";
+        aff_name = QStringLiteral("DIRTY_DIRTY_THIEF");
         break;
       case SKILL_HARM_TOUCH:
-        aff_name = "harmtouch reuse timer";
+        aff_name = QStringLiteral("harmtouch reuse timer");
         break;
       case SKILL_LAY_HANDS:
-        aff_name = "layhands reuse timer";
+        aff_name = QStringLiteral("layhands reuse timer");
         break;
       case SKILL_QUIVERING_PALM:
-        aff_name = "quiver reuse timer";
+        aff_name = QStringLiteral("quiver reuse timer");
         break;
       case SKILL_BLOOD_FURY:
-        aff_name = "blood fury reuse timer";
+        aff_name = QStringLiteral("blood fury reuse timer");
         break;
       case SKILL_CRAZED_ASSAULT:
         if (strcmp(apply_types[(int)aff->location], "HITROLL"))
-          aff_name = "crazed assault reuse timer";
+          aff_name = QStringLiteral("crazed assault reuse timer");
         break;
       case SPELL_HOLY_AURA_TIMER:
-        aff_name = "holy aura timer";
+        aff_name = QStringLiteral("holy aura timer");
         break;
       default:
         break;
       }
-      if (!aff_name) // not one we want displayed
+      if (aff_name.isEmpty()) // not one we want displayed
         continue;
 
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
         sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
-                scratch, aff_name,
+                scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], aff->caster.c_str());
       }
       else
       {
         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
-                scratch, aff_name,
+                scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], scratch);
       }

@@ -1078,7 +1078,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
   {
     char buf[MAX_STRING_LENGTH];
 
-    sprintf(buf, "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", get_skill_name(skl));
+    snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
     return eSUCCESS;
   }
@@ -1112,14 +1112,14 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
 
     extern void prepare_character_for_sixty(Character * ch);
     prepare_character_for_sixty(ch);
-    sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
+    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
 
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
       ch->learn_skill(SPELL_RELEASE_ELEMENTAL, 1, 1);
-      sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL));
+      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL).toStdString().c_str());
       ch->send(buf);
       break;
     }
@@ -1413,9 +1413,9 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
     return;
   }
   // figure out the name of the affect (if any)
-  const char *skillname = get_skill_name(skill);
+  QString skillname = get_skill_name(skill);
 
-  if (!skillname)
+  if (skillname.isEmpty())
   {
     send(QString("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
     logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
@@ -1425,7 +1425,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
   // increase the skill by one
   learn_skill(skill, 1, get_max(skill));
   learned = has_skill(skill);
-  csendf(this, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(skill));
+  sendln(QString("$R$B$5You feel more competent in your %1 ability. It increased to %2 out of %3.$R").arg(skillname).arg(learned).arg(get_max(skill)));
 }
 
 void Character::verify_max_stats(void)

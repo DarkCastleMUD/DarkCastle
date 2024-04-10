@@ -76,7 +76,6 @@ extern const char *race_abbrev[];
 extern int max_who;
 extern int movement_loss[];
 extern const char *skills[];
-extern const char *songs[];
 extern const char *ki[];
 extern const char *innate_skills[];
 extern const char *reserved[];

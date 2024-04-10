@@ -579,10 +579,6 @@ void mob_stat(Character *ch, Character *k)
   int i2;
   char buf2[MAX_STRING_LENGTH];
   class Object *j = 0;
-  // extern char *skills[];
-  // extern char *spells[];
-  // extern char *ki[];
-  // extern char *songs[];
   struct affected_type *aff;
 
   if (IS_MOB(k))
@@ -891,19 +887,18 @@ void mob_stat(Character *ch, Character *k)
     for (aff = k->affected; aff; aff = aff->next)
     {
 
-      const char *aff_name = get_skill_name(aff->type);
+      QString aff_name = get_skill_name(aff->type);
 
-      if (!aff_name)
+      if (aff_name.isEmpty())
       {
         if (aff->type == INTERNAL_SLEEPING)
-          aff_name = "Internal Sleeping";
+          aff_name = QStringLiteral("Internal Sleeping");
         else if (aff->type == Character::PLAYER_CANTQUIT)
-          aff_name = "CANTQUIT";
+          aff_name = QStringLiteral("CANTQUIT");
         else
-          aff_name = "Unknown!!!";
+          aff_name = QStringLiteral("Unknown!!!");
       }
-      sprintf(buf, "Spell : '%s' (%d)\n\r", aff_name, aff->type);
-      ch->send(buf);
+      ch->sendln(QString("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
       sprintf(buf, "     Modifies %s by %d points\n\r",
               apply_types[(int)aff->location], aff->modifier);
       ch->send(buf);
@@ -1323,8 +1318,8 @@ void obj_stat(Character *ch, class Object *j)
     //      sprinttype(j->affected[i].location,apply_types,buf2);
     if (j->affected[i].location < 1000)
       sprinttype(j->affected[i].location, apply_types, buf2);
-    else if (get_skill_name(j->affected[i].location / 1000))
-      strcpy(buf2, get_skill_name(j->affected[i].location / 1000));
+    else if (!get_skill_name(j->affected[i].location / 1000).isEmpty())
+      strcpy(buf2, get_skill_name(j->affected[i].location / 1000).toStdString().c_str());
     else
       strcpy(buf2, "Invalid");
 

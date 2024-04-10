@@ -1015,9 +1015,9 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
               act("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, TO_ROOM, 0);
               eq_destroyed(tmp_victim, tmp_obj, -1);
             } // if (tmp_obj
-          }   // for (tmp_obj
-        }     // if (tmp_victim
-      }       // else
+          } // for (tmp_obj
+        } // if (tmp_victim
+      } // else
 
       if (dam > 0)
       {
@@ -1185,7 +1185,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
       if (!isSet(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !isSet(retval, eEXTRA_VAL2))
         do_solar_blind(ch, tmp_victim, skill);
     } // if are grouped, etc
-  }   // for
+  } // for
 
   // do surrounding rooms
 
@@ -1261,10 +1261,10 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                   do_move(tmp_victim, "", to_charge[i]);
               }
           } // if ! eVICT_DIED
-        }   // if are grouped, etc
-      }     // for tmp victim
-    }       // if can go
-  }         // for i 0 < 6
+        } // if are grouped, etc
+      } // for tmp victim
+    } // if can go
+  } // for i 0 < 6
   return eSUCCESS;
 }
 
@@ -4608,7 +4608,7 @@ void show_obj_class_size_mini(Object *obj, Character *ch)
 {
   for (int i = 12; i < 23; i++)
     if (isSet(obj->obj_flags.extra_flags, 1 << i))
-      csendf(ch, " %s", Object::extra_bits[i].toStdString().c_str());
+      csendf(ch, " %s", Object::extra_bits.value(i).toStdString().c_str());
 }
 
 /* IDENFITY */
@@ -4787,8 +4787,8 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
         if (obj->affected[i].location < 1000)
           sprinttype(obj->affected[i].location, apply_types, buf2);
-        else if (get_skill_name(obj->affected[i].location / 1000))
-          strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
+        else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
+          strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
         else
           strcpy(buf2, "Invalid");
         sprintf(buf, "    Affects : %s By %d\n\r", buf2, obj->affected[i].modifier);
@@ -5701,7 +5701,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
       done = true;
       break;
     } // of switch
-  }   // of while
+  } // of while
 
   if (IS_NPC(victim) && !victim->fighting)
   {
@@ -5940,7 +5940,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
       done = true;
       break;
     } // end of switch
-  }   // end of while
+  } // end of while
 
   if (IS_NPC(victim) && !victim->fighting)
   {

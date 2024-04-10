@@ -126,13 +126,13 @@ QString showObjectAffects(Object *obj)
     {
       buffer += sprinttype(obj->affected[i].location, apply_types);
     }
-    else if (get_skill_name(obj->affected[i].location / 1000))
+    else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
     {
       buffer += get_skill_name(obj->affected[i].location / 1000);
     }
     else
     {
-      buffer += "Invalid";
+      buffer += QStringLiteral("Invalid");
     }
 
     buffer += " by " + QString::number(obj->affected[i].modifier);

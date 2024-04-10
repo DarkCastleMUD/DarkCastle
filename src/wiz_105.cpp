@@ -38,8 +38,8 @@ int do_clearaff(Character *ch, char *argument, int cmd)
     {
       found = true;
       afpk = af->next;
-      const char *aff_name = get_skill_name(af->type);
-      if (aff_name)
+      QString aff_name = get_skill_name(af->type);
+      if (!aff_name.isEmpty())
       {
         ch->send(QString("Removing %1 affect.\r\n").arg(aff_name));
       }
@@ -685,7 +685,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     ch->sendln("Class modified.");
     break;
   case 5: // show
-    csendf(ch, "$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n", get_skill_name(skill->num), skill->message, print_classes(skill->clas), skill->level);
+    csendf(ch, "$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n", get_skill_name(skill->num).toStdString().c_str(), skill->message, print_classes(skill->clas), skill->level);
     break;
   case 6:
     int l;
@@ -705,7 +705,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     {
       if (!isSet(curren->clas, 1 << (l - 1)))
         continue;
-      csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+      csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num).toStdString().c_str());
       done = true;
     }
     if (!done)

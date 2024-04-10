@@ -953,7 +953,7 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
    QString color_good = "$2";
    QString color_bad = "$4";
 
-   if (this && this->player)
+   if (this->player)
    {
       color_good = this->getSettingAsColor("color.good");
       color_bad = this->getSettingAsColor("color.bad");
@@ -1209,8 +1209,8 @@ bool identify(Character *ch, Object *obj)
 
          if (obj->affected[i].location < 1000)
             sprinttype(obj->affected[i].location, apply_types, buf2);
-         else if (get_skill_name(obj->affected[i].location / 1000))
-            strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
+         else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
+            strcpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str());
          else
             strcpy(buf2, "Invalid");
          csendf(ch, "    $3Affects : $R%s$3 By $R%d", buf2, obj->affected[i].modifier);
@@ -2074,7 +2074,7 @@ int do_score(Character *ch, char *argument, int cmd)
          modifyOutput = false;
 
          // figure out the name of the affect (if any)
-         const char *aff_name = get_skill_name(aff->type);
+         QString aff_name = get_skill_name(aff->type);
          //	 if (aff_name)
          //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
          switch (aff->type)
@@ -2082,80 +2082,80 @@ int do_score(Character *ch, char *argument, int cmd)
          case BASE_SETS + SET_RAGER:
             if (aff->location == 0)
             {
-               aff_name = "Battlerager's Fury";
+               aff_name = QStringLiteral("Battlerager's Fury");
             }
             break;
          case BASE_SETS + SET_RAGER2:
             if (aff->location == 0)
             {
-               aff_name = "Battlerager's Fury";
+               aff_name = QStringLiteral("Battlerager's Fury");
             }
             break;
          case BASE_SETS + SET_MOSS:
             if (aff->location == 0)
-               aff_name = "infravision";
+               aff_name = QStringLiteral("infravision");
             break;
          case Character::PLAYER_CANTQUIT:
-            aff_name = "CANTQUIT";
+            aff_name = QStringLiteral("CANTQUIT");
             break;
          case Character::PLAYER_OBJECT_THIEF:
-            aff_name = "DIRTY_THIEF/CANT_QUIT";
+            aff_name = QStringLiteral("DIRTY_THIEF/CANT_QUIT");
             break;
          case Character::PLAYER_GOLD_THIEF:
-            aff_name = "GOLD_THIEF/CANT_QUIT";
+            aff_name = QStringLiteral("GOLD_THIEF/CANT_QUIT");
             break;
          case SKILL_HARM_TOUCH:
-            aff_name = "harmtouch reuse timer";
+            aff_name = QStringLiteral("harmtouch reuse timer");
             break;
          case SKILL_LAY_HANDS:
-            aff_name = "layhands reuse timer";
+            aff_name = QStringLiteral("layhands reuse timer");
             break;
          case SKILL_QUIVERING_PALM:
-            aff_name = "quiver reuse timer";
+            aff_name = QStringLiteral("quiver reuse timer");
             break;
          case SKILL_BLOOD_FURY:
-            aff_name = "blood fury reuse timer";
+            aff_name = QStringLiteral("blood fury reuse timer");
             break;
          case SKILL_FEROCITY_TIMER:
-            aff_name = "ferocity reuse timer";
+            aff_name = QStringLiteral("ferocity reuse timer");
             break;
          case SKILL_DECEIT_TIMER:
-            aff_name = "deceit reuse timer";
+            aff_name = QStringLiteral("deceit reuse timer");
             break;
          case SKILL_TACTICS_TIMER:
-            aff_name = "tactics reuse timer";
+            aff_name = QStringLiteral("tactics reuse timer");
             break;
          case SKILL_CLANAREA_CLAIM:
-            aff_name = "clanarea claim timer";
+            aff_name = QStringLiteral("clanarea claim timer");
             break;
          case SKILL_CLANAREA_CHALLENGE:
-            aff_name = "clanarea challenge timer";
+            aff_name = QStringLiteral("clanarea challenge timer");
             break;
          case SKILL_CRAZED_ASSAULT:
             if (strcmp(apply_types[(int)aff->location], "HITROLL"))
-               aff_name = "crazed assault reuse timer";
+               aff_name = QStringLiteral("crazed assault reuse timer");
             break;
          case SPELL_IMMUNITY:
-            aff_name = "immunity";
+            aff_name = QStringLiteral("immunity");
             modifyOutput = true;
             break;
          case SKILL_NAT_SELECT:
-            aff_name = "natural selection";
+            aff_name = QStringLiteral("natural selection");
             modifyOutput = true;
             break;
          case SKILL_BREW_TIMER:
-            aff_name = "brew timer";
+            aff_name = QStringLiteral("brew timer");
             break;
          case SKILL_SCRIBE_TIMER:
-            aff_name = "scribe timer";
+            aff_name = QStringLiteral("scribe timer");
             break;
          case CONC_LOSS_FIXER:
-            aff_name = 0; // We don't want this showing up in score
+            aff_name = {}; // We don't want this showing up in score
             break;
          default:
             break;
          }
-         if (!aff_name) // not one we want displayed
+         if (aff_name.isEmpty()) // not one we want displayed
             continue;
 
          std::string fading;
@@ -2194,7 +2194,7 @@ int do_score(Character *ch, char *argument, int cmd)
          {
             format = "|%1| Affected by %2 %3 Modifier %4 |%1|\r\n";
             format = format.arg(scratch);
-            format = format.arg(QString::fromStdString(aff_name), -25);
+            format = format.arg(aff_name, -25);
             format = format.arg(QString::fromStdString(fading), 8);
             format = format.arg(QString::fromStdString(modified), -15);
          }
@@ -4639,7 +4639,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                {
                   buffer = sprinttype(obj->affected[i].location, Object::apply_types);
                }
-               else if (get_skill_name(obj->affected[i].location / 1000))
+               else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
                {
                   buffer = get_skill_name(obj->affected[i].location / 1000);
                }

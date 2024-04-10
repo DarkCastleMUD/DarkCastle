@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <QStringLiteral>
 
 #include "fileinfo.h"
 #include "act.h"
@@ -1157,11 +1158,11 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  const char *skillname = get_skill_name(skillnum);
+  QString skillname = get_skill_name(skillnum);
 
   if (victim->has_skill(skillnum))
   {
-    csendf(victim, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
+    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : skillname.toStdString().c_str());
     return eFAILURE;
   }
 
@@ -1179,8 +1180,8 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (skillname)
-    sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skillname);
+  if (!skillname.isEmpty())
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n\r", skillname.toStdString().c_str());
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
@@ -1194,7 +1195,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
 
   prepare_character_for_sixty(ch);
 
-  sprintf(skill, "$N has learned the basics of %s.", skillname);
+  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", skillname.toStdString().c_str());
   act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 
   return eSUCCESS;

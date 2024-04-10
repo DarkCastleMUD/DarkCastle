@@ -1531,11 +1531,11 @@ int do_sedit(Character *ch, char *argument, int cmd)
                          GET_NAME(vict), "Skill", "#"));
     for (const auto &skill : vict->skills)
     {
-      const char *skillname = get_skill_name(skill.first);
+      QString skillname = get_skill_name(skill.first);
 
-      if (skillname)
+      if (!skillname.isEmpty())
       {
-        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", skillname, skill.first, skill.second.learned));
+        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", skillname.toStdString(), skill.first, skill.second.learned));
       }
       else
       {
@@ -1864,8 +1864,8 @@ int oedit_affects(Character *ch, int item_num, char *buf)
 
       if (obj->affected[x].location < 1000)
         sprinttype(obj->affected[x].location, apply_types, buf2);
-      else if (get_skill_name(obj->affected[x].location / 1000))
-        strcpy(buf2, get_skill_name(obj->affected[x].location / 1000));
+      else if (!get_skill_name(obj->affected[x].location / 1000).isEmpty())
+        strcpy(buf2, get_skill_name(obj->affected[x].location / 1000).toStdString().c_str());
 
       sprintf(buf, "%2d$3)$R %s$3($R%d$3)$R by %d.\r\n", x + 1, buf2,
               obj->affected[x].location, obj->affected[x].modifier);
@@ -2205,7 +2205,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%s\n", item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag]);
+      snprintf(buf, sizeof(buf), "%s\n", item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
 
@@ -2553,7 +2553,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
             void item_remove(Object * obj, struct vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
-            logf(0, LogChannels::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner);
+            logf(0, LogChannels::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
           }
         }
       }
@@ -3479,7 +3479,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       mobdata->default_pos = position_t::SLEEPING;
       break;
     }
-    sprintf(buf, "Mob default position set to %s.\r\n", Character::position_to_string(mobdata->default_pos));
+    snprintf(buf, sizeof(buf), "Mob default position set to %s.\r\n", Character::position_to_string(mobdata->default_pos).toStdString().c_str());
     ch->send(buf);
   }
   break;
@@ -4304,7 +4304,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           } // end of check if Player::PLR_ONEWAY is toggled
           return eSUCCESS;
         } // end of is_abbred for dirs
-      }   // end of for loop through directions
+      } // end of for loop through directions
 
       ch->sendln("Missing direction you want to delete.");
       return eFAILURE;
@@ -5235,11 +5235,11 @@ int do_instazone(Character *ch, char *arg, int cmd)
                       obj->short_description);
               string_to_file(fl, buf);
             } /*  for loop */
-          }   /* end of the object's contents... */
-        }     /* end of if !obj->in_obj */
-      }       /* first for loop for loose objects... */
-    }         /* All loose objects taken care of..  (Not on mobs,but inthe rooms) */
-  }           /*  for loop going through the fucking rooms again for loose obj's */
+          } /* end of the object's contents... */
+        } /* end of if !obj->in_obj */
+      } /* first for loop for loose objects... */
+    } /* All loose objects taken care of..  (Not on mobs,but inthe rooms) */
+  } /*  for loop going through the fucking rooms again for loose obj's */
 
   /* Now for the major bitch...
    * All the mobs, and all possible bullshit our builders will try to
@@ -5324,8 +5324,8 @@ int do_instazone(Character *ch, char *arg, int cmd)
                 } /*  for loop */
               }
             } /* end of the object's contents... */
-          }   /* End of if ch->equipment[pos]  */
-        }     /* For loop going through a mob's eq.. */
+          } /* End of if ch->equipment[pos]  */
+        } /* For loop going through a mob's eq.. */
 
         if (mob->carrying)
         {
@@ -5374,11 +5374,11 @@ int do_instazone(Character *ch, char *arg, int cmd)
                 } /*  for loop */
               }
             } /* end of the object's contents... */
-          }   /* end of for loop going through a mob's inventory */
-        }     /* end of if a mob has shit in their inventory */
-      }       /* end of for loop for looking at the mobs in ths room. */
-    }         /* end of if some body is in the fucking room.  */
-  }           /* end of for loop going through the zone looking for mobs...  */
+          } /* end of for loop going through a mob's inventory */
+        } /* end of if a mob has shit in their inventory */
+      } /* end of for loop for looking at the mobs in ths room. */
+    } /* end of if some body is in the fucking room.  */
+  } /* end of for loop going through the zone looking for mobs...  */
 
   fprintf(fl, "S\n");
   fclose(fl);

@@ -1503,7 +1503,7 @@ int do_release(Character *ch, char *argument, int cmd)
       aff_next = aff->next;
       //       while (aff_next && aff_next->type == aff->type)
       //	aff_next = aff_next->next;
-      if (!get_skill_name(aff->type))
+      if (get_skill_name(aff->type).isEmpty())
         continue;
       if (!printed)
       {
@@ -1515,7 +1515,7 @@ int do_release(Character *ch, char *argument, int cmd)
           aff->type != SPELL_IMMUNITY)
       { // Spells that default to self seems a good measure of
         // allow to release spells..
-        const char *aff_name = get_skill_name(aff->type);
+        QString aff_name = get_skill_name(aff->type);
         ch->send(aff_name);
         ch->sendln("");
       }
@@ -1536,9 +1536,9 @@ int do_release(Character *ch, char *argument, int cmd)
       while (aff_next && aff_next->type == aff->type)
         aff_next = aff_next->next;
 
-      if (!get_skill_name(aff->type))
+      if (get_skill_name(aff->type).isEmpty())
         continue;
-      if (str_prefix(argument, get_skill_name(aff->type)))
+      if (str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
         continue;
       if (aff->type > MAX_SPL_LIST)
         continue;
@@ -1573,7 +1573,7 @@ int do_release(Character *ch, char *argument, int cmd)
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
-      snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype));
+      snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype).toStdString().c_str());
       act(buffer, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
       done = true;
@@ -2187,7 +2187,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
 
         } // end if filterable spell
-      }   // end filter
+      } // end filter
       if (!target_ok && !isSet(spell_info[spl].targets, TAR_IGNORE))
       {
         argument = one_argument(argument, name);
@@ -2509,7 +2509,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-                   GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
+                   GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
               return eFAILURE;
             }
 
@@ -2517,14 +2517,14 @@ int do_cast(Character *ch, char *argument, int cmd)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
-                   GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
+                   GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
               return eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
-                   get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+                   get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
               return eFAILURE;
             }
           }
@@ -2537,7 +2537,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl), GET_NAME(tar_char), get_clan_name(tar_char));
+                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
 
@@ -2547,7 +2547,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
                    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
-                   get_skill_name(spl),
+                   get_skill_name(spl).toStdString().c_str(),
                    GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
@@ -2556,7 +2556,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
-                   get_skill_name(spl),
+                   get_skill_name(spl).toStdString().c_str(),
                    GET_NAME(tar_char), get_clan_name(tar_char),
                    GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
               return eFAILURE;

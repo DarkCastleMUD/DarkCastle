@@ -14,8 +14,12 @@
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 #include <cstring>
+#include <cstddef>
 
 #include <fmt/format.h>
+#include <QString>
+#include <QStringLiteral>
+#include <QStringList>
 
 #include "room.h"
 #include "obj.h"
@@ -34,8 +38,6 @@
 #include "const.h"
 #include "inventory.h"
 #include "corpse.h"
-
-
 
 extern class Object *object_list;
 
@@ -87,7 +89,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -165,7 +167,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -266,7 +268,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -511,58 +513,53 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 
 char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 {
-	std::string buf = {}, buf2 = {}, buf3 = {};
-	size_t length = {};
-
+	QString buf;
 	if (platinum)
 	{
-		buf = fmt::format("$B$7{:-2}$R) {} ", number + 1, obj->short_description);
+		buf = QString("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description);
 	}
 	else
 	{
-		buf = fmt::format("$B$7{:-2}$R) $3$B{}$R ", number + 1, obj->short_description);
+		buf = QString("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description);
 	}
 
 	if (obj->obj_flags.type_flag == ITEM_WEAPON)
 	{ // weapon
-		buf = fmt::format("{}{}d{}, {}, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2], isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+		buf = QString("%1%2d%3, %4, ").arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
 	}
 
-	for (uint i = 0; i < obj->num_affects; i++)
+	QString buf2;
+	qsizetype length{};
+	for (decltype(obj->num_affects) i = 0; i < obj->num_affects; i++)
 	{
 		if ((obj->affected[i].location != APPLY_NONE) && (obj->affected[i].modifier != 0))
 		{
 			if (obj->affected[i].location < 1000)
 			{
-				buf2 = sprinttype(obj->affected[i].location, apply_types);
+				buf2 = sprinttype(obj->affected[i].location, apply_types).c_str();
 			}
-			else if (get_skill_name(obj->affected[i].location / 1000))
+			else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
 			{
 				buf2 = get_skill_name(obj->affected[i].location / 1000);
 			}
 			else
 			{
-				buf2 = "Invalid";
+				buf2 = QStringLiteral("Invalid");
 			}
 
-			buf3 = fmt::format("{} by {}, ", buf2, obj->affected[i].modifier);
+			QString buf3 = QString("%1 by %2, ").arg(buf2).arg(obj->affected[i].modifier).toLower();
 
-			for (auto &ch : buf3)
-			{
-				ch = LOWER(ch);
-			}
-
-			auto potential_buffer = buf + buf3;
-			auto starting_point = potential_buffer.find_last_of("\n");
-			if (starting_point == potential_buffer.npos)
+			QString potential_buffer = buf + buf3;
+			qsizetype starting_point = potential_buffer.lastIndexOf("\n");
+			if (starting_point == -1)
 			{
 				starting_point = 0;
 			}
-			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+			length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
 			if (length > 79)
 			{
-				buf = fmt::format("{}\r\n    {}", buf, buf3);
+				buf = QString("%1\r\n    {}").arg(buf).arg(buf3);
 			}
 			else
 			{
@@ -576,18 +573,18 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 	{
 		if (class_restricted(ch, obj) || size_restricted(ch, obj))
 		{
-			buf2 = "$4[restricted]$R, ";
+			buf2 = QStringLiteral("$4[restricted]$R, ");
 
-			auto potential_buffer = buf + buf2;
-			auto starting_point = potential_buffer.find_last_of("\n");
-			if (starting_point == potential_buffer.npos)
+			QString potential_buffer = buf + buf2;
+			qsizetype starting_point = potential_buffer.lastIndexOf("\n");
+			if (starting_point == -1)
 			{
 				starting_point = 0;
 			}
-			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+			length = nocolor_strlen(potential_buffer.sliced(starting_point));
 			if (length > 79)
 			{
-				buf = fmt::format("{}\r\n    {}", buf, buf2);
+				buf = QString("%1\r\n    {}").arg(buf).arg(buf2);
 			}
 			else
 			{
@@ -597,25 +594,25 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 	}
 	else
 	{
-		uint32_t a = obj->obj_flags.extra_flags;
+		auto a = obj->obj_flags.extra_flags;
 		a &= ALL_CLASSES;
 
 		QString buffer = sprintbit(a, Object::extra_bits);
-		buf2 = fmt::format("{}]$R, ", buffer.toStdString());
+		buf2 = QString("%1]$R, ").arg(buffer);
 
 		if (a)
 		{
-			auto potential_buffer = fmt::format("{}$4[{}", buf, buf2);
-			auto starting_point = potential_buffer.find_last_of("\n");
-			if (starting_point == potential_buffer.npos)
+			QString potential_buffer = QString("%1$4[%2").arg(buf).arg(buf2);
+			qsizetype starting_point = potential_buffer.lastIndexOf("\n");
+			if (starting_point == -1)
 			{
 				starting_point = 0;
 			}
-			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+			length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
 			if (length > 79)
 			{
-				buf = fmt::format("{}\r\n    $4[{}", buf, buf2);
+				buf = QString("%1\r\n    $4[%2").arg(buf).arg(buf2);
 			}
 			else
 			{
@@ -626,24 +623,24 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (platinum)
 	{
-		buf2 = fmt::format("costing {} coins.", obj->obj_flags.cost / 10);
+		buf2 = QString("costing %1 coins.").arg(obj->obj_flags.cost / 10);
 	}
 	else
 	{
-		buf2 = fmt::format("costing {} qpoints.", obj->obj_flags.cost / 10000);
+		buf2 = QString("costing %1 qpoints.").arg(obj->obj_flags.cost / 10000);
 	}
 
-	auto potential_buffer = buf + buf2;
-	auto starting_point = potential_buffer.find_last_of("\n");
-	if (starting_point == potential_buffer.npos)
+	QString potential_buffer = buf + buf2;
+	qsizetype starting_point = potential_buffer.lastIndexOf("\n");
+	if (starting_point == -1)
 	{
 		starting_point = 0;
 	}
-	length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+	length = nocolor_strlen(potential_buffer.sliced(starting_point));
 
 	if (length > 79)
 	{
-		buf = fmt::format("{}\r\n    {}", buf, buf2);
+		buf = QString("%1\r\n    %2").arg(buf).arg(buf2);
 	}
 	else
 	{
@@ -651,7 +648,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 	}
 
 	buf += "\r\n";
-	return str_dup(buf.c_str());
+	return str_dup(buf.toStdString().c_str());
 }
 
 struct platsmith
@@ -667,7 +664,7 @@ const struct platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538
 // Apoc enjoys the dirty mooselove. Honest.
 int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
-	
+
 	int mobvnum = DC::getInstance()->mob_index[owner->mobdata->nr].virt;
 	int o;
 	char buf[MAX_STRING_LENGTH];
@@ -798,7 +795,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) &&ch->isPlayerGoldThief())
+	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;

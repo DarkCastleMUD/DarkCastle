@@ -491,7 +491,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   };
   if (!threat)
   { // Nothing set. Bugger.
-    logf(110, LogChannels::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill), skill);
+    logf(110, LogChannels::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
     return;
   }
   threat = (int)(threat * v); // vary depending on skill
@@ -696,7 +696,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       if (SOMEONE_DIED(result))
         return result;
     }
-  }    // End of the monk attacks
+  } // End of the monk attacks
   else // It's a normal attack
   {
     if (isSet(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
@@ -1929,7 +1929,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
     } // of switch
     logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
     victim->player->statmetas -= 1; // we lost a stat, so don't charge extra meta
-  }                                 // of pir's extra stat loss
+  } // of pir's extra stat loss
 }
 
 int damage_retval(Character *ch, Character *vict, int value)
@@ -7454,7 +7454,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
             do_flee(victim, "", 0);
           return;
         } // end of if ACT_WIMPY
-      }   // end of if npc
+      } // end of if npc
       else
       {
         if (isSet(victim->player->toggles, Player::PLR_WIMPY))
@@ -7469,7 +7469,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
           return;
         }
       } // end else
-    }   // end max_hit / 5
+    } // end max_hit / 5
     break;
   } // switch
 } // inform_victim
@@ -7620,7 +7620,7 @@ int do_flee(Character *ch, char *argument, int cmd)
           return retval;
         }
       } // if CAN_GO
-  }     // for
+  } // for
 
   // No exits were found
   ch->sendln("PANIC! You couldn't escape!");

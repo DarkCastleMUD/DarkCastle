@@ -17,6 +17,9 @@
 #ifndef INTERP_H_
 #define INTERP_H_
 
+#include <QString>
+#include <QStringList>
+
 #include "common.h"
 #include "character.h"
 #include "returnvals.h"
@@ -25,6 +28,9 @@ class Character;
 
 char *remove_trailing_spaces(char *arg);
 int search_block(const char *arg, const char **l, bool exact);
+
+int old_search_block(const char *arg, const QStringList list, bool exact);
+int old_search_block(const char *argument, int begin, int length, const QStringList list, int mode);
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
 char *one_argument(char *argument, char *first_arg);

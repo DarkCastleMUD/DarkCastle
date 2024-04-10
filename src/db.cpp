@@ -1420,7 +1420,7 @@ void write_one_room(FILE *f, int a)
 			string_to_file(f, extra->description);
 		else
 			fprintf(f, "~\n"); // print blank
-	}						   /* extra descriptions */
+	} /* extra descriptions */
 
 	struct deny_data *deni;
 	for (deni = DC::getInstance()->world[a].denied; deni; deni = deni->next)
@@ -4483,8 +4483,8 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 		{
 			if (obj->affected[i].location < 1000)
 				sprinttype(obj->affected[i].location, apply_types, buf2);
-			else if (get_skill_name(obj->affected[i].location / 1000))
-				strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
+			else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
+				strncpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str(),sizeof(buf2));
 			else
 				strcpy(buf2, "Invalid");
 
@@ -5406,7 +5406,7 @@ char *fread_string(FILE *fl, int hasher)
 			throw error_eof();
 			break;
 		} // switch
-	}	  // for
+	} // for
 
 	perror("fread_string: std::string too long");
 	abort();
@@ -5482,7 +5482,7 @@ char *fread_word(FILE *fl, int hasher)
 			return pAlloc;
 			// end of ~ case
 		} // switch
-	}	  // for
+	} // for
 
 	perror("fread_word: std::string too long");
 	abort();

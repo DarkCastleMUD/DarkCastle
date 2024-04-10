@@ -507,7 +507,7 @@ int32_t mana_limit(Character *ch);
 int32_t ki_limit(Character *ch);
 int32_t hit_limit(Character *ch);
 typedef int16_t skill_t;
-const char *get_skill_name(int skillnum);
+QString get_skill_name(int skillnum);
 void gain_exp_regardless(Character *ch, int gain);
 void advance_level(Character *ch, int is_conversion);
 int close_socket(class Connection *d);

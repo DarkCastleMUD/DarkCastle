@@ -64,6 +64,7 @@ typedef QQueue<communication> history_t;
 typedef QString player_config_key_t;
 typedef QString player_config_value_t;
 typedef QMap<player_config_key_t, player_config_value_t> player_config_t;
+
 class PlayerConfig : public QObject
 {
     Q_OBJECT
@@ -1030,6 +1031,7 @@ public:
     static const QStringList class_names;
     static const QStringList race_names;
     static const QStringList position_types;
+    static const QStringList song_names;
     static constexpr quint64 PLAYER_OBJECT_THIEF = 297ULL;
     static constexpr quint64 PLAYER_GOLD_THIEF = 298ULL;
     static constexpr quint64 PLAYER_CANTQUIT = 299ULL;

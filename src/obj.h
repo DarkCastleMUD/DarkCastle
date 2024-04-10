@@ -17,6 +17,7 @@
 #define OBJ_H_
 
 #include <vector>
+#include <QStringList>
 
 #include "common.h"
 #include "structs.h" // uint8_t

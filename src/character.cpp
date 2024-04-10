@@ -608,6 +608,12 @@ const QStringList Character::race_names = {
     "orc",
     "troll"};
 
+const QStringList Character::song_names = {QStringLiteral("listsongs"), QStringLiteral("whistle sharp"), QStringLiteral("stop"), /* If you move stop, update do_sing */
+                                           QStringLiteral("travelling march"), QStringLiteral("bountiful sonnet"), QStringLiteral("insane chant"), QStringLiteral("glitter dust"), QStringLiteral("synchronous chord"), QStringLiteral("healing melody"), QStringLiteral("sticky lullaby"), QStringLiteral("revealing staccato"),
+                                           QStringLiteral("flight of the bumblebee"), QStringLiteral("jig of alacrity"), QStringLiteral("note of knowledge"), QStringLiteral("terrible clef"), QStringLiteral("soothing rememberance"), QStringLiteral("forgetful rhythm"), QStringLiteral("searching song"),
+                                           QStringLiteral("vigilant siren"), QStringLiteral("astral chanty"), QStringLiteral("disarming limerick"), QStringLiteral("shattering resonance"), QStringLiteral("irresistable ditty"), QStringLiteral("fanatical fanfare"), QStringLiteral("dischordant dirge"),
+                                           QStringLiteral("crushing crescendo"), QStringLiteral("hypnotic harmony"), QStringLiteral("mountain king's charge"), QStringLiteral("submariner's anthem"), QStringLiteral("summoning song"), QStringLiteral("\n")};
+
 const QList<Toggle> Player::togglables = {
     {"brief", PLR_BRIEF_BIT, &Character::do_brief},
     {"compact", PLR_COMPACT_BIT, &Character::do_compact},
