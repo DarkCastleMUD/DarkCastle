@@ -559,7 +559,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 			if (length > 79)
 			{
-				buf = QString("%1\r\n    {}").arg(buf).arg(buf3);
+				buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf3);
 			}
 			else
 			{
@@ -584,7 +584,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 			length = nocolor_strlen(potential_buffer.sliced(starting_point));
 			if (length > 79)
 			{
-				buf = QString("%1\r\n    {}").arg(buf).arg(buf2);
+				buf = QString("%1\r\n    %2").arg(buf).arg(buf2);
 			}
 			else
 			{

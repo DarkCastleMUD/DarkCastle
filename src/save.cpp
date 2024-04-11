@@ -684,19 +684,19 @@ void read_skill(Character *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
