@@ -1768,7 +1768,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
     if (Broker)
     {
-      Broker->do_auction(QString("%1 is selling \"$R%2$R$6$B\" for %3 gold.").arg(GET_SHORT(ch)).arg(obj->short_description).arg(price).split(' '));
+      Broker->do_auction(QStringLiteral("%1 is selling \"$R%2$R$6$B\" for %3 gold.").arg(GET_SHORT(ch)).arg(obj->short_description).arg(price).split(' '));
     }
     else
     {

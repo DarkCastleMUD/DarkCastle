@@ -299,7 +299,7 @@ int write_hotboot_file(char **new_argv)
       char unlink_strerror[1024] = {};
       strerror_r(errno, unlink_strerror, sizeof(unlink_strerror));
 
-      logentry(QString("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, LogChannels::LOG_MISC);
     }
 
     for (auto i = 0; i < arguments.size(); ++i)

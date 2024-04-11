@@ -1594,7 +1594,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
       if (!FOUND)
       {
-         owner->do_tell(QString("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
+         owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 

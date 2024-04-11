@@ -721,7 +721,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		int k = atoi(arg2) - 1;
 		if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
 		{
-			owner->do_tell(QString("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		class Object *obj;
