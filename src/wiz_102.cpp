@@ -5648,7 +5648,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
   const uint64_t longest_connection_state_size = std::max(5UL, sockets.getLongestConnectionStateSize());
   const uint64_t longest_idle_size = std::max(4UL, sockets.getLongestIdleSize() + 1);
 
-  send(QString("%1: %2 | %3 | %4 | %5$R\r\n").arg("Des").arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
+  send(QStringLiteral("%1: %2 | %3 | %4 | %5$R\r\n").arg("Des").arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
   for (const auto &d : connections)
   {
     const QString connection_character_name = d->getName();
@@ -5658,7 +5658,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     const QString connected_state = constindex(d->connected, DC::connected_states);
     const QString idle_seconds = QStringLiteral("%1s").arg(d->idle_time / DC::PASSES_PER_SEC);
 
-    send(QString("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
+    send(QStringLiteral("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
   }
 
   const uint64_t num_can_see = connections.size();
