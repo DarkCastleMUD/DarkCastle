@@ -87,5 +87,28 @@
         "-extra-arg=-std=c++23",
         "-extra-arg=-stdlib=libc++"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}/src"
+    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "C_Cpp.codeAnalysis.exclude": {
+        "build/*": true,
+        "build/**": true,
+        "lib/*": true,
+        "lib/**": true,
+        "log/*": true,
+        "log/**": true
+    },
+    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
+        "clang-analyzer-core.NullDereference"
+    ],
+    "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
+        "clang-analyzer-cplusplus.*",
+        "clang-analyzer-deadcode.DeadStores",
+        "clang-analyzer-nullablity.*",
+        "clang-analyzer-optin.*",
+        "clang-analyzer-osx.*",
+        "clang-analyzer-security.*",
+        "clang-analyzer-unix.*",
+        "clang-analyzer-valist.*"
+    ],
+    "editor.formatOnSave": true,
+    "gitlens.telemetry.enabled": false,
 }
