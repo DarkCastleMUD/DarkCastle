@@ -884,7 +884,7 @@ int do_mpxpreward(Character *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-  vict->send(QString("You receive %1 exps.\r\n").arg(reward));
+  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(reward));
   gain_exp(vict, reward);
   return eSUCCESS;
 }
@@ -1176,7 +1176,7 @@ int do_mpteachskill(Character *ch, char *argument, int cmd)
   int index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
-    victim->send(QString("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
+    victim->send(QStringLiteral("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
     return eFAILURE;
   }
 

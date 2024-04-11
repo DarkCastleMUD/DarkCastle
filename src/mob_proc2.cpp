@@ -459,7 +459,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		cost = corpse_cost(ch);
 		cost /= 20000;
 		cost = MAX(cost, 30);
-		ch->send(QString("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
+		ch->send(QStringLiteral("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
 		return eSUCCESS;
 	}
 
@@ -584,7 +584,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 			length = nocolor_strlen(potential_buffer.sliced(starting_point));
 			if (length > 79)
 			{
-				buf = QString("%1\r\n    %2").arg(buf).arg(buf2);
+				buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
 			}
 			else
 			{
@@ -640,7 +640,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (length > 79)
 	{
-		buf = QString("%1\r\n    %2").arg(buf).arg(buf2);
+		buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
 	}
 	else
 	{

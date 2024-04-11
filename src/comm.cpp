@@ -941,7 +941,7 @@ void DC::game_loop_init(void)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
     }
 
     auto future = QtConcurrent::run([]() {});
@@ -950,7 +950,7 @@ void DC::game_loop_init(void)
     {
       // QJsonArray array = QJsonArray::fromStringList(myData);
 
-      return QHttpServerResponse(QString("Success.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
     }
     else
     {
@@ -961,14 +961,14 @@ void DC::game_loop_init(void)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
     }
 
     auto future = QtConcurrent::run([]() {});
 
     if (future.isValid())
     {
-      return QHttpServerResponse(QString("Success.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
     }
     else
     {
@@ -979,14 +979,14 @@ void DC::game_loop_init(void)
                {
                  if (!dc->authenticate(request, 110))
                  {
-                   return QHttpServerResponse(QString("Failed to authenticate.\r\n"));
+                   return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
                  }
 
                  auto future = QtConcurrent::run([]() {});
 
                  int do_not_save_corpses = 1;
 
-                 QString buf = QString("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                 QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
                  logentry(buf, ANGEL, LogChannels::LOG_GOD);
                  logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);

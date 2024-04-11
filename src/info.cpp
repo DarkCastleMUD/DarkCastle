@@ -792,7 +792,7 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
             i = d->character;
          if (!CAN_SEE(this, i))
             continue;
-         sendln(QString("\n\r%1").arg(i->getName()));
+         sendln(QStringLiteral("\n\r%1").arg(i->getName()));
          sendln("----------");
          do_botcheck(i->getName().split(' '));
       }
@@ -1288,7 +1288,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
       }
       else
       {
-         send(QString("You could not find %1 in your inventory, among your equipment or in this room.\r\n").arg(arg1));
+         send(QStringLiteral("You could not find %1 in your inventory, among your equipment or in this room.\r\n").arg(arg1));
       }
    }
 
@@ -3344,11 +3344,11 @@ command_return_t Character::do_experience(QStringList arguments, int cmd)
 
       if (experience_remaining < 0)
       {
-         send(QString("You have enough experience to advance to level %L1.\r\n").arg(next_level));
+         send(QStringLiteral("You have enough experience to advance to level %L1.\r\n").arg(next_level));
       }
       else
       {
-         send(QString("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
+         send(QStringLiteral("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
       }
    } while (experience_remaining < 0);
 
@@ -4163,7 +4163,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("%1 matches found in inventory.\r\n").arg(obj_results.size() - old_count));
+      send(QStringLiteral("%1 matches found in inventory.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
       // Search equipment
@@ -4195,7 +4195,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("%1 matches found among worn equipment.\r\n").arg(obj_results.size() - old_count));
+      send(QStringLiteral("%1 matches found among worn equipment.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
       // search room
@@ -4224,7 +4224,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             }
          }
       }
-      send(QString("%1 matches found in room.\r\n").arg(obj_results.size() - old_count));
+      send(QStringLiteral("%1 matches found in room.\r\n").arg(obj_results.size() - old_count));
       old_count = obj_results.size();
 
       // Search all vaults player has access to
@@ -4280,11 +4280,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       if (vaults_searched == 1)
       {
-         send(QString("%1 matches found within 1 vault.\r\n").arg(obj_results.size() - old_count));
+         send(QStringLiteral("%1 matches found within 1 vault.\r\n").arg(obj_results.size() - old_count));
       }
       else
       {
-         send(QString("%1 matches found within %2 vaults.\r\n").arg(obj_results.size() - old_count).arg(vaults_searched));
+         send(QStringLiteral("%1 matches found within %2 vaults.\r\n").arg(obj_results.size() - old_count).arg(vaults_searched));
       }
       old_count = obj_results.size();
 
@@ -4363,7 +4363,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                   }
                }
 
-               send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+               send(QStringLiteral("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
 
                showed_ranges = true;
             }
@@ -4424,7 +4424,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       }
       if (obj_results.empty())
       {
-         send(QString("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
+         send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
          return eFAILURE;
       }
 
@@ -4450,7 +4450,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                   }
                }
 
-               send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+               send(QStringLiteral("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
 
                showed_ranges = true;
             }
@@ -4467,11 +4467,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    {
       if (limit_output)
       {
-         send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+         send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
       }
       else
       {
-         send(QString("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+         send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
       }
    }
 

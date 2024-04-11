@@ -907,7 +907,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     {
       x = (int)(exp_needed - GET_EXP(ch));
 
-      ch->send(QString("You need %1 experience to level.\r\n").arg(x));
+      ch->send(QStringLiteral("You need %1 experience to level.\r\n").arg(x));
       return eSUCCESS;
     }
 

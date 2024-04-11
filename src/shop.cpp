@@ -236,7 +236,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
   keeper->do_tell(shop.message_buy.arg(GET_NAME(ch)).arg(cost).split(' '));
-  ch->send(QString("You now have %1.\r\n").arg(obj->short_description));
+  ch->send(QStringLiteral("You now have %1.\r\n").arg(obj->short_description));
   ch->removeGold(cost);
   keeper->addGold(cost);
 
@@ -349,7 +349,7 @@ void shopping_sell(const char *arg, Character *ch,
 
   act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
   keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(GET_NAME(ch)).arg(cost).split(' '));
-  ch->send(QString("The shopkeeper now has %1.\r\n").arg(obj->short_description));
+  ch->send(QStringLiteral("The shopkeeper now has %1.\r\n").arg(obj->short_description));
   ch->addGold(cost);
   keeper->removeGold(cost);
 
@@ -1258,7 +1258,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 
   shop->money_on_hand -= value;
   ch->addGold(value);
-  ch->send(QString("You take %1 $B$5gold$R out of the till.\r\n").arg(value));
+  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\r\n").arg(value));
   write_one_player_shop(shop);
 }
 
@@ -1404,7 +1404,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
-    ch->send(QString("\r\nYour shop has %1 cash in the till.\r\n").arg(shop->money_on_hand));
+    ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(shop->money_on_hand));
 }
 
 int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
@@ -1734,7 +1734,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      ch->send(QString("Invalid number. Choose between 1 and %1.\r\n").arg(MAX_EDDIE_ITEMS));
+      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(MAX_EDDIE_ITEMS));
       return eSUCCESS;
     }
 

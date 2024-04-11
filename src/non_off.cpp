@@ -406,7 +406,7 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
       if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
         send(QStringLiteral("%1 ").arg(t.name_, -11));
-        send(QString("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+        send(QStringLiteral("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
     return eSUCCESS;
@@ -519,7 +519,7 @@ int Character::do_config(QStringList arguments, int cmd)
     {
       if (key.isEmpty() == false)
       {
-        send(QString("%1 not found.\r\n").arg(key));
+        send(QStringLiteral("%1 not found.\r\n").arg(key));
       }
       else
       {
@@ -536,11 +536,11 @@ int Character::do_config(QStringList arguments, int cmd)
   {
     if (player->config->find(key) != player->config->end())
     {
-      send(QString("%1 unset.\r\n").arg(key));
+      send(QStringLiteral("%1 unset.\r\n").arg(key));
       player->config->insert(key, QString());
       return eSUCCESS;
     }
-    send(QString("%1 not found.\r\n").arg(key));
+    send(QStringLiteral("%1 not found.\r\n").arg(key));
     return eFAILURE;
   }
 
@@ -564,11 +564,11 @@ int Character::do_config(QStringList arguments, int cmd)
         {
           if (color.key() == "black")
           {
-            send(QString("%1\r\n").arg(color.key()));
+            send(QStringLiteral("%1\r\n").arg(color.key()));
           }
           else
           {
-            send(QString("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
+            send(QStringLiteral("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
           }
         }
 

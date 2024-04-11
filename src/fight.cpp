@@ -2567,7 +2567,7 @@ int damage(Character *ch, Character *victim,
     else
     {
       pspell->duration -= dam;
-      victim->send(QString("Your stones absorb %1 damage from the attack and change its direction slightly.\r\n").arg(dam));
+      victim->send(QStringLiteral("Your stones absorb %1 damage from the attack and change its direction slightly.\r\n").arg(dam));
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();

@@ -189,7 +189,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
 
   Object *reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  ch->send(QString("You succesfully make a %1!\r\n").arg(reward->short_description));
+  ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return eSUCCESS;
@@ -245,7 +245,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
 
   if (found < 0)
   {
-    ch->send(QString("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
+    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
     return eFAILURE;
   }
 
@@ -276,7 +276,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 {
   if (!(container->contains))
   {
-    ch->send(QString("Your %1 appears to be empty.\r\n").arg(container->short_description));
+    ch->send(QStringLiteral("Your %1 appears to be empty.\r\n").arg(container->short_description));
     return -2;
   }
 
@@ -389,7 +389,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
            break;
 
         default:
-           ch->send(QString("Unknown poison type %1.  Let a god know.\r\n").arg(type));
+           ch->send(QStringLiteral("Unknown poison type %1.  Let a god know.\r\n").arg(type));
            break;
      }
 
@@ -878,13 +878,13 @@ int Brew::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QString("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
 
       return eSUCCESS;
     }
   }
 
-  ch->send(QString("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
   return eFAILURE;
 }
 
@@ -1345,13 +1345,13 @@ int Scribe::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QString("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
 
       return eSUCCESS;
     }
   }
 
-  ch->send(QString("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
   return eFAILURE;
 }
 

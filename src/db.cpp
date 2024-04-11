@@ -4248,7 +4248,7 @@ void write_object(Object *obj, QTextStream &fl)
 {
 	struct extra_descr_data *currdesc;
 
-	fl << QString("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
+	fl << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->description);

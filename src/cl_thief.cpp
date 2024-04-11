@@ -1024,7 +1024,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
               (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
-            ch->send(QString("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description));
+            ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description));
             extract_obj(obj);
           }
           // check for no_trade inside containers

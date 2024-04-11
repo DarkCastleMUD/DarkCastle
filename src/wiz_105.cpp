@@ -41,7 +41,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
       QString aff_name = get_skill_name(af->type);
       if (!aff_name.isEmpty())
       {
-        ch->send(QString("Removing %1 affect.\r\n").arg(aff_name));
+        ch->send(QStringLiteral("Removing %1 affect.\r\n").arg(aff_name));
       }
       else
       {

@@ -2281,7 +2281,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
          if (obj->slot->bet == 1)
             ch->sendln("You place only the minimum bet into the slot machine now.");
          else
-            ch->send(QString("You now start placing %1 times the base amount into the slot machine.\r\n").arg(obj->slot->bet));
+            ch->send(QStringLiteral("You now start placing %1 times the base amount into the slot machine.\r\n").arg(obj->slot->bet));
          return eSUCCESS;
       }
       ch->sendln("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.");
@@ -2467,7 +2467,7 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
                              num == 35))
    {
       tmp = 2 * plr->bet_array[0];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $0$BBLACK$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $0$BBLACK$R!\n\r").arg(tmp));
       winnings += tmp;
    }
 
@@ -2477,61 +2477,61 @@ uint32_t check_roulette_wins(struct roulette_player *plr, int num)
                               num == 35 || num == 0))
    {
       tmp = 2 * plr->bet_array[1];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $4$BRED$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $4$BRED$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[2] && num % 2 == 0 && num)
    {
       tmp = 2 * plr->bet_array[2];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $BEVEN$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BEVEN$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[3] && num % 2 == 1)
    {
       tmp = 2 * plr->bet_array[3];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $BODD$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $BODD$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[4] && num > 0 && num < 13)
    {
       tmp = 3 * plr->bet_array[4];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B1-12$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-12$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[5] && num > 12 && num < 25)
    {
       tmp = 3 * plr->bet_array[5];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B13-24$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B13-24$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[6] && num > 24 && num < 37)
    {
       tmp = 3 * plr->bet_array[6];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B25-36$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B25-36$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[7] && num > 0 && num < 10)
    {
       tmp = 4 * plr->bet_array[7];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B1-9$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B1-9$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[8] && num > 9 && num < 19)
    {
       tmp = 4 * plr->bet_array[8];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B10-18$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B10-18$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[9] && num > 18 && num < 28)
    {
       tmp = 4 * plr->bet_array[9];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B19-27$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B19-27$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    if (plr->bet_array[10] && num > 27 && num < 37)
    {
       tmp = 4 * plr->bet_array[10];
-      plr->ch->send(QString("You WIN %1 coins on your bet of $B28-36$R!\n\r").arg(tmp));
+      plr->ch->send(QStringLiteral("You WIN %1 coins on your bet of $B28-36$R!\n\r").arg(tmp));
       winnings += tmp;
    }
    for (int i = 11; i < 48; i++)
@@ -2771,7 +2771,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B$0BLACK$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B$0BLACK$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B$0BLACK$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2796,7 +2796,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B$4RED$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B$4RED$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B$4RED$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2821,7 +2821,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $BEVEN$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $BEVEN$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $BEVEN$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2846,7 +2846,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $BODD$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $BODD$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $BODD$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2871,7 +2871,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B1-12$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B1-12$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B1-12$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2896,7 +2896,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B13-24$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B13-24$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B13-24$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2921,7 +2921,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B25-36$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B25-36$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2946,7 +2946,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B1-9$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B1-9$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B1-9$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2971,7 +2971,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B10-18$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B10-18$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B10-18$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -2996,7 +2996,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B19-27$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B19-27$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B19-27$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }
@@ -3021,7 +3021,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
          }
          else
          {
-            ch->send(QString("You have placed a bet of %1 on $B28-36$R.\r\n").arg(bet));
+            ch->send(QStringLiteral("You have placed a bet of %1 on $B28-36$R.\r\n").arg(bet));
             sprintf(buf, "$n places a bet of %u on $B28-36$R.", bet);
             act(buf, ch, 0, 0, TO_ROOM, 0);
          }

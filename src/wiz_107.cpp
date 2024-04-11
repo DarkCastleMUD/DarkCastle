@@ -125,7 +125,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
   if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
     this->sendln("Can't do that. That mob is higher than you!");
-    logentry(QString("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, LogChannels::LOG_GOD);
+    logentry(QStringLiteral("%1 tried to snoop a higher mob\n\r").arg(GET_NAME(this)), OVERSEER, LogChannels::LOG_GOD);
     return eFAILURE;
   }
 

@@ -818,7 +818,7 @@ void save_char_obj_db(Character *ch)
 
   int msec = finish.tv_sec * 1000 + finish.tv_usec / 1000;
   msec -= start.tv_sec * 1000 + start.tv_usec / 1000;
-  ch->send(QString("Save took %1ms\n\r").arg(msec));
+  ch->send(QStringLiteral("Save took %1ms\n\r").arg(msec));
 
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&

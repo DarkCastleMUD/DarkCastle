@@ -462,7 +462,7 @@ int songstaff(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(QString("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
+        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
       }
       else
       {
@@ -605,22 +605,22 @@ int orrowand(Character *ch, class Object *obj, int cmd, const char *arg, Charact
     if (!firstP && real_object(27903))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
-      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!secondP && real_object(27903))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
-      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!vial && real_object(27904))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27904)].item);
-      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!diamond && real_object(17399))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(17399)].item);
-      ch->send(QString("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     return eSUCCESS;
   }
@@ -3293,7 +3293,7 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    obj->equipped_by->send(QString("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
+    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
     return eSUCCESS;
   }
   return eFAILURE;
@@ -3554,7 +3554,7 @@ int eternitystaff(Character *ch, class Object *obj, int cmd, const char *arg,
     if (dam > 0)
     {
       GET_MANA(obj->equipped_by) -= dam;
-      obj->equipped_by->send(QString("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
+      obj->equipped_by->send(QStringLiteral("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
 
       act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
     }

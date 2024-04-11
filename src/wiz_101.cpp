@@ -157,12 +157,12 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
     {
       if (zones.isEmpty())
       {
-        send(QString("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
+        send(QStringLiteral("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
         return eFAILURE;
       }
 
       auto last_zone_nr = zones.lastKey();
-      send(QString("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
+      send(QStringLiteral("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
       return eFAILURE;
     }
     auto &zone = zones[zone_key];
@@ -213,19 +213,19 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       if ((target_mob = getVisiblePlayer(arg1)))
       {
         location = target_mob->in_room;
-        send(QString("Going to player %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
+        send(QStringLiteral("Going to player %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
       }
       else if ((target_mob = getVisibleCharacter(arg1)))
       {
         location = target_mob->in_room;
-        send(QString("Going to character %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
+        send(QStringLiteral("Going to character %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
         if (target_obj->in_room != DC::NOWHERE)
         {
           location = target_obj->in_room;
-          send(QString("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
+          send(QStringLiteral("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
         }
         else
         {

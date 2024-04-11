@@ -1840,7 +1840,7 @@ void do_god_clans(Character *ch, char *arg, int cmd)
 
     if (get_clan(x) != nullptr)
     {
-      ch->send(QString("%1 is an invalid clan number because it already exists.\r\n").arg(x));
+      ch->send(QStringLiteral("%1 is an invalid clan number because it already exists.\r\n").arg(x));
       return;
     }
 
@@ -2833,7 +2833,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
   if (getGold() < dep)
   {
     send(QString("You don't have %L1 $B$5gold$R coins to deposit into your clan account.\r\n").arg(dep));
-    send(QString("You only have %L1 $B$5gold$R coins on you.\r\n").arg(getGold()));
+    send(QStringLiteral("You only have %L1 $B$5gold$R coins on you.\r\n").arg(getGold()));
     return eFAILURE;
   }
 
@@ -2849,7 +2849,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
   }
 
   send(QString("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
-  QString log_entry = QString("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name_).arg(dep).arg(coin);
+  QString log_entry = QStringLiteral("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name_).arg(dep).arg(coin);
   clan_data *clan = get_clan(this->clan);
   if (clan != nullptr)
   {
@@ -2898,7 +2898,7 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
   }
   else
   {
-    ch->send(QString("You withdraw %1 $B$5gold$R coins.\r\n").arg(wdraw));
+    ch->send(QStringLiteral("You withdraw %1 $B$5gold$R coins.\r\n").arg(wdraw));
   }
   save_clans();
   ch->save(0);
@@ -3458,7 +3458,7 @@ command_return_t Character::do_clanarea(QStringList arguments, int cmd)
     DC::setZoneClanOwner(zone_key, clan);
 
     send("You claim the area on behalf of your clan.\r\n");
-    send(QString("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getZoneName(zone_key)).arg(get_clan(clan)->name));
+    send(QStringLiteral("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getZoneName(zone_key)).arg(get_clan(clan)->name));
 
     return eSUCCESS;
   }

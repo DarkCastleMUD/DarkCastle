@@ -504,7 +504,7 @@ int do_guild(Character *ch, char *argument, int cmd)
 
   if (!DC::getInstance()->rooms.contains(room))
   {
-    ch->send(QString("Room %1 does not exist.\r\n").arg(room));
+    ch->send(QStringLiteral("Room %1 does not exist.\r\n").arg(room));
     return eFAILURE;
   }
 

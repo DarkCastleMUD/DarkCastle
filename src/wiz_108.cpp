@@ -246,7 +246,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
       }
       else
       {
-        ch->send(QString("You purloin %1.\r\n").arg(k->short_description));
+        ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description));
       }
       move_obj(k, ch);
       return eSUCCESS;
@@ -798,7 +798,7 @@ int do_set(Character *ch, char *argument, int cmd)
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
-      ch->send(QString("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
+      ch->send(QStringLiteral("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
       return eFAILURE;
     }
 

@@ -617,7 +617,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       case '%':
         zone.cmd[cmd]->arg2 = 100;
         zone.cmd[cmd]->command = result;
-        ch->send(QString("Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n").arg(cmd + 1).arg(result));
+        ch->send(QStringLiteral("Type for command %1 changed to %2.\r\nArg1-3 reset.\r\n").arg(cmd + 1).arg(result));
         break;
       default:
         ch->sendln("Type must be:  M, O, P, G, E, D, X, K, *, or %.");
@@ -684,7 +684,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       if (last == "none")
       {
         zone.cmd[cmd]->comment = {};
-        ch->send(QString("Comment for command %d removed.\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("Comment for command %d removed.\r\n").arg(cmd + 1));
       }
       else
       {
@@ -808,7 +808,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       {
         change_type += " ";
       }
-      ch->send(QString("Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n").arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
+      ch->send(QStringLiteral("Zone %1, command %2, argument %3 changed from %4%5 to %6.\r\n").arg(zone.getID()).arg(cmd + 1).arg(argument_number).arg(change_type).arg(original_value).arg(new_value));
     }
     return eFAILURE;
   }
@@ -838,7 +838,7 @@ command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
 
   zone.cmd.remove(zone_command_number);
 
-  ch->send(QString("Command %1 removed.\r\n").arg(zone_command_number + 1));
+  ch->send(QStringLiteral("Command %1 removed.\r\n").arg(zone_command_number + 1));
   return eSUCCESS;
 }
 
@@ -1146,7 +1146,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     }
     else
     {
-      ch->send(QString("Searching for Object rnum %1 with vnum %2\r\n").arg(robj).arg(j));
+      ch->send(QStringLiteral("Searching for Object rnum %1 with vnum %2\r\n").arg(robj).arg(j));
     }
     if (rmob == -1)
     {
@@ -1154,7 +1154,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     }
     else
     {
-      ch->send(QString("Searching for Mobile rnum %1 with vnum %2\r\n").arg(rmob).arg(j));
+      ch->send(QStringLiteral("Searching for Mobile rnum %1 with vnum %2\r\n").arg(rmob).arg(j));
     }
 
     for (const auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
@@ -1169,11 +1169,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             do_zedit(ch, str, 1);
             free(str);
@@ -1187,11 +1187,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str, 1);
@@ -1205,11 +1205,11 @@ int do_zedit(Character *ch, char *argument, int cmd)
             csendf(ch, " Zone %d  Command %d (%c)\r\n", z_key, i + 1, zone.cmd[i]->command);
             if (stats)
             {
-              str = strdup(QString(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1 stats\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
             else
             {
-              str = strdup(QString(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
+              str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
             do_zedit(ch, str, 1);
@@ -1297,7 +1297,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
       // bump everything up a slot
       for (j = last_cmd; j != (to - 2); j--)
         zone.cmd[j + 1] = zone.cmd[j];
-      buf = QString("Command copied to %1.\r\n").arg(to);
+      buf = QStringLiteral("Command copied to %1.\r\n").arg(to);
       to--;
     }
     else // tack it on the end
@@ -1953,11 +1953,11 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     {
       QString skill_name = get_skill_name(obj->affected[num].location / 1000);
 
-      ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
+      ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(skill_name).arg(obj->affected[num].modifier));
     }
     else
     {
-      ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
+      ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(apply_types[obj->affected[num].location]).arg(obj->affected[num].modifier));
     }
     break;
   }
@@ -1986,7 +1986,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     modifier = atoi(value);
     num -= 1;
     obj->affected[num].location = modifier * 1000;
-    ch->send(QString("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
+    ch->send(QStringLiteral("Affect %1 changed to %2 by %3.\r\n").arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
     break;
   default:
     ch->sendln("Illegal value, tell pir.");
@@ -2247,7 +2247,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::wear_bits.size(); i++)
       {
-        ch->send(QString("  %1\r\n").arg(Object::wear_bits[i]));
+        ch->send(QStringLiteral("  %1\r\n").arg(Object::wear_bits[i]));
       }
       return eFAILURE;
     }
@@ -2292,7 +2292,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::extra_bits.size(); i++)
       {
-        ch->send(QString("  %1\r\n").arg(Object::extra_bits[i]));
+        ch->send(QStringLiteral("  %1\r\n").arg(Object::extra_bits[i]));
       }
       return eFAILURE;
     }
@@ -2351,7 +2351,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::more_obj_bits.size(); i++)
       {
-        ch->send(QString("  %1\r\n").arg(Object::more_obj_bits[i]));
+        ch->send(QStringLiteral("  %1\r\n").arg(Object::more_obj_bits[i]));
       }
       return eFAILURE;
     }
@@ -2775,7 +2775,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
 
     update_mobprog_bits(mob_num);
 
-    ch->send(QString("New mobprog created as #%1.\r\n").arg(prog_num));
+    ch->send(QStringLiteral("New mobprog created as #%1.\r\n").arg(prog_num));
   }
   break;
 
@@ -3526,7 +3526,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           NPCs_changed++;
         }
       }
-      ch->send(QString("%1 NPCs in the world have been updated.\r\n").arg(NPCs_changed));
+      ch->send(QStringLiteral("%1 NPCs in the world have been updated.\r\n").arg(NPCs_changed));
     }
   }
   break;
@@ -4384,13 +4384,13 @@ int do_redit(Character *ch, char *argument, int cmd)
       if (create_one_room(ch, d))
       {
         c = real_room(d);
-        ch->send(QString("Creating room %1.\r\n").arg(d));
+        ch->send(QStringLiteral("Creating room %1.\r\n").arg(d));
       }
     }
 
     if (c == (-1))
     {
-      ch->send(QString("Error creating exit to room %1.\r\n").arg(d));
+      ch->send(QStringLiteral("Error creating exit to room %1.\r\n").arg(d));
       return eFAILURE;
     }
 
@@ -4459,7 +4459,7 @@ int do_redit(Character *ch, char *argument, int cmd)
             found = true;
             ch->sendln("Extra description keywords:");
           }
-          ch->send(QString("%1\r\n").arg(extra->keyword));
+          ch->send(QStringLiteral("%1\r\n").arg(extra->keyword));
         }
       }
       if (found == false)
@@ -4696,7 +4696,7 @@ int do_redit(Character *ch, char *argument, int cmd)
         else
           DC::getInstance()->world[ch->in_room].denied = nd->next;
         dc_free(nd);
-        ch->send(QString("Mobile %1 ALLOWED entrance.\r\n").arg(mob));
+        ch->send(QStringLiteral("Mobile %1 ALLOWED entrance.\r\n").arg(mob));
         done = true;
         break;
       }
@@ -4720,7 +4720,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     }
 
     DC::getInstance()->world[ch->in_room].denied = nd;
-    ch->send(QString("Mobile %1 DENIED entrance.\r\n").arg(mob));
+    ch->send(QStringLiteral("Mobile %1 DENIED entrance.\r\n").arg(mob));
     break;
   }
   set_zone_modified_world(ch->in_room);
@@ -4888,20 +4888,20 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
   auto &zones = DC::getInstance()->zones;
   if (zones.contains(zone_key) == false)
   {
-    send(QString("Current room is in zone %1 but that zone is not found out of %2 zones loaded.\r\n").arg(zone_key).arg(zones.size()));
+    send(QStringLiteral("Current room is in zone %1 but that zone is not found out of %2 zones loaded.\r\n").arg(zone_key).arg(zones.size()));
     return eFAILURE;
   }
   auto &zone = zones[zone_key];
 
   if (zone.getFilename().isEmpty())
   {
-    send(QString("Zone %1 has an empty filename.\r\n").arg(zone_key));
+    send(QStringLiteral("Zone %1 has an empty filename.\r\n").arg(zone_key));
     return eFAILURE;
   }
 
   if (zone.isModified() == false)
   {
-    send(QString("Zone %1 has not been modified. Saving anyway.\r\n").arg(zone_key));
+    send(QStringLiteral("Zone %1 has not been modified. Saving anyway.\r\n").arg(zone_key));
   }
 
   QString filename = QString("zonefiles/%1").arg(zone.getFilename());
@@ -5662,7 +5662,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
   }
 
   const uint64_t num_can_see = connections.size();
-  send(QString("\r\nThere are %1 connections.\r\n").arg(num_can_see));
+  send(QStringLiteral("\r\nThere are %1 connections.\r\n").arg(num_can_see));
 
   return eSUCCESS;
 }

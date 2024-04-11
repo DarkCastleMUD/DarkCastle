@@ -131,8 +131,8 @@ void save_vault(QString name)
   }
 
   QTextStream out(&file);
-  out << QString("S %1\n").arg(vault->size);
-  out << QString("G %1\n").arg(vault->gold);
+  out << QStringLiteral("S %1\n").arg(vault->size);
+  out << QStringLiteral("G %1\n").arg(vault->gold);
 
   for (items = vault->items; items; items = items->next)
   {
@@ -140,13 +140,13 @@ void save_vault(QString name)
     if (obj == 0)
       continue;
 
-    out << QString("O %1 %2 %3\n").arg(items->item_vnum).arg(items->count).arg(items->obj ? 1 : 0);
+    out << QStringLiteral("O %1 %2 %3\n").arg(items->item_vnum).arg(items->count).arg(items->obj ? 1 : 0);
     if (items->obj)
       write_object(items->obj, out);
   }
 
   for (access = vault->access; access; access = access->next)
-    out << QString("A %1\n").arg(access->name);
+    out << QStringLiteral("A %1\n").arg(access->name);
 
   out << "$\n";
 }
@@ -166,7 +166,7 @@ void vault_access(Character *ch, const char *who)
   {
     ch->send("The following people have access to your vault:\r\n");
     for (access = vault->access; access; access = access->next)
-      ch->send(QString("%1\r\n").arg(access->name));
+      ch->send(QStringLiteral("%1\r\n").arg(access->name));
     return;
   }
 
@@ -200,7 +200,7 @@ void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
   ch->sendln("You have access to the following vaults:");
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && has_vault_access(GET_NAME(ch), vault))
-      ch->send(QString("%1\r\n").arg(vault->owner));
+      ch->send(QStringLiteral("%1\r\n").arg(vault->owner));
 }
 
 void vault_balance(Character *ch, char *owner)
@@ -228,7 +228,7 @@ void vault_balance(Character *ch, char *owner)
   }
 
   if (self)
-    ch->send(QString("You have %1 $B$5gold$R coins in your vault.\r\n").arg(vault->gold));
+    ch->send(QStringLiteral("You have %1 $B$5gold$R coins in your vault.\r\n").arg(vault->gold));
   else
     ch->send(QString("There are %1 $B$5gold$R coins in %2's vault.\r\n").arg(vault->gold).arg(owner));
 }
@@ -946,7 +946,7 @@ void add_vault_access(Character *ch, QString name, struct vault_data *vault)
     return;
   }
 
-  ch->send(QString("%1 now has access to your vault.\r\n").arg(name));
+  ch->send(QStringLiteral("%1 now has access to your vault.\r\n").arg(name));
   CREATE(access, struct vault_access_data, 1);
   access->name = name;
   access->next = vault->access;
@@ -1193,7 +1193,7 @@ void remove_vault_access(Character *ch, QString name, struct vault_data *vault)
     return;
   }
 
-  ch->send(QString("%1 no longer has access to your vault.\r\n").arg(name));
+  ch->send(QStringLiteral("%1 no longer has access to your vault.\r\n").arg(name));
   access_remove(name, vault);
   save_char_obj(ch);
 }
@@ -1542,7 +1542,7 @@ void vault_get(Character *ch, QString object, QString owner)
     sbuf = QString("%1 removed %2(v%3) from %4's vault.").arg(ch->getName()).arg(GET_OBJ_SHORT(obj)).arg(QString::number(GET_OBJ_VNUM(obj))).arg(owner);
     vlog(sbuf, owner);
     act(sbuf, ch, 0, 0, TO_ROOM, GODS);
-    ch->send(QString("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 has been removed from the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     item_remove(obj, vault);
 
@@ -1703,7 +1703,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
 
   if (amount < 1 || amount > max_amount)
   {
-    ch->send(QString("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
+    ch->send(QStringLiteral("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
     return;
   }
 
@@ -1715,11 +1715,11 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     save_vault(owner);
 
     vlog(QString("%1 added %2 gold to %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
-    ch->send(QString("You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
+    ch->send(QStringLiteral("You deposit %1 $B$5gold$R into the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    ch->send(QString("But you only have %1 $B$5gold$R coins!\r\n").arg(ch->getGold()));
+    ch->send(QStringLiteral("But you only have %1 $B$5gold$R coins!\r\n").arg(ch->getGold()));
   }
 }
 
@@ -1751,7 +1751,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   auto max_amount = MIN(vault->gold, VAULT_MAX_DEPWITH);
   if (amount < 1 || amount > max_amount)
   {
-    ch->send(QString("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
+    ch->send(QStringLiteral("Valid amounts are from 1 to %1 $B$5gold$R.\r\n").arg(max_amount));
     return;
   }
 
@@ -1766,11 +1766,11 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
     save_char_obj(ch);
     save_vault(owner);
     vlog(QString("%1 removed %2 gold from %3's vault.").arg(GET_NAME(ch)).arg(amount).arg(owner), owner);
-    ch->send(QString("You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
+    ch->send(QStringLiteral("You withdraw %1 $B$5gold$R from the vault. Its new balance is %2 $B$5gold$R.\r\nYou have %3 $B$5gold$R left on you.\r\n").arg(amount).arg(vault->gold).arg(ch->getGold()));
   }
   else
   {
-    ch->send(QString("The vault only has %1 $B$5gold$R coins in it!\r\n").arg(vault->gold));
+    ch->send(QStringLiteral("The vault only has %1 $B$5gold$R coins in it!\r\n").arg(vault->gold));
   }
 }
 
@@ -1780,7 +1780,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
-    ch->send(QString("%1 is hardly worth saving.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 is hardly worth saving.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1804,13 +1804,13 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
 
   if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && ch->isMortal())
   { // no_trade
-    ch->send(QString("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   { // cursed
-    ch->send(QString("%1 is stuck! Ack!.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 is stuck! Ack!.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1822,7 +1822,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    ch->send(QString("%1 needs to be emptied first.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 needs to be emptied first.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1833,7 +1833,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
   }
   if (obj->obj_flags.timer > 0)
   {
-    ch->send(QString("%1 cannot be placed in the vault right now.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 cannot be placed in the vault right now.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
@@ -1894,7 +1894,7 @@ void vault_put(Character *ch, QString object, QString owner)
         buffer = QString("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
 
       vlog(buffer, owner);
-      ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
       QString sbuf;
       QTextStream ssin;
@@ -1949,7 +1949,7 @@ void vault_put(Character *ch, QString object, QString owner)
 
       vlog(buffer, owner);
 
-      ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
       if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
       {
         item_add(GET_OBJ_VNUM(obj), vault);
@@ -1987,7 +1987,7 @@ void vault_put(Character *ch, QString object, QString owner)
 
     vlog(buffer, owner);
 
-    ch->send(QString("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
     if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
     {
@@ -2081,7 +2081,7 @@ void vault_list(Character *ch, QString owner)
   {
     if (self)
     {
-      ch->send(QString("Your vault is currently empty and can hold %1 pounds.\r\n").arg(vault->size));
+      ch->send(QStringLiteral("Your vault is currently empty and can hold %1 pounds.\r\n").arg(vault->size));
     }
     else
     {
@@ -2703,7 +2703,7 @@ int vault_search(Character *ch, const char *args)
     } // if we have access to vault
   } // for loop of vaults
 
-  ch->send(QString("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
+  ch->send(QStringLiteral("\n\rSearched %1 vaults and found %2 objects.\r\n").arg(vaults_searched).arg(objects_found));
 
   return eSUCCESS;
 }

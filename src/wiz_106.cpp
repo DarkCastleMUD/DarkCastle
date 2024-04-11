@@ -410,7 +410,7 @@ command_return_t test_casino(Character *ch)
 
   if (ch->getGold() > 2000000)
   {
-    ch->send(QString("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
+    ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
     max_rc = max_rc | eFAILURE;
   }
 

@@ -403,21 +403,21 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   Character *victim = get_pc(oldname);
   if (!victim)
   {
-    send(QString("%1 is not in the game.\r\n").arg(oldname));
+    send(QStringLiteral("%1 is not in the game.\r\n").arg(oldname));
     return eFAILURE;
   }
 
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
-    send(QString("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
+    send(QStringLiteral("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
     return eFAILURE;
   }
 
   // +1 cause you can actually have 13 char names
   if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
-    send(QString("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
+    send(QStringLiteral("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
     return eFAILURE;
   }
 
@@ -433,7 +433,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     {
       GET_PLATINUM(victim) -= 500;
       send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
-      victim->send(QString("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
+      victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
       logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
     }
   }
@@ -1026,7 +1026,7 @@ command_return_t do_world(Character *ch, std::string args, int cmd)
       if (world->filename != potential_filename)
       {
         ch->send(QString("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
-        ch->send(QString("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
+        ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
         if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
         {
@@ -1034,7 +1034,7 @@ command_return_t do_world(Character *ch, std::string args, int cmd)
           char *errStr = strerror(rename_errno);
           if (errStr != nullptr)
           {
-            ch->send(QString("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
+            ch->send(QStringLiteral("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
           }
         }
       }

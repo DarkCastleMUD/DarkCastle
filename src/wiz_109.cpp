@@ -138,14 +138,14 @@ command_return_t Character::do_guide(QStringList arguments, int cmd)
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QString("%1 is now a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getNameC()));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QString("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -335,7 +335,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(QString("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, LogChannels::LOG_GOD);
+    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, LogChannels::LOG_GOD);
   }
 
   else
@@ -408,7 +408,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
 
   if (arg1 == "cold")
   {
-    QString buffer = QString("Shutdown by %1.\r\n").arg(GET_SHORT(this));
+    QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     _shutdown = 1;
@@ -426,7 +426,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(QString("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }
@@ -435,7 +435,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     }
 
     do_not_save_corpses = 1;
-    QString buffer = QString("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
+    QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
@@ -498,7 +498,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(QString("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+              send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
               return eFAILURE;
             }
           }

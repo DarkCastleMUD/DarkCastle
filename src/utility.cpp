@@ -857,7 +857,7 @@ void util_archive(const char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
-      caller->send(QString("%1\n\r").arg(buf));
+      caller->send(QStringLiteral("%1\n\r").arg(buf));
     else
       logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
@@ -867,7 +867,7 @@ void util_archive(const char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
-    caller->send(QString("%1\n\r").arg(buf));
+    caller->send(QStringLiteral("%1\n\r").arg(buf));
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
@@ -911,7 +911,7 @@ void util_unarchive(char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
-      caller->send(QString("%1\n\r").arg(buf));
+      caller->send(QStringLiteral("%1\n\r").arg(buf));
     else
       logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
@@ -921,7 +921,7 @@ void util_unarchive(char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
-    caller->send(QString("%1\n\r").arg(buf));
+    caller->send(QStringLiteral("%1\n\r").arg(buf));
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
@@ -1453,7 +1453,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(QString("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
+      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
       return eFAILURE;
     }
   }
@@ -1835,7 +1835,7 @@ command_return_t Character::save(int cmd)
 
   if (cmd != 666)
   {
-    send(QString("Saving %1.\r\n").arg(GET_NAME(this)));
+    send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
   }
 
   if (IS_PC(this))
@@ -2091,7 +2091,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
         REMOVE_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QString("%1 flag REMOVED.\r\n").arg(bits.value(x)));
+          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(bits.value(x)));
         }
       }
       else
@@ -2099,7 +2099,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
         SET_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QString("%1 flag ADDED.\r\n").arg(bits.value(x)));
+          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(bits.value(x)));
         }
       }
       found = true;

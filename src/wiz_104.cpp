@@ -1123,7 +1123,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				room_t range_end = zone.getTop();
 				int num = count_rooms(range_start, range_end);
 
-				ch->send(QString("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
+				ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
 			}
 			return eSUCCESS;
 		}
@@ -1184,7 +1184,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		if (zon > last_room)
 		{
 
-			ch->send(QString("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
+			ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
 			return eFAILURE;
 		}
 		char buf[MAX_INPUT_LENGTH];
@@ -1918,7 +1918,7 @@ int do_teleport(Character *ch, char *argument, int cmd)
 			ch->sendln("There's a private conversation going on in that room");
 			return eFAILURE;
 		} /* if */
-	}	  /* if */
+	} /* if */
 
 	if (isSet(DC::getInstance()->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
 	{
