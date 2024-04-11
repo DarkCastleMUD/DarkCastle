@@ -360,24 +360,50 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
   fwrite("STP", sizeof(char), 3, fpsave);
 }
 
-qsizetype fread_to_tilde(FILE *fpsave)
+qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 {
   qsizetype characters_read{};
   QString buffer;
-  char a;
+  char a{};
+
   while (characters_read++ < 160)
   {
-    fread(&a, 1, 1, fpsave);
+    if (feof(fpsave))
+    {
+      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
+      return characters_read;
+    }
+
+    if (ferror(fpsave))
+    {
+      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
+      return characters_read;
+    }
+
+    long before_fread_offset = ftell(fpsave);
+    size_t read_count = fread(&a, 1, 1, fpsave);
+    long after_fread_offset = ftell(fpsave);
+    if (read_count != 1)
+    {
+      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
+    }
+
     buffer += a;
     if (a == '~')
+    {
       break;
+    }
   }
+
   if (characters_read >= 160)
-    qDebug() << "fread_to_tilde: " << buffer;
+  {
+    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
+  }
+
   return characters_read;
 }
 
-bool Player::read(FILE *fpsave, Character *ch)
+bool Player::read(FILE *fpsave, Character *ch, QString filename)
 {
   if (!ch)
   {
@@ -396,7 +422,7 @@ bool Player::read(FILE *fpsave, Character *ch)
   aliases_ = read_char_aliases(fpsave);
   if (ch->has_skill(NEW_SAVE))
   {
-    if (fread_to_tilde(fpsave) >= 160)
+    if (fread_to_tilde(fpsave, filename) >= 160)
     {
       buglog(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
       return false;
@@ -574,7 +600,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
   return false;
 }
 
-bool read_pc_or_mob_data(Character *ch, FILE *fpsave)
+bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 {
   if (IS_MOB(ch))
   {
@@ -590,7 +616,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave)
   {
     ch->mobdata = nullptr;
     ch->player = new Player;
-    if (!ch->player->read(fpsave, ch))
+    if (!ch->player->read(fpsave, ch, filename))
     {
       return false;
     }
@@ -1009,7 +1035,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
 
   store_to_char(&uchar, ch);
   ch->store_to_char_variable_data(fpsave);
-  if (!read_pc_or_mob_data(ch, fpsave))
+  if (!read_pc_or_mob_data(ch, fpsave, strsave))
   {
     return load_status_t::error;
   }

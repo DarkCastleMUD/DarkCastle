@@ -29,8 +29,8 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
-qsizetype fread_to_tilde(FILE *fpsave);
-bool read_pc_or_mob_data(Character *ch, FILE *fpsave);
+qsizetype fread_to_tilde(FILE *fpsave, QString filename);
+bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename);
 void load_vaults();
 
 extern struct vault_data *vault_table;
@@ -447,6 +447,20 @@ int main(int argc, char **argv)
           {
           }
         }
+      }
+    }
+
+    for (const auto &c : DC::getInstance()->character_list)
+    {
+      c->desc = d;
+      do_score(c, "");
+      process_output(d);
+      do_vault(c, "list");
+      process_output(d);
+
+      if (c->isImmortal() && c->isPlayer())
+      {
+        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
       }
     }
 

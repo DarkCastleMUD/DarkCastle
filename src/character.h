@@ -379,7 +379,7 @@ public:
     void save_char_aliases(FILE *fpsave);
     QString perform_alias(QString orig);
     void save(FILE *fpsave, time_data tmpage);
-    bool read(FILE *fpsave, Character *ch);
+    bool read(FILE *fpsave, Character *ch, QString filename);
 
     aliases_t aliases_; /* Aliases */
 };
