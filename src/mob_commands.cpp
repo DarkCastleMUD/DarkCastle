@@ -2166,9 +2166,9 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   }
 
   Character *vict;
-  //  if (activeActor) activeActor->send(QString("{%1}\r\n").arg(arg));
+  //  if (activeActor) activeActor->send(QStringLiteral("{%1}\r\n").arg(arg));
   //  vict = get_pc("Urizen");
-  //  if (vict) vict->send(QString("{%1}\r\n").arg(arg));
+  //  if (vict) vict->send(QStringLiteral("{%1}\r\n").arg(arg));
 
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];

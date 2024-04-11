@@ -159,7 +159,7 @@ void AreaData::DisplayAreaData(Character *ch)
 	{
 		if (areaStats[zone_key].xps == 0)
 			continue;
-		buf = QString("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n\r").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
+		buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n\r").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
 		ch->send(buf.arg(zone_key).arg(zone.Name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
 	}
 	return;
