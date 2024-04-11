@@ -786,7 +786,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
     if (!*buf)
     {
-      ch->send(QString("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
+      ch->send(QStringLiteral("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
       return eFAILURE;
     }
 

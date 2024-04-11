@@ -5740,22 +5740,22 @@ T fread_int(QTextStream &in, T beg_range, T end_range)
 	{
 		if (arg1.toLongLong(&ok) != number && ok)
 		{
-			logentry(QString("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+			logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
 		}
 		else if (!ok)
 		{
-			logentry(QString("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(beg_range).name()));
+			logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(beg_range).name()));
 		}
 	}
 	else if (std::is_unsigned<T>::value)
 	{
 		if (arg1.toULongLong(&ok) != number && ok)
 		{
-			logentry(QString("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
+			logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
 		}
 		else if (!ok)
 		{
-			logentry(QString("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(beg_range).name()));
+			logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(beg_range).name()));
 		}
 	}
 	else

@@ -398,7 +398,7 @@ bool Player::read(FILE *fpsave, Character *ch)
   {
     if (fread_to_tilde(fpsave) >= 160)
     {
-      buglog(QString("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
+      buglog(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
       return false;
     }
   }

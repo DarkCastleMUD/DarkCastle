@@ -715,7 +715,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		}
 		if (!is_number(arg2))
 		{
-			owner->do_tell(QString("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Sorry, mate. You type buy <number> to specify what you want..").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		int k = atoi(arg2) - 1;

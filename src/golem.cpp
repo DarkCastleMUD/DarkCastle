@@ -372,7 +372,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
   if (ch->getLevel() + 19 > 60)
   {
-    logentry(QString("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
     return eSUCCESS;
