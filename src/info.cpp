@@ -14,6 +14,8 @@
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
 /* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
+#include <sys/time.h>
+
 #include <cctype>
 #include <cstring>
 #include <cassert>

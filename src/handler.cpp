@@ -14,6 +14,8 @@
  ***************************************************************************/
 /* $Id: handler.cpp,v 1.208 2013/03/27 03:32:58 jhhudso Exp $ */
 
+#include <sys/time.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
