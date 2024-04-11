@@ -313,7 +313,6 @@ int main(int argc, char **argv)
   ch->do_bestow({"debugimp", "load"});
   process_output(d);
 
-  exit(EXIT_SUCCESS);
   /*
     qDebug("\n");
 
