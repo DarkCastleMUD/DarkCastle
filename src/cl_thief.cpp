@@ -717,7 +717,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_hide(Character *ch, char *argument, int cmd)
+int do_hide(Character *ch, const char *argument, int cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
@@ -1239,7 +1239,7 @@ int do_steal(Character *ch, char *argument, int cmd)
             }
           }
       } // else
-    }   // if(obj)
+    } // if(obj)
     else
     { // they don't got it
       act("$N does not seem to possess that item.", ch, 0, victim, TO_CHAR, 0);
@@ -2200,11 +2200,11 @@ int do_jab(Character *ch, char *argument, int cmd)
 
 int do_appraise(Character *ch, char *argument, int cmd)
 {
-  Character *victim;
-  Object *obj;
-  char name[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
-  char item[MAX_STRING_LENGTH];
-  int appraised = 0, bits, learned;
+  Character *victim = {};
+  Object *obj = {};
+  char name[MAX_STRING_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
+  char item[MAX_STRING_LENGTH] = {};
+  int appraised = {}, bits = {}, learned = {};
   bool found = false, weight = false;
 
   argument = one_argument(argument, name);
@@ -2320,13 +2320,21 @@ int do_appraise(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (weight)
-      sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
-    else if (found)
-      sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
-    else
-      sprintf(buf, "After some consideration, you estimate the amount of $B$5gold$R %s is carrying to be %d.\r\n", victim->getNameC(), appraised);
-    ch->send(buf);
+    if (obj)
+    {
+      if (weight)
+      {
+        ch->sendln(QString(QStringLiteral("After some consideration, you estimate the weight of %1 to be %2.")).arg(GET_OBJ_SHORT(obj)).arg(appraised));
+      }
+      else if (found)
+      {
+        ch->sendln(QString(QStringLiteral("After some consideration, you estimate the value of %1 to be %2.")).arg(GET_OBJ_SHORT(obj)).arg(appraised));
+      }
+    }
+    else if (victim)
+    {
+      ch->sendln(QString(QStringLiteral("After some consideration, you estimate the amount of $B$5gold$R %1 is carrying to be %2.")).arg(victim->getName()).arg(appraised));
+    }
     WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
   }
 
