@@ -241,7 +241,7 @@ void run_check(Character *ch, command_return_t *rc, auto *function, char *argume
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       process_output(ch->desc);
@@ -263,7 +263,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       process_output(ch->desc);
@@ -285,7 +285,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       process_output(ch->desc);
@@ -307,7 +307,7 @@ void run_check(Character *ch, command_return_t *rc, command_special_t function, 
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QString("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       process_output(ch->desc);
@@ -444,14 +444,14 @@ command_return_t Character::do_test(QStringList arguments, int cmd)
     {
       send(QStringLiteral("Running %1..").arg(test.getName()));
       rc = test.run(this) & rc;
-      sendln(QString("Return code is %1 (%2)").arg(rc).arg(rc_to_qstring(rc)));
+      sendln(QStringLiteral("Return code is %1 (%2)").arg(rc).arg(rc_to_qstring(rc)));
     }
     return rc;
   }
   else if (tests.contains(arg1))
   {
     auto rc = tests[arg1].run(this);
-    send(QString("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
+    send(QStringLiteral("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
     return rc;
   }
 

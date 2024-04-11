@@ -404,7 +404,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
       if (victim->isMortal())
       {
         dam = victim->getHP() * 5 + 20;
-        victim->sendln(QString("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
+        victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
         act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
         return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);

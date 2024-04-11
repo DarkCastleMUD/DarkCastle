@@ -62,10 +62,10 @@ void load_game_portals()
   for (i = 0; i < MAX_GAME_PORTALS; i++)
   {
     num_lines = 0;
-    QString portal_filename = QString("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
+    QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
     if ((cur_file = fopen(portal_filename.toStdString().c_str(), "r")) == 0)
     {
-      logentry(QString("Could not open portal file: %1").arg(portal_filename));
+      logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
     /* Now we have a readable file.  Here's the structure:
@@ -83,7 +83,7 @@ void load_game_portals()
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
     {
-      logentry(QString("Error reading portal file: %1!").arg(buf));
+      logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
       break;
     }
     /* Store the current file value and count line feeds */

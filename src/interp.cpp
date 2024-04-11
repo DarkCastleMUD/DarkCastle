@@ -94,7 +94,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QString("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, LogChannels::LOG_BUG);
     }
     return eFAILURE;
   }
@@ -104,7 +104,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // Handle logged players.
   if (isPlayer() && isSet(player->punish, PUNISH_LOG))
   {
-    logentry(QString("Log %1: %2").arg(getName()).arg(pcomm), 110, LogChannels::LOG_PLAYER);
+    logentry(QStringLiteral("Log %1: %2").arg(getName()).arg(pcomm), 110, LogChannels::LOG_PLAYER);
   }
 
   // Implement freeze command.
@@ -195,7 +195,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
           if (command_skill == 0)
           {
-            buglog(QString("command_interpreter: Unable to find command [%1].").arg(found->getName()));
+            buglog(QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->getName()));
           }
           return eFAILURE;
         }
@@ -288,7 +288,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         // Don't log communication
         if (found->getNumber() != CMD_GTELL && found->getNumber() != CMD_CTELL && found->getNumber() != CMD_SAY && found->getNumber() != CMD_TELL && found->getNumber() != CMD_WHISPER && found->getNumber() != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && isSet(this->player->punish, PUNISH_LOG) == false)
         {
-          logentry(QString("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LogChannels::LOG_PLAYER, this);
+          logentry(QStringLiteral("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LogChannels::LOG_PLAYER, this);
         }
       }
 

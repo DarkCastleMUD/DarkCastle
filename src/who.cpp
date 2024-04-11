@@ -488,11 +488,11 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       {
         if (!IS_MOB(i) && i->player->incognito == true)
         {
-          extraBuf = QString(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
+          extraBuf = QStringLiteral(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
         }
         else
         {
-          extraBuf = QString(" (WizInvis %1)").arg(i->player->wizinvis);
+          extraBuf = QStringLiteral(" (WizInvis %1)").arg(i->player->wizinvis);
         }
       }
       numImmort++;
@@ -506,7 +506,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       }
       else
       {
-        infoBuf = QString("  $6-==-   $B$2%1$R ").arg(race_abbrev[(int)GET_RACE(i)]);
+        infoBuf = QStringLiteral("  $6-==-   $B$2%1$R ").arg(race_abbrev[(int)GET_RACE(i)]);
       }
       numPC++;
     }
@@ -535,11 +535,11 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
     auto clanPtr = get_clan(i);
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
-      buf = QString("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
     else
     {
-      buf = QString("[%1] %2$3%3 %4 %5 %6$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 %5 %6$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)

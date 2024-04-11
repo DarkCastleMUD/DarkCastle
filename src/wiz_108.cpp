@@ -37,7 +37,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
+  ch->send(QStringLiteral("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
   for (low = curRoom; low > 0; low--)
   {
     if (!DC::getInstance()->rooms.contains(low - 1))
@@ -138,7 +138,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   // }
   // catch(char *errmsg)
   // {
-  //   ch->send(QString("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
+  //   ch->send(QStringLiteral("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
   //   ch->sendln("Ask Rubicon if it needs fixed...");
   //   return eFAILURE;
   //}

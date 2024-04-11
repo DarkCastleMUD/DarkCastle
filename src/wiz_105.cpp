@@ -31,7 +31,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
   if (!*buf)
     victim = ch;
   else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
-    ch->send(QString("Couldn't find '%1' anywhere.\r\n").arg(argument));
+    ch->send(QStringLiteral("Couldn't find '%1' anywhere.\r\n").arg(argument));
   if (victim)
   {
     for (af = victim->affected; af; af = afpk)

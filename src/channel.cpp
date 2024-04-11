@@ -106,8 +106,6 @@ std::queue<QString> auction_history;
 std::queue<QString> newbie_history;
 std::queue<QString> trivia_history;
 
-
-
 command_return_t do_say(Character *ch, std::string argument, int cmd)
 {
   int i;
@@ -215,7 +213,7 @@ command_return_t do_psay(Character *ch, std::string argument, int cmd)
 
   if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
-    ch->send(QString("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
+    ch->send(QStringLiteral("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
     return eSUCCESS;
   }
 
@@ -470,14 +468,14 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
     QString buf1;
     if (IS_NPC(this))
     {
-      buf1 = QString("$6$B%1 auctions '%2'$R").arg(GET_SHORT(this)).arg(arguments.join(' '));
+      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(GET_SHORT(this)).arg(arguments.join(' '));
     }
     else
     {
-      buf1 = QString("$6$B%1 auctions '%2'$R").arg(GET_NAME(this)).arg(arguments.join(' '));
+      buf1 = QStringLiteral("$6$B%1 auctions '%2'$R").arg(GET_NAME(this)).arg(arguments.join(' '));
     }
 
-    QString buf2 = QString("$6$BYou auction '%1'$R").arg(arguments.join(' '));
+    QString buf2 = QStringLiteral("$6$BYou auction '%1'$R").arg(arguments.join(' '));
     act(buf2, this, 0, 0, TO_CHAR, 0);
 
     auction_history.push(buf1);
@@ -956,7 +954,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
@@ -990,7 +988,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
       }
     }
     else

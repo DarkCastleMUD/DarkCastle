@@ -831,7 +831,7 @@ void mob_stat(Character *ch, Character *k)
 
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
-  ch->send(QString("$3Combat flags$R: %1\n\r").arg(buf));
+  ch->send(QStringLiteral("$3Combat flags$R: %1\n\r").arg(buf));
 
   if (!IS_MOB(k))
     display_punishes(ch, k);
@@ -898,7 +898,7 @@ void mob_stat(Character *ch, Character *k)
         else
           aff_name = QStringLiteral("Unknown!!!");
       }
-      ch->sendln(QString("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
+      ch->sendln(QStringLiteral("Spell : '%1' (%2)").arg(aff_name).arg(aff->type));
       sprintf(buf, "     Modifies %s by %d points\n\r",
               apply_types[(int)aff->location], aff->modifier);
       ch->send(buf);

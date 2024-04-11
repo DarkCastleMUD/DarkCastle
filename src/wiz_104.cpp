@@ -284,17 +284,17 @@ int do_load(Character *ch, char *arg, int cmd)
 				Object *obj = (Object *)(DC::getInstance()->obj_index[number].item);
 				if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
-					ch->send(QString("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 				else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
 				{
-					ch->send(QString("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 				else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
 				{
-					ch->send(QString("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
+					ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
 					return eFAILURE;
 				}
 			}
@@ -786,7 +786,7 @@ void show_legacy_files(Character *ch, world_file_list_item *head)
 			file_modified = "MODIFIED";
 		}
 
-		ch->send(QString("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+		ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
 		curr = curr->next;
 	}
 }
@@ -1758,7 +1758,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 
-		ch->send(QString("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
+		ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
 		for (i = 0; i < top_of_world; i++)
 			for (nr = 0; nr < MAX_DIRS; nr++)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])

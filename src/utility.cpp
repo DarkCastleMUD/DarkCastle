@@ -471,11 +471,11 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
   {
     if (cf.stderr_timestamp == true)
     {
-      std::cerr << QString("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
     else
     {
-      std::cerr << QString("%1:%2").arg(type).arg(str).toStdString() << std::endl;
+      std::cerr << QStringLiteral("%1:%2").arg(type).arg(str).toStdString() << std::endl;
     }
   }
 
@@ -1579,7 +1579,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
 
     if (this->getGold() < (uint32_t)cost)
     {
-      this->send(QString("You don't have %1 gold!\n\r").arg(cost));
+      this->send(QStringLiteral("You don't have %1 gold!\n\r").arg(cost));
       return eFAILURE;
     }
 

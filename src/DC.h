@@ -372,7 +372,7 @@ public:
     currentName(current_name);
     currentVNUM(current_VNUM);
   }
-  [[nodiscard]] inline QString current(void) { return QString("%1: %2, %3").arg(currentType()).arg(currentName()).arg(currentVNUM()); }
+  [[nodiscard]] inline QString current(void) { return QStringLiteral("%1: %2, %3").arg(currentType()).arg(currentName()).arg(currentVNUM()); }
 
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;

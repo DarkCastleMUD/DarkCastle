@@ -150,13 +150,13 @@ AuctionHouse TheAuctionHouse("auctionhouse");
 void AuctionHouse::ShowStats(Character *ch)
 {
   ch->sendln("Vendor Statistics:");
-  ch->send(QString("Items Posted:     %1\r\n").arg(ItemsPosted));
-  ch->send(QString("Items For Sale:   %1\r\n").arg(ItemsActive));
-  ch->send(QString("Items Sold:       %1\r\n").arg(ItemsSold));
-  ch->send(QString("Items Expired:    %1\r\n").arg(ItemsExpired));
-  ch->send(QString("Total Revenue:    %1\r\n").arg(Revenue));
-  ch->send(QString("Tax Collected:    %1\r\n").arg(TaxCollected));
-  ch->send(QString("Uncollected Gold: %1\r\n").arg(UncollectedGold));
+  ch->send(QStringLiteral("Items Posted:     %1\r\n").arg(ItemsPosted));
+  ch->send(QStringLiteral("Items For Sale:   %1\r\n").arg(ItemsActive));
+  ch->send(QStringLiteral("Items Sold:       %1\r\n").arg(ItemsSold));
+  ch->send(QStringLiteral("Items Expired:    %1\r\n").arg(ItemsExpired));
+  ch->send(QStringLiteral("Total Revenue:    %1\r\n").arg(Revenue));
+  ch->send(QStringLiteral("Tax Collected:    %1\r\n").arg(TaxCollected));
+  ch->send(QStringLiteral("Uncollected Gold: %1\r\n").arg(UncollectedGold));
   return;
 }
 
@@ -276,13 +276,13 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
   }
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
 
   if (Item_it->seller.compare(GET_NAME(ch)))
   {
-    ch->send(QString("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
     return;
   }
 
@@ -311,7 +311,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
     }
   }
 
-  logentry(QString("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+  logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, LogChannels::LOG_OBJECTS);
   Item_it->price = new_price;
   Save();
   return;
@@ -472,7 +472,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
 
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
 
@@ -500,7 +500,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
   if (!obj)
   {
 
-    logentry(QString("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -749,7 +749,7 @@ void AuctionHouse::RemoveRoom(Character *ch, int room)
     return;
   }
   else
-    ch->send(QString("Room %1 doesn't appear to be an auction house.\r\n").arg(room));
+    ch->send(QStringLiteral("Room %1 doesn't appear to be an auction house.\r\n").arg(room));
   return;
 }
 
@@ -1028,12 +1028,12 @@ void AuctionHouse::CollectTickets(Character *ch, unsigned int ticket)
     {
       if (Item_it->seller.compare(GET_NAME(ch)))
       {
-        ch->send(QString("Ticket %1 doesn't seem to belong to you.\r\n").arg(ticket));
+        ch->send(QStringLiteral("Ticket %1 doesn't seem to belong to you.\r\n").arg(ticket));
         return;
       }
       if (Item_it->state != AUC_EXPIRED && Item_it->state != AUC_SOLD)
       {
-        ch->send(QString("Ticket %1 isn't collectible!.\r\n").arg(ticket));
+        ch->send(QStringLiteral("Ticket %1 isn't collectible!.\r\n").arg(ticket));
         return;
       }
     }
@@ -1102,7 +1102,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
 
@@ -1339,12 +1339,12 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    ch->send(QString("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't seem to exist.\r\n").arg(ticket));
     return;
   }
   if (Item_it->seller.compare(GET_NAME(ch)))
   {
-    ch->send(QString("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
+    ch->send(QStringLiteral("Ticket number %1 doesn't belong to you.\r\n").arg(ticket));
     return;
   }
 
@@ -1684,7 +1684,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), DC::getInstance()->obj_index[obj->item_number].virt))
   {
-    ch->send(QString("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
+    ch->send(QStringLiteral("You're selling %1 already and it's unique!\n\r").arg(obj->short_description));
     return;
   }
 
@@ -1755,7 +1755,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     csendf(ch, "You are now selling %s to %s for %u coins.\r\n",
            obj->short_description, buyer.toStdString().c_str(), price);
   }
-  logentry(QString("Character *Broker was nullptr in AuctionHouse::AddItem(%1, %2, %3, %4)").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+  logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem(%1, %2, %3, %4)").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
   if (advertise == true && NewTicket.buyer.isEmpty())
   {
     Character *find_mob_in_room(Character * ch, int iFriendId);
@@ -1773,7 +1773,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      logentry(QString("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 

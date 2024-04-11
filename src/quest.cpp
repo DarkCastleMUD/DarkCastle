@@ -410,7 +410,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
 int show_one_complete_quest(Character *ch, struct quest_info *quest, int count)
 {
-   ch->send(QString(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n\r").arg(quest->name, -35).arg(quest->reward, -5));
+   ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n\r").arg(quest->name, -35).arg(quest->reward, -5));
    return ++count;
 }
 
@@ -550,7 +550,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    price = quest->cost;
    if (GET_PLATINUM(ch) < price)
    {
-      ch->send(QString("You need %1 platinum coins to start this quest, which you don't have!\n\r").arg(price));
+      ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\n\r").arg(price));
       return eEXTRA_VAL2;
    }
 
@@ -1622,7 +1622,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
 
       if (GET_QPOINTS(ch) < (unsigned int)(obj->obj_flags.cost / 10000))
       {
-         owner->do_tell(QString("%1 Come back when you've got the qpoints.").arg(GET_NAME(ch)).split(' '));
+         owner->do_tell(QStringLiteral("%1 Come back when you've got the qpoints.").arg(GET_NAME(ch)).split(' '));
          extract_obj(obj);
          return eSUCCESS;
       }
@@ -1634,7 +1634,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
       obj_to_char(obj, ch);
-      owner->do_tell(QString("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
+      owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
       return eSUCCESS;
    }
    else if (cmd == CMD_SELL)
@@ -1669,14 +1669,14 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          time_t expires = obj->no_sell_expiration;
          if (now < expires)
          {
-            owner->do_tell(QString("%1 I won't buy that for another %2 seconds.").arg(GET_NAME(ch)).arg(expires - now).split(' '));
+            owner->do_tell(QStringLiteral("%1 I won't buy that for another %2 seconds.").arg(GET_NAME(ch)).arg(expires - now).split(' '));
             return eSUCCESS;
          }
       }
 
       int cost = obj->obj_flags.cost / 10000.0;
 
-      owner->do_tell(QString("%1 I'll give you %2 qpoints for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
+      owner->do_tell(QStringLiteral("%1 I'll give you %2 qpoints for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
       extract_obj(obj);
       GET_QPOINTS(ch) += cost;
       return eSUCCESS;

@@ -4740,7 +4740,7 @@ void end_oproc(Character *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		logentry(QString("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, LogChannels::LOG_BUG);
 
 		if (core_counter++ < 10)
 		{

@@ -617,7 +617,7 @@ void DC::boot_db(void)
 	{
 		if (cf.verbose_mode)
 		{
-			// std::cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << std::endl;
+			// std::cerr << QStringLiteral("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << std::endl;
 		}
 
 		zone.reset(Zone::ResetType::full);
@@ -3808,7 +3808,7 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 	auto current_line = stream.readLine();
 	assert(stream.status() == QTextStream::Status::Ok);
 
-	qDebug(QString("%1: [%2]").arg(message).arg(current_line).toStdString().c_str());
+	qDebug(QStringLiteral("%1: [%2]").arg(message).arg(current_line).toStdString().c_str());
 	auto ok = stream.seek(current_pos);
 	assert(stream.pos() == current_pos);
 	assert(stream.status() == QTextStream::Status::Ok);
@@ -3840,7 +3840,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 
 	obj->name = fread_string(fl, 1);
 
-	qDebug(QString("Object name: %1").arg(obj->name).toStdString().c_str());
+	qDebug(QStringLiteral("Object name: %1").arg(obj->name).toStdString().c_str());
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
@@ -3853,7 +3853,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	fl.skipWhiteSpace();
 	if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
 	{
-		logentry(QString("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
+		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
@@ -3938,7 +3938,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 			break;
 
 		default:
-			logentry(QString("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name), IMPLEMENTER, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("Illegal obj addon flag [%1] in obj [%2].").arg(chk).arg(obj->name), IMPLEMENTER, LogChannels::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -5545,7 +5545,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		}
 		else
 		{
-			misclog(QString("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
+			misclog(QStringLiteral("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
 			perror("fread_bitvector: illegal character");
 			abort();
 		}
@@ -6019,7 +6019,7 @@ void free_char(Character *ch, Trace trace)
 	}
 	else
 	{
-		// logf(IMMORTAL, LogChannels::LOG_BUG, QString("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
+		// logf(IMMORTAL, LogChannels::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
 	}
 
 	if (ch->title)
@@ -6674,7 +6674,7 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 		}
 		else if (letter != '>' && letter != '\\')
 		{
-			logentry(QString("Load_mobiles: vnum %1 MOBPROG char").arg(i));
+			logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG char").arg(i));
 			return;
 		}
 		QString word = fread_word(fp);
@@ -6682,7 +6682,7 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 		switch (type)
 		{
 		case ERROR_PROG:
-			logentry(QString("Load_mobiles: vnum %1 MOBPROG type.").arg(i));
+			logentry(QStringLiteral("Load_mobiles: vnum %1 MOBPROG type.").arg(i));
 			return;
 		case IN_FILE_PROG:
 			mprog_file_read(fread_string(fp, 1), i);

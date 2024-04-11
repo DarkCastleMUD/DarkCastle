@@ -231,7 +231,7 @@ int do_poisonweapon(Character *ch, char *argument, int cmd)
   Object *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
-    ch->send(QString("You don't seem to have any %1.\r\n").arg(vialarg));
+    ch->send(QStringLiteral("You don't seem to have any %1.\r\n").arg(vialarg));
     return eFAILURE;
   }
 

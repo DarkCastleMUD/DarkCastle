@@ -581,7 +581,7 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (member_found)
   { // found um, get out
-    logentry(QString("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -1042,7 +1042,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   {
     if (!(load_char_obj(&d, arg1)))
     {
-      if (file_exists(QString("../archive/%1.gz").arg(arg1)))
+      if (file_exists(QStringLiteral("../archive/%1.gz").arg(arg1)))
       {
         sendln("Character is archived.");
       }
@@ -1081,7 +1081,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
 
   if (victim == this)
   {
-    logentry(QString("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
+    logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
     this->sendln("You quit your clan.");
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1103,7 +1103,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   sendln(QStringLiteral("You cast %1 out of your clan.").arg(victim->getName()));
   victim->sendln(QStringLiteral("You are cast out of %1.").arg(clanPtr->name));
 
-  logentry(QString("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
+  logentry(QStringLiteral("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
 
   victim->save(666);
   if (!victim_connected)
@@ -2522,7 +2522,7 @@ void do_leader_clans(Character *ch, char *arg, int cmd)
 
 void clan_data::log(QString log_entry)
 {
-  QString clan_filename = QString("../lib/clans/clan%1.log").arg(number);
+  QString clan_filename = QStringLiteral("../lib/clans/clan%1.log").arg(number);
   QFile file(clan_filename);
 
   if (!file.open(QIODeviceBase::Append | QIODeviceBase::Text))
@@ -2832,7 +2832,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
 
   if (getGold() < dep)
   {
-    send(QString("You don't have %L1 $B$5gold$R coins to deposit into your clan account.\r\n").arg(dep));
+    send(QStringLiteral("You don't have %L1 $B$5gold$R coins to deposit into your clan account.\r\n").arg(dep));
     send(QStringLiteral("You only have %L1 $B$5gold$R coins on you.\r\n").arg(getGold()));
     return eFAILURE;
   }
@@ -2848,7 +2848,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, int cmd)
     coin = "coins";
   }
 
-  send(QString("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
+  send(QStringLiteral("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
   QString log_entry = QStringLiteral("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name_).arg(dep).arg(coin);
   clan_data *clan = get_clan(this->clan);
   if (clan != nullptr)

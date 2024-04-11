@@ -974,11 +974,11 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
       // if postive show "+ difference"
       if (swapcolors)
       {
-         buf2 = QString("%1+%2$R").arg(color_bad).arg(random - base);
+         buf2 = QStringLiteral("%1+%2$R").arg(color_bad).arg(random - base);
       }
       else
       {
-         buf2 = QString("%1+%2$R").arg(color_good).arg(random - base);
+         buf2 = QStringLiteral("%1+%2$R").arg(color_good).arg(random - base);
       }
       buf += buf2;
    }
@@ -1023,20 +1023,20 @@ bool identify(Character *ch, Object *obj)
 
    if (obj->short_description)
    {
-      ch->send(QString("$3Short description: $R%1\r\n").arg(obj->short_description));
+      ch->send(QStringLiteral("$3Short description: $R%1\r\n").arg(obj->short_description));
    }
    else
    {
       ch->sendln("$3Short description: $R");
    }
 
-   ch->send(QString("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name));
+   ch->send(QStringLiteral("$3Keywords: '$R%1$3'$R\r\n").arg(obj->name));
 
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    csendf(ch, "$3Item type: $R%s\r\n", buf2);
 
    sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-   ch->send(QString("$3Extra flags: $R%1\r\n").arg(buf));
+   ch->send(QStringLiteral("$3Extra flags: $R%1\r\n").arg(buf));
 
    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
    csendf(ch, "$3More flags: $R%s\r\n", buf2);
@@ -1047,14 +1047,14 @@ bool identify(Character *ch, Object *obj)
    }
 
    sprintbit(obj->obj_flags.wear_flags, Object::wear_bits, buf);
-   ch->send(QString("$3Worn on: $R%1\r\n").arg(buf));
+   ch->send(QStringLiteral("$3Worn on: $R%1\r\n").arg(buf));
 
    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
-   ch->send(QString("$3Worn by: $R%1\r\n").arg(buf));
+   ch->send(QStringLiteral("$3Worn by: $R%1\r\n").arg(buf));
 
-   ch->send(QString("$3Level: $R%1\n\r").arg(obj->obj_flags.eq_level));
-   ch->send(QString("$3Weight: $R%1\r\n").arg(obj->obj_flags.weight));
-   ch->send(QString("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
+   ch->send(QStringLiteral("$3Level: $R%1\n\r").arg(obj->obj_flags.eq_level));
+   ch->send(QStringLiteral("$3Weight: $R%1\r\n").arg(obj->obj_flags.weight));
+   ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
    const Object *vobj = nullptr;
    if (obj->item_number >= 0)
@@ -1747,7 +1747,7 @@ int do_look(Character *ch, const char *argument, int cmd)
             {
                sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
                          tempflag_buf);
-               ch->send(QString(" [ %1]").arg(tempflag_buf));
+               ch->send(QStringLiteral(" [ %1]").arg(tempflag_buf));
             }
          }
 
@@ -3448,7 +3448,7 @@ int do_version(Character *ch, char *arg, int cmd)
 {
    if (ch)
    {
-      ch->sendln(QString("Version: %1 Build time: %2").arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
+      ch->sendln(QStringLiteral("Version: %1 Build time: %2").arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
    }
    return eSUCCESS;
 }
@@ -4501,38 +4501,38 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
                      { return (search_item.getType() == Search::types::O_NAME); }))
    {
-      header += QString(" [%1]").arg("Keywords", -max_keyword_size);
+      header += QStringLiteral(" [%1]").arg("Keywords", -max_keyword_size);
    }
 
    if (search_world)
    {
-      header += QString(" [%1]").arg("Location", 19);
+      header += QStringLiteral(" [%1]").arg("Location", 19);
    }
 
    if (true || std::count_if(sl.begin(), sl.end(), [](Search search_item)
                              { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
    {
-      header += QString(" [%1]").arg(QStringLiteral("Short Description"), -max_short_description_size);
+      header += QStringLiteral(" [%1]").arg(QStringLiteral("Short Description"), -max_short_description_size);
    }
 
    if (show_details)
    {
       if (search_world)
       {
-         header += QString(" [%1]").arg(QStringLiteral("Details"), -21);
+         header += QStringLiteral(" [%1]").arg(QStringLiteral("Details"), -21);
       }
       else
       {
-         header += QString(" [%1]").arg(QStringLiteral("Details"));
+         header += QStringLiteral(" [%1]").arg(QStringLiteral("Details"));
       }
    }
 
    if (show_affects)
    {
-      header += QString(" [%1]").arg(QStringLiteral("Affects"));
+      header += QStringLiteral(" [%1]").arg(QStringLiteral("Affects"));
    }
 
-   send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
+   send(QStringLiteral("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
 
    result_nr = 0;
    for (const auto &result : obj_results)
@@ -4547,7 +4547,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       if (std::count_if(sl.begin(), sl.end(), [](Search search_item)
                         { return (search_item.getType() == Search::types::O_NAME); }))
       {
-         custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
+         custom_columns += QStringLiteral(" [%1]").arg(obj->name, -max_keyword_size);
       }
 
       if (search_world)
@@ -4555,17 +4555,17 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          switch (result.getLocation())
          {
          case Search::locations::in_inventory:
-            custom_columns += QString(" [%1]").arg("inventory", 19);
+            custom_columns += QStringLiteral(" [%1]").arg("inventory", 19);
             break;
          case Search::locations::in_equipment:
-            custom_columns += QString(" [%1]").arg("equipped", 19);
+            custom_columns += QStringLiteral(" [%1]").arg("equipped", 19);
             break;
          case Search::locations::in_room:
-            custom_columns += QString(" [%1]").arg("in room", 19);
+            custom_columns += QStringLiteral(" [%1]").arg("in room", 19);
             break;
          case Search::locations::in_vault:
          case Search::locations::in_clan_vault:
-            custom_columns += QString(" [%1 vault]").arg(result.getName(), 13);
+            custom_columns += QStringLiteral(" [%1 vault]").arg(result.getName(), 13);
             break;
          }
       }
@@ -4576,7 +4576,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                         { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
       {
          // Because the color codes make the std::string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-         custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+         custom_columns += QStringLiteral(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
       }
 
       // Needed to show details or affects below
@@ -4615,7 +4615,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             buffer = "";
             break;
          }
-         custom_columns += QString(" [%1]").arg(buffer, -21);
+         custom_columns += QStringLiteral(" [%1]").arg(buffer, -21);
          /*
                   int get_weapon_damage_type(Object * wielded);
                   bits = get_weapon_damage_type(obj) - 1000;
@@ -4652,7 +4652,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
                if (affects_found++ == 0)
                {
-                  custom_columns += QString(" [");
+                  custom_columns += QStringLiteral(" [");
                }
                else
                {
@@ -4661,7 +4661,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
                if (obj->affected[i].modifier > 0)
                {
-                  custom_columns += QString("$R%1%2+%3$R").arg(buffer).arg(getSettingAsColor("color.good")).arg(obj->affected[i].modifier);
+                  custom_columns += QStringLiteral("$R%1%2+%3$R").arg(buffer).arg(getSettingAsColor("color.good")).arg(obj->affected[i].modifier);
                }
                else
                {
@@ -4671,11 +4671,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          }
          if (affects_found)
          {
-            custom_columns += QString("]");
+            custom_columns += QStringLiteral("]");
          }
       }
 
-      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+      send(QStringLiteral("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
    }
    send("\r\nIdentify a virtual object with the command: identify v####\r\n");
 

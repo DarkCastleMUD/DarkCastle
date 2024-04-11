@@ -3238,7 +3238,7 @@ QString translate_name(const Character *ch)
 {
   if (IS_NPC(ch))
   {
-    return QString("%1(v%2)").arg(GET_NAME(ch)).arg(DC::getInstance()->mob_index[ch->mobdata->nr].virt);
+    return QStringLiteral("%1(v%2)").arg(GET_NAME(ch)).arg(DC::getInstance()->mob_index[ch->mobdata->nr].virt);
   }
   return GET_NAME(ch);
 }
@@ -3247,7 +3247,7 @@ void debug_isHit(const Character *ch, const Character *victim, const int &attack
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QString("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, LOG_BUG);
   }
 }
 
@@ -3255,7 +3255,7 @@ void debug_isHit_toHit(const Character *ch, const Character *victim, const int &
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QString("isHit: toHit=%1").arg(toHit), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, LOG_BUG);
   }
 }
 
@@ -3263,7 +3263,7 @@ void debug_isHit_generic(const Character *ch, const Character *victim, const aut
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QString("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, LOG_BUG);
   }
 }
 
@@ -3416,7 +3416,7 @@ int isHit(Character *ch, Character *victim, int attacktype, int &type, int &redu
   // Ze random stuff.
   if (number(1, 100) < (int)percent && !isSet(victim->combat, COMBAT_BLADESHIELD1) && !isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    debug_isHit(ch, victim, attacktype, type, reduce, toHit, QString("Ze random stuff percent=%1").arg(percent));
+    debug_isHit(ch, victim, attacktype, type, reduce, toHit, QStringLiteral("Ze random stuff percent=%1").arg(percent));
     return eFAILURE;
   }
 

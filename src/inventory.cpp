@@ -51,7 +51,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       }
       else if (!obj_object->getOwner().isEmpty() && obj_object->getOwner() != GET_NAME(ch))
       {
-        ch->send(QString("You cannot get that item because it's marked NO_TRADE and owned by %1\r\n").arg(obj_object->getOwner()));
+        ch->send(QStringLiteral("You cannot get that item because it's marked NO_TRADE and owned by %1\r\n").arg(obj_object->getOwner()));
         return;
       }
     }
@@ -428,7 +428,7 @@ int do_get(Character *ch, char *argument, int cmd)
       // Ignore NO_TRADE items on a 'get all'
       if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->isMortal())
       {
-        ch->send(QString("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
+        ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
         continue;
       }
       if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
@@ -694,7 +694,7 @@ int do_get(Character *ch, char *argument, int cmd)
           // Ignore NO_TRADE items on a 'get all'
           if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
           {
-            ch->send(QString("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
+            ch->send(QStringLiteral("The %1 appears to be NO_TRADE so you don't pick it up.\r\n").arg(obj_object->short_description));
             continue;
           }
 
@@ -1003,7 +1003,7 @@ int do_consent(Character *ch, char *arg, int cmd)
 
   if (!(vict = get_char_vis(ch, buf)))
   {
-    ch->send(QString("Consent whom?  You can't see any %1.\r\n").arg(buf));
+    ch->send(QStringLiteral("Consent whom?  You can't see any %1.\r\n").arg(buf));
     return eFAILURE;
   }
 

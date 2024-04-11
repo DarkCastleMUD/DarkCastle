@@ -3279,7 +3279,7 @@ int noremove_eq(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      obj->equipped_by->send(QString("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
+      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
     return eSUCCESS;
   }
   if (!cmd && obj->obj_flags.value[3] <= 0)

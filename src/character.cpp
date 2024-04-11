@@ -256,11 +256,11 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     }
     QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(0).arg(restored);
 
-    QString path = QString("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
+    QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
     QString fullpath = path + filename;
     if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
     {
-        send(QString("No charmie save file found at '%1'.").arg(fullpath));
+        send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
         return false;
     }
 
@@ -280,7 +280,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
     char_to_room(charmie, in_room);
 
-    QString message = QString("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
+    QString message = QStringLiteral("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
     send(message);
     logentry(message);
 
@@ -289,7 +289,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
         QFile file(fullpath);
         if (file.rename(fullpath + ".restored"))
         {
-            logentry(QString("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
+            logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
         }
     }
 
@@ -645,7 +645,7 @@ level_t Character::getLevel(void) const
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QString("Warning: getLevel returned %1.").arg(level_));
+        logentry(QStringLiteral("Warning: getLevel returned %1.").arg(level_));
     }
 
     return level_;
@@ -658,7 +658,7 @@ void Character::setLevel(level_t level)
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QString("Warning: setLevel(%1).").arg(level_));
+        logentry(QStringLiteral("Warning: setLevel(%1).").arg(level_));
     }
 }
 

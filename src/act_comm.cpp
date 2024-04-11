@@ -98,7 +98,7 @@ int do_report(Character *ch, char *argument, int cmd)
       sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
-      ch->send(QString("You report: %1\n\r").arg(report));
+      ch->send(QStringLiteral("You report: %1\n\r").arg(report));
       return eSUCCESS;
     }
   }
@@ -121,7 +121,7 @@ int do_report(Character *ch, char *argument, int cmd)
   sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  ch->send(QString("You report: %1\n\r").arg(report));
+  ch->send(QStringLiteral("You report: %1\n\r").arg(report));
 
   return eSUCCESS;
 }
@@ -210,8 +210,8 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
     break;
   }
 
-  buf = QString("//(%1) %2\n\r").arg(typestr).arg(message);
-  buf1 = QString("%1%2//%3(%4)%5 %6%7 %8%9%10\n\r").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
+  buf = QStringLiteral("//(%1) %2\n\r").arg(typestr).arg(message);
+  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\n\r").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
@@ -750,7 +750,7 @@ void DC::send_hint(void)
     num = number(0LL, hints_.size() - 1);
   }
 
-  QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
+  QString hint = QStringLiteral("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
 
   for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
   {

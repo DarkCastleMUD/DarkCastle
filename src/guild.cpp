@@ -535,48 +535,48 @@ void Character::output_praclist(class_skill_defines *skilllist)
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
       extern struct song_info_type song_info[];
-      send(QString("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski, 3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
       extern struct ki_info_type ki_info[];
-      send(QString("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski, 3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {
-      send(QString("Move: $B%1$R ").arg(2, 3));
+      send(QStringLiteral("Move: $B%1$R ").arg(2, 3));
     }
     else if (skilllist[i].skillnum == 320) // switch
     {
-      send(QString("Move: $B%1$R ").arg(4, 3));
+      send(QStringLiteral("Move: $B%1$R ").arg(4, 3));
     }
     else if (skilllist[i].skillnum == 319) // consider
     {
-      send(QString("Move: $B%1$R ").arg(5, 3));
+      send(QStringLiteral("Move: $B%1$R ").arg(5, 3));
     }
     else if (skilllist[i].skillnum == 368) // release
     {
-      send(QString("Move: $B%1$R ").arg(25, 3));
+      send(QStringLiteral("Move: $B%1$R ").arg(25, 3));
     }
     else if (skilllist[i].skillnum == 380) // fire arrows
     {
-      send(QString("Mana: $B%1$R ").arg(30, 3));
+      send(QStringLiteral("Mana: $B%1$R ").arg(30, 3));
     }
     else if (skilllist[i].skillnum == 381) // ice arrows
     {
-      send(QString("Mana: $B%1$R ").arg(20, 3));
+      send(QStringLiteral("Mana: $B%1$R ").arg(20, 3));
     }
     else if (skilllist[i].skillnum == 382) // tempest arrows
     {
-      send(QString("Mana: $B%1$R ").arg(10, 3));
+      send(QStringLiteral("Mana: $B%1$R ").arg(10, 3));
     }
     else if (skilllist[i].skillnum == 383) // granite arrows
     {
-      send(QString("Mana: $B%1$R ").arg(40, 3));
+      send(QStringLiteral("Mana: $B%1$R ").arg(40, 3));
     }
     else if (skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
     {
-      send(QString("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
+      send(QStringLiteral("Move: $B%1$R ").arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
     }
     else
       send("          ");
@@ -1417,7 +1417,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 
   if (skillname.isEmpty())
   {
-    send(QString("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
+    send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
     logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }

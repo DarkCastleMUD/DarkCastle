@@ -822,7 +822,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
-      ch->send(QString("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
       return eFAILURE | eINTERNAL_ERROR;
     }
     else

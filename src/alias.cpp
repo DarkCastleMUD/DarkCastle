@@ -37,7 +37,7 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
     sendln("Aliases:");
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
-      sendln(QString("%2=%3").arg(alias).arg(command));
+      sendln(QStringLiteral("%2=%3").arg(alias).arg(command));
     }
     return eSUCCESS;
   }
@@ -72,16 +72,16 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
 
     if (player->aliases_.contains(alias) && player->aliases_[alias] == command)
     {
-      sendln(QString("Alias '%1' with command '%2' already set.").arg(alias).arg(command));
+      sendln(QStringLiteral("Alias '%1' with command '%2' already set.").arg(alias).arg(command));
       return eFAILURE;
     }
     else if (player->aliases_.contains(alias))
     {
-      sendln(QString("Alias '%1' with command '%2' replaced with '%3'.").arg(alias).arg(player->aliases_[alias]).arg(command));
+      sendln(QStringLiteral("Alias '%1' with command '%2' replaced with '%3'.").arg(alias).arg(player->aliases_[alias]).arg(command));
     }
     else
     {
-      sendln(QString("Alias '%1' defined with command '%2'.").arg(alias).arg(command));
+      sendln(QStringLiteral("Alias '%1' defined with command '%2'.").arg(alias).arg(command));
     }
     player->aliases_[alias] = command;
     save();
@@ -98,7 +98,7 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
 
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
-      sendln(QString("Removed alias %2=%3").arg(alias).arg(command));
+      sendln(QStringLiteral("Removed alias %2=%3").arg(alias).arg(command));
     }
 
     player->aliases_.clear();
@@ -108,12 +108,12 @@ command_return_t Character::do_alias(QStringList arguments, int cmd)
 
   if (!player->aliases_.contains(arg1))
   {
-    sendln(QString("Alias '%1' not found to delete.").arg(arg1));
+    sendln(QStringLiteral("Alias '%1' not found to delete.").arg(arg1));
     return eFAILURE;
   }
 
   player->aliases_.remove(arg1);
-  sendln(QString("Alias '%1' deleted.").arg(arg1));
+  sendln(QStringLiteral("Alias '%1' deleted.").arg(arg1));
   save();
   return eFAILURE;
 }

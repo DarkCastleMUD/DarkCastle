@@ -269,7 +269,7 @@ int write_hotboot_file(char **new_argv)
   char *cwd = get_current_dir_name();
   if (cwd != nullptr)
   {
-    logentry(QString("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, LogChannels::LOG_GOD);
+    logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, LogChannels::LOG_GOD);
     free(cwd);
   }
 
@@ -291,7 +291,7 @@ int write_hotboot_file(char **new_argv)
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    logentry(QString("Hotboot execv(%1, argv) failed with error: %2").arg(DC::getInstance()->applicationFilePath()).arg(execv_strerror), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(DC::getInstance()->applicationFilePath()).arg(execv_strerror), 0, LogChannels::LOG_MISC);
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -929,12 +929,12 @@ void DC::game_loop_init(void)
   server.route("/myApi/<arg>", QHttpServerRequest::Method::Get,
                [&dc](int id, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QString("int:%1\r\n").arg(id));
+                 return QHttpServerResponse(QStringLiteral("int:%1\r\n").arg(id));
                });
   server.route("/myApi/<arg>/<arg>", QHttpServerRequest::Method::Get,
                [&dc](QString str, QString str2, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QString("str:%1 str2:%2\r\n").arg(str).arg(str2));
+                 return QHttpServerResponse(QStringLiteral("str:%1 str2:%2\r\n").arg(str).arg(str2));
                });
 
   server.route("/test", [&dc](const QHttpServerRequest &request)
@@ -2912,7 +2912,7 @@ void checkpointing(int sig)
 
 void report_debug_logging()
 {
-  logentry(QString("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, LogChannels::LOG_BUG);
 }
 
 void crash_hotboot()
@@ -3518,7 +3518,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
+      logf(IMMORTAL, LogChannels::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
     }
   }
 
@@ -3540,7 +3540,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg5).toStdString().c_str());
+      logf(IMMORTAL, LogChannels::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5).toStdString().c_str());
       return;
     }
   }
@@ -3553,7 +3553,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, QString("Invalid source port [%1]").arg(arg6).toStdString().c_str());
+      logf(IMMORTAL, LogChannels::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6).toStdString().c_str());
       return;
     }
 

@@ -56,7 +56,7 @@ Table::Table(Database &database, const QString &name)
     if (!db.tables().contains(name))
     {
       QSqlQuery query;
-      if (query.exec(QString("CREATE TABLE %1 (id BIGINT GENERATED ALWAYS AS IDENTITY)").arg(name)))
+      if (query.exec(QStringLiteral("CREATE TABLE %1 (id BIGINT GENERATED ALWAYS AS IDENTITY)").arg(name)))
       {
         logentry(QStringLiteral("Created database table %1.").arg(name));
         if (!db.tables().contains(name))

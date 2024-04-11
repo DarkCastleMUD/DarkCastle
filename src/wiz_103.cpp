@@ -419,7 +419,7 @@ int do_guild(Character *ch, char *argument, int cmd)
         return eFAILURE;
       }
 
-      ch->send(QString("Allow list for room #%1: ").arg(room));
+      ch->send(QStringLiteral("Allow list for room #%1: ").arg(room));
       bool found = false;
       for (c_class = 1; c_class < CLASS_MAX; c_class++)
       {

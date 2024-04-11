@@ -454,7 +454,7 @@ int Character::do_config(QStringList arguments, int cmd)
   {
     for (auto setting = player->config->constBegin(); setting != player->config->constEnd(); ++setting)
     {
-      send(QString("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
+      send(QStringLiteral("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
     }
     return eSUCCESS;
   }
@@ -511,7 +511,7 @@ int Character::do_config(QStringList arguments, int cmd)
       if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
       {
         found = true;
-        send(QString("%1=%2\r\n").arg(i.key()).arg(i.value()));
+        send(QStringLiteral("%1=%2\r\n").arg(i.key()).arg(i.value()));
       }
     }
 
@@ -602,7 +602,7 @@ int Character::do_config(QStringList arguments, int cmd)
 
     player->config->insert(key, value);
 
-    send(QString("Setting %1=%2\r\n").arg(key).arg(value));
+    send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
     return eSUCCESS;
   }
 
@@ -1321,7 +1321,7 @@ void CVoteData::DisplayVote(Character *ch)
   ch->send(buf);
   ch->send("\n\r");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
-    ch->send(QString("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
+    ch->send(QStringLiteral("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
   ch->send("\n\r");
 }
 
@@ -1692,7 +1692,7 @@ int do_random(Character *ch, char *argument, int cmd)
   }
 
   i = number(1, 100);
-  ch->send(QString("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
+  ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
   sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
   act(buf, ch, 0, 0, TO_ROOM, 0);
   return eSUCCESS;

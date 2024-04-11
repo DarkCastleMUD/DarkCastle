@@ -681,7 +681,7 @@ public:
             return false;
         }
     }
-    bool decrementMove(move_t move_change = 1, QString message = QString("You're too out of breath!"))
+    bool decrementMove(move_t move_change = 1, QString message = QStringLiteral("You're too out of breath!"))
     {
         if (move_ >= move_change)
         {

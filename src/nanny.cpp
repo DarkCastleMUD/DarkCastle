@@ -656,7 +656,7 @@ void Character::do_on_login_stuff(void)
       {
          if (!access->name.isEmpty())
          {
-            if (!file_exists(QString("%1/%2/%3").arg(SAVE_DIR).arg(access->name[0].toUpper()).arg(access->name)))
+            if (!file_exists(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(access->name[0].toUpper()).arg(access->name)))
             {
                todelete.push(access->name);
             }
@@ -666,7 +666,7 @@ void Character::do_on_login_stuff(void)
 
    while (!todelete.empty())
    {
-      logentry(QString("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, LogChannels::LOG_MORTAL);
+      logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, LogChannels::LOG_MORTAL);
       remove_vault_access(this, todelete.front(), vault);
       todelete.pop();
    }

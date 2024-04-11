@@ -743,7 +743,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, int cmd)
     }
     else
     {
-      ch->send(QString("You are configured to auto-join: %1\r\n").arg(ch->player->getJoining()));
+      ch->send(QStringLiteral("You are configured to auto-join: %1\r\n").arg(ch->player->getJoining()));
     }
 
     ch->send("Syntax: autojoin <player1> <player2> <player3> ...\r\n");
@@ -764,7 +764,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, int cmd)
     ch->player->toggleJoining(i);
   }
 
-  ch->send(QString("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
+  ch->send(QStringLiteral("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
   return eSUCCESS;
 }
 

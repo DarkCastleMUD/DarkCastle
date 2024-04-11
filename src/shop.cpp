@@ -280,7 +280,7 @@ void shopping_sell(const char *arg, Character *ch,
 
   if (*argm == '\0')
   {
-    keeper->do_tell(QString("%1 What do you want to sell?").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 What do you want to sell?").arg(GET_NAME(ch)).split(' '));
     return;
   }
 
@@ -386,7 +386,7 @@ void shopping_value(const char *arg, Character *ch,
 
   if (*argm == '\0')
   {
-    keeper->do_tell(QString("%1 What do you want to value?").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 What do you want to value?").arg(GET_NAME(ch)).split(' '));
     return;
   }
 
@@ -595,7 +595,7 @@ void shopping_value(const char *arg, Character *ch,
   if (!keeperhas)
   {
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_sell);
-    keeper->do_tell(QString("%1 I'll give you %2 gold coins for that.").arg(GET_NAME(ch)).arg(cost).split(' '));
+    keeper->do_tell(QStringLiteral("%1 I'll give you %2 gold coins for that.").arg(GET_NAME(ch)).arg(cost).split(' '));
   }
   return;
 }
@@ -1153,7 +1153,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   one_argument(arg, buf);
   if (!*buf)
   {
-    keeper->do_tell(QString("%1 Which do you want to buy?").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 Which do you want to buy?").arg(GET_NAME(ch)).split(' '));
     return;
   }
 
@@ -1331,7 +1331,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       *shop->sell_message = '\0';
     else
       strcpy(shop->sell_message, text);
-    ch->send(QString("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
+    ch->send(QStringLiteral("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
     write_one_player_shop(shop); // save it
     break;
 
@@ -1398,9 +1398,9 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       count++;
       robj = real_object(item->item_vnum);
       if (robj < 0)
-        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
       else
-        ch->send(QString("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(item->price));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(item->price));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
@@ -1890,7 +1890,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
       if (obj == nullptr)
       {
-        owner->tell(ch, QString("I don't see anything on you matching \'%1\'").arg(arg1.c_str()));
+        owner->tell(ch, QStringLiteral("I don't see anything on you matching \'%1\'").arg(arg1.c_str()));
         return eSUCCESS;
       }
       else
@@ -1932,7 +1932,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         r.orig_rnum = GET_OBJ_RNUM(obj);
         r.state = reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL;
         reroll_sessions[GET_NAME(ch)] = r;
-        owner->tell(ch, QString("Are you sure you want me to reroll %1 for you?").arg(GET_OBJ_SHORT(obj)));
+        owner->tell(ch, QStringLiteral("Are you sure you want me to reroll %1 for you?").arg(GET_OBJ_SHORT(obj)));
         owner->tell(ch, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.");
       }
     }

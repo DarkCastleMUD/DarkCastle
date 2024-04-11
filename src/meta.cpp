@@ -463,7 +463,7 @@ void Character::meta_list_stats(void)
 	plat_cost = meta_get_stat_plat_cost(attribute_t::STRENGTH);
 	max_stat = get_max_stat(this, attribute_t::STRENGTH);
 	if (this->raw_str >= max_stat)
-		this->send(QString("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
+		this->send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
 	else
 		csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
 			   (this->raw_str + 1), xp_price, plat_cost);
@@ -472,7 +472,7 @@ void Character::meta_list_stats(void)
 	plat_cost = meta_get_stat_plat_cost(attribute_t::DEXTERITY);
 	max_stat = get_max_stat(this, attribute_t::DEXTERITY);
 	if (this->raw_dex >= max_stat)
-		this->send(QString("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
+		this->send(QStringLiteral("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
 	else
 		csendf(this, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (this->raw_dex + 1), xp_price, plat_cost);
@@ -481,7 +481,7 @@ void Character::meta_list_stats(void)
 	plat_cost = meta_get_stat_plat_cost(attribute_t::CONSTITUTION);
 	max_stat = get_max_stat(this, attribute_t::CONSTITUTION);
 	if (this->raw_con >= max_stat)
-		this->send(QString("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
+		this->send(QStringLiteral("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
 	else
 		csendf(this, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (this->raw_con + 1), xp_price, plat_cost);
@@ -490,7 +490,7 @@ void Character::meta_list_stats(void)
 	plat_cost = meta_get_stat_plat_cost(attribute_t::INTELLIGENCE);
 	max_stat = get_max_stat(this, attribute_t::INTELLIGENCE);
 	if (this->raw_intel >= max_stat)
-		this->send(QString("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
+		this->send(QStringLiteral("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
 	else
 		csendf(this, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (this->raw_intel + 1), xp_price, plat_cost);
@@ -499,7 +499,7 @@ void Character::meta_list_stats(void)
 	plat_cost = meta_get_stat_plat_cost(attribute_t::WISDOM);
 	max_stat = get_max_stat(this, attribute_t::WISDOM);
 	if (this->raw_wis >= max_stat)
-		this->send(QString("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
+		this->send(QStringLiteral("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
 	else
 		csendf(this, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (this->raw_wis + 1), xp_price, plat_cost);
@@ -1702,7 +1702,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			}
 			else
 			{
-				ch->send(QString("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n").arg(choice));
+				ch->send(QStringLiteral("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n").arg(choice));
 				ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R");
 			}
 			return eSUCCESS;

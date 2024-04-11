@@ -60,7 +60,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
 
         if (bestow_command->testcmd == false)
         {
-          bestow_buffer.append(QString("[GFT]%1").arg(command.getName(), -11));
+          bestow_buffer.append(QStringLiteral("[GFT]%1").arg(command.getName(), -11));
           if (++bestow_column % 5 == 0)
           {
             bestow_buffer.append("\r\n");
@@ -68,7 +68,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
         }
         else
         {
-          test_buffer.append(QString("[TST]%1").arg(command.getName(), -11));
+          test_buffer.append(QStringLiteral("[TST]%1").arg(command.getName(), -11));
           if (++test_column % 5 == 0)
           {
             test_buffer.append("\n\r");
@@ -82,7 +82,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
         continue;
       }
 
-      buffer.append(QString("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.getName(), -11));
+      buffer.append(QStringLiteral("[%1]%2").arg(command.getMinimumLevel(), 2).arg(command.getName(), -11));
 
       if (++column % 5 == 0)
       {
@@ -261,7 +261,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         }
         else
         {
-          send(QString("You can't modify room %1").arg(loc_nr));
+          send(QStringLiteral("You can't modify room %1").arg(loc_nr));
           return eFAILURE;
         }
       }
@@ -789,14 +789,14 @@ int do_findfix(Character *ch, char *argument, int cmd)
         continue;
       if (amt > max)
       {
-        ch->send(QString("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
         char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer, CMD_DEFAULT);
         free(buffer);
       }
       else
       {
-        ch->send(QString("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
+        ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
         char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer, CMD_DEFAULT);
         free(buffer);

@@ -23,7 +23,7 @@ int main(int argc, char **argv)
   DC dcastle(parse_arguments(argc, argv));
   QThread::currentThread()->setObjectName("Main Thread");
 
-  logentry(QString("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
+  logentry(QStringLiteral("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
   backup_executable(argv);
 
   // If no ports specified then set default ports
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   {
     char strerror_buffer[512];
     const char *strerror_result = strerror_r(errno, strerror_buffer, sizeof(strerror_buffer));
-    logentry(QString("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
+    logentry(QStringLiteral("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
     exit(EXIT_FAILURE);
   }
 
@@ -80,7 +80,7 @@ void backup_executable(char *const argv[])
     {
       char buffer[512];
       const char *strerror_result = strerror_r(errno, buffer, sizeof(buffer));
-      logentry(QString("Error linking %1 to %2: %3").arg(argv[0]).arg(backup_filename).arg(strerror_result));
+      logentry(QStringLiteral("Error linking %1 to %2: %3").arg(argv[0]).arg(backup_filename).arg(strerror_result));
     }
   }
   return;

@@ -533,8 +533,8 @@ int do_hindex(Character *ch, char *argument, int cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QString("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QString("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
 
   return eSUCCESS;
 }
@@ -616,8 +616,8 @@ int do_index(Character *ch, char *argument, int cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QString("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QString("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
 
   return eSUCCESS;
 }

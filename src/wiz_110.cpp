@@ -152,7 +152,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
   Character *victim = get_pc_vis(this, name);
   if (!victim)
   {
-    this->sendln(QString("You don't see anyone named '%1'.").arg(name));
+    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
     return eSUCCESS;
   }
 
@@ -188,7 +188,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
 
   if (!bc.has_value())
   {
-    this->sendln(QString("There is no god command named '%1'.").arg(command));
+    this->sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
     return eSUCCESS;
   }
 
@@ -426,13 +426,13 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   {
     if (GET_PLATINUM(victim) < 500)
     {
-      send(QString("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
+      send(QStringLiteral("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
       return eFAILURE;
     }
     else
     {
       GET_PLATINUM(victim) -= 500;
-      send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
+      send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
       logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
     }
@@ -441,17 +441,17 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   QString strsave;
   if (DC::getInstance()->cf.bport == false)
   {
-    strsave = QString("%1/%2/%3").arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    strsave = QString("%1/%2/%3").arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    strsave = QStringLiteral("%1/%2/%3").arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
   unique_file_t fl(std::fopen(strsave.toStdString().c_str(), "r"), &close_file);
   if (fl)
   {
-    send(QString("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
+    send(QStringLiteral("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
     return eFAILURE;
   }
 
@@ -534,11 +534,11 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   QString buffer;
   if (DC::getInstance()->cf.bport == false)
   {
-    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(SAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(SAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(SAVE_DIR).arg(newname[0]).arg(newname);
   }
   else
   {
-    buffer = QString("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
+    buffer = QStringLiteral("cp %1/%2/%3 %4/%5/%6").arg(BSAVE_DIR).arg(victim->getName()[0]).arg(victim->getNameC()).arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
   system(buffer.toStdString().c_str());
@@ -548,16 +548,16 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   // Only copy golems if they exist
   for (unsigned i = 0; i < MAX_GOLEMS; i++)
   {
-    QString src_filename = QString("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
+    QString src_filename = QStringLiteral("%s/%c/%s.%d").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
     if (0 == stat(src_filename.toStdString().c_str(), &buf))
     {
       // Make backup
-      QString dst_filename = QString("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
+      QString dst_filename = QStringLiteral("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
       QString command = QStringLiteral("cp -f %1 %2").arg(src_filename).arg(dst_filename);
       system(command.toStdString().c_str());
 
       // Rename
-      dst_filename = QString("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
+      dst_filename = QStringLiteral("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
       command = QStringLiteral("mv -f %1 %2").arg(src_filename).arg(dst_filename);
       system(command.toStdString().c_str());
     }
@@ -1025,7 +1025,7 @@ command_return_t do_world(Character *ch, std::string args, int cmd)
       QString potential_filename = QStringLiteral("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
       if (world->filename != potential_filename)
       {
-        ch->send(QString("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
+        ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
         ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
         if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)

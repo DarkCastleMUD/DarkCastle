@@ -516,11 +516,11 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 	QString buf;
 	if (platinum)
 	{
-		buf = QString("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description);
+		buf = QStringLiteral("$B$7%1$R) %2 ").arg(number + 1, -2).arg(obj->short_description);
 	}
 	else
 	{
-		buf = QString("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description);
+		buf = QStringLiteral("$B$7%1$R) $3$B%2$R ").arg(number + 1, -2).arg(obj->short_description);
 	}
 
 	if (obj->obj_flags.type_flag == ITEM_WEAPON)
@@ -598,11 +598,11 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 		a &= ALL_CLASSES;
 
 		QString buffer = sprintbit(a, Object::extra_bits);
-		buf2 = QString("%1]$R, ").arg(buffer);
+		buf2 = QStringLiteral("%1]$R, ").arg(buffer);
 
 		if (a)
 		{
-			QString potential_buffer = QString("%1$4[%2").arg(buf).arg(buf2);
+			QString potential_buffer = QStringLiteral("%1$4[%2").arg(buf).arg(buf2);
 			qsizetype starting_point = potential_buffer.lastIndexOf("\n");
 			if (starting_point == -1)
 			{
@@ -612,7 +612,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 			if (length > 79)
 			{
-				buf = QString("%1\r\n    $4[%2").arg(buf).arg(buf2);
+				buf = QStringLiteral("%1\r\n    $4[%2").arg(buf).arg(buf2);
 			}
 			else
 			{
@@ -682,10 +682,10 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 				break;
 		if (platsmith_list[o].vnum == 0)
 		{
-			owner->do_tell(QString("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
-		owner->do_tell(QString("%1 Here's what I can do for you, %2.").arg(GET_NAME(ch)).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
+		owner->do_tell(QStringLiteral("%1 Here's what I can do for you, %2.").arg(GET_NAME(ch)).arg(pc_clss_types3[GET_CLASS(ch)]).split(' '));
 
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
@@ -710,7 +710,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		one_argument(arg, arg2);
 		if (platsmith_list[o].vnum == 0)
 		{
-			owner->do_tell(QString("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Sorry, I don't seem to be working correctly. Do tell someone.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		if (!is_number(arg2))
@@ -735,7 +735,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		}
 		if (GET_PLATINUM(ch) < (unsigned int)(obj->obj_flags.cost / 10))
 		{
-			owner->do_tell(QString("%1 Come back when you've got the platinum.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Come back when you've got the platinum.").arg(GET_NAME(ch)).split(' '));
 			extract_obj(obj);
 			return eSUCCESS;
 		}
@@ -743,7 +743,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		sprintf(buf, "%s %s", obj->name, GET_NAME(ch));
 		obj->name = str_hsh(buf);
 		obj_to_char(obj, ch);
-		owner->do_tell(QString("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
+		owner->do_tell(QStringLiteral("%1 Here's your %2$B$2. Have a nice time with it.").arg(GET_NAME(ch)).arg(obj->short_description).split(' '));
 		return eSUCCESS;
 	}
 	else if (cmd == 57)
@@ -764,7 +764,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		}
 		if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 		{
-			owner->do_tell(QString("%1 I don't deal in worthless junk.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 I don't deal in worthless junk.").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 
@@ -777,7 +777,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		int cost = obj->obj_flags.cost / 10;
 
-		owner->do_tell(QString("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
+		owner->do_tell(QStringLiteral("%1 I'll give you %2 plats for that. Thanks for shoppin'.").arg(GET_NAME(ch)).arg(cost).split(' '));
 		extract_obj(obj);
 		GET_PLATINUM(ch) += cost;
 		return eSUCCESS;

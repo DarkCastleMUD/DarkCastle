@@ -467,7 +467,7 @@ command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
   if (arguments.isEmpty())
   {
     ch->sendln("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>");
-    ch->send(QString("Current flags: %1\r\n").arg(sprintbit(zone.getZoneFlags(), Zone::zone_bits)));
+    ch->send(QStringLiteral("Current flags: %1\r\n").arg(sprintbit(zone.getZoneFlags(), Zone::zone_bits)));
     return eFAILURE;
   }
 
@@ -536,7 +536,7 @@ command_return_t zedit_flags(Character *ch, QStringList arguments, Zone &zone)
   }
   else
   {
-    ch->send(QString("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text));
+    ch->send(QStringLiteral("'%1' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n").arg(text));
     return eFAILURE;
   }
   return eSUCCESS;
@@ -562,7 +562,7 @@ command_return_t zedit_lifetime(Character *ch, QStringList arguments, Zone &zone
     return eFAILURE;
   }
 
-  ch->send(QString("Zone %1's lifetime changed from %2 to %3.\r\n").arg(zone.getID()).arg(zone.lifespan).arg(ticks));
+  ch->send(QStringLiteral("Zone %1's lifetime changed from %2 to %3.\r\n").arg(zone.getID()).arg(zone.lifespan).arg(ticks));
   zone.lifespan = ticks;
 
   return eSUCCESS;
@@ -630,43 +630,43 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       {
       case '0':
         zone.cmd[cmd]->if_flag = 0;
-        ch->send(QString("If flag for command %1 changed to 0 (always).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 0 (always).\r\n").arg(cmd + 1));
         break;
       case '1':
         zone.cmd[cmd]->if_flag = 1;
-        ch->send(QString("If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 1 ($B$2ontrue$R).\r\n").arg(cmd + 1));
         break;
       case '2':
         zone.cmd[cmd]->if_flag = 2;
-        ch->send(QString("If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 2 ($B$4onfalse$R).\r\n").arg(cmd + 1));
         break;
       case '3':
         zone.cmd[cmd]->if_flag = 3;
-        ch->send(QString("If flag for command %1 changed to 3 ($B$5onboot$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 3 ($B$5onboot$R).\r\n").arg(cmd + 1));
         break;
       case '4':
         zone.cmd[cmd]->if_flag = 4;
-        ch->send(QString("If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '5':
         zone.cmd[cmd]->if_flag = 5;
-        ch->send(QString("If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '6':
         zone.cmd[cmd]->if_flag = 6;
-        ch->send(QString("If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '7':
         zone.cmd[cmd]->if_flag = 7;
-        ch->send(QString("If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n").arg(cmd + 1));
         break;
       case '8':
         zone.cmd[cmd]->if_flag = 8;
-        ch->send(QString("If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n").arg(cmd + 1));
         break;
       case '9':
         zone.cmd[cmd]->if_flag = 9;
-        ch->send(QString("If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n").arg(cmd + 1));
+        ch->send(QStringLiteral("If flag for command %1 changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n").arg(cmd + 1));
         break;
       default:
         ch->send("Legal values are 0 (always), 1 (ontrue), 2 (onfalse), 3 (onboot),\r\n"
@@ -689,7 +689,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
       else
       {
         zone.cmd[cmd]->comment = last;
-        ch->send(QString("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd]->comment));
+        ch->send(QStringLiteral("Comment for command %1 change to '%2'.\r\n").arg(cmd + 1).arg(zone.cmd[cmd]->comment));
       }
     }
     else
@@ -864,7 +864,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   if (isexact(text, "new"))
   {
     zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
-    ch->send(QString("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
+    ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
     return zone.cmd.size() - 1;
   }
 
@@ -876,7 +876,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   }
 
   zone.cmd.insert(i, QSharedPointer<ResetCommand>::create('J'));
-  ch->send(QString("New command 'J' added at %1.\r\n").arg(i + 1));
+  ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(i + 1));
   return i - 1;
 }
 
@@ -925,7 +925,7 @@ command_return_t zedit_name(Character *ch, QStringList arguments, Zone &zone)
 
   zone.Name(arguments.join(' '));
 
-  ch->send(QString("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.Name()));
+  ch->send(QStringLiteral("Zone %1's name changed to '%2'.\r\n").arg(zone.getID()).arg(zone.Name()));
 
   return eSUCCESS;
 }
@@ -941,7 +941,7 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
     QString buffer;
     for (uint64_t j = 0; *zone_modes[j] != '\n'; j++)
     {
-      ch->send(QString("  $C%1$R: %2\r\n").arg(j + 1).arg(zone_modes[j]));
+      ch->send(QStringLiteral("  $C%1$R: %2\r\n").arg(j + 1).arg(zone_modes[j]));
     }
     return eFAILURE;
   }
@@ -958,7 +958,7 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
 
   zone.reset_mode = k - 1;
 
-  ch->send(QString("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
+  ch->send(QStringLiteral("Zone %1's reset mode changed to %2(%3).\r\n").arg(zone.getID()).arg(zone_modes[k - 1]).arg(k));
   return eSUCCESS;
 }
 
@@ -1041,7 +1041,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   if (!subcommand_found)
   {
-    ch->send(QString("'%1' is an invalid subcommand.\r\n").arg(select));
+    ch->send(QStringLiteral("'%1' is an invalid subcommand.\r\n").arg(select));
     return zedit_help(ch);
   }
 
@@ -2211,7 +2211,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
       for (i = 1; i < item_types.size(); i++)
       {
-        ch->send(QString("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
+        ch->send(QStringLiteral("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
       }
       return eFAILURE;
     }
@@ -2506,10 +2506,10 @@ int do_oedit(Character *ch, char *argument, int cmd)
     x = create_blank_item(intval);
     if (x < 0)
     {
-      ch->send(QString("Could not create item '%1'.  Max index hit or obj already exists.\r\n").arg(intval));
+      ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists.\r\n").arg(intval));
       return eFAILURE;
     }
-    ch->send(QString("Item '%1' created successfully.\r\n").arg(intval));
+    ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
     break;
   }
 
@@ -3989,7 +3989,7 @@ int do_medit(Character *ch, char *argument, int cmd)
              intval);
       return eFAILURE;
     }
-    ch->send(QString("Mobile '%1' created successfully.\r\n").arg(intval));
+    ch->send(QStringLiteral("Mobile '%1' created successfully.\r\n").arg(intval));
     ch->setPlayerLastMob(intval);
   }
   break;
@@ -4492,7 +4492,7 @@ int do_redit(Character *ch, char *argument, int cmd)
           {
             prev->next = extra->next;
           }
-          ch->send(QString("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
+          ch->send(QStringLiteral("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
           FREE(extra);
           deleted = true;
           // break out of for loop
@@ -4904,13 +4904,13 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
     send(QStringLiteral("Zone %1 has not been modified. Saving anyway.\r\n").arg(zone_key));
   }
 
-  QString filename = QString("zonefiles/%1").arg(zone.getFilename());
+  QString filename = QStringLiteral("zonefiles/%1").arg(zone.getFilename());
   QString command = QStringLiteral("cp %1 %1.last").arg(filename);
   system(command.toStdString().c_str());
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    std::cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << std::endl;
+    std::cerr << QStringLiteral("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << std::endl;
     return eFAILURE;
   }
 
@@ -5470,7 +5470,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     if (a == 0)
       ch->send("Mobiles Denied: ");
     if (real_mobile(d->vnum) == -1)
-      ch->send(QString("UNKNOWN(%1)\r\n").arg(d->vnum));
+      ch->send(QStringLiteral("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
       csendf(ch, "%s(%d)\r\n", ((Character *)DC::getInstance()->mob_index[real_mobile(d->vnum)].item)->short_desc, d->vnum);
     a++;

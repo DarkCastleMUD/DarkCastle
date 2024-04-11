@@ -92,7 +92,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      logentry(QString("Removing command alias [%1] because it's missing a keyword.").arg(command));
+      logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
       continue;
     }
 
@@ -108,7 +108,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    logentry(QString("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -570,7 +570,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
     return true;
   }
 
-  buglog(QString("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
+  buglog(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
   return false;
 }
 
@@ -948,7 +948,7 @@ void save_char_obj(Character *ch)
 // just error crap to avoid using "goto" like we were
 void load_char_obj_error(FILE *fpsave, QString strsave)
 {
-  QString log_buf = QString("Load_char_obj: %1").arg(strsave);
+  QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(log_buf.toStdString().c_str());
   logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   if (fpsave != nullptr)
@@ -983,11 +983,11 @@ load_status_t load_char_obj(class Connection *d, QString name)
 
   if (DC::getInstance()->cf.bport)
   {
-    strsave = QString("%1/%2/%3").arg(BSAVE_DIR).arg(name[0]).arg(name);
+    strsave = QStringLiteral("%1/%2/%3").arg(BSAVE_DIR).arg(name[0]).arg(name);
   }
   else
   {
-    strsave = QString("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
+    strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
   }
 
   //  struct stat mystats;

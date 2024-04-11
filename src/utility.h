@@ -885,7 +885,7 @@ T number(T from, T to)
    if (from > to)
    {
 
-      logentry(QString("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+      logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
       produce_coredump();
       return to;
    }
