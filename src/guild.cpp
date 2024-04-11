@@ -1425,7 +1425,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
   // increase the skill by one
   learn_skill(skill, 1, get_max(skill));
   learned = has_skill(skill);
-  sendln(QString("$R$B$5You feel more competent in your %1 ability. It increased to %2 out of %3.$R").arg(skillname).arg(learned).arg(get_max(skill)));
+  sendln(QStringLiteral("$R$B$5You feel more competent in your %1 ability. It increased to %2 out of %3.$R").arg(skillname).arg(learned).arg(get_max(skill)));
 }
 
 void Character::verify_max_stats(void)

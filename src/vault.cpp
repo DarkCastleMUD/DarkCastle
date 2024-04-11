@@ -1249,7 +1249,7 @@ void access_remove(QString name, struct vault_data *vault)
 
 QString clanVName(uint64_t clan_id)
 {
-  return QString("Clan%1").arg(clan_id);
+  return QStringLiteral("Clan%1").arg(clan_id);
 }
 
 bool has_vault_access(QString who, struct vault_data *vault)
@@ -2112,7 +2112,7 @@ void vault_list(Character *ch, QString owner)
       ch->send(QString("[$5%1$R] ").arg(count));
     }
 
-    ch->send(QString("%1$R").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("%1$R").arg(GET_OBJ_SHORT(obj)));
 
     if (obj->obj_flags.type_flag == ITEM_ARMOR ||
         obj->obj_flags.type_flag == ITEM_WEAPON ||

@@ -1243,7 +1243,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
     {
       int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
 
-      logentry(QString("Mob %1 lacking argument for mpsettemp.").arg(num));
+      logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
     return eFAILURE;
   }

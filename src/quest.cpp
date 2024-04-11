@@ -1368,51 +1368,51 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         ch->send(QString("Name changed from %1 ").arg(quest->name));
+         ch->send(QStringLiteral("Name changed from %1 ").arg(quest->name));
          quest->name = str_hsh(field);
          ch->send(QString("to %1.\r\n").arg(quest->name));
       }
       break;
    case 1: // level
-      ch->send(QString("Level changed from %1 ").arg(quest->level));
+      ch->send(QStringLiteral("Level changed from %1 ").arg(quest->level));
       quest->level = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->level));
       break;
    case 2: // objnum
-      ch->send(QString("Objnum changed from %1 ").arg(quest->objnum));
+      ch->send(QStringLiteral("Objnum changed from %1 ").arg(quest->objnum));
       quest->objnum = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->objnum));
       break;
    case 3: // objshort
-      ch->send(QString("Objshort changed from %1 ").arg(quest->objshort));
+      ch->send(QStringLiteral("Objshort changed from %1 ").arg(quest->objshort));
       sprintf(field, "%s %s", value, argument);
       quest->objshort = str_hsh(field);
       ch->send(QString("to %1.\r\n").arg(quest->objshort));
       break;
    case 4: // objlong
-      ch->send(QString("Objlong changed from %1 ").arg(quest->objlong));
+      ch->send(QStringLiteral("Objlong changed from %1 ").arg(quest->objlong));
       sprintf(field, "%s %s", value, argument);
       quest->objlong = str_hsh(field);
       ch->send(QString("to %1.\r\n").arg(quest->objlong));
       break;
    case 5: // objkey
-      ch->send(QString("Objkey changed from %1 ").arg(quest->objkey));
+      ch->send(QStringLiteral("Objkey changed from %1 ").arg(quest->objkey));
       sprintf(field, "%s %s", value, argument);
       quest->objkey = str_hsh(field);
       ch->send(QString("to %1.\r\n").arg(quest->objkey));
       break;
    case 6: // mobnum
-      ch->send(QString("Mobnum changed from %1 ").arg(quest->mobnum));
+      ch->send(QStringLiteral("Mobnum changed from %1 ").arg(quest->mobnum));
       quest->mobnum = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->mobnum));
       break;
    case 7: // timer
-      ch->send(QString("Timer changed from %1 ").arg(quest->timer));
+      ch->send(QStringLiteral("Timer changed from %1 ").arg(quest->timer));
       quest->timer = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->timer));
       break;
    case 8: // reward
-      ch->send(QString("Reward changed from %1 ").arg(quest->reward));
+      ch->send(QStringLiteral("Reward changed from %1 ").arg(quest->reward));
       quest->reward = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->reward));
       break;
@@ -1435,7 +1435,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       csendf(ch, "to %s.\r\n", quest->hint3);
       break;
    case 12: // cost
-      ch->send(QString("Cost changed from %1 ").arg(quest->cost));
+      ch->send(QStringLiteral("Cost changed from %1 ").arg(quest->cost));
       quest->cost = atoi(value);
       ch->send(QString("to %1.\r\n").arg(quest->cost));
       break;
@@ -1615,7 +1615,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
           search_char_for_item(ch, obj->item_number, false))
       {
-         owner->do_tell(QString("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
+         owner->do_tell(QStringLiteral("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
          extract_obj(obj);
          return eSUCCESS;
       }
@@ -1645,7 +1645,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       Object *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
       if (!obj)
       {
-         owner->do_tell(QString("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
+         owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 
@@ -1659,7 +1659,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
           DC::getInstance()->obj_index[obj->item_number].virt != 27998 &&
           DC::getInstance()->obj_index[obj->item_number].virt != 27999)
       {
-         owner->do_tell(QString("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
+         owner->do_tell(QStringLiteral("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
       }
 

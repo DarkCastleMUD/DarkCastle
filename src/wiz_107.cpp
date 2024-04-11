@@ -137,14 +137,14 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
       this->desc->snooping->snoop_by = 0;
       this->desc->snooping = 0;
     }
-    logentry(QString("%1 snoops themself.").arg(getName()), this->getLevel(), LogChannels::LOG_GOD);
+    logentry(QStringLiteral("%1 snoops themself.").arg(getName()), this->getLevel(), LogChannels::LOG_GOD);
     return eSUCCESS;
   }
 
   if (victim->getLevel() == IMPLEMENTER)
   {
     sendln("What are you!? Crazy! You can't snoop an Imp.");
-    victim->sendln(QString("%1 failed snooping you.").arg(getName()));
+    victim->sendln(QStringLiteral("%1 failed snooping you.").arg(getName()));
     return eFAILURE;
   }
 
@@ -152,11 +152,11 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
   {
     if (victim->desc->snoop_by->character)
     {
-      sendln(QString("%1 is snooping them already.").arg(victim->desc->snoop_by->character->getName()));
+      sendln(QStringLiteral("%1 is snooping them already.").arg(victim->desc->snoop_by->character->getName()));
     }
     else
     {
-      sendln(QString("Descriptor #%1 is snooping them already.").arg(victim->desc->snoop_by->descriptor));
+      sendln(QStringLiteral("Descriptor #%1 is snooping them already.").arg(victim->desc->snoop_by->descriptor));
     }
 
     return eFAILURE;
@@ -171,7 +171,7 @@ command_return_t Character::do_snoop(QStringList arguments, int cmd)
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;
-  logentry(QString("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 snoops %2.").arg(getName()).arg(victim->getName()), getLevel(), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 

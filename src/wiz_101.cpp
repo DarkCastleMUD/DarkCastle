@@ -790,14 +790,14 @@ int do_findfix(Character *ch, char *argument, int cmd)
       if (amt > max)
       {
         ch->send(QString("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = strdup(QString("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer, CMD_DEFAULT);
         free(buffer);
       }
       else
       {
         ch->send(QString("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = strdup(QString("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer, CMD_DEFAULT);
         free(buffer);
       }

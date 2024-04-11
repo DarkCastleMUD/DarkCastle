@@ -1185,11 +1185,11 @@ int do_drop(Character *ch, char *argument, int cmd)
             ch->sendln("(This item is cursed, BTW.)");
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
-            ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
+            ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
           }
           else if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
+            ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
             blindlag = true;
           }
           else
@@ -1261,7 +1261,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         {
           if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
-          ch->sendln(QString("You drop the %1.").arg(fname(tmp_object->name)));
+          ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {

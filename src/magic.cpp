@@ -411,7 +411,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
       }
       else if (victim->isImmortal())
       {
-        victim->sendln(QString("%1 attempts to tear you apart with a watery blast but fails because you are an Immortal.").arg(ch->getName()));
+        victim->sendln(QStringLiteral("%1 attempts to tear you apart with a watery blast but fails because you are an Immortal.").arg(ch->getName()));
         act("$n attempts to tear $N apart with a watery blast but fails because they are an Immortal.", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is not torn apart by the force of your watery blast because they are an Immortal.", ch, 0, victim, TO_CHAR, 0);
         return eSUCCESS;

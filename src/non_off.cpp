@@ -405,7 +405,7 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
     {
       if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
-        send(QString("%1 ").arg(t.name_, -11));
+        send(QStringLiteral("%1 ").arg(t.name_, -11));
         send(QString("%1\n\r").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }

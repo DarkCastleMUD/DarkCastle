@@ -684,11 +684,11 @@ void DC::game_loop(void)
     if (nsecs_expired >= 1000000)
     {
       msecs_expired = nsecs_expired / 1000000.0;
-      // qDebug() << QString("%1 msec.").arg(msecs_expired);
+      // qDebug() << QStringLiteral("%1 msec.").arg(msecs_expired);
     }
     else
     {
-      // qDebug() << QString("%1 nsec.").arg(nsecs_expired);
+      // qDebug() << QStringLiteral("%1 nsec.").arg(nsecs_expired);
     }
 
     last_execution.restart();
@@ -860,7 +860,7 @@ void DC::game_loop(void)
         PerfTimers["command"].stop();
 
       } // else if input
-    }   // if input
+    } // if input
     // the below two if-statements are used to allow the mud to detect and respond
     // to web-browsers attempting to connect to the game on port 80
     // this line processes a "get" or "post" if available.  Otherwise it prints the
@@ -1027,12 +1027,12 @@ void DC::game_loop_init(void)
 
 void game_test_init(void)
 {
-  assert(remove_all_codes(QString("$B")) == "$$B");
-  assert(remove_non_color_codes(QString("$B")) == "$B");
-  assert(nocolor_strlen(QString("$B")) == 0);
-  assert(remove_all_codes(QString("$B123$R")) == "$$B123$$R");
-  assert(remove_non_color_codes(QString("$B123$R")) == "$B123$R");
-  assert(nocolor_strlen(QString("$B123$R")) == 3);
+  assert(remove_all_codes(QStringLiteral("$B")) == "$$B");
+  assert(remove_non_color_codes(QStringLiteral("$B")) == "$B");
+  assert(nocolor_strlen(QStringLiteral("$B")) == 0);
+  assert(remove_all_codes(QStringLiteral("$B123$R")) == "$$B123$$R");
+  assert(remove_non_color_codes(QStringLiteral("$B123$R")) == "$B123$R");
+  assert(nocolor_strlen(QStringLiteral("$B123$R")) == 3);
 
   char arg[] = " start 1";
   char name[MAX_STRING_LENGTH] = {};
@@ -2491,11 +2491,11 @@ int process_input(class Connection *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
+        logentry(QStringLiteral("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
 
       return -1;
@@ -2810,11 +2810,11 @@ int close_socket(class Connection *d)
 
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
       {
-        socketlog(QString("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        socketlog(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       else
       {
-        socketlog(QString("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        socketlog(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       d->character->desc = nullptr;
     }

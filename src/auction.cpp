@@ -366,7 +366,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  logentry(QString("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, LogChannels::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -411,7 +411,7 @@ void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_nam
   {
     plural = "s ";
   }
-  logentry(QString("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), LogChannels::LOG_GOD);
   Save();
   return;
 }
@@ -711,7 +711,7 @@ void AuctionHouse::ListRooms(Character *ch)
 
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {
-    ch->send(QString(" %1").arg(room_it.key()));
+    ch->send(QStringLiteral(" %1").arg(room_it.key()));
   }
 
   ch->sendln();

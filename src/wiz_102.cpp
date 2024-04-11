@@ -3401,7 +3401,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
           "$3Current$R: ",
           ch);
-      ch->sendln(QString("%1").arg(((Character *)DC::getInstance()->mob_index[mob_num].item)->getPositionQString()));
+      ch->sendln(QStringLiteral("%1").arg(((Character *)DC::getInstance()->mob_index[mob_num].item)->getPositionQString()));
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
                    "  2 = Sitting\r\n"
@@ -3433,7 +3433,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       break;
     }
 
-    ch->sendln(QString("Mob default position set to %1.").arg(victim->getPositionQString()));
+    ch->sendln(QStringLiteral("Mob default position set to %1.").arg(victim->getPositionQString()));
   }
   break;
 
@@ -3446,7 +3446,7 @@ int do_medit(Character *ch, char *argument, int cmd)
           "$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
           "$3Current$R: ",
           ch);
-      ch->sendln(QString("%1").arg(Character::position_to_string(((Character *)DC::getInstance()->mob_index[mob_num].item)->mobdata->default_pos)));
+      ch->sendln(QStringLiteral("%1").arg(Character::position_to_string(((Character *)DC::getInstance()->mob_index[mob_num].item)->mobdata->default_pos)));
 
       send_to_char("$3Valid positions$R:\r\n"
                    "  1 = Standing\r\n"
@@ -4905,7 +4905,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
   }
 
   QString filename = QString("zonefiles/%1").arg(zone.getFilename());
-  QString command = QString("cp %1 %1.last").arg(filename);
+  QString command = QStringLiteral("cp %1 %1.last").arg(filename);
   system(command.toStdString().c_str());
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
@@ -5656,7 +5656,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
     const auto descriptor = d->descriptor;
     const bool duplicate_IP = IPs[d->getPeerOriginalAddress().toString()] > 1;
     const QString connected_state = constindex(d->connected, DC::connected_states);
-    const QString idle_seconds = QString("%1s").arg(d->idle_time / DC::PASSES_PER_SEC);
+    const QString idle_seconds = QStringLiteral("%1s").arg(d->idle_time / DC::PASSES_PER_SEC);
 
     send(QString("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
   }

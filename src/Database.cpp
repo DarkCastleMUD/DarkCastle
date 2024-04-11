@@ -29,7 +29,7 @@ Database::Database(const QString &name, const QString &hostname, const QString &
 
   if (!database_.open())
   {
-    logentry(QString("Failed to open database %1.").arg(name));
+    logentry(QStringLiteral("Failed to open database %1.").arg(name));
     qWarning() << database_ << database_.isOpen();
     logentry(database_.lastError().databaseText());
     logentry(database_.lastError().driverText());
@@ -58,16 +58,16 @@ Table::Table(Database &database, const QString &name)
       QSqlQuery query;
       if (query.exec(QString("CREATE TABLE %1 (id BIGINT GENERATED ALWAYS AS IDENTITY)").arg(name)))
       {
-        logentry(QString("Created database table %1.").arg(name));
+        logentry(QStringLiteral("Created database table %1.").arg(name));
         if (!db.tables().contains(name))
         {
-          logentry(QString("Failed to find database table %1 after creating it.").arg(name));
+          logentry(QStringLiteral("Failed to find database table %1 after creating it.").arg(name));
           return;
         }
       }
       else
       {
-        logentry(QString("Failed to create database table %1.").arg(name));
+        logentry(QStringLiteral("Failed to create database table %1.").arg(name));
         logentry(query.lastError().databaseText());
         logentry(query.lastError().driverText());
       }
@@ -86,21 +86,21 @@ Column::Column(Table &table, const QString &name, const QString &type)
   if (!table_fields.contains(name))
   {
     QSqlQuery query;
-    if (query.exec(QString("ALTER TABLE %1 ADD %2 %3").arg(table.getName()).arg(name).arg(type)))
+    if (query.exec(QStringLiteral("ALTER TABLE %1 ADD %2 %3").arg(table.getName()).arg(name).arg(type)))
     {
-      logentry(QString("Created table %1 column %2.").arg(table.getName()).arg(name));
+      logentry(QStringLiteral("Created table %1 column %2.").arg(table.getName()).arg(name));
 
       // Check again
       QSqlRecord table_fields = table.getDatabase().getQSqlDatabase().record(table.getName());
       if (!table_fields.contains(name))
       {
-        logentry(QString("Failed to find table %1 column %2 after creating it.").arg(table.getName()).arg(name));
+        logentry(QStringLiteral("Failed to find table %1 column %2 after creating it.").arg(table.getName()).arg(name));
         return;
       }
     }
     else
     {
-      logentry(QString("Failed to create table %1 column %2.").arg(table.getName()).arg(name));
+      logentry(QStringLiteral("Failed to create table %1 column %2.").arg(table.getName()).arg(name));
       logentry(query.lastError().databaseText());
       logentry(query.lastError().driverText());
     }

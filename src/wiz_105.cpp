@@ -319,7 +319,7 @@ int do_debug(Character *ch, char *args, int cmd)
       return eFAILURE;
     }
     victim->setDebug(!victim->getDebug());
-    ch->sendln(QString("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
+    ch->sendln(QStringLiteral("Debug for %1 toggled %2").arg(GET_NAME(victim)).arg(victim->getDebug() ? "on" : "off"));
     return eSUCCESS;
   }
   else if (arg1 == "mobile")
@@ -349,11 +349,11 @@ int do_debug(Character *ch, char *args, int cmd)
               first_npc_debug_state = c->getDebug();
             }
             c->setDebug(!first_npc_debug_state);
-            ch->sendln(QString("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
+            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
             change_count++;
           }
         }
-        ch->sendln(QString("%1 mobiles changed.").arg(change_count));
+        ch->sendln(QStringLiteral("%1 mobiles changed.").arg(change_count));
         return eSUCCESS;
       }
     }

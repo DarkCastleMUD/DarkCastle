@@ -419,7 +419,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
 
         return eSUCCESS;
       } // if isname
-    }   // for
+    } // for
 
     if (!hunting.isEmpty())
     {
@@ -521,19 +521,19 @@ command_return_t Character::do_ambush(QStringList arguments, int cmd)
 
   if (arg1.isEmpty())
   {
-    sendln(QString("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
+    sendln(QStringLiteral("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
     return eSUCCESS;
   }
 
   if (ambush == arg1)
   {
     ambush.clear();
-    sendln(QString("You will no longer ambush %1 on sight.").arg(arg1));
+    sendln(QStringLiteral("You will no longer ambush %1 on sight.").arg(arg1));
     return eSUCCESS;
   }
 
   ambush = arg1;
-  sendln(QString("You will now ambush %1 on sight.").arg(arg1));
+  sendln(QStringLiteral("You will now ambush %1 on sight.").arg(arg1));
   return eSUCCESS;
 }
 
@@ -1316,7 +1316,7 @@ int do_fire(Character *ch, char *arg, int cmd)
         }
       }
 
-      if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT)&& dir >= 0)
+      if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT) && dir >= 0)
       {
         if (DC::getInstance()->world[new_room].dir_option[dir] && !(DC::getInstance()->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(DC::getInstance()->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
@@ -1626,8 +1626,8 @@ int do_fire(Character *ch, char *arg, int cmd)
         retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW,
                         0);
         ch->skill_increase_check(SKILL_FIRE_ARROW,
-                             ch->has_skill(SKILL_FIRE_ARROW),
-                             get_difficulty(SKILL_FIRE_ARROW));
+                                 ch->has_skill(SKILL_FIRE_ARROW),
+                                 get_difficulty(SKILL_FIRE_ARROW));
         enchantmentused = true;
         break;
       case 2:
@@ -1649,8 +1649,8 @@ int do_fire(Character *ch, char *arg, int cmd)
         }
         retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
         ch->skill_increase_check(SKILL_ICE_ARROW,
-                             ch->has_skill(SKILL_ICE_ARROW),
-                             get_difficulty(SKILL_ICE_ARROW));
+                                 ch->has_skill(SKILL_ICE_ARROW),
+                                 get_difficulty(SKILL_ICE_ARROW));
         enchantmentused = true;
         break;
       case 3:
@@ -1669,8 +1669,8 @@ int do_fire(Character *ch, char *arg, int cmd)
         retval = damage(ch, victim, dam, TYPE_ENERGY,
                         SKILL_TEMPEST_ARROW, 0);
         ch->skill_increase_check(SKILL_TEMPEST_ARROW,
-                             ch->has_skill(SKILL_TEMPEST_ARROW),
-                             get_difficulty(SKILL_TEMPEST_ARROW));
+                                 ch->has_skill(SKILL_TEMPEST_ARROW),
+                                 get_difficulty(SKILL_TEMPEST_ARROW));
         enchantmentused = true;
         break;
       case 4:
@@ -1698,8 +1698,8 @@ int do_fire(Character *ch, char *arg, int cmd)
         retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
                         0);
         ch->skill_increase_check(SKILL_GRANITE_ARROW,
-                             ch->has_skill(SKILL_GRANITE_ARROW),
-                             get_difficulty(SKILL_GRANITE_ARROW));
+                                 ch->has_skill(SKILL_GRANITE_ARROW),
+                                 get_difficulty(SKILL_GRANITE_ARROW));
         enchantmentused = true;
         break;
       default:
@@ -1766,7 +1766,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   }
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
-  ch->sendln(QString("%1 seems to hate... %2.").arg(GET_SHORT(target)).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
+  ch->sendln(QStringLiteral("%1 seems to hate... %2.").arg(GET_SHORT(target)).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
 
   if (ch->master)
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
@@ -1810,7 +1810,7 @@ int do_natural_selection(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  cur =ch->affected_by_spell( SKILL_NAT_SELECT);
+  cur = ch->affected_by_spell(SKILL_NAT_SELECT);
 
   for (i = 1; i < 33; i++)
   {

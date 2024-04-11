@@ -525,7 +525,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (obj->obj_flags.type_flag == ITEM_WEAPON)
 	{ // weapon
-		buf = QString("%1%2d%3, %4, ").arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+		buf = QStringLiteral("%1%2d%3, %4, ").arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
 	}
 
 	QString buf2;
@@ -547,7 +547,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 				buf2 = QStringLiteral("Invalid");
 			}
 
-			QString buf3 = QString("%1 by %2, ").arg(buf2).arg(obj->affected[i].modifier).toLower();
+			QString buf3 = QStringLiteral("%1 by %2, ").arg(buf2).arg(obj->affected[i].modifier).toLower();
 
 			QString potential_buffer = buf + buf3;
 			qsizetype starting_point = potential_buffer.lastIndexOf("\n");
@@ -623,11 +623,11 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
 	if (platinum)
 	{
-		buf2 = QString("costing %1 coins.").arg(obj->obj_flags.cost / 10);
+		buf2 = QStringLiteral("costing %1 coins.").arg(obj->obj_flags.cost / 10);
 	}
 	else
 	{
-		buf2 = QString("costing %1 qpoints.").arg(obj->obj_flags.cost / 10000);
+		buf2 = QStringLiteral("costing %1 qpoints.").arg(obj->obj_flags.cost / 10000);
 	}
 
 	QString potential_buffer = buf + buf2;
@@ -729,7 +729,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
 		{
-			owner->do_tell(QString("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
 			extract_obj(obj);
 			return eSUCCESS;
 		}
@@ -759,7 +759,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		}
 		if (!obj)
 		{
-			owner->do_tell(QString("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
+			owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));
 			return eSUCCESS;
 		}
 		if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -771,7 +771,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 		// don't allow non-empty containers to be sold
 		if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
 		{
-			owner->do_tell(QString("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
+			owner->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
 			return eSUCCESS;
 		}
 

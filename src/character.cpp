@@ -254,7 +254,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     {
         restored = ".restored";
     }
-    QString filename = QString("%1.%2%3").arg(player_name).arg(0).arg(restored);
+    QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(0).arg(restored);
 
     QString path = QString("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
     QString fullpath = path + filename;
@@ -531,7 +531,7 @@ void Character::display_string_list(QStringList list)
     uint64_t count{};
     for (const auto &item : list)
     {
-        send(QString("%1").arg(item, 18));
+        send(QStringLiteral("%1").arg(item, 18));
         if (++count % 4 == 0)
         {
             send("\r\n");

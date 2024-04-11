@@ -85,7 +85,7 @@ int do_force(Character *ch, std::string argument, int cmd)
       if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
       {
         ch->sendln("Now doing that would just tick off the IMPS!");
-        logentry(QString("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
+        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
       if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
@@ -442,7 +442,7 @@ command_return_t Character::do_test(QStringList arguments, int cmd)
     command_return_t rc{};
     for (auto &test : tests)
     {
-      send(QString("Running %1..").arg(test.getName()));
+      send(QStringLiteral("Running %1..").arg(test.getName()));
       rc = test.run(this) & rc;
       sendln(QString("Return code is %1 (%2)").arg(rc).arg(rc_to_qstring(rc)));
     }

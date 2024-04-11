@@ -3695,7 +3695,7 @@ bool do_bufs(char *bufpt, char *argpt, char *point)
 	return true;
 }
 
-void debugpoint(){};
+void debugpoint() {};
 /* This procedure simply copies the cmnd to a buffer while expanding
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
@@ -5100,7 +5100,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 			{
 				if (!arguments.isEmpty())
 				{
-					do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
+					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 				}
 
 				vmob = initiate_oproc(this, item);
@@ -5120,7 +5120,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 		{
 			if (!arguments.isEmpty())
 			{
-				do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
+				do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 			}
 			vmob = initiate_oproc(this, item);
 			if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
@@ -5140,7 +5140,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 			{
 				if (!arguments.isEmpty())
 				{
-					do_mpsettemp(QString("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
+					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), CMD_OTHER);
 				}
 
 				vmob = initiate_oproc(this, equipment[i]);

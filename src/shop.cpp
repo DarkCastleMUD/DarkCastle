@@ -329,14 +329,14 @@ void shopping_sell(const char *arg, Character *ch,
   if (virt >= 13400 && virt <= 13707 &&
       DC::getInstance()->mob_index[keeper->mobdata->nr].virt != 13416)
   {
-    keeper->do_tell(QString("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
   }
 
   // don't allow non-empty containers to be sold
   if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
   {
-    keeper->do_tell(QString("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 %2$B$2 needs to be emptied first.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).split(' '));
     return;
   }
 
@@ -618,8 +618,8 @@ void shopping_list(const char *arg, Character *ch,
 
   if (!keeper->carrying && DC::getInstance()->shop_index[shop_nr].inventory)
   {
-    keeper->do_tell(QString("%1 Oops, I seem to be out of inventory.").arg(GET_NAME(ch)).split(' '));
-    keeper->do_tell(QString("%1 One minute while I restock.").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 Oops, I seem to be out of inventory.").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 One minute while I restock.").arg(GET_NAME(ch)).split(' '));
     restock_keeper(keeper, shop_nr);
   }
   i = 0;
@@ -1190,11 +1190,11 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
 
   if (!shop->sell_message || !*shop->sell_message)
   {
-    keeper->do_tell(QString("%1 Thank you, come again!").arg(GET_NAME(ch)).split(' '));
+    keeper->do_tell(QStringLiteral("%1 Thank you, come again!").arg(GET_NAME(ch)).split(' '));
   }
   else
   {
-    keeper->do_tell(QString("%1 %2").arg(GET_NAME(ch)).arg(shop->sell_message).split(' '));
+    keeper->do_tell(QStringLiteral("%1 %2").arg(GET_NAME(ch)).arg(shop->sell_message).split(' '));
   }
 
   // update inventory
@@ -1856,7 +1856,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
   case CMD_LIST:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, QString("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
 
@@ -1871,7 +1871,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
   case CMD_REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      owner->tell(ch, QString("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
     else if (r.state == reroll_t::reroll_states_t::REROLLED)
@@ -1954,7 +1954,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1963,7 +1963,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       }
       else
       {
@@ -2013,7 +2013,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2030,7 +2030,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2048,7 +2048,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2076,7 +2076,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+      logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LogChannels::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

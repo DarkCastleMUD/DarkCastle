@@ -165,7 +165,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
     {
       if (!bgc.testcmd)
       {
-        this->sendln(QString("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -177,7 +177,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
     {
       if (bgc.testcmd)
       {
-        this->sendln(QString("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -195,15 +195,15 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
   // if has
   if (victim->has_skill(bc->num))
   {
-    this->sendln(QString("%1 already has that command.").arg(victim->getName()));
+    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
     return eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  logentry(QString("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), LogChannels::LOG_GOD);
-  this->sendln(QString("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
-  this->sendln(QString("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
+  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), LogChannels::LOG_GOD);
+  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
+  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
   return eSUCCESS;
 }
 
@@ -434,7 +434,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       GET_PLATINUM(victim) -= 500;
       send(QString("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QString("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QString("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
+      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
     }
   }
 
@@ -467,7 +467,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
         tmp[x] = '\0';
       }
 
-      tmp = QString("%1 %2").arg(tmp).arg(newname);
+      tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
       victim->equipment[iWear]->name = str_hsh(tmp.toStdString().c_str());
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
@@ -482,7 +482,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
           {
             tmp[x] = '\0';
           }
-          tmp = QString("%1 %2").arg(tmp).arg(newname);
+          tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
           obj->name = str_hsh(tmp.toStdString().c_str());
         }
       }
@@ -494,13 +494,13 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      QString tmp = QString("%1").arg(obj->name);
+      QString tmp = QStringLiteral("%1").arg(obj->name);
       qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
       if (x >= 0 && x < tmp.length())
       {
         tmp[x] = '\0';
       }
-      tmp = QString("%1 %2").arg(tmp).arg(newname);
+      tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
       obj->name = str_hsh(tmp.toStdString().c_str());
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
@@ -510,13 +510,13 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       {
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          QString tmp = QString("%1").arg(obj2->name);
+          QString tmp = QStringLiteral("%1").arg(obj2->name);
           qsizetype x = tmp.length() - strlen(victim->getNameC()) - 1;
           if (x >= 0 && x < tmp.length())
           {
             tmp[x] = '\0';
           }
-          tmp = QString("%1 %2").arg(tmp).arg(newname);
+          tmp = QStringLiteral("%1 %2").arg(tmp).arg(newname);
           obj2->name = str_hsh(tmp.toStdString().c_str());
         }
       }
@@ -553,17 +553,17 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     {
       // Make backup
       QString dst_filename = QString("%1/%2/%3.%4.old").arg(FAMILIAR_DIR).arg(victim->getNameC()[0]).arg(victim->getNameC()).arg(i);
-      QString command = QString("cp -f %1 %2").arg(src_filename).arg(dst_filename);
+      QString command = QStringLiteral("cp -f %1 %2").arg(src_filename).arg(dst_filename);
       system(command.toStdString().c_str());
 
       // Rename
       dst_filename = QString("%1/%2/%3.%4").arg(FAMILIAR_DIR).arg(newname[0]).arg(newname).arg(i);
-      command = QString("mv -f %1 %2").arg(src_filename).arg(dst_filename);
+      command = QStringLiteral("mv -f %1 %2").arg(src_filename).arg(dst_filename);
       system(command.toStdString().c_str());
     }
   }
 
-  buffer = QString("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
+  buffer = QStringLiteral("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
   logentry(buffer, level_, LogChannels::LOG_GOD);
 
   // handle the renames
@@ -1022,7 +1022,7 @@ command_return_t do_world(Character *ch, std::string args, int cmd)
     auto world = world_file_list;
     while (world != nullptr)
     {
-      QString potential_filename = QString("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
+      QString potential_filename = QStringLiteral("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
       if (world->filename != potential_filename)
       {
         ch->send(QString("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));

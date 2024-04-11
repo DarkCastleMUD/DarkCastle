@@ -4760,7 +4760,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else if (!(*tar_ch)->getName().isEmpty())
 				{
-					ch->sendln(QString("You find %1 in this room.").arg((*tar_ch)->getName()));
+					ch->sendln(QStringLiteral("You find %1 in this room.").arg((*tar_ch)->getName()));
 				}
 				else
 				{
@@ -4784,7 +4784,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
 				}
 				else if (!(*tar_ch)->getName().isEmpty())
 				{
-					ch->sendln(QString("You find %1 somewhere in the world.").arg((*tar_ch)->getName()));
+					ch->sendln(QStringLiteral("You find %1 somewhere in the world.").arg((*tar_ch)->getName()));
 				}
 				else
 				{
@@ -5030,7 +5030,7 @@ void Character::add_memory(QString victim_name, char type)
 			}
 
 			// name 1 + name 2 + a space + terminator
-			this->mobdata->hated = QString("%1 %2").arg(mobdata->hated).arg(victim_name);
+			this->mobdata->hated = QStringLiteral("%1 %2").arg(mobdata->hated).arg(victim_name);
 		}
 	}
 	else if (type == 'f')

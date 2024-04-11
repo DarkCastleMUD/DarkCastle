@@ -801,7 +801,7 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 
    if (victim == nullptr)
    {
-      sendln(QString("Unable to find %1.").arg(name));
+      sendln(QStringLiteral("Unable to find %1.").arg(name));
       return eFAILURE;
    }
 
@@ -966,7 +966,7 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
    }
 
    // original value
-   buf2 = QString("%1").arg(base);
+   buf2 = QStringLiteral("%1").arg(base);
    buf += buf2;
 
    if (random - base > 0)
@@ -987,11 +987,11 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
       // if negative show "- difference"
       if (swapcolors)
       {
-         buf2 = QString("%s%d$R").arg(color_good).arg(random - base);
+         buf2 = QStringLiteral("%s%d$R").arg(color_good).arg(random - base);
       }
       else
       {
-         buf2 = QString("%1%2$R").arg(color_bad).arg(random - base);
+         buf2 = QStringLiteral("%1%2$R").arg(color_bad).arg(random - base);
       }
       buf += buf2;
    }
@@ -1980,7 +1980,7 @@ int do_score(Character *ch, char *argument, int cmd)
       }
       else
       {
-         experience_needed = QString("%L1").arg(exp_needed);
+         experience_needed = QStringLiteral("%L1").arg(exp_needed);
       }
 
       sprintf(buf,
@@ -1996,10 +1996,10 @@ int do_score(Character *ch, char *argument, int cmd)
               "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
               GET_ARMOR(ch), GET_PKILLS(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch),
               to_hit, GET_PDEATHS(ch), IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-              to_dam, spell_dam, QString("%L1").arg(GET_EXP(ch)).toStdString().c_str(),
+              to_dam, spell_dam, QStringLiteral("%L1").arg(GET_EXP(ch)).toStdString().c_str(),
               get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), experience_needed.toStdString().c_str(),
-              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QString("%L1").arg(ch->getGold()).toStdString().c_str(),
-              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QString("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
+              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QStringLiteral("%L1").arg(ch->getGold()).toStdString().c_str(),
+              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QStringLiteral("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
 
       ch->send(buf);
    }
@@ -4292,7 +4292,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       {
          // search clan vault is able
 
-         QString vault_name = QString("clan%1").arg(clan);
+         QString vault_name = QStringLiteral("clan%1").arg(clan);
          auto vault = has_vault(vault_name.toStdString().c_str());
          // search vault if able
          if (vault)
@@ -4512,24 +4512,24 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    if (true || std::count_if(sl.begin(), sl.end(), [](Search search_item)
                              { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
    {
-      header += QString(" [%1]").arg(QString("Short Description"), -max_short_description_size);
+      header += QString(" [%1]").arg(QStringLiteral("Short Description"), -max_short_description_size);
    }
 
    if (show_details)
    {
       if (search_world)
       {
-         header += QString(" [%1]").arg(QString("Details"), -21);
+         header += QString(" [%1]").arg(QStringLiteral("Details"), -21);
       }
       else
       {
-         header += QString(" [%1]").arg(QString("Details"));
+         header += QString(" [%1]").arg(QStringLiteral("Details"));
       }
    }
 
    if (show_affects)
    {
-      header += QString(" [%1]").arg(QString("Affects"));
+      header += QString(" [%1]").arg(QStringLiteral("Affects"));
    }
 
    send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
@@ -4600,7 +4600,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          switch (GET_ITEM_TYPE(obj))
          {
          case ITEM_WEAPON:
-            buffer = QString("%1D%2").arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
+            buffer = QStringLiteral("%1D%2").arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
 
             if (search_world && vobj != nullptr)
             {
@@ -4656,7 +4656,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                }
                else
                {
-                  custom_columns += QString(",");
+                  custom_columns += QStringLiteral(",");
                }
 
                if (obj->affected[i].modifier > 0)
@@ -4665,7 +4665,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
                }
                else
                {
-                  custom_columns += QString("$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad")).arg(obj->affected[i].modifier);
+                  custom_columns += QStringLiteral("$R%1%2-%3$R").arg(buffer).arg(getSettingAsColor("color.bad")).arg(obj->affected[i].modifier);
                }
             }
          }

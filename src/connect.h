@@ -172,7 +172,7 @@ public:
   {
     if (proxy.isActive())
     {
-      return QString("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
+      return QStringLiteral("%1 via %2").arg(getPeerOriginalAddress().toString()).arg(getPeerAddress().toString());
     }
     else
     {

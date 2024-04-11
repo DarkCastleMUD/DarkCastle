@@ -405,7 +405,7 @@ int main(int argc, char **argv)
               continue;
             }
 
-            if (argv[1] == QString("all"))
+            if (argv[1] == QStringLiteral("all"))
             {
               Character *ch = d->character;
               for (int iWear = 0; iWear < MAX_WEAR; iWear++)
@@ -450,7 +450,7 @@ int main(int argc, char **argv)
       }
     }
 
-    if (argv[1] == QString("leaderboard"))
+    if (argv[1] == QStringLiteral("leaderboard"))
     {
       do_leaderboard(ch, "scan", CMD_DEFAULT);
       process_output(d);

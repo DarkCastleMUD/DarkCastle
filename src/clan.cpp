@@ -1100,8 +1100,8 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   victim->clan = 0;
   remove_clan_member(clan, victim);
   save_clans();
-  sendln(QString("You cast %1 out of your clan.").arg(victim->getName()));
-  victim->sendln(QString("You are cast out of %1.").arg(clanPtr->name));
+  sendln(QStringLiteral("You cast %1 out of your clan.").arg(victim->getName()));
+  victim->sendln(QStringLiteral("You are cast out of %1.").arg(clanPtr->name));
 
   logentry(QString("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
 

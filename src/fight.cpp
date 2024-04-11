@@ -150,7 +150,7 @@ int check_autojoiners(Character *ch, int skill = 0)
       continue;
     if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN))
       continue;
-    int retval = tmp->do_join(QString("0.%1").arg(ch->getName()).split(' '));
+    int retval = tmp->do_join(QStringLiteral("0.%1").arg(ch->getName()).split(' '));
     if (SOMEONE_DIED(retval))
       return retval;
   }
@@ -194,7 +194,7 @@ int Character::check_charmiejoin(void)
     return eFAILURE;
   }
 
-  return do_join(QString("0.%1").arg(master->getName()).split(' '));
+  return do_join(QStringLiteral("0.%1").arg(master->getName()).split(' '));
 }
 
 int check_charmiejoin(Character *ch)

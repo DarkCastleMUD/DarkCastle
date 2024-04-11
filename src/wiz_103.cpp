@@ -233,7 +233,7 @@ int do_fsave(Character *ch, std::string argument, int cmd)
   }
   vict->save();
 
-  logentry(QString("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), LogChannels::LOG_GOD);
 
   return eSUCCESS;
 }
@@ -458,7 +458,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       {
         if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
         {
-          ch->send(QString("%1 ").arg(r, 5));
+          ch->send(QStringLiteral("%1 ").arg(r, 5));
 
           count++;
           cols++;

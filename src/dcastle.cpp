@@ -36,11 +36,11 @@ int main(int argc, char **argv)
     dcastle.cf.ports.push_back(DFLT_PORT4);
   }
 
-  logentry(QString("Using %1 as data directory.").arg(dcastle.cf.library_directory));
+  logentry(QStringLiteral("Using %1 as data directory.").arg(dcastle.cf.library_directory));
 
   if (!QFile(dcastle.cf.library_directory).exists())
   {
-    logentry(QString("Data directory %1 is missing.").arg(dcastle.cf.library_directory));
+    logentry(QStringLiteral("Data directory %1 is missing.").arg(dcastle.cf.library_directory));
     exit(EXIT_FAILURE);
   }
 
@@ -71,7 +71,7 @@ void backup_executable(char *const argv[])
 {
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
-  QString backup_filename = QString("%1.%2.%3").arg(argv[0]).arg(DC::getBuildVersion()).arg(getpid());
+  QString backup_filename = QStringLiteral("%1.%2.%3").arg(argv[0]).arg(DC::getBuildVersion()).arg(getpid());
 
   // If backup file does not exist already then link to it
   if (!QFile(backup_filename).exists())

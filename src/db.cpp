@@ -1513,7 +1513,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			}
 			if (!found)
 			{
-				QString error = QString("Room %1 is outside of any zone.").arg(room_nr);
+				QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
 				logentry(error);
 				logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LogChannels::LOG_BUG);
 			}
@@ -2517,7 +2517,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
 	// copy the temp into the memory
 	zone.cmd = reset_tab;
-	// // std::cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << std::endl;
+	// // std::cerr << QStringLiteral("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << std::endl;
 	zones.insert(new_zone_key, zone);
 	return new_zone_key;
 }
@@ -2571,7 +2571,7 @@ void DC::boot_zones(void)
 		auto zone_key = read_one_zone(fl);
 		auto &zone = zones[zone_key];
 		zone.setFilename(temp);
-		// // std::cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << std::endl;
+		// // std::cerr << QStringLiteral("%1 %2").arg(zone).arg(temp).toStdString() << std::endl;
 
 		fclose(fl);
 	}
@@ -4484,7 +4484,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 			if (obj->affected[i].location < 1000)
 				sprinttype(obj->affected[i].location, apply_types, buf2);
 			else if (!get_skill_name(obj->affected[i].location / 1000).isEmpty())
-				strncpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str(),sizeof(buf2));
+				strncpy(buf2, get_skill_name(obj->affected[i].location / 1000).toStdString().c_str(), sizeof(buf2));
 			else
 				strcpy(buf2, "Invalid");
 
@@ -5504,7 +5504,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			qWarning() << QString("Reading %1").arg(DC::getInstance()->current());
+			qWarning() << QStringLiteral("Reading %1").arg(DC::getInstance()->current());
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5526,7 +5526,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5607,7 +5607,7 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 			else
 			{
 				buglog("fread_bitvector: illegal character");
-				buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+				buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 				throw;
 			}
 
@@ -5619,7 +5619,7 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 	catch (...)
 	{
 		buglog("fread_bitvector: unknown error");
-		buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+		buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		throw;
 	}
 	in.exceptions(orig_exceptions);
@@ -5638,7 +5638,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	{
 		if (ch == EOF)
 		{
-			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_int: premature EOF");
 			abort();
 		}
@@ -5687,7 +5687,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 				else
 				{
 					printf("Buffer: '%s'\n", buf);
-					buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+					buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					throw error_range_int();
@@ -5844,7 +5844,7 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 				else
 				{
 					printf("Buffer: '%s'\n", buf);
-					buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+					buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					if (i < beg_range)
@@ -5875,7 +5875,7 @@ char fread_char(QTextStream &fl)
 {
 	if (fl.atEnd())
 	{
-		buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+		buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		perror("fread_char: premature EOF");
 		abort();
 	}
@@ -5894,7 +5894,7 @@ char fread_char(FILE *fl)
 	{
 		if (ch == EOF)
 		{
-			buglog(QString("Reading %1").arg(DC::getInstance()->current()));
+			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_char: premature EOF");
 			abort();
 		}
@@ -6989,7 +6989,7 @@ FILE *legacyFileOpen(QString directory, QString filename, QString error_message)
 	FILE *file_handle = nullptr;
 
 	QString file = directory.arg(filename);
-	QString syscmd = QString("cp -f %1 %1.last").arg(file);
+	QString syscmd = QStringLiteral("cp -f %1 %1.last").arg(file);
 	system(syscmd.toStdString().c_str());
 
 	if ((file_handle = fopen(file.toStdString().c_str(), "w")) == nullptr)

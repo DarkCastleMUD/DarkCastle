@@ -613,7 +613,7 @@ void Character::do_on_login_stuff(void)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            logentry(QString("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, LogChannels::LOG_PLAYER);
+            logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, LogChannels::LOG_PLAYER);
             // this->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
@@ -989,7 +989,7 @@ void nanny(class Connection *d, std::string arg)
       }
       else
       {
-         SEND_TO_Q(QString("There was an error loading %1").arg(tmp_name), d);
+         SEND_TO_Q(QStringLiteral("There was an error loading %1").arg(tmp_name), d);
          close_socket(d);
          return;
       }
@@ -1052,7 +1052,7 @@ void nanny(class Connection *d, std::string arg)
       if (check_reconnect(d, ch->getName(), true))
          return;
 
-      buffer = QString("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
+      buffer = QStringLiteral("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
       if (ch->getLevel() < ANGEL)
          logentry(buffer, OVERSEER, LogChannels::LOG_SOCKET);
       else
@@ -2058,7 +2058,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
          tmp_ch->timer = 0;
          tmp_ch->sendln("Reconnecting.");
 
-         QString log_buf = QString("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
+         QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
 
          if (tmp_ch->isMortal())
