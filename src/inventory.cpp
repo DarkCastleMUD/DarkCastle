@@ -1677,8 +1677,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
     if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || ch->getLevel() > 50))
     {
-      sprintf(buf, "%s (mob) giving gold to %s.", GET_NAME(ch),
-              GET_NAME(vict));
+      sprintf(buf, "%s (mob) giving %ld gold to %s.", GET_NAME(ch), amount, GET_NAME(vict));
       special_log(buf);
     }
 
