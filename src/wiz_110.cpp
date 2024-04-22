@@ -448,8 +448,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
     strsave = QStringLiteral("%1/%2/%3").arg(BSAVE_DIR).arg(newname[0]).arg(newname);
   }
 
-  unique_file_t fl(std::fopen(strsave.toStdString().c_str(), "r"), &close_file);
-  if (fl)
+  if (QFile(strsave).exists())
   {
     send(QStringLiteral("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
     return eFAILURE;
