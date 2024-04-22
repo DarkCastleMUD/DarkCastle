@@ -1669,9 +1669,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       ch->sendln("Whoops!  You dropped the coins!");
       if (ch->getLevel() >= IMMORTAL)
       {
-        sprintf(buf, "%s tries to slip %d coins to %s and drops them!", GET_NAME(ch),
-                amount, GET_NAME(vict));
-        special_log(buf);
+        special_log(QString(QStringLiteral("%1 tries to slip %2 coins to %3 and drops them in room %4!")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
 
       act("$n tries to slip you some coins, but $e accidentally drops "
@@ -1696,9 +1694,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
       if (ch->getLevel() >= IMMORTAL)
       {
-        sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
-                GET_NAME(vict));
-        special_log(buf);
+        special_log(QString(QStringLiteral("%1 slips %2 coins to %3 in room %4!")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
 
       sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
@@ -1869,9 +1865,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
     if (ch->getLevel() >= IMMORTAL && ch->getLevel() <= DEITY)
     {
-      sprintf(buf, "%s slips %s to %s and fumbles it.", GET_NAME(ch),
-              obj->short_description, GET_NAME(vict));
-      special_log(buf);
+      special_log(QString(QStringLiteral("%1 slips %2 to %3 and fumbles it in room %4!")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
     }
 
     move_obj(obj, ch->in_room);
@@ -1889,12 +1883,11 @@ int do_slip(Character *ch, char *argument, int cmd)
   // Success
   else
   {
-    /*      if (ch->getLevel() >= IMMORTAL  && ch->getLevel() <= DEITY ) {
-             sprintf(buf, "%s slips %s to %s.", GET_NAME(ch),
-                     obj->short_description, GET_NAME(vict));
-             special_log(buf);
-             }
-      */
+    if (ch->getLevel() >= IMMORTAL && ch->getLevel() <= DEITY)
+    {
+      special_log(QString(QStringLiteral("%1 slips %2 to %3 in room %4.")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
+    }
+
     sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
             GET_NAME(vict));
     logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);

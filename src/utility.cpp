@@ -3158,18 +3158,18 @@ bool str_infix(QString astr, QString bstr)
   return true;
 }
 
-void special_log(char *arg)
+void special_log(QString message)
 {
-  FILE *fl;
+  QFile special_logfile(QStringLiteral("../lib/special.txt"));
 
-  if (!(fl = fopen("../lib/special.txt", "a")))
+  if (!special_logfile.open(QIODevice::Append | QIODevice::Text))
   {
     logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, LogChannels::LOG_GOD);
     return;
   }
 
-  fprintf(fl, "%s\n", arg);
-  fclose(fl);
+  QTextStream out(&special_logfile);
+  out << message << "\n";
 }
 
 void Character::swapSkill(skill_t origSkill, skill_t newSkill)

@@ -872,7 +872,7 @@ std::string handle_ansi(std::string s, Character *ch);
 char *handle_ansi_(char *s, Character *ch);
 void blackjack_prompt(Character *ch, std::string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
-void special_log(char *arg);
+void special_log(QString message);
 
 template <typename T>
 T number(T from, T to)

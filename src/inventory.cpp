@@ -1147,8 +1147,7 @@ int do_drop(Character *ch, char *argument, int cmd)
     ch->removeGold(amount);
     if (ch->getLevel() >= IMMORTAL)
     {
-      sprintf(buffer, "%s dropped %d coins.", GET_NAME(ch), amount);
-      special_log(buffer);
+      special_log(QString(QStringLiteral("%1 dropped %2 coins in room %3!")).arg(ch->getName()).arg(amount).arg(ch->in_room));
     }
 
     ch->save(666);
@@ -1677,8 +1676,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
     if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || ch->getLevel() > 50))
     {
-      sprintf(buf, "%s (mob) giving %ld gold to %s.", GET_NAME(ch), amount, GET_NAME(vict));
-      special_log(buf);
+      special_log(QString(QStringLiteral("%1 (mob) giving %2 gold to %3 in room %4.")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
     }
 
     if (ch->getGold() < 0)
@@ -1687,9 +1685,7 @@ int do_give(Character *ch, char *argument, int cmd)
       ch->sendln("Warning:  You are giving out more $B$5gold$R than you had.");
       if (ch->getLevel() < IMPLEMENTER)
       {
-        sprintf(buf, "%s gives %ld coins to %s (negative!)", GET_NAME(ch),
-                amount, GET_NAME(vict));
-        special_log(buf);
+        special_log(QString(QStringLiteral("%1 gives %2 coins to %3 (negative!) in room %4.")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
     }
     vict->addGold(amount);

@@ -5442,8 +5442,7 @@ void raw_kill(Character *ch, Character *victim)
   }
   if (ch && IS_NPC(victim) && IS_PC(ch) && ch->getLevel() >= IMMORTAL)
   {
-    sprintf(buf, "%s killed %s.", GET_NAME(ch), victim->getNameC());
-    special_log(buf);
+    special_log(QString(QStringLiteral("%1 killed %2 in room %3!")).arg(ch->getName()).arg(victim->getName()).arg(ch->in_room));
   }
 
   // register my death with this zone's counter

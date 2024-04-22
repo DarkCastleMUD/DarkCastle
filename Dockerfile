@@ -2,8 +2,8 @@
 FROM opensuse/tumbleweed
 
 #RUN zypper mr -a -e -f
-RUN zypper -n in fmt-devel libfmt9 gcc-c++ gcc13-c++ libpq5 zlib-devel cmake postgresql-devel \
-    qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild
+RUN zypper -n in fmt-devel libfmt9 gcc-c++ gcc14-c++ libpq5 zlib-devel cmake postgresql-devel \
+    qt6-sql-devel qt6-dbus-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git rpmbuild clang17
 RUN zypper -n dup --auto-agree-with-licenses
 
 RUN mkdir -p /srv/dcastle2/git
@@ -18,4 +18,4 @@ RUN zypper -n in --allow-unsigned-rpm build/dc*rpm
 WORKDIR /srv/dcastle2/git/DarkCastle/lib
 CMD ["/srv/dcastle2/git/DarkCastle/build/dcastle", "-P"]
 
-LABEL Name=darkcastle Version=0.0.3
+LABEL Name=darkcastle Version=0.0.4
