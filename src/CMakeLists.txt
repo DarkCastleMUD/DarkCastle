@@ -9,7 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
   tracy
   GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-  GIT_TAG master
+  GIT_TAG v0.10
   GIT_SHALLOW TRUE
   GIT_PROGRESS TRUE
 )
@@ -18,7 +18,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
 add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
 
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/")
-# -DTRACY_ENABLE -DTRACY_NO_EXIT
+# -DTRACY_ENABLE -DTRACY_ON_DEMAND -DTRACY_NO_EXIT
 # -p    prof
 # -pg   gprof
 # -fsanitize=address
