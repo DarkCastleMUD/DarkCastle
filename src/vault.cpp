@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <list>
 #include <fmt/format.h>
+#include <tracy/Tracy.hpp>
 
 #include "structs.h"
 #include "db.h"
@@ -1252,27 +1253,49 @@ QString clanVName(uint64_t clan_id)
   return QStringLiteral("Clan%1").arg(clan_id);
 }
 
-bool has_vault_access(QString who, struct vault_data *vault)
+bool has_vault_access(Character *ch, struct vault_data *vault)
 {
-  struct vault_access_data *access;
-  Character *ch;
+  if (ch == nullptr)
+  {
+    return false;
+  }
 
-  if ((ch = find_owner(who)) && ch->getLevel() >= 108)
+  if (ch->getLevel() >= 108)
+  {
     return true;
+  }
 
-  // its their vault
-  if (who == vault->owner)
+  if (ch->getName() == vault->owner)
+  {
     return true;
+  }
 
-  if (ch && ch->clan && get_clan(ch->clan) && vault->owner == clanVName(ch->clan).toStdString().c_str() && has_right(ch, CLAN_RIGHTS_VAULT))
+  if (ch->clan && get_clan(ch->clan) && vault->owner == clanVName(ch->clan) && has_right(ch, CLAN_RIGHTS_VAULT))
+  {
     return true;
+  }
 
   // its not their vault so check all the access lines
-  for (access = vault->access; access; access = access->next)
-    if (who == access->name)
+  for (struct vault_access_data *access = vault->access; access; access = access->next)
+  {
+    if (ch->getName() == access->name)
+    {
       return true;
+    }
+  }
 
   return false;
+}
+
+bool has_vault_access(QString who, struct vault_data *vault)
+{
+  Character *ch = find_owner(who);
+  if (ch == nullptr)
+  {
+    return false;
+  }
+
+  return has_vault_access(ch, vault);
 }
 
 struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num)
@@ -2606,7 +2629,7 @@ int vault_search(Character *ch, const char *args)
   // now that we know what we're looking for, let's search through all the vaults to find it
   for (vault_data *vault = vault_table; vault; vault = vault->next)
   {
-    if (vault && !vault->owner.isEmpty() && has_vault_access(GET_NAME(ch), vault))
+    if (vault && !vault->owner.isEmpty() && has_vault_access(ch, vault))
     {
       vaults_searched++;
       objects = 0;
