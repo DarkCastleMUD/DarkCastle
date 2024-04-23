@@ -1,3 +1,7 @@
+# Usually compiled with one of the following commands:
+# time (rm -rf build && cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" -GNinja && ninja -C build package)
+# or
+# cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" -GNinja && ninja -C build
 cmake_minimum_required(VERSION 3.14)
 #set these two options to ON when using tracy
 option(TRACY_ENABLE "" OFF)
