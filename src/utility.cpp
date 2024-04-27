@@ -1970,8 +1970,10 @@ QString get_skill_name(int skillnum)
     return skills[skillnum - SKILL_BASE];
   else if (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET + MAX_KI_LIST))
     return ki[skillnum - KI_OFFSET];
-  else if (skillnum >= 0 && skillnum <= MAX_SPL_LIST)
+  else if (skillnum >= 1 && skillnum <= MAX_SPL_LIST)
+  {
     return spells[skillnum - 1];
+  }
   else if (skillnum >= SKILL_INNATE_BASE && skillnum <= SKILL_INNATE_MAX)
     return innate_skills[skillnum - SKILL_INNATE_BASE];
   else if (skillnum >= BASE_SETS && skillnum <= SET_MAX)
