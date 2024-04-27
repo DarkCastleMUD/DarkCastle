@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <cctype>
 #include <sys/time.h>
+#include <tracy/Tracy.hpp>
 
 #include <sstream>
 #include <iostream>
@@ -907,6 +908,7 @@ void DC::game_loop(void)
   // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
+  FrameMark;
 }
 
 void DC::game_loop_init(void)
@@ -1057,6 +1059,11 @@ void game_test_init(void)
   d->character->do_on_login_stuff();
 
   STATE(d) = Connection::states::PLAYING;
+
+  for (uint32_t i = 0; i < UINT32_MAX; ++i)
+  {
+    QString aff_name = get_skill_name(i);
+  }
 
   update_max_who();
 
