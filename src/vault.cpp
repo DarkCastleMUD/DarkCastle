@@ -1851,7 +1851,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
 
   if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
   { // vault is full
-    ch->send(QStringLiteral("You can't seem to stuff %s in the vault.  Its too big!\r\n").arg(GET_OBJ_SHORT(obj)));
+    ch->send(QStringLiteral("You can't seem to stuff %1 in the vault.  Its too big!\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
   if (obj->obj_flags.timer > 0)
