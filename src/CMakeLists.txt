@@ -61,8 +61,8 @@ message("SHA1: ${VERSION_SHA1}")
 
 project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 configure_file(buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/buildinfo.h)
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent Test)
 
 find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
 set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++23" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
@@ -267,3 +267,10 @@ qt_generate_deploy_app_script(
 
 install(SCRIPT ${deploy_script})
 include(CPack)
+
+enable_testing(true)
+qt_add_executable(testDC tests/test_utility.cpp)
+add_test(NAME testDC COMMAND testDC)
+target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(testDC PRIVATE Qt::Test)

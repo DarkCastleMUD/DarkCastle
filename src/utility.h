@@ -413,7 +413,25 @@ enum MatchType
 char *str_hsh(const char *);
 bool ishashed(char *);
 void double_dollars(char *destination, char *source);
-std::string double_dollars(std::string source);
+template <typename T>
+T double_dollars(T source)
+{
+   T destination{};
+
+   for (const auto &c : source)
+   {
+      if (c == '$')
+      {
+         destination += "$$";
+      }
+      else
+      {
+         destination += c;
+      }
+   }
+
+   return destination;
+}
 
 void clan_death(char *b, Character *ch);
 

@@ -1983,26 +1983,6 @@ QString get_skill_name(int skillnum)
   return {};
 }
 
-std::string double_dollars(std::string source)
-{
-  std::string destination = {};
-
-  for (const auto &ch : source)
-  {
-    if (ch == '$')
-    {
-      destination += "$$";
-    }
-    else
-    {
-      destination += ch;
-    }
-  }
-
-  // std::cerr << source << " becomes " << destination << std::endl;
-  return destination;
-}
-
 void double_dollars(char *destination, char *source)
 {
   while (*source != '\0')
