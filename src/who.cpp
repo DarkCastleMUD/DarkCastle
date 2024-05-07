@@ -48,16 +48,8 @@ void add_to_who(char *strAdd)
   if ((strLength + gWhoBufferCurSize) >= gWhoBufferMaxSize)
   {                                         // expand the buffer
     gWhoBufferMaxSize += (strLength + 500); // expand by the size + 500
-#ifdef LEAK_CHECK
-    gWhoBuffer = (char *)realloc(gWhoBuffer, gWhoBufferMaxSize);
-    if (!gWhoBuffer)
-    {
-      fprintf(stderr, "Unable to realloc in who.C add_to_who");
-      abort();
-    }
-#else
+
     gWhoBuffer = (char *)dc_realloc(gWhoBuffer, gWhoBufferMaxSize);
-#endif
   }
 
   // guaranteed to work, since we just allocated enough for it + 500
