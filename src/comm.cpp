@@ -110,7 +110,6 @@ int buf_largecount = 0;        /* # of large buffers which exist */
 int buf_overflows = 0;         /* # of overflows of output */
 int buf_switches = 0;          /* # of switches from small to large buf */
 int _shutdown = 0;             /* clean shutdown */
-int tics = 0;                  /* for extern checkpointing */
 // int nameserver_is_slow = 0;	/* see config.c */
 // extern int auto_save;		/* see config.c */
 // extern int autosave_time;	/* see config.c */
@@ -2900,21 +2899,6 @@ void check_idle_passwords(void)
       STATE(d) = Connection::states::CLOSE;
     }
   }
-}
-
-/* ******************************************************************
- *  signal-handling functions (formerly signals.c)                   *
- ****************************************************************** */
-
-void checkpointing(int sig)
-{
-  if (!tics)
-  {
-    logentry(QStringLiteral("SYSERR: CHECKPOINT shutdown: tics not updated"), ANGEL, LogChannels::LOG_BUG);
-    abort();
-  }
-  else
-    tics = 0;
 }
 
 void report_debug_logging()
