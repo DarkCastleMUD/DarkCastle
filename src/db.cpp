@@ -609,7 +609,7 @@ void DC::boot_db(void)
 	// DC::config &cf = DC::getInstance()->cf;
 	if (cf.verbose_mode)
 	{
-		fprintf(stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n");
+		qInfo("\n[ Room  Room]\t{Level}\t  Author\tZone\n");
 	}
 
 	// auto &zones = DC::getInstance()->zones;
@@ -617,15 +617,10 @@ void DC::boot_db(void)
 	{
 		if (cf.verbose_mode)
 		{
-			// std::cerr << QStringLiteral("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << std::endl;
+			qInfo(qUtf8Printable(QStringLiteral("[%1 %2]\t%3.").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.Name())));
 		}
 
 		zone.reset(Zone::ResetType::full);
-	}
-
-	if (cf.verbose_mode)
-	{
-		fprintf(stderr, "\n");
 	}
 
 	logentry(QStringLiteral("Loading banned list"), 0, LogChannels::LOG_MISC);
@@ -1350,9 +1345,7 @@ index_data *generate_obj_indices(int *top,
 			}
 			else
 			{
-				fprintf(stderr, "Error in \'%s\'.\r\n", endfile);
-				perror("generate obj indices");
-				abort();
+				qFatal("Error in \'%s\'.\r\n", endfile);
 			}
 		} // for ;;
 
@@ -2172,7 +2165,7 @@ void renum_zone_table(void)
 			case 'M':
 				/*if(real_room(zone.cmd[comm]->arg3) < 0) {
 
-				 fprintf(stderr, "Problem in zonefile: no room number %d for mob "
+				 qWarning("Problem in zonefile: no room number %d for mob "
 				 "%d - setting to J command\n", zone.cmd[comm]->arg3,
 				 zone.cmd[comm]->arg1);
 				 zone.cmd[comm]->command = 'J';
@@ -2234,8 +2227,8 @@ void renum_zone_table(void)
 						real_room(zone.cmd[comm]->arg1);
 					if (zone.cmd[comm]->arg1 == -1)
 					{
-						fprintf(stderr, "Problem in zonefile: no room number for door"
-										" - setting to J command\n");
+						qWarning("Problem in zonefile: no room number for door"
+								 " - setting to J command\n");
 						zone.cmd[comm]->command = 'J';
 					}
 				}
@@ -4532,7 +4525,7 @@ class Object *clone_object(int nr)
 	}
 	else
 	{
-		fprintf(stderr, "clone_object(%d): Obj not found in DC::getInstance()->obj_index.\n", nr);
+		qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
 		dc_free(obj);
 		return nullptr;
 	}

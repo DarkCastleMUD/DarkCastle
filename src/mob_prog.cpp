@@ -3154,21 +3154,21 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 #ifdef DEBUG_MPROG
 				if (mob && mob->mobdata != (Mobile *)0x95959595 && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
 				{
-					fprintf(stderr, "debug: ");
+					qDebug("debug: ");
 					if (cmnd)
-						fprintf(stderr, "cmd: %s ", cmnd);
+						qDebug(qUtf8Printable(QStringLiteral("cmd: %1 ").arg(cmnd));
 					else
-						fprintf(stderr, "cmd: (null) ");
+						qDebug("cmd: (null) ");
 
 					if (mob && mob->name)
-						fprintf(stderr, "mob: %s ", mob->name);
+						qDebug(qUtf8Printable(QStringLiteral("mob: %1 ").arg(mob->name)));
 					else
-						fprintf(stderr, "mob: (null) ");
+						qDebug("mob: (null) ");
 
 					if (actor && actor->name)
-						fprintf(stderr, "actor: %s = ", actor->name);
+						qDebug(qUtf8Printable(QStringLiteral("actor: %1 = ").arg(actor->name)));
 					else
-						fprintf(stderr, "actor: (null) = ");
+						qDebug("actor: (null) = ");
 				}
 #endif
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
@@ -3177,23 +3177,23 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				if (mob && mob->mobdata != (Mobile *)0x95959595 && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
 				{
 					if (isSet(mprog_cur_result, eFAILURE))
-						fprintf(stderr, "eFAILURE ");
+						qDebug("eFAILURE ");
 					if (isSet(mprog_cur_result, eSUCCESS))
-						fprintf(stderr, "eSUCCESS ");
+						qDebug("eSUCCESS ");
 					if (isSet(mprog_cur_result, eCH_DIED))
-						fprintf(stderr, "eCH_DIED ");
+						qDebug("eCH_DIED ");
 					if (isSet(mprog_cur_result, eVICT_DIED))
-						fprintf(stderr, "eVICT_DIED ");
+						qDebug("eVICT_DIED ");
 					if (isSet(mprog_cur_result, eINTERNAL_ERROR))
-						fprintf(stderr, "eINTERNAL_ERROR ");
+						qDebug("eINTERNAL_ERROR ");
 					if (isSet(mprog_cur_result, eEXTRA_VALUE))
-						fprintf(stderr, "eEXTRA_VALUE ");
+						qDebug("eEXTRA_VALUE ");
 					if (isSet(mprog_cur_result, eEXTRA_VAL2))
-						fprintf(stderr, "eEXTRA_VAL2 ");
+						qDebug("eEXTRA_VAL2 ");
 					if (isSet(mprog_cur_result, eDELAYED_EXEC))
-						fprintf(stderr, "eDELAYED_EXEC ");
+						qDebug("eDELAYED_EXEC ");
 
-					fprintf(stderr, "\n");
+					qDebug("\n");
 				}
 #endif
 				if (isSet(mprog_cur_result, eCH_DIED) ||

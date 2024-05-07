@@ -161,8 +161,7 @@ char *str_dup(const char *str)
 
   if (!str_new)
   {
-    fprintf(stderr, "NO MEMORY DUPLICATING STRING!");
-    abort();
+    qFatal("NO MEMORY DUPLICATING STRING!");
   }
   strcpy(str_new, str);
   return str_new;
@@ -357,8 +356,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << BUG_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open bug log.\n");
-      exit(1);
+      qFatal("Unable to open bug log.\n");
     }
 
     // TODO - need some sort of thing to automatically have bugs switch from file to
@@ -374,8 +372,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << GOD_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open god log.\n");
-      exit(1);
+      qFatal("Unable to open god log.\n");
     }
     break;
   case LogChannels::LOG_MORTAL:
@@ -383,8 +380,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << MORTAL_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open mortal log.\n");
-      exit(1);
+      qFatal("Unable to open mortal log.\n");
     }
     break;
   case LogChannels::LOG_SOCKET:
@@ -392,8 +388,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << SOCKET_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open socket log: %s\n", logpath.str().c_str());
-      exit(1);
+      qFatal(qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
     }
     break;
   case LogChannels::LOG_PLAYER:
@@ -403,7 +398,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
       logpath << PLAYER_DIR << vict->getName().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
-        fprintf(stderr, "Unable to open player log '%s'.\n", logpath.str().c_str());
+        qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
       }
     }
     else
@@ -411,7 +406,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
       logpath << PLAYER_LOG;
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
-        fprintf(stderr, "Unable to open player log.\n");
+        qCritical("Unable to open player log.\n");
       }
     }
     break;
@@ -420,8 +415,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << WORLD_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open world log.\n");
-      exit(1);
+      qFatal("Unable to open world log.\n");
     }
     break;
   case LogChannels::LOG_ARENA:
@@ -429,8 +423,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << ARENA_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open arena log.\n");
-      exit(1);
+      qFatal("Unable to open arena log.\n");
     }
     break;
   case LogChannels::LOG_CLAN:
@@ -438,8 +431,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << CLAN_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open clan log.\n");
-      exit(1);
+      qFatal("Unable to open clan log.\n");
     }
     break;
   case LogChannels::LOG_OBJECTS:
@@ -447,8 +439,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << OBJECTS_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open objects log.\n");
-      exit(1);
+      qFatal("Unable to open objects log.\n");
     }
     break;
   case LogChannels::LOG_QUEST:
@@ -456,8 +447,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << QUEST_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      fprintf(stderr, "Unable to open quest log.\n");
-      exit(1);
+      qFatal("Unable to open quest log.\n");
     }
     break;
   }

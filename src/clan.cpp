@@ -78,7 +78,7 @@ void boot_clans(void)
 
   if (!(fl = fopen("../lib/clan.txt", "r")))
   {
-    fprintf(stderr, "Unable to open clan file...\n");
+    qCritical("Unable to open clan file...\n");
     fl = fopen("../lib/clan.txt", "w");
     fprintf(fl, "~\n");
     fclose(fl);
@@ -171,19 +171,14 @@ void boot_clans(void)
         }
         catch (error_negative_int &e)
         {
-          fprintf(stderr, "negative clan balance read for clan %d.\n",
-                  new_new_clan->number);
-          fprintf(stderr, "Setting clan %d's balance to 0.\n",
-                  new_new_clan->number);
+          qCritical(qUtf8Printable(QStringLiteral("negative clan balance read for clan %1.\n").arg(new_new_clan->number)));
+          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         catch (...)
         {
-          fprintf(stderr,
-                  "unknown error reading clan balance for clan %d.\n",
-                  new_new_clan->number);
-          fprintf(stderr, "Setting clan %d's balance to 0.\n",
-                  new_new_clan->number);
+          qCritical(qUtf8Printable(QStringLiteral("unknown error reading clan balance for clan %1.\n").arg(new_new_clan->number)));
+          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         break;
@@ -264,8 +259,7 @@ void save_clans(void)
 
   if (!(fl = fopen("../lib/clan.txt", "w")))
   {
-    fprintf(stderr, "Unable to open clan.txt for writing.\n");
-    abort();
+    qFatal("Unable to open clan.txt for writing.\n");
   }
 
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)

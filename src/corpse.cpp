@@ -613,9 +613,8 @@ char *fread_string_new(FILE *fl, char *error)
 	{
 		if (!fgets(tmp, 512, fl))
 		{
-			fprintf(stderr, "SYSERR: fread_string_new: format error at or near %s\n",
-					error);
-			exit(1);
+			qFatal("SYSERR: fread_string_new: format error at or near %s\n",
+				   error);
 		}
 		/* If there is a '~', end the std::string; else put an "\r\n" over the '\n'. */
 		if ((point = strchr(tmp, '~')) != nullptr)

@@ -149,21 +149,21 @@ DC::config parse_arguments(int argc, char **argv)
     default:
     case 'h':
     case '?':
-      fprintf(stderr, "Usage: %s [-t] [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P] [-i playername]\n"
-                      "-t\t\tTesting mode\n"
-                      "-v\t\tVerbose mode\n"
-                      "-h\t\tUsage information\n"
-                      "-w\t\tWorld testing mode\n"
-                      "-c\t\tObj testing mode\n"
-                      "-m\t\tObj & Mob testing mode\n"
-                      "-n\t\tinhibits printing timestamps on STDOUT/STDERR\n"
-                      "-b\t\tBuilders' port (7000-7003)\n"
-                      "-d directory\tData directory\n"
-                      "-p [port#]\tCan be repeated to listen on multiple ports\n"
-                      "-P\t\tAllow imps to use their password\n"
-                      "-s\t\tSyntax checking mode\n"
-                      "-i playername\tset playername as level 110\n",
-              argv[0]);
+      qInfo("Usage: %s [-t] [-v] [-h] [-w] [-c] [-m] [-d directory] [-p port#] [-P] [-i playername]\n"
+            "-t\t\tTesting mode\n"
+            "-v\t\tVerbose mode\n"
+            "-h\t\tUsage information\n"
+            "-w\t\tWorld testing mode\n"
+            "-c\t\tObj testing mode\n"
+            "-m\t\tObj & Mob testing mode\n"
+            "-n\t\tinhibits printing timestamps on STDOUT/STDERR\n"
+            "-b\t\tBuilders' port (7000-7003)\n"
+            "-d directory\tData directory\n"
+            "-p [port#]\tCan be repeated to listen on multiple ports\n"
+            "-P\t\tAllow imps to use their password\n"
+            "-s\t\tSyntax checking mode\n"
+            "-i playername\tset playername as level 110\n",
+            argv[0]);
 
       exit(EXIT_FAILURE);
       break;
