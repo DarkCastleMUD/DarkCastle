@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 #set these two options to ON when using tracy
 option(TRACY_ENABLE "" OFF)
-option(TRACY_NO_EXIT "" OFF)
+#option(TRACY_NO_EXIT "" ON)
 #option(TRACY_ON_DEMAND "" ON)
 #option(TRACY_ONLY_LOCALHOST "" ON)
 #option(TRACY_ONLY_IPV4 "" ON)
@@ -22,12 +22,47 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
 add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
 
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/")
+#set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/ -DTRACY_ENABLE -DTRACY_ON_DEMAND")
 # -DTRACY_ENABLE -DTRACY_ON_DEMAND -DTRACY_NO_EXIT
 # -p    prof
 # -pg   gprof
 # -fsanitize=address
 # -Og
 # -Wdangling-gsl for clang
+
+# https://stackoverflow.com/a/64294837
+
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+if(isMultiConfig)
+    if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES SanitizeAddress)
+    endif()
+else()
+    set(allowedBuildTypes Asan Debug Release RelWithDebInfo MinSizeRel)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowedBuildTypes}")
+
+    if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST allowedBuildTypes)
+        message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}")
+    endif()
+endif()
+
+set(CMAKE_C_FLAGS_ASAN
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
+    "Flags used by the C compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_CXX_FLAGS_ASAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
+    "Flags used by the C++ compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_ASAN
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
+    "Linker flags to be used to create executables for Asan build type." FORCE)
+
+set(CMAKE_SHARED_LINKER_FLAGS_ASAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
+    "Linker lags to be used to create shared libraries for Asan build type." FORCE)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
