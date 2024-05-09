@@ -2067,9 +2067,10 @@ void opstat(Character *ch, int vnum)
 		ch->send("$R ");
 		sprintf(buf, "$B$5%s$R\n\r", mprg->arglist);
 		ch->send(buf);
-		sprintf(buf, "%s\n\r", mprg->comlist);
-		double_dollars(buf2, buf);
-		send_to_char(buf2, ch);
+		if (mprg->comlist != nullptr)
+		{
+			ch->sendln(double_dollars(QString(mprg->comlist)));
+		}
 	}
 }
 

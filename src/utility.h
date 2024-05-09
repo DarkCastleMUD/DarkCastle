@@ -412,7 +412,6 @@ enum MatchType
 
 char *str_hsh(const char *);
 bool ishashed(char *);
-void double_dollars(char *destination, char *source);
 template <typename T>
 T double_dollars(T source)
 {

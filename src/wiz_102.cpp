@@ -3008,8 +3008,10 @@ int do_procedit(Character *ch, char *argument, int cmd)
       if (currprog->comlist)
       {
         ch->desc->backstr = str_dup(currprog->comlist);
-        double_dollars(buf3, ch->desc->backstr);
-        send_to_char(buf3, ch);
+        if (ch->desc->backstr != nullptr)
+        {
+          ch->send(double_dollars(QString(ch->desc->backstr)));
+        }
       }
     }
   }

@@ -1973,21 +1973,6 @@ QString get_skill_name(int skillnum)
   return {};
 }
 
-void double_dollars(char *destination, char *source)
-{
-  while (*source != '\0')
-    if (*source == '$')
-    {
-      *destination++ = '$';
-      *destination++ = '$';
-      source++;
-    }
-    else
-      *destination++ = *source++;
-
-  *destination = '\0';
-}
-
 // convert char std::string to int
 // return true if successful, false if error
 bool check_valid_and_convert(int &value, char *buf)
