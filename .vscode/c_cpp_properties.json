@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/qt6/**"
+                "/usr/include/qt6/**",
+                "${workspaceFolder}/build/testDC_autogen/include"
             ],
             "compilerPath": "/usr/bin/clang++-17",
             "compilerArgs": [
