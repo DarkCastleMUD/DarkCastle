@@ -84,7 +84,7 @@ struct timer_data *timer_list = nullptr;
 // local funcs
 void update_wizlist(Character *ch);
 
-// test_nocolor_strlen_qstring
+// tested in UtilityTest::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
 {
   size_t len{};
@@ -133,7 +133,7 @@ std::size_t nocolor_strlen(const QStringView str)
   return len;
 }
 
-// test_nocolor_strlen_c
+// tested in UtilityTest::test_nocolor_strlen_c
 size_t nocolor_strlen(const char *s)
 {
   if (!s)
@@ -183,7 +183,7 @@ size_t nocolor_strlen(const char *s)
 }
 
 // This function is like str_dup except it returns 0 if passed 0
-// test_str_dup0
+// tested in UtilityTest::test_str_dup0
 char *str_dup0(const char *str)
 {
   if (str == 0)
@@ -214,6 +214,7 @@ char *str_dup(const char *str)
 // basically we assign the total to the number of dice (since you always
 // roll at least a one with each die) then add a random MOD of the die
 // size.  ie, 4d10 would be 4 + loop*4 (0-9)
+// tested in UtilityTest::test_dice
 int dice(int num, int size, QRandomGenerator *rng)
 {
   int r;
@@ -229,6 +230,7 @@ int dice(int num, int size, QRandomGenerator *rng)
 }
 
 // compare strings but ignore case (unlike strcmp)
+// tested in UtilityTest::test_str_cmp
 int str_cmp(const char *arg1, const char *arg2)
 {
   int check, i;
@@ -253,17 +255,6 @@ int str_cmp(const char *arg1, const char *arg2)
   return 0;
 }
 
-std::string space_to_underscore(std::string str)
-{
-  for_each(str.begin(), str.end(), [](auto c)
-           {
-    if (c == ' ')
-    {
-      c = '_';
-    } });
-
-  return str;
-}
 
 char *str_nospace(const char *stri)
 {

@@ -432,6 +432,21 @@ T double_dollars(T source)
    return destination;
 }
 
+// Tested in UtilityTest::test_space_to_underscore
+template <typename T>
+T space_to_underscore(T str)
+{
+   for (auto &c : str)
+   {
+      if (c == ' ')
+      {
+         c = '_';
+      }
+   }
+
+   return str;
+}
+
 void clan_death(char *b, Character *ch);
 
 int move_char(Character *ch, int dest, bool stop_all_fighting = true);

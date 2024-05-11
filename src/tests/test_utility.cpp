@@ -95,6 +95,20 @@ private slots:
         QCOMPARE(dice(1, 0, &rng), 1);
         QCOMPARE(dice(0, 1, &rng), 0);
     }
+
+    void test_str_cmp()
+    {
+        QVERIFY(str_cmp("ABC123", "abc123") == 0);
+        QVERIFY(str_cmp("abc123", "abc123") == 0);
+        QVERIFY(str_cmp("ABC123", "ABC123") == 0);
+        QVERIFY(str_cmp("XYZ987", "ABC123") != 0);
+    }
+
+    void test_space_to_underscore()
+    {
+        QCOMPARE(space_to_underscore(QStringLiteral("  this is a test  ")), "__this_is_a_test__");
+        QCOMPARE(space_to_underscore(std::string("  this is a test  ")), "__this_is_a_test__");
+    }
 };
 
 QTEST_MAIN(UtilityTest)
