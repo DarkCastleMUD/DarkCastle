@@ -65,6 +65,16 @@ private slots:
             std::unique_ptr<char, decltype(std::free) *> result = {str_dup(STRING_LITERAL1), std::free};
         }
     }
+
+    void benchmark_str_cmp()
+    {
+        int result{};
+        QBENCHMARK
+        {
+            result = str_cmp("ABC123", "abc123");
+        }
+        Q_UNUSED(result);
+    }
 };
 
 QTEST_MAIN(UtilityBenchmark)
