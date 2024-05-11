@@ -7,7 +7,7 @@ using namespace std::literals;
 
 #define STRING_LITERAL1 "$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"
 
-class UtilityBenchmark : public QObject
+class BenchmarkUtility : public QObject
 {
     Q_OBJECT
 
@@ -77,5 +77,5 @@ private slots:
     }
 };
 
-QTEST_MAIN(UtilityBenchmark)
+QTEST_MAIN(BenchmarkUtility)
 #include "benchmark_utility.moc"
