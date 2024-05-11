@@ -309,3 +309,8 @@ add_test(NAME testDC COMMAND testDC)
 target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(testDC PRIVATE Qt::Test)
+
+qt_add_executable(benchmarkDC benchmarks/benchmark_utility.cpp)
+target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(benchmarkDC PRIVATE Qt::Test)

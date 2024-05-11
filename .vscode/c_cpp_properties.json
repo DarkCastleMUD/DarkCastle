@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/include/qt6/**",
-                "${workspaceFolder}/build/testDC_autogen/include"
+                "${workspaceFolder}/build/testDC_autogen/include",
+                "${workspaceFolder}/build/benchmarkDC_autogen/include"
             ],
             "compilerPath": "/usr/bin/clang++-17",
             "compilerArgs": [
