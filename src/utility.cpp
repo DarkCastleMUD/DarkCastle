@@ -84,11 +84,56 @@ struct timer_data *timer_list = nullptr;
 // local funcs
 void update_wizlist(Character *ch);
 
-std::size_t nocolor_strlen(QString str)
+// test_nocolor_strlen_qstring
+std::size_t nocolor_strlen(const QStringView str)
 {
-  return nocolor_strlen(str.toStdString().c_str());
+  size_t len{};
+  bool decode_color{};
+
+  for (const auto &s : str)
+  {
+    if (s == '$')
+    {
+      decode_color = true;
+      continue;
+    }
+
+    if (Q_UNLIKELY(decode_color))
+    {
+      decode_color = false;
+
+      // Recognized color code so does not add to length
+      if ((s <= '9' && s >= '0') || s == 'I' || s == 'L' || s == '*' || s == 'R' || s == 'B')
+      {
+        continue;
+      }
+      // $$ translates to $ so it adds 1 to length
+      else if (s == '$')
+      {
+        len++;
+      }
+      // Unrecognized color code adds 2 to length because it doesn't translate into anything
+      else
+      {
+        len += 2;
+      }
+    }
+    else
+    {
+      len++;
+    }
+  }
+
+  // Last character of string was a $ so it adds 1 to length because it doesn't translate into anything
+  if (decode_color)
+  {
+    len++;
+  }
+
+  return len;
 }
 
+// test_nocolor_strlen_c
 size_t nocolor_strlen(const char *s)
 {
   if (!s)
@@ -138,6 +183,7 @@ size_t nocolor_strlen(const char *s)
 }
 
 // This function is like str_dup except it returns 0 if passed 0
+// test_str_dup0
 char *str_dup0(const char *str)
 {
   if (str == 0)
@@ -148,7 +194,8 @@ char *str_dup0(const char *str)
   return str_dup(str);
 }
 
-// duplicate a std::string with it's own memory
+// duplicate a string with it's own memory
+// test_str_dup
 char *str_dup(const char *str)
 {
   char *str_new = 0;
@@ -166,23 +213,6 @@ char *str_dup(const char *str)
   strcpy(str_new, str);
   return str_new;
 }
-
-#ifdef WIN32
-char *index(char *buf, char op)
-{
-  int i = 0;
-
-  while (buf[i] != 0)
-  {
-    if (buf[i] == op)
-    {
-      return (buf + i);
-    }
-    i++;
-  }
-  return (nullptr);
-}
-#endif
 
 // generate a (relatively) random number.
 int number_old(int from, int to)

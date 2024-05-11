@@ -707,7 +707,7 @@ bool is_in_game(Character *ch);
 int get_stat(Character *ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
-size_t nocolor_strlen(QString str);
+size_t nocolor_strlen(const QStringView str);
 void make_prompt(class Connection *d, std::string &prompt);
 
 qsizetype find(QString haystack, auto needle, qsizetype pos)
