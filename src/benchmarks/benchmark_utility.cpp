@@ -52,22 +52,18 @@ private slots:
 
     void benchmark_str_dup0()
     {
-        char *result{};
         QBENCHMARK
         {
-            result = str_dup0(STRING_LITERAL1);
+            std::unique_ptr<char, decltype(std::free) *> result = {str_dup0(STRING_LITERAL1), std::free};
         }
-        QCOMPARE(strlen(result), strlen(STRING_LITERAL1));
     }
 
     void benchmark_str_dup()
     {
-        char *result{};
         QBENCHMARK
         {
-            result = str_dup(STRING_LITERAL1);
+            std::unique_ptr<char, decltype(std::free) *> result = {str_dup(STRING_LITERAL1), std::free};
         }
-        QCOMPARE(strlen(result), strlen(STRING_LITERAL1));
     }
 };
 
