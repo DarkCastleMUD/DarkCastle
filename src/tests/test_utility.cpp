@@ -11,7 +11,7 @@ using namespace std::literals;
 #define STRING_LITERAL4 "$"
 #define STRING_LITERAL5 "test"
 #define STRING_LITERAL6 "$z$>$;"
-class UtilityTest : public QObject
+class TestUtility : public QObject
 {
     Q_OBJECT
 
@@ -111,5 +111,5 @@ private slots:
     }
 };
 
-QTEST_MAIN(UtilityTest)
+QTEST_MAIN(TestUtility)
 #include "test_utility.moc"

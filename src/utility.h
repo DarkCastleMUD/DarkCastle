@@ -432,7 +432,7 @@ T double_dollars(T source)
    return destination;
 }
 
-// Tested in UtilityTest::test_space_to_underscore
+// Tested in TestUtility::test_space_to_underscore
 template <typename T>
 T space_to_underscore(T str)
 {
