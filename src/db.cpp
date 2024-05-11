@@ -176,7 +176,6 @@ extern bool MOBtrigger;
 /* external refs */
 
 void load_messages(char *file, int base = 0);
-int dice(int number, int size);
 void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);

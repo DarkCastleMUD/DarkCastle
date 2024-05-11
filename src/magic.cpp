@@ -61,7 +61,6 @@
 int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
 clan_data *get_clan(Character *);
 
-int dice(int number, int size);
 void update_pos(Character *victim);
 bool many_charms(Character *ch);
 bool ARE_GROUPED(Character *sub, Character *obj);
