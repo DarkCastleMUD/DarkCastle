@@ -199,35 +199,22 @@ char *str_dup0(const char *str)
 char *str_dup(const char *str)
 {
   char *str_new = 0;
+  size_t strlength = strlen(str);
 
-#ifdef LEAK_CHECK
-  str_new = (char *)calloc(strlen(str) + 1, sizeof(char));
-#else
-  str_new = (char *)dc_alloc(strlen(str) + 1, sizeof(char));
-#endif
+  str_new = (char *)dc_alloc(strlength + 1, sizeof(char));
 
   if (!str_new)
   {
     qFatal("NO MEMORY DUPLICATING STRING!");
   }
-  strcpy(str_new, str);
-  return str_new;
-}
-
-// generate a (relatively) random number.
-int number_old(int from, int to)
-{
-  if (from >= to)
-    return from;
-
-  return (from + (random() % (to - from + 1)));
+  return strncpy(str_new, str, strlength);
 }
 
 // simulates a dice roll
 // basically we assign the total to the number of dice (since you always
 // roll at least a one with each die) then add a random MOD of the die
 // size.  ie, 4d10 would be 4 + loop*4 (0-9)
-int dice(int num, int size)
+int dice(int num, int size, QRandomGenerator *rng)
 {
   int r;
   int sum = 0;
@@ -236,7 +223,7 @@ int dice(int num, int size)
     return 1;
 
   for (r = 1; r <= num; r++)
-    sum += number(1, size);
+    sum += number(1, size, rng);
 
   return sum;
 }

@@ -437,7 +437,7 @@ void clan_death(char *b, Character *ch);
 int move_char(Character *ch, int dest, bool stop_all_fighting = true);
 // int number(int from, int to);
 
-int dice(int number, int size);
+int dice(int number, int size, QRandomGenerator *rng = QRandomGenerator::global());
 int str_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(QString arg1, QString arg2);
@@ -892,7 +892,7 @@ void show_string(class Connection *d, const char *input);
 void special_log(QString message);
 
 template <typename T>
-T number(T from, T to)
+T number(T from, T to, QRandomGenerator *rng = QRandomGenerator::global())
 {
    if (from == to)
    {
@@ -909,11 +909,11 @@ T number(T from, T to)
 
    if (std::is_unsigned<T>::value)
    {
-      return QRandomGenerator::global()->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
+      return rng->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
    }
    else if (std::is_signed<T>::value)
    {
-      return QRandomGenerator::global()->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
+      return rng->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
    }
 }
 
