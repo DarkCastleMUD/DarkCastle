@@ -70,15 +70,30 @@ private slots:
 
     void test_str_dup0()
     {
-        QCOMPARE(strlen(str_dup0(STRING_LITERAL1)), strlen(STRING_LITERAL1));
+        std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup0(STRING_LITERAL1), std::free};
+        QVERIFY(new_string.get() != nullptr);
+        QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
+
         QCOMPARE(str_dup0(nullptr), nullptr);
     }
 
     void test_str_dup()
     {
-        QCOMPARE(strlen(str_dup(STRING_LITERAL1)), strlen(STRING_LITERAL1));
+        std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup(STRING_LITERAL1), std::free};
+        QVERIFY(new_string.get() != nullptr);
+        QCOMPARE(strlen(new_string.get()), strlen(STRING_LITERAL1));
         // causes expected crash
         // QCOMPARE(str_dup(nullptr), nullptr);
+    }
+
+    void test_dice()
+    {
+        QRandomGenerator rng(0);
+        QCOMPARE(dice(4, 10, &rng), 11);
+        QCOMPARE(dice(10, 4, &rng), 28);
+        QCOMPARE(dice(0, 0, &rng), 1);
+        QCOMPARE(dice(1, 0, &rng), 1);
+        QCOMPARE(dice(0, 1, &rng), 0);
     }
 };
 
