@@ -195,7 +195,7 @@ char *str_dup0(const char *str)
 }
 
 // duplicate a string with it's own memory
-// test_str_dup
+// tested in TestUtility::test_str_dup
 char *str_dup(const char *str)
 {
   char *str_new = 0;
@@ -240,7 +240,7 @@ int str_cmp(const char *arg1, const char *arg2)
   if (!arg1 || !arg2)
   {
     logentry(QStringLiteral("nullptr args sent to str_cmp in utility.c!"), ANGEL, LogChannels::LOG_BUG);
-    return 0;
+    return -1;
   }
 
   for (i = 0; arg1[i] || arg2[i]; i++)
@@ -255,6 +255,7 @@ int str_cmp(const char *arg1, const char *arg2)
   return 0;
 }
 
+// Tested in TestUtility::test_str_nospace
 char *str_nospace(const char *stri)
 {
   if (!stri)
@@ -273,6 +274,7 @@ char *str_nospace(const char *stri)
 }
 
 // compare strings but ignore case and change all spaces to underscores
+// Tested in TestUtility::test_str_nosp_cmp_c_string
 int str_nosp_cmp(const char *arg1, const char *arg2)
 {
   char *tmp_arg1 = str_nospace(arg1);
@@ -284,11 +286,13 @@ int str_nosp_cmp(const char *arg1, const char *arg2)
   return retval;
 }
 
+// Tested in TestUtility::test_str_nosp_cmp_qtring
 int str_nosp_cmp(QString arg1, QString arg2)
 {
   return str_nosp_cmp(arg1.toStdString().c_str(), arg2.toStdString().c_str());
 }
 
+// Tested in TestUtility::test_str_n_nosp_cmp_c_string
 int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
 {
   char *tmp_arg1 = str_nospace(arg1);
