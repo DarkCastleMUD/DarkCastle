@@ -20,8 +20,7 @@ class BenchmarkUtility : public QObject
 
 private slots:
 
-    void
-    benchmark_nocolor_strlen_data()
+    void benchmark_nocolor_strlen_data()
     {
         QTest::addColumn<VariableType>("type");
         QTest::newRow("C style string") << VariableType::C_STRING;
@@ -74,6 +73,44 @@ private slots:
             result = str_cmp("ABC123", "abc123");
         }
         Q_UNUSED(result);
+    }
+
+    void benchmark_space_to_underscore_data()
+    {
+        QTest::addColumn<VariableType>("type");
+        QTest::newRow("std::string") << VariableType::STD_STRING;
+        QTest::newRow("QString") << VariableType::QSTRING;
+    }
+
+    void benchmark_space_to_underscore()
+    {
+        QFETCH(VariableType, type);
+        if (type == VariableType::STD_STRING)
+        {
+            std::string result;
+            QBENCHMARK
+            {
+                result = space_to_underscore(std::string("  this is a test  "));
+            }
+            Q_UNUSED(result);
+        }
+        else if (type == VariableType::QSTRING)
+        {
+            QString result;
+            QBENCHMARK
+            {
+                result = space_to_underscore(QStringLiteral("  this is a test  "));
+            }
+            Q_UNUSED(result);
+        }
+    }
+
+    void benchmark_str_nospace()
+    {
+        QBENCHMARK
+        {
+            std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
+        }
     }
 };
 
