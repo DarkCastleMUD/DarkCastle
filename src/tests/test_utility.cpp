@@ -109,6 +109,35 @@ private slots:
         QCOMPARE(space_to_underscore(QStringLiteral("  this is a test  ")), "__this_is_a_test__");
         QCOMPARE(space_to_underscore(std::string("  this is a test  ")), "__this_is_a_test__");
     }
+
+    void test_str_nospace()
+    {
+        std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
+        QVERIFY(result.get());
+        QCOMPARE(result.get(), "__this_is_a_test__");
+    }
+
+    void test_str_nosp_cmp_c_string()
+    {
+        QCOMPARE(str_nosp_cmp("  this is a test  ", "__this_is_a_test__"), 0);
+    }
+
+    void test_str_nosp_cmp_qstring()
+    {
+        QCOMPARE(str_nosp_cmp(QStringLiteral("  this is a test  "), QStringLiteral("__this_is_a_test__")), 0);
+    }
+
+    void test_str_n_nosp_cmp_c_string()
+    {
+        QCOMPARE(str_n_nosp_cmp("  this is a test  ABC", "__THIS_IS_A_test__XYZ", 18), 0);
+    }
+
+    void test_str_n_nosp_cmp_begin()
+    {
+        QCOMPARE(str_n_nosp_cmp_begin(std::string("  this is a test "), std::string("__THIS_IS_A_test__")), MatchType::Exact);
+        QCOMPARE(str_n_nosp_cmp_begin(std::string("  that is a test  "), std::string("__THIS_IS_A_test__")), MatchType::Failure);
+        QCOMPARE(str_n_nosp_cmp_begin(std::string("  this is a"), std::string("__THIS_IS_A_test__XYZ")), MatchType::Subset);
+    }
 };
 
 QTEST_MAIN(TestUtility)
