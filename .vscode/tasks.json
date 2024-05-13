@@ -25,7 +25,7 @@
         {
             "label": "Build Debug",
             "type": "shell",
-            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -GNinja && ninja -C build && if pidof dcastle; then rebootdc.sh; fi",
+            "command": "cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=\"/usr/bin/g++-14\" -DCMAKE_EXE_LINKER_FLAGS=\"-fuse-ld=mold\" -DCMAKE_SHARED_LINKER_FLAGS=\"-fuse-ld=mold\" -GNinja && ninja -C build && if pidof dcastle; then rebootdc.sh; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
