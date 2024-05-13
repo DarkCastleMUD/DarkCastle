@@ -468,7 +468,7 @@ MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
    }
    else
    {
-      static_assert(false, std::string(typeid(tmp_arg1).name()));
+      static_assert(false, "Unhandled variable type passed to str_n_nosp_cmp_begin");
    }
 
    if (compare_result == 0)
