@@ -447,6 +447,47 @@ T space_to_underscore(T str)
    return str;
 }
 
+// Tested in TestUtility::str_n_nosp_cmp_begin
+template <typename T>
+MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
+{
+   auto tmp_arg1 = space_to_underscore(arg1);
+   auto tmp_arg1_len = tmp_arg1.length();
+   auto tmp_arg2 = space_to_underscore(arg2);
+   auto tmp_arg2_len = tmp_arg2.length();
+
+   int compare_result = -1;
+   if constexpr (std::convertible_to<T, std::string_view>)
+   {
+      compare_result = strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1_len);
+   }
+   else if constexpr (std::convertible_to<T, QStringView>)
+   {
+      tmp_arg2.truncate(tmp_arg1_len);
+      compare_result = tmp_arg1.compare(tmp_arg2, Qt::CaseInsensitive);
+   }
+   else
+   {
+      static_assert(false, std::string(typeid(tmp_arg1).name()));
+   }
+
+   if (compare_result == 0)
+   {
+      if (tmp_arg1_len == tmp_arg2_len)
+      {
+         return MatchType::Exact;
+      }
+      else
+      {
+         return MatchType::Subset;
+      }
+   }
+   else
+   {
+      return MatchType::Failure;
+   }
+}
+
 void clan_death(char *b, Character *ch);
 
 int move_char(Character *ch, int dest, bool stop_all_fighting = true);

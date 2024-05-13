@@ -112,6 +112,33 @@ private slots:
             std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};
         }
     }
+
+    void benchmark_str_n_nosp_cmp_begin_data()
+    {
+        QTest::addColumn<VariableType>("type");
+        QTest::newRow("std::string") << VariableType::STD_STRING;
+        QTest::newRow("QString") << VariableType::QSTRING;
+    }
+    void benchmark_str_n_nosp_cmp_begin()
+    {
+        QFETCH(VariableType, type);
+        int result{};
+        if (type == VariableType::STD_STRING)
+        {
+            QBENCHMARK
+            {
+                result = str_n_nosp_cmp_begin(std::string("  this is a test  "), std::string("__THIS_IS_A_test__"));
+            }
+        }
+        else if (type == VariableType::QSTRING)
+        {
+            QBENCHMARK
+            {
+                result = str_n_nosp_cmp_begin(QStringLiteral("  this is a test  "), QStringLiteral("__THIS_IS_A_test__"));
+            }
+        }
+        Q_UNUSED(result);
+    }
 };
 
 QTEST_MAIN(BenchmarkUtility)
