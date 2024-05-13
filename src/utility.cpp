@@ -304,29 +304,6 @@ int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
   return retval;
 }
 
-MatchType str_n_nosp_cmp_begin(std::string arg1, std::string arg2)
-{
-  auto tmp_arg1 = space_to_underscore(arg1);
-  auto tmp_arg2 = space_to_underscore(arg2);
-
-  // It matches
-  if (strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1.length()) == 0)
-  {
-    if (tmp_arg1.length() == tmp_arg2.length())
-    {
-      return MatchType::Exact;
-    }
-    else
-    {
-      return MatchType::Subset;
-    }
-  }
-  else
-  {
-    return MatchType::Failure;
-  }
-}
-
 // TODO - Declare these in a more appropriate place
 FILE *bug_log = 0;
 FILE *god_log = 0;

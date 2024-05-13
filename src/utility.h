@@ -498,7 +498,6 @@ int str_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(QString arg1, QString arg2);
 int str_n_nosp_cmp(const char *arg1, const char *arg2, int size);
-MatchType str_n_nosp_cmp_begin(std::string arg1, std::string arg2);
 char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
