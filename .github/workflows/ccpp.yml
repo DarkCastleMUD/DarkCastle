@@ -25,4 +25,4 @@ jobs:
       - name: test
         run: |
           set -x
-          DarkCastle/build/testDC && DarkCastle/build/benchDC
+          DarkCastle/build/testDC && DarkCastle/build/benchmarkDC
