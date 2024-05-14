@@ -11,12 +11,18 @@
     ],
     "cmake.sourceDirectory": "${workspaceFolder}/src",
     "C_Cpp.codeAnalysis.exclude": {
-        "build/*": true,
+        "archive/**": true,
+        "blog/**": true,
         "build/**": true,
-        "lib/*": true,
+        "docs/**": true,
+        "familiar/**": true,
+        "follower/**": true,
         "lib/**": true,
-        "log/*": true,
-        "log/**": true
+        "log/**": true,
+        "public_html/**": true,
+        "save/**": true,
+        "tmp/**": true,
+        "vaults/**": true
     },
     "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
         "clang-analyzer-core.NullDereference"
