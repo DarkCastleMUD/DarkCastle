@@ -237,7 +237,7 @@ int val(int card)
    return card;
 }
 
-char *valstri(int card)
+const char *valstri(int card)
 {
    while (card > 13)
       card -= 13;

@@ -239,11 +239,11 @@ int do_channel(Character *ch, char *arg, int cmd)
   char buf[200];
   char buf2[200];
 
-  char *on_off[] = {
+  const char *on_off[] = {
       "$B$4off$R",
       "$B$2on$R"};
 
-  char *types[] = {
+  const char *types[] = {
       "bug", // 0
       "prayer",
       "god",
