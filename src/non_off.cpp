@@ -1195,6 +1195,7 @@ command_return_t Character::wake(Character *victim)
   sendln("You wake, and stand up.");
   act("$n awakens.", this, 0, 0, TO_ROOM, 0);
   setStanding();
+  return eSUCCESS;
 }
 
 command_return_t Character::do_wake(QStringList arguments, int cmd)
