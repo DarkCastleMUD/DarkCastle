@@ -1,7 +1,14 @@
-#include <QTest>
-#include "utility.h"
-#include <string>
+#include <cstring>
 #include <memory>
+
+#include <QTest>
+
+#include "utility.h"
+#include "sing.h"
+#include "comm.h"
+#include "handler.h"
+#include "db.h"
+#include "spells.h"
 
 using namespace std::literals;
 
@@ -11,7 +18,8 @@ using namespace std::literals;
 #define STRING_LITERAL4 "$"
 #define STRING_LITERAL5 "test"
 #define STRING_LITERAL6 "$z$>$;"
-class TestUtility : public QObject
+
+class TestDC : public QObject
 {
     Q_OBJECT
 
@@ -142,7 +150,136 @@ private slots:
         QCOMPARE(str_n_nosp_cmp_begin(QStringLiteral("  that is a test  "), QStringLiteral("__THIS_IS_A_test__")), MatchType::Failure);
         QCOMPARE(str_n_nosp_cmp_begin(QStringLiteral("  this is a"), QStringLiteral("__THIS_IS_A_test__XYZ")), MatchType::Subset);
     }
+
+    void test_update_character_singing()
+    {
+        char argc = 1;
+        char *argv[] = {""};
+        DC::config cf;
+        cf.argc_ = argc;
+        cf.argv_ = argv;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.random_ = QRandomGenerator(0);
+        dc.boot_zones();
+        extern room_t top_of_world_alloc;
+        top_of_world_alloc = 2000;
+        dc.boot_world();
+        renum_world();
+        renum_zone_table();
+        boot_social_messages();
+
+        Character ch;
+        ch.in_room = 3;
+        ch.height = 72;
+        ch.weight = 150;
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        ch.do_on_login_stuff();
+
+        QVERIFY(ch.isPlayer());
+        QVERIFY(ch.isMortal());
+        QVERIFY(!ch.isNPC());
+        QVERIFY(!dc.character_list.empty());
+
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "Lie still; you are DEAD.\r\n");
+        conn.output = {};
+
+        ch.setPosition(position_t::STANDING);
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
+        conn.output = {};
+        QVERIFY(ch.songs.empty());
+
+        skill_results_t results = find_skills_by_name("flight_of_the_bumblebee");
+        QVERIFY(!results.empty());
+        QVERIFY(results.size() == 1);
+        auto skillnum = results.begin()->second;
+        QCOMPARE(ch.has_skill(skillnum), 0);
+        ch.learn_skill(skillnum, 1, 100);
+        QCOMPARE(ch.has_skill(skillnum), 1);
+
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "You raise your clear (?) voice towards the sky.\r\n");
+        conn.output = {};
+        QVERIFY(ch.songs.empty());
+
+        ch.setClass(10);
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "You do not have enough ki!\r\n");
+        conn.output = {};
+        QVERIFY(ch.songs.empty());
+
+        ch.setLevel(60);
+        ch.intel = 25;
+        redo_ki(&ch);
+        ch.ki = ki_limit(&ch);
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "You begin to sing a lofty song...\r\n");
+        conn.output = {};
+        QVERIFY(!ch.songs.empty());
+
+        do_sing(&ch, "'flight of the bumblebee'");
+        QCOMPARE(conn.output, "You are already in the middle of another song!\r\n");
+        conn.output = {};
+        QVERIFY(!ch.songs.empty());
+
+        update_bard_singing();
+        QVERIFY(!ch.songs.empty());
+        QCOMPARE(conn.output, "Singing [flight of the bumblebee]: * * * * \r\n");
+        conn.output = {};
+
+        update_bard_singing();
+        QVERIFY(!ch.songs.empty());
+        QCOMPARE(conn.output, "Singing [flight of the bumblebee]: * * * \r\n");
+        conn.output = {};
+
+        update_bard_singing();
+        QVERIFY(!ch.songs.empty());
+        QCOMPARE(conn.output, "Singing [flight of the bumblebee]: * * \r\n");
+        conn.output = {};
+
+        update_bard_singing();
+        QVERIFY(!ch.songs.empty());
+        QVERIFY(!ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
+        QVERIFY(!IS_AFFECTED(&ch, AFF_FLYING));
+        QCOMPARE(conn.output, "Singing [flight of the bumblebee]: * \r\n");
+        conn.output = {};
+
+        update_bard_singing();
+        QVERIFY(!ch.songs.empty());
+        QVERIFY(ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
+        QVERIFY(IS_AFFECTED(&ch, AFF_FLYING));
+        QCOMPARE(conn.output, "Your feet feel like air.\r\n");
+        conn.output = {};
+
+        update_bard_singing();
+        QVERIFY(ch.songs.empty());
+        QVERIFY(ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
+        QVERIFY(IS_AFFECTED(&ch, AFF_FLYING));
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        affect_update(DC::PULSE_TIME);
+        QVERIFY(ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
+        QVERIFY(IS_AFFECTED(&ch, AFF_FLYING));
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        affect_update(DC::PULSE_TIME);
+        QVERIFY(!ch.affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE));
+        QVERIFY(!IS_AFFECTED(&ch, AFF_FLYING));
+        QCOMPARE(conn.output, "Your feet touch the ground once more.\r\n");
+        conn.output = {};
+    }
 };
 
-QTEST_MAIN(TestUtility)
-#include "test_utility.moc"
+QTEST_MAIN(TestDC)
+#include "TestDC.moc"

@@ -40,9 +40,10 @@ struct songInfo
 /************************************************************************
 | Function declarations
 */
-
+QDebug operator<<(QDebug debug, const songInfo &song);
 char *skip_spaces(char *string);
 void stop_grouped_bards(Character *ch, int action);
+void update_character_singing(Character *ch);
 
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;

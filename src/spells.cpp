@@ -3099,7 +3099,7 @@ int Character::has_skill(skill_t skill)
   class Object *o;
   int bonus = 0;
 
-  if (isNPC())
+  if (isNPC() || !isPlayer())
     return 0;
 
   if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)

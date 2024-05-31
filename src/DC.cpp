@@ -17,13 +17,45 @@ const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 
 DC::DC(int &argc, char **argv)
-	: QCoreApplication(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
+	: QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
 {
+	QCoreApplication::setOrganizationName("DarkCastleMUD");
+	QCoreApplication::setOrganizationDomain("dcastle.org");
+	QCoreApplication::setApplicationName("DarkCastle");
+	if (cf.sql)
+	{
+		database_ = Database("dcastle");
+	}
+	findLibrary();
 }
 
 DC::DC(config c)
 	: QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr)
 {
+	QCoreApplication::setOrganizationName("DarkCastleMUD");
+	QCoreApplication::setOrganizationDomain("dcastle.org");
+	QCoreApplication::setApplicationName("DarkCastle");
+	if (cf.sql)
+	{
+		database_ = Database("dcastle");
+	}
+	findLibrary();
+}
+
+void DC::findLibrary(void)
+{
+	QDir cwd;
+	if (cwd.dirName() != "lib")
+	{
+		if (!cwd.cd("lib"))
+		{
+			cwd.cd("../lib");
+		}
+	}
+	if (cwd.exists())
+	{
+		QDir::setCurrent(cwd.absolutePath());
+	}
 }
 
 void DC::removeDead(void)

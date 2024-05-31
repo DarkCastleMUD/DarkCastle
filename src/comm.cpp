@@ -133,7 +133,6 @@ Database db;
 
 /* functions in this file */
 void update_mprog_throws(void);
-void update_bard_singing(void);
 void update_characters(void);
 void short_activity();
 void skip_spaces(char **string);
@@ -157,9 +156,8 @@ void report_debug_logging();
 /* extern fcnts */
 void pulse_takeover(void);
 void zone_update(void);
-void affect_update(int32_t duration_type); /* In spells.c */
-void point_update(void);                   /* In limits.c */
-void food_update(void);                    /* In limits.c */
+void point_update(void); /* In limits.c */
+void food_update(void);  /* In limits.c */
 void mobile_activity(void);
 void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
@@ -1529,7 +1527,7 @@ char *calc_condition(Character *ch, bool colour = false)
 void make_prompt(class Connection *d, std::string &prompt)
 {
   std::string buf = {};
-  if (!d->character)
+  if (!d->character || !d->character->player)
   {
     return;
   }

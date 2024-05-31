@@ -4,6 +4,10 @@
 #include <QSqlError>
 #include <QSqlRecord>
 
+Database::Database(void)
+{
+}
+
 Database::Database(const QString &name, const QString &hostname, const QString &type)
     : name_(name), hostname_(hostname), type_(type)
 {

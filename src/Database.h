@@ -10,7 +10,8 @@ class Column;
 class Database
 {
 public:
-  Database(const QString &name = "", const QString &hostname = "", const QString &type = "QPSQL");
+  Database(void);
+  Database(const QString &name, const QString &hostname = "", const QString &type = "QPSQL");
   QSqlDatabase getQSqlDatabase(void) { return database_; }
   QString getName(void) { return name_; }
   QString getHostname(void) { return hostname_; }

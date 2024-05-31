@@ -925,8 +925,6 @@ const char *find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32_t, int8_t);
 
-void produce_coredump(void *ptr = 0);
-
 bool isDead(Character *ch);
 bool isNowhere(Character *ch);
 bool file_exists(std::string filename);
@@ -945,33 +943,6 @@ char *handle_ansi_(char *s, Character *ch);
 void blackjack_prompt(Character *ch, std::string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
 void special_log(QString message);
-
-template <typename T>
-T number(T from, T to, QRandomGenerator *rng = QRandomGenerator::global())
-{
-   if (from == to)
-   {
-      return to;
-   }
-
-   if (from > to)
-   {
-
-      logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
-      produce_coredump();
-      return to;
-   }
-
-   if (std::is_unsigned<T>::value)
-   {
-      return rng->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
-   }
-   else if (std::is_signed<T>::value)
-   {
-      return rng->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
-   }
-}
-
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 int len_cmp(const char *s1, const char *s2);
 int len_cmp(QString s1, QString s2);

@@ -175,10 +175,6 @@ extern bool MOBtrigger;
 
 /* external refs */
 
-void load_messages(char *file, int base = 0);
-void boot_social_messages(void);
-void boot_clans(void);
-void assign_clan_rooms(void);
 struct help_index_element *build_help_index(FILE *fl, int *num);
 // The Room implementation
 // -Sadus 9/1/96

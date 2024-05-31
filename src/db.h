@@ -172,6 +172,10 @@ bool verify_item(class Object **obj);
 bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
+void load_messages(char *file, int base = 0);
+void boot_social_messages(void);
+void boot_clans(void);
+void assign_clan_rooms(void);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */

@@ -246,6 +246,9 @@ public:
   {
     config(int argc = {}, char **argv = {})
         : argc_(argc), argv_(argv) {}
+    int argc_{};
+    char **argv_{};
+    bool sql = true;
     port_list_t ports;
     bool allow_imp_password = false;
     bool verbose_mode = false;
@@ -261,8 +264,6 @@ public:
     QString library_directory = DEFAULT_LIBRARY_PATH;
     QString leaderboard_check;
     QString implementer;
-    int argc_{};
-    char **argv_{};
   } cf;
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
@@ -327,6 +328,7 @@ public:
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
   Object *getObject(vnum_t vnum);
+  void findLibrary(void);
 
   explicit DC(int &argc, char **argv);
   explicit DC(config c);
@@ -399,6 +401,34 @@ private:
   void game_loop(void);
   int init_socket(in_port_t port);
 };
+
+void produce_coredump(void *ptr = 0);
+
+template <typename T>
+T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
+{
+  if (from == to)
+  {
+    return to;
+  }
+
+  if (from > to)
+  {
+
+    logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+    produce_coredump();
+    return to;
+  }
+
+  if (std::is_unsigned<T>::value)
+  {
+    return rng->bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
+  }
+  else if (std::is_signed<T>::value)
+  {
+    return rng->bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
+  }
+}
 
 extern std::vector<std::string> continent_names;
 

@@ -21,7 +21,8 @@ FetchContent_MakeAvailable (tracy)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
 add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
 
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/")
+set(CMAKE_CXX_FLAGS "-w -Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
+#-Wpedantic -Wall -Wextra -Wno-change-meaning -Wno-coverage-mismatch -Wno-coverage-invalid-line-number -Wdouble-promotion -Wformat -Wformat-nonliteral -Wformat-overflow -Wformat-security -Wformat-signedness -Wformat-truncation -Wwrite-strings -Wformat-y2k -Wnonnull -Wnonnull-compare -Wnull-dereference -Winit-self -Wfatal-errors -Wdangling-reference
 #set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/ -DTRACY_ENABLE -DTRACY_ON_DEMAND")
 # -DTRACY_ENABLE -DTRACY_ON_DEMAND -DTRACY_NO_EXIT
 # -p    prof
@@ -304,7 +305,7 @@ install(SCRIPT ${deploy_script})
 include(CPack)
 
 enable_testing(true)
-qt_add_executable(testDC tests/test_utility.cpp)
+qt_add_executable(testDC tests/TestDC.cpp)
 add_test(NAME testDC COMMAND testDC)
 target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)

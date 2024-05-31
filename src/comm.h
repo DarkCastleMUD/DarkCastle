@@ -67,5 +67,7 @@ void telnet_ga(Connection *d);
 void telnet_sga(Connection *d);
 void telnet_echo_off(class Connection *d);
 void telnet_echo_on(class Connection *d);
+void update_bard_singing(void);
+void affect_update(int32_t duration_type); /* In spells.c */
 
 #endif

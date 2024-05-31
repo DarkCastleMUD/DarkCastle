@@ -374,7 +374,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 	if (song_info[spl].song_pointer)
 	{
-		if (GET_POS(ch) < song_info[spl].minimum_position && IS_PC(ch) && spl != 2)
+		if (GET_POS(ch) < song_info[spl].minimum_position && IS_PC(ch) && spl != SPELL_TYPE_WAND)
 		{
 			switch (GET_POS(ch))
 			{
@@ -398,7 +398,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		}
 		else
 		{
-			if (ch->getLevel() < ARCHANGEL && spl != 0 && spl != 2)
+			if (ch->getLevel() < ARCHANGEL && spl != 0 && spl != SPELL_TYPE_WAND)
 				if (!(learned = ch->has_skill(song_info[spl].skill_num)))
 				{
 					if (IS_MOB(ch) && !ch->master)
@@ -589,7 +589,9 @@ int do_sing(Character *ch, char *arg, int cmd)
 				}
 			}
 
-			if (spl != 2 && !skill_success(ch, tar_char, spl + SKILL_SONG_BASE) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+			bool skill_succeeded = skill_success(ch, tar_char, spl + SKILL_SONG_BASE);
+			bool in_room_safe = isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE);
+			if (spl != SPELL_TYPE_WAND && !skill_succeeded && !in_room_safe)
 			{
 
 				ch->sendln("You forgot the words!");
@@ -659,7 +661,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 					if ((song_info[(*i).song_number].intrp_pointer))
 						((*song_info[(*i).song_number].intrp_pointer)(ch->getLevel(), ch, nullptr, nullptr, learned));
 				}
-				if (spl != 2 && !origsing) // song 'stop'
+				if (spl != SPELL_TYPE_WAND && !origsing) // song 'stop'
 					ch->songs.clear();
 			}
 			else if (cmd == CMD_ORCHESTRATE)
@@ -3451,4 +3453,11 @@ int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Cha
 	}
 
 	return eSUCCESS;
+}
+
+QDebug operator<<(QDebug debug, const songInfo &song)
+{
+	QDebugStateSaver saver(debug);
+	debug.nospace() << "Song:" << song.song_data << " number:" << song.song_number << " timer:" << song.song_timer;
+	return debug;
 }
