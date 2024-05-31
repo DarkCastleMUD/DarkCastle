@@ -255,19 +255,17 @@
             ]
         },
         {
-            "name": "dcastle -tv in dcastle.6969/lib",
+            "name": "testDC",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dcastle",
-            "args": [
-                "-t",
-                "-v"
-            ],
+            "program": "${workspaceFolder}/build/testDC",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerArgs": "-ex \"set debuginfod enabled off\"",
             "logging": {
                 "engineLogging": false,
             },
@@ -275,7 +273,7 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
+                    "ignoreFailures": false
                 }
             ],
             "preLaunchTask": "Build Debug"
