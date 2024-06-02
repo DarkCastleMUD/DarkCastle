@@ -1957,8 +1957,8 @@ void DC::boot_world(void)
 	{
 		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE_TINY, "r")))
 		{
-			perror("fopen");
-			logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, LogChannels::LOG_BUG);
+			int fopen_errno = errno;
+			logentry(QStringLiteral("boot_world: could not open tiny world index file '%1': %2.").arg(WORLD_INDEX_FILE_TINY).arg(strerror(fopen_errno)), 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
@@ -1966,8 +1966,8 @@ void DC::boot_world(void)
 	{
 		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE, "r")))
 		{
-			perror("fopen");
-			logentry(QStringLiteral("boot_world: could not open world index file."), 0, LogChannels::LOG_BUG);
+			int fopen_errno = errno;
+			logentry(QStringLiteral("boot_world: could not open world index file '%1': %2.").arg(WORLD_INDEX_FILE).arg(strerror(fopen_errno)), 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
