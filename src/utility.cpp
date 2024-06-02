@@ -334,7 +334,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << "../log/";
   }
 
-  if (type == LogChannels::LOG_PLAYER)
+  if (type == LogChannels::LOG_PLAYER && vict && !vict->getName().isEmpty())
   {
     logpath << PLAYER_DIR;
   }
@@ -402,7 +402,7 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     f = &player_log;
     if (vict && !vict->getName().isEmpty())
     {
-      logpath << PLAYER_DIR << vict->getName().toStdString();
+      logpath << vict->getName().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
         qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
