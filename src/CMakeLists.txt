@@ -21,7 +21,8 @@ FetchContent_MakeAvailable (tracy)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
 add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
 
-set(CMAKE_CXX_FLAGS "-w -Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
+set_source_files_properties(tests/TestDC.cpp PROPERTIES COMPILE_OPTIONS "-Wwrite-strings")
 #-Wpedantic -Wall -Wextra -Wno-change-meaning -Wno-coverage-mismatch -Wno-coverage-invalid-line-number -Wdouble-promotion -Wformat -Wformat-nonliteral -Wformat-overflow -Wformat-security -Wformat-signedness -Wformat-truncation -Wwrite-strings -Wformat-y2k -Wnonnull -Wnonnull-compare -Wnull-dereference -Winit-self -Wfatal-errors -Wdangling-reference
 #set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/ -DTRACY_ENABLE -DTRACY_ON_DEMAND")
 # -DTRACY_ENABLE -DTRACY_ON_DEMAND -DTRACY_NO_EXIT
