@@ -29,7 +29,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Debug"
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "Debug dcastle -P -p6969 in dcastle.6969/lib/",
@@ -52,7 +52,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Debug"
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "Production dcastle -P -p6969 in lib/",
@@ -75,7 +75,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Production"
+            "preLaunchTask": "Clean release with debug info build"
         },
         {
             "name": "Production dcastle -P -p6969 in dcastle.6969/lib",
@@ -98,7 +98,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Production"
+            "preLaunchTask": "Clean release with debug info build"
         },
         {
             "name": "debug in lib/",
@@ -122,7 +122,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "debug ../save/D/Dummy in lib/",
@@ -148,7 +149,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "debug all in lib/",
@@ -174,7 +176,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "debug all in dcastle.6969/lib",
@@ -200,7 +203,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "debug ../../dcastle/save/J/Julian",
@@ -226,7 +230,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "debug leaderboard in dcastle.6969/lib",
@@ -252,7 +257,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "testDC",
@@ -276,7 +282,7 @@
                     "ignoreFailures": false
                 }
             ],
-            "preLaunchTask": "Build Debug"
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "valgrind dcastle",
@@ -300,7 +306,8 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "preLaunchTask": "rebuild"
         },
         {
             "name": "valgrind debug",
@@ -324,7 +331,8 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "preLaunchTask": "rebuild"
         }
     ]
 }
