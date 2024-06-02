@@ -334,6 +334,25 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     logpath << "../log/";
   }
 
+  if (type == LogChannels::LOG_PLAYER)
+  {
+    logpath << PLAYER_DIR;
+  }
+
+  QDir logDirectory(logpath.str().c_str());
+  if (!logDirectory.exists())
+  {
+    qWarning("Log directory '%s' does not exist.", qUtf8Printable(logDirectory.absolutePath()));
+    if (logDirectory.mkdir(logDirectory.absolutePath()))
+    {
+      qInfo("Made log directory '%s'.", qUtf8Printable(logDirectory.absolutePath()));
+    }
+    else
+    {
+      qFatal("Unable to make directory '%s'.", qUtf8Printable(logDirectory.absolutePath()));
+    }
+  }
+
   switch (type)
   {
   default:
