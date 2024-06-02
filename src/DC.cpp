@@ -44,17 +44,34 @@ DC::DC(config c)
 
 void DC::findLibrary(void)
 {
-	QDir cwd;
-	if (cwd.dirName() != "lib")
+	QDir libraryDirectory;
+	QString absolutePath = libraryDirectory.absolutePath();
+	QSet<QString> searchedDirectories;
+
+	if (libraryDirectory.dirName() != QStringLiteral("lib"))
 	{
-		if (!cwd.cd("lib"))
+		searchedDirectories.insert(absolutePath);
+		if (!libraryDirectory.cd(absolutePath + QStringLiteral("/lib")))
 		{
-			cwd.cd("../lib");
+			searchedDirectories.insert(absolutePath + QStringLiteral("/lib"));
+			if (!libraryDirectory.cd(absolutePath + QStringLiteral("/../lib")))
+			{
+				searchedDirectories.insert(absolutePath + QStringLiteral("/../lib"));
+				if (!libraryDirectory.cd(QCoreApplication::applicationDirPath() + QStringLiteral("/../lib")))
+				{
+					searchedDirectories.insert(QCoreApplication::applicationDirPath() + QStringLiteral("/../lib"));
+				}
+			}
 		}
 	}
-	if (cwd.exists())
+	if (libraryDirectory.exists() && libraryDirectory.dirName() == QStringLiteral("lib"))
 	{
-		QDir::setCurrent(cwd.absolutePath());
+		QDir::setCurrent(libraryDirectory.absolutePath());
+	}
+	else
+	{
+		qWarning("Unable to locate lib directory at following locations:");
+		qWarning() << searchedDirectories;
 	}
 }
 
