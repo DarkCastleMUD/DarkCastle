@@ -3,8 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/usr/include/qt6/**",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/include",
                 "${workspaceFolder}/build/testDC_autogen/include",
                 "${workspaceFolder}/build/benchmarkDC_autogen/include"
             ],
