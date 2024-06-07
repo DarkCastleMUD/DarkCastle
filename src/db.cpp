@@ -32,6 +32,8 @@ int load_debug = 0;
 #include <limits>
 #include <typeinfo>
 
+#include <QDebug>
+
 #include "DC/affect.h"
 #include "DC/db.h"
 #include "DC/memory.h"
@@ -6952,11 +6954,29 @@ bool verify_item(class Object **obj)
 			break; // No item at all found, it's a restring or deleted.
 
 		if ((*obj)->item_number - i >= 0)
-			if (!str_cmp((*obj)->short_description, ((class Object *)DC::getInstance()->obj_index[(*obj)->item_number - i].item)->short_description))
+		{
+			index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
+			if (obj_index_entry)
 			{
-				newitem = (*obj)->item_number - i;
-				break;
+				Object *obj_index_item = (class Object *)obj_index_entry->item;
+				if (obj_index_item)
+				{
+					if (!str_cmp((*obj)->short_description, obj_index_item->short_description))
+					{
+						newitem = (*obj)->item_number - i;
+						break;
+					}
+				}
+				else
+				{
+					qWarning("obj_index_item is null");
+				}
 			}
+			else
+			{
+				qWarning("obj_index_entry is null");
+			}
+		}
 
 		if ((*obj)->item_number + i <= top_of_objt)
 			if (!str_cmp((*obj)->short_description, ((class Object *)DC::getInstance()->obj_index[(*obj)->item_number + i].item)->short_description))
