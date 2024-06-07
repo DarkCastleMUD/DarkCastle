@@ -1,16 +1,6 @@
 *~
 src/*~
-src/*.o
-src/*/*.o
-src/libdcastle.a
-src/.sconsign.dblite
-src/buildinfo.h
-src/version.h
-src/debug
-src/dcastle.stable
-src/dcastle.master
-src/Makefile
-scripts/*.o
+src/include/DC/buildinfo.h
 lib/*.last
 lib/*/*.last
 lib/corpse.save
