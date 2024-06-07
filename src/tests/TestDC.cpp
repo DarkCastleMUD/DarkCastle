@@ -2,6 +2,7 @@
 #include <memory>
 
 #include <QTest>
+#include <QtLogging>
 
 #include "DC/utility.h"
 #include "DC/sing.h"
@@ -24,6 +25,13 @@ class TestDC : public QObject
 {
     Q_OBJECT
 
+public:
+    TestDC()
+    {
+        qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{file}:%{line} %{function}: %{message}"));
+    }
+
+private:
     enum class VariableType
     {
         C_STRING,
@@ -359,7 +367,7 @@ private slots:
 
         rc = do_vault(&ch, str_hsh("get all"));
         QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "a small mushroom has been removed from the vault.\r\na short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\na small mushroom has been removed from the vault.\r\n");
+        QCOMPARE(conn.output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\na small mushroom has been removed from the vault.\r\n");
         conn.output = {};
 
         rc = do_vault(&ch, str_hsh("put all.sword"));
@@ -370,6 +378,11 @@ private slots:
         rc = do_vault(&ch, str_hsh("put mushroom"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get all.sword"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\n");
         conn.output = {};
     }
 };
