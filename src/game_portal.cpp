@@ -13,7 +13,7 @@
 #include "levels.h"
 #include "obj.h"
 #include "room.h"
-#include "db.h"
+#include "DC/db.h"
 #include "handler.h"
 
 #include <cstring>

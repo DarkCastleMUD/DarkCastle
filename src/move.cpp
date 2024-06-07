@@ -19,7 +19,7 @@
 #include "interp.h"
 #include "spells.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "obj.h"
 #include "connect.h"
 #include "act.h"

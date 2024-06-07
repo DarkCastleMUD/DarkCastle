@@ -15,7 +15,7 @@
 #include "mobile.h"
 #include "act.h"
 #include "returnvals.h"
-#include "db.h"
+#include "DC/db.h"
 #include "room.h"
 #include "interp.h"
 

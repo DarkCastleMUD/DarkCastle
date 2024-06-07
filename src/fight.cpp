@@ -44,7 +44,7 @@
 #include "handler.h"
 #include "interp.h"   // do_flee()
 #include "fileinfo.h" // SAVE_DIR
-#include "db.h"       // fread_string()
+#include "DC/db.h"    // fread_string()
 #include "connect.h"  // Connection
 #include "magic.h"    // weapon spells
 #include "terminal.h" // YELLOW, etc..

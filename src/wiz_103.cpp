@@ -9,7 +9,7 @@
 #include "utility.h"
 #include "mobile.h"
 #include "player.h"
-#include "db.h"
+#include "DC/db.h"
 #include "connect.h"
 #include "interp.h"
 #include "room.h"

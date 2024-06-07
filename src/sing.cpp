@@ -23,7 +23,7 @@
 #include "handler.h"
 #include "connect.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "magic.h"	// dispel_magic
 #include "innate.h" // SKILL_INNATE_EVASION
 #include "returnvals.h"

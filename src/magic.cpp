@@ -47,7 +47,7 @@
 #include "levels.h"
 #include "weather.h"
 #include "isr.h"
-#include "db.h"
+#include "DC/db.h"
 #include "act.h"
 #include "clan.h"
 #include "innate.h"

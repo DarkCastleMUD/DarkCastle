@@ -14,7 +14,7 @@
 #include "player.h"
 #include "obj.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "newedit.h"
 
 #include <string>

@@ -22,7 +22,7 @@
 #include "levels.h"
 #include "interp.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "act.h"
 #include "returnvals.h"
 #include "spells.h"

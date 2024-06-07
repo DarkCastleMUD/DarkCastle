@@ -7,8 +7,9 @@
 #include "sing.h"
 #include "comm.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "spells.h"
+#include "vault.h"
 
 using namespace std::literals;
 
@@ -292,6 +293,7 @@ private slots:
         renum_zone_table();
 
         Character ch;
+        ch.setName(QStringLiteral("Testplayer"));
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;
@@ -304,9 +306,21 @@ private slots:
         dc.character_list.insert(&ch);
         ch.do_on_login_stuff();
 
-        Object o1, o2;
-        GET_OBJ_NAME(&o1) = str_hsh("sword");
-        GET_OBJ_NAME(&o2) = str_hsh("sword");
+        int rnum = create_blank_item(1);
+        QCOMPARE(rnum, 1);
+        // int rnum = real_object(1);
+        Object *o1 = clone_object(rnum);
+        Object *o2 = clone_object(rnum);
+        Object *o3 = clone_object(rnum);
+        QVERIFY(o1);
+        QVERIFY(o2);
+        QVERIFY(o3);
+        GET_OBJ_NAME(o1) = str_hsh("sword");
+        GET_OBJ_SHORT(o1) = str_hsh("a short sword");
+        GET_OBJ_NAME(o2) = str_hsh("sword");
+        GET_OBJ_SHORT(o2) = str_hsh("a short sword");
+        GET_OBJ_NAME(o3) = str_hsh("mushroom");
+        GET_OBJ_SHORT(o3) = str_hsh("a small mushroom");
 
         command_return_t rc;
         rc = do_vault(&ch, str_hsh("put all"));
@@ -319,9 +333,43 @@ private slots:
         QCOMPARE(conn.output, "");
         conn.output = {};
 
-        rc = do_vault(&ch, str_hsh("get all.sword"));
+        rc = do_vault(&ch, str_hsh("put all"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "You don't have a vault.\r\n");
+        conn.output = {};
+
+        add_new_vault(ch.getNameC(), 0);
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        int status;
+        status = obj_to_char(o1, &ch);
+        QVERIFY(status);
+        status = obj_to_char(o2, &ch);
+        QVERIFY(status);
+        status = obj_to_char(o3, &ch);
+        QVERIFY(status);
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\na short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a small mushroom has been removed from the vault.\r\na short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\na small mushroom has been removed from the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all.sword"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put mushroom"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\n");
         conn.output = {};
     }
 };

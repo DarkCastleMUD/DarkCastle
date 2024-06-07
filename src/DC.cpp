@@ -9,7 +9,7 @@
 #include <cassert>
 
 #include "DC.h"
-#include "db.h"
+#include "DC/db.h"
 #include "Version.h"
 #include "character.h"
 

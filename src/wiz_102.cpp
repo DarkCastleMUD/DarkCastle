@@ -34,7 +34,7 @@
 #include "interp.h"
 #include "obj.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "spells.h"
 #include "race.h"
 #include "returnvals.h"

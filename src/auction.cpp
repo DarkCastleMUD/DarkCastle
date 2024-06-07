@@ -29,7 +29,7 @@ void load_auction_tickets()
 #include "room.h"
 #include "utility.h"
 #include <cassert>
-#include "db.h"
+#include "DC/db.h"
 #include "vault.h"
 #include "returnvals.h"
 #include "interp.h"

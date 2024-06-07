@@ -16,7 +16,7 @@
 #include "social.h"
 #include "handler.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h" // len_cmp
 #include "returnvals.h"
 

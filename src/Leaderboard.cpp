@@ -15,7 +15,7 @@
 #include "connect.h"
 #include "levels.h"
 #include <climits>
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "returnvals.h"
 

@@ -24,7 +24,7 @@ uint64_t i = UINT64_MAX;
 #include <QFile>
 
 #include "fileinfo.h"
-#include "db.h" // real_room
+#include "DC/db.h" // real_room
 #include "player.h"
 #include "utility.h"
 #include "character.h"

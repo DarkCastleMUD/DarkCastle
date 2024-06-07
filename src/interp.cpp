@@ -41,7 +41,7 @@
 #include "mobile.h"
 #include "connect.h" // Connection
 #include "room.h"
-#include "db.h"
+#include "DC/db.h"
 #include "act.h"
 #include "returnvals.h"
 #include "terminal.h"

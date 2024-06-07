@@ -25,7 +25,7 @@
 #include "interp.h"
 #include "terminal.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "returnvals.h"
 
 class channel_msg

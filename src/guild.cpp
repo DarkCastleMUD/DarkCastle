@@ -9,7 +9,7 @@
 #include "utility.h"
 #include "levels.h"
 #include "player.h"
-#include "db.h" // exp_table
+#include "DC/db.h" // exp_table
 #include "interp.h"
 #include <cstring>
 #include "returnvals.h"

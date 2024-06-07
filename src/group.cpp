@@ -16,7 +16,7 @@
 #include "clan.h"
 #include "levels.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "player.h"
 #include "sing.h" // stop_grouped_bards
 #include <cstring>

@@ -25,7 +25,7 @@
 #include "connect.h"
 #include "fight.h"
 #include "interp.h"
-#include "db.h"
+#include "DC/db.h"
 #include "act.h"
 #include "fileinfo.h" // SAVE_DIR
 #include "returnvals.h"

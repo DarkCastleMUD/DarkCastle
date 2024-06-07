@@ -19,7 +19,7 @@
 #include "mobile.h"
 #include "clan.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "connect.h"
 #include "spells.h"

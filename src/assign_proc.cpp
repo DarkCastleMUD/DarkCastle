@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include "db.h"
+#include "DC/db.h"
 #include "room.h"
 #include "levels.h"
 #include "player.h"
@@ -20,8 +20,6 @@
 
 typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
-
-
 
 void boot_the_shops();
 void boot_player_shops();

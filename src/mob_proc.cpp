@@ -32,8 +32,8 @@
 #include "interp.h"
 #include "isr.h"
 #include "race.h"
-#include "db.h"   // real_room
-#include "sing.h" // bard skills
+#include "DC/db.h" // real_room
+#include "sing.h"  // bard skills
 #include "act.h"
 #include "ki.h" // monk skills
 #include "returnvals.h"

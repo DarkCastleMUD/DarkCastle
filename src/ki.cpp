@@ -23,7 +23,7 @@
 #include "handler.h"
 #include "connect.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "returnvals.h"
 #include <vector>
 #include "handler.h"
@@ -206,7 +206,7 @@ int do_ki(Character *ch, char *argument, int cmd)
             tar_char = ch;
             target_ok = true;
           } // of !target_ok
-      }     // of *name
+      } // of *name
 
       /* No argument was typed */
       else if (!*name)

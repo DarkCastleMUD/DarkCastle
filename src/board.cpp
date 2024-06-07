@@ -56,7 +56,7 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "utility.h" // false
 #include "memory.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "returnvals.h"
 #include <string>
 #include <map>

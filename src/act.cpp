@@ -12,7 +12,7 @@
 #include "character.h"
 #include "comm.h"
 #include "levels.h"
-#include "db.h"
+#include "DC/db.h"
 #include "room.h"
 #include "utility.h"
 #include "player.h"

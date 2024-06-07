@@ -19,7 +19,7 @@
 #include "mobile.h"
 #include "room.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "DC.h"
 #include "returnvals.h"
 #include "race.h"
@@ -28,9 +28,6 @@
 #include "spells.h"
 #include "const.h"
 #include "move.h"
-
-
-
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the

@@ -71,6 +71,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${BUILD_VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR RPM)
 set(CPACK_THREADS 0)
@@ -81,6 +82,7 @@ set(CPACK_RPM_PACKAGE_RELOCATABLE ON)
 set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
 set(CPACK_RPM_PACKAGE_REQUIRES "qt6-sql-postgresql qt6-sql-sqlite")
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/bin/qt.conf)
+
 execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE BUILD_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${BUILD_VERSION}")
@@ -216,7 +218,7 @@ add_library(DC SHARED
     const.h
     corpse.h
     Database.h
-    db.h
+    include/DC/db.h
     DC.h
     DC_global.h
     dc_xmlrpc.h
@@ -272,22 +274,19 @@ add_library(DC SHARED
 )
 #set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
-target_compile_definitions(DC PRIVATE
-  $<$<CONFIG:Debug>:DEBUG_BUILD>
-)
+target_compile_definitions(DC PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
+target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
-target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 qt_add_executable(dcastle dcastle.cpp)
-target_compile_definitions(dcastle PRIVATE
-  $<$<CONFIG:Debug>:DEBUG_BUILD>
-)
+target_compile_definitions(dcastle PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
+target_include_directories(dcastle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
 
 qt_add_executable(debug debug.cpp)
-target_compile_definitions(debug PRIVATE
-  $<$<CONFIG:Debug>:DEBUG_BUILD>
-)
+target_compile_definitions(debug PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
+target_include_directories(debug PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
 
 install (TARGETS dcastle debug
@@ -308,11 +307,11 @@ include(CPack)
 enable_testing(true)
 qt_add_executable(testDC tests/TestDC.cpp)
 add_test(NAME testDC COMMAND testDC)
-target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(testDC PRIVATE Qt::Test)
 
 qt_add_executable(benchmarkDC benchmarks/benchmark_utility.cpp)
-target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(benchmarkDC PRIVATE Qt::Test)

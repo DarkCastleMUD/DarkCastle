@@ -27,7 +27,7 @@
 #include "mobile.h"
 #include "clan.h"
 #include "handler.h"
-#include "db.h" // exp_table
+#include "DC/db.h" // exp_table
 #include "interp.h"
 #include "connect.h"
 #include "spells.h"

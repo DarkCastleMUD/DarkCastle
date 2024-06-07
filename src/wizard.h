@@ -28,7 +28,7 @@
 #include "player.h"
 #include "connect.h"
 #include "ctime"
-#include "db.h"
+#include "DC/db.h"
 
 /* Function headers */
 void display_punishes(Character *ch, Character

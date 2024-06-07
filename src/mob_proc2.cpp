@@ -28,7 +28,7 @@
 #include "utility.h"
 #include "character.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "player.h"
 #include "levels.h"
 #include "interp.h"

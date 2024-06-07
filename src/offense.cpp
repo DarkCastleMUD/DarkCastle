@@ -21,7 +21,7 @@
 #include "act.h"
 #include "returnvals.h"
 #include "room.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "const.h"
 

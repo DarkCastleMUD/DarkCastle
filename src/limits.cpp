@@ -30,7 +30,7 @@
 #include "player.h"
 #include "obj.h"
 #include "connect.h"
-#include "db.h"	   // exp_table
+#include "DC/db.h" // exp_table
 #include "fight.h" // damage
 #include "ki.h"
 #include "game_portal.h"

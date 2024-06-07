@@ -13,7 +13,7 @@ one liner quest shit
 #include "levels.h"
 #include "interp.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "connect.h"
 #include "quest.h"
 #include "spells.h"

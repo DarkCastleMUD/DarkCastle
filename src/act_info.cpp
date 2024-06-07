@@ -28,7 +28,7 @@
 #include "terminal.h"
 #include "interp.h"
 #include "connect.h"
-#include "db.h" // help_index_element
+#include "DC/db.h" // help_index_element
 #include "spells.h"
 #include "returnvals.h"
 

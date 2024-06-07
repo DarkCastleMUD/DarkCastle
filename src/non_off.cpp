@@ -18,7 +18,7 @@
 #include "utility.h"
 #include "levels.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "player.h"
 #include "act.h"

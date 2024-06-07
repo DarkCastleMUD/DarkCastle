@@ -38,7 +38,7 @@
 #include "ki.h"
 #include "clan.h"
 #include "fileinfo.h" // SAVE_DIR
-#include "db.h"       // init_char..
+#include "DC/db.h"    // init_char..
 #include "mobile.h"
 #include "interp.h"
 #include "room.h"

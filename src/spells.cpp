@@ -38,7 +38,7 @@
 #include "fight.h"
 #include "mobile.h"
 #include "room.h"
-#include "db.h"
+#include "DC/db.h"
 #include "handler.h"
 #include "connect.h"
 #include "interp.h"

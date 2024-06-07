@@ -10,7 +10,7 @@
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
 #include "character.h"
-#include "db.h"     // get_mob_room_vis
+#include "DC/db.h"  // get_mob_room_vis
 #include "spells.h" // INTERNAL_SLEEPING
 #include "act.h"    // TO_ROOM
 

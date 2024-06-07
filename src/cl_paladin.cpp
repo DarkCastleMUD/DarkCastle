@@ -17,11 +17,9 @@
 #include "mobile.h"
 #include "room.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "returnvals.h"
 #include "interp.h"
-
-
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
@@ -45,7 +43,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(victim = ch->get_char_room_vis( victim_name)))
+  if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     victim = ch->fighting;
     if (!victim)
@@ -66,7 +64,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->affected_by_spell(SKILL_HARM_TOUCH) && ch->getLevel()<= IMMORTAL)
+  if (ch->affected_by_spell(SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
   {
     ch->sendln("You have not spend enough time in devotion to your god to warrant such a favor yet.");
     return eFAILURE;
@@ -95,7 +93,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     if (isSet(retval, eVICT_DIED) && !isSet(retval, eCH_DIED))
     {
-      if (ch->has_skill( SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
+      if (ch->has_skill(SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1)
       {
         char dammsg[MAX_STRING_LENGTH];
         int amount = ch->getLevel() * 10;
@@ -138,7 +136,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(victim = ch->get_char_room_vis( victim_name)))
+  if (!(victim = ch->get_char_room_vis(victim_name)))
   {
     ch->sendln("Whom do you want to layhands on?");
     return eFAILURE;
@@ -178,7 +176,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
   else
   {
     char dammsg[MAX_STRING_LENGTH];
-    int amount = 500 + (ch->has_skill( SKILL_LAY_HANDS) * 10);
+    int amount = 500 + (ch->has_skill(SKILL_LAY_HANDS) * 10);
     if (amount + victim->getHP() > GET_MAX_HIT(victim))
       amount = GET_MAX_HIT(victim) - victim->getHP();
     victim->addHP(amount);
@@ -208,7 +206,6 @@ int do_behead(Character *ch, char *argument, int cmd)
   int retval = eSUCCESS;
   char buf[MAX_STRING_LENGTH];
   Character *vict;
-  
 
   one_argument(argument, buf);
 
@@ -223,7 +220,7 @@ int do_behead(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!(vict = ch->get_char_room_vis( buf)))
+  if (!(vict = ch->get_char_room_vis(buf)))
   {
     if (ch->fighting)
       vict = ch->fighting;
@@ -257,7 +254,7 @@ int do_behead(Character *ch, char *argument, int cmd)
     return retval;
   }
 
-  int skill_level = ch->has_skill( SKILL_BEHEAD);
+  int skill_level = ch->has_skill(SKILL_BEHEAD);
   modifier = 50.0 + skill_level / 2.0 + GET_ALIGNMENT(ch) / 100.0;
   modifier /= 100.0; // range .15-1.0
 
@@ -271,7 +268,7 @@ int do_behead(Character *ch, char *argument, int cmd)
 
   if (enemy_hp < 0.3) // covered is 0.3
   {
-    chance += (ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
+    chance += (ch->has_skill(SKILL_TWO_HANDED_WEAPONS) / 6);
     // csendf(ch, "BEHEAD chance increased by %d\r\n", ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
   }
   else

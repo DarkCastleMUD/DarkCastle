@@ -15,7 +15,7 @@
 #include "spells.h"
 #include "connect.h"
 #include "utility.h"
-#include "db.h"
+#include "DC/db.h"
 #include "obj.h"
 #include "const.h"
 #include "utility.h"

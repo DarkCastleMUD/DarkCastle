@@ -59,7 +59,7 @@
 #include "fileinfo.h"
 #include "mobile.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "connect.h"
 #include "act.h"
 #include "spells.h"

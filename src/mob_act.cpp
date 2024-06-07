@@ -30,7 +30,7 @@
 #include "mobile.h"
 #include "utility.h"
 #include "fight.h"
-#include "db.h" // index_data
+#include "DC/db.h" // index_data
 #include "player.h"
 #include "levels.h"
 #include "act.h"
@@ -580,7 +580,7 @@ void mobile_activity(void)
               break;
             }
           } // If IS_PC(tmp_ch)
-        }   // for() for the RACIST, AGG_XXX and FRIENDLY flags
+        } // for() for the RACIST, AGG_XXX and FRIENDLY flags
 
     // Note, if you add anything to this point, you need to put if(done) continue
     // check after the RACIST stuff.  They aren't checking if ch died or not since
@@ -947,9 +947,9 @@ void scavenge(Character *ch)
           else
             continue;
         } // else can wear
-      }   // if hands are free
-    }     /* if keyword != -2 */
-  }       /* for obj */
+      } // if hands are free
+    } /* if keyword != -2 */
+  } /* for obj */
 }
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3)

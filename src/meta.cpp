@@ -32,7 +32,7 @@
 #include "interp.h"
 #include "isr.h"
 #include "race.h"
-#include "db.h"
+#include "DC/db.h"
 #include "sing.h"
 #include "act.h"
 #include "ki.h"

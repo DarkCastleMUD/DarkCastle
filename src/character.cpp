@@ -3,7 +3,7 @@
 
 #include "character.h"
 #include "levels.h"
-#include "db.h"
+#include "DC/db.h"
 
 void set_golem(Character *golem, int golemtype);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);

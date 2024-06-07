@@ -18,7 +18,7 @@
 #include "mobile.h"
 #include "clan.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "connect.h"
 #include "spells.h"
@@ -99,29 +99,29 @@ int do_spec(Character *ch, char *argument, int cmd)
     ch->spec = 0;
     GET_PLATINUM(ch) -= 10000;
     ch->saves[SAVE_TYPE_FIRE] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
-                                                        : 0 + ch->getLevel() > 53   ? 1
-                                                        : 0 + ch->getLevel() > 50   ? 1
-                                                                                   : 0);
-    ch->saves[SAVE_TYPE_COLD] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
-                                                        : 0 + ch->getLevel() > 53   ? 1
-                                                        : 0 + ch->getLevel() > 50   ? 1
-                                                                                   : 0);
-    ch->saves[SAVE_TYPE_ENERGY] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
-                                                          : 0 + ch->getLevel() > 53   ? 1
-                                                          : 0 + ch->getLevel() > 50   ? 1
-                                                                                     : 0);
-    ch->saves[SAVE_TYPE_ACID] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
-                                                        : 0 + ch->getLevel() > 53   ? 1
-                                                        : 0 + ch->getLevel() > 50   ? 1
-                                                                                   : 0);
-    ch->saves[SAVE_TYPE_MAGIC] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
                                                          : 0 + ch->getLevel() > 53   ? 1
                                                          : 0 + ch->getLevel() > 50   ? 1
-                                                                                    : 0);
-    ch->saves[SAVE_TYPE_POISON] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                                                     : 0);
+    ch->saves[SAVE_TYPE_COLD] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                         : 0 + ch->getLevel() > 53   ? 1
+                                                         : 0 + ch->getLevel() > 50   ? 1
+                                                                                     : 0);
+    ch->saves[SAVE_TYPE_ENERGY] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                           : 0 + ch->getLevel() > 53   ? 1
+                                                           : 0 + ch->getLevel() > 50   ? 1
+                                                                                       : 0);
+    ch->saves[SAVE_TYPE_ACID] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                         : 0 + ch->getLevel() > 53   ? 1
+                                                         : 0 + ch->getLevel() > 50   ? 1
+                                                                                     : 0);
+    ch->saves[SAVE_TYPE_MAGIC] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
                                                           : 0 + ch->getLevel() > 53   ? 1
                                                           : 0 + ch->getLevel() > 50   ? 1
-                                                                                     : 0);
+                                                                                      : 0);
+    ch->saves[SAVE_TYPE_POISON] -= (ch->getLevel() == 60 ? 1 : 0 + ch->getLevel() > 56 ? 1
+                                                           : 0 + ch->getLevel() > 53   ? 1
+                                                           : 0 + ch->getLevel() > 50   ? 1
+                                                                                       : 0);
     ch->setLevel(51);
 
     // messagemoose

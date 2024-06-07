@@ -33,7 +33,7 @@ int load_debug = 0;
 #include <typeinfo>
 
 #include "affect.h"
-#include "db.h"
+#include "DC/db.h"
 #include "memory.h"
 #include "structs.h"  // MAX_STRING_LENGTH
 #include "weather.h"  // structs

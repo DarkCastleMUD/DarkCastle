@@ -14,7 +14,7 @@
 #include "levels.h"
 #include "obj.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "room.h"
 #include "interp.h"
 #include "returnvals.h"

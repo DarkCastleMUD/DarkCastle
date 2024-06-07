@@ -11,7 +11,7 @@
 #include "utility.h"
 #include "levels.h"
 #include "player.h"
-#include "db.h"
+#include "DC/db.h"
 #include "interp.h"
 #include "returnvals.h"
 #include "ki.h"

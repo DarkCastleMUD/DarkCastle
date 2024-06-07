@@ -17,7 +17,7 @@
 #include "room.h"
 #include "utility.h"
 #include "cassert"
-#include "db.h"
+#include "DC/db.h"
 #include "vault.h"
 #include "returnvals.h"
 #include "interp.h"

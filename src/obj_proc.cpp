@@ -10,7 +10,6 @@
 
 #include <fmt/format.h>
 
-#include "db.h"
 #include "fight.h"
 #include "room.h"
 #include "obj.h"
@@ -19,7 +18,7 @@
 #include "utility.h"
 #include "character.h"
 #include "handler.h"
-#include "db.h"
+#include "DC/db.h"
 #include "player.h"
 #include "levels.h"
 #include "sing.h"

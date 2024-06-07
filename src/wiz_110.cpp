@@ -29,7 +29,7 @@
 #include "spells.h"
 #include "interp.h"
 #include "const.h"
-#include "db.h"
+#include "DC/db.h"
 #include "Leaderboard.h"
 #include "guild.h"
 #include "const.h"

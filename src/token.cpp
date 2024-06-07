@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <cstdio>
 // DarkCastle header files
-#include "db.h"
+#include "DC/db.h"
 #include "room.h"
 #include "character.h" // Character
 #include "obj.h"       // Object
@@ -249,8 +249,8 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                 default:
                   break;
                 } // switch
-              }   // if they are appropriate
-            }     // if it's ansi or vt100
+              } // if they are appropriate
+            } // if it's ansi or vt100
             else if (current->IsCode())
             {
 #ifdef DEBUG_TOKEN
@@ -503,8 +503,8 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
               default: // Illegal code - just output it
                 interp += current->GetBuf();
                 break;
-              }  /* switch */
-            }    /* if it's a code */
+              } /* switch */
+            } /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
               logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, LogChannels::LOG_BUG);
@@ -612,5 +612,5 @@ void Token::SetBuf(char *rhs)
 #endif
       break;
     } /* switch */
-  }   /* else */
+  } /* else */
 }

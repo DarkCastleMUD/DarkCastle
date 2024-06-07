@@ -32,7 +32,7 @@
 #include "interp.h"
 #include "utility.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include "returnvals.h"
 #include "fileinfo.h"
 #include "const.h"

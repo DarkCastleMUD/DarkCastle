@@ -33,7 +33,7 @@
 #include "character.h"
 #include "act.h"
 #include "structs.h"
-#include "db.h"
+#include "DC/db.h"
 #include <cassert>
 #include "mobile.h" // ACT_ISNPC
 #include "race.h"

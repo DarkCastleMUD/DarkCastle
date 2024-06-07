@@ -18,7 +18,7 @@
 #include "connect.h"
 #include "interp.h"
 #include "act.h"
-#include "db.h"
+#include "DC/db.h"
 #include <cstring>
 #include "returnvals.h"
 #include "clan.h"
