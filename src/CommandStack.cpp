@@ -5,10 +5,10 @@
  *      Author: Jared H. Hudson
  */
 
-#include "CommandStack.h"
-#include "player.h"	 // LogChannels::LOG_BUG
-#include "levels.h"	 // IMMORTAL
-#include "utility.h" // logf
+#include "DC/CommandStack.h"
+#include "DC/player.h"	// LogChannels::LOG_BUG
+#include "DC/levels.h"	// IMMORTAL
+#include "DC/utility.h" // logf
 
 uint32_t CommandStack::depth = 0;
 uint32_t CommandStack::max_depth = 5;

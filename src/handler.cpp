@@ -31,31 +31,31 @@
 #include <QString>
 #include <QStringList>
 
-#include "magic.h"
-#include "spells.h"
-#include "room.h"
-#include "obj.h"
-#include "character.h"
-#include "player.h"	 // APPLY
-#include "utility.h" // LOWER
-#include "clan.h"
-#include "levels.h"
+#include "DC/magic.h"
+#include "DC/spells.h"
+#include "DC/room.h"
+#include "DC/obj.h"
+#include "DC/character.h"
+#include "DC/player.h"	// APPLY
+#include "DC/utility.h" // LOWER
+#include "DC/clan.h"
+#include "DC/levels.h"
 #include "DC/db.h"
-#include "mobile.h"
-#include "connect.h" // Connection
-#include "handler.h" // FIND_CHAR_ROOM
-#include "interp.h"	 // do_return
-#include "act.h"
-#include "isr.h"
-#include "race.h"
-#include "fight.h"
-#include "returnvals.h"
-#include "innate.h"
-#include "set.h"
-#include "DC.h"
-#include "const.h"
-#include "corpse.h"
-#include "shop.h"
+#include "DC/mobile.h"
+#include "DC/connect.h" // Connection
+#include "DC/handler.h" // FIND_CHAR_ROOM
+#include "DC/interp.h"	// do_return
+#include "DC/act.h"
+#include "DC/isr.h"
+#include "DC/race.h"
+#include "DC/fight.h"
+#include "DC/returnvals.h"
+#include "DC/innate.h"
+#include "DC/set.h"
+#include "DC/DC.h"
+#include "DC/const.h"
+#include "DC/corpse.h"
+#include "DC/shop.h"
 
 extern class Object *object_list;
 

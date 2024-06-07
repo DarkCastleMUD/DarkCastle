@@ -3,24 +3,24 @@ one liner quest shit
 *****************************************************/
 
 #include <math.h>
-#include "structs.h"
-#include "character.h"
-#include "comm.h"
-#include "fileinfo.h"
-#include "returnvals.h"
-#include "obj.h"
-#include "act.h"
-#include "levels.h"
-#include "interp.h"
-#include "handler.h"
+#include "DC/structs.h"
+#include "DC/character.h"
+#include "DC/comm.h"
+#include "DC/fileinfo.h"
+#include "DC/returnvals.h"
+#include "DC/obj.h"
+#include "DC/act.h"
+#include "DC/levels.h"
+#include "DC/interp.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "connect.h"
-#include "quest.h"
-#include "spells.h"
+#include "DC/connect.h"
+#include "DC/quest.h"
+#include "DC/spells.h"
 #include <vector>
 #include <cstring>
-#include "room.h"
-#include "inventory.h"
+#include "DC/room.h"
+#include "DC/inventory.h"
 
 typedef std::vector<quest_info *> quest_list_t;
 quest_list_t quest_list;

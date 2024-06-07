@@ -6,9 +6,9 @@
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
-#include "punish.h"  // punishment vectors
-#include "structs.h" // uint8_t
-#include "class.h"
+#include "DC/punish.h"  // punishment vectors
+#include "DC/structs.h" // uint8_t
+#include "DC/class.h"
 /************************************************************************
 | Character.misc vector
 |  These should probably not be combined, and they probably shouldn't

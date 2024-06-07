@@ -10,23 +10,23 @@
 #include <cstring>
 #include <fmt/format.h>
 
-#include "ki.h"
-#include "room.h"
-#include "character.h"
-#include "spells.h" // tar_char..
-#include "levels.h"
-#include "utility.h"
-#include "player.h"
-#include "interp.h"
-#include "mobile.h"
-#include "fight.h"
-#include "handler.h"
-#include "connect.h"
-#include "act.h"
+#include "DC/ki.h"
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/spells.h" // tar_char..
+#include "DC/levels.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/interp.h"
+#include "DC/mobile.h"
+#include "DC/fight.h"
+#include "DC/handler.h"
+#include "DC/connect.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "returnvals.h"
+#include "DC/returnvals.h"
 #include <vector>
-#include "handler.h"
+#include "DC/handler.h"
 
 struct ki_info_type ki_info[] = {
     {/* 0 */

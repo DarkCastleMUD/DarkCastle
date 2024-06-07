@@ -17,10 +17,10 @@
 #ifndef SPELLS_H_
 #define SPELLS_H_
 
-#include "structs.h" // uint8_t, int16_t
-#include "handler.h"
-#include "obj.h"
-#include "character.h"
+#include "DC/structs.h" // uint8_t, int16_t
+#include "DC/handler.h"
+#include "DC/obj.h"
+#include "DC/character.h"
 
 #include <map>
 

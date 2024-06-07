@@ -5,20 +5,20 @@
 
 #include <fmt/format.h>
 
-#include "wizard.h"
-#include "utility.h"
-#include "mobile.h"
-#include "player.h"
+#include "DC/wizard.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/player.h"
 #include "DC/db.h"
-#include "connect.h"
-#include "interp.h"
-#include "room.h"
-#include "handler.h"
-#include "returnvals.h"
-#include "spells.h"
-#include "clan.h"
-#include "race.h"
-#include "const.h"
+#include "DC/connect.h"
+#include "DC/interp.h"
+#include "DC/room.h"
+#include "DC/handler.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
+#include "DC/clan.h"
+#include "DC/race.h"
+#include "DC/const.h"
 
 int do_boot(Character *ch, char *arg, int cmd)
 {

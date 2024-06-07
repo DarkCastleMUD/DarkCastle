@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 #include <QDebug>
-#include "memory.h"
+#include "DC/memory.h"
 
 /************************************************************************
 | void * dc_alloc(size_t nmemb, size_t size)

@@ -8,8 +8,8 @@
 #ifndef KI_H_
 #define KI_H_
 
-#include "structs.h" // uint8_t, uint8_t, etc..
-#include "character.h"
+#include "DC/structs.h" // uint8_t, uint8_t, etc..
+#include "DC/character.h"
 
 typedef int KI_FUN(uint8_t level, Character *ch, char *arg, Character *vict);
 

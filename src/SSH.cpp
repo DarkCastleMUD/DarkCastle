@@ -3,15 +3,13 @@
 #include <libssh/callbacks.h>
 #include <QDebug>
 
-#include "SSH.h"
-#include "utility.h"
+#include "DC/SSH.h"
+#include "DC/utility.h"
 
 namespace SSH
 {
 
-  
-
-  SSH::SSH(QObject *parent) : QObject(parent)
+    SSH::SSH(QObject *parent) : QObject(parent)
   {
   }
 

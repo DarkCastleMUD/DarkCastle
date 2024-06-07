@@ -13,10 +13,10 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 #include "DC/db.h"
-#include "room.h"
-#include "levels.h"
-#include "player.h"
-#include "utility.h"
+#include "DC/room.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/utility.h"
 
 typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);

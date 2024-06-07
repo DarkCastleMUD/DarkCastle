@@ -23,24 +23,24 @@ uint64_t i = UINT64_MAX;
 #include <fmt/format.h>
 #include <QFile>
 
-#include "fileinfo.h"
+#include "DC/fileinfo.h"
 #include "DC/db.h" // real_room
-#include "player.h"
-#include "utility.h"
-#include "character.h"
-#include "connect.h"  // Connection
-#include "mobile.h"   // utility.h stuff
-#include "clan.h"     // duh
-#include "interp.h"   // do_outcast, etc..
-#include "levels.h"   // levels
-#include "handler.h"  // get_char_room_vis
-#include "terminal.h" // get_char_room_vis
-#include "room.h"     // CLAN_ROOM flag
-#include "returnvals.h"
-#include "spells.h"
-#include "DC.h"
-#include "Trace.h"
-#include "clan.h"
+#include "DC/player.h"
+#include "DC/utility.h"
+#include "DC/character.h"
+#include "DC/connect.h"  // Connection
+#include "DC/mobile.h"   // utility.h stuff
+#include "DC/clan.h"     // duh
+#include "DC/interp.h"   // do_outcast, etc..
+#include "DC/levels.h"   // levels
+#include "DC/handler.h"  // get_char_room_vis
+#include "DC/terminal.h" // get_char_room_vis
+#include "DC/room.h"     // CLAN_ROOM flag
+#include "DC/returnvals.h"
+#include "DC/spells.h"
+#include "DC/DC.h"
+#include "DC/Trace.h"
+#include "DC/clan.h"
 
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);

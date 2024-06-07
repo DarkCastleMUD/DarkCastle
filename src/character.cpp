@@ -1,8 +1,8 @@
 #include <QStringTokenizer>
 #include <QFile>
 
-#include "character.h"
-#include "levels.h"
+#include "DC/character.h"
+#include "DC/levels.h"
 #include "DC/db.h"
 
 void set_golem(Character *golem, int golemtype);

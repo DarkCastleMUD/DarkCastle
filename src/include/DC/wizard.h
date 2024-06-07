@@ -13,20 +13,20 @@
 #include <cstring>
 #include <cctype>
 
-#include "character.h"
-#include "act.h"
+#include "DC/character.h"
+#include "DC/act.h"
 
-#include "levels.h"
-#include "utility.h"
-#include "mobile.h"
-#include "interp.h"
-#include "room.h"
-#include "handler.h"
-#include "obj.h"
-#include "interp.h"
-#include "terminal.h"
-#include "player.h"
-#include "connect.h"
+#include "DC/levels.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/room.h"
+#include "DC/handler.h"
+#include "DC/obj.h"
+#include "DC/interp.h"
+#include "DC/terminal.h"
+#include "DC/player.h"
+#include "DC/connect.h"
 #include "ctime"
 #include "DC/db.h"
 

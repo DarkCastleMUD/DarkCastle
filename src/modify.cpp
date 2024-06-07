@@ -21,16 +21,16 @@
 #include <ctime>
 #include <cstdlib>
 
-#include "connect.h" // Connection
-#include "utility.h"
-#include "character.h"
-#include "mobile.h"
-#include "interp.h"
-#include "levels.h"
-#include "player.h"
-#include "obj.h"
-#include "spells.h"
-#include "handler.h"
+#include "DC/connect.h" // Connection
+#include "DC/utility.h"
+#include "DC/character.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/obj.h"
+#include "DC/spells.h"
+#include "DC/handler.h"
 #include "DC/db.h"
 #include <string>
 #include <iostream>

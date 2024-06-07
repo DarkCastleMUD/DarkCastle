@@ -10,7 +10,7 @@
  *
  */
 /* $Id: event.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
-#include "character.h"
+#include "DC/character.h"
 
 #define MAX_NUM_EVT 1024
 

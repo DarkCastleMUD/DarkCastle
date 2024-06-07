@@ -30,25 +30,25 @@
 #include <fmt/format.h>
 #include <QStringList>
 
-#include "structs.h" // MAX_STRING_LENGTH
-#include "character.h"
-#include "interp.h"
-#include "levels.h"
-#include "utility.h"
-#include "player.h"
-#include "fight.h"
-#include "spells.h" // ETHERAL consts
-#include "mobile.h"
-#include "connect.h" // Connection
-#include "room.h"
+#include "DC/structs.h" // MAX_STRING_LENGTH
+#include "DC/character.h"
+#include "DC/interp.h"
+#include "DC/levels.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/fight.h"
+#include "DC/spells.h" // ETHERAL consts
+#include "DC/mobile.h"
+#include "DC/connect.h" // Connection
+#include "DC/room.h"
 #include "DC/db.h"
-#include "act.h"
-#include "returnvals.h"
-#include "terminal.h"
-#include "CommandStack.h"
-#include "const.h"
-#include "DC.h"
-#include "Command.h"
+#include "DC/act.h"
+#include "DC/returnvals.h"
+#include "DC/terminal.h"
+#include "DC/CommandStack.h"
+#include "DC/const.h"
+#include "DC/DC.h"
+#include "DC/Command.h"
 
 #define SKILL_HIDE 337
 

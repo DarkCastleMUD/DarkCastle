@@ -15,22 +15,22 @@
 #include <cstring>
 #include <cctype>
 
-#include "obj.h"
-#include "mobile.h"
-#include "character.h"
-#include "utility.h"
-#include "player.h"
-#include "levels.h"
-#include "clan.h"
-#include "room.h"
-#include "weather.h"
-#include "handler.h"
-#include "terminal.h"
-#include "interp.h"
-#include "connect.h"
+#include "DC/obj.h"
+#include "DC/mobile.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/clan.h"
+#include "DC/room.h"
+#include "DC/weather.h"
+#include "DC/handler.h"
+#include "DC/terminal.h"
+#include "DC/interp.h"
+#include "DC/connect.h"
 #include "DC/db.h" // help_index_element
-#include "spells.h"
-#include "returnvals.h"
+#include "DC/spells.h"
+#include "DC/returnvals.h"
 
 /* Used for "who" */
 int max_who = 0;

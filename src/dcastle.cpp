@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <cstring>
 #include <QCoreApplication>
-#include "DC.h"
-#include "handler.h"
+#include "DC/DC.h"
+#include "DC/handler.h"
 #include <iostream>
 
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;

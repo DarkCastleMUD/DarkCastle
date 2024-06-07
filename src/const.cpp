@@ -14,18 +14,17 @@
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
-
 #include <cstdio>
 
 #include <map>
 #include <string>
 
-#include "obj.h"
-#include "player.h" // *app_type
-#include "character.h"
-#include "spells.h"
-#include "levels.h"
-#include "mobile.h"
+#include "DC/obj.h"
+#include "DC/player.h" // *app_type
+#include "DC/character.h"
+#include "DC/spells.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
 
 room_t IMM_PIRAHNA_ROOM = 25;
 

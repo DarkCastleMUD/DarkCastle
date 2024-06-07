@@ -3,24 +3,24 @@
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
-#include "wizard.h"
-#include "character.h"
-#include "utility.h"
-#include "levels.h"
+#include "DC/wizard.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
 #include "DC/db.h"
-#include "room.h"
-#include "player.h"
-#include "obj.h"
-#include "mobile.h"
-#include "handler.h"
-#include "connect.h"
-#include "spells.h"
-#include "interp.h"
-#include "returnvals.h"
+#include "DC/room.h"
+#include "DC/player.h"
+#include "DC/obj.h"
+#include "DC/mobile.h"
+#include "DC/handler.h"
+#include "DC/connect.h"
+#include "DC/spells.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
 #include <unistd.h>
-#include "comm.h"
-#include "const.h"
-#include "inventory.h"
+#include "DC/comm.h"
+#include "DC/const.h"
+#include "DC/inventory.h"
 #include <fmt/format.h>
 
 int getRealSpellDamage(Character *ch);

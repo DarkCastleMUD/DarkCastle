@@ -2,16 +2,16 @@
 | Level 106 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
-#include "handler.h"
-#include "spells.h"
-#include "utility.h"
-#include "connect.h"
-#include "levels.h"
-#include "mobile.h"
-#include "interp.h"
-#include "player.h"
-#include "returnvals.h"
+#include "DC/wizard.h"
+#include "DC/handler.h"
+#include "DC/spells.h"
+#include "DC/utility.h"
+#include "DC/connect.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/player.h"
+#include "DC/returnvals.h"
 
 #include <fmt/format.h>
 

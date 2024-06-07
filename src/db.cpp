@@ -32,34 +32,34 @@ int load_debug = 0;
 #include <limits>
 #include <typeinfo>
 
-#include "affect.h"
+#include "DC/affect.h"
 #include "DC/db.h"
-#include "memory.h"
-#include "structs.h"  // MAX_STRING_LENGTH
-#include "weather.h"  // structs
-#include "timeinfo.h" // structs
-#include "player.h"	  // log info
-#include "fileinfo.h" // file names
-#include "utility.h"  // assign..
-#include "levels.h"
-#include "character.h"
-#include "mobile.h"
-#include "room.h"
-#include "race.h"
-#include "obj.h"		 // extra_descr_data
-#include "handler.h"	 // get_obj_num
-#include "connect.h"	 // Connection
-#include "game_portal.h" // load_game_portals()
-#include "interp.h"
-#include "returnvals.h"
-#include "spells.h" // command_range
-#include "shop.h"
-#include "help.h"
-#include "quest.h"
-#include "vault.h"
-#include "const.h"
-#include "wizard.h"
-#include "Command.h"
+#include "DC/memory.h"
+#include "DC/structs.h"	 // MAX_STRING_LENGTH
+#include "DC/weather.h"	 // structs
+#include "DC/timeinfo.h" // structs
+#include "DC/player.h"	 // log info
+#include "DC/fileinfo.h" // file names
+#include "DC/utility.h"	 // assign..
+#include "DC/levels.h"
+#include "DC/character.h"
+#include "DC/mobile.h"
+#include "DC/room.h"
+#include "DC/race.h"
+#include "DC/obj.h"			// extra_descr_data
+#include "DC/handler.h"		// get_obj_num
+#include "DC/connect.h"		// Connection
+#include "DC/game_portal.h" // load_game_portals()
+#include "DC/interp.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h" // command_range
+#include "DC/shop.h"
+#include "DC/help.h"
+#include "DC/quest.h"
+#include "DC/vault.h"
+#include "DC/const.h"
+#include "DC/wizard.h"
+#include "DC/Command.h"
 
 int load_new_help(FILE *fl, int reload, Character *ch);
 void load_vaults();

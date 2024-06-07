@@ -5,21 +5,21 @@
 |
 | File create with do_layhands -Pirahna 7/6/1999
 */
-#include "structs.h"
-#include "character.h"
-#include "player.h"
-#include "fight.h"
-#include "utility.h"
-#include "spells.h"
-#include "handler.h"
-#include "levels.h"
-#include "connect.h"
-#include "mobile.h"
-#include "room.h"
-#include "act.h"
+#include "DC/structs.h"
+#include "DC/character.h"
+#include "DC/player.h"
+#include "DC/fight.h"
+#include "DC/utility.h"
+#include "DC/spells.h"
+#include "DC/handler.h"
+#include "DC/levels.h"
+#include "DC/connect.h"
+#include "DC/mobile.h"
+#include "DC/room.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "returnvals.h"
-#include "interp.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the

@@ -25,26 +25,26 @@
 
 #include <cstdio>
 
-#include "character.h"
-#include "room.h"
-#include "mobile.h"
-#include "utility.h"
-#include "fight.h"
+#include "DC/character.h"
+#include "DC/room.h"
+#include "DC/mobile.h"
+#include "DC/utility.h"
+#include "DC/fight.h"
 #include "DC/db.h" // index_data
-#include "player.h"
-#include "levels.h"
-#include "act.h"
-#include "handler.h"
-#include "interp.h"
-#include "returnvals.h"
-#include "spells.h"
-#include "race.h" // Race defines used in align-aggro messages.
-#include "comm.h"
-#include "connect.h"
-#include "inventory.h"
-#include "const.h"
-#include "Timer.h"
-#include "move.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/act.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
+#include "DC/race.h" // Race defines used in align-aggro messages.
+#include "DC/comm.h"
+#include "DC/connect.h"
+#include "DC/inventory.h"
+#include "DC/const.h"
+#include "DC/Timer.h"
+#include "DC/move.h"
 
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);

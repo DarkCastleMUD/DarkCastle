@@ -20,28 +20,28 @@ void load_auction_tickets()
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "obj.h"
-#include "spells.h"
-#include "player.h"
-#include "terminal.h"
-#include "levels.h"
-#include "character.h"
-#include "room.h"
-#include "utility.h"
+#include "DC/obj.h"
+#include "DC/spells.h"
+#include "DC/player.h"
+#include "DC/terminal.h"
+#include "DC/levels.h"
+#include "DC/character.h"
+#include "DC/room.h"
+#include "DC/utility.h"
 #include <cassert>
 #include "DC/db.h"
-#include "vault.h"
-#include "returnvals.h"
-#include "interp.h"
+#include "DC/vault.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
 #include <QString>
 #include <map>
 #include <queue>
-#include "fileinfo.h"
+#include "DC/fileinfo.h"
 #include <cerrno>
-#include "const.h"
-#include "inventory.h"
-#include "const.h"
-#include "inventory.h"
+#include "DC/const.h"
+#include "DC/inventory.h"
+#include "DC/const.h"
+#include "DC/inventory.h"
 
 #define auction_duration 1209600
 #define AUC_MIN_PRICE 1000

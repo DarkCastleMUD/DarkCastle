@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <sstream>
 #include <string>
-#include "character.h"
+#include "DC/character.h"
 
 class Leaderboard
 {

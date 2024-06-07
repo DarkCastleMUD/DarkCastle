@@ -8,10 +8,10 @@
 
 #include <cassert>
 
-#include "DC.h"
+#include "DC/DC.h"
 #include "DC/db.h"
-#include "Version.h"
-#include "character.h"
+#include "DC/Version.h"
+#include "DC/character.h"
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";

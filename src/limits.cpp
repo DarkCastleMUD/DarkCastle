@@ -18,32 +18,32 @@
 #include <cstring>
 
 #ifdef BANDWIDTH
-#include "bandwidth.h"
+#include "DC/bandwidth.h"
 #endif
-#include "room.h"
-#include "character.h"
-#include "utility.h"
-#include "mobile.h"
-#include "isr.h"
-#include "spells.h" // TYPE
-#include "levels.h"
-#include "player.h"
-#include "obj.h"
-#include "connect.h"
-#include "DC/db.h" // exp_table
-#include "fight.h" // damage
-#include "ki.h"
-#include "game_portal.h"
-#include "act.h"
-#include "handler.h"
-#include "race.h"
-#include "returnvals.h"
-#include "interp.h"
-#include "clan.h" //totem
-#include "vault.h"
-#include "inventory.h"
-#include "const.h"
-#include "corpse.h"
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/isr.h"
+#include "DC/spells.h" // TYPE
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/obj.h"
+#include "DC/connect.h"
+#include "DC/db.h"	  // exp_table
+#include "DC/fight.h" // damage
+#include "DC/ki.h"
+#include "DC/game_portal.h"
+#include "DC/act.h"
+#include "DC/handler.h"
+#include "DC/race.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
+#include "DC/clan.h" //totem
+#include "DC/vault.h"
+#include "DC/inventory.h"
+#include "DC/const.h"
+#include "DC/corpse.h"
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */

@@ -9,10 +9,10 @@
 
 #include <QSharedPointer>
 #include <expected>
-#include "structs.h" // uint8_t
-#include "class.h"
-#include "Zone.h"
-#include "common.h"
+#include "DC/structs.h" // uint8_t
+#include "DC/class.h"
+#include "DC/Zone.h"
+#include "DC/common.h"
 
 /* Bitvector For 'room_flags' */
 

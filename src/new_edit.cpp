@@ -5,17 +5,17 @@
 #include <ctime>
 #include <cstdlib>
 
-#include "connect.h" // Connection
-#include "character.h"
-#include "utility.h"
-#include "mobile.h"
-#include "interp.h"
-#include "levels.h"
-#include "player.h"
-#include "obj.h"
-#include "handler.h"
+#include "DC/connect.h" // Connection
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/obj.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "newedit.h"
+#include "DC/newedit.h"
 
 #include <string>
 #include <fmt/format.h>

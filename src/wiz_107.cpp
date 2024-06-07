@@ -2,16 +2,16 @@
 | Level 107 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
-#include "interp.h"
-#include "utility.h"
-#include "levels.h"
-#include "player.h"
-#include "mobile.h"
-#include "connect.h"
-#include "handler.h"
-#include "returnvals.h"
-#include "spells.h"
+#include "DC/wizard.h"
+#include "DC/interp.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/mobile.h"
+#include "DC/connect.h"
+#include "DC/handler.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
 
 int do_archive(Character *ch, char *argument, int cmd)
 {

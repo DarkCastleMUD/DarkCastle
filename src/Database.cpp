@@ -1,5 +1,5 @@
-#include "Database.h"
-#include "utility.h" // logentry
+#include "DC/Database.h"
+#include "DC/utility.h" // logentry
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>

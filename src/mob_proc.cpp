@@ -16,28 +16,28 @@
 #include <cassert>
 #include <cstring>
 
-#include "character.h"
-#include "structs.h"
-#include "utility.h"
-#include "mobile.h"
-#include "spells.h"
-#include "room.h"
-#include "handler.h"
-#include "magic.h"
-#include "levels.h"
-#include "fight.h"
-#include "obj.h"
-#include "player.h"
-#include "connect.h"
-#include "interp.h"
-#include "isr.h"
-#include "race.h"
-#include "DC/db.h" // real_room
-#include "sing.h"  // bard skills
-#include "act.h"
-#include "ki.h" // monk skills
-#include "returnvals.h"
-#include "const.h"
+#include "DC/character.h"
+#include "DC/structs.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/spells.h"
+#include "DC/room.h"
+#include "DC/handler.h"
+#include "DC/magic.h"
+#include "DC/levels.h"
+#include "DC/fight.h"
+#include "DC/obj.h"
+#include "DC/player.h"
+#include "DC/connect.h"
+#include "DC/interp.h"
+#include "DC/isr.h"
+#include "DC/race.h"
+#include "DC/db.h"   // real_room
+#include "DC/sing.h" // bard skills
+#include "DC/act.h"
+#include "DC/ki.h" // monk skills
+#include "DC/returnvals.h"
+#include "DC/const.h"
 
 /*   external vars  */
 

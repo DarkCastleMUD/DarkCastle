@@ -13,7 +13,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "character.h"
+#include "DC/character.h"
 
 void rebuild_rnum_references(int startAt, int type);
 void mprog_driver(char *com_list, Character *mob,

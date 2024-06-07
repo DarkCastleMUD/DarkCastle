@@ -2,18 +2,18 @@
 | Level 108 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
-#include "interp.h"
-#include "utility.h"
-#include "levels.h"
-#include "mobile.h"
-#include "player.h"
-#include "handler.h"
-#include "returnvals.h"
-#include "spells.h"
+#include "DC/wizard.h"
+#include "DC/interp.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/player.h"
+#include "DC/handler.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
 #include <string>
-#include "game_portal.h"
-#include "const.h"
+#include "DC/game_portal.h"
+#include "DC/const.h"
 
 int get_number(char **name);
 

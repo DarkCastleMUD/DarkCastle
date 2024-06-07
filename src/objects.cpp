@@ -7,25 +7,25 @@
 
 #include <cctype>
 #include <cstring>
-#include "obj.h"
-#include "connect.h"
-#include "utility.h"
-#include "room.h"
-#include "spells.h"
-#include "player.h"
-#include "handler.h"
-#include "affect.h"
-#include "levels.h"
-#include "interp.h"
-#include "character.h"
-#include "act.h"
-#include "structs.h"
+#include "DC/obj.h"
+#include "DC/connect.h"
+#include "DC/utility.h"
+#include "DC/room.h"
+#include "DC/spells.h"
+#include "DC/player.h"
+#include "DC/handler.h"
+#include "DC/affect.h"
+#include "DC/levels.h"
+#include "DC/interp.h"
+#include "DC/character.h"
+#include "DC/act.h"
+#include "DC/structs.h"
 #include "DC/db.h"
 #include <cassert>
-#include "mobile.h" // ACT_ISNPC
-#include "race.h"
-#include "returnvals.h"
-#include "clan.h" // vault stuff
+#include "DC/mobile.h" // ACT_ISNPC
+#include "DC/race.h"
+#include "DC/returnvals.h"
+#include "DC/clan.h" // vault stuff
 
 extern const char *drinks[];
 extern const char *dirs[];

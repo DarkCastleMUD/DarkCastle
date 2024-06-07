@@ -6,23 +6,23 @@
 
 #include <cctype>
 
-#include "character.h"
-#include "room.h"
-#include "affect.h"
-#include "utility.h"
-#include "mobile.h"
-#include "interp.h"
-#include "handler.h"
-#include "clan.h"
-#include "levels.h"
-#include "act.h"
+#include "DC/character.h"
+#include "DC/room.h"
+#include "DC/affect.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/handler.h"
+#include "DC/clan.h"
+#include "DC/levels.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "player.h"
-#include "sing.h" // stop_grouped_bards
+#include "DC/player.h"
+#include "DC/sing.h" // stop_grouped_bards
 #include <cstring>
-#include "returnvals.h"
-#include "spells.h"
-#include "terminal.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
+#include "DC/terminal.h"
 
 char *calc_color(int hit, int max_hit);
 

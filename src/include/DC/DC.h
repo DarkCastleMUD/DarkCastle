@@ -96,27 +96,27 @@
 #include <QString>
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
-#include "DC_global.h"
+#include "DC/DC_global.h"
 
 typedef uint64_t vnum_t;
 typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
-#include "connect.h"
-#include "character.h"
-#include "obj.h"
-#include "fileinfo.h"
-#include "Trace.h"
-#include "SSH.h"
-#include "weather.h"
-#include "Zone.h"
-#include "Shops.h"
-#include "room.h"
-#include "Database.h"
-#include "interp.h"
-#include "Command.h"
-#include "clan.h"
+#include "DC/connect.h"
+#include "DC/character.h"
+#include "DC/obj.h"
+#include "DC/fileinfo.h"
+#include "DC/Trace.h"
+#include "DC/SSH.h"
+#include "DC/weather.h"
+#include "DC/Zone.h"
+#include "DC/Shops.h"
+#include "DC/room.h"
+#include "DC/Database.h"
+#include "DC/interp.h"
+#include "DC/Command.h"
+#include "DC/clan.h"
 
 class Connection;
 class index_data;

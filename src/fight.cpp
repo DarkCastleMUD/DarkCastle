@@ -30,34 +30,34 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "fight.h"
-#include "levels.h"
-#include "race.h"
-#include "player.h" // log
-#include "character.h"
-#include "utility.h" // log
-#include "connect.h"
-#include "spells.h" // weapon_spells
-#include "isr.h"
-#include "mobile.h"
-#include "room.h"
-#include "handler.h"
-#include "interp.h"   // do_flee()
-#include "fileinfo.h" // SAVE_DIR
-#include "DC/db.h"    // fread_string()
-#include "connect.h"  // Connection
-#include "magic.h"    // weapon spells
-#include "terminal.h" // YELLOW, etc..
-#include "act.h"
-#include "clan.h"
-#include "returnvals.h"
-#include "sing.h" // stop_grouped_bards
-#include "innate.h"
-#include "token.h"
-#include "vault.h"
-#include "const.h"
-#include "corpse.h"
-#include "stat.h"
+#include "DC/fight.h"
+#include "DC/levels.h"
+#include "DC/race.h"
+#include "DC/player.h" // log
+#include "DC/character.h"
+#include "DC/utility.h" // log
+#include "DC/connect.h"
+#include "DC/spells.h" // weapon_spells
+#include "DC/isr.h"
+#include "DC/mobile.h"
+#include "DC/room.h"
+#include "DC/handler.h"
+#include "DC/interp.h"   // do_flee()
+#include "DC/fileinfo.h" // SAVE_DIR
+#include "DC/db.h"       // fread_string()
+#include "DC/connect.h"  // Connection
+#include "DC/magic.h"    // weapon spells
+#include "DC/terminal.h" // YELLOW, etc..
+#include "DC/act.h"
+#include "DC/clan.h"
+#include "DC/returnvals.h"
+#include "DC/sing.h" // stop_grouped_bards
+#include "DC/innate.h"
+#include "DC/token.h"
+#include "DC/vault.h"
+#include "DC/const.h"
+#include "DC/corpse.h"
+#include "DC/stat.h"
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 

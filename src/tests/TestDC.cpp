@@ -3,13 +3,13 @@
 
 #include <QTest>
 
-#include "utility.h"
-#include "sing.h"
-#include "comm.h"
-#include "handler.h"
+#include "DC/utility.h"
+#include "DC/sing.h"
+#include "DC/comm.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "spells.h"
-#include "vault.h"
+#include "DC/spells.h"
+#include "DC/vault.h"
 
 using namespace std::literals;
 

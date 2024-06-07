@@ -8,9 +8,9 @@
 |   act() function
 */
 #include <string>
-#include "character.h"
-#include "obj.h"
-#include "token.h"
+#include "DC/character.h"
+#include "DC/obj.h"
+#include "DC/token.h"
 //--
 // Function interface
 //--

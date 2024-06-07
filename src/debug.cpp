@@ -12,18 +12,18 @@
 #include <QtSql/QSqlField>
 #include <QtSql/QSqlError>
 
-#include "spells.h"
-#include "connect.h"
-#include "utility.h"
+#include "DC/spells.h"
+#include "DC/connect.h"
+#include "DC/utility.h"
 #include "DC/db.h"
-#include "obj.h"
-#include "const.h"
-#include "utility.h"
-#include "vault.h"
-#include "Leaderboard.h"
-#include "interp.h"
-#include "DC.h"
-#include "Database.h"
+#include "DC/obj.h"
+#include "DC/const.h"
+#include "DC/utility.h"
+#include "DC/vault.h"
+#include "DC/Leaderboard.h"
+#include "DC/interp.h"
+#include "DC/DC.h"
+#include "DC/Database.h"
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u4 *st, Character *ch);

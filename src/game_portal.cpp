@@ -4,17 +4,17 @@
 |   move throughout the game.
 */
 #include <cstdio>
-#include "game_portal.h"
-#include "fileinfo.h"
-#include "structs.h"
-#include "character.h"
-#include "utility.h"
-#include "player.h"
-#include "levels.h"
-#include "obj.h"
-#include "room.h"
+#include "DC/game_portal.h"
+#include "DC/fileinfo.h"
+#include "DC/structs.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/room.h"
 #include "DC/db.h"
-#include "handler.h"
+#include "DC/handler.h"
 
 #include <cstring>
 

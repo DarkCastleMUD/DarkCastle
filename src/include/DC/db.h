@@ -27,10 +27,10 @@
 
 #include <QDateTime>
 
-#include "character.h"
-#include "weather.h"
-#include "handler.h"
-#include "DC.h"
+#include "DC/character.h"
+#include "DC/weather.h"
+#include "DC/handler.h"
+#include "DC/DC.h"
 
 extern class Object *object_list;
 extern room_t top_of_world;

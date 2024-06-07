@@ -1,7 +1,7 @@
-#include "Command.h"
-#include "character.h"
-#include "levels.h"
-#include "common.h"
+#include "DC/Command.h"
+#include "DC/character.h"
+#include "DC/levels.h"
+#include "DC/common.h"
 
 QMap<QString, Command> Commands::map_ = {};
 

@@ -9,22 +9,22 @@
 
 #include <string>
 
-#include "character.h"
-#include "comm.h"
-#include "levels.h"
+#include "DC/character.h"
+#include "DC/comm.h"
+#include "DC/levels.h"
 #include "DC/db.h"
-#include "room.h"
-#include "utility.h"
-#include "player.h"
-#include "terminal.h"
-#include "handler.h"
-#include "obj.h"
-#include "connect.h"
-#include "act.h"
-#include "mobile.h"
-#include "token.h"
-#include "spells.h"
-#include "returnvals.h"
+#include "DC/room.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/terminal.h"
+#include "DC/handler.h"
+#include "DC/obj.h"
+#include "DC/connect.h"
+#include "DC/act.h"
+#include "DC/mobile.h"
+#include "DC/token.h"
+#include "DC/spells.h"
+#include "DC/returnvals.h"
 
 extern bool MOBtrigger;
 

@@ -11,23 +11,23 @@
 #include <fmt/format.h>
 #include <tracy/Tracy.hpp>
 
-#include "structs.h"
+#include "DC/structs.h"
 #include "DC/db.h"
-#include "utility.h"
-#include "vault.h"
-#include "room.h"
-#include "player.h"
-#include "fileinfo.h"
-#include "obj.h"
-#include "act.h"
-#include "handler.h"
-#include "levels.h"
-#include "connect.h"
-#include "returnvals.h"
-#include "interp.h"
-#include "spells.h"
-#include "clan.h" // clan right
-#include "inventory.h"
+#include "DC/utility.h"
+#include "DC/vault.h"
+#include "DC/room.h"
+#include "DC/player.h"
+#include "DC/fileinfo.h"
+#include "DC/obj.h"
+#include "DC/act.h"
+#include "DC/handler.h"
+#include "DC/levels.h"
+#include "DC/connect.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
+#include "DC/spells.h"
+#include "DC/clan.h" // clan right
+#include "DC/inventory.h"
 
 class vault_search_parameter
 {

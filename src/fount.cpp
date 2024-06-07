@@ -14,14 +14,14 @@
 #include <cstdio>
 #include <cctype>
 
-#include "room.h"
-#include "obj.h"
-#include "character.h"
-#include "utility.h"
-#include "act.h"
+#include "DC/room.h"
+#include "DC/obj.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "handler.h"
-#include "interp.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
 
 /*************************************************************************
  * Figures out if a fountain is present in the room                       *

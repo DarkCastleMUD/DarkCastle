@@ -14,17 +14,17 @@
 #include <cstdio>
 // DarkCastle header files
 #include "DC/db.h"
-#include "room.h"
-#include "character.h" // Character
-#include "obj.h"       // Object
-#include "levels.h"    // MIN_GOD
-#include "utility.h"   // GET_SHORT, GET_LEVEL, &c
-#include "terminal.h"  // colors
-#include "act.h"       // act flags
-#include "player.h"    // Player::PLR_ANSI Player::PLR_VT100
-#include "handler.h"   // fname()
-#include "token.h"     // fname()
-#include "connect.h"
+#include "DC/room.h"
+#include "DC/character.h" // Character
+#include "DC/obj.h"       // Object
+#include "DC/levels.h"    // MIN_GOD
+#include "DC/utility.h"   // GET_SHORT, GET_LEVEL, &c
+#include "DC/terminal.h"  // colors
+#include "DC/act.h"       // act flags
+#include "DC/player.h"    // Player::PLR_ANSI Player::PLR_VT100
+#include "DC/handler.h"   // fname()
+#include "DC/token.h"     // fname()
+#include "DC/connect.h"
 
 #undef DEBUG_TOKEN
 

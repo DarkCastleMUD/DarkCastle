@@ -2,25 +2,25 @@
 #include <cctype>
 #include <cstring>
 
-#include "structs.h"
-#include "room.h"
-#include "character.h"
-#include "obj.h"
-#include "utility.h"
-#include "terminal.h"
-#include "player.h"
-#include "levels.h"
-#include "mobile.h"
-#include "clan.h"
-#include "handler.h"
+#include "DC/structs.h"
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/obj.h"
+#include "DC/utility.h"
+#include "DC/terminal.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/clan.h"
+#include "DC/handler.h"
 #include "DC/db.h" // exp_table
-#include "interp.h"
-#include "connect.h"
-#include "spells.h"
-#include "act.h"
-#include "returnvals.h"
-#include "help.h"
-#include "fileinfo.h"
+#include "DC/interp.h"
+#include "DC/connect.h"
+#include "DC/spells.h"
+#include "DC/act.h"
+#include "DC/returnvals.h"
+#include "DC/help.h"
+#include "DC/fileinfo.h"
 
 #include <map>
 #include <vector>

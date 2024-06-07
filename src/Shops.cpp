@@ -7,9 +7,9 @@
 #include <QSqlQuery>
 #include <QVariant>
 
-#include "shop.h" // legacy shop
-#include "Shops.h"
-#include "utility.h"
+#include "DC/shop.h" // legacy shop
+#include "DC/Shops.h"
+#include "DC/utility.h"
 
 Shops::Shops(QObject *parent)
 {

@@ -29,14 +29,14 @@
 #include <vector>
 #include <queue>
 
-#include "common.h"
-#include "DC.h"
-#include "structs.h"
-#include "weather.h"
-#include "memory.h"
-#include "player.h"
-#include "character.h"
-#include "Trace.h"
+#include "DC/common.h"
+#include "DC/DC.h"
+#include "DC/structs.h"
+#include "DC/weather.h"
+#include "DC/memory.h"
+#include "DC/player.h"
+#include "DC/character.h"
+#include "DC/Trace.h"
 
 enum LogChannels
 {

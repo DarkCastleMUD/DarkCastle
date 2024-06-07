@@ -2,21 +2,21 @@
 | Level 105 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
-#include "spells.h" // Character::PLAYER_CANTQUIT
-#include "mobile.h"
-#include "handler.h"
-#include "room.h"
-#include "player.h"
-#include "fight.h"
-#include "utility.h"
-#include "levels.h"
-#include "interp.h"
-#include "returnvals.h"
-#include "innate.h"
-#include "fileinfo.h"
-#include "const.h"
-#include "Timer.h"
+#include "DC/wizard.h"
+#include "DC/spells.h" // Character::PLAYER_CANTQUIT
+#include "DC/mobile.h"
+#include "DC/handler.h"
+#include "DC/room.h"
+#include "DC/player.h"
+#include "DC/fight.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
+#include "DC/innate.h"
+#include "DC/fileinfo.h"
+#include "DC/const.h"
+#include "DC/Timer.h"
 
 int do_clearaff(Character *ch, char *argument, int cmd)
 {

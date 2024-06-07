@@ -5,8 +5,7 @@
 */
 
 #include <map>
-#include "character.h"
-
+#include "DC/character.h"
 
 /*			 PATHFINDING 				*/
 /*			 PATHFINDING 				*/

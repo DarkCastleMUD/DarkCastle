@@ -44,24 +44,24 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <cstring> // memset()
 #include <cctype>  // isspace(), isdigit()
 
-#include "room.h"
-#include "obj.h"
-#include "player.h"   // MAX_*
-#include "connect.h"  // Connection::states::WRITE_BOARD
-#include "terminal.h" // BOLD
-#include "fileinfo.h" // for the board files
-#include "levels.h"   // levels..
-#include "clan.h"
-#include "character.h"
-#include "utility.h" // false
-#include "memory.h"
-#include "act.h"
+#include "DC/room.h"
+#include "DC/obj.h"
+#include "DC/player.h"   // MAX_*
+#include "DC/connect.h"  // Connection::states::WRITE_BOARD
+#include "DC/terminal.h" // BOLD
+#include "DC/fileinfo.h" // for the board files
+#include "DC/levels.h"   // levels..
+#include "DC/clan.h"
+#include "DC/character.h"
+#include "DC/utility.h" // false
+#include "DC/memory.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "returnvals.h"
+#include "DC/returnvals.h"
 #include <string>
 #include <map>
 #include <vector>
-#include "interp.h"
+#include "DC/interp.h"
 #include <sstream>
 
 #define MAX_MESSAGE_LENGTH 2048

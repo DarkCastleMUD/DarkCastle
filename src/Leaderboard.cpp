@@ -8,16 +8,16 @@
 #include <cstring>
 #include <sstream>
 
-#include "Leaderboard.h"
-#include "utility.h"
-#include "structs.h"
-#include "fileinfo.h"
-#include "connect.h"
-#include "levels.h"
+#include "DC/Leaderboard.h"
+#include "DC/utility.h"
+#include "DC/structs.h"
+#include "DC/fileinfo.h"
+#include "DC/connect.h"
+#include "DC/levels.h"
 #include <climits>
 #include "DC/db.h"
-#include "interp.h"
-#include "returnvals.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
 
 Leaderboard::Leaderboard()
 {

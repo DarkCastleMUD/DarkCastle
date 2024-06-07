@@ -4,7 +4,7 @@
 #include <expected>
 #include <QList>
 #include <QMap>
-#include "common.h"
+#include "DC/common.h"
 
 enum class CommandType
 {

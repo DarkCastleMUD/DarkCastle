@@ -19,9 +19,9 @@
 
 #include <map>
 
-#include "structs.h" // uint8_t, etc..
-#include "comm.h"
-#include "Trace.h"
+#include "DC/structs.h" // uint8_t, etc..
+#include "DC/comm.h"
+#include "DC/Trace.h"
 
 /* handling the affected-structures */
 void affect_total(Character *ch);

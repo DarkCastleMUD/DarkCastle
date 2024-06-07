@@ -3,7 +3,7 @@
 #ifndef LEVELS_H_
 #define LEVELS_H_
 
-#include "structs.h"
+#include "DC/structs.h"
 #include <QString>
 
 #define MORTAL 60

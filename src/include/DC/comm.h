@@ -47,7 +47,7 @@ struct pulse_info
 #define BAN_SELECT 2
 #define BAN_ALL 3
 
-#include "character.h"
+#include "DC/character.h"
 void write_to_output(const char *txt, class Connection *t);
 void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(std::string txt, class Connection *d);

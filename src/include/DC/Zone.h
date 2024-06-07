@@ -4,7 +4,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QList>
-#include "weather.h"
+#include "DC/weather.h"
 
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
@@ -12,8 +12,8 @@ typedef uint64_t room_t;
 class ResetCommand
 {
 public:
-    ResetCommand(){};
-    ResetCommand(char comm) : command(comm), active(1){};
+    ResetCommand() {};
+    ResetCommand(char comm) : command(comm), active(1) {};
     char command = {}; /* current command                      */
     int if_flag = {};  // 0=always 1=if prev exe'd  2=if prev DIDN'T exe   3=ONLY on reboot
     int arg1 = {};

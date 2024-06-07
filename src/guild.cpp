@@ -3,23 +3,23 @@
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
-#include "character.h"
-#include "structs.h"
-#include "spells.h"
-#include "utility.h"
-#include "levels.h"
-#include "player.h"
+#include "DC/character.h"
+#include "DC/structs.h"
+#include "DC/spells.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/player.h"
 #include "DC/db.h" // exp_table
-#include "interp.h"
+#include "DC/interp.h"
 #include <cstring>
-#include "returnvals.h"
-#include "ki.h"
-#include "mobile.h"
-#include "room.h"
-#include "sing.h"
-#include "handler.h"
-#include "const.h"
-#include "guild.h"
+#include "DC/returnvals.h"
+#include "DC/ki.h"
+#include "DC/mobile.h"
+#include "DC/room.h"
+#include "DC/sing.h"
+#include "DC/handler.h"
+#include "DC/const.h"
+#include "DC/guild.h"
 
 extern std::vector<profession> professions;
 

@@ -5,12 +5,12 @@
 */
 #include <cstring>
 
-#include "character.h"
-#include "utility.h"
-#include "levels.h"
-#include "player.h"
-#include "returnvals.h"
-#include "interp.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
 
 command_return_t Character::do_alias(QStringList arguments, int cmd)
 {

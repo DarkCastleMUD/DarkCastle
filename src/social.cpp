@@ -4,21 +4,21 @@
 #include <cstring>
 #include <cstdlib> // qsort()
 
-#include "fileinfo.h" // SOCIAL_FILE
-#include "structs.h"  // MAX_INPUT_LENGTH
-#include "room.h"
-#include "character.h"
-#include "utility.h"
-#include "mobile.h"
-#include "connect.h"
-#include "levels.h"
-#include "player.h"
-#include "social.h"
-#include "handler.h"
-#include "act.h"
+#include "DC/fileinfo.h" // SOCIAL_FILE
+#include "DC/structs.h"  // MAX_INPUT_LENGTH
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/mobile.h"
+#include "DC/connect.h"
+#include "DC/levels.h"
+#include "DC/player.h"
+#include "DC/social.h"
+#include "DC/handler.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "interp.h" // len_cmp
-#include "returnvals.h"
+#include "DC/interp.h" // len_cmp
+#include "DC/returnvals.h"
 
 // storage of socials
 struct social_messg *soc_mess_list; // head of social array

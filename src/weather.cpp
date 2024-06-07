@@ -16,10 +16,10 @@
 
 #include <cstdio>
 #include <cstring>
-#include "timeinfo.h"
-#include "weather.h"
-#include "character.h"
-#include "utility.h"
+#include "DC/timeinfo.h"
+#include "DC/weather.h"
+#include "DC/character.h"
+#include "DC/utility.h"
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.
 // TODO - Add wind, and it's effects (on movement/combat etc)

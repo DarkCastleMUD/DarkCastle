@@ -8,30 +8,30 @@
  *                        noncombat_damage() for damage                  *
  *************************************************************************
  */
-#include "character.h"
-#include "affect.h"
-#include "room.h"
-#include "levels.h"
-#include "utility.h"
-#include "player.h"
-#include "fight.h"
-#include "mobile.h"
-#include "interp.h"
-#include "spells.h"
-#include "handler.h"
+#include "DC/character.h"
+#include "DC/affect.h"
+#include "DC/room.h"
+#include "DC/levels.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/fight.h"
+#include "DC/mobile.h"
+#include "DC/interp.h"
+#include "DC/spells.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "obj.h"
-#include "connect.h"
-#include "act.h"
-#include "race.h" // RACE_FISH
-#include "clan.h" // clan_room_data
+#include "DC/obj.h"
+#include "DC/connect.h"
+#include "DC/act.h"
+#include "DC/race.h" // RACE_FISH
+#include "DC/clan.h" // clan_room_data
 #include <cstring>
-#include "returnvals.h"
-#include "game_portal.h"
-#include "innate.h"
-#include "weather.h"
-#include "const.h"
-#include "move.h"
+#include "DC/returnvals.h"
+#include "DC/game_portal.h"
+#include "DC/innate.h"
+#include "DC/weather.h"
+#include "DC/const.h"
+#include "DC/move.h"
 
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 

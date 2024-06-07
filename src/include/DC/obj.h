@@ -19,12 +19,12 @@
 #include <vector>
 #include <QStringList>
 
-#include "common.h"
-#include "structs.h" // uint8_t
-#include "character.h"
-#include "DC.h"
-#include "casino.h"
-#include "room.h"
+#include "DC/common.h"
+#include "DC/structs.h" // uint8_t
+#include "DC/character.h"
+#include "DC/DC.h"
+#include "DC/casino.h"
+#include "DC/room.h"
 
 /* The following defs are for Object  */
 

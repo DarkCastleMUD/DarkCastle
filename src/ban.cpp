@@ -3,17 +3,17 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 
-#include "player.h"
-#include "levels.h"
-#include "structs.h"
-#include "character.h"
-#include "utility.h"
-#include "comm.h"
-#include "interp.h"
-#include "handler.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/comm.h"
+#include "DC/interp.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "returnvals.h"
-#include "spells.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
 
 struct ban_list_element *ban_list = nullptr;
 

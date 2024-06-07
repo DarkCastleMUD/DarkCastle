@@ -23,22 +23,22 @@
 #include <fmt/format.h>
 #include <memory>
 
-#include "obj.h"
-#include "room.h"
-#include "character.h"
-#include "mobile.h"
-#include "utility.h"
-#include "spells.h"
-#include "fileinfo.h" // SAVE_DIR
-#include "player.h"
-#include "levels.h"
+#include "DC/obj.h"
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/mobile.h"
+#include "DC/utility.h"
+#include "DC/spells.h"
+#include "DC/fileinfo.h" // SAVE_DIR
+#include "DC/player.h"
+#include "DC/levels.h"
 #include "DC/db.h"
-#include "connect.h"
-#include "handler.h"
-#include "race.h"
-#include "vault.h"
-#include "const.h"
-#include "guild.h"
+#include "DC/connect.h"
+#include "DC/handler.h"
+#include "DC/race.h"
+#include "DC/vault.h"
+#include "DC/const.h"
+#include "DC/guild.h"
 
 #ifdef USE_SQL
 #include <iostream>

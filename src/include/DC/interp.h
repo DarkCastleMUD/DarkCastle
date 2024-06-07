@@ -20,9 +20,9 @@
 #include <QString>
 #include <QStringList>
 
-#include "common.h"
-#include "character.h"
-#include "returnvals.h"
+#include "DC/common.h"
+#include "DC/character.h"
+#include "DC/returnvals.h"
 
 class Character;
 

@@ -1,8 +1,8 @@
-#include "levels.h"
-#include "mobile.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
 #include "DC/db.h"
-#include "character.h"
-#include "DC.h"
+#include "DC/character.h"
+#include "DC/DC.h"
 
 extern const char *dirs[];
 extern struct race_data races[];

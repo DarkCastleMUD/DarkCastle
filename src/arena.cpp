@@ -9,10 +9,10 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#include "character.h"
-#include "DC/db.h"  // get_mob_room_vis
-#include "spells.h" // INTERNAL_SLEEPING
-#include "act.h"    // TO_ROOM
+#include "DC/character.h"
+#include "DC/db.h"     // get_mob_room_vis
+#include "DC/spells.h" // INTERNAL_SLEEPING
+#include "DC/act.h"    // TO_ROOM
 
 auto Character::do_arena(QStringList arguments, int cmd) -> command_return_t
 {

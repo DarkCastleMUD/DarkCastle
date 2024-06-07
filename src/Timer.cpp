@@ -6,7 +6,7 @@
  */
 
 #include <cassert>
-#include "Timer.h"
+#include "DC/Timer.h"
 #include <sys/time.h>
 
 std::map<std::string, Timer> PerfTimers;

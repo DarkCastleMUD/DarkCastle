@@ -13,20 +13,20 @@
 #include <tuple>
 #include <fmt/format.h>
 
-#include "structs.h"
-#include "player.h"
-#include "room.h"
-#include "character.h"
-#include "utility.h"
-#include "levels.h"
-#include "connect.h"
-#include "mobile.h"
-#include "handler.h"
-#include "interp.h"
-#include "terminal.h"
-#include "act.h"
+#include "DC/structs.h"
+#include "DC/player.h"
+#include "DC/room.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/levels.h"
+#include "DC/connect.h"
+#include "DC/mobile.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
+#include "DC/terminal.h"
+#include "DC/act.h"
 #include "DC/db.h"
-#include "returnvals.h"
+#include "DC/returnvals.h"
 
 class channel_msg
 {

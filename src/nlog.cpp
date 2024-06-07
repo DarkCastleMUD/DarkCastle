@@ -7,12 +7,12 @@
 #include <cstdio>
 #include <stdarg.h>
 
-#include "connect.h"
-#include "character.h"
-#include "utility.h"
-#include "terminal.h"
-#include "player.h" // Player::PLR_ANSI
-#include "utility.h"
+#include "DC/connect.h"
+#include "DC/character.h"
+#include "DC/utility.h"
+#include "DC/terminal.h"
+#include "DC/player.h" // Player::PLR_ANSI
+#include "DC/utility.h"
 #include <iostream>
 
 /*

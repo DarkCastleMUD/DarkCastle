@@ -8,19 +8,19 @@
 #include <algorithm>
 #include <list>
 
-#include "obj.h"
-#include "spells.h"
-#include "player.h"
-#include "terminal.h"
-#include "levels.h"
-#include "character.h"
-#include "room.h"
-#include "utility.h"
+#include "DC/obj.h"
+#include "DC/spells.h"
+#include "DC/player.h"
+#include "DC/terminal.h"
+#include "DC/levels.h"
+#include "DC/character.h"
+#include "DC/room.h"
+#include "DC/utility.h"
 #include "cassert"
 #include "DC/db.h"
-#include "vault.h"
-#include "returnvals.h"
-#include "interp.h"
+#include "DC/vault.h"
+#include "DC/returnvals.h"
+#include "DC/interp.h"
 
 /******************* Area start **************************************/
 enum SortState

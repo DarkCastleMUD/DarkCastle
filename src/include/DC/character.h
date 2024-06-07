@@ -22,20 +22,20 @@
 #include <QMap>
 
 class Character;
-#include "DC.h"
-#include "affect.h"   /* MAX_AFFECTS, etc.. */
-#include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
-#include "structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
-#include "timeinfo.h" // time data, etc..
-#include "event.h"    // eventBrief
-#include "isr.h"      // SAVE_TYPE_MAX
-#include "mobile.h"
-#include "sing.h"
-#include "quest.h"
-#include "interp.h"
-#include "utility.h"
-#include "Zone.h"
-#include "room.h"
+#include "DC/DC.h"
+#include "DC/affect.h"   /* MAX_AFFECTS, etc.. */
+#include "DC/alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
+#include "DC/structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
+#include "DC/timeinfo.h" // time data, etc..
+#include "DC/event.h"    // eventBrief
+#include "DC/isr.h"      // SAVE_TYPE_MAX
+#include "DC/mobile.h"
+#include "DC/sing.h"
+#include "DC/quest.h"
+#include "DC/interp.h"
+#include "DC/utility.h"
+#include "DC/Zone.h"
+#include "DC/room.h"
 
 typedef uint64_t gold_t;
 

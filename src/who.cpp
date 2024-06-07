@@ -5,20 +5,20 @@
 */
 #include <cstring>
 
-#include "connect.h"
-#include "utility.h"
-#include "character.h"
-#include "mobile.h"
-#include "terminal.h"
-#include "player.h"
-#include "levels.h"
-#include "clan.h"
-#include "room.h"
-#include "interp.h"
-#include "handler.h"
+#include "DC/connect.h"
+#include "DC/utility.h"
+#include "DC/character.h"
+#include "DC/mobile.h"
+#include "DC/terminal.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/clan.h"
+#include "DC/room.h"
+#include "DC/interp.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "returnvals.h"
-#include "const.h"
+#include "DC/returnvals.h"
+#include "DC/const.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is DC::NOWHERE near matching.

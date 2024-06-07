@@ -10,24 +10,24 @@
 
 #include <fmt/format.h>
 
-#include "wizard.h"
-#include "spells.h"
-#include "fileinfo.h"
-#include "connect.h"
-#include "utility.h"
-#include "player.h"
-#include "levels.h"
-#include "mobile.h"
-#include "handler.h"
-#include "interp.h"
+#include "DC/wizard.h"
+#include "DC/spells.h"
+#include "DC/fileinfo.h"
+#include "DC/connect.h"
+#include "DC/utility.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
 #include "DC/db.h"
-#include "returnvals.h"
-#include "comm.h"
-#include "vault.h"
-#include "utility.h"
+#include "DC/returnvals.h"
+#include "DC/comm.h"
+#include "DC/vault.h"
+#include "DC/utility.h"
 
 #ifdef BANDWIDTH
-#include "bandwidth.h"
+#include "DC/bandwidth.h"
 #endif
 
 void AuctionHandleDelete(QString name);

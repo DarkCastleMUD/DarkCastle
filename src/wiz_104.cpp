@@ -6,22 +6,22 @@
 
 #include <QTimeZone>
 
-#include "wizard.h"
-#include "utility.h"
-#include "connect.h"
-#include "mobile.h"
-#include "player.h"
-#include "levels.h"
-#include "obj.h"
-#include "handler.h"
+#include "DC/wizard.h"
+#include "DC/utility.h"
+#include "DC/connect.h"
+#include "DC/mobile.h"
+#include "DC/player.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/handler.h"
 #include "DC/db.h"
-#include "room.h"
-#include "interp.h"
-#include "returnvals.h"
-#include "spells.h"
-#include "race.h"
-#include "const.h"
-#include "corpse.h"
+#include "DC/room.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
+#include "DC/spells.h"
+#include "DC/race.h"
+#include "DC/const.h"
+#include "DC/corpse.h"
 
 int count_rooms(int start, int end)
 {
