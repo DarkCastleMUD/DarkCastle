@@ -6004,7 +6004,7 @@ int64_t scale_char_xp(Character *ch, Character *killer, Character *victim,
   int32_t scaled_share;
   *bonus_xp = 0;
 
-  scaled_share = ((base_xp + *bonus_xp) * ch->getLevel()) / total_levels;
+  scaled_share = ((base_xp + *bonus_xp) * MAX(ch->getLevel(), 1)) / total_levels;
 
   if (scaled_share > (ch->getLevel() * 8000))
     scaled_share = ch->getLevel() * 8000;

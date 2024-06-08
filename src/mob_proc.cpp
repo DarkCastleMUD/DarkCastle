@@ -2141,7 +2141,7 @@ int bee(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * ch->getLevel())
+      number(0, 120) < 2 * MAX(ch->getLevel(), 1))
   {
     act("You sting $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);
@@ -2580,7 +2580,7 @@ int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (ch->fighting &&
       (ch->fighting->in_room == ch->in_room) &&
-      number(0, 120) < 2 * ch->getLevel())
+      number(0, 120) < 2 * MAX(ch->getLevel(), 1))
   {
     act("You peck $N!", ch, 0, ch->fighting, TO_CHAR,
         INVIS_NULL);

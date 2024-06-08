@@ -2205,7 +2205,7 @@ void add_new_vault(const char *name, int indexonly)
   }
 
   if (ch)
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * ch->getLevel());
+    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
   else
     fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
@@ -2221,7 +2221,7 @@ void add_new_vault(const char *name, int indexonly)
 
   vault->owner = str_dup(name);
   if (ch)
-    vault->size = VAULT_BASE_SIZE * ch->getLevel();
+    vault->size = VAULT_BASE_SIZE * MAX(ch->getLevel(), 1);
   else
     vault->size = VAULT_BASE_SIZE;
   vault->weight = 0;
