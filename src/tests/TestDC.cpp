@@ -300,6 +300,7 @@ private slots:
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;
+        ch.setClass(CLASS_WARRIOR);
         Player player;
         ch.player = &player;
         Connection conn;
@@ -342,12 +343,24 @@ private slots:
             remove_vault(ch.getNameC()); // free it up first..
         }
 
+        rc = do_vault(&ch, str_hsh("list"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have a vault.\r\n");
+        conn.output = {};
+
         rc = do_vault(&ch, str_hsh("put all"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "You don't have a vault.\r\n");
         conn.output = {};
 
-        add_new_vault(ch.getNameC(), 0);
+        while (ch.getLevel() < 10)
+        {
+            ch.incrementLevel();
+            advance_level(&ch, 0);
+        }
+        QCOMPARE(conn.output, "Your gain is: 13/16 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 14/30 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 11/41 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 13/54 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 13/67 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 10/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\nYour gain is: 14/91 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 13/104 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 10/114 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/127 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n");
+        conn.output = {};
+
         rc = do_vault(&ch, str_hsh("put all"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "");
@@ -355,7 +368,7 @@ private slots:
 
         rc = do_vault(&ch, str_hsh("list"));
         QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "Your vault is currently empty and can hold 0 pounds.\r\n");
+        QCOMPARE(conn.output, "Your vault is currently empty and can hold 100 pounds.\r\n");
         conn.output = {};
 
         int status;
