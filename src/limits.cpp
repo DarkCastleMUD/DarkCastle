@@ -440,81 +440,83 @@ void advance_level(Character *ch, int is_conversion)
 	int i;
 	char buf[MAX_STRING_LENGTH];
 
+	auto effective_level = MAX(ch->getLevel(), 1);
+	auto effective_con = MAX(GET_CON(ch), 2);
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_MAGIC_USER:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(3, 6);
 		add_mana += number(5, 10);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_CLERIC:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(4, 8);
 		add_mana += number(4, 9);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_THIEF:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(4, 11);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_WARRIOR:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(14, 18);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_ANTI_PAL:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(8, 12);
 		add_mana += number(3, 5);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_PALADIN:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(10, 14);
 		add_mana += number(2, 4);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_BARBARIAN:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(16, 20);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_MONK:
 		add_ki += 1;
 		add_hp += number(10, 14);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		GET_AC(ch) += -2;
 		break;
 
 	case CLASS_RANGER:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		add_hp += number(8, 12);
 		add_mana += number(3, 5);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_BARD:
 		add_ki += 1;
 		add_hp += number(6, 10);
 		add_mana += 0;
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	case CLASS_DRUID:
-		add_ki += (ch->getLevel() % 2);
+		add_ki += (effective_level % 2);
 		;
 		add_hp += number(5, 9);
 		add_mana += number(4, 9);
-		add_moves += number(1, (GET_CON(ch) / 2));
+		add_moves += number(1, (effective_con / 2));
 		break;
 
 	default:
@@ -566,7 +568,7 @@ void advance_level(Character *ch, int is_conversion)
 	if (!is_conversion)
 		ch->send(buf);
 
-	if (ch->getLevel() % 3 == 0)
+	if (effective_level % 3 == 0)
 		for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 			ch->saves[i]++;
 
@@ -575,11 +577,11 @@ void advance_level(Character *ch, int is_conversion)
 	ch->setMove(GET_MAX_MOVE(ch));
 	GET_KI(ch) = GET_MAX_KI(ch);
 
-	if (ch->getLevel() > IMMORTAL)
+	if (effective_level > IMMORTAL)
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (ch->getLevel() > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
+	if (effective_level > 10 && !isSet(ch->player->toggles, Player::PLR_REMORTED))
 	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
 		if (vault)
@@ -590,20 +592,20 @@ void advance_level(Character *ch, int is_conversion)
 		}
 	}
 
-	if (ch->getLevel() == 6)
+	if (effective_level == 6)
 		ch->sendln("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.");
-	if (ch->getLevel() == 10)
+	if (effective_level == 10)
 	{
 		ch->sendln("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.");
 		add_new_vault(GET_NAME(ch), 0);
 	}
-	if (ch->getLevel() == 11)
+	if (effective_level == 11)
 		ch->sendln("It now costs you $B$5gold$R every time you recall.");
-	if (ch->getLevel() == 20)
+	if (effective_level == 20)
 		ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.");
-	if (ch->getLevel() == 40)
+	if (effective_level == 40)
 		ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
-	if (ch->getLevel() == 50)
+	if (effective_level == 50)
 		ch->sendln("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)");
 }
 
