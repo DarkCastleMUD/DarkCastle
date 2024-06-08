@@ -1421,7 +1421,7 @@ void vault_get(Character *ch, QString object, QString owner)
   class Object *obj, *tmp_obj;
   struct vault_items_data *items;
   struct vault_data *vault;
-  int self = 0, num = 1, i;
+  int self = 0, i;
 
   if (!owner.isEmpty())
   {
@@ -1449,20 +1449,23 @@ void vault_get(Character *ch, QString object, QString owner)
 
   QStringList namelist = object.trimmed().split('.');
 
-  if (namelist.length() != 2)
+  QString prefix;
+  int num = 1;
+  if (namelist.length() > 1)
   {
-    num = 1;
+    prefix = namelist.at(0);
+
+    bool ok = false;
+    num = prefix.toInt(&ok);
+    if (ok)
+    {
+      prefix = {};
+    }
+    object = namelist.at(1);
   }
   else
   {
-    bool ok = false;
-    num = namelist.at(0).toInt(&ok);
-    if (!ok)
-    {
-      num = 1;
-    }
-    namelist.pop_front();
-    object = namelist.join('.');
+    object = namelist.at(0);
   }
 
   if (object == "all")
@@ -1497,10 +1500,8 @@ void vault_get(Character *ch, QString object, QString owner)
       vault_get(ch, obj_list[i], owner);
     return;
   }
-
-  if (object.startsWith("all.")) // sscanf(object, "all.%s", object))
+  else if (prefix == "all")
   {
-    object.remove(0, 4);
     num = 0; // count the number of items that match that keyword so we know how many to get
     for (items = vault->items; items; items = items->next)
     {
