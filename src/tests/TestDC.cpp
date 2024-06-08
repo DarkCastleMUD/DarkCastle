@@ -360,29 +360,174 @@ private slots:
         status = obj_to_char(o3, &ch);
         QVERIFY(status);
 
-        rc = do_vault(&ch, str_hsh("put all"));
+        rc = do_vault(&ch, str_hsh("put all")); // put all
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\na short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
         conn.output = {};
 
-        rc = do_vault(&ch, str_hsh("get all"));
+        rc = do_vault(&ch, str_hsh("get all")); // get all
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\na small mushroom has been removed from the vault.\r\n");
         conn.output = {};
 
-        rc = do_vault(&ch, str_hsh("put all.sword"));
+        rc = do_vault(&ch, str_hsh("put all.sword")); // put all.keyword
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a short sword has been placed in the vault.\r\na short sword has been placed in the vault.\r\n");
         conn.output = {};
 
-        rc = do_vault(&ch, str_hsh("put mushroom"));
+        rc = do_vault(&ch, str_hsh("put mushroom")); // put keyword
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\n");
         conn.output = {};
 
-        rc = do_vault(&ch, str_hsh("get all.sword"));
+        rc = do_vault(&ch, str_hsh("get all.sword")); // get all.keyword
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "a short sword has been removed from the vault.\r\na short sword has been removed from the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get mushroom")); // get keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a small mushroom has been removed from the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 2.mushroom")); // put bad#.keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 1.mushroom")); // put #.keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a small mushroom has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 2.sword"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a short sword has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 2.sword"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 1.sword"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a short sword has been placed in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get all.missing")); // get all.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all.missing")); // put all.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put undefined.missing")); // put undefined.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put missing")); // put missing
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get missing")); // get missing
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("get undefined.sword")); // put undefined.keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 1.missing")); // put #.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put 2.missing")); // put bad#.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put -2.sword")); // put invalid#.keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put -2.missing")); // put invalid#.missingkeyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You don't have anything like that.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get undefined.sword")); // get undefined.keyword
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get undefined.missing")); // get undefined.missingkeyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 1.sword")); // get #.keyword
+        QCOMPARE(conn.output, "a short sword has been removed from the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "a short sword has been placed in the vault.\r\n");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 1.missing")); // get #.missingkeyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 3.sword")); // get bad#.keyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 3.missing")); // get bad#.missingkeyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 3.sword")); // get invalid#.keyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("put all"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        rc = do_vault(&ch, str_hsh("get 3.missing")); // get invalid#.missingkeyword
+        QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
         conn.output = {};
     }
 };
