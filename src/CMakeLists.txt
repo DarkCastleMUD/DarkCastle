@@ -3,6 +3,7 @@
 # or
 # cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" -GNinja && ninja -C build
 cmake_minimum_required(VERSION 3.14)
+
 #set these two options to ON when using tracy
 option(TRACY_ENABLE "" OFF)
 #option(TRACY_NO_EXIT "" ON)
@@ -11,15 +12,20 @@ option(TRACY_ENABLE "" OFF)
 #option(TRACY_ONLY_IPV4 "" ON)
 include(FetchContent)
 FetchContent_Declare(
-  tracy
-  GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-  GIT_TAG v0.10
-  GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+    tracy
+    GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+    GIT_TAG v0.10
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable (tracy)
-set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
-add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
+
+if (NOT "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "Release")
+    set(CMAKE_CXX_COMPILER "/usr/bin/g++-14")
+    add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
+    set(TRACY "tracy")
+endif()
 
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
 set_source_files_properties(tests/TestDC.cpp PROPERTIES COMPILE_OPTIONS "-Wwrite-strings")
@@ -282,16 +288,28 @@ target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt
 qt_add_executable(dcastle dcastle.cpp)
 target_compile_definitions(dcastle PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(dcastle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
+target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
 
 qt_add_executable(debug debug.cpp)
 target_compile_definitions(debug PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(debug PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread tracy)
+target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
 
-install (TARGETS dcastle debug
-BUNDLE DESTINATION .
-RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+qt_add_executable(benchmarkDC benchmarks/benchmark_utility.cpp)
+target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(benchmarkDC PRIVATE Qt::Test)
+
+enable_testing(true)
+qt_add_executable(testDC tests/TestDC.cpp)
+add_test(NAME testDC COMMAND testDC)
+target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(testDC PRIVATE Qt::Test)
+
+install (TARGETS dcastle debug testDC benchmarkDC
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 qt_generate_deploy_app_script(
@@ -303,15 +321,3 @@ qt_generate_deploy_app_script(
 
 install(SCRIPT ${deploy_script})
 include(CPack)
-
-enable_testing(true)
-qt_add_executable(testDC tests/TestDC.cpp)
-add_test(NAME testDC COMMAND testDC)
-target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
-target_link_libraries(testDC PRIVATE Qt::Test)
-
-qt_add_executable(benchmarkDC benchmarks/benchmark_utility.cpp)
-target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
-target_link_libraries(benchmarkDC PRIVATE Qt::Test)
