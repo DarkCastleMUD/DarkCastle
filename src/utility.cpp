@@ -315,6 +315,7 @@ FILE *arena_log = 0;
 FILE *clan_log = 0;
 FILE *objects_log = 0;
 FILE *quest_log = 0;
+FILE *vault_log = 0;
 
 // writes a std::string to the log
 void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict)
@@ -455,6 +456,14 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open quest log.\n");
+    }
+    break;
+  case LogChannels::LOG_VAULT:
+    f = &vault_log;
+    logpath << VAULT_LOG;
+    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    {
+      qFatal("Unable to open vault log.\n");
     }
     break;
   }
