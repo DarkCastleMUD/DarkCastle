@@ -4926,7 +4926,6 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
 int do_rsave(Character *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
 
   if (!can_modify_room(ch, ch->in_room))
@@ -4954,18 +4953,17 @@ int do_rsave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1.")) == nullptr)
+  LegacyFile lf("world/%1", curr->filename, "Couldn't open room save file %1.");
+  if (lf.isOpen())
   {
-    return eFAILURE;
+    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    {
+      write_one_room(lf, x);
+    }
+
+    fprintf(lf.file_handle_, "$~\n");
   }
 
-  for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_one_room(f, x);
-
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   ch->sendln("Saved.");
   set_zone_saved_world(ch->in_room);
   return eSUCCESS;
@@ -4973,7 +4971,6 @@ int do_rsave(Character *ch, char *arg, int cmd)
 
 int do_msave(Character *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
   char buf2[180];
@@ -5012,18 +5009,16 @@ int do_msave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.")) == nullptr)
+  LegacyFile lf("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.");
+  if (lf.isOpen())
   {
-    return eFAILURE;
+    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    {
+      write_mobile(lf, (Character *)DC::getInstance()->mob_index[x].item);
+    }
+    fprintf(lf.file_handle_, "$~\n");
   }
 
-  for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_mobile((Character *)DC::getInstance()->mob_index[x].item, f);
-
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   ch->sendln("Saved.");
   set_zone_saved_mob(curr->firstnum);
   return eSUCCESS;
@@ -5031,7 +5026,6 @@ int do_msave(Character *ch, char *arg, int cmd)
 
 int do_osave(Character *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
   char buf2[180];
@@ -5067,18 +5061,16 @@ int do_osave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open legacy obj save file %1.")) == nullptr)
+  LegacyFile lf("objects/%1", curr->filename, "Couldn't open legacy obj save file %1.");
+  if (lf.isOpen())
   {
-    return eFAILURE;
+    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    {
+      write_object(lf, (Object *)DC::getInstance()->obj_index[x].item);
+    }
+    fprintf(lf.file_handle_, "$~\n");
   }
 
-  for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_object((Object *)DC::getInstance()->obj_index[x].item, f);
-
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   ch->sendln("Saved.");
   set_zone_saved_obj(curr->firstnum);
   return eSUCCESS;

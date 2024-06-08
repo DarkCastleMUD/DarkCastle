@@ -987,7 +987,6 @@ void save_shop_list()
 
 void save_player_shop_world_range()
 {
-  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
 
@@ -1004,15 +1003,15 @@ void save_player_shop_world_range()
     exit(1);
   }
 
-  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.")) == nullptr)
+  LegacyFile lf("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.");
+  if (lf.isOpen())
   {
-    return;
+    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    {
+      write_one_room(lf, x);
+    }
+    fprintf(lf.file_handle_, "$~\n");
   }
-
-  for (int x = curr->firstnum; x <= curr->lastnum; x++)
-    write_one_room(f, x);
-  fprintf(f, "$~\n");
-  fclose(f);
 }
 
 void boot_player_shops()

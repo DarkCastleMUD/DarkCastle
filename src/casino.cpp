@@ -1989,7 +1989,6 @@ void save_slot_machines()
       return;
    }
 
-   FILE *f = (FILE *)nullptr;
    world_file_list_item *curr;
    char buf[180];
    char buf2[180];
@@ -2006,18 +2005,15 @@ void save_slot_machines()
       return;
    }
 
-   if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.")) == nullptr)
+   LegacyFile lf("objects/%1", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+   if (lf.isOpen())
    {
-      return;
+      for (int x = curr->firstnum; x <= curr->lastnum; x++)
+      {
+         write_object(lf, (Object *)DC::getInstance()->obj_index[x].item);
+      }
+      fprintf(lf.file_handle_, "$~\n");
    }
-
-   for (int x = curr->firstnum; x <= curr->lastnum; x++)
-      write_object((Object *)DC::getInstance()->obj_index[x].item, f);
-
-   // end file
-   fprintf(f, "$~\n");
-
-   fclose(f);
 }
 
 void create_slot(Object *obj)

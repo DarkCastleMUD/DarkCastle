@@ -1355,8 +1355,9 @@ index_data *generate_obj_indices(int *top,
 	return (index);
 }
 
-void write_one_room(FILE *f, int a)
+void write_one_room(LegacyFile &lf, int a)
 {
+	FILE *f = lf.file_handle_;
 	struct extra_descr_data *extra;
 
 	if (!DC::getInstance()->rooms.contains(a))
@@ -2885,8 +2886,9 @@ void write_mprog_recur(QTextStream &fl, mob_prog_data *mprg, bool mob)
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
-void write_mobile(Character *mob, FILE *fl)
+void write_mobile(LegacyFile &lf, Character *mob)
 {
+	FILE *fl = lf.file_handle_;
 	int i = 0;
 
 	fprintf(fl, "#%d\n", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
@@ -4269,8 +4271,9 @@ void write_object(Object *obj, QTextStream &fl)
 // write an object to file
 // This assumes that the object is valid, and the file is open for writing
 //
-void write_object(Object *obj, FILE *fl)
+void write_object(LegacyFile &lf, Object *obj)
 {
+	FILE *fl = lf.file_handle_;
 	struct extra_descr_data *currdesc;
 
 	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].virt);
@@ -6986,19 +6989,36 @@ bool verify_item(class Object **obj)
 	return true;
 }
 
-FILE *legacyFileOpen(QString directory, QString filename, QString error_message)
+LegacyFile::LegacyFile(QString directory, QString filename, QString error_message)
+	: directory_(directory), filename_(filename), error_message_(error_message), file_handle_(nullptr)
 {
-	FILE *file_handle = nullptr;
+	openFile();
+}
 
-	QString file = directory.arg(filename);
+LegacyFile::~LegacyFile()
+{
+	if (file_handle_)
+	{
+		fclose(file_handle_);
+	}
+}
+
+FILE *LegacyFile::openFile(void)
+{
+	if (file_handle_)
+	{
+		fclose(file_handle_);
+	}
+
+	QString file = directory_.arg(filename_);
 	QString syscmd = QStringLiteral("cp -f %1 %1.last").arg(file);
 	system(syscmd.toStdString().c_str());
 
-	if ((file_handle = fopen(file.toStdString().c_str(), "w")) == nullptr)
+	if ((file_handle_ = fopen(qPrintable(file), "w")) == nullptr)
 	{
-		qCritical() << error_message.arg(file);
+		qCritical() << error_message_.arg(file);
 		return nullptr;
 	}
 
-	return file_handle;
+	return file_handle_;
 }

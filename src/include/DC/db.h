@@ -94,6 +94,33 @@ enum Continents
   MAX_CONTINENTS       // for iteration
 };
 
+class LegacyFile : public QObject
+{
+  Q_OBJECT
+public:
+  LegacyFile(QString directory, QString filename, QString error_message);
+  ~LegacyFile();
+  FILE *openFile(void);
+  bool isOpen(void)
+  {
+    if (!file_handle_ || feof(file_handle_) || ferror(file_handle_))
+    {
+      return false;
+    }
+    return true;
+  }
+  FILE *file_handle_;
+  QString directory_;
+  QString filename_;
+  QString error_message_;
+
+private:
+};
+
+class LegacyFileWorld : public LegacyFile
+{
+};
+
 /* public procedures in db.c */
 void set_zone_modified_zone(int32_t room);
 void set_zone_saved_zone(int32_t room);
@@ -108,9 +135,10 @@ bool can_modify_room(Character *ch, int32_t room);
 bool can_modify_mobile(Character *ch, int32_t room);
 bool can_modify_object(Character *ch, int32_t room);
 
-void write_one_room(FILE *fl, int nr);
-void write_mobile(Character *mob, FILE *fl);
-void write_object(Object *obj, FILE *fl);
+void write_one_room(LegacyFile &fl, int nr);
+void write_mobile(LegacyFile &lf, Character *mob);
+void write_object(LegacyFile &lf, Object *obj);
+
 void write_object(Object *obj, QTextStream &fl);
 void load_emoting_objects(void);
 int create_entry(char *name);

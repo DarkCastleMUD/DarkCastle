@@ -905,75 +905,74 @@ void show_hedit_usage(Character *ch)
 
 void save_help(Character *ch)
 {
-  FILE *f;
   int i;
   char file[256], buf[256];
 
   sprintf(file, "%s", NEW_HELP_FILE);
+  LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
+  if (lf.isOpen())
+  {
+    fprintf(lf.file_handle_, "@Version: 2\n");
 
-  if ((f = fopen(file, "w")) == nullptr)
+    for (i = 0; i < new_top_of_helpt; i++)
+    {
+      help_string_to_file(lf.file_handle_, new_help_table[i].keyword1);
+      help_string_to_file(lf.file_handle_, new_help_table[i].keyword2);
+      help_string_to_file(lf.file_handle_, new_help_table[i].keyword3);
+      help_string_to_file(lf.file_handle_, new_help_table[i].keyword4);
+      help_string_to_file(lf.file_handle_, new_help_table[i].keyword5);
+      help_string_to_file(lf.file_handle_, new_help_table[i].related);
+      fprintf(lf.file_handle_, "L: %d\n", new_help_table[i].min_level);
+      fprintf(lf.file_handle_, "E:\n");
+      help_string_to_file(lf.file_handle_, new_help_table[i].entry);
+      fprintf(lf.file_handle_, "#\n");
+      fprintf(lf.file_handle_, "~\n");
+    }
+
+    // end file
+    fprintf(lf.file_handle_, "$~\n");
+  }
+  else
   {
     ch->sendln("Couldn't open help file for saving.");
-    perror("Couldn't open help file for saving.\r\n");
     return;
   }
 
-  fprintf(f, "@Version: 2\n");
-
-  for (i = 0; i < new_top_of_helpt; i++)
-  {
-    help_string_to_file(f, new_help_table[i].keyword1);
-    help_string_to_file(f, new_help_table[i].keyword2);
-    help_string_to_file(f, new_help_table[i].keyword3);
-    help_string_to_file(f, new_help_table[i].keyword4);
-    help_string_to_file(f, new_help_table[i].keyword5);
-    help_string_to_file(f, new_help_table[i].related);
-    fprintf(f, "L: %d\n", new_help_table[i].min_level);
-    fprintf(f, "E:\n");
-    help_string_to_file(f, new_help_table[i].entry);
-    fprintf(f, "#\n");
-    fprintf(f, "~\n");
-  }
-
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
   ch->sendln("Saved.");
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
   logentry(buf, OVERSEER, LogChannels::LOG_HELP);
 
   sprintf(file, "%s", WEB_HELP_FILE);
+  LegacyFile lf_web_help(".", file, "Unable to open '%1'");
+  if (lf_web_help.isOpen())
+  {
+    for (i = 0; i < new_top_of_helpt; i++)
+    {
+      if (new_help_table[i].min_level <= DC::MAX_MORTAL_LEVEL)
+      {
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword1);
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword2);
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword3);
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword4);
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword5);
+        //      help_string_to_file(lf.file_handle_ new_help_table[i].related);
+        //      fprintf(lf.file_handle_ "L: %d\n", new_help_table[i].min_level);
+        //      fprintf(lf.file_handle_ "E:\n");
+        help_string_to_file(lf_web_help.file_handle_, new_help_table[i].entry);
+        fprintf(lf_web_help.file_handle_, "#\n");
+        //      fprintf(lf.file_handle_ "~\n");
+      }
+    }
 
-  if ((f = fopen(file, "w")) == nullptr)
+    // end file
+    fprintf(lf.file_handle_, "$~\n");
+  }
+  else
   {
     ch->sendln("Couldn't open web help file for saving.");
     perror("Couldn't open web help file for saving.\r\n");
     return;
   }
-
-  for (i = 0; i < new_top_of_helpt; i++)
-  {
-    if (new_help_table[i].min_level <= DC::MAX_MORTAL_LEVEL)
-    {
-      help_string_to_file(f, new_help_table[i].keyword1);
-      help_string_to_file(f, new_help_table[i].keyword2);
-      help_string_to_file(f, new_help_table[i].keyword3);
-      help_string_to_file(f, new_help_table[i].keyword4);
-      help_string_to_file(f, new_help_table[i].keyword5);
-      //      help_string_to_file(f, new_help_table[i].related);
-      //      fprintf(f, "L: %d\n", new_help_table[i].min_level);
-      //      fprintf(f, "E:\n");
-      help_string_to_file(f, new_help_table[i].entry);
-      fprintf(f, "#\n");
-      //      fprintf(f, "~\n");
-    }
-  }
-
-  // end file
-  fprintf(f, "$~\n");
-
-  fclose(f);
 }
 
 void help_string_to_file(FILE *f, char *str)
