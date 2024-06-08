@@ -4953,15 +4953,13 @@ int do_rsave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  LegacyFile lf("world/%1", curr->filename, "Couldn't open room save file %1.");
-  if (lf.isOpen())
+  LegacyFileWorld lfw(curr->filename);
+  if (lfw.isOpen())
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)
     {
-      write_one_room(lf, x);
+      write_one_room(lfw, x);
     }
-
-    fprintf(lf.file_handle_, "$~\n");
   }
 
   ch->sendln("Saved.");
