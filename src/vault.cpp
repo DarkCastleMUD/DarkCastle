@@ -1921,7 +1921,8 @@ void vault_put(Character *ch, QString object, QString owner)
       ch->send(QStringLiteral("%1 has been placed in the vault.\r\n").arg(GET_OBJ_SHORT(obj)));
 
       QString sbuf;
-      QTextStream ssin;
+      QString ssin_string;
+      QTextStream ssin(&ssin_string);
       ssin << GET_OBJ_VNUM(obj);
 
       sbuf = GET_NAME(ch);
