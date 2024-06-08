@@ -13,8 +13,8 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: db.h,v 1.40 2012/02/08 22:54:25 jhhudso Exp $ */
-#ifndef DB_H_
-#define DB_H_
+#ifndef DC_DB_H_
+#define DC_DB_H_
 
 #include <cstdio>
 #include <ctime>
@@ -127,7 +127,12 @@ char *fread_string(FILE *fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
 char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
-int create_blank_item(int nr);
+enum class create_error
+{
+  index_full,
+  entry_exists
+};
+auto create_blank_item(int nr) -> std::expected<int, create_error>;
 int create_blank_mobile(int nr);
 void delete_item_from_index(int nr);
 void delete_mob_from_index(int nr);
@@ -176,6 +181,7 @@ void load_messages(char *file, int base = 0);
 void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
+void find_unordered_objects(void);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */

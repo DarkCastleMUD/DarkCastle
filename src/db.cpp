@@ -69,7 +69,6 @@ void load_auction_tickets();
 void load_corpses(void);
 int count_hash_records(FILE *fl);
 void load_hints();
-void find_unordered_objects(void);
 void find_unordered_mobiles(void);
 char *mprog_type_to_name(int type);
 void write_wizlist(std::stringstream &filename);
@@ -1974,7 +1973,7 @@ void DC::boot_world(void)
 		}
 	}
 
-	logentry(QStringLiteral("Booting individual world files"), 0, LogChannels::LOG_MISC);
+	// logentry(QStringLiteral("Booting individual world files"), 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
@@ -2015,7 +2014,7 @@ void DC::boot_world(void)
 
 		fclose(fl);
 	}
-	logentry(QStringLiteral("World Boot done."), 0, LogChannels::LOG_MISC);
+	// logentry(QStringLiteral("World Boot done."), 0, LogChannels::LOG_MISC);
 	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
@@ -2537,7 +2536,7 @@ void DC::boot_zones(void)
 		logentry(QStringLiteral("boot_world: could not open world index file tiny."), 0, LogChannels::LOG_BUG);
 		abort();
 	}
-	logentry(QStringLiteral("Booting individual zone files"), 0, LogChannels::LOG_MISC);
+	// logentry(QStringLiteral("Booting individual zone files"), 0, LogChannels::LOG_MISC);
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
 		 temp.isEmpty() == false;
@@ -2566,7 +2565,7 @@ void DC::boot_zones(void)
 		fclose(fl);
 	}
 
-	logentry(QStringLiteral("Zone Boot done."), 0, LogChannels::LOG_MISC);
+	// logentry(QStringLiteral("Zone Boot done."), 0, LogChannels::LOG_MISC);
 
 	fclose(flZoneIndex);
 
@@ -3399,7 +3398,7 @@ Character *clone_mobile(int nr)
 //
 // return index of item on success, -1 on failure
 //
-int create_blank_item(int nr)
+auto create_blank_item(int nr) -> std::expected<int, create_error>
 {
 	class Object *obj;
 	class Object *curr;
@@ -3407,7 +3406,7 @@ int create_blank_item(int nr)
 
 	// check if room available in index
 	if ((top_of_objt + 1) >= MAX_INDEX)
-		return -1;
+		return std::unexpected(create_error::index_full);
 
 	// find how where our index will be
 	// yes, i could check if the last item is smaller and then do a binary
@@ -3417,19 +3416,14 @@ int create_blank_item(int nr)
 		cur_index++;
 
 	if (DC::getInstance()->obj_index[cur_index].virt == nr) // item already exists
-		return -1;
+		return std::unexpected(create_error::entry_exists);
 
-		// theoretically if top_of_objt+1 wasn't initialized properly it could
-		// be junk data, which could be == nr, returning -1, but i'm not gonna worry about it
+	// theoretically if top_of_objt+1 wasn't initialized properly it could
+	// be junk data, which could be == nr, returning -1, but i'm not gonna worry about it
 
-		// create
+	// create
 
-#ifdef LEAK_CHECK
-	obj = (class Object *)calloc(1, sizeof(class Object));
-#else
-	obj = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-
+	obj = new Object;
 	clear_object(obj);
 	obj->name = str_hsh("empty obj");
 	obj->short_description = str_hsh("An empty obj");

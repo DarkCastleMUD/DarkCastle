@@ -293,12 +293,7 @@ private slots:
 
         DC dc(cf);
         dc.random_ = QRandomGenerator(0);
-        dc.boot_zones();
-        extern room_t top_of_world_alloc;
-        top_of_world_alloc = 2000;
-        dc.boot_world();
-        renum_world();
-        renum_zone_table();
+        dc.boot_db();
 
         Character ch;
         ch.setName(QStringLiteral("Testplayer"));
@@ -314,9 +309,9 @@ private slots:
         dc.character_list.insert(&ch);
         ch.do_on_login_stuff();
 
-        int rnum = create_blank_item(1);
-        QCOMPARE(rnum, 1);
-        // int rnum = real_object(1);
+        auto new_rnum = create_blank_item(1);
+        QCOMPARE(new_rnum.error(), create_error::entry_exists);
+        int rnum = real_object(1);
         Object *o1 = clone_object(rnum);
         Object *o2 = clone_object(rnum);
         Object *o3 = clone_object(rnum);
@@ -341,6 +336,12 @@ private slots:
         QCOMPARE(conn.output, "");
         conn.output = {};
 
+        vault_data *vault = has_vault(ch.getNameC());
+        if (vault)
+        {
+            remove_vault(ch.getNameC()); // free it up first..
+        }
+
         rc = do_vault(&ch, str_hsh("put all"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "You don't have a vault.\r\n");
@@ -350,6 +351,11 @@ private slots:
         rc = do_vault(&ch, str_hsh("put all"));
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        rc = do_vault(&ch, str_hsh("list"));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Your vault is currently empty and can hold 0 pounds.\r\n");
         conn.output = {};
 
         int status;
@@ -529,6 +535,8 @@ private slots:
         rc = do_vault(&ch, str_hsh("get 3.missing")); // get invalid#.missingkeyword
         QCOMPARE(conn.output, "There is nothing like that in the vault.\r\n");
         conn.output = {};
+
+        remove_vault(ch.getNameC());
     }
 };
 

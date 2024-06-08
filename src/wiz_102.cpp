@@ -2503,10 +2503,10 @@ int do_oedit(Character *ch, char *argument, int cmd)
               return eFAILURE;
             }
     */
-    x = create_blank_item(intval);
-    if (x < 0)
+    auto x = create_blank_item(intval);
+    if (!x.has_value())
     {
-      ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists.\r\n").arg(intval));
+      ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
       return eFAILURE;
     }
     ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));

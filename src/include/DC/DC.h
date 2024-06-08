@@ -66,6 +66,7 @@
 #define CLAN_LOG "clan.log"
 #define OBJECTS_LOG "objects.log"
 #define QUEST_LOG "quest.log"
+#define VAULT_LOG "vault.log"
 
 #define WORLD_INDEX_FILE "worldindex"
 #define OBJECT_INDEX_FILE "objectindex"
