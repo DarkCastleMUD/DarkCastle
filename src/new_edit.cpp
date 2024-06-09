@@ -12,7 +12,7 @@
 #include "DC/interp.h"
 #include "DC/levels.h"
 #include "DC/player.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/newedit.h"

@@ -20,7 +20,7 @@ void load_auction_tickets()
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/terminal.h"

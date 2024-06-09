@@ -18,7 +18,7 @@
 #include "DC/room.h"
 #include "DC/player.h"
 #include "DC/fileinfo.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/levels.h"

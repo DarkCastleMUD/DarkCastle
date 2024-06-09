@@ -7,7 +7,6 @@
 | This file defines the header information for fight.
 */
 #include "DC/structs.h" // uint8_t, uint8_t, etc..
-#include "DC/obj.h"     // WIELD, SECOND_WIELD
 #include "DC/character.h"
 #include "DC/utility.h" // false
 

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <list>
 
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/terminal.h"

@@ -20,7 +20,7 @@
 #include "DC/spells.h"
 #include "DC/handler.h"
 #include "DC/db.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/act.h"
 #include "DC/race.h" // RACE_FISH

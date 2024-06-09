@@ -13,7 +13,7 @@
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/mobile.h"
 #include "DC/utility.h"
 #include "DC/levels.h"

@@ -11,7 +11,7 @@
 #include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/levels.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/db.h"
 #include "DC/handler.h"

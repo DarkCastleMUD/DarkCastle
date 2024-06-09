@@ -45,7 +45,7 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <cctype>  // isspace(), isdigit()
 
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/player.h"   // MAX_*
 #include "DC/connect.h"  // Connection::states::WRITE_BOARD
 #include "DC/terminal.h" // BOLD

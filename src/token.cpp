@@ -16,7 +16,7 @@
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/character.h" // Character
-#include "DC/obj.h"       // Object
+#include "DC/DC.h"        // Object
 #include "DC/levels.h"    // MIN_GOD
 #include "DC/utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "DC/terminal.h"  // colors

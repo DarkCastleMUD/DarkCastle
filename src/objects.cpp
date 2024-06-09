@@ -7,7 +7,7 @@
 
 #include <cctype>
 #include <cstring>
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/room.h"

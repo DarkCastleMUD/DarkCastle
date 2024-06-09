@@ -22,7 +22,6 @@
 #include "DC/interp.h"
 #include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/obj.h"
 #include "DC/interp.h"
 #include "DC/terminal.h"
 #include "DC/player.h"

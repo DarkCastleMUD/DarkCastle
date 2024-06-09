@@ -9,7 +9,6 @@
 */
 #include <string>
 #include "DC/character.h"
-#include "DC/obj.h"
 #include "DC/token.h"
 //--
 // Function interface

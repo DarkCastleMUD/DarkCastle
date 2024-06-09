@@ -54,7 +54,7 @@
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/interp.h"
 #include "DC/fileinfo.h"
 #include "DC/mobile.h"
@@ -67,7 +67,6 @@
 #include "DC/fight.h"
 #include "DC/returnvals.h"
 #include "DC/set.h"
-#include "DC/DC.h"
 #include "DC/const.h"
 
 #ifndef GZIP

@@ -14,7 +14,7 @@
 #include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/handler.h"

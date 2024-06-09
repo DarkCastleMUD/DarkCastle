@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/player.h" // *app_type
 #include "DC/character.h"
 #include "DC/spells.h"

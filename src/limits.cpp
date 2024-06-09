@@ -28,7 +28,7 @@
 #include "DC/spells.h" // TYPE
 #include "DC/levels.h"
 #include "DC/player.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/db.h"	  // exp_table
 #include "DC/fight.h" // damage

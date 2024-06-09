@@ -31,7 +31,6 @@
 #include "DC/DC.h"
 #include "DC/structs.h"
 #include "DC/character.h"
-#include "DC/obj.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
 #include "DC/player.h"

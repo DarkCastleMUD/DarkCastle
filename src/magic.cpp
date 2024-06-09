@@ -32,7 +32,7 @@
 
 #include "DC/room.h"
 #include "DC/connect.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/race.h"
 #include "DC/character.h"
 #include "DC/spells.h"
@@ -54,7 +54,6 @@
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-#include "DC/obj.h"
 
 #define BEACON_OBJ_NUMBER 405
 

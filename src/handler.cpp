@@ -34,7 +34,7 @@
 #include "DC/magic.h"
 #include "DC/spells.h"
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/player.h"	// APPLY
 #include "DC/utility.h" // LOWER
@@ -52,7 +52,6 @@
 #include "DC/returnvals.h"
 #include "DC/innate.h"
 #include "DC/set.h"
-#include "DC/DC.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/shop.h"

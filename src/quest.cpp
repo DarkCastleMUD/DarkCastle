@@ -8,7 +8,7 @@ one liner quest shit
 #include "DC/comm.h"
 #include "DC/fileinfo.h"
 #include "DC/returnvals.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/act.h"
 #include "DC/levels.h"
 #include "DC/interp.h"

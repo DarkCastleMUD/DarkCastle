@@ -27,7 +27,6 @@
 #include "DC/room.h"
 #include "DC/mobile.h"
 #include "DC/player.h"
-#include "DC/obj.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/utility.h"

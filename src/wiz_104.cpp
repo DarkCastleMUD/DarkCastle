@@ -12,7 +12,7 @@
 #include "DC/mobile.h"
 #include "DC/player.h"
 #include "DC/levels.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/room.h"

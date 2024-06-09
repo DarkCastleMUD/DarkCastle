@@ -26,7 +26,7 @@
 #include "DC/magic.h"
 #include "DC/levels.h"
 #include "DC/fight.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/player.h"
 #include "DC/connect.h"
 #include "DC/interp.h"
@@ -37,7 +37,6 @@
 #include "DC/act.h"
 #include "DC/ki.h"
 #include "DC/returnvals.h"
-#include "DC/obj.h"
 #include "DC/const.h"
 #include "DC/meta.h"
 

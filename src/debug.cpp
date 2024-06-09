@@ -16,13 +16,12 @@
 #include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/db.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/const.h"
 #include "DC/utility.h"
 #include "DC/vault.h"
 #include "DC/Leaderboard.h"
 #include "DC/interp.h"
-#include "DC/DC.h"
 #include "DC/Database.h"
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);

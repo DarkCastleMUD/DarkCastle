@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
 #include "DC/levels.h"
@@ -18,7 +19,6 @@
 #include "DC/player.h"
 #include "DC/terminal.h"
 #include "DC/handler.h"
-#include "DC/obj.h"
 #include "DC/connect.h"
 #include "DC/act.h"
 #include "DC/mobile.h"

@@ -48,7 +48,7 @@ int load_debug = 0;
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/race.h"
-#include "DC/obj.h"			// extra_descr_data
+#include "DC/DC.h"			// extra_descr_data
 #include "DC/handler.h"		// get_obj_num
 #include "DC/connect.h"		// Connection
 #include "DC/game_portal.h" // load_game_portals()

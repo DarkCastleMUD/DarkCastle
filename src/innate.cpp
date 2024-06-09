@@ -5,7 +5,7 @@
 #include "DC/db.h"
 #include "DC/fight.h"
 #include "DC/room.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/character.h"

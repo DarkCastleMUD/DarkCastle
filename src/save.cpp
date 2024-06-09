@@ -23,7 +23,7 @@
 #include <fmt/format.h>
 #include <memory>
 
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/mobile.h"

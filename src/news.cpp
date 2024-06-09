@@ -19,7 +19,7 @@
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
 #include "DC/player.h"

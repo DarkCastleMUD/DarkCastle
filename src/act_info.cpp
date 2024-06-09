@@ -15,7 +15,7 @@
 #include <cstring>
 #include <cctype>
 
-#include "DC/obj.h"
+#include "DC/DC.h"
 #include "DC/mobile.h"
 #include "DC/character.h"
 #include "DC/utility.h"
