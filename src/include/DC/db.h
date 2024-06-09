@@ -197,42 +197,57 @@ void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
   }
 }
 
-void write_object(Object *obj, auto &fl)
+auto &operator<<(auto &out, const obj_flag_data &of)
 {
-  struct extra_descr_data *currdesc;
+  out << of.type_flag << " " << of.extra_flags << " " << of.wear_flags << " " << of.size << "\n";
+  out << of.value[0] << " " << of.value[1] << " " << of.value[2] << " " << of.value[3] << " " << of.eq_level << "\n";
+  out << of.weight << " " << of.cost << " " << of.more_flags << "\n";
+  return out;
+}
 
-  fl << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
-  string_to_file(fl, obj->name);
-  string_to_file(fl, obj->short_description);
-  string_to_file(fl, obj->description);
-  string_to_file(fl, obj->ActionDescription());
-
-  fl << obj->obj_flags.type_flag << " " << obj->obj_flags.extra_flags << " " << obj->obj_flags.wear_flags << " " << obj->obj_flags.size << "\n";
-  fl << obj->obj_flags.value[0] << " " << obj->obj_flags.value[1] << " " << obj->obj_flags.value[2] << " " << obj->obj_flags.value[3] << " " << obj->obj_flags.eq_level << "\n";
-  fl << obj->obj_flags.weight << " " << obj->obj_flags.cost << " " << obj->obj_flags.more_flags << "\n";
-
-  currdesc = obj->ex_description;
+auto &operator<<(auto &out, extra_descr_data *currdesc)
+{
   while (currdesc)
   {
-    fl << "E\n";
-    string_to_file(fl, currdesc->keyword);
-    string_to_file(fl, currdesc->description);
+    out << "E\n";
+    string_to_file(out, currdesc->keyword);
+    string_to_file(out, currdesc->description);
     currdesc = currdesc->next;
   }
+  return out;
+}
 
+void affects_to_file(auto &out, Object *obj)
+{
   for (int i = 0; i < obj->num_affects; i++)
   {
-    fl << "A\n";
-    fl << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
+    out << "A\n";
+    out << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
   }
+}
 
-  if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
+auto &operator<<(auto &out, mob_prog_data *mobprogs)
+{
+  if (mobprogs)
   {
-    write_mprog_recur(fl, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
-    fl << "|\n";
+    write_mprog_recur(out, mobprogs, false);
+    out << "|\n";
   }
+  return out;
+}
 
-  fl << "S\n";
+void write_object(Object *obj, auto &out)
+{
+  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
+  string_to_file(out, obj->name);
+  string_to_file(out, obj->short_description);
+  string_to_file(out, obj->description);
+  string_to_file(out, obj->ActionDescription());
+  out << obj->obj_flags;
+  out << obj->ex_description;
+  affects_to_file(out, obj);
+  out << DC::getInstance()->obj_index[obj->item_number].mobprogs;
+  out << "S\n";
 }
 
 void load_emoting_objects(void);
