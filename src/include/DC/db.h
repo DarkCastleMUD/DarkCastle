@@ -147,8 +147,94 @@ bool can_modify_object(Character *ch, int32_t room);
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, Character *mob);
 void write_object(LegacyFile &lf, Object *obj);
+void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob);
+int load_new_help(FILE *fl, int reload, Character *ch);
+void load_vaults();
+void load_auction_tickets();
+void load_corpses(void);
+int count_hash_records(FILE *fl);
+void load_hints();
+void find_unordered_mobiles(void);
+char *mprog_type_to_name(int type);
+void write_wizlist(std::stringstream &filename);
+void write_wizlist(std::string filename);
+void write_wizlist(const char filename[]);
+void string_to_file(QTextStream &fl, QString str);
+void string_to_file(std::ofstream &fl, QString str);
 
-void write_object(Object *obj, QTextStream &fl);
+void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
+{
+  if (mprg->next)
+  {
+    write_mprog_recur(fl, mprg->next, mob);
+  }
+
+  if (mob)
+  {
+    fl << ">" << mprog_type_to_name(mprg->type) << " ";
+  }
+  else
+  {
+    fl << "\\" << mprog_type_to_name(mprg->type) << " ";
+  }
+
+  if (mprg->arglist)
+  {
+    string_to_file(fl, mprg->arglist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+
+  if (mprg->comlist)
+  {
+    string_to_file(fl, mprg->comlist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+}
+
+void write_object(Object *obj, auto &fl)
+{
+  struct extra_descr_data *currdesc;
+
+  fl << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
+  string_to_file(fl, obj->name);
+  string_to_file(fl, obj->short_description);
+  string_to_file(fl, obj->description);
+  string_to_file(fl, obj->ActionDescription());
+
+  fl << obj->obj_flags.type_flag << " " << obj->obj_flags.extra_flags << " " << obj->obj_flags.wear_flags << " " << obj->obj_flags.size << "\n";
+  fl << obj->obj_flags.value[0] << " " << obj->obj_flags.value[1] << " " << obj->obj_flags.value[2] << " " << obj->obj_flags.value[3] << " " << obj->obj_flags.eq_level << "\n";
+  fl << obj->obj_flags.weight << " " << obj->obj_flags.cost << " " << obj->obj_flags.more_flags << "\n";
+
+  currdesc = obj->ex_description;
+  while (currdesc)
+  {
+    fl << "E\n";
+    string_to_file(fl, currdesc->keyword);
+    string_to_file(fl, currdesc->description);
+    currdesc = currdesc->next;
+  }
+
+  for (int i = 0; i < obj->num_affects; i++)
+  {
+    fl << "A\n";
+    fl << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
+  }
+
+  if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
+  {
+    write_mprog_recur(fl, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
+    fl << "|\n";
+  }
+
+  fl << "S\n";
+}
+
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
