@@ -1,14 +1,3 @@
-#0
-$B$0The Void$R~
-  You step out into ......
-  You don't think that you are not floating in nothing.
-~
-0 605300812 0
-D3
-~
-~
-0 -1 70
-S
 #1
 $R$0The Abyss$R~
 $R$0You don't think you are not floating in nothing.$R
@@ -17,7 +6,7 @@ $R$0You don't think you are not floating in nothing.$R
 D3
 ~
 ~
-0 -1 70
+0 -1 0
 D5
 ~
 seeya door~
@@ -42,7 +31,7 @@ have thought twice before lipping off to the wrong person.
 D0
 ~
 ~
-0 -1 30
+0 -1 0
 D4
 You do not see that here.
 ~
@@ -64,27 +53,27 @@ D0
 The TOP SECRET entrance to the Quest Headquarters rooms lies north.
 ~
 ~
-0 -1 18
+0 -1 0
 D1
 The Sheriff's Office, where punishments are posted lies to the east.
 ~
 ~
-0 -1 13
+0 -1 0
 D2
 A filthy and slovenly room filled with porn lies to the south.
 ~
 ~
-0 -1 15
+0 -1 0
 D3
 Several Architects and Builders relax in the lounge to the west.
 ~
 door~
-1 -1 14
+1 -1 0
 D4
 A spiral staircase leads upward to the Immortal Observatory and home of the Mortal Board.
 ~
 ~
-0 -1 16
+0 -1 0
 D5
 An entrance to the Mortal realms heads down below.
 ~
@@ -96,12 +85,12 @@ $B$4Platsmith and Special Proc Range$R~
 This range is reserved for special proc rooms, platsmiths, and
 other special immortal purposes.
 ~
-1 33562640 0
+2 33562640 0
 S
 #96
 Room 96~
 Empty description.
 ~
-1 0 0
+2 0 0
 S
 $~
