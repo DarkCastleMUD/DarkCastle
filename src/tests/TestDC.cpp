@@ -30,6 +30,14 @@ public:
     {
         qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{file}:%{line} %{function}: %{message}"));
     }
+    QByteArray checksumFile(QString filename)
+    {
+        QFile file(filename);
+        file.open(QIODeviceBase::ReadOnly);
+        QCryptographicHash file_hash(QCryptographicHash::Algorithm::Sha512);
+        file_hash.addData(file.readAll());
+        return file_hash.result();
+    }
 
 private:
     enum class VariableType
@@ -550,6 +558,84 @@ private slots:
         conn.output = {};
 
         remove_vault(ch.getNameC());
+    }
+
+    void test_room_write()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        extern world_file_list_item *world_file_list;
+
+        QString filename;
+        if (world_file_list)
+        {
+            filename = world_file_list->filename;
+        }
+        else
+        {
+            filename = "1-1.txt";
+        }
+
+        QString qfile_filename = QStringLiteral("world/%1.qfile").arg(filename);
+        QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
+        std::string s_filename = QStringLiteral("world/%1.fstream").arg(filename).toStdString();
+        uint64_t rooms_written{};
+
+        {
+            LegacyFileWorld lfw(filename);
+            QFile qf(qfile_filename);
+            QSaveFile qsf(qsavefile_filename);
+            std::fstream fstream_world_file;
+            fstream_world_file.open(s_filename, std::ios::out);
+
+            if (lfw.isOpen() &&
+                qf.open(QIODeviceBase::WriteOnly) &&
+                qsf.open(QIODeviceBase::WriteOnly) &&
+                fstream_world_file.is_open())
+            {
+                QTextStream out(&qf);
+                QTextStream out2(&qsf);
+
+                if (world_file_list)
+                {
+                    for (int x = world_file_list->firstnum; x <= world_file_list->lastnum; x++)
+                    {
+                        write_one_room(lfw, x);
+                        out << DC::getInstance()->world[x];
+                        out2 << DC::getInstance()->world[x];
+                        fstream_world_file << DC::getInstance()->world[x];
+                        rooms_written++;
+                    }
+                }
+                else
+                {
+                    write_one_room(lfw, 1);
+                    out << DC::getInstance()->world[1];
+                    out2 << DC::getInstance()->world[1];
+                    fstream_world_file << DC::getInstance()->world[1];
+                    rooms_written = 1;
+                }
+
+                out << "$~\n";
+                out2 << "$~\n";
+                qsf.commit();
+                fstream_world_file << "$~\n";
+            }
+        }
+
+        qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
+
+        auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
+        auto qfile_checksum = checksumFile(qfile_filename);
+        auto qsavefile_checksum = checksumFile(qsavefile_filename);
+        auto fstream_checksum = checksumFile(s_filename.c_str());
+
+        QCOMPARE(original_checksum.toHex(), qfile_checksum.toHex());
+        QCOMPARE(original_checksum.toHex(), qsavefile_checksum.toHex());
+        QCOMPARE(original_checksum.toHex(), fstream_checksum.toHex());
     }
 };
 
