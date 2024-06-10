@@ -124,11 +124,9 @@ FILE *new_help_fl; /* file for help texts (HELP <kwd>)*/
 struct help_index_element *help_index = 0;
 struct help_index_element_new *new_help_table = 0;
 
-int top_of_mobt = 0;	  /* top of mobile index table       */
-int top_of_objt = 0;	  /* top of object index table       */
-int top_of_helpt = 0;	  /* top of help index table         */
-int new_top_of_helpt = 0; /* top of help index table         */
-int total_rooms = 0;	  /* total amount of rooms in memory */
+int top_of_mobt = 0; /* top of mobile index table       */
+int top_of_objt = 0; /* top of object index table       */
+int total_rooms = 0; /* total amount of rooms in memory */
 
 struct time_info_data time_info;  /* the infomation about the time   */
 struct weather_data weather_info; /* the infomation about the weather */
@@ -517,7 +515,7 @@ void DC::boot_db(void)
 		abort();
 	}
 	CREATE(new_help_table, struct help_index_element_new, help_rec_count);
-	load_new_help(new_help_fl, 0, 0);
+	load_new_help(new_help_fl);
 	fclose(new_help_fl);
 	// end new help files
 

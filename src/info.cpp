@@ -2401,7 +2401,6 @@ int do_weather(Character *ch, char *argument, int cmd)
 
 int do_help(Character *ch, char *argument, int cmd)
 {
-   extern int top_of_helpt;
    extern struct help_index_element *help_index;
    extern FILE *help_fl;
    extern char help[MAX_STRING_LENGTH];
@@ -2423,7 +2422,7 @@ int do_help(Character *ch, char *argument, int cmd)
          return eSUCCESS;
       }
       bot = 0;
-      top = top_of_helpt;
+      top = DC::getInstance()->top_of_helpt;
 
       for (;;)
       {

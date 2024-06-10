@@ -315,6 +315,9 @@ public:
   class index_data mob_index_array[MAX_INDEX];
   class index_data *mob_index = mob_index_array;
 
+  int top_of_helpt = 0;     /* top of help index table         */
+  int new_top_of_helpt = 0; /* top of help index table         */
+
   static QString getBuildVersion();
   static QString getBuildTime();
   static DC *getInstance();

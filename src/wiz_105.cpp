@@ -67,7 +67,6 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
 {
   extern FILE *help_fl;
   extern struct help_index_element *help_index;
-  extern int top_of_helpt;
   extern struct help_index_element *build_help_index(FILE * fl, int *num);
   extern void free_help_from_memory();
   free_help_from_memory();
@@ -77,7 +76,7 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
     perror(HELP_KWRD_FILE);
     abort();
   }
-  help_index = build_help_index(help_fl, &top_of_helpt);
+  help_index = build_help_index(help_fl, &DC::getInstance()->top_of_helpt);
   ch->sendln("Reloaded.");
   return eSUCCESS;
 }

@@ -29,7 +29,6 @@
 // Externs
 extern void skip_spaces(char **string);
 extern struct help_index_element_new *new_help_table;
-extern int new_top_of_helpt;
 int get_line(FILE *fl, char *buf);
 int is_abbrev(const char *arg1, const char *arg2);
 void help_string_to_file(FILE *f, char *string);
@@ -144,7 +143,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
     int level = ch->getLevel() == 0 ? 1 : ch->getLevel();
 
-    for (h = 0; h < new_top_of_helpt; h++)
+    for (h = 0; h < DC::getInstance()->new_top_of_helpt; h++)
     {
       if (new_help_table[h].min_level > level)
       {
@@ -277,7 +276,7 @@ struct help_index_element_new *find_help(char *keyword)
   for (i = 0; i < (int)strlen(keyword); i++)
     keyword[i] = UPPER(keyword[i]);
 
-  for (i = 0; i < new_top_of_helpt; i++)
+  for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     if (!strcmp(keyword, new_help_table[i].keyword1) ||
         !strcmp(keyword, new_help_table[i].keyword2) ||
         !strcmp(keyword, new_help_table[i].keyword3) ||
@@ -367,8 +366,8 @@ int load_new_help(FILE *fl, int reload, Character *ch)
     if (!(new_help.entry = str_hsh(tmpentry)))
       new_help.entry = str_hsh("Error reading help entry. Please notify an Immortal!\n");
 
-    new_help_table[new_top_of_helpt] = new_help;
-    new_top_of_helpt++;
+    new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
+    DC::getInstance()->new_top_of_helpt++;
 
     level = -1;
     *entry = '\0';
@@ -380,7 +379,10 @@ int load_new_help(FILE *fl, int reload, Character *ch)
 
   if (reload == 1)
   {
-    sprintf(buf, "%s just reloaded the help files.", GET_NAME(ch));
+    if (ch)
+    {
+      sprintf(buf, "%s just reloaded the help files.", GET_NAME(ch));
+    }
     logentry(buf, OVERSEER, LogChannels::LOG_HELP);
   }
   return eSUCCESS;
@@ -439,7 +441,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
         if (!*arg)
           sprintf(arg, "%s", argument); // if they left off the second arg, copy the first, show only one level
         show_help_header(ch);
-        for (i = 0; i < new_top_of_helpt; i++)
+        for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
         {
           if (new_help_table[i].min_level >= atoi(argument) && new_help_table[i].min_level <= atoi(arg) && start-- <= 0) // too many level 1s, so we must exclude them or get an OVERFLOW
             count = show_one_help_entry(i, ch, count);
@@ -450,7 +452,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
     else if ((*(argument + 1) == 'u' || *(argument + 1) == 'U'))
     { // unfinished help = level 75
       show_help_header(ch);
-      for (i = 0; i < new_top_of_helpt; i++)
+      for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
       {
         if (new_help_table[i].min_level == 75)
           count = show_one_help_entry(i, ch, count);
@@ -460,7 +462,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
     else if ((*(argument + 1) == 'd' || *(argument + 1) == 'D'))
     { // show defunct ones with out of range levels
       show_help_header(ch);
-      for (i = 0; i < new_top_of_helpt; i++)
+      for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
       {
         if (new_help_table[i].min_level <= 0 || new_help_table[i].min_level > IMPLEMENTER)
           count = show_one_help_entry(i, ch, count);
@@ -470,7 +472,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
     else if ((*(argument + 1) == 'i' || *(argument + 1) == 'I'))
     { // show defunct ones with out of range levels
       show_help_header(ch);
-      for (i = 0; i < new_top_of_helpt; i++)
+      for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
       {
         if (new_help_table[i].min_level >= IMMORTAL && new_help_table[i].min_level <= IMPLEMENTER)
           count = show_one_help_entry(i, ch, count);
@@ -490,7 +492,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
       ch->sendln("You can only list 30 help entries at a time.");
       return eFAILURE;
     }
-    else if (atoi(argument) >= new_top_of_helpt || atoi(arg) >= new_top_of_helpt)
+    else if (atoi(argument) >= DC::getInstance()->new_top_of_helpt || atoi(arg) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
@@ -505,7 +507,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
   }
   else if (((atoi(argument)) > 0) || *argument == '0')
   { // show a specific ID #
-    if (atoi(argument) >= new_top_of_helpt)
+    if (atoi(argument) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
@@ -519,7 +521,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
   { // we are searching based on keywords, show as many as you find
     minlen = strlen(argument);
     show_help_header(ch);
-    for (i = 0; i < new_top_of_helpt; i++)
+    for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     {
       if (!strn_cmp(argument, new_help_table[i].keyword1, minlen) ||
           !strn_cmp(argument, new_help_table[i].keyword2, minlen) ||
@@ -534,7 +536,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
   }
   ch->send(help_buf);
   ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
 
   return eSUCCESS;
 }
@@ -561,7 +563,7 @@ int do_index(Character *ch, char *argument, int cmd)
       ch->sendln("Usage: index <low ID#> <high ID#>"); // wrong order, first > second
       return eFAILURE;
     }
-    if (atoi(argument) >= new_top_of_helpt || atoi(arg) >= new_top_of_helpt)
+    if (atoi(argument) >= DC::getInstance()->new_top_of_helpt || atoi(arg) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return eFAILURE;
@@ -579,7 +581,7 @@ int do_index(Character *ch, char *argument, int cmd)
   }
   else if (((atoi(argument)) > 0) || *argument == '0')
   { // show a specific ID #
-    if (atoi(argument) >= new_top_of_helpt)
+    if (atoi(argument) >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Out of range.");
       return eFAILURE;
@@ -598,7 +600,7 @@ int do_index(Character *ch, char *argument, int cmd)
   { // we are searching based on keywords, show as many as you find
     minlen = strlen(argument);
     show_help_header(ch);
-    for (i = 0; i < new_top_of_helpt; i++)
+    for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     {
       if (new_help_table[i].min_level > 1)
         continue;
@@ -617,7 +619,7 @@ int do_index(Character *ch, char *argument, int cmd)
   }
   ch->send(help_buf);
   ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
 
   return eSUCCESS;
 }
@@ -697,7 +699,7 @@ int do_reload_help(Character *ch, char *argument, int cmd)
   }
 
   FREE(new_help_table);
-  new_top_of_helpt = 0;
+  DC::getInstance()->new_top_of_helpt = 0;
   CREATE(new_help_table, struct help_index_element_new, help_rec_count);
   ret = load_new_help(new_help_fl, 1, ch);
   fclose(new_help_fl);
@@ -760,11 +762,11 @@ int do_hedit(Character *ch, char *argument, int cmd)
     new_help.min_level = 75;
     new_help.entry = str_hsh("Blank help file!\r\n");
 
-    RECREATE(new_help_table, struct help_index_element_new, new_top_of_helpt + 1);
-    new_help_table[new_top_of_helpt] = new_help;
-    sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", new_top_of_helpt, buf2);
+    RECREATE(new_help_table, struct help_index_element_new, DC::getInstance()->new_top_of_helpt + 1);
+    new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
+    sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
     ch->send(buf);
-    new_top_of_helpt++;
+    DC::getInstance()->new_top_of_helpt++;
     sprintf(buf, "%s just created a help file for '%s'.", GET_NAME(ch), buf2);
     logentry(buf, OVERSEER, LogChannels::LOG_HELP);
   }
@@ -772,7 +774,7 @@ int do_hedit(Character *ch, char *argument, int cmd)
   { // Edit a specific help entry
     if (*buf == 0)
       help_id = 0;
-    if (help_id < 0 || help_id >= new_top_of_helpt)
+    if (help_id < 0 || help_id >= DC::getInstance()->new_top_of_helpt)
     {
       ch->sendln("Not a valid help ID number.  Try using 'hindex'");
       return eFAILURE;
@@ -914,7 +916,7 @@ void save_help(Character *ch)
   {
     fprintf(lf.file_handle_, "@Version: 2\n");
 
-    for (i = 0; i < new_top_of_helpt; i++)
+    for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     {
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword1);
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword2);
@@ -946,7 +948,7 @@ void save_help(Character *ch)
   LegacyFile lf_web_help(".", file, "Unable to open '%1'");
   if (lf_web_help.isOpen())
   {
-    for (i = 0; i < new_top_of_helpt; i++)
+    for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     {
       if (new_help_table[i].min_level <= DC::MAX_MORTAL_LEVEL)
       {
