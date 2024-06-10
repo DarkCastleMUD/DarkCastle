@@ -217,6 +217,7 @@ private:
     class DC *dc_{};
 };
 
+bool operator==(const Room &r1, const Room &r2);
 struct Entity
 {
     auto room(void) -> Room &;

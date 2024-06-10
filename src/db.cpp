@@ -223,6 +223,93 @@ void Room::AddTrackItem(room_track_data *newTrack)
 	}
 }
 
+bool operator==(const struct deny_data &dd1, const struct deny_data &dd2)
+{
+	QList<decltype(dd1.vnum)> denies1;
+	const struct deny_data *curr1 = &dd1;
+	do
+	{
+		denies1.push_back(curr1->vnum);
+	} while (curr1 = curr1->next);
+
+	QList<decltype(dd2.vnum)> denies2;
+	const struct deny_data *curr2 = &dd2;
+	do
+	{
+		denies2.push_back(curr2->vnum);
+	} while (curr2 = curr2->next);
+
+	return denies1 == denies2;
+}
+
+bool operator==(struct extra_descr_data &edd1, struct extra_descr_data &edd2)
+{
+	QMap<QString, QString> extra_descriptions1;
+	struct extra_descr_data *curr1 = &edd1;
+	do
+	{
+		extra_descriptions1.insert(curr1->keyword, curr1->description);
+	} while (curr1 = curr1->next);
+
+	QMap<QString, QString> extra_descriptions2;
+	struct extra_descr_data *curr2 = &edd2;
+	do
+	{
+		extra_descriptions2.insert(curr2->keyword, curr2->description);
+	} while (curr2 = curr2->next);
+
+	return extra_descriptions1 == extra_descriptions2;
+}
+
+bool operator==(const struct room_direction_data &rdd1, const struct room_direction_data &rdd2)
+{
+	return (rdd1.bracee == rdd2.bracee &&
+			rdd1.exit_info == rdd2.exit_info &&
+			QString(rdd1.general_description) == QString(rdd2.general_description) &&
+			rdd1.key == rdd2.key &&
+			QString(rdd1.keyword) == QString(rdd2.keyword) &&
+			rdd1.to_room == rdd2.to_room);
+}
+
+bool operator==(const Room &r1, const Room &r2)
+{
+	for (int direction = 0; direction < MAX_DIRS; ++direction)
+	{
+		if (r1.dir_option[direction] == r2.dir_option[direction])
+		{
+			continue;
+		}
+		else if (r1.dir_option[direction] && r2.dir_option[direction] &&
+				 *r1.dir_option[direction] == *r2.dir_option[direction])
+		{
+			continue;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return (r1.number == r2.number &&
+			r1.zone == r2.zone &&
+			r1.zonePtr == r2.zonePtr &&
+			r1.sector_type == r2.sector_type &&
+			r1.denied == r2.denied &&
+			QString(r1.name) == QString(r2.name) &&
+			QString(r1.description) == QString(r2.description) &&
+			r1.ex_description == r2.ex_description &&
+			r1.room_flags == r2.room_flags &&
+			r1.temp_room_flags == r2.temp_room_flags &&
+			r1.light == r2.light &&
+			r1.funct == r2.funct &&
+			// r1.contents == r2.contents &&
+			// r1.people == r2.people &&
+			// r1.nTracks == r2.nTracks &&
+			// r1.tracks == r2.tracks &&
+			// r1.iFlags == r2.iFlags &&
+			// ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
+			!memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)));
+}
+
 room_track_data *Room::TrackItem(int nIndex)
 {
 	int nr;
