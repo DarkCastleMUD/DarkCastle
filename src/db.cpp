@@ -6630,11 +6630,6 @@ void string_to_file(QTextStream &fl, QString str)
 	fl << str.remove('\r') + "~\n";
 }
 
-void string_to_file(std::ofstream &fl, QString str)
-{
-	fl << str.remove('\r').toStdString() << "~\n";
-}
-
 void copySaveData(Object *target, Object *source)
 {
 	int i;

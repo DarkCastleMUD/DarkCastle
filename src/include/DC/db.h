@@ -31,6 +31,7 @@
 #include "DC/weather.h"
 #include "DC/handler.h"
 #include "DC/DC.h"
+#include "DC/utility.h"
 
 extern class Object *object_list;
 extern room_t top_of_world;
@@ -160,7 +161,11 @@ void write_wizlist(std::stringstream &filename);
 void write_wizlist(std::string filename);
 void write_wizlist(const char filename[]);
 void string_to_file(QTextStream &fl, QString str);
-void string_to_file(std::ofstream &fl, QString str);
+
+void string_to_file(auto &fl, QString str)
+{
+  fl << str.remove('\r').toStdString() << "~\n";
+}
 
 void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
 {
@@ -250,6 +255,77 @@ void write_object(Object *obj, auto &out)
   out << "S\n";
 }
 
+auto &operator<<(auto &out, const Room &room)
+{
+  auto temp_room_flags = room.room_flags;
+  if (room.iFlags)
+  {
+    REMOVE_BIT(temp_room_flags, room.iFlags);
+  }
+
+  struct extra_descr_data *extra;
+  if (!DC::getInstance()->rooms.contains(room.number))
+    return out;
+
+  out << "#" << room.number << "\n";
+  string_to_file(out, room.name);
+  string_to_file(out, room.description);
+
+  out << room.zone << " " << room.room_flags << " " << room.sector_type << "\n";
+
+  /* exits */
+  for (int b = 0; b <= 5; b++)
+  {
+    if (!(room.dir_option[b]))
+      continue;
+    out << "D" << b << "\n";
+    if (room.dir_option[b]->general_description)
+      string_to_file(out, room.dir_option[b]->general_description);
+    else
+      out << "~\n"; // print blank
+    if (room.dir_option[b]->keyword)
+      string_to_file(out, room.dir_option[b]->keyword);
+    else
+      out << "~\n"; // print blank
+    out << room.dir_option[b]->exit_info << " " << room.dir_option[b]->key << " " << room.dir_option[b]->to_room << "\n";
+  } /* exits */
+
+  /* extra descriptions */
+  for (extra = room.ex_description; extra; extra = extra->next)
+  {
+    if (!extra)
+      break;
+    out << "E\n";
+    if (extra->keyword)
+      string_to_file(out, extra->keyword);
+    else
+      out << "~\n"; // print blank
+    if (extra->description)
+      string_to_file(out, extra->description);
+    else
+      out << "~\n"; // print blank
+  } /* extra descriptions */
+
+  struct deny_data *deni;
+  for (deni = room.denied; deni; deni = deni->next)
+  {
+    out << "B\n"
+        << deni->vnum << "\n";
+  }
+
+  // Write out allowed classes if any
+  for (int i = 0; i < CLASS_MAX; i++)
+  {
+    if (room.allow_class[i] == true)
+    {
+      out << "C" << i << "\n";
+    }
+  }
+
+  out << "S\n";
+  return out;
+}
+
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
@@ -305,7 +381,6 @@ class Object *clone_object(int nr);
 Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
 void string_to_file(FILE *fl, QString str);
-void string_to_file(std::ofstream &fl, QString str);
 void string_to_file(QTextStream &fl, QString str);
 std::ofstream &operator<<(std::ofstream &out, Object *obj);
 std::ifstream &operator>>(std::ifstream &in, Object *obj);

@@ -143,6 +143,13 @@ struct deny_data
 class Room
 {
 public:
+    Room(void)
+    {
+    }
+    explicit Room(int16_t roomNumber, class DC *parent)
+        : number(roomNumber), dc_(parent)
+    {
+    }
     int16_t number = {}; // Rooms number
     zone_t zone = {};    // Room zone (for resetting)
     QSharedPointer<Zone> zonePtr = {};
@@ -205,6 +212,9 @@ public:
     void AddTrackItem(room_track_data *newTrack);
     room_track_data *TrackItem(int nIndex);
     void FreeTracks();
+
+private:
+    class DC *dc_{};
 };
 
 struct Entity
