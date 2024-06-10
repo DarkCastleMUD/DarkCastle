@@ -2167,7 +2167,6 @@ void add_new_vault(const char *name, int indexonly)
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
     logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, LogChannels::LOG_BUG);
-    return;
   }
 
   if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
@@ -2176,18 +2175,24 @@ void add_new_vault(const char *name, int indexonly)
     return;
   }
 
-  // read and print each line until we get to $
-  fscanf(vfl, "%s\n", line);
-  while (*line != '$')
+  if (vfl)
   {
-    fprintf(tvfl, "%s\n", line);
+    // read and print each line until we get to $
     fscanf(vfl, "%s\n", line);
+    while (*line != '$')
+    {
+      fprintf(tvfl, "%s\n", line);
+      fscanf(vfl, "%s\n", line);
+    }
   }
   // we found $, now add in the new name, then the $
   fprintf(tvfl, "%s\n", name);
   fprintf(tvfl, "$\n");
   fclose(tvfl);
-  fclose(vfl);
+  if (vfl)
+  {
+    fclose(vfl);
+  }
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
 
   if (indexonly)
