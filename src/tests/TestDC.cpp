@@ -175,14 +175,7 @@ private slots:
 
         DC dc(cf);
         dc.random_ = QRandomGenerator(0);
-        dc.boot_zones();
-        extern room_t top_of_world_alloc;
-        top_of_world_alloc = 2000;
-        dc.boot_world();
-        renum_world();
-        renum_zone_table();
-        void boot_social_messages(void);
-        boot_social_messages();
+        dc.boot_db();
 
         Character ch;
         ch.in_room = 3;
@@ -235,6 +228,11 @@ private slots:
         ch.intel = 25;
         redo_ki(&ch);
         ch.ki = ki_limit(&ch);
+        do_sing(&ch, str_hsh("'flight of the bumblebee'"));
+        QCOMPARE(conn.output, "R$B$5You feel more competent in your flight of the bumblebee ability. It increased to 2 out of 75.$R\r\nYou forgot the words!\r\n");
+        conn.output = {};
+        QVERIFY(ch.songs.empty());
+
         do_sing(&ch, str_hsh("'flight of the bumblebee'"));
         QCOMPARE(conn.output, "You begin to sing a lofty song...\r\n");
         conn.output = {};
@@ -579,17 +577,18 @@ private slots:
             filename = "1-1.txt";
         }
 
+        QString legacyfile_filename = QStringLiteral("world/%1.legacyfile").arg(filename);
         QString qfile_filename = QStringLiteral("world/%1.qfile").arg(filename);
         QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
-        std::string s_filename = QStringLiteral("world/%1.fstream").arg(filename).toStdString();
+        QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
         uint64_t rooms_written{};
 
         {
-            LegacyFileWorld lfw(filename);
+            LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
             QFile qf(qfile_filename);
             QSaveFile qsf(qsavefile_filename);
             std::fstream fstream_world_file;
-            fstream_world_file.open(s_filename, std::ios::out);
+            fstream_world_file.open(fstream_filename.toStdString(), std::ios::out);
 
             if (lfw.isOpen() &&
                 qf.open(QIODeviceBase::WriteOnly) &&
@@ -629,13 +628,48 @@ private slots:
         qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
 
         auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
+        auto legacyfile_checksum = checksumFile(legacyfile_filename);
         auto qfile_checksum = checksumFile(qfile_filename);
         auto qsavefile_checksum = checksumFile(qsavefile_filename);
-        auto fstream_checksum = checksumFile(s_filename.c_str());
+        auto fstream_checksum = checksumFile(fstream_filename);
 
-        QCOMPARE(original_checksum.toHex(), qfile_checksum.toHex());
-        QCOMPARE(original_checksum.toHex(), qsavefile_checksum.toHex());
-        QCOMPARE(original_checksum.toHex(), fstream_checksum.toHex());
+        QCOMPARE(legacyfile_checksum.toHex(), original_checksum.toHex());
+        QCOMPARE(qfile_checksum.toHex(), original_checksum.toHex());
+        QCOMPARE(qsavefile_checksum.toHex(), original_checksum.toHex());
+        QCOMPARE(fstream_checksum.toHex(), original_checksum.toHex());
+
+        {
+            FILE *fl = fopen(qPrintable(legacyfile_filename), "r");
+            QVERIFY(fl);
+
+            QFile qf(qfile_filename);
+            QVERIFY(qf.open(QIODeviceBase::ReadOnly));
+
+            std::fstream fstream_world_file;
+            fstream_world_file.open(fstream_filename.toStdString(), std::ios::in);
+            QVERIFY(fstream_world_file.is_open());
+
+            QTextStream in(&qf);
+            int room_nr = {};
+
+            Room original_room1 = DC::getInstance()->world[1];
+            int new_room_nr = DC::getInstance()->read_one_room(fl, room_nr);
+            QCOMPARE(room_nr, 1);
+            QCOMPARE(new_room_nr, 1);
+            Room new_room1 = DC::getInstance()->world[1];
+
+            QCOMPARE(new_room1, original_room1);
+            Room r1;
+            // in >> r1;
+            //  QCOMPARE(r1, original_room1);
+            //  fstream_world_file >> r2;
+            //  QCOMPARE(r2, original_room1);
+        }
+
+        QVERIFY(QFile(legacyfile_filename).remove());
+        QVERIFY(QFile(qfile_filename).remove());
+        QVERIFY(QFile(qsavefile_filename).remove());
+        QVERIFY(QFile(fstream_filename).remove());
     }
 };
 
