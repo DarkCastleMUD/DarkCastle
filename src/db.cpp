@@ -71,8 +71,7 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-room_t top_of_world = 0;	   // index of last room in world
-room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
+room_t top_of_world = 0; // index of last room in world
 
 class Object *object_list = 0; /* the global linked list of obj's */
 
@@ -2159,7 +2158,7 @@ void setup_dir(FILE *fl, int room, int dir)
 }
 
 // return true for success
-int create_one_room(Character *ch, int vnum)
+int DC::create_one_room(Character *ch, int vnum)
 {
 	Room *rp{};
 	int x{};

@@ -315,8 +315,9 @@ public:
   class index_data mob_index_array[MAX_INDEX];
   class index_data *mob_index = mob_index_array;
 
-  int top_of_helpt = 0;     /* top of help index table         */
-  int new_top_of_helpt = 0; /* top of help index table         */
+  int top_of_helpt = 0;          /* top of help index table         */
+  int new_top_of_helpt = 0;      /* top of help index table         */
+  room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -333,6 +334,7 @@ public:
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
   Object *getObject(vnum_t vnum);
   void findLibrary(void);
+  int create_one_room(Character *ch, int vnum);
 
   explicit DC(int &argc, char **argv);
   explicit DC(config c);

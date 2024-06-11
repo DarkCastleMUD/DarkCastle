@@ -4382,7 +4382,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     if (c == (-1) && can_modify_room(ch, d))
     {
-      if (create_one_room(ch, d))
+      if (DC::getInstance()->create_one_room(ch, d))
       {
         c = real_room(d);
         ch->send(QStringLiteral("Creating room %1.\r\n").arg(d));

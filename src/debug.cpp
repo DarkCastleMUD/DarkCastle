@@ -238,8 +238,8 @@ int main(int argc, char **argv)
   DC::getInstance()->boot_zones();
 
   logentry(QStringLiteral("Loading the world."), 0, LogChannels::LOG_MISC);
-  extern room_t top_of_world_alloc;
-  top_of_world_alloc = 2000;
+
+  DC::getInstance()->top_of_world_alloc = 2000;
 
   DC::getInstance()->boot_world();
 

@@ -39,7 +39,6 @@ int real_roomb(int virt);
 void save_ban_list(void);
 void save_nonew_new_list(void);
 int is_in_range(Character *ch, int virt);
-int create_one_room(Character *ch, int vnum);
 void isr_set(Character *ch);
 void mob_stat(Character *ch, Character *k);
 void obj_stat(Character *ch, class Object *j);
