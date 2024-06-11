@@ -65,9 +65,6 @@ extern Character *activeRndm;
 extern Character *activeTarget;
 extern Object *activeObj;
 extern void *activeVo;
-
-extern room_t top_of_world;
-
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
 
@@ -765,8 +762,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   }
   if (location == ch->in_room)
     return eFAILURE; // zz
-  extern room_t top_of_world;
-  if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
+  if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
     location = 0;
 
   if (ch->fighting != nullptr)
@@ -817,8 +813,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
     prog_error(ch, "do_mpat - No such location.");
     return eFAILURE | eINTERNAL_ERROR;
   }
-  extern room_t top_of_world;
-  if (location > top_of_world || !DC::getInstance()->rooms.contains(location))
+  if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
@@ -1906,7 +1901,7 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
     }
     else
     {
-      to_room = number<room_t>(1, top_of_world);
+      to_room = number<room_t>(1, DC::getInstance()->top_of_world);
     }
   } while (!DC::getInstance()->rooms.contains(to_room) ||
            isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||

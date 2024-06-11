@@ -3783,7 +3783,6 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *invoker)
 {
   auto &arena = DC::getInstance()->arena_;
-  extern room_t top_of_world;
   int dropped = 0;
   Character *vict = nullptr;
 
@@ -3807,7 +3806,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       vict->sendln("It's already been started!");
       return eSUCCESS;
     }
-    if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
+    if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened())
     {
       vict->sendln("Wait until the potato arena is open before you try blowing yourself up!");
@@ -3869,7 +3868,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return eSUCCESS;
     }
-    if ((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
+    if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
         vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortal())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");

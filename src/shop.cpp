@@ -806,7 +806,7 @@ void boot_the_shops()
     fscanf(fp, "%d \n", &temp);
 
     int room_nr = real_room(temp);
-    if (room_nr < 0 || room_nr > top_of_world)
+    if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
     {
       logf(100, LogChannels::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = 0;
@@ -1503,7 +1503,7 @@ int do_pshopedit(Character * ch, char * arg, int cmd)
          return eFAILURE;
       }
       i = atoi(text);
-      if(i < 1 || i > top_of_world || !DC::getInstance()->rooms[i]) {
+      if(i < 1 || i > DC::getInstance()->top_of_world || !DC::getInstance()->rooms[i]) {
          ch->sendln("You must choose a valid room number.");
          return eFAILURE;
       }

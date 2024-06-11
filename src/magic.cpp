@@ -1679,7 +1679,6 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   auto &arena = DC::getInstance()->arena_;
   room_t to_room;
   char buf[100];
-  extern room_t top_of_world; /* ref to the top element of world */
 
   if (!victim)
   {
@@ -1687,7 +1686,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
     return eFAILURE;
   }
 
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't teleport in potato arenas!");
@@ -1735,7 +1734,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   {
     do
     {
-      to_room = number<room_t>(1, top_of_world);
+      to_room = number<room_t>(1, DC::getInstance()->top_of_world);
     } while (!DC::getInstance()->rooms.contains(to_room) ||
              isSet(DC::getInstance()->world[to_room].room_flags, PRIVATE) ||
              isSet(DC::getInstance()->world[to_room].room_flags, IMP_ONLY) ||
@@ -6537,7 +6536,6 @@ void make_portal(Character *ch, Character *vict)
 {
   class Object *ch_portal, *vict_portal;
   extern class Object *object_list;
-  extern room_t top_of_world;
   char buf[250];
   qint64 chance{};
   room_t destination{};
@@ -6582,7 +6580,7 @@ void make_portal(Character *ch, Character *vict)
   {
     while (!good_destination)
     {
-      destination = number<room_t>(1, top_of_world);
+      destination = number<room_t>(1, DC::getInstance()->top_of_world);
       if (!DC::getInstance()->rooms.contains(destination) ||
           isSet(DC::getInstance()->world[destination].room_flags, ARENA) ||
           isSet(DC::getInstance()->world[destination].room_flags, IMP_ONLY) ||
@@ -12462,7 +12460,6 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 
 int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *victim, class Object *tar_obj, int skill)
 {
-  //   extern room_t top_of_world;
   //   int to_room = 0;
 
   if (!ch->beacon)

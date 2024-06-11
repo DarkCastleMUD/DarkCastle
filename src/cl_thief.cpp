@@ -27,8 +27,6 @@
 
 extern int rev_dir[];
 
-extern room_t top_of_world;
-
 int find_door(Character *ch, char *type, char *dir);
 int get_weapon_damage_type(class Object *wielded);
 int check_autojoiners(Character *ch, int skill = 0);
@@ -616,7 +614,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   auto &arena = DC::getInstance()->arena_;
   affected_type af;
 
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && ch->room().isArena() && arena.isPotato())
+  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
     return eFAILURE;
@@ -727,7 +725,7 @@ int do_hide(Character *ch, const char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't do that in a potato arena ya sneaky bastard!");

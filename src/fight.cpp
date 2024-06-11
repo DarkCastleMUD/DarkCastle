@@ -61,8 +61,6 @@
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 
-extern room_t top_of_world;
-
 Character *combat_list = nullptr, *combat_next_dude = nullptr;
 
 char *champ_death_messages[] =
@@ -6982,7 +6980,7 @@ int can_attack(Character *ch)
   }
 
   auto &arena = DC::getInstance()->arena_;
-  if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+  if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("You can't attack in a potato arena, go find a potato would ya?!");
@@ -7003,8 +7001,8 @@ int can_be_attacked(Character *ch, Character *vict)
   if (!ch || !vict)
     return false;
 
-  if (vict->in_room == DC::NOWHERE || vict->in_room >= top_of_world ||
-      ch->in_room == DC::NOWHERE || ch->in_room >= top_of_world)
+  if (vict->in_room == DC::NOWHERE || vict->in_room >= DC::getInstance()->top_of_world ||
+      ch->in_room == DC::NOWHERE || ch->in_room >= DC::getInstance()->top_of_world)
     return false;
 
   // Ch should not be able to attack a wizinvis immortal player

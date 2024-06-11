@@ -257,7 +257,6 @@ void find_and_remove_player_portal(Character *ch)
   class Object *next_k;
   char searchstr[180];
   extern class Object *object_list;
-  extern room_t top_of_world;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));
@@ -271,7 +270,7 @@ void find_and_remove_player_portal(Character *ch)
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if (k->in_room < top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->rooms.contains(k->in_room))
+    if (k->in_room < DC::getInstance()->top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->rooms.contains(k->in_room))
     {
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
     }

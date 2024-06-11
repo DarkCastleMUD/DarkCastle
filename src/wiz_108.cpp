@@ -48,7 +48,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   }
   low = last_good;
   last_good = curRoom;
-  for (high = curRoom; high < top_of_world; high++)
+  for (high = curRoom; high < DC::getInstance()->top_of_world; high++)
   {
     if (!DC::getInstance()->rooms.contains(high + 1))
       continue;

@@ -36,7 +36,7 @@ int count_rooms(int start, int end)
 	}
 
 	int count = 0;
-	for (int i = start; i < top_of_world && i <= end; i++)
+	for (int i = start; i < DC::getInstance()->top_of_world && i <= end; i++)
 	{
 		if (!DC::getInstance()->rooms.contains(i))
 			continue;
@@ -1081,7 +1081,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 			else
 			{
-				for (i = begin; i < top_of_world && i <= end; i++)
+				for (i = begin; i < DC::getInstance()->top_of_world && i <= end; i++)
 				{
 					if (!DC::getInstance()->rooms.contains(i))
 						continue;
@@ -1759,7 +1759,7 @@ int do_show(Character *ch, char *argument, int cmd)
 		}
 
 		ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
-		for (i = 0; i < top_of_world; i++)
+		for (i = 0; i < DC::getInstance()->top_of_world; i++)
 			for (nr = 0; nr < MAX_DIRS; nr++)
 				if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
 				{
@@ -1888,11 +1888,11 @@ int do_teleport(Character *ch, char *argument, int cmd)
 			ch->sendln("No room exists with that number.");
 			return eFAILURE;
 		}
-		//      for (loop = 0; loop <= top_of_world; loop++) {
+		//      for (loop = 0; loop <= DC::getInstance()->top_of_world; loop++) {
 		//         if (DC::getInstance()->world[loop].number == target) {
 		//            target = (int16_t)loop;
 		//            break;
-		//      } else if (loop == top_of_world) {
+		//      } else if (loop == DC::getInstance()->top_of_world) {
 		//            ch->sendln("No room exists with that number.");
 		//            return eFAILURE;
 		//      } /* if */

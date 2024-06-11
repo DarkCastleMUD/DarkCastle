@@ -1590,7 +1590,6 @@ int do_give(Character *ch, char *argument, int cmd)
   char arg[80], allbuf[80];
   int64_t amount;
   int retval;
-  extern room_t top_of_world;
   Character *vict;
   class Object *obj;
 
@@ -1850,7 +1849,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       auto &arena = DC::getInstance()->arena_;
-      if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+      if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && !strcmp(obj_name, "potato") &&
           ch->room().isArena() && vict->room().isArena() &&
           arena.isPotato())
       {
@@ -1874,7 +1873,7 @@ int do_give(Character *ch, char *argument, int cmd)
     else
     {
       auto &arena = DC::getInstance()->arena_;
-      if ((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+      if ((ch->in_room >= 0 && ch->in_room <= DC::getInstance()->top_of_world) && !strcmp(obj_name, "potato") &&
           ch->room().isArena() && vict->room().isArena() &&
           arena.isPotato())
       {
@@ -1919,7 +1918,7 @@ int do_give(Character *ch, char *argument, int cmd)
          loop_obj->short_description,
          DC::getInstance()->obj_index[loop_obj->item_number].virt);
 
-  if ((vict->in_room >= 0 && vict->in_room <= top_of_world) && vict->isMortal() &&
+  if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortal() &&
       vict->room().isArena() && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].virt == 393)
   {
     vict->sendln("Here, have some for some potato lag!!");

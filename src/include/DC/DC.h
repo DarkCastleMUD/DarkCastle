@@ -318,6 +318,7 @@ public:
   int top_of_helpt = 0;          /* top of help index table         */
   int new_top_of_helpt = 0;      /* top of help index table         */
   room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
+  room_t top_of_world = 0;
 
   static QString getBuildVersion();
   static QString getBuildTime();

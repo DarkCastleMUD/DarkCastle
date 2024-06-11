@@ -372,7 +372,7 @@ int lookupRoom(Character *ch, char *str)
 
   int room = atoi(str);
 
-  if (room == DC::NOWHERE || room > top_of_world || !DC::getInstance()->rooms.contains(room))
+  if (room == DC::NOWHERE || room > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(room))
   {
     if (ch)
     {
@@ -454,7 +454,7 @@ int do_guild(Character *ch, char *argument, int cmd)
       csendf(ch, "%s only rooms:\n\r", pc_clss_types[c_class]);
 
       int cols = 0;
-      for (int r = 0; r < top_of_world; r++)
+      for (int r = 0; r < DC::getInstance()->top_of_world; r++)
       {
         if (DC::getInstance()->rooms.contains(r) && DC::getInstance()->rooms[r].allow_class[c_class] == true)
         {

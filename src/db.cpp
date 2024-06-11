@@ -71,8 +71,6 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-room_t top_of_world = 0; // index of last room in world
-
 class Object *object_list = 0; /* the global linked list of obj's */
 
 pulse_data *bard_list = 0; /* global l-list of bards          */
@@ -81,7 +79,7 @@ Room &World::operator[](room_t room_key)
 {
 	static Room generic_room = {};
 
-	if (room_key > top_of_world || room_key == DC::NOWHERE || !DC::getInstance()->rooms.contains(room_key))
+	if (room_key > DC::getInstance()->top_of_world || room_key == DC::NOWHERE || !DC::getInstance()->rooms.contains(room_key))
 	{
 		generic_room = {};
 		return generic_room;
@@ -1891,7 +1889,7 @@ void free_world_from_memory()
 	struct extra_descr_data *curr_extra = nullptr;
 	struct world_file_list_item *curr_wfli = nullptr;
 
-	for (int i = 0; i <= top_of_world; i++)
+	for (int i = 0; i <= DC::getInstance()->top_of_world; i++)
 	{
 		if (!DC::getInstance()->rooms.contains(i))
 			continue;
@@ -2165,7 +2163,7 @@ int DC::create_one_room(Character *ch, int vnum)
 
 	char buf[256]{};
 
-	if (DC::getInstance()->rooms.contains(vnum))
+	if (rooms.contains(vnum))
 		return 0;
 
 	if (vnum > WORLD_MAX_ROOM)
@@ -2209,7 +2207,7 @@ void renum_world(void)
 {
 	int room, door;
 
-	for (room = 0; room <= top_of_world; room++)
+	for (room = 0; room <= DC::getInstance()->top_of_world; room++)
 		for (door = 0; door <= 5; door++)
 			if (DC::getInstance()->rooms.contains(room))
 				if (DC::getInstance()->world[room].dir_option[door])
@@ -5009,7 +5007,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'D': /* set state of door */
-				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > top_of_world)
+				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > DC::getInstance()->top_of_world)
 				{
 					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_,
 							cmd_no);
@@ -6304,7 +6302,7 @@ void init_char(Character *ch)
 /* returns the real number of the room with given virt number */
 room_t real_room(room_t virt)
 {
-	if (virt < 0 || virt > top_of_world)
+	if (virt < 0 || virt > DC::getInstance()->top_of_world)
 	{
 		return DC::NOWHERE;
 	}

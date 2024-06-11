@@ -34,7 +34,6 @@
 #include "DC/utility.h"
 
 extern class Object *object_list;
-extern room_t top_of_world;
 
 struct error_eof
 {

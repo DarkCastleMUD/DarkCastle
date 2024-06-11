@@ -125,7 +125,6 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
   Character *tmp_ch = {};
   struct follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
-  extern room_t top_of_world;
 
   if (IS_NPC(this))
   {
@@ -178,7 +177,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
     send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(std::string(DC::getInstance()->zones.value(zone_key).Name().toStdString()))));
 
-    if (loc_nr > top_of_world || loc_nr < 0)
+    if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
     {
       send("No room exists with that number.\r\n");
       return eFAILURE;
@@ -241,7 +240,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
     }
     else
     {
-      if (loc_nr > top_of_world || loc_nr < 0)
+      if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
       {
         send("No room exists with that number.\r\n");
         return eFAILURE;
@@ -471,7 +470,6 @@ int do_at(Character *ch, char *argument, int cmd)
   int loc_nr, location, original_loc;
   Character *target_mob;
   class Object *target_obj;
-  // extern room_t top_of_world;
 
   if (IS_NPC(ch))
     return eFAILURE;
