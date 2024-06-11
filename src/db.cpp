@@ -123,7 +123,6 @@ struct help_index_element_new *new_help_table = 0;
 
 int top_of_mobt = 0; /* top of mobile index table       */
 int top_of_objt = 0; /* top of object index table       */
-int total_rooms = 0; /* total amount of rooms in memory */
 
 struct time_info_data time_info;  /* the infomation about the time   */
 struct weather_data weather_info; /* the infomation about the weather */
@@ -1550,7 +1549,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			DC::getInstance()->world[room_nr].tracks = 0;
 			DC::getInstance()->world[room_nr].last_track = 0;
 			DC::getInstance()->world[room_nr].denied = 0;
-			total_rooms++;
+			DC::getInstance()->total_rooms++;
 		}
 		// Ignore recorded zone number since it may not longer be valid
 		fread_int(fl, -1, 64000); // zone nr

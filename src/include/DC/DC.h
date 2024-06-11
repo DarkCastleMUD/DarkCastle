@@ -104,6 +104,7 @@ typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
+#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/obj.h"
@@ -319,6 +320,7 @@ public:
   int new_top_of_helpt = 0;      /* top of help index table         */
   room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
   room_t top_of_world = 0;
+  int total_rooms = 0; /* total amount of rooms in memory */
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -471,5 +473,192 @@ void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
+void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
+#define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
+
+auto &operator>>(auto &in, Room &room)
+{
+  room_t room_nr = {};
+  char *temp = nullptr;
+  char ch = 0;
+  int dir = 0;
+  struct extra_descr_data *new_new_descr{};
+  zone_t zone_nr = {};
+
+  ch = fread_char(in);
+
+  if (ch != '$')
+  {
+    room_nr = fread_int(in, 0, 1000000);
+    temp = fread_string(in, 0);
+
+    if (room_nr)
+    {
+      /*
+      DC::getInstance()->currentVNUM(room_nr);
+      DC::getInstance()->currentType("Room");
+      DC::getInstance()->currentName(temp);
+
+      if (room_nr >= DC::getInstance()->top_of_world_alloc)
+      {
+        DC::getInstance()->top_of_world_alloc = room_nr + 200;
+      }
+
+      if (DC::getInstance()->top_of_world < room_nr)
+        DC::getInstance()->top_of_world = room_nr;
+      */
+
+      room.paths = 0;
+      room.number = room_nr;
+      room.name = temp;
+    }
+    char *description = fread_string(in, 0);
+    if (room_nr)
+    {
+      room.description = description;
+      room.nTracks = 0;
+      room.tracks = 0;
+      room.last_track = 0;
+      room.denied = 0;
+      // DC::getInstance()->total_rooms++;
+    }
+    // Ignore recorded zone number since it may not longer be valid
+    fread_int(in, -1, 64000); // zone nr
+
+    if (room_nr)
+    {
+      // Go through the zone table until room.number is
+      // in the current zone.
+
+      bool found = false;
+      zone_t zone_nr = {};
+      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      {
+        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
+        {
+          found = true;
+          zone_nr = zone_key;
+          break;
+        }
+      }
+      if (!found)
+      {
+        // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
+        // logentry(error);
+        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LogChannels::LOG_BUG);
+      }
+      else
+      {
+        auto &zone = DC::getInstance()->zones[zone_nr];
+        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
+        {
+          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+          {
+            zone.setRealBottom(room_nr);
+          }
+          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+          {
+            zone.setRealTop(room_nr);
+          }
+        }
+        room.zone = zone_nr;
+      }
+    }
+
+    uint32_t room_flags = fread_bitvector(in, -1, 2147483467);
+
+    if (room_nr)
+    {
+      room.room_flags = room_flags;
+      if (isSet(room.room_flags, NO_ASTRAL))
+      {
+        REMOVE_BIT(room.room_flags, NO_ASTRAL);
+      }
+
+      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+      room.temp_room_flags = 0;
+    }
+
+    int sector_type = fread_int(in, -1, 64000);
+
+    if (room_nr)
+    {
+      room.sector_type = sector_type;
+      room.funct = 0;
+      room.contents = 0;
+      room.people = 0;
+      room.light = 0; /* Zero light sources */
+
+      for (size_t tmp = 0; tmp <= 5; tmp++)
+        room.dir_option[tmp] = 0;
+
+      room.ex_description = 0;
+    }
+
+    for (;;)
+    {
+      ch = fread_char(in); /* dir field */
+
+      /* direction field */
+      if (ch == 'D')
+      {
+        dir = fread_int(in, 0, 5);
+        setup_dir(in, room_nr, dir);
+      }
+      /* extra description field */
+      else if (ch == 'E')
+      {
+        // strip off the \n after the E
+        if (fread_char(in) != '\n')
+        {
+          fseek(in, -1, SEEK_CUR);
+        }
+
+        new_new_descr = new struct extra_descr_data;
+        new_new_descr->keyword = fread_string(in, 0);
+        new_new_descr->description = fread_string(in, 0);
+
+        if (room_nr)
+        {
+          new_new_descr->next = room.ex_description;
+          room.ex_description = new_new_descr;
+        }
+        else
+        {
+          delete new_new_descr;
+        }
+      }
+      else if (ch == 'B')
+      {
+        struct deny_data *deni;
+
+        deni = new struct deny_data;
+        deni->vnum = fread_int(in, -1, 2147483467);
+
+        if (room_nr)
+        {
+          deni->next = room.denied;
+          room.denied = deni;
+        }
+        else
+        {
+          delete deni;
+        }
+      }
+      else if (ch == 'S') /* end of current room */
+        break;
+      else if (ch == 'C')
+      {
+        int c_class = fread_int(in, 0, CLASS_MAX);
+        if (room_nr)
+        {
+          room.allow_class[c_class] = true;
+        }
+      }
+    } // of for (;;) (get directions and extra descs)
+  } // if == $
+
+  return in;
+}
 
 #endif

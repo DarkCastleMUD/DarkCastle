@@ -934,7 +934,7 @@ int do_show(Character *ch, char *argument, int cmd)
 	else if (is_abbrev(type, "counts") && has_range)
 	{
 		csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
-			   total_rooms, top_of_mobt, top_of_objt);
+			   DC::getInstance()->total_rooms, top_of_mobt, top_of_objt);
 		return eSUCCESS;
 	}
 	else if (is_abbrev(type, "object"))

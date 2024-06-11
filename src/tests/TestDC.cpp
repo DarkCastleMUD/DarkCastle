@@ -657,13 +657,13 @@ private slots:
             QCOMPARE(room_nr, 1);
             QCOMPARE(new_room_nr, 1);
             Room new_room1 = DC::getInstance()->world[1];
-
             QCOMPARE(new_room1, original_room1);
-            Room r1;
+
+            // Room r1;
             // in >> r1;
-            //  QCOMPARE(r1, original_room1);
-            //  fstream_world_file >> r2;
-            //  QCOMPARE(r2, original_room1);
+            // QCOMPARE(r1, original_room1);
+            //   fstream_world_file >> r2;
+            //   QCOMPARE(r2, original_room1);
         }
 
         QVERIFY(QFile(legacyfile_filename).remove());

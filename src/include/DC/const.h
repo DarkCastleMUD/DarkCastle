@@ -51,7 +51,6 @@ extern world_file_list_item *mob_file_list;
 extern world_file_list_item *obj_file_list;
 extern int top_of_mobt;
 extern int top_of_objt;
-extern int total_rooms;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *size_bitfields[];
