@@ -360,38 +360,38 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		left += 6;
 
 		const auto &character_list = DC::getInstance()->character_list;
-		find_if(character_list.begin(), character_list.end(),
-				[&target, &left](Character *const &tmp)
-				{
-					if (isexact(left, GET_NAME(tmp)))
-					{
-						target = tmp;
-						return true;
-					}
-					else
-					{
-						return false;
-					}
-				});
+		auto result = find_if(character_list.begin(), character_list.end(),
+							  [&target, &left](Character *const &tmp)
+							  {
+								  if (isexact(left, GET_NAME(tmp)))
+								  {
+									  target = tmp;
+									  return true;
+								  }
+								  else
+								  {
+									  return false;
+								  }
+							  });
 	}
 	else if (!str_prefix("zone_", left))
 	{
 		left += 5;
 
 		const auto &character_list = DC::getInstance()->character_list;
-		find_if(character_list.begin(), character_list.end(),
-				[&target, &left, &mob](Character *const &tmp)
-				{
-					if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, GET_NAME(tmp)))
-					{
-						target = tmp;
-						return true;
-					}
-					else
-					{
-						return false;
-					}
-				});
+		auto result = find_if(character_list.begin(), character_list.end(),
+							  [&target, &left, &mob](Character *const &tmp)
+							  {
+								  if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, GET_NAME(tmp)))
+								  {
+									  target = tmp;
+									  return true;
+								  }
+								  else
+								  {
+									  return false;
+								  }
+							  });
 	}
 	else if (!str_prefix("mroom_", left))
 	{

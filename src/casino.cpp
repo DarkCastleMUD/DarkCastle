@@ -973,8 +973,8 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)
          return;
-   class Object *obj;
-   for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = obj->next_content)
+   auto obj = DC::getInstance()->world[ch->in_room].contents;
+   for (; obj; obj = obj->next_content)
    {
       if (obj->table)
          break;
