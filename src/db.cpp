@@ -3793,7 +3793,10 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 	auto current_line = stream.readLine();
 	assert(stream.status() == QTextStream::Status::Ok);
 
-	qDebug(QStringLiteral("%1: [%2]").arg(message).arg(current_line).toStdString().c_str());
+	if (!message.isEmpty())
+	{
+		qDebug(qPrintable(QStringLiteral("%1: [%2]").arg(message).arg(current_line)));
+	}
 	auto ok = stream.seek(current_pos);
 	assert(stream.pos() == current_pos);
 	assert(stream.status() == QTextStream::Status::Ok);
@@ -5307,8 +5310,8 @@ char *fread_string(FILE *fl, int hasher)
 		case '\n':
 			while (pBufLast > buf && isspace(pBufLast[-1]))
 				pBufLast--;
-			*pBufLast++ = '\n';
 			*pBufLast++ = '\r';
+			*pBufLast++ = '\n';
 			break;
 
 		case '~':
@@ -5678,7 +5681,8 @@ template <typename T>
 T fread_int(QTextStream &in, T beg_range, T end_range)
 {
 	T number;
-	QString line = qDebugQTextStreamLine(in, "Before fread_int");
+
+	QString line = qDebugQTextStreamLine(in, "");
 	QStringList namelist = line.split(' ');
 	QString arg1 = namelist.value(0);
 	in >> number >> Qt::ws;
@@ -5722,8 +5726,8 @@ T fread_int(QTextStream &in, T beg_range, T end_range)
 		number = end_range;
 	}
 
-	qDebug() << "fread_int returning" << number;
-	qDebugQTextStreamLine(in, "After fread_int");
+	// qDebug() << "fread_int returning" << number;
+	// qDebugQTextStreamLine(in, "After fread_int");
 	return number;
 }
 
@@ -6977,4 +6981,64 @@ FILE *LegacyFile::openFile(void)
 	}
 
 	return file_handle_;
+}
+
+QDebug operator<<(QDebug debug, const Room::room_errors_t &errors)
+{
+	switch (errors)
+	{
+	case Room::room_errors_t::alllow_class:
+		debug << "Room::room_errors_t::allow_class";
+		break;
+	case Room::room_errors_t::denied:
+		debug << "Room::room_errors_t::denied";
+		break;
+	case Room::room_errors_t::description:
+		debug << "Room::room_errors_t::description";
+		break;
+	case Room::room_errors_t::direction:
+		debug << "Room::room_errors_t::direction";
+		break;
+	case Room::room_errors_t::ex_description:
+		debug << "Room::room_errors_t::ex_description";
+		break;
+	case Room::room_errors_t::funct:
+		debug << "Room::room_errors_t::funct";
+		break;
+	case Room::room_errors_t::light:
+		debug << "Room::room_errors_t::light";
+		break;
+	case Room::room_errors_t::name:
+		debug << "Room::room_errors_t::name";
+		break;
+	case Room::room_errors_t::number:
+		debug << "Room::room_errors_t::number";
+		break;
+	case Room::room_errors_t::room_flags:
+		debug << "Room::room_errors_t::room_flags";
+		break;
+	case Room::room_errors_t::sector_type:
+		debug << "Room::room_errors_t::sector_type";
+		break;
+	case Room::room_errors_t::temp_room_flags:
+		debug << "Room::room_errors_t::temp_room_flags";
+		break;
+	case Room::room_errors_t::zone:
+		debug << "Room::room_errors_t::zone";
+		break;
+	case Room::room_errors_t::zonePtr:
+		debug << "Room::room_errors_t::zonePtr";
+		break;
+	}
+	return debug;
+}
+
+QDebug operator<<(QDebug debug, const std::expected<bool, Room::room_errors_t> &status)
+{
+	if (status.has_value())
+		debug << status.value();
+	else
+		debug << status.error();
+
+	return debug;
 }

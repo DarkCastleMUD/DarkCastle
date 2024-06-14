@@ -213,6 +213,78 @@ public:
     room_track_data *TrackItem(int nIndex);
     void FreeTracks();
 
+    enum class room_errors_t
+    {
+        direction,
+        number,
+        zone,
+        zonePtr,
+        sector_type,
+        denied,
+        name,
+        description,
+        ex_description,
+        room_flags,
+        temp_room_flags,
+        light,
+        funct,
+        alllow_class
+    };
+    /*
+            static auto compare(Room &r1, Room &r2) -> std::expected<bool, room_errors_t>
+            {
+                for (int direction = 0; direction < MAX_DIRS; ++direction)
+                {
+                    if (r1.dir_option[direction] == r2.dir_option[direction])
+                    {
+                        continue;
+                    }
+                    else if (r1.dir_option[direction] && r2.dir_option[direction] &&
+                             *r1.dir_option[direction] == *r2.dir_option[direction])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        return std::unexpected(Room::room_errors_t::direction);
+                    }
+                }
+                if (r1.number != r2.number)
+                    return std::unexpected(Room::room_errors_t::number);
+                if (r1.zone != r2.zone)
+                    return std::unexpected(Room::room_errors_t::zone);
+                if (r1.zonePtr != r2.zonePtr)
+                    return std::unexpected(Room::room_errors_t::zonePtr);
+                if (r1.sector_type != r2.sector_type)
+                    return std::unexpected(Room::room_errors_t::sector_type);
+                if (r1.denied != r2.denied)
+                    return std::unexpected(Room::room_errors_t::denied);
+                if (QString(r1.name) != QString(r2.name))
+                    return std::unexpected(Room::room_errors_t::name);
+                if (QString(r1.description) != QString(r2.description))
+                    return std::unexpected(Room::room_errors_t::description);
+                if (r1.ex_description != r2.ex_description)
+                    return std::unexpected(Room::room_errors_t::ex_description);
+                if (r1.room_flags != r2.room_flags)
+                    return std::unexpected(Room::room_errors_t::room_flags);
+                if (r1.temp_room_flags != r2.temp_room_flags)
+                    return std::unexpected(Room::room_errors_t::temp_room_flags);
+                if (r1.light != r2.light)
+                    return std::unexpected(Room::room_errors_t::light);
+                if (r1.funct != r2.funct)
+                    return std::unexpected(Room::room_errors_t::funct);
+                // r1.contents == r2.contents &&
+                // r1.people == r2.people &&
+                // r1.nTracks == r2.nTracks &&
+                // r1.tracks == r2.tracks &&
+                // r1.iFlags == r2.iFlags &&
+                // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
+                if (memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)))
+                    return std::unexpected(Room::room_errors_t::alllow_class);
+
+                return true;
+            }
+        */
 private:
     class DC *dc_{};
 };
