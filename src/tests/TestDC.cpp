@@ -28,7 +28,7 @@ class TestDC : public QObject
 public:
     TestDC()
     {
-        qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{file}:%{line} %{function}: %{message}"));
+        qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"));
     }
     QByteArray checksumFile(QString filename)
     {
