@@ -377,13 +377,21 @@ public:
   [[nodiscard]] inline vnum_t currentVNUM(void) { return current_VNUM_; }
   void currentVNUM(vnum_t current_VNUM) { current_VNUM_ = current_VNUM; }
 
-  void current(QString current_type, QString current_name, vnum_t current_VNUM)
+  [[nodiscard]] inline QString currentFilename(void) { return current_filename_; }
+  void currentFilename(QString current_filename) { current_filename_ = current_filename; }
+
+  void current(QString current_type, QString current_name, vnum_t current_VNUM, QString current_filename)
   {
     currentType(current_type);
     currentName(current_name);
     currentVNUM(current_VNUM);
+    currentFilename(current_filename);
   }
-  [[nodiscard]] inline QString current(void) { return QStringLiteral("%1: %2, %3").arg(currentType()).arg(currentName()).arg(currentVNUM()); }
+
+  [[nodiscard]] inline QString current(void)
+  {
+    return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(currentVNUM()).arg(currentFilename());
+  }
 
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
@@ -405,6 +413,7 @@ private:
   QString current_type_;
   QString current_name_;
   vnum_t current_VNUM_;
+  QString current_filename_;
 
   void game_loop_init(void);
   void game_loop(void);
