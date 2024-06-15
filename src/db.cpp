@@ -4359,6 +4359,18 @@ std::string quotequotes(std::string &s1)
 	return s1;
 }
 
+QString lf_to_crlf(QString s1)
+{
+	qsizetype pos = s1.indexOf('\n'); // @suppress("Ambiguous problem")
+	while (pos != -1)
+	{
+		s1.insert(pos, '\r');
+		pos = s1.indexOf('\n', pos + 2);
+	}
+
+	return s1;
+}
+
 std::string lf_to_crlf(std::string &s1)
 {
 	size_t pos = s1.find('\n'); // @suppress("Ambiguous problem")
@@ -5283,6 +5295,22 @@ char *fread_string(std::ifstream &in, int hasher)
 		memcpy(retval, swapstr.c_str(), swapstr.length());
 	}
 	return retval;
+}
+
+QString fread_qstring(FILE *stream, bool *ok)
+{
+	char *lineptr = nullptr;
+	size_t n = 0;
+
+	ssize_t bytes_read = getdelim(&lineptr, &n, '~', stream);
+	if (lineptr && bytes_read && lineptr[bytes_read - 1] == '~')
+	{
+		lineptr[bytes_read - 1] = 0;
+	}
+	fseek(stream, 1, SEEK_CUR);
+	// qDebug("%d [%s]", bytes_read, lineptr);
+
+	return lf_to_crlf(QString(lineptr));
 }
 
 /* read and allocate space for a '~'-terminated std::string from a given file */
