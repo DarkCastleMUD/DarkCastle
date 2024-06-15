@@ -412,7 +412,7 @@ private:
   command_lag *command_lag_list_{};
   QString current_type_;
   QString current_name_;
-  vnum_t current_VNUM_;
+  vnum_t current_VNUM_{};
   QString current_filename_;
 
   void game_loop_init(void);
