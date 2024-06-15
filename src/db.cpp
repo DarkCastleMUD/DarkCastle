@@ -5236,18 +5236,13 @@ char *fread_string(QTextStream &in, bool hasher, bool *ok)
 {
 	QString buffer = fread_qstring(in, ok);
 
-	if (ok && !*ok)
-	{
-		buffer = "";
-	}
-
 	if (hasher)
 	{
-		return str_hsh(buffer.toStdString().c_str());
+		return str_hsh(qUtf8Printable(buffer));
 	}
 	else
 	{
-		return strdup(buffer.toStdString().c_str());
+		return strdup(qUtf8Printable(buffer));
 	}
 }
 
