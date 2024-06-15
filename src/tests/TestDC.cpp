@@ -558,6 +558,75 @@ private slots:
         remove_vault(ch.getNameC());
     }
 
+    void test_fread()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+
+        QFile testfile(QStringLiteral("fread_tests.txt"));
+        testfile.open(QIODeviceBase::WriteOnly);
+        testfile.write("3\n");
+        testfile.write("-1\n");
+        testfile.write("abc\n123~\n");
+        testfile.write("abc123~\n");
+        testfile.write("~\n");
+        testfile.write("\n");
+        testfile.close();
+
+        FILE *stream = fopen(qPrintable(testfile.fileName()), "r");
+        QVERIFY(stream);
+        QCOMPARE(ftell(stream), 0);
+
+        bool error_range_over_raised = false;
+        int val1 = 3333333;
+        try
+        {
+            val1 = fread_int(stream, 0, 0);
+        }
+        catch (error_range_over)
+        {
+            error_range_over_raised = true;
+        }
+        QVERIFY(error_range_over_raised);
+        QCOMPARE(val1, 3333333);
+        QCOMPARE(ftell(stream), 2);
+
+        QCOMPARE(fseek(stream, 0, SEEK_SET), 0);
+        bool error_range_under_raised = false;
+        val1 = 3333333;
+        try
+        {
+            val1 = fread_int(stream, 10, 20);
+        }
+        catch (error_range_under)
+        {
+            error_range_under_raised = true;
+        }
+        QVERIFY(error_range_under_raised);
+        QCOMPARE(val1, 3333333);
+        QCOMPARE(ftell(stream), 2);
+
+        QCOMPARE(fseek(stream, 0, SEEK_SET), 0);
+        int val2 = fread_int(stream, -10, 10);
+        QCOMPARE(val2, 3);
+
+        int val3 = fread_int(stream, -10, 10);
+        QCOMPARE(val3, -1);
+
+        QString str1 = fread_qstring(stream);
+        QCOMPARE(str1, QStringLiteral("abc\r\n123"));
+
+        QString str2 = fread_qstring(stream);
+        QCOMPARE(str2, QStringLiteral("abc123"));
+
+        QString str3 = fread_qstring(stream);
+        QCOMPARE(str3, QStringLiteral(""));
+
+        fclose(stream);
+        testfile.remove();
+    }
+
     void test_room_write()
     {
         DC::config cf;
