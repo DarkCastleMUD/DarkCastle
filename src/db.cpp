@@ -5194,7 +5194,7 @@ bool Zone::isEmpty(void)
 	return true;
 }
 
-QString fread_string(QTextStream &stream, bool *ok)
+QString fread_qstring(QTextStream &stream, bool *ok)
 {
 	assert(stream.status() == QTextStream::Status::Ok);
 	QString buffer;
@@ -5234,7 +5234,7 @@ QString fread_string(QTextStream &stream, bool *ok)
 
 char *fread_string(QTextStream &in, bool hasher, bool *ok)
 {
-	QString buffer = fread_string(in, ok);
+	QString buffer = fread_qstring(in, ok);
 
 	if (ok && !*ok)
 	{

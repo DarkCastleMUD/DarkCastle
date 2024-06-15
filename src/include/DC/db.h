@@ -335,7 +335,7 @@ void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
 char *fread_string(QTextStream &stream, bool hasher, bool *ok = nullptr);
-QString fread_string(QTextStream &stream, bool *ok = nullptr);
+QString fread_qstring(QTextStream &stream, bool *ok = nullptr);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
 char *fread_word(FILE *, int);
