@@ -239,6 +239,7 @@ private:
   gold_t entry_fee_{};
 };
 
+void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -393,6 +394,14 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(currentVNUM()).arg(currentFilename());
   }
 
+  void logverbose(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr)
+  {
+    if (cf.verbose_mode)
+    {
+      logentry(str, god_level, type, vict);
+    }
+  }
+
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
   CVoteData DCVote;
@@ -482,7 +491,6 @@ void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
-void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
 #define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
 
 auto &operator>>(auto &in, Room &room)

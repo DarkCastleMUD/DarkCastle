@@ -554,7 +554,7 @@ void DC::boot_db(void)
 	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_SOCKET);
 	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_MISC);
 	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_WORLD);
-	logentry(QStringLiteral("Reading aux files."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Reading aux files."));
 	file_to_string(WEBPAGE_FILE, webpage);
 	file_to_string(GREETINGS1_FILE, greetings1);
 	file_to_string(GREETINGS2_FILE, greetings2);
@@ -688,28 +688,28 @@ void DC::boot_db(void)
 		zone.reset(Zone::ResetType::full);
 	}
 
-	logentry(QStringLiteral("Loading banned list"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading banned list"));
 	load_banned();
 
-	logentry(QStringLiteral("Loading skill quests."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading skill quests."));
 	load_skillquests();
 
-	logentry(QStringLiteral("Assigning inventory to shopkeepers"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Assigning inventory to shopkeepers"));
 	fix_shopkeepers_inventory();
 
-	logentry(QStringLiteral("Turning on MOB Progs"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Turning on MOB Progs"));
 	MOBtrigger = true;
 
-	logentry(QStringLiteral("Loading quest one liners."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading quest one liners."));
 	load_quests();
 
-	logentry(QStringLiteral("Loading vaults."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading vaults."));
 	load_vaults();
 
-	logentry(QStringLiteral("Loading player hints."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading player hints."));
 	load_hints();
 
-	logentry(QStringLiteral("Loading auction tickets."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading auction tickets."));
 	load_auction_tickets();
 }
 
@@ -728,7 +728,7 @@ void do_godlist()
 	int x;
 	FILE *fl;
 
-	logentry(QStringLiteral("Doing wizlist...db.c\n\r"), 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Doing wizlist...db.c\n\r"));
 
 	if (!(fl = fopen("../lib/wizlist.txt", "r")))
 	{
@@ -752,7 +752,7 @@ void do_godlist()
 		wizlist[x].level = atoi(buf3);
 	}
 
-	logentry(QStringLiteral("Done!\n\r"), 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Done!\n\r"));
 	fclose(fl);
 }
 
@@ -992,11 +992,7 @@ void reset_time(void)
 		break;
 	}
 	}
-	char log_buf[MAX_STRING_LENGTH] = {};
-	sprintf(log_buf, "Current Gametime: %dH %dD %dM %dY.",
-			time_info.hours, time_info.day,
-			time_info.month, time_info.year);
-	logentry(log_buf, 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Current Gametime: %1H %2D %3M %4Y.").arg(time_info.hours).arg(time_info.day).arg(time_info.month).arg(time_info.year));
 
 	weather_info.pressure = 960;
 	if ((time_info.month >= 7) && (time_info.month <= 12))
@@ -6036,7 +6032,7 @@ int file_to_string(const char *name, char *buf)
 
 	if (!(fl = fopen(name, "r")))
 	{
-		perror(name);
+		DC::getInstance()->logverbose(QStringLiteral("Unable to open '%1':%2").arg(name).arg(strerror(errno)));
 		*buf = '\0';
 		return (-1);
 	}
