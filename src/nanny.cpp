@@ -795,9 +795,9 @@ void Character::check_hw(void)
 void Character::set_hw(void)
 {
    this->height = number(races[this->race].min_height, races[this->race].max_height);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+   // logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
    this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
-   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+   // logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
