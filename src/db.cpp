@@ -552,7 +552,7 @@ void DC::boot_db(void)
 	reset_time();
 
 	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_SOCKET);
-	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_MISC);
 	logentry(QStringLiteral("************** BOOTING THE MUD ***********"), 0, LogChannels::LOG_WORLD);
 	logverbose(QStringLiteral("Reading aux files."));
 	file_to_string(WEBPAGE_FILE, webpage);
@@ -572,16 +572,16 @@ void DC::boot_db(void)
 	funny_boot_message();
 
 	do_godlist();
-	logentry(QStringLiteral("Godlist done!"), 0, LogChannels::LOG_MISC);
-	logentry(QStringLiteral("Booting clans..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Godlist done!"));
+	logverbose(QStringLiteral("Booting clans..."));
 
 	boot_clans();
 
-	logentry(QStringLiteral("Loading new news file."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading new news file."));
 	extern void loadnews();
 	loadnews();
 
-	logentry(QStringLiteral("Loading new help file."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading new help file."));
 
 	// new help file stuff
 	if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
@@ -602,7 +602,7 @@ void DC::boot_db(void)
 	fclose(new_help_fl);
 	// end new help files
 
-	logentry(QStringLiteral("Opening help file."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Opening help file."));
 
 	if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
 	{
@@ -612,61 +612,61 @@ void DC::boot_db(void)
 
 	help_index = build_help_index(help_fl, &top_of_helpt);
 
-	logentry(QStringLiteral("Loading the zones"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading the zones"));
 	boot_zones();
 
-	logentry(QStringLiteral("Loading the world."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading the world."));
 	top_of_world_alloc = 2000;
 
 	funny_boot_message();
 
 	boot_world();
 
-	logentry(QStringLiteral("Renumbering the world."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Renumbering the world."));
 	renum_world();
 
 	funny_boot_message();
 
-	logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Generating mob indices/loading all mobiles"));
 	generate_mob_indices(&top_of_mobt, mob_index);
 
-	logentry(QStringLiteral("Generating object indices/loading all objects"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Generating object indices/loading all objects"));
 	generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
 
 	funny_boot_message();
 
-	logentry(QStringLiteral("renumbering zone table"), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("renumbering zone table"));
 	renum_zone_table();
 
-	logentry(QStringLiteral("Looking for unordered mobiles..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Looking for unordered mobiles..."));
 	find_unordered_mobiles();
 
-	logentry(QStringLiteral("Looking for unordered objects..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Looking for unordered objects..."));
 	find_unordered_objects();
 
 	if (cf.bport == false)
 	{
-		logentry(QStringLiteral("Loading Corpses."), 0, LogChannels::LOG_MISC);
+		logverbose(QStringLiteral("Loading Corpses."));
 		load_corpses();
 	}
 
-	logentry(QStringLiteral("Loading messages."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading messages."));
 	load_messages(MESS_FILE);
 	load_messages(MESS2_FILE, 2000);
 
-	logentry(QStringLiteral("Loading socials."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading socials."));
 	boot_social_messages();
 
-	logentry(QStringLiteral("Processing game portals..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Processing game portals..."));
 	load_game_portals();
 
-	logentry(QStringLiteral("Loading emoting objects..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Loading emoting objects..."));
 	load_emoting_objects();
 
-	logentry(QStringLiteral("Adding clan room flags to rooms..."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Adding clan room flags to rooms..."));
 	assign_clan_rooms();
 
-	logentry(QStringLiteral("Assigning function pointers."), 0, LogChannels::LOG_MISC);
+	logverbose(QStringLiteral("Assigning function pointers."));
 	assign_mobiles();
 	assign_objects();
 	assign_rooms();
@@ -1025,12 +1025,12 @@ index_data *generate_mob_indices(int *top, index_data *index)
 	struct world_file_list_item *pItem = nullptr;
 	//  extern short code_testing_mode;
 
-	logentry(QStringLiteral("Opening mobile file index."), 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
 	if (DC::getInstance()->cf.test_mobs)
 	{
 		if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
 		{
-			logentry(QStringLiteral("Could not open index file."), 0, LogChannels::LOG_MISC);
+			logentry(QStringLiteral("Could not open index file."));
 			abort();
 		}
 	}
@@ -1038,12 +1038,12 @@ index_data *generate_mob_indices(int *top, index_data *index)
 	{
 		if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
 		{
-			logentry(QStringLiteral("Could not open index file."), 0, LogChannels::LOG_MISC);
+			logentry(QStringLiteral("Could not open index file."));
 			abort();
 		}
 	}
 
-	logentry(QStringLiteral("Opening object files."), 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
 
 	// note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
 	for (temp = read_next_worldfile_name(flMobIndex);
