@@ -760,11 +760,19 @@ private slots:
         Player player;
         ch.player = &player;
         Connection conn;
+        DC::getInstance()->descriptor_list = &conn;
         conn.descriptor = 1;
         conn.character = &ch;
         ch.desc = &conn;
         dc.character_list.insert(&ch);
         ch.do_on_login_stuff();
+        while (ch.getLevel() < 10)
+        {
+            ch.incrementLevel();
+            advance_level(&ch, 0);
+        }
+        ch.setMove(GET_MAX_MOVE(&ch));
+        conn.output = {};
 
         Character ch2;
         ch2.setName(QStringLiteral("Testplayer2"));
@@ -775,11 +783,19 @@ private slots:
         Player player2;
         ch2.player = &player2;
         Connection conn2;
+        DC::getInstance()->descriptor_list->next = &conn2;
         conn2.descriptor = 1;
         conn2.character = &ch2;
         ch2.desc = &conn2;
         dc.character_list.insert(&ch2);
         ch2.do_on_login_stuff();
+        while (ch2.getLevel() < 10)
+        {
+            ch2.incrementLevel();
+            advance_level(&ch2, 0);
+        }
+        ch2.setMove(GET_MAX_MOVE(&ch2));
+        conn2.output = {};
 
         auto rc = do_channel(&ch, str_hsh("auction"));
         QCOMPARE(conn.output, "auction channel turned B$2ON$R.\r\n");
@@ -791,6 +807,13 @@ private slots:
         conn2.output = {};
         QCOMPARE(rc, eSUCCESS);
 
+        rc = ch.do_auction({QStringLiteral("test")});
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        QCOMPARE(conn2.output, "");
+        conn2.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
         auto new_mob_rnum = real_mobile(5258);
         QVERIFY(new_mob_rnum != -1);
 
@@ -799,16 +822,10 @@ private slots:
         int rnum = real_object(1);
         Object *o1 = clone_object(rnum);
         Object *o2 = clone_object(rnum);
-        Object *o3 = clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
-        QVERIFY(o3);
         GET_OBJ_NAME(o1) = str_hsh("sword");
         GET_OBJ_SHORT(o1) = str_hsh("a short sword");
-        // GET_OBJ_NAME(o2) = str_hsh("sword");
-        // GET_OBJ_SHORT(o2) = str_hsh("a short sword");
-        // GET_OBJ_NAME(o3) = str_hsh("mushroom");
-        // GET_OBJ_SHORT(o3) = str_hsh("a small mushroom");
 
         rc = do_vend(&ch, str_hsh(""));
         QCOMPARE(conn.output, "You must be in an auction house to do this!\r\n");
