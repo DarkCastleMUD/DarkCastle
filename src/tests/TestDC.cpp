@@ -174,8 +174,8 @@ private slots:
         cf.sql = false;
 
         DC dc(cf);
-        dc.random_ = QRandomGenerator(0);
         dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
 
         Character ch;
         ch.in_room = 3;
@@ -298,8 +298,8 @@ private slots:
         cf.sql = false;
 
         DC dc(cf);
-        dc.random_ = QRandomGenerator(0);
         dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
 
         Character ch;
         ch.setName(QStringLiteral("Testplayer"));
@@ -364,7 +364,7 @@ private slots:
             ch.incrementLevel();
             advance_level(&ch, 0);
         }
-        QCOMPARE(conn.output, "Your gain is: 13/16 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 14/30 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 11/41 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 13/54 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 13/67 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 10/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\nYour gain is: 14/91 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 13/104 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 10/114 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/127 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n");
+        QCOMPARE(conn.output, "Your gain is: 11/14 hp, 1/1 m, 1/21 mv, 0/0 prac, 1/1 ki.\r\nYour gain is: 12/26 hp, 1/2 m, 1/22 mv, 0/0 prac, 0/1 ki.\r\nYour gain is: 10/36 hp, 1/3 m, 1/23 mv, 0/0 prac, 1/2 ki.\r\nYour gain is: 14/50 hp, 1/4 m, 1/24 mv, 0/0 prac, 0/2 ki.\r\nYour gain is: 14/64 hp, 1/5 m, 1/25 mv, 0/0 prac, 1/3 ki.\r\nYour gain is: 13/77 hp, 1/6 m, 1/26 mv, 0/0 prac, 0/3 ki.\r\nYou are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\nYour gain is: 12/89 hp, 1/7 m, 1/27 mv, 0/0 prac, 1/4 ki.\r\nYour gain is: 11/100 hp, 1/8 m, 1/28 mv, 0/0 prac, 0/4 ki.\r\nYour gain is: 13/113 hp, 1/9 m, 1/29 mv, 0/0 prac, 1/5 ki.\r\nYour gain is: 13/126 hp, 1/10 m, 1/30 mv, 0/0 prac, 0/5 ki.\r\nYou have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n");
         conn.output = {};
 
         rc = do_vault(&ch, str_hsh("put all"));
@@ -634,6 +634,7 @@ private slots:
 
         DC dc(cf);
         dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
         extern world_file_list_item *world_file_list;
 
         QString filename;
@@ -739,6 +740,123 @@ private slots:
         QVERIFY(QFile(qfile_filename).remove());
         QVERIFY(QFile(qsavefile_filename).remove());
         QVERIFY(QFile(fstream_filename).remove());
+    }
+
+    void test_do_vend()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+
+        Character ch;
+        ch.setName(QStringLiteral("Testplayer"));
+        ch.in_room = 3;
+        ch.height = 72;
+        ch.weight = 150;
+        ch.setClass(CLASS_WARRIOR);
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        ch.do_on_login_stuff();
+
+        Character ch2;
+        ch2.setName(QStringLiteral("Testplayer2"));
+        ch2.in_room = 3;
+        ch2.height = 72;
+        ch2.weight = 150;
+        ch2.setClass(CLASS_WARRIOR);
+        Player player2;
+        ch2.player = &player2;
+        Connection conn2;
+        conn2.descriptor = 1;
+        conn2.character = &ch2;
+        ch2.desc = &conn2;
+        dc.character_list.insert(&ch2);
+        ch2.do_on_login_stuff();
+
+        auto rc = do_channel(&ch, str_hsh("auction"));
+        QCOMPARE(conn.output, "auction channel turned B$2ON$R.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_channel(&ch2, str_hsh("auction"));
+        QCOMPARE(conn2.output, "auction channel turned B$2ON$R.\r\n");
+        conn2.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        auto new_mob_rnum = real_mobile(5258);
+        QVERIFY(new_mob_rnum != -1);
+
+        auto new_rnum = create_blank_item(1);
+        QCOMPARE(new_rnum.error(), create_error::entry_exists);
+        int rnum = real_object(1);
+        Object *o1 = clone_object(rnum);
+        Object *o2 = clone_object(rnum);
+        Object *o3 = clone_object(rnum);
+        QVERIFY(o1);
+        QVERIFY(o2);
+        QVERIFY(o3);
+        GET_OBJ_NAME(o1) = str_hsh("sword");
+        GET_OBJ_SHORT(o1) = str_hsh("a short sword");
+        // GET_OBJ_NAME(o2) = str_hsh("sword");
+        // GET_OBJ_SHORT(o2) = str_hsh("a short sword");
+        // GET_OBJ_NAME(o3) = str_hsh("mushroom");
+        // GET_OBJ_SHORT(o3) = str_hsh("a small mushroom");
+
+        rc = do_vend(&ch, str_hsh(""));
+        QCOMPARE(conn.output, "You must be in an auction house to do this!\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eFAILURE);
+
+        rc = move_char(&ch, 5200);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(rc, eSUCCESS);
+        rc = move_char(&ch2, 5200);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_vend(&ch, str_hsh(""));
+        QCOMPARE(conn.output, "Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_vend(&ch, str_hsh("sell sword"));
+        QCOMPARE(conn.output, "You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        auto status = obj_to_char(o1, &ch);
+        QVERIFY(status);
+
+        rc = do_vend(&ch, str_hsh("sell sword"));
+        QCOMPARE(conn.output, "How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_vend(&ch, str_hsh("sell sword 1000"));
+        QCOMPARE(conn.output, "The Consignment broker informs you that he does not handle items that have been restrung.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        extract_obj(o1);
+
+        status = obj_to_char(o2, &ch);
+        QVERIFY(status);
+
+        QCOMPARE(conn2.output, "");
+        rc = do_vend(&ch, str_hsh("sell item 1000000"));
+        QCOMPARE(conn.output, "You are now selling a reflecty test item for 1000000 coins.\r\n"
+                              "Saving Testplayer.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn2.output, "");
     }
 };
 
