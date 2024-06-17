@@ -1,0 +1,18 @@
+#5258
+consignment broker vendor~
+the Consignment Broker~
+A well-dressed merchant stands behind a counter displaying many items.
+~
+~
+1074004802 32 -1
+262280 0 0 -1
+300 1 45
+20 10 0d1+0 7d5+0
+100 0
+8 8 1 0 0 0
+>rand_prog 2~
+MPECHO Having sold an item, the Consignment Broker quickly fills the empty display space with a new item for sale.
+~
+|
+S
+$~

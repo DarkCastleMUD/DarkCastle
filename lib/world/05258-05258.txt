@@ -1,0 +1,18 @@
+#5200
+The Thalosian Consignment House~
+   The small building is packed with people.  They jostle to-and-fro in an
+attempt to see the next item up for sale.  Their collective murmuring creates a
+dim roar, occasionally punctuated by oohs and ahhs with the presentation of a
+particularly rare item.
+~
+44 33563838 1
+D3
+~
+~
+0 -1 5271
+D5
+~
+~
+0 -1 5351
+S
+$~
