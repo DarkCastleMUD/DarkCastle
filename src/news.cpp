@@ -74,7 +74,7 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    logentry(QStringLiteral("Cannot open news file."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, LogChannels::LOG_MISC);
     abort();
   }
   struct news_data *tmpnews;
@@ -97,7 +97,7 @@ void loadnews()
   FILE *fl;
   if (!(fl = fopen("news.data", "r")))
   {
-    logentry(QStringLiteral("Cannot open news file."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, LogChannels::LOG_MISC);
     return;
   }
   int i;
