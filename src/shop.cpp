@@ -825,7 +825,7 @@ void boot_the_shops()
     {
       char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
-      logentry(log_buf, 0, LogChannels::LOG_MISC);
+      DC::getInstance()->logverbose(log_buf);
       continue;
       /* This way we don't increment if it was bad */
     }
