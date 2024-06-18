@@ -5653,10 +5653,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 				}
 				else
 				{
-					printf("Buffer: '%s'\n", buf);
-					buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
-					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
-					perror("fread_int: Value range error");
+					logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
 					throw error_range_int();
 				}
 			}
@@ -5811,10 +5808,8 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 				}
 				else
 				{
-					printf("Buffer: '%s'\n", buf);
-					buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
-					printf("fread_int: Bad value for range %ld - %ld: %ld\n", beg_range, end_range, i);
-					perror("fread_int: Value range error");
+					logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
+
 					if (i < beg_range)
 					{
 						throw error_range_under();
