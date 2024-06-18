@@ -1,0 +1,22 @@
+#0
+Autoquest~
+   Spike has short bleached blond hair that stands up in..  Spikes!  He wears
+leather chaps over a pair of jeans and continues the western look with his
+leather vest (with no shirt, though) and cowboy boots.
+~
+~
+~
+a token of Phire~
+A token inscribed with the crest of Phire lies here.~
+token phire~
+30 51 0 12 1 25 0
+#1
+The Jade Monkey~
+The jade monkey was recently purloined from the Sorpigal Museum. ~
+Witnesses described a dark skinned imp of Elvish ancestory as the culprit.~
+Seek him out within a day and return with the statue for your reward!~
+a $B$2jade$R monkey~
+The statue of a monkey lies here, carved out of jade.~
+jade monkey statue~
+30 51 8308 36 2 50 0
+$
