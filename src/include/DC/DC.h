@@ -240,6 +240,105 @@ private:
 };
 
 void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
+
+#define auction_duration 1209600
+#define AUC_MIN_PRICE 1000
+#define AUC_MAX_PRICE 2000000000
+
+struct AuctionTicket;
+Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
+
+enum ListOptions
+{
+  LIST_ALL = 0,
+  LIST_MINE,
+  LIST_PRIVATE,
+  LIST_BY_NAME,
+  LIST_BY_LEVEL,
+  LIST_BY_SLOT,
+  LIST_BY_SELLER,
+  LIST_BY_CLASS,
+  LIST_BY_RACE,
+  LIST_RECENT
+};
+
+enum AuctionStates
+{
+  AUC_FOR_SALE = 0,
+  AUC_EXPIRED,
+  AUC_SOLD,
+  AUC_DELETED
+};
+
+/*
+TICKET STRUCT
+*/
+struct AuctionTicket
+{
+  int vitem;
+  QString item_name;
+  unsigned int price;
+  QString seller;
+  QString buyer;
+  AuctionStates state;
+  unsigned int end_time;
+  Object *obj;
+};
+class Character;
+class AuctionHouse
+{
+public:
+  AuctionHouse(QString in_file);
+  AuctionHouse();
+  ~AuctionHouse();
+  void CollectTickets(Character *ch, unsigned int ticket = 0);
+  void CancelAll(Character *ch);
+  void AddItem(Character *ch, Object *obj, unsigned int price, QString buyer);
+  void RemoveTicket(Character *ch, unsigned int ticket);
+  void BuyItem(Character *ch, unsigned int ticket);
+  void ListItems(Character *ch, ListOptions options, QString name, unsigned int to, unsigned int from);
+  void CheckExpire();
+  void Identify(Character *ch, unsigned int ticket);
+  void AddRoom(Character *ch, int room);
+  void RemoveRoom(Character *ch, int room);
+  void ListRooms(Character *ch);
+  void HandleRename(Character *ch, QString old_name, QString new_name);
+  void HandleDelete(QString name);
+  void CheckForSoldItems(Character *ch);
+  bool IsAuctionHouse(int room);
+  void DoModify(Character *ch, unsigned int ticket, unsigned int new_price);
+  void ShowStats(Character *ch);
+  void Save();
+  void Load();
+  [[nodiscard]] unsigned int getItemsPosted(void) { return ItemsPosted; }
+  void setItemsPosted(unsigned int items_posted) { ItemsPosted = items_posted; }
+
+private:
+  unsigned int ItemsPosted;
+  unsigned int ItemsExpired;
+  unsigned int ItemsSold;
+  unsigned int TaxCollected;
+  unsigned int Revenue;
+  unsigned int UncollectedGold;
+  unsigned int ItemsActive;
+  void ParseStats();
+  bool CanSellMore(Character *ch);
+  bool IsOkToSell(Object *obj);
+  bool IsWearable(Character *ch, int vnum);
+  bool IsNoTrade(int vnum);
+  bool IsSeller(QString in_name, QString seller);
+  bool IsExist(QString name, int vnum);
+  bool IsClass(int vnum, QString isclass);
+  bool IsRace(int vnum, QString israce);
+  bool IsName(QString name, int vnum);
+  bool IsSlot(QString slot, int vnum);
+  bool IsLevel(unsigned int to, unsigned int from, int vnum);
+  QMap<int, int> auction_rooms;
+  unsigned int cur_index;
+  QString file_name;
+  QMap<unsigned int, AuctionTicket> Items_For_Sale;
+};
+
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -322,6 +421,7 @@ public:
   room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
   room_t top_of_world = 0;
   int total_rooms = 0; /* total amount of rooms in memory */
+  AuctionHouse TheAuctionHouse;
 
   static QString getBuildVersion();
   static QString getBuildTime();

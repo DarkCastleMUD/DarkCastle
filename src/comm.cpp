@@ -1099,7 +1099,6 @@ void game_test_init(void)
 }
 
 extern void pulse_hunts();
-extern void auction_expire();
 void init_heartbeat()
 {
   pulse_mobile = DC::PULSE_MOBILE;
@@ -1191,7 +1190,7 @@ void heartbeat()
     PerfTimers["weather"].stop();
 
     PerfTimers["auctionexp"].start();
-    auction_expire();
+    dc->TheAuctionHouse.CheckExpire();
     PerfTimers["auctionexp"].stop();
   }
 

@@ -8,10 +8,6 @@ Objects:
 Auction Class
 
 External: (explained more below)
-void auction_expire()
-void check_for_sold_items(Character *ch)
-void AuctionHandleRenames(Character *ch, QString old_name, QString new_name)
-void load_auction_tickets()
 
 */
 
@@ -42,110 +38,6 @@ void load_auction_tickets()
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-
-#define auction_duration 1209600
-#define AUC_MIN_PRICE 1000
-#define AUC_MAX_PRICE 2000000000
-
-struct AuctionTicket;
-Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
-
-enum ListOptions
-{
-  LIST_ALL = 0,
-  LIST_MINE,
-  LIST_PRIVATE,
-  LIST_BY_NAME,
-  LIST_BY_LEVEL,
-  LIST_BY_SLOT,
-  LIST_BY_SELLER,
-  LIST_BY_CLASS,
-  LIST_BY_RACE,
-  LIST_RECENT
-};
-
-enum AuctionStates
-{
-  AUC_FOR_SALE = 0,
-  AUC_EXPIRED,
-  AUC_SOLD,
-  AUC_DELETED
-};
-
-/*
-TICKET STRUCT
-*/
-struct AuctionTicket
-{
-  int vitem;
-  QString item_name;
-  unsigned int price;
-  QString seller;
-  QString buyer;
-  AuctionStates state;
-  unsigned int end_time;
-  Object *obj;
-};
-
-/*
-CLASS DEFINE
-*/
-class AuctionHouse
-{
-public:
-  AuctionHouse(QString in_file);
-  AuctionHouse();
-  ~AuctionHouse();
-  void CollectTickets(Character *ch, unsigned int ticket = 0);
-  void CancelAll(Character *ch);
-  void AddItem(Character *ch, Object *obj, unsigned int price, QString buyer);
-  void RemoveTicket(Character *ch, unsigned int ticket);
-  void BuyItem(Character *ch, unsigned int ticket);
-  void ListItems(Character *ch, ListOptions options, QString name, unsigned int to, unsigned int from);
-  void CheckExpire();
-  void Identify(Character *ch, unsigned int ticket);
-  void AddRoom(Character *ch, int room);
-  void RemoveRoom(Character *ch, int room);
-  void ListRooms(Character *ch);
-  void HandleRename(Character *ch, QString old_name, QString new_name);
-  void HandleDelete(QString name);
-  void CheckForSoldItems(Character *ch);
-  bool IsAuctionHouse(int room);
-  void DoModify(Character *ch, unsigned int ticket, unsigned int new_price);
-  void ShowStats(Character *ch);
-  void Save();
-  void Load();
-
-private:
-  unsigned int ItemsPosted;
-  unsigned int ItemsExpired;
-  unsigned int ItemsSold;
-  unsigned int TaxCollected;
-  unsigned int Revenue;
-  unsigned int UncollectedGold;
-  unsigned int ItemsActive;
-  void ParseStats();
-  bool CanSellMore(Character *ch);
-  bool IsOkToSell(Object *obj);
-  bool IsWearable(Character *ch, int vnum);
-  bool IsNoTrade(int vnum);
-  bool IsSeller(QString in_name, QString seller);
-  bool IsExist(QString name, int vnum);
-  bool IsClass(int vnum, QString isclass);
-  bool IsRace(int vnum, QString israce);
-  bool IsName(QString name, int vnum);
-  bool IsSlot(QString slot, int vnum);
-  bool IsLevel(unsigned int to, unsigned int from, int vnum);
-  QMap<int, int> auction_rooms;
-  unsigned int cur_index;
-  QString file_name;
-  QMap<unsigned int, AuctionTicket> Items_For_Sale;
-};
-
-/*
-This is the actual auction house creation
-*/
-AuctionHouse TheAuctionHouse("auctionhouse");
 
 void AuctionHouse::ShowStats(Character *ch)
 {
@@ -1802,62 +1694,13 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   return;
 }
 
-/*
-AUCTION_EXPIRE
-Called externally from heartbeat
-*/
-void auction_expire()
-{
-  TheAuctionHouse.CheckExpire();
-  return;
-}
-
-/*
-check if the player has gold items
-*/
-void check_for_sold_items(Character *ch)
-{
-  TheAuctionHouse.CheckForSoldItems(ch);
-  return;
-}
-
-/*
-HANDLE RENAMES
-Called externally in wiz_110 (do_rename)
-*/
-void AuctionHandleDelete(QString name)
-{
-  TheAuctionHouse.HandleDelete(name);
-  return;
-}
-
-/*
-HANDLE RENAMES
-Called externally in wiz_110 (do_rename)
-*/
-void AuctionHandleRenames(Character *ch, QString old_name, QString new_name)
-{
-  TheAuctionHouse.HandleRename(ch, old_name, new_name);
-  return;
-}
-
-/*
-LOAD AUCTION TICKETS
-called externally from db.cpp during boot
-*/
-void load_auction_tickets()
-{
-  TheAuctionHouse.Load();
-  return;
-}
-
 int do_vend(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   Object *obj;
   unsigned int price;
 
-  if (!TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
+  if (!DC::getInstance()->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
     ch->sendln("You must be in an auction house to do this!");
     return eFAILURE;
@@ -1896,7 +1739,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       ch->sendln("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>");
       return eSUCCESS;
     }
-    TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
 
     return eSUCCESS;
   }
@@ -1918,7 +1761,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         ch->sendln("What name do you want to search for?\n\rSyntax: vend search name <keyword>");
         return eSUCCESS;
       }
-      TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -1936,7 +1779,7 @@ int do_vend(Character *ch, char *argument, int cmd)
                      ch);
         return eSUCCESS;
       }
-      TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -1953,7 +1796,7 @@ int do_vend(Character *ch, char *argument, int cmd)
                      ch);
         return eSUCCESS;
       }
-      TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -1974,7 +1817,7 @@ int do_vend(Character *ch, char *argument, int cmd)
         ch->sendln("Class name needs to be at least 4 letters to search!");
         return eSUCCESS;
       }
-      TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -1990,7 +1833,7 @@ int do_vend(Character *ch, char *argument, int cmd)
                      ch);
         return eSUCCESS;
       }
-      TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -2008,9 +1851,9 @@ int do_vend(Character *ch, char *argument, int cmd)
       level = atoi(buf);
       argument = one_argument(argument, buf);
       if (!*buf)
-        TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
+        DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
-        TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
+        DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return eSUCCESS;
@@ -2031,12 +1874,12 @@ int do_vend(Character *ch, char *argument, int cmd)
     }
     if (!strcmp(buf, "all"))
     {
-      TheAuctionHouse.CollectTickets(ch);
+      DC::getInstance()->TheAuctionHouse.CollectTickets(ch);
       return eSUCCESS;
     }
     if (atoi(buf) > 0)
     {
-      TheAuctionHouse.CollectTickets(ch, atoi(buf));
+      DC::getInstance()->TheAuctionHouse.CollectTickets(ch, atoi(buf));
       return eSUCCESS;
     }
 
@@ -2053,7 +1896,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       ch->sendln("Buy what?\n\rSyntax: vend buy <ticket #>");
       return eSUCCESS;
     }
-    TheAuctionHouse.BuyItem(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.BuyItem(ch, atoi(buf));
     return eSUCCESS;
   }
 
@@ -2068,10 +1911,10 @@ int do_vend(Character *ch, char *argument, int cmd)
     }
     if (!strcmp(buf, "all")) // stupid cancel all didn't fit my design, but the boss wanted it
     {
-      TheAuctionHouse.CancelAll(ch);
+      DC::getInstance()->TheAuctionHouse.CancelAll(ch);
       return eSUCCESS;
     }
-    TheAuctionHouse.RemoveTicket(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.RemoveTicket(ch, atoi(buf));
     return eSUCCESS;
   }
 
@@ -2087,19 +1930,19 @@ int do_vend(Character *ch, char *argument, int cmd)
 
     if (!strcmp(buf, "all"))
     {
-      TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
     }
     else if (!strcmp(buf, "mine"))
     {
-      TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
     }
     else if (!strcmp(buf, "private"))
     {
-      TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
     }
     else if (!strcmp(buf, "recent"))
     {
-      TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
     }
     else
     {
@@ -2137,7 +1980,7 @@ int do_vend(Character *ch, char *argument, int cmd)
     }
 
     argument = one_argument(argument, buf); // private name
-    TheAuctionHouse.AddItem(ch, obj, price, buf);
+    DC::getInstance()->TheAuctionHouse.AddItem(ch, obj, price, buf);
     return eSUCCESS;
   }
 
@@ -2150,14 +1993,14 @@ int do_vend(Character *ch, char *argument, int cmd)
       ch->sendln("Identify what?\n\rSyntax: vend identify <ticket>");
       return eSUCCESS;
     }
-    TheAuctionHouse.Identify(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.Identify(ch, atoi(buf));
     return eSUCCESS;
   }
 
   /*SHOW STATS*/
   if (ch->getLevel() >= 104 && !strcmp(buf, "stats"))
   {
-    TheAuctionHouse.ShowStats(ch);
+    DC::getInstance()->TheAuctionHouse.ShowStats(ch);
     return eSUCCESS;
   }
 
@@ -2170,7 +2013,7 @@ int do_vend(Character *ch, char *argument, int cmd)
       ch->sendln("Add what room?\n\rSyntax: vend addroom <vnum>");
       return eSUCCESS;
     }
-    TheAuctionHouse.AddRoom(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoi(buf));
     return eSUCCESS;
   }
 
@@ -2183,14 +2026,14 @@ int do_vend(Character *ch, char *argument, int cmd)
       ch->sendln("Remove what room?\n\rSyntax: vend removeroom <vnum>");
       return eSUCCESS;
     }
-    TheAuctionHouse.RemoveRoom(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
     return eSUCCESS;
   }
 
   /*LIST ROOMS*/
   if (ch->getLevel() >= 104 && !strcmp(buf, "listrooms"))
   {
-    TheAuctionHouse.ListRooms(ch);
+    DC::getInstance()->TheAuctionHouse.ListRooms(ch);
     return eSUCCESS;
   }
 

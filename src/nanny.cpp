@@ -55,9 +55,7 @@
 
 #define STATE(d) ((d)->connected)
 
-void AuctionHandleDelete(QString name);
 bool is_bracing(Character *bracee, struct room_direction_data *exit);
-void check_for_sold_items(Character *ch);
 void show_question_race(Connection *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
@@ -1084,7 +1082,7 @@ void nanny(class Connection *d, std::string arg)
          sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->player->bad_pw_tries);
          SEND_TO_Q(buf, d);
       }
-      check_for_sold_items(d->character);
+      DC::getInstance()->TheAuctionHouse.CheckForSoldItems(d->character);
       STATE(d) = Connection::states::READ_MOTD;
       break;
 
@@ -1874,7 +1872,7 @@ void nanny(class Connection *d, std::string arg)
          sprintf(buf, "%s just deleted themself.", d->character->getNameC());
          logentry(buf, IMMORTAL, LogChannels::LOG_MORTAL);
 
-         AuctionHandleDelete(d->character->getName());
+         DC::getInstance()->TheAuctionHouse.HandleDelete(d->character->getName());
          // To remove the vault from memory
          remove_familiars(d->character->getName(), SELFDELETED);
          remove_vault(d->character->getName(), SELFDELETED);

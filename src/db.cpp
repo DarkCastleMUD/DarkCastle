@@ -710,7 +710,7 @@ void DC::boot_db(void)
 	load_hints();
 
 	logverbose(QStringLiteral("Loading auction tickets."));
-	load_auction_tickets();
+	TheAuctionHouse.Load();
 }
 
 /*

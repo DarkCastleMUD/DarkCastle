@@ -37,8 +37,6 @@
 #include "DC/Command.h"
 #include "DC/meta.h"
 
-void AuctionHandleRenames(Character *ch, QString old_name, QString new_name);
-
 int get_max_stat_bonus(Character *ch, int attrs)
 {
   int bonus = 0;
@@ -566,7 +564,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   logentry(buffer, level_, LogChannels::LOG_GOD);
 
   // handle the renames
-  AuctionHandleRenames(this, victim->getNameC(), newname);
+  DC::getInstance()->TheAuctionHouse.HandleRename(this, victim->getNameC(), newname);
 
   // Get rid of the existing one
   do_zap(victim->getName().split(' '), 10);

@@ -30,8 +30,6 @@
 #include "DC/bandwidth.h"
 #endif
 
-void AuctionHandleDelete(QString name);
-
 command_return_t Character::do_linkload(QStringList arguments, int cmd)
 {
   class Connection d;
@@ -328,7 +326,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
     if (this->clan)
       remove_clan_member(this->clan, this);
 
-    AuctionHandleDelete(victim->getNameC());
+    DC::getInstance()->TheAuctionHouse.HandleDelete(victim->getName());
 
     do_quit(victim, "", 666);
     remove_character(victim->getName(), ZAPPED);
