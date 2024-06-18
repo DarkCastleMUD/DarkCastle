@@ -2,7 +2,7 @@
 
 [Dark Castle](http://www.dcastle.org/) is a [MUD](https://en.wikipedia.org/wiki/MUD) that has been in existence since the early 90s.  Branched from an early version of [DIKU](https://en.wikipedia.org/wiki/DikuMUD) the code has been rewritten multiple times by many authors over the years.  It has been a source of enjoyment and rivalry for many over the years.  In 2020 it was decided to open-source it for the enjoyment of our players and for some nostalgia for those that return for a visit.
 
-The game is available to login via telnet dcastle.org over ports 23, 6969 or 8080 for the standard no-botting/no-multiplaying server or dcastle.org 6666 for the botting/multiplaying server.
+The game is available to login via telnet dcastle.org over ports 23 or 6969 for the standard no-botting/no-multiplaying server or dcastle.org 6666 for the botting/multiplaying server.
 
 ## Use existing Docker image
 ```
@@ -44,11 +44,7 @@ sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-de
 Ubuntu 22.04
 ```
 sudo apt update
-sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
-sudo apt install scons libcurl4
-sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
-sudo apt install unzip zlib1g-dev
-sudo apt install libfmt-dev cmake qt6-base-dev
+sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++ scons libcurl4 libpq-dev libpq5 libcurl4-openssl-dev unzip zlib1g-dev libfmt-dev cmake qt6-base-dev
 ```
 
 Now build the DarkCastle project. Change -j64 option below to match the number of threads your CPU(s) can run in parallel.
