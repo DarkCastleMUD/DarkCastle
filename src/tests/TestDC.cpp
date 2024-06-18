@@ -874,6 +874,27 @@ private slots:
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn2.output, "");
+
+        rc = do_vend(&ch, str_hsh("list mine"));
+        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"
+                              "You are using 1 of your 1 available tickets.\r\n\n\r"
+                              "00002) 7$B            $R $51,000,000 $R $2PUBLIC$R     a reflecty test item          \n\r\n\r"
+                              "'$4N$R' indicates an item is NO_TRADE and requires a Genuine Wendy $B$3W$5i$6n$3g$7d$4i$3n$5g$R to purchase.\r\n"
+                              "'$4*$R' indicates you are unable to use this item.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_vend(&ch, str_hsh("cancel 2"));
+        QCOMPARE(conn.output, "The Consignment Broker retrieves a reflecty test item and returns it to you.\r\nSaving Testplayer.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_vend(&ch, str_hsh("list mine"));
+        QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"
+                              "You do not have any tickets.\r\n\n\r"
+                              "You are using 0 of your 1 available tickets.\r\n");
+        conn.output = {};
+        QCOMPARE(rc, eSUCCESS);
     }
 };
 
