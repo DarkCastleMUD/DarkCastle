@@ -1755,7 +1755,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     csendf(ch, "You are now selling %s to %s for %u coins.\r\n",
            obj->short_description, buyer.toStdString().c_str(), price);
   }
-  logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem(%1, %2, %3, %4)").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+
   if (advertise == true && NewTicket.buyer.isEmpty())
   {
     Character *find_mob_in_room(Character * ch, int iFriendId);
