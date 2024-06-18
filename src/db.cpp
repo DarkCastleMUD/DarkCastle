@@ -1352,7 +1352,7 @@ index_data *generate_obj_indices(int *top,
 	 }
 	 }
 	 */
-	logentry(QStringLiteral("Opening object files."), 0, LogChannels::LOG_MISC);
+	DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
 
 	// note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
 	for (temp = read_next_worldfile_name(flObjIndex);
@@ -1363,10 +1363,7 @@ index_data *generate_obj_indices(int *top,
 		strcat(endfile, temp.toStdString().c_str());
 
 		DC::config &cf = DC::getInstance()->cf;
-		if (cf.verbose_mode)
-		{
-			logentry(temp, 0, LogChannels::LOG_MISC);
-		}
+		DC::getInstance()->logverbose(temp);
 
 		if (!(fl = fopen(endfile, "r")))
 		{
