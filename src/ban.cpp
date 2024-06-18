@@ -36,7 +36,7 @@ void load_banned(void)
 
   if (!(fl = fopen("banned", "r")))
   {
-    perror("Unable to open banfile");
+    perror("Unable to open banfile 'banned'");
     return;
   }
   while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
