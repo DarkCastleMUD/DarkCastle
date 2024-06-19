@@ -282,6 +282,9 @@ struct social_messg *find_social(QString arg)
 
 void DC::clean_socials_from_memory()
 {
+  if (!soc_mess_list)
+    return;
+
   for (int i = 0; i < num_socials; i++)
   {
     if (soc_mess_list[i].name)
@@ -305,6 +308,7 @@ void DC::clean_socials_from_memory()
   }
 
   dc_free(soc_mess_list);
+  soc_mess_list = nullptr;
 }
 
 int do_social(Character *ch, char *argument, int cmd)
