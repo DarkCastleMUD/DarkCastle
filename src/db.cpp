@@ -717,49 +717,37 @@ void DC::boot_db(void)
  */
 void DC::do_godlist(void)
 {
-	char bufl[100], buf2[100], buf3[100];
-	int x;
-	FILE *fl;
-
-	logverbose(QStringLiteral("Doing wizlist...db.c\n\r"));
-
-	if (!(fl = fopen("../lib/wizlist.txt", "r")))
+	logverbose(QStringLiteral("Reading ../lib/wizlist.txt"));
+	QFile wizlist_file("../lib/wizlist.txt");
+	if (!wizlist_file.open(QIODeviceBase::ReadOnly))
 	{
-		logentry(QStringLiteral("db.c: error reading wizlist.txt"), ANGEL, LogChannels::LOG_BUG);
-		perror("db.c...error reading wizlist.txt: ");
-		fclose(fl);
+		logentry(QStringLiteral("db.c: error reading ../lib/wizlist.txt"), ANGEL, LogChannels::LOG_BUG);
+		wizlist_file.close();
 		return;
 	}
 
-	for (x = 0;; x++)
+	do
 	{
-		fgets(bufl, 90, fl);
-		half_chop(bufl, buf2, buf3);
-		if (buf2[0] == '@')
+		auto wizlist_file_line = wizlist_file.readLine().split(' ');
+		QString immortal_name = wizlist_file_line.value(0);
+		bool ok = false;
+		level_t immortal_level = wizlist_file_line.value(1).toULongLong(&ok);
+		if (!ok)
 		{
-			wizlist[x].name = str_dup("@");
-			wizlist[x].level = 0;
+			immortal_level = 0;
+		}
+
+		if (immortal_name.startsWith('@'))
+		{
+			wizlist.push_back({QStringLiteral("@"), 0});
 			break;
 		}
-		wizlist[x].name = str_dup(buf2);
-		wizlist[x].level = atoi(buf3);
-	}
+		wizlist.push_back({immortal_name, immortal_level});
+		assert(wizlist.length() < 1000);
+	} while (true);
 
 	logverbose(QStringLiteral("Done!\n\r"));
-	fclose(fl);
-}
-
-void DC::free_wizlist_from_memory(void)
-{
-	for (int x = 0;; x++)
-	{
-		if (wizlist[x].name[0] == '@')
-		{
-			dc_free(wizlist[x].name);
-			break;
-		}
-		dc_free(wizlist[x].name);
-	}
+	wizlist_file.close();
 }
 
 void DC::write_wizlist(std::stringstream &filename)
@@ -774,26 +762,27 @@ void DC::write_wizlist(std::string filename)
 
 void DC::write_wizlist(const char filename[])
 {
-	int x;
-	FILE *fl;
-
-	if (!(fl = fopen(filename, "w")))
+	QFile wizlist_file(filename);
+	auto file_opened = wizlist_file.open(QIODeviceBase::WriteOnly);
+	if (!file_opened)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open wizlist file: %s", filename);
+		logentry(QStringLiteral("Unable to open wizlist file: %1").arg(filename));
 		return;
 	}
 
-	for (x = 0;; x++)
+	for (const auto &entry : wizlist)
 	{
-		if (wizlist[x].name[0] == '@')
+		if (entry.name.startsWith('@'))
 		{
-			fprintf(fl, "%s", "@ @\n");
+			wizlist_file.write("@ @\n");
 			break;
 		}
-		if (wizlist[x].level >= IMMORTAL)
-			fprintf(fl, "%s %d\n", wizlist[x].name, wizlist[x].level);
+		if (entry.level >= IMMORTAL)
+		{
+			wizlist_file.write(QStringLiteral("%1 %2\n").arg(entry.name).arg(entry.level).toLocal8Bit());
+		}
 	}
-	fclose(fl);
+	wizlist_file.close();
 }
 
 void DC::update_wizlist(Character *ch)
@@ -803,25 +792,23 @@ void DC::update_wizlist(Character *ch)
 	if (IS_NPC(ch))
 		return;
 
-	for (x = 0;; x++)
+	for (auto &entry : wizlist)
 	{
-		if (wizlist[x].name[0] == '@')
+		if (entry.name.startsWith('@'))
 		{
 			if (ch->isMortal())
 				return;
-			dc_free(wizlist[x].name);
-			wizlist[x].name = str_dup(GET_NAME(ch));
-			wizlist[x].level = ch->getLevel();
+			entry.name = ch->getName();
+			entry.level = ch->getLevel();
 
-			wizlist[x + 1].name = str_dup("@");
-			wizlist[x + 1].level = 0;
+			wizlist.push_back({QStringLiteral("@"), 0});
 			break;
 		}
 		else
 		{
-			if (isexact(wizlist[x].name, GET_NAME(ch)))
+			if (isexact(entry.name, GET_NAME(ch)))
 			{
-				wizlist[x].level = ch->getLevel();
+				entry.level = ch->getLevel();
 				break;
 			}
 		}
@@ -830,9 +817,9 @@ void DC::update_wizlist(Character *ch)
 	write_wizlist("../lib/wizlist.txt");
 
 	in_port_t port1 = 0;
-	if (DC::getInstance()->cf.ports.size() > 0)
+	if (cf.ports.size() > 0)
 	{
-		port1 = DC::getInstance()->cf.ports[0];
+		port1 = cf.ports[0];
 	}
 
 	std::stringstream ssbuffer;

@@ -341,8 +341,8 @@ private:
 
 struct wizlist_info
 {
-  char *name;
-  level_t level;
+  QString name;
+  level_t level = {};
 };
 class DC_EXPORT DC : public QCoreApplication
 {
@@ -427,7 +427,7 @@ public:
   room_t top_of_world = 0;
   int total_rooms = 0; /* total amount of rooms in memory */
   AuctionHouse TheAuctionHouse;
-  struct wizlist_info wizlist[100]; /* the actual wizlist            */
+  QList<struct wizlist_info> wizlist; /* the actual wizlist            */
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -522,7 +522,6 @@ public:
   void free_objs_from_memory(void);
   void free_messages_from_memory(void);
   void free_hsh_tree_from_memory(void);
-  void free_wizlist_from_memory(void);
   void free_help_from_memory(void);
   void free_emoting_objects_from_memory(void);
   void free_game_portals_from_memory(void);
@@ -545,7 +544,7 @@ public:
     free_objs_from_memory();
     free_messages_from_memory();
     free_hsh_tree_from_memory();
-    free_wizlist_from_memory();
+    wizlist.clear();
     free_help_from_memory();
     shop_index.clear();
     free_emoting_objects_from_memory();
