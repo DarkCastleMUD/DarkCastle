@@ -734,6 +734,11 @@ int stop_current_quest(Character *ch, int number)
 
 int stop_all_quests(Character *ch)
 {
+   if (!ch->player)
+   {
+      return eFAILURE;
+   }
+
    int retval = 0;
 
    for (int i = 0; i < QUEST_MAX; i++)
