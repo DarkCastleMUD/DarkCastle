@@ -339,6 +339,11 @@ private:
   QMap<unsigned int, AuctionTicket> Items_For_Sale;
 };
 
+struct wizlist_info
+{
+  char *name;
+  level_t level;
+};
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -422,6 +427,7 @@ public:
   room_t top_of_world = 0;
   int total_rooms = 0; /* total amount of rooms in memory */
   AuctionHouse TheAuctionHouse;
+  struct wizlist_info wizlist[100]; /* the actual wizlist            */
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -439,7 +445,11 @@ public:
   Object *getObject(vnum_t vnum);
   void findLibrary(void);
   int create_one_room(Character *ch, int vnum);
-
+  void update_wizlist(Character *ch);
+  void do_godlist(void);
+  void write_wizlist(std::stringstream &filename);
+  void write_wizlist(std::string filename);
+  void write_wizlist(const char filename[]);
   explicit DC(int &argc, char **argv);
   explicit DC(config c);
   DC(const DC &) = delete; // non-copyable

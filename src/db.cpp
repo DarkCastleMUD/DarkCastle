@@ -92,13 +92,7 @@ Room &World::operator[](room_t room_key)
 #define SEEK_CUR 1
 #endif
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
-
-struct wizlist_info
-{
-	char *name;
-	level_t level;
-};
-struct skill_quest *skill_list; // List of skill quests.
+struct skill_quest *skill_list;					  // List of skill quests.
 
 char webpage[MAX_STRING_LENGTH];	/* the webbrowser connect screen*/
 char greetings1[MAX_STRING_LENGTH]; /* the greeting screen          */
@@ -113,7 +107,6 @@ char help[MAX_STRING_LENGTH];	   /* the main help page            */
 char new_help[MAX_STRING_LENGTH];  /* the main new help page            */
 char new_ihelp[MAX_STRING_LENGTH]; /* the main immortal help page            */
 char info[MAX_STRING_LENGTH];	   /* the info text                 */
-struct wizlist_info wizlist[100];  /* the actual wizlist            */
 
 FILE *help_fl;	   /* file for help texts (HELP <kwd>)*/
 FILE *new_help_fl; /* file for help texts (HELP <kwd>)*/
@@ -722,13 +715,13 @@ void DC::boot_db(void)
  return eSUCCESS;
  }
  */
-void do_godlist()
+void DC::do_godlist(void)
 {
 	char bufl[100], buf2[100], buf3[100];
 	int x;
 	FILE *fl;
 
-	DC::getInstance()->logverbose(QStringLiteral("Doing wizlist...db.c\n\r"));
+	logverbose(QStringLiteral("Doing wizlist...db.c\n\r"));
 
 	if (!(fl = fopen("../lib/wizlist.txt", "r")))
 	{
@@ -752,7 +745,7 @@ void do_godlist()
 		wizlist[x].level = atoi(buf3);
 	}
 
-	DC::getInstance()->logverbose(QStringLiteral("Done!\n\r"));
+	logverbose(QStringLiteral("Done!\n\r"));
 	fclose(fl);
 }
 
@@ -769,17 +762,17 @@ void DC::free_wizlist_from_memory(void)
 	}
 }
 
-void write_wizlist(std::stringstream &filename)
+void DC::write_wizlist(std::stringstream &filename)
 {
 	write_wizlist(filename.str().c_str());
 }
 
-void write_wizlist(std::string filename)
+void DC::write_wizlist(std::string filename)
 {
 	write_wizlist(filename.c_str());
 }
 
-void write_wizlist(const char filename[])
+void DC::write_wizlist(const char filename[])
 {
 	int x;
 	FILE *fl;
@@ -803,7 +796,7 @@ void write_wizlist(const char filename[])
 	fclose(fl);
 }
 
-void update_wizlist(Character *ch)
+void DC::update_wizlist(Character *ch)
 {
 	int x;
 
@@ -872,9 +865,9 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 	// count the number of gods at each level, store in array gods_each_level
 	for (x = 0;; x++)
 	{
-		if (wizlist[x].name[0] == '@')
+		if (DC::getInstance()->wizlist[x].name[0] == '@')
 			break;
-		gods_each_level[wizlist[x].level - IMMORTAL]++;
+		gods_each_level[DC::getInstance()->wizlist[x].level - IMMORTAL]++;
 	}
 
 	buf[0] = '\0';
@@ -894,7 +887,7 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 		lines[0] = '\0';
 		for (x = 0;; x++)
 		{
-			if (wizlist[x].name[0] == '@')
+			if (DC::getInstance()->wizlist[x].name[0] == '@')
 			{
 				z = 1;
 				if (*lines)
@@ -912,14 +905,14 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 				break;
 			}
 
-			if (wizlist[x].level != current_level)
+			if (DC::getInstance()->wizlist[x].level != current_level)
 				continue;
 
 			if (z++ % 5)
-				sprintf(lines + strlen(lines), "%s, ", wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s, ", DC::getInstance()->wizlist[x].name);
 			else
 			{
-				sprintf(lines + strlen(lines), "%s\n\r", wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s\n\r", DC::getInstance()->wizlist[x].name);
 				line_length = strlen(lines) - 2;
 				sp = 79 - line_length;
 				sp /= 2;
@@ -2668,11 +2661,7 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->description = fread_string(fl, 1);
 	mob->title = 0;
 
-#ifdef LEAK_CHECK
-	mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-	mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+	mob->mobdata = new Mobile;
 	mob->mobdata->reset = {};
 	/* *** Numeric data *** */
 	j = 0;
@@ -6011,7 +6000,7 @@ void free_obj(class Object *obj)
 
 	dc_free(obj->affected);
 
-	dc_free(obj);
+	delete obj;
 }
 
 /* read contents of a text file, and place in buf */
