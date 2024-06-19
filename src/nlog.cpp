@@ -47,6 +47,7 @@ void DC::free_hsh_tree_from_memory()
     kill_hsh_tree_func(tree.left);
   if (tree.right)
     kill_hsh_tree_func(tree.right);
+  tree = {"m", 0, 0};
 }
 
 bool ishashed(char *arg)
