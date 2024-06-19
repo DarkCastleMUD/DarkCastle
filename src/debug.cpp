@@ -260,7 +260,7 @@ int main(int argc, char **argv)
   /* Create 1 blank obj to be used when playerfile loads */
   create_blank_item(1);
 
-  load_vaults();
+  DC::getInstance()->load_vaults();
 
   chdir(orig_cwd.toStdString().c_str());
 

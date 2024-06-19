@@ -501,7 +501,7 @@ void vault_stats(Character *ch, char *name)
   ch->send(QStringLiteral("Not Showing: %1\r\n").arg(skipped));
 }
 
-void reload_vaults(void)
+void DC::reload_vaults(void)
 {
   struct vault_data *vault, *tvault;
   struct vault_access_data *access, *taccess;
@@ -736,7 +736,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   }
 }
 
-void testing_load_vaults(void)
+void DC::testing_load_vaults(void)
 {
   struct vault_data *vault;
   struct vault_access_data *access;
@@ -876,7 +876,7 @@ void testing_load_vaults(void)
         }
         break;
       case 'A':
-        qDebugQTextStreamLine(vault_file_stream, "load_vaults, before type A vault_file_stream >> value");
+        qDebugQTextStreamLine(vault_file_stream, "load_vaults(), before type A vault_file_stream >> value");
         vault_file_stream >> value >> Qt::ws;
 
         if (!value.isEmpty() && !stat(QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(value[0]).arg(value).toStdString().c_str(), &statbuf))
@@ -958,7 +958,7 @@ void add_vault_access(Character *ch, QString name, struct vault_data *vault)
     free_char(d.character, Trace("add_vault_access 2"));
 }
 
-void load_vaults(void)
+void DC::load_vaults(void)
 {
   struct vault_data *vault;
   struct vault_access_data *access;
@@ -974,21 +974,19 @@ void load_vaults(void)
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   fscanf(index, "%s\n", line);
   while (*line != '$')
   {
     total_vaults++;
-    sprintf(buf, "%d - %s", total_vaults, line);
-    //    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logverbose(QStringLiteral("%1 - %2").arg(total_vaults).arg(line));
     fscanf(index, "%s\n", line);
   }
   fclose(index);
 
-  sprintf(buf, "boot_vaults: found [%d] player vaults to read.", total_vaults);
-  // logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+  logverbose(QStringLiteral("boot_vaults: found [%1] player vaults to read.").arg(total_vaults));
+
   if (total_vaults)
     CREATE(vault_table, struct vault_data, total_vaults);
 

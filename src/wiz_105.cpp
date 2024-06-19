@@ -868,7 +868,6 @@ int do_eqmax(Character *ch, char *argument, int cmd)
 int do_reload(Character *ch, char *argument, int cmd)
 {
   int do_reload_help(Character * ch, char *argument, int cmd);
-  void reload_vaults(void);
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
   extern char new_help[MAX_STRING_LENGTH];
@@ -931,7 +930,7 @@ int do_reload(Character *ch, char *argument, int cmd)
   }
   else if (!str_cmp(arg, "vaults"))
   {
-    reload_vaults();
+    DC::getInstance()->reload_vaults();
     ch->sendln("Done!");
   }
   else

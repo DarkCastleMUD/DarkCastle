@@ -54,7 +54,6 @@ int16_t frozen_start_room = 1;
 int count_hash_records(FILE *fl);
 class Object *create_obj_new(void);
 void save_corpses(void);
-void load_corpses(void);
 int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tree);
 int write_corpse_to_disk(FILE *fp, class Object *obj, int locate);
 void clean_string(char *buffer);
@@ -245,7 +244,7 @@ void save_corpses(void)
 	fclose(fp);
 }
 
-void load_corpses(void)
+void DC::load_corpses(void)
 {
 	/* Ahh load corpses.. it was cake to write them out to a file      */
 	/* it was a pain to load them back up through without a character. */
@@ -270,8 +269,7 @@ void load_corpses(void)
 
 	if (!(fp = fopen(CORPSE_FILE, "r")))
 	{
-		sprintf(buf1, "SYSERR: READING CORPSE FILE %s in load_corpses", CORPSE_FILE);
-		logentry(buf1, 0, LogChannels::LOG_MISC);
+		logverbose(QStringLiteral("Unable to open '%1").arg(CORPSE_FILE));
 		return;
 	}
 

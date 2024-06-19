@@ -149,8 +149,6 @@ void write_mobile(LegacyFile &lf, Character *mob);
 void write_object(LegacyFile &lf, Object *obj);
 void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob);
 int load_new_help(FILE *fl, int reload = 0, Character *ch = nullptr);
-void load_vaults();
-void load_corpses(void);
 int count_hash_records(FILE *fl);
 void load_hints();
 void find_unordered_mobiles(void);

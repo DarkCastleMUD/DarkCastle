@@ -518,6 +518,10 @@ public:
   void free_game_portals_from_memory(void);
   void free_ban_list_from_memory(void);
   void free_buff_pool_from_memory(void);
+  void load_vaults(void);
+  void testing_load_vaults(void);
+  void reload_vaults(void);
+  void load_corpses(void);
 
   ~DC(void)
   {
