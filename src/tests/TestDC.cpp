@@ -839,6 +839,8 @@ private slots:
         QCOMPARE(conn.output, "");
         QCOMPARE(rc, eSUCCESS);
 
+        auto items_posted_qty = dc.TheAuctionHouse.getItemsPosted();
+
         rc = do_vend(&ch, str_hsh(""));
         QCOMPARE(conn.output, "Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\r\n");
         conn.output = {};
@@ -895,6 +897,9 @@ private slots:
                               "You are using 0 of your 1 available tickets.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
+
+        dc.TheAuctionHouse.setItemsPosted(items_posted_qty);
+        dc.TheAuctionHouse.Save();
     }
 };
 
