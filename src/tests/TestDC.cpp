@@ -290,6 +290,10 @@ private slots:
         QVERIFY(!IS_AFFECTED(&ch, AFF_FLYING));
         QCOMPARE(conn.output, "Your feet touch the ground once more.\r\n");
         conn.output = {};
+
+        dc.character_list.erase(&ch);
+        ch.desc = nullptr;
+        ch.player = nullptr;
     }
 
     void test_do_vault_get()
@@ -556,6 +560,10 @@ private slots:
         conn.output = {};
 
         remove_vault(ch.getNameC());
+
+        dc.character_list.erase(&ch);
+        ch.desc = nullptr;
+        ch.player = nullptr;
     }
 
     void test_fread()
@@ -900,6 +908,13 @@ private slots:
 
         dc.TheAuctionHouse.setItemsPosted(items_posted_qty);
         dc.TheAuctionHouse.Save();
+
+        dc.character_list.erase(&ch);
+        dc.character_list.erase(&ch2);
+        ch.desc = nullptr;
+        ch.player = nullptr;
+        ch2.desc = nullptr;
+        ch2.player = nullptr;
     }
 };
 
