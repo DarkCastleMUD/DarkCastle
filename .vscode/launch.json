@@ -310,10 +310,10 @@
             "preLaunchTask": "rebuild"
         },
         {
-            "name": "valgrind debug",
+            "name": "valgrind testDC",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug",
+            "program": "${workspaceFolder}/build/testDC",
             "targetArchitecture": "x64",
             "customLaunchSetupCommands": [
                 {
