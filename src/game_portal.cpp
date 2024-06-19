@@ -114,7 +114,10 @@ void DC::free_game_portals_from_memory(void)
   for (int i = 0; i < MAX_GAME_PORTALS; i++)
   {
     if (game_portals[i].from_rooms)
+    {
       dc_free(game_portals[i].from_rooms);
+      game_portals[i].from_rooms = {};
+    }
   }
 }
 
