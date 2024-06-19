@@ -4085,7 +4085,7 @@ void load_messages(char *file, int base)
   fclose(fl);
 }
 
-void free_messages_from_memory()
+void DC::free_messages_from_memory(void)
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *next_message = nullptr;

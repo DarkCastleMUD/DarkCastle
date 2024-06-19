@@ -77,7 +77,7 @@ void free_emoting_obj_data(obj_emote_index *myobj)
   }
 }
 
-void free_emoting_objects_from_memory()
+void DC::free_emoting_objects_from_memory(void)
 {
   obj_emote_index *curr_index = nullptr;
 

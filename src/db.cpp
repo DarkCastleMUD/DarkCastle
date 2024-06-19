@@ -756,7 +756,7 @@ void do_godlist()
 	fclose(fl);
 }
 
-void free_wizlist_from_memory()
+void DC::free_wizlist_from_memory(void)
 {
 	for (int x = 0;; x++)
 	{
@@ -1301,7 +1301,7 @@ void add_mobspec(int i)
 			SET_BIT(DC::getInstance()->mob_index[i].progtypes, mprg->type);
 }
 
-void remove_all_mobs_from_world()
+void DC::remove_all_mobs_from_world(void)
 {
 	const auto &character_list = DC::getInstance()->character_list;
 
@@ -1316,7 +1316,7 @@ void remove_all_mobs_from_world()
 	DC::getInstance()->removeDead();
 }
 
-void remove_all_objs_from_world()
+void DC::remove_all_objs_from_world()
 {
 	Object *curr = nullptr;
 
@@ -1876,7 +1876,7 @@ void set_zone_saved_obj(int32_t obj)
 }
 
 /* destruct the world */
-void free_world_from_memory()
+void DC::free_world_from_memory(void)
 {
 	struct extra_descr_data *curr_extra = nullptr;
 	struct world_file_list_item *curr_wfli = nullptr;
@@ -1926,30 +1926,30 @@ void free_world_from_memory()
 	}
 }
 
-void free_mobs_from_memory()
+void DC::free_mobs_from_memory(void)
 {
 	Character *curr = nullptr;
 
 	for (int i = 0; i <= top_of_mobt; i++)
 	{
-		if ((curr = (Character *)DC::getInstance()->mob_index[i].item))
+		if ((curr = (Character *)mob_index[i].item))
 		{
 			free_char(curr, Trace("free_mobs_from_memory"));
-			DC::getInstance()->mob_index[i].item = nullptr;
+			mob_index[i].item = nullptr;
 		}
 	}
 }
 
-void free_objs_from_memory()
+void DC::free_objs_from_memory(void)
 {
 	class Object *curr = nullptr;
 	// struct extra_descr_data * curr_extra = nullptr;
 
 	for (int i = 0; i <= top_of_objt; i++)
-		if ((curr = (class Object *)DC::getInstance()->obj_index[i].item))
+		if ((curr = (class Object *)obj_index[i].item))
 		{
 			free_obj(curr);
-			DC::getInstance()->obj_index[i].item = nullptr;
+			obj_index[i].item = nullptr;
 		}
 }
 
@@ -2311,7 +2311,7 @@ void renum_zone_table(void)
 	}
 }
 
-void free_zones_from_memory()
+void DC::free_zones_from_memory()
 {
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{

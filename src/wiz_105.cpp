@@ -68,8 +68,7 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
   extern FILE *help_fl;
   extern struct help_index_element *help_index;
   extern struct help_index_element *build_help_index(FILE * fl, int *num);
-  extern void free_help_from_memory();
-  free_help_from_memory();
+  DC::getInstance()->free_help_from_memory();
   fclose(help_fl);
   if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
   {

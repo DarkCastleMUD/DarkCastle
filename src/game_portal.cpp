@@ -109,7 +109,7 @@ void load_game_portals()
   }
 }
 
-void free_game_portals_from_memory()
+void DC::free_game_portals_from_memory(void)
 {
   for (int i = 0; i < MAX_GAME_PORTALS; i++)
   {

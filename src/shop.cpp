@@ -729,11 +729,6 @@ LFound2:
   return eSUCCESS;
 }
 
-void free_shops_from_memory()
-{
-  DC::getInstance()->shop_index.clear();
-}
-
 void boot_the_shops()
 {
   char *buf;

@@ -428,12 +428,12 @@ void delete_clan(const clan_data *currclan)
   delete currclan;
 }
 
-void free_clans_from_memory(void)
+void DC::free_clans_from_memory(void)
 {
   clan_data *currclan = nullptr;
   clan_data *nextclan = nullptr;
 
-  for (currclan = DC::getInstance()->clan_list; currclan; currclan = nextclan)
+  for (currclan = clan_list; currclan; currclan = nextclan)
   {
     nextclan = currclan->next;
     delete_clan(currclan);

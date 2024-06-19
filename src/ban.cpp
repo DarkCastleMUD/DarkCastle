@@ -59,7 +59,7 @@ void load_banned(void)
   fclose(fl);
 }
 
-void free_ban_list_from_memory()
+void DC::free_ban_list_from_memory(void)
 {
   ban_list_element *next = nullptr;
 

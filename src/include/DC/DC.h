@@ -502,6 +502,45 @@ public:
     }
   }
 
+  void clean_socials_from_memory(void);
+  void remove_all_mobs_from_world(void);
+  void remove_all_objs_from_world(void);
+  void free_zones_from_memory(void);
+  void free_clans_from_memory(void);
+  void free_world_from_memory(void);
+  void free_mobs_from_memory(void);
+  void free_objs_from_memory(void);
+  void free_messages_from_memory(void);
+  void free_hsh_tree_from_memory(void);
+  void free_wizlist_from_memory(void);
+  void free_help_from_memory(void);
+  void free_emoting_objects_from_memory(void);
+  void free_game_portals_from_memory(void);
+  void free_ban_list_from_memory(void);
+  void free_buff_pool_from_memory(void);
+
+  ~DC(void)
+  {
+    remove_all_mobs_from_world();
+    remove_all_objs_from_world();
+    clean_socials_from_memory();
+    free_zones_from_memory();
+    free_clans_from_memory();
+    free_world_from_memory();
+    free_mobs_from_memory();
+    free_objs_from_memory();
+    free_messages_from_memory();
+    free_hsh_tree_from_memory();
+    free_wizlist_from_memory();
+    free_help_from_memory();
+    shop_index.clear();
+    free_emoting_objects_from_memory();
+    free_game_portals_from_memory();
+    free_ban_list_from_memory();
+    free_buff_pool_from_memory();
+    removeDead();
+  }
+
   QRandomGenerator random_;
   QMap<uint64_t, Shop> shop_index;
   CVoteData DCVote;

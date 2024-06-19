@@ -280,7 +280,7 @@ struct social_messg *find_social(QString arg)
   //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
 }
 
-void clean_socials_from_memory()
+void DC::clean_socials_from_memory()
 {
   for (int i = 0; i < num_socials; i++)
   {

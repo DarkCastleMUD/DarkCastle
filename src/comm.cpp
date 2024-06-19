@@ -451,27 +451,6 @@ void finish_hotboot()
 /* Init sockets, run game, and cleanup sockets */
 void DC::init_game(void)
 {
-
-#ifdef LEAK_CHECK
-  void remove_all_mobs_from_world();
-  void remove_all_objs_from_world();
-  void clean_socials_from_memory();
-  void free_clans_from_memory();
-  void free_world_from_memory();
-  void free_mobs_from_memory();
-  void free_objs_from_memory();
-  void free_messages_from_memory();
-  void free_hsh_tree_from_memory();
-  void free_wizlist_from_memory();
-  void free_game_portals_from_memory();
-  void free_help_from_memory();
-  void free_zones_from_memory();
-  void free_shops_from_memory();
-  void free_emoting_objects_from_memory();
-  void free_ban_list_from_memory();
-  void free_buff_pool_from_memory();
-#endif
-
   FILE *fp;
   // create boot'ing lockfile
   if ((fp = fopen("died_in_bootup", "w")))
@@ -550,46 +529,6 @@ void DC::init_game(void)
            {
              logf(0, LogChannels::LOG_MISC, "Closing fd %d.", fd);
              CLOSE_SOCKET(fd); });
-#ifdef LEAK_CHECK
-
-  logentry(QStringLiteral("Freeing all mobs in world."), 0, LogChannels::LOG_MISC);
-  remove_all_mobs_from_world();
-  logentry(QStringLiteral("Freeing all objs in world."), 0, LogChannels::LOG_MISC);
-  remove_all_objs_from_world();
-  logentry(QStringLiteral("Freeing socials from memory."), 0, LogChannels::LOG_MISC);
-  clean_socials_from_memory();
-  logentry(QStringLiteral("Freeing zones data."), 0, LogChannels::LOG_MISC);
-  free_zones_from_memory();
-  logentry(QStringLiteral("Freeing clan data."), 0, LogChannels::LOG_MISC);
-  free_clans_from_memory();
-  logentry(QStringLiteral("Freeing the world."), 0, LogChannels::LOG_MISC);
-  free_world_from_memory();
-  logentry(QStringLiteral("Freeing mobs from memory."), 0, LogChannels::LOG_MISC);
-  free_mobs_from_memory();
-  logentry(QStringLiteral("Freeing objs from memory."), 0, LogChannels::LOG_MISC);
-  free_objs_from_memory();
-  logentry(QStringLiteral("Freeing messages from memory."), 0, LogChannels::LOG_MISC);
-  free_messages_from_memory();
-  logentry(QStringLiteral("Freeing hash tree from memory."), 0, LogChannels::LOG_MISC);
-  free_hsh_tree_from_memory();
-  logentry(QStringLiteral("Freeing wizlist from memory."), 0, LogChannels::LOG_MISC);
-  free_wizlist_from_memory();
-  logentry(QStringLiteral("Freeing help index."), 0, LogChannels::LOG_MISC);
-  free_help_from_memory();
-  logentry(QStringLiteral("Freeing shops from memory."), 0, LogChannels::LOG_MISC);
-  free_shops_from_memory();
-  logentry(QStringLiteral("Freeing emoting objects from memory."), 0, LogChannels::LOG_MISC);
-  free_emoting_objects_from_memory();
-  logentry(QStringLiteral("Freeing game portals from memory."), 0, LogChannels::LOG_MISC);
-  free_game_portals_from_memory();
-  logentry(QStringLiteral("Freeing command radix from memory."), 0, LogChannels::LOG_MISC);
-  free_command_radix_nodes(cmd_radix_);
-  logentry(QStringLiteral("Freeing ban list from memory."), 0, LogChannels::LOG_MISC);
-  free_ban_list_from_memory();
-  logentry(QStringLiteral("Freeing the bufpool."), 0, LogChannels::LOG_MISC);
-  free_buff_pool_from_memory();
-  DC::getInstance()->removeDead();
-#endif
 
   logentry(QStringLiteral("Goodbye."), 0, LogChannels::LOG_MISC);
   logentry(QStringLiteral("Normal termination of game."), 0, LogChannels::LOG_MISC);
@@ -2074,7 +2013,7 @@ void flush_queues(class Connection *d)
   }
 }
 
-void free_buff_pool_from_memory()
+void DC::free_buff_pool_from_memory(void)
 {
   struct txt_block *curr = nullptr;
 

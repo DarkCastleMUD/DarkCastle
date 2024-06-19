@@ -41,7 +41,7 @@ void kill_hsh_tree_func(struct hash_info *leaf)
 }
 
 // Since the top of the tree is static, we have to free both sides
-void free_hsh_tree_from_memory()
+void DC::free_hsh_tree_from_memory()
 {
   if (tree.left)
     kill_hsh_tree_func(tree.left);

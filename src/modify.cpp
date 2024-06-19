@@ -476,7 +476,7 @@ char *one_word(char *argument, char *first_arg)
 
 #define MAX_HELP 1100
 
-void free_help_from_memory()
+void DC::free_help_from_memory(void)
 {
 	extern struct help_index_element *help_index;
 
