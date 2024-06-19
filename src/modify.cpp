@@ -480,11 +480,17 @@ void DC::free_help_from_memory(void)
 {
 	extern struct help_index_element *help_index;
 
+	if (!help_index)
+	{
+		return;
+	}
+
 	for (int i = 0; i < MAX_HELP; i++)
 		if (help_index[i].keyword)
 			dc_free(help_index[i].keyword);
 
 	dc_free(help_index);
+	help_index = nullptr;
 }
 
 struct help_index_element *build_help_index(FILE *fl, int *num)
