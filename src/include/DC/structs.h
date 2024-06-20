@@ -7,17 +7,15 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-
 #include <sys/types.h>
 #include <cstdio> // FILE
 #include <string>
 #include <vector>
 #include <map>
 #include <cstdint>
+#include <QString>
 
 const size_t MAX_STRING_LENGTH = 8192;
-
-
 
 // FILE * fopen(const char *filename, const char *type);
 // int fclose(FILE * fl);
@@ -52,9 +50,9 @@ struct snoop_data
 
 struct msg_type
 {
-  char *attacker_msg; /* message to attacker */
-  char *victim_msg;   /* message to victim   */
-  char *room_msg;     /* message to room     */
+  QString attacker_msg; /* message to attacker */
+  QString victim_msg;   /* message to victim   */
+  QString room_msg;     /* message to room     */
 };
 
 struct message_type

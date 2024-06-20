@@ -19,6 +19,8 @@ int damage(Character *ch, Character *victim, int dam,
 int noncombat_damage(Character *ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
 void send_damage(char const *, Character *, Object *, Character *, char const *, char const *, int);
+void send_damage(QString buf, Character *, Object *, Character *, QString dmg, QString buf2, int);
+
 int getRealSpellDamage(Character *ch);
 
 #define FIRST WIELD

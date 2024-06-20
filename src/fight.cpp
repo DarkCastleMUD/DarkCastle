@@ -2945,6 +2945,11 @@ int is_pkill(Character *ch, Character *vict)
   return false;
 }
 
+void send_damage(QString buf, Character *ch, Object *obj, Character *victim, QString dmg, QString buf2, int to)
+{
+  send_damage(qPrintable(buf), ch, obj, victim, qPrintable(dmg), qPrintable(buf2), to);
+}
+
 void send_damage(char const *buf, Character *ch, Object *obj, Character *victim, char const *dmg, char const *buf2, int to)
 {
   Character *tmpch;
@@ -3013,7 +3018,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *messages, *messages2;
   int i, j, nr;
-  std::string find, replace;
+  QString find, replace;
 
   if (is_bingo(dam, weapon, attacktype))
     return;
@@ -3021,33 +3026,33 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
   if (filter > TYPE_HIT && (attacktype == SPELL_BURNING_HANDS || attacktype == SPELL_FIREBALL || attacktype == SPELL_FIRESTORM || attacktype == SPELL_HELLSTREAM || attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM || attacktype == SPELL_LIGHTNING_BOLT || attacktype == SPELL_CHILL_TOUCH))
   {
     if (attacktype == SPELL_CHILL_TOUCH)
-      find = "$B$3";
+      find = QStringLiteral("$B$3");
     else if (attacktype == SPELL_LIGHTNING_BOLT)
-      find = "$B$5";
+      find = QStringLiteral("$B$5");
     else if (attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM)
-      find = "$B$7";
+      find = QStringLiteral("$B$7");
     else
-      find = "$B$4";
+      find = QStringLiteral("$B$4");
 
     switch (filter)
     {
     case TYPE_FIRE:
-      replace = "$B$4";
+      replace = QStringLiteral("$B$4");
       break;
     case TYPE_COLD:
-      replace = "$B$3";
+      replace = QStringLiteral("$B$3");
       break;
     case TYPE_ENERGY:
-      replace = "$B$5";
+      replace = QStringLiteral("$B$5");
       break;
     case TYPE_ACID:
-      replace = "$B$2";
+      replace = QStringLiteral("$B$2");
       break;
     case TYPE_POISON:
-      replace = "$2";
+      replace = QStringLiteral("$2");
       break;
     case TYPE_MAGIC:
-      replace = "$B$7";
+      replace = QStringLiteral("$B$7");
       break;
     default:
       replace = find;
@@ -3094,21 +3099,29 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
     }
     else if (GET_POS(victim) == position_t::DEAD)
     {
-      send_damage(replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
-      send_damage(replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-      send_damage(replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
+      QString victim_msg1 = replaceString(messages->die_msg.victim_msg, find, replace);
+      QString victim_msg2 = replaceString(messages2->die_msg.victim_msg, find, replace);
+      QString attacker_msg1 = replaceString(messages->die_msg.attacker_msg, find, replace);
+      QString attacker_msg2 = replaceString(messages2->die_msg.attacker_msg, find, replace);
+      QString room_msg1 = replaceString(messages->die_msg.room_msg, find, replace);
+      QString room_msg2 = replaceString(messages2->die_msg.room_msg, find, replace);
+
+      send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
+      send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
+      send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
     }
     else
     {
-      send_damage(replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
-      send_damage(replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-      send_damage(replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-                  victim, dmgmsg, replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
+      QString victim_msg1 = replaceString(messages->hit_msg.victim_msg, find, replace);
+      QString victim_msg2 = replaceString(messages2->hit_msg.victim_msg, find, replace);
+      QString attacker_msg1 = replaceString(messages->hit_msg.attacker_msg, find, replace);
+      QString attacker_msg2 = replaceString(messages2->hit_msg.attacker_msg, find, replace);
+      QString room_msg1 = replaceString(messages->hit_msg.room_msg, find, replace);
+      QString room_msg2 = replaceString(messages2->hit_msg.room_msg, find, replace);
+
+      send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
+      send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
+      send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
     }
   }
 }
@@ -4095,18 +4108,6 @@ void DC::free_messages_from_memory(void)
     while (fight_messages[i].msg)
     {
       next_message = fight_messages[i].msg->next;
-      dc_free(fight_messages[i].msg->die_msg.attacker_msg);
-      dc_free(fight_messages[i].msg->die_msg.victim_msg);
-      dc_free(fight_messages[i].msg->die_msg.room_msg);
-      dc_free(fight_messages[i].msg->miss_msg.attacker_msg);
-      dc_free(fight_messages[i].msg->miss_msg.victim_msg);
-      dc_free(fight_messages[i].msg->miss_msg.room_msg);
-      dc_free(fight_messages[i].msg->hit_msg.attacker_msg);
-      dc_free(fight_messages[i].msg->hit_msg.victim_msg);
-      dc_free(fight_messages[i].msg->hit_msg.room_msg);
-      dc_free(fight_messages[i].msg->god_msg.attacker_msg);
-      dc_free(fight_messages[i].msg->god_msg.victim_msg);
-      dc_free(fight_messages[i].msg->god_msg.room_msg);
       dc_free(fight_messages[i].msg);
       fight_messages[i].msg = next_message;
     }

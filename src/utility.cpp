@@ -2742,6 +2742,23 @@ std::string replaceString(std::string message, std::string find, std::string rep
   return message;
 }
 
+QString replaceString(QString message, QString find, QString replace)
+{
+  if (find.isEmpty())
+    return message;
+  if (replace.isEmpty())
+    return message;
+  if (find == replace)
+    return message;
+
+  qsizetype find_length = find.length();
+  while (qsizetype j = message.indexOf(find) != -1)
+  {
+    message.replace(j, find_length, replace);
+  }
+  return message;
+}
+
 char *numToStringTH(int number)
 {
   switch (number)

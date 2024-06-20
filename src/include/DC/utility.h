@@ -883,7 +883,7 @@ void remove_character(QString name, BACKUP_TYPE backup = NONE);
 void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
 
 std::string replaceString(std::string message, std::string find, std::string replace);
-
+QString replaceString(QString message, QString find, QString replace);
 char *numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
