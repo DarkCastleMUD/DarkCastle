@@ -56,7 +56,8 @@ else()
 endif()
 
 # Removed -fsanitize=leak
-set(ASAN_COMMON_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fno-omit-frame-pointer -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING "" FORCE)
+# Removed -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract
+set(ASAN_COMMON_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fno-omit-frame-pointer" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_EXE_LINKER_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
