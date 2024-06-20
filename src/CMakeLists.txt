@@ -28,7 +28,7 @@ if (NOT "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" AND NOT "${CMAKE_BUILD_TY
 endif()
 
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
-set_source_files_properties(tests/TestDC.cpp PROPERTIES COMPILE_OPTIONS "-Wwrite-strings")
+set_source_files_properties(tests/testDC.cpp benchmarks/benchmarkDC.cpp PROPERTIES COMPILE_OPTIONS "-Wwrite-strings")
 #-Wpedantic -Wall -Wextra -Wno-change-meaning -Wno-coverage-mismatch -Wno-coverage-invalid-line-number -Wdouble-promotion -Wformat -Wformat-nonliteral -Wformat-overflow -Wformat-security -Wformat-signedness -Wformat-truncation -Wwrite-strings -Wformat-y2k -Wnonnull -Wnonnull-compare -Wnull-dereference -Winit-self -Wfatal-errors -Wdangling-reference
 #set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/ -DTRACY_ENABLE -DTRACY_ON_DEMAND")
 # -DTRACY_ENABLE -DTRACY_ON_DEMAND -DTRACY_NO_EXIT
@@ -55,22 +55,12 @@ else()
     endif()
 endif()
 
-set(CMAKE_C_FLAGS_ASAN
-    "${CMAKE_C_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
-    "Flags used by the C compiler for Asan build type or configuration." FORCE)
-
-set(CMAKE_CXX_FLAGS_ASAN
-    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
-    "Flags used by the C++ compiler for Asan build type or configuration." FORCE)
-
-set(CMAKE_EXE_LINKER_FLAGS_ASAN
-    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
-    "Linker flags to be used to create executables for Asan build type." FORCE)
-
-set(CMAKE_SHARED_LINKER_FLAGS_ASAN
-    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fsanitize=leak -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING
-    "Linker lags to be used to create shared libraries for Asan build type." FORCE)
-
+# Removed -fsanitize=leak
+set(ASAN_COMMON_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fno-omit-frame-pointer -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_ASAN "${ASAN_COMMON_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -284,7 +274,6 @@ target_compile_definitions(DC PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 
-
 qt_add_executable(dcastle dcastle.cpp)
 target_compile_definitions(dcastle PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(dcastle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -295,13 +284,13 @@ target_compile_definitions(debug PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(debug PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
 
-qt_add_executable(benchmarkDC benchmarks/benchmark_utility.cpp)
+qt_add_executable(benchmarkDC benchmarks/benchmarkDC.cpp)
 target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(benchmarkDC PRIVATE Qt::Test)
 
 enable_testing(true)
-qt_add_executable(testDC tests/TestDC.cpp)
+qt_add_executable(testDC tests/testDC.cpp)
 add_test(NAME testDC COMMAND testDC)
 target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)

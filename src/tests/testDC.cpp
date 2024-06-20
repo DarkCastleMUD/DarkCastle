@@ -919,4 +919,4 @@ private slots:
 };
 
 QTEST_MAIN(TestDC)
-#include "TestDC.moc"
+#include "testDC.moc"

@@ -142,4 +142,4 @@ private slots:
 };
 
 QTEST_MAIN(BenchmarkUtility)
-#include "benchmark_utility.moc"
+#include "benchmarkDC.moc"
