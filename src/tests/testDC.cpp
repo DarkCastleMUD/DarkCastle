@@ -758,6 +758,7 @@ private slots:
         DC dc(cf);
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
 
         Character ch;
         ch.setName(QStringLiteral("Testplayer"));
@@ -768,11 +769,12 @@ private slots:
         Player player;
         ch.player = &player;
         Connection conn;
-        DC::getInstance()->descriptor_list = &conn;
+        dc.descriptor_list = &conn;
         conn.descriptor = 1;
         conn.character = &ch;
         ch.desc = &conn;
         dc.character_list.insert(&ch);
+        QCOMPARE(dc.character_list.size(), base_character_count + 1);
         ch.do_on_login_stuff();
         while (ch.getLevel() < 10)
         {
@@ -791,11 +793,12 @@ private slots:
         Player player2;
         ch2.player = &player2;
         Connection conn2;
-        DC::getInstance()->descriptor_list->next = &conn2;
+        dc.descriptor_list->next = &conn2;
         conn2.descriptor = 1;
         conn2.character = &ch2;
         ch2.desc = &conn2;
         dc.character_list.insert(&ch2);
+        QCOMPARE(dc.character_list.size(), base_character_count + 2);
         ch2.do_on_login_stuff();
         while (ch2.getLevel() < 10)
         {
@@ -909,8 +912,8 @@ private slots:
         dc.TheAuctionHouse.setItemsPosted(items_posted_qty);
         dc.TheAuctionHouse.Save();
 
-        dc.character_list.erase(&ch);
-        dc.character_list.erase(&ch2);
+        QCOMPARE(dc.character_list.erase(&ch), 1);
+        QCOMPARE(dc.character_list.erase(&ch2), 1);
         ch.desc = nullptr;
         ch.player = nullptr;
         ch2.desc = nullptr;
