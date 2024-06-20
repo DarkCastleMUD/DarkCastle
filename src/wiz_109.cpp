@@ -259,7 +259,7 @@ int do_advance(Character *ch, char *argument, int cmd)
       victim->incrementLevel();
       advance_level(victim, 0);
     }
-  update_wizlist(victim);
+  DC::getInstance()->update_wizlist(victim);
   return eSUCCESS;
 }
 
@@ -321,7 +321,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
       remove_vault(victim->getNameC(), ZAPPED);
 
     victim->setLevel(1);
-    update_wizlist(victim);
+    DC::getInstance()->update_wizlist(victim);
 
     if (this->clan)
       remove_clan_member(this->clan, this);

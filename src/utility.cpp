@@ -80,9 +80,6 @@ clan_data *get_clan(Character *);
 void release_message(Character *ch);
 struct timer_data *timer_list = nullptr;
 
-// local funcs
-void update_wizlist(Character *ch);
-
 // tested in TestUtility::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
 {
@@ -1788,7 +1785,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (cmd != 666)
     clan_logout(ch);
 
-  update_wizlist(ch);
+  DC::getInstance()->update_wizlist(ch);
 
   if (!IS_MOB(ch) && ch->desc && !ch->desc->getPeerOriginalAddress().isNull())
   {

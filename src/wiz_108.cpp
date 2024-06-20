@@ -469,7 +469,7 @@ int do_set(Character *ch, char *argument, int cmd)
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
     /* set level of victim */
     vict->setLevel(value);
-    update_wizlist(vict);
+    DC::getInstance()->update_wizlist(vict);
   }
   break;
   case 4: /* height */

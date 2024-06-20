@@ -34,7 +34,6 @@ void display_punishes(Character *ch, Character
                                          *vict);
 char *str_str(char *first, char *second);
 void setup_dir(FILE *fl, int room, int dir);
-void update_wizlist(Character *ch);
 int real_roomb(int virt);
 void save_ban_list(void);
 void save_nonew_new_list(void);

@@ -81,7 +81,6 @@ extern Object *object_list;
 
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, char *name);
-void update_wizlist(Character *ch);
 void isr_set(Character *ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
@@ -1776,7 +1775,7 @@ void nanny(class Connection *d, std::string arg)
          act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
          if (!GET_SHORT_ONLY(ch))
             GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch));
-         update_wizlist(ch);
+         DC::getInstance()->update_wizlist(ch);
          ch->check_maxes(); // Check skill maxes.
 
          STATE(d) = Connection::states::PLAYING;
@@ -1855,7 +1854,7 @@ void nanny(class Connection *d, std::string arg)
       {
          str_tmp << GET_NAME(d->character);
          SEND_TO_Q("\n\rCharacter Archived.\r\n", d);
-         update_wizlist(d->character);
+         DC::getInstance()->update_wizlist(d->character);
          close_socket(d);
          util_archive(str_tmp.str().c_str(), 0);
       }
@@ -1883,7 +1882,7 @@ void nanny(class Connection *d, std::string arg)
          remove_character(d->character->getName(), SELFDELETED);
 
          d->character->setLevel(1);
-         update_wizlist(d->character);
+         DC::getInstance()->update_wizlist(d->character);
          close_socket(d);
          d = nullptr;
       }

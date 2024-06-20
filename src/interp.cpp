@@ -54,10 +54,6 @@
 
 int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
-
-void update_wizlist(Character *ch);
-// int system(const char *);
-
 const char *fillwords[] =
     {
         "in",
