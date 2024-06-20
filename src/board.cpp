@@ -909,20 +909,6 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
   return;
 }
 
-std::string check_returns(std::string in_str)
-{
-  std::string check_me = in_str;
-  std::string::iterator checker;
-  for (checker = check_me.begin(); checker != check_me.end(); checker++)
-    if (*checker == '\n')
-    {
-      if (checker + 1 != check_me.end() && *(checker + 1) != '\r')
-        check_me.insert(checker + 1, '\r');
-    }
-
-  return check_me;
-}
-
 void board_load_board()
 {
 

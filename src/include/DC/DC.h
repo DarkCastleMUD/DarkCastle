@@ -830,4 +830,21 @@ auto &operator>>(auto &in, Room &room)
   return in;
 }
 
+template <typename T>
+T check_returns(T in_str)
+{
+  T new_string;
+  for (auto checker = in_str.begin(); checker != in_str.end(); checker++)
+  {
+    if (*checker == '\n')
+    {
+      if (checker + 1 != in_str.end() && *(checker + 1) != '\r')
+        new_string.push_back('\r');
+    }
+    new_string.push_back(*checker);
+  }
+
+  return new_string;
+}
+
 #endif
