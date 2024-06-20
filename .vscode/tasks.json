@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Clean release with debug info build",
+            "label": "clean RelWithDebInfo build",
             "type": "shell",
             "command": "rm -rf build && cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=\"/usr/bin/g++-14\" -DCMAKE_EXE_LINKER_FLAGS=\"-fuse-ld=mold\" -DCMAKE_SHARED_LINKER_FLAGS=\"-fuse-ld=mold\" -GNinja && ninja -C build && pidof dcastle && rebootdc.sh",
             "problemMatcher": {
@@ -23,9 +23,28 @@
             "group": "build"
         },
         {
-            "label": "Clean debug build",
+            "label": "clean debug build",
             "type": "shell",
             "command": "rm -rf build && cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=\"/usr/bin/g++-14\" -DCMAKE_EXE_LINKER_FLAGS=\"-fuse-ld=mold\" -DCMAKE_SHARED_LINKER_FLAGS=\"-fuse-ld=mold\" -GNinja && ninja -C build && pidof dcastle && rebootdc.sh",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            },
+            "group": "build"
+        },
+        {
+            "label": "clean Asan build",
+            "type": "shell",
+            "command": "rm -rf build && cmake -S src -B build -DCMAKE_BUILD_TYPE=Asan -DCMAKE_CXX_COMPILER=\"/usr/bin/g++-14\" -DCMAKE_EXE_LINKER_FLAGS=\"-fuse-ld=mold\" -DCMAKE_SHARED_LINKER_FLAGS=\"-fuse-ld=mold\" -GNinja && ninja -C build && pidof dcastle && rebootdc.sh",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
