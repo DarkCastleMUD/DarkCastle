@@ -76,13 +76,13 @@ struct message
 
 struct BOARD_INFO
 {
-  Character *locked_for;
-  bool lock;
-  int min_read_level;
-  int min_write_level;
-  int min_remove_level;
-  int type;
-  int owner;
+  Character *locked_for = {};
+  bool lock = {};
+  int min_read_level = {};
+  int min_write_level = {};
+  int min_remove_level = {};
+  int type = {};
+  int owner = {};
   std::string save_file;
   std::vector<message> msgs;
 };
@@ -153,7 +153,7 @@ Function to populate the board_db with all of the current clan info
 std::map<std::string, BOARD_INFO> populate_boards()
 {
   std::map<std::string, BOARD_INFO> board_tmp;
-  BOARD_INFO board_struct;
+  BOARD_INFO board_struct = {};
 
   board_struct.min_read_level = 0;
   board_struct.min_write_level = 5;
