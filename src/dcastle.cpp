@@ -10,7 +10,6 @@
 
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 
-void init_game(void);
 void backup_executable(char *const argv[]);
 DC::config parse_arguments(int argc, char **argv);
 
