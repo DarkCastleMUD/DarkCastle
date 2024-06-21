@@ -306,7 +306,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
 
         Character ch;
-        ch.setName(QStringLiteral("Testplayer"));
+        ch.setName(QStringLiteral("Testvault"));
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;
@@ -761,7 +761,7 @@ private slots:
         auto base_character_count = dc.character_list.size();
 
         Character ch;
-        ch.setName(QStringLiteral("Testplayer"));
+        ch.setName(QStringLiteral("Testvend"));
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;
@@ -785,7 +785,7 @@ private slots:
         conn.output = {};
 
         Character ch2;
-        ch2.setName(QStringLiteral("Testplayer2"));
+        ch2.setName(QStringLiteral("Testvend2"));
         ch2.in_room = 3;
         ch2.height = 72;
         ch2.weight = 150;
@@ -883,7 +883,7 @@ private slots:
         QCOMPARE(conn2.output, "");
         rc = do_vend(&ch, str_hsh("sell item 1000000"));
         QCOMPARE(conn.output, "You are now selling a reflecty test item for 1000000 coins.\r\n"
-                              "Saving Testplayer.\r\n");
+                              "Saving Testvend.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn2.output, "");
@@ -898,7 +898,7 @@ private slots:
         QCOMPARE(rc, eSUCCESS);
 
         rc = do_vend(&ch, str_hsh("cancel 2"));
-        QCOMPARE(conn.output, "The Consignment Broker retrieves a reflecty test item and returns it to you.\r\nSaving Testplayer.\r\n");
+        QCOMPARE(conn.output, "The Consignment Broker retrieves a reflecty test item and returns it to you.\r\nSaving Testvend.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
 
