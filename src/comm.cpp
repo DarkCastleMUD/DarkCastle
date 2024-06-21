@@ -315,7 +315,7 @@ int write_hotboot_file(char **new_argv)
 
 // attempts to read in the descs written to file, and reconnect their
 // links to the mud.
-int load_hotboot_descs()
+int DC::load_hotboot_descs(void)
 {
   std::string chr = {};
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
@@ -330,7 +330,7 @@ int load_hotboot_descs()
   {
     ifs.open("hotboot");
     unlink("hotboot");
-    logentry(QStringLiteral("Hotboot, reloading characters."), 0, LogChannels::LOG_MISC);
+    logverbose(QStringLiteral("Hotboot, reloading characters."), 0, LogChannels::LOG_MISC);
 
     for_each(dc->cf.ports.begin(), dc->cf.ports.end(), [&dc, &ifs](in_port_t &port)
              {
@@ -398,7 +398,7 @@ int load_hotboot_descs()
   }
   catch (...)
   {
-    logentry(QStringLiteral("Hotboot file missing/unopenable."), 0, LogChannels::LOG_MISC);
+    logverbose(QStringLiteral("Hotboot file missing/unopenable."));
     return false;
   }
 
@@ -458,17 +458,17 @@ void DC::init_game(void)
     fclose(fp);
   }
 
-  logentry(QStringLiteral("Attempting to load hotboot file."), 0, LogChannels::LOG_MISC);
+  logverbose(QStringLiteral("Attempting to load hotboot file."));
 
   if (load_hotboot_descs())
   {
-    logentry(QStringLiteral("Hotboot Loading complete."), 0, LogChannels::LOG_MISC);
+    logverbose(QStringLiteral("Hotboot Loading complete."));
     was_hotboot = 1;
   }
   else
   {
-    logentry(QStringLiteral("Hotboot failed.  Starting regular sockets."), 0, LogChannels::LOG_MISC);
-    logentry(QStringLiteral("Opening mother connections."), 0, LogChannels::LOG_MISC);
+    logverbose(QStringLiteral("Hotboot failed.  Starting regular sockets."));
+    logverbose(QStringLiteral("Opening mother connections."));
 
     for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
              {
@@ -493,7 +493,7 @@ void DC::init_game(void)
     finish_hotboot();
   }
 
-  logentry(QStringLiteral("Signal trapping."), 0, LogChannels::LOG_MISC);
+  logverbose(QStringLiteral("Signal trapping."));
   signal_setup();
 
   // we got all the way through, let's turn auto-hotboot back on
