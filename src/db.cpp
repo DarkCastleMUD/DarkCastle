@@ -6599,10 +6599,10 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 
 void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 {
-	mob_prog_data *mprog{};
-	char letter;
-	int type;
-	mob_prog_data lmprog;
+	mob_prog_data *mprog = {};
+	char letter = {};
+	int type = {};
+	mob_prog_data lmprog = {};
 	for (;;)
 	{
 		fp >> letter;

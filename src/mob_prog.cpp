@@ -4752,8 +4752,8 @@ void end_oproc(Character *ch, Trace trace)
 	{
 		trace.addTrack("end_oproc");
 		extract_char(ch, true, trace);
-		DC::getInstance()->mob_index[real_mobile(12)].progtypes = 0;
-		DC::getInstance()->mob_index[real_mobile(12)].mobprogs = 0;
+		DC::getInstance()->mob_index[real_mobile(12)].progtypes = {};
+		DC::getInstance()->mob_index[real_mobile(12)].mobprogs = {};
 	}
 }
 
