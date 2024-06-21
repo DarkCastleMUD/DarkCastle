@@ -531,6 +531,7 @@ public:
   void testing_load_vaults(void);
   void reload_vaults(void);
   void load_corpses(void);
+  int load_hotboot_descs(void);
 
   ~DC(void)
   {
