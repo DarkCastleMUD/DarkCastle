@@ -178,6 +178,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
 
         Character ch;
+        ch.setName(QStringLiteral("Testsing"));
         ch.in_room = 3;
         ch.height = 72;
         ch.weight = 150;
@@ -291,7 +292,7 @@ private slots:
         QCOMPARE(conn.output, "Your feet touch the ground once more.\r\n");
         conn.output = {};
 
-        dc.character_list.erase(&ch);
+        QCOMPARE(dc.character_list.erase(&ch), 1);
         ch.desc = nullptr;
         ch.player = nullptr;
     }
@@ -561,7 +562,7 @@ private slots:
 
         remove_vault(ch.getNameC());
 
-        dc.character_list.erase(&ch);
+        QCOMPARE(dc.character_list.erase(&ch), 1);
         ch.desc = nullptr;
         ch.player = nullptr;
     }
@@ -774,6 +775,7 @@ private slots:
         conn.character = &ch;
         ch.desc = &conn;
         dc.character_list.insert(&ch);
+        QCOMPARE(dc.character_list.count(&ch), 1);
         QCOMPARE(dc.character_list.size(), base_character_count + 1);
         ch.do_on_login_stuff();
         while (ch.getLevel() < 10)
@@ -913,7 +915,9 @@ private slots:
         dc.TheAuctionHouse.Save();
 
         QCOMPARE(dc.character_list.erase(&ch), 1);
+        QCOMPARE(dc.character_list.count(&ch), 0);
         QCOMPARE(dc.character_list.erase(&ch2), 1);
+        QCOMPARE(dc.character_list.count(&ch2), 0);
         ch.desc = nullptr;
         ch.player = nullptr;
         ch2.desc = nullptr;
