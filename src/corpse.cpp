@@ -585,9 +585,7 @@ int get_line_new(FILE *fl, char *buf)
 
 class Object *create_obj_new(void)
 {
-	class Object *obj;
-
-	CREATE(obj, class Object, 1);
+	class Object *obj = new Object;
 	clear_object(obj);
 	obj->next = object_list;
 	object_list = obj;
