@@ -415,10 +415,10 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  class index_data obj_index_array[MAX_INDEX];
+  class index_data obj_index_array[MAX_INDEX] = {};
   class index_data *obj_index = obj_index_array;
 
-  class index_data mob_index_array[MAX_INDEX];
+  class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
 
   int top_of_helpt = 0;          /* top of help index table         */
