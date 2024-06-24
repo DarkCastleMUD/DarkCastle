@@ -604,6 +604,7 @@ void DC::boot_db(void)
 	}
 
 	help_index = build_help_index(help_fl, &top_of_helpt);
+	fclose(help_fl);
 
 	logverbose(QStringLiteral("Loading the zones"));
 	boot_zones();
