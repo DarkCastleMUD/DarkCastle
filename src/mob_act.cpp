@@ -417,7 +417,7 @@ void mobile_activity(void)
           if (ch == tmp_ch)
             continue;
 
-          tmp_bitv = GET_BITV(tmp_ch);
+          tmp_bitv = getBitvector(tmp_ch->race);
 
           if (ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
               (ch->mobdata->hated.isEmpty() || !isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) &&
@@ -426,7 +426,7 @@ void mobile_activity(void)
               (isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
                (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
-              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
+              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
               !tmp_ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !tmp_ch->isPlayerGoldThief())
           {
             tmp_race = GET_RACE(tmp_ch);

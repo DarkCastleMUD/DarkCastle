@@ -291,7 +291,22 @@ bool IS_DARK(int room);
 #define GET_SPELLDAMAGE(ch) ((ch)->spelldamage)
 
 #define GET_RACE(ch) ((ch)->race)
-#define GET_BITV(ch) ((ch)->race == 1 ? 1 : (1 << (((ch)->race) - 1)))
+
+// #define GET_BITV(ch) ((ch)->race == 1 ? 1 : (1 << (((ch)->race) - 1)))
+auto getBitvector(auto value)
+{
+   if (value == 0)
+   {
+      return 0;
+   }
+
+   if (value == 1)
+   {
+      return 1;
+   }
+
+   return 1 << (value - 1);
+}
 #define IS_UNDEAD(ch) ((GET_RACE(ch) == RACE_UNDEAD) || (GET_RACE(ch) == RACE_GHOST))
 
 #define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
