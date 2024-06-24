@@ -273,18 +273,20 @@ int write_hotboot_file(char **new_argv)
 
   QStringList arguments = DC::getInstance()->arguments();
   char **argv = new char *[arguments.size() + 1];
+  assert(argv);
   for (auto i = 0; i < arguments.size(); ++i)
   {
     auto size = arguments.at(i).length();
     argv[i] = new char[size + 1];
-    strncpy(argv[i], arguments.at(i).toStdString().c_str(), size);
+    assert(argv[i]);
+    strncpy(argv[i], qPrintable(arguments.at(i)), size);
     argv[i][size] = '\0';
   }
   argv[arguments.size()] = nullptr;
 
   DC::getInstance()->ssh.close();
   char *const *argv2 = argv;
-  if (execv(DC::getInstance()->applicationFilePath().toStdString().c_str(), argv2) == -1)
+  if (execv(qPrintable(DC::getInstance()->applicationFilePath()), argv2) == -1)
   {
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
