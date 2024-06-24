@@ -2988,11 +2988,10 @@ void signal_handler(int signal, siginfo_t *si, void *)
   if (signal == SIGHUP)
   {
     char **new_argv = nullptr;
-    std::string buf = "Hot reboot by SIGHUP.\r\n";
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
-    send_to_all(buf.data());
-    logentry(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
+    send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
+    logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, LogChannels::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
     if (!write_hotboot_file(new_argv))
     {
