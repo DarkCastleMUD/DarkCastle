@@ -286,7 +286,7 @@ int write_hotboot_file(void)
 
   DC::getInstance()->ssh.close();
   char *const *argv2 = argv;
-  if (execv(qPrintable(DC::getInstance()->applicationFilePath()), argv2) == -1)
+  if (execv(strdup(qPrintable(DC::getInstance()->applicationFilePath())), argv2) == -1)
   {
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
