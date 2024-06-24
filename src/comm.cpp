@@ -186,7 +186,7 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
-int write_hotboot_file(char **new_argv)
+int write_hotboot_file(void)
 {
   FILE *fp;
   class Connection *d;
@@ -939,8 +939,7 @@ void DC::game_loop_init(void)
                    }
                  }
 
-                 char **argv = nullptr;
-                 if (!write_hotboot_file(argv))
+                 if (!write_hotboot_file())
                  {
                    logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
                    return QHttpServerResponse("Failed.\r\n");
@@ -2867,7 +2866,7 @@ void crash_hotboot()
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
     logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, LogChannels::LOG_BUG);
-    write_hotboot_file(0);
+    write_hotboot_file();
     // we shouldn't return from there unless we failed
     logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, LogChannels::LOG_BUG);
     for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
@@ -2943,7 +2942,7 @@ void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
   logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
-  if (!write_hotboot_file(nullptr))
+  if (!write_hotboot_file())
   {
     logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
   }
@@ -2995,7 +2994,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, LogChannels::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
-    if (!write_hotboot_file(new_argv))
+    if (!write_hotboot_file())
     {
       logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
     }
