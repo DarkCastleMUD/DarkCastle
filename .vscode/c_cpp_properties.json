@@ -5,11 +5,12 @@
             "includePath": [
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/src/include",
+                "/usr/include/qt6",
                 "/usr/include/qt6/QtCore",
                 "/usr/include/qt6/QtTest",
-                "/usr/include/qt6",
                 "/usr/include/qt6/QtSql",
-                "${workspaceFolder}/build/testDC_autogen/include"
+                "/usr/include/qt6/QtConcurrent",
+                "${workspaceFolder}/build/testDC_autogen/include",
             ],
             "compilerPath": "/usr/bin/clang++-17",
             "compilerArgs": [
