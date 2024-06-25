@@ -410,6 +410,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     send_to_all(buffer);
     logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     _shutdown = 1;
+    DC::getInstance()->quit();
   }
   else if (arg1 == "hot")
   {
