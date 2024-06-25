@@ -19,19 +19,18 @@ const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 DC::DC(int &argc, char **argv)
 	: QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
 {
-	QCoreApplication::setOrganizationName("DarkCastleMUD");
-	QCoreApplication::setOrganizationDomain("dcastle.org");
-	QCoreApplication::setApplicationName("DarkCastle");
-	if (cf.sql)
-	{
-		database_ = Database("dcastle");
-	}
-	findLibrary();
+	setup();
 }
 
 DC::DC(config c)
 	: QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global()), clan_list(nullptr), end_clan_list(nullptr), TheAuctionHouse("auctionhouse")
 {
+	setup();
+}
+
+void DC::setup(void)
+{
+	qSetMessagePattern(QStringLiteral("%{if-category}%{category}:%{endif}%{function}:%{line}:%{message}"));
 	QCoreApplication::setOrganizationName("DarkCastleMUD");
 	QCoreApplication::setOrganizationDomain("dcastle.org");
 	QCoreApplication::setApplicationName("DarkCastle");

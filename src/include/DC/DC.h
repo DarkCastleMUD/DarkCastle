@@ -452,6 +452,7 @@ public:
   void write_wizlist(const char filename[]);
   explicit DC(int &argc, char **argv);
   explicit DC(config c);
+  void setup(void);
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
   DC &operator=(const DC &) = delete;
