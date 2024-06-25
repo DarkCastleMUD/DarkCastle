@@ -5916,8 +5916,6 @@ void free_char(Character *ch, Trace trace)
 		{
 			// these won't be here if you free an unloaded char
 			ch->player->skillchange = 0;
-			if (ch->player->last_site)
-				dc_free(ch->player->last_site);
 			if (!ch->player->ignoring.empty())
 				ch->player->ignoring.clear();
 			if (ch->player->prompt)

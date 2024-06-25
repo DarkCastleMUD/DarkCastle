@@ -186,31 +186,20 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
-int write_hotboot_file(void)
+int DC::write_hotboot_file(void)
 {
   FILE *fp;
-  class Connection *d;
   class Connection *sd;
-  /* Azrack -- do these need to be here?
-  extern int mother_desc;
-  extern int other_desc;
-  extern int third_desc;
-  */
-  //  extern char ** ext_argv;
-
   if ((fp = fopen("hotboot", "w")) == nullptr)
   {
     logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, LogChannels::LOG_MISC);
     return 0;
   }
-
-  DC *dc = dynamic_cast<DC *>(DC::instance());
-
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
-  for_each(dc->server_descriptor_list.begin(), dc->server_descriptor_list.end(), [&fp](const int &fd)
+  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const int &fd)
            { fprintf(fp, "%d\n", fd); });
 
-  for (d = DC::getInstance()->descriptor_list; d; d = sd)
+  for (Connection *d = descriptor_list; d; d = sd)
   {
     sd = d->next;
     if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
@@ -224,34 +213,20 @@ int write_hotboot_file(void)
       STATE(d) = Connection::states::PLAYING; // if editors.
       if (d->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->getPeerOriginalAddress().toString().toStdString().c_str());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
         if (d->original->player)
         {
-          if (d->original->player->last_site)
-            dc_free(d->original->player->last_site);
-#ifdef LEAK_CHECK
-          d->original->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
-#else
-          d->original->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
-#endif
-          strcpy(d->original->player->last_site, d->original->desc->getPeerOriginalAddress().toString().toStdString().c_str());
+          d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
           d->original->player->time.logon = time(0);
         }
         save_char_obj(d->original);
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
+        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
         if (d->character->player)
         {
-          if (d->character->player->last_site)
-            dc_free(d->character->player->last_site);
-#ifdef LEAK_CHECK
-          d->character->player->last_site = (char *)calloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
-#else
-          d->character->player->last_site = (char *)dc_alloc(strlen(d->getPeerOriginalAddress().toString().toStdString().c_str()) + 1, sizeof(char));
-#endif
-          strcpy(d->character->player->last_site, d->character->desc->getPeerOriginalAddress().toString().toStdString().c_str());
+          d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
           d->character->player->time.logon = time(0);
         }
         save_char_obj(d->character);
@@ -322,7 +297,6 @@ int DC::load_hotboot_descs(void)
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   int desc = {};
   class Connection *d = nullptr;
-  DC *dc = dynamic_cast<DC *>(DC::instance());
   std::ifstream ifs;
 
   ifs.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
@@ -333,11 +307,11 @@ int DC::load_hotboot_descs(void)
     unlink("hotboot");
     logverbose(QStringLiteral("Hotboot, reloading characters."), 0, LogChannels::LOG_MISC);
 
-    for_each(dc->cf.ports.begin(), dc->cf.ports.end(), [&dc, &ifs](in_port_t &port)
+    for_each(cf.ports.begin(), cf.ports.end(), [this, &ifs](in_port_t &port)
              {
              int fd;
             ifs >> fd;
-            dc->server_descriptor_list.insert(fd); });
+            this->server_descriptor_list.insert(fd); });
 
     while (ifs.good())
     {
@@ -363,15 +337,13 @@ int DC::load_hotboot_descs(void)
       d->wait = 1;
       d->prompt_mode = 1;
       d->output = {};
-      //    *d->output                 = '\0';
       d->input = std::queue<std::string>();
       d->output = chr; // store it for later
       d->login_time = time(0);
 
       if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
       {
-        sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr.c_str(), desc);
-        logentry(buf, 0, LogChannels::LOG_MISC);
+        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
         CLOSE_SOCKET(desc);
         delete d;
         d = nullptr;
@@ -382,12 +354,11 @@ int DC::load_hotboot_descs(void)
       d->descriptor = desc;
 
       // we need a second to be sure
-      if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"))
+      if (write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n") == -1)
       {
-        sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr.c_str(), desc);
-        logentry(buf, 0, LogChannels::LOG_MISC);
+        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
         CLOSE_SOCKET(desc);
-        dc_free(d);
+        delete d;
         d = nullptr;
         continue;
       }
@@ -914,7 +885,7 @@ void DC::game_loop_init(void)
       return QHttpServerResponse("Failed.\r\n");
     } });
 
-  server.route("/shutdown", QHttpServerRequest::Method::Get, [&dc](const QHttpServerRequest &request)
+  server.route("/shutdown", QHttpServerRequest::Method::Get, [this, &dc](const QHttpServerRequest &request)
                {
                  if (!dc->authenticate(request, 110))
                  {
@@ -2071,7 +2042,7 @@ void write_to_output(QString txt, class Connection *t)
 {
   if (!txt.isEmpty())
   {
-    write_to_output(QByteArray(txt.toStdString().c_str()), t);
+    write_to_output(QByteArray(qPrintable(txt)), t);
   }
 }
 

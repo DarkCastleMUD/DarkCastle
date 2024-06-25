@@ -1070,10 +1070,7 @@ void nanny(class Connection *d, std::string arg)
          ch->sendln("$B----------------------------------------------------------------------$R");
       }
 
-      sprintf(log_buf, "\n\rIf you have read this motd, press Return."
-                       "\n\rLast connected from:\n\r%s\n\r",
-              ch->player->last_site);
-      SEND_TO_Q(log_buf, d);
+      SEND_TO_Q(QStringLiteral("\n\rIf you have read this motd, press Return.\n\rLast connected from:\n\r%1\n\r").arg(ch->player->last_site), d);
       telnet_ga(d);
 
       if (d->character->player->bad_pw_tries)

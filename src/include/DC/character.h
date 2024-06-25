@@ -229,7 +229,7 @@ public:
     | Player vectors
     | Character->player->toggles
     */
-    char *last_site = {};     /* Last login from.. */
+    QString last_site;        /* Last login from.. */
     QString poofin;           /* poofin message */
     QString poofout;          /* poofout message */
     char *prompt = {};        /* Sadus' disguise.. unused */
