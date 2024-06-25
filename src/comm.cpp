@@ -2110,7 +2110,8 @@ int new_descriptor(int s)
   getsockname(s, (struct sockaddr *)&peer, &i);
   if ((desc = accept(s, (struct sockaddr *)&peer, &i)) < 0)
   {
-    perror("accept");
+    auto accept_errno = errno;
+    qDebug("accept(%d, &peer, %d) returned %d with errno %d %s", s, i, desc, accept_errno, strerror(accept_errno));
     return -1;
   }
 
