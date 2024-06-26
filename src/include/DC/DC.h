@@ -473,6 +473,7 @@ public:
   void assign_mobiles(void);
   bool authenticate(QString username, QString password, uint64_t level = 0);
   bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
+  void crash_hotboot(void);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
   Database getDatabase(void) { return database_; }

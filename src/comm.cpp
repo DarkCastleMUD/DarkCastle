@@ -2087,20 +2087,11 @@ int new_descriptor(int s)
   }
 
   // keep it from blocking
-#ifndef WIN32
   if (fcntl(desc, F_SETFL, O_NONBLOCK) < 0)
   {
     perror("init_socket : fcntl : nonblock");
     exit(1);
   }
-#else
-  uint32_t nb = 1;
-  if (ioctlsocket(desc, FIONBIO, &nb) < 0)
-  {
-    perror("init_socket : ioctl : nonblock");
-    exit(1);
-  }
-#endif
 
   /* create a new descriptor */
   newd = new Connection;
@@ -2115,9 +2106,8 @@ int new_descriptor(int s)
                         "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
-    sprintf(buf, "Connection attempt denied from [%s]", newd->getPeerOriginalAddress().toString().toStdString().c_str());
-    logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
-    dc_free(newd);
+    logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, LogChannels::LOG_SOCKET);
+    delete newd;
     return 0;
   }
 
@@ -2814,7 +2804,7 @@ void report_debug_logging()
   logentry(QStringLiteral("Name: [%1] Last cmd: [%2] Last room: [%3]").arg(DC::getInstance()->last_char_name).arg(DC::getInstance()->last_processed_cmd).arg(DC::getInstance()->last_char_room), ANGEL, LogChannels::LOG_BUG);
 }
 
-void crash_hotboot()
+void DC::crash_hotboot(void)
 {
   class Connection *d = nullptr;
   extern int try_to_hotboot_on_crash;
@@ -2824,7 +2814,7 @@ void crash_hotboot()
   // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
   // sigsegv = # of times we've crashed from SIGSEGV
 
-  for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
     write_to_descriptor(d->descriptor, "Mud crash detected.\r\n");
   }
@@ -2832,7 +2822,7 @@ void crash_hotboot()
   // attempt to hotboot
   if (try_to_hotboot_on_crash)
   {
-    for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
@@ -2840,13 +2830,13 @@ void crash_hotboot()
     write_hotboot_file();
     // we shouldn't return from there unless we failed
     logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, LogChannels::LOG_BUG);
-    for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+    for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
     }
   }
 
-  for (d = DC::getInstance()->descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
     write_to_descriptor(d->descriptor, "Giving up, goodbye.\r\n");
   }
@@ -2856,7 +2846,7 @@ void crashill(int sig)
 {
   report_debug_logging();
   logentry(QStringLiteral("Recieved SIGFPE (Illegal Instruction)"), ANGEL, LogChannels::LOG_BUG);
-  crash_hotboot();
+  DC::getInstance()->crash_hotboot();
   logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
@@ -2865,7 +2855,7 @@ void crashfpe(int sig)
 {
   report_debug_logging();
   logentry(QStringLiteral("Recieved SIGFPE (Arithmetic Error)"), ANGEL, LogChannels::LOG_BUG);
-  crash_hotboot();
+  DC::getInstance()->crash_hotboot();
   logentry(QStringLiteral("Mud exiting from SIGFPE."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
@@ -2885,7 +2875,7 @@ void crashsig(int sig)
   }
   report_debug_logging();
   logentry(QStringLiteral("Recieved SIGSEGV (Segmentation fault)"), ANGEL, LogChannels::LOG_BUG);
-  crash_hotboot();
+  DC::getInstance()->crash_hotboot();
   logentry(QStringLiteral("Mud exiting from SIGSEGV."), ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
@@ -2913,7 +2903,7 @@ void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
   logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
-  if (!write_hotboot_file())
+  if (!DC::getInstance()->write_hotboot_file())
   {
     logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
   }
@@ -2965,7 +2955,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
     logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, LogChannels::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
-    if (!write_hotboot_file())
+    if (!DC::getInstance()->write_hotboot_file())
     {
       logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
     }

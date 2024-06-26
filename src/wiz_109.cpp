@@ -439,7 +439,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     logentry(buffer, ANGEL, LogChannels::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
     do_force(this, "all save");
-    if (!write_hotboot_file())
+    if (!DC::getInstance()->write_hotboot_file())
     {
       logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
       this->sendln("Hot reboot failed.");
