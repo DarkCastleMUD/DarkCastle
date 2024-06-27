@@ -2078,11 +2078,16 @@ int new_descriptor(int s)
 
   /* accept the new connection */
   i = sizeof(peer);
-  getsockname(s, (struct sockaddr *)&peer, &i);
+  if (auto return_value = getsockname(s, (struct sockaddr *)&peer, &i) == -1)
+  {
+    auto saved_errno = errno;
+    qDebug("getsockname(%d, &peer, %d) returned %d with errno %d %s", s, i, return_value, saved_errno, strerror(saved_errno));
+  }
+
   if ((desc = accept(s, (struct sockaddr *)&peer, &i)) < 0)
   {
-    auto accept_errno = errno;
-    qDebug("accept(%d, &peer, %d) returned %d with errno %d %s", s, i, desc, accept_errno, strerror(accept_errno));
+    auto saved_errno = errno;
+    qDebug("accept(%d, &peer, %d) returned %d with errno %d %s", s, i, desc, saved_errno, strerror(saved_errno));
     return -1;
   }
 
