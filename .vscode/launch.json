@@ -12,7 +12,8 @@
             "program": "${workspaceFolder}/build/dcastle",
             "args": [
                 "-P",
-                "-p 6969"
+                "-p 6969",
+                "-v"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
@@ -38,7 +39,8 @@
             "program": "${workspaceFolder}/build/dcastle",
             "args": [
                 "-P",
-                "-p 6969"
+                "-p 6969",
+                "-v"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
@@ -61,7 +63,8 @@
             "program": "${workspaceFolder}/build/dcastle",
             "args": [
                 "-P",
-                "-p 6969"
+                "-p 6969",
+                "-v"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
@@ -84,7 +87,8 @@
             "program": "${workspaceFolder}/build/dcastle",
             "args": [
                 "-P",
-                "-p 6969"
+                "-p 6969",
+                "-v"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
