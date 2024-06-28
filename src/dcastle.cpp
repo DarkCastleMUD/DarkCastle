@@ -10,7 +10,6 @@
 
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 
-void backup_executable(char *const argv[]);
 DC::config parse_arguments(int argc, char **argv);
 
 /**********************************************************************
@@ -23,7 +22,6 @@ int main(int argc, char **argv)
   QThread::currentThread()->setObjectName("Main Thread");
 
   logentry(QStringLiteral("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
-  backup_executable(argv);
 
   // If no ports specified then set default ports
   if (dcastle.cf.ports.size() == 0)
@@ -64,25 +62,6 @@ int main(int argc, char **argv)
   }
 
   return 0;
-}
-
-void backup_executable(char *const argv[])
-{
-  // Make a copy of our executable so that in the event of a crash we have a
-  // known good copy to debug with.
-  QString backup_filename = QStringLiteral("%1.%2.%3").arg(argv[0]).arg(DC::getBuildVersion()).arg(getpid());
-
-  // If backup file does not exist already then link to it
-  if (!QFile(backup_filename).exists())
-  {
-    if (link(argv[0], backup_filename.toStdString().c_str()) == -1)
-    {
-      char buffer[512];
-      const char *strerror_result = strerror_r(errno, buffer, sizeof(buffer));
-      logentry(QStringLiteral("Error linking %1 to %2: %3").arg(argv[0]).arg(backup_filename).arg(strerror_result));
-    }
-  }
-  return;
 }
 
 DC::config parse_arguments(int argc, char **argv)
