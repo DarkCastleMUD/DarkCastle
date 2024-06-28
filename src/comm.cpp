@@ -293,6 +293,11 @@ int DC::write_hotboot_file(void)
 // links to the mud.
 int DC::load_hotboot_descs(void)
 {
+  if (!QFile("hotboot").exists())
+  {
+    return 0;
+  }
+
   std::string chr = {};
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   int desc = {};
@@ -311,6 +316,7 @@ int DC::load_hotboot_descs(void)
              {
              int fd;
             ifs >> fd;
+            qDebug("Read %d for port %d", fd, port);
             this->server_descriptor_list.insert(fd); });
 
     while (ifs.good())
