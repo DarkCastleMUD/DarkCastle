@@ -97,8 +97,8 @@ message("SHA1: ${VERSION_SHA1}")
 
 project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 configure_file(buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/DC/buildinfo.h)
-find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent Test)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql DBus HttpServer Concurrent Test)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
 
 find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
 set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++23" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
@@ -273,7 +273,7 @@ add_library(DC SHARED
 
 target_compile_definitions(DC PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 
 qt_add_executable(dcastle dcastle.cpp)
 target_compile_definitions(dcastle PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
@@ -287,14 +287,14 @@ target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VER
 
 qt_add_executable(benchmarkDC benchmarks/benchmarkDC.cpp)
 target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(benchmarkDC PRIVATE Qt::Test)
 
 enable_testing(true)
 qt_add_executable(testDC tests/testDC.cpp)
 add_test(NAME testDC COMMAND testDC)
 target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::DBus Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
+target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(testDC PRIVATE Qt::Test)
 
 install (TARGETS dcastle debug testDC benchmarkDC
