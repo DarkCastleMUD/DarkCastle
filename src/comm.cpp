@@ -246,26 +246,13 @@ int DC::write_hotboot_file(void)
     free(cwd);
   }
 
-  QStringList arguments = DC::getInstance()->arguments();
-  char **argv = new char *[arguments.size() + 1];
-  assert(argv);
-  for (auto i = 0; i < arguments.size(); ++i)
-  {
-    auto size = arguments.at(i).length();
-    argv[i] = new char[size + 1];
-    assert(argv[i]);
-    strncpy(argv[i], qPrintable(arguments.at(i)), size);
-    argv[i][size] = '\0';
-  }
-  argv[arguments.size()] = nullptr;
-
-  DC::getInstance()->ssh.close();
-  if (execv(strdup(qPrintable(DC::getInstance()->applicationFilePath())), argv) == -1)
+  ssh.close();
+  if (execv(qPrintable(applicationFilePath()), cf.argv_) == -1)
   {
     char execv_strerror[1024] = {};
     strerror_r(errno, execv_strerror, sizeof(execv_strerror));
 
-    logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(DC::getInstance()->applicationFilePath()).arg(execv_strerror), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Hotboot execv(%1, argv) failed with error: %2").arg(applicationFilePath()).arg(execv_strerror), 0, LogChannels::LOG_MISC);
 
     // wipe the file since we can't use it anyway
     if (unlink("hotboot") == -1)
@@ -276,13 +263,7 @@ int DC::write_hotboot_file(void)
       logentry(QStringLiteral("Hotboot unlink(\"hotboot\") failed with error: %1").arg(unlink_strerror), 0, LogChannels::LOG_MISC);
     }
 
-    for (auto i = 0; i < arguments.size(); ++i)
-    {
-      delete argv[i];
-    }
-    delete argv;
-
-    chdir(DC::getInstance()->cf.library_directory.toStdString().c_str());
+    chdir(qPrintable(cf.library_directory));
     return 0;
   }
 
