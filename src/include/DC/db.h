@@ -131,14 +131,6 @@ public:
 };
 
 /* public procedures in db.c */
-void set_zone_modified_zone(int32_t room);
-void set_zone_saved_zone(int32_t room);
-void set_zone_modified_world(int32_t room);
-void set_zone_saved_world(int32_t room);
-void set_zone_modified_mob(int32_t room);
-void set_zone_saved_mob(int32_t room);
-void set_zone_modified_obj(int32_t room);
-void set_zone_saved_obj(int32_t room);
 bool can_modify_this_room(Character *ch, int32_t room);
 bool can_modify_room(Character *ch, int32_t room);
 bool can_modify_mobile(Character *ch, int32_t room);

@@ -519,7 +519,7 @@ int do_guild(Character *ch, char *argument, int cmd)
     DC::getInstance()->rooms[room].allow_class[c_class] = true;
   }
 
-  set_zone_modified_world(room);
+  DC::getInstance()->set_zone_modified_world(room);
 
   old_room = ch->in_room;
   ch->in_room = room;

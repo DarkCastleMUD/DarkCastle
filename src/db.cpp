@@ -1764,17 +1764,30 @@ bool can_modify_object(Character *ch, int32_t obj)
 	return can_modify_this_object(ch, obj);
 }
 
-void set_zone_saved_zone(int32_t room)
+void DC::set_zone_saved_zone(int32_t room)
 {
-	DC::setZoneNotModified(DC::getInstance()->world[room].zone);
+	setZoneNotModified(world[room].zone);
 }
 
-void set_zone_modified_zone(int32_t room)
+void DC::set_zone_modified_zone(int32_t room)
 {
-	DC::setZoneModified(DC::getInstance()->world[room].zone);
+	setZoneModified(world[room].zone);
 }
 
-void set_zone_modified(int32_t modnum, world_file_list_item *list)
+auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>
+{
+	struct world_file_list_item *world_entry = {};
+
+	for (quint8 i = 1; i < 4; ++i)
+	{
+		vnum_t generation = pow(10, i);
+		qDebug("searching for vnum %lu. %lu %lu %lu", vnum, i, generation, vnum - (vnum % generation));
+	}
+
+	return std::unexpected(search_error::not_found);
+}
+
+void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 {
 	world_file_list_item *curr = list;
 
@@ -1786,14 +1799,15 @@ void set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, LogChannels::LOG_BUG);
+		auto world_file = findWorldFileWithVNUM(modnum);
+		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(modnum));
 		return;
 	}
 
 	curr->flags = WORLD_FILE_MODIFIED;
 }
 
-void set_zone_modified_world(int32_t room)
+void DC::set_zone_modified_world(int32_t room)
 {
 	extern world_file_list_item *world_file_list;
 
@@ -1801,7 +1815,7 @@ void set_zone_modified_world(int32_t room)
 }
 
 // rnum of mob
-void set_zone_modified_mob(int32_t mob)
+void DC::set_zone_modified_mob(int32_t mob)
 {
 	extern world_file_list_item *mob_file_list;
 
@@ -1809,14 +1823,14 @@ void set_zone_modified_mob(int32_t mob)
 }
 
 // rnum of mob
-void set_zone_modified_obj(int32_t obj)
+void DC::set_zone_modified_obj(int32_t obj)
 {
 	extern world_file_list_item *obj_file_list;
 
 	set_zone_modified(obj, obj_file_list);
 }
 
-void set_zone_saved(int32_t modnum, world_file_list_item *list)
+void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
 {
 	world_file_list_item *curr = list;
 
@@ -1835,21 +1849,21 @@ void set_zone_saved(int32_t modnum, world_file_list_item *list)
 	REMOVE_BIT(curr->flags, WORLD_FILE_MODIFIED);
 }
 
-void set_zone_saved_world(int32_t room)
+void DC::set_zone_saved_world(int32_t room)
 {
 	extern world_file_list_item *world_file_list;
 
 	set_zone_saved(room, world_file_list);
 }
 
-void set_zone_saved_mob(int32_t mob)
+void DC::set_zone_saved_mob(int32_t mob)
 {
 	extern world_file_list_item *mob_file_list;
 
 	set_zone_saved(mob, mob_file_list);
 }
 
-void set_zone_saved_obj(int32_t obj)
+void DC::set_zone_saved_obj(int32_t obj)
 {
 	extern world_file_list_item *obj_file_list;
 

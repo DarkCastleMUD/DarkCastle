@@ -150,7 +150,7 @@ class index_data
 {
 public:
   vnum_t virt{};                                                                         /* virt number of ths mob/obj           */
-  vnum_t number{};                                                                          /* number of existing units of ths mob/obj */
+  vnum_t number{};                                                                       /* number of existing units of ths mob/obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
   void *item{};                                                                          /* the mobile/object itself                 */
@@ -519,6 +519,17 @@ public:
   void remove_all_objs_from_world(void);
   void free_zones_from_memory(void);
   void free_clans_from_memory(void);
+  void set_zone_saved_zone(int32_t room);
+  void set_zone_modified_zone(int32_t room);
+  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>;
+  void set_zone_modified(int32_t modnum, world_file_list_item *list);
+  void set_zone_modified_world(int32_t room);
+  void set_zone_modified_mob(int32_t mob);
+  void set_zone_modified_obj(int32_t obj);
+  void set_zone_saved(int32_t modnum, world_file_list_item *list);
+  void set_zone_saved_world(int32_t room);
+  void set_zone_saved_mob(int32_t mob);
+  void set_zone_saved_obj(int32_t obj);
   void free_world_from_memory(void);
   void free_mobs_from_memory(void);
   void free_objs_from_memory(void);

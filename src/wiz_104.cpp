@@ -2446,7 +2446,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	// extract_obj(otmp);
 
 	ch->player->last_obj_vnum = v2;
-	set_zone_modified_obj(r2);
+	DC::getInstance()->set_zone_modified_obj(r2);
 
 	return eSUCCESS;
 }
@@ -2550,7 +2550,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	}
 
 	ch->player->last_mob_edit = dst;
-	set_zone_modified_mob(dst);
+	DC::getInstance()->set_zone_modified_mob(dst);
 
 	return eSUCCESS;
 }

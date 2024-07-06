@@ -1348,7 +1348,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
     ch->sendln("Error:  Couldn't find item in switch.");
     break;
   }
-  set_zone_modified_zone(ch->in_room);
+  DC::getInstance()->set_zone_modified_zone(ch->in_room);
   return eSUCCESS;
 }
 
@@ -1748,7 +1748,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     break;
   } // switch(x)
 
-  set_zone_modified_obj(item_num);
+  DC::getInstance()->set_zone_modified_obj(item_num);
   return eSUCCESS;
 }
 
@@ -1992,7 +1992,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     break;
   } // switch(x)
 
-  set_zone_modified_obj(item_num);
+  DC::getInstance()->set_zone_modified_obj(item_num);
   return eSUCCESS;
 }
 
@@ -2620,7 +2620,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     break;
   }
 
-  set_zone_modified_obj(rnum);
+  DC::getInstance()->set_zone_modified_obj(rnum);
   return eSUCCESS;
 }
 
@@ -3021,7 +3021,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     mpstat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
     return eFAILURE;
   }
-  set_zone_modified_mob(mob_num);
+  DC::getInstance()->set_zone_modified_mob(mob_num);
   return eSUCCESS;
 }
 
@@ -4118,7 +4118,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   }
   break;
   }
-  set_zone_modified_mob(mob_num);
+  DC::getInstance()->set_zone_modified_mob(mob_num);
   return eSUCCESS;
 }
 
@@ -4724,7 +4724,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     ch->send(QStringLiteral("Mobile %1 DENIED entrance.\r\n").arg(mob));
     break;
   }
-  set_zone_modified_world(ch->in_room);
+  DC::getInstance()->set_zone_modified_world(ch->in_room);
   return eSUCCESS;
 }
 
@@ -4851,7 +4851,7 @@ int do_rdelete(Character *ch, char *arg, int cmd)
                  "exdesc <direction>\n\rrdelete extra  <keyword>\n\r",
                  ch);
 
-  set_zone_modified_world(ch->in_room);
+  DC::getInstance()->set_zone_modified_world(ch->in_room);
   return eSUCCESS;
 }
 
@@ -4919,7 +4919,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   fclose(f);
   send("Saved.\r\n");
-  set_zone_saved_zone(in_room);
+  DC::getInstance()->set_zone_saved_zone(in_room);
   return eSUCCESS;
 }
 
@@ -4962,7 +4962,7 @@ int do_rsave(Character *ch, char *arg, int cmd)
   }
 
   ch->sendln("Saved.");
-  set_zone_saved_world(ch->in_room);
+  DC::getInstance()->set_zone_saved_world(ch->in_room);
   return eSUCCESS;
 }
 
@@ -5017,7 +5017,7 @@ int do_msave(Character *ch, char *arg, int cmd)
   }
 
   ch->sendln("Saved.");
-  set_zone_saved_mob(curr->firstnum);
+  DC::getInstance()->set_zone_saved_mob(curr->firstnum);
   return eSUCCESS;
 }
 
@@ -5069,7 +5069,7 @@ int do_osave(Character *ch, char *arg, int cmd)
   }
 
   ch->sendln("Saved.");
-  set_zone_saved_obj(curr->firstnum);
+  DC::getInstance()->set_zone_saved_obj(curr->firstnum);
   return eSUCCESS;
 }
 
