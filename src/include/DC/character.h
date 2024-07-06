@@ -343,8 +343,8 @@ public:
     int16_t buildMLowVnum = {}, buildMHighVnum = {};
     int16_t buildOLowVnum = {}, buildOHighVnum = {};
 
-    int32_t last_mob_edit = {}; // vnum of last mob edited
-    vnum_t last_obj_vnum = {};  // vnum of last obj edited
+    vnum_t last_mob_edit = {}; // vnum of last mob edited
+    vnum_t last_obj_vnum = {}; // vnum of last obj edited
 
     QString last_tell = {};      /* last person who told           */
     int16_t last_mess_read = {}; /* for reading messages */

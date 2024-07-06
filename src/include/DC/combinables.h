@@ -3,31 +3,41 @@
 
 #include <iostream>
 
-namespace Combinables {
+namespace Combinables
+{
 
-  class Brew {
+  class Brew
+  {
   public:
-
-    class recipe {
+    class recipe
+    {
     public:
-      bool operator<(const recipe& r2) const { 
-	if (container < r2.container) {
-	  return true;
-	} else if (container == r2.container) {
-	  if (liquid < r2.liquid) {
-	    return true;
-	  } else if (liquid == r2.liquid) {
-	    if (herb < r2.herb) {
-	      return true;
-	    }
-	  }
-	}
-	  
-	return false;	      
+      bool operator<(const recipe &r2) const
+      {
+        if (container < r2.container)
+        {
+          return true;
+        }
+        else if (container == r2.container)
+        {
+          if (liquid < r2.liquid)
+          {
+            return true;
+          }
+          else if (liquid == r2.liquid)
+          {
+            if (herb < r2.herb)
+            {
+              return true;
+            }
+          }
+        }
+
+        return false;
       }
-      int32_t herb = {};
+      vnum_t herb = {};
       int64_t liquid = {};
-      int32_t container = {};
+      vnum_t container = {};
     };
 
     Brew();
@@ -39,9 +49,12 @@ namespace Combinables {
     int remove(Character *ch, char *argument);
     int size(void);
     int find(recipe);
+
   private:
     static std::map<recipe, int32_t> recipes;
-    struct loadError {};
+    struct loadError
+    {
+    };
     static const char RECIPES_FILENAME[];
     static bool initialized;
   };
@@ -54,34 +67,46 @@ namespace Combinables {
   // this really should be combined into a parent class with 2 children
   // inheriting common functionality...
 
-  class Scribe {
+  class Scribe
+  {
   public:
-
-    class recipe {
+    class recipe
+    {
     public:
-      bool operator<(const recipe& r2) const { 
-	if (ink < r2.ink) {
-	  return true;
-	} else if (ink == r2.ink) {
-	  if (dust < r2.dust) {
-	    return true;
-	  } else if (dust == r2.dust) {
-	    if (pen < r2.pen) {
-	      return true;
-	    } else if (pen == r2.pen) {
-	      if (paper < r2.paper) {
-		return true;
-	      }
-	    }
-	  }
-	}
-	  
-	return false;	      
+      bool operator<(const recipe &r2) const
+      {
+        if (ink < r2.ink)
+        {
+          return true;
+        }
+        else if (ink == r2.ink)
+        {
+          if (dust < r2.dust)
+          {
+            return true;
+          }
+          else if (dust == r2.dust)
+          {
+            if (pen < r2.pen)
+            {
+              return true;
+            }
+            else if (pen == r2.pen)
+            {
+              if (paper < r2.paper)
+              {
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
       }
-      int32_t ink;
-      int32_t dust;
-      int32_t pen;
-      int32_t paper;
+      vnum_t ink;
+      vnum_t dust;
+      vnum_t pen;
+      vnum_t paper;
     };
 
     Scribe();
@@ -93,9 +118,12 @@ namespace Combinables {
     int remove(Character *ch, char *argument);
     int size(void);
     int find(recipe);
+
   private:
     static std::map<recipe, int32_t> recipes;
-    struct loadError {};
+    struct loadError
+    {
+    };
     static const char RECIPES_FILENAME[];
     static bool initialized;
   };

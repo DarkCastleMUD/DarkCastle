@@ -3056,13 +3056,13 @@ int do_mscore(Character *ch, char *argument, int cmd)
 
 int do_medit(Character *ch, char *argument, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
-  char buf2[MAX_INPUT_LENGTH];
-  char buf3[MAX_INPUT_LENGTH];
-  char buf4[MAX_INPUT_LENGTH];
-  int mob_num = -1;
-  int intval = 0;
-  int x, i;
+  char buf[MAX_INPUT_LENGTH] = {};
+  char buf2[MAX_INPUT_LENGTH] = {};
+  char buf3[MAX_INPUT_LENGTH] = {};
+  char buf4[MAX_INPUT_LENGTH] = {};
+  vnum_t mob_num = {};
+  int intval = {};
+  int x = {}, i = {};
 
   const char *fields[] = {"keywords", "shortdesc", "longdesc", "description",
                           "sex", "class", "race", "level", "alignment", "loadposition",
@@ -3100,10 +3100,10 @@ int do_medit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  int mobvnum = -1;
+  vnum_t mobvnum = {};
   if (isdigit(*buf))
   {
-    mob_num = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+    mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
     mobvnum = mob_num;
     if (((mob_num = real_mobile(mobvnum)) < 0))
     {

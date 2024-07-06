@@ -774,10 +774,10 @@ void Brew::save(void)
 
 void Brew::list(Character *ch)
 {
-  char buffer[MAX_STRING_LENGTH];
-  int i = 0;
+  char buffer[MAX_STRING_LENGTH] = {};
+  int i = {};
 
-  if (ch == 0)
+  if (!ch)
   {
     return;
   }
@@ -789,14 +789,15 @@ void Brew::list(Character *ch)
     int spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%6d] [%6d] [%9d] %s (%d)\n\r", ++i, r.herb, r.liquid, r.container, buffer, spell);
+    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\n\r", ++i, r.herb, r.liquid, r.container, buffer, spell);
   }
 }
 
 int Brew::add(Character *ch, char *argument)
 {
-  int herb_vnum, liquid_type, container_vnum, spell;
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+  vnum_t herb_vnum = {}, container_vnum = {};
+  int liquid_type = {}, spell = {};
+  char arg1[MAX_INPUT_LENGTH] = {}, arg2[MAX_INPUT_LENGTH] = {}, arg3[MAX_INPUT_LENGTH] = {}, arg4[MAX_INPUT_LENGTH] = {};
 
   if (!ch)
   {
@@ -814,9 +815,9 @@ int Brew::add(Character *ch, char *argument)
     return eFAILURE;
   }
 
-  herb_vnum = atoi(arg1);
+  herb_vnum = atoll(arg1);
   liquid_type = atoi(arg2);
-  container_vnum = atoi(arg3);
+  container_vnum = atoll(arg3);
 
   if (herb_vnum < 6301 || herb_vnum > 6312)
   {
@@ -1261,7 +1262,8 @@ void Scribe::list(Character *ch)
 
 int Scribe::add(Character *ch, char *argument)
 {
-  int ink_vnum, dust_vnum, pen_vnum, paper_vnum, spell;
+  vnum_t ink_vnum = {}, dust_vnum = {}, pen_vnum = {}, paper_vnum = {};
+  int spell = {};
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 
   if (!ch)

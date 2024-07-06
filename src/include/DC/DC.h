@@ -149,8 +149,8 @@ typedef QMap<zone_t, Zone> zones_t;
 class index_data
 {
 public:
-  int virt{};                                                                            /* virt number of ths mob/obj           */
-  int number{};                                                                          /* number of existing units of ths mob/obj */
+  vnum_t virt{};                                                                         /* virt number of ths mob/obj           */
+  vnum_t number{};                                                                          /* number of existing units of ths mob/obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
   void *item{};                                                                          /* the mobile/object itself                 */
