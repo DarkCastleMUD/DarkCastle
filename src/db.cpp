@@ -5470,7 +5470,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	{
 		if (ch == EOF)
 		{
-			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5489,7 +5489,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		}
 		else
 		{
-			misclog(QStringLiteral("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
+			logmisc(QStringLiteral("Reading %1 (%2)").arg(DC::getInstance()->current()).arg(ch));
 			perror("fread_bitvector: illegal character");
 			abort();
 		}
@@ -5550,8 +5550,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 			}
 			else
 			{
-				buglog("fread_bitvector: illegal character");
-				buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+				logbug("fread_bitvector: illegal character");
+				logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 				throw;
 			}
 
@@ -5562,8 +5562,8 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
 	}
 	catch (...)
 	{
-		buglog("fread_bitvector: unknown error");
-		buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+		logbug("fread_bitvector: unknown error");
+		logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		throw;
 	}
 	in.exceptions(orig_exceptions);
@@ -5582,7 +5582,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	{
 		if (ch == EOF)
 		{
-			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_int: premature EOF");
 			abort();
 		}
@@ -5815,7 +5815,7 @@ char fread_char(QTextStream &fl)
 {
 	if (fl.atEnd())
 	{
-		buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+		logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 		perror("fread_char: premature EOF");
 		abort();
 	}
@@ -5834,7 +5834,7 @@ char fread_char(FILE *fl)
 	{
 		if (ch == EOF)
 		{
-			buglog(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
+			logbug(QStringLiteral("Reading %1").arg(DC::getInstance()->current()));
 			perror("fread_char: premature EOF");
 			abort();
 		}

@@ -491,17 +491,17 @@ void logentry(QString str, uint64_t god_level, LogChannels type, Character *vict
     send_to_gods(str, god_level, type);
 }
 
-void socketlog(QString message)
+void logsocket(QString message)
 {
   logentry(message, IMMORTAL, LOG_SOCKET);
 }
 
-void buglog(QString message)
+void logbug(QString message)
 {
   logentry(message, IMMORTAL, LOG_BUG);
 }
 
-void misclog(QString message)
+void logmisc(QString message)
 {
   logentry(message, IMMORTAL, LOG_MISC);
 }

@@ -2706,11 +2706,11 @@ int close_socket(class Connection *d)
 
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
       {
-        socketlog(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        logsocket(QStringLiteral("%1@%2 has disconnected from room %3 with CANTQUIT.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       else
       {
-        socketlog(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
+        logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
       d->character->desc = nullptr;
     }

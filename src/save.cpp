@@ -424,7 +424,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   {
     if (fread_to_tilde(fpsave, filename) >= 160)
     {
-      buglog(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
+      logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
       return false;
     }
   }
@@ -596,7 +596,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
     return true;
   }
 
-  buglog(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
+  logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
   return false;
 }
 

@@ -191,7 +191,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
           if (command_skill == 0)
           {
-            buglog(QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->getName()));
+            logbug(QStringLiteral("command_interpreter: Unable to find command [%1].").arg(found->getName()));
           }
           return eFAILURE;
         }
