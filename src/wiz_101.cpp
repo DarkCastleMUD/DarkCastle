@@ -193,7 +193,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
       {
         if (DC::getInstance()->create_one_room(this, loc_nr))
         {
-          send("You form order out of chaos.\r\n");
+          sendln("You form order out of chaos.");
           location = loc_nr;
         }
       }
@@ -254,7 +254,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
         {
           if (DC::getInstance()->create_one_room(this, loc_nr))
           {
-            send("You form order out of chaos.\n\r\n\r");
+            sendln("You form order out of chaos.");
             location = loc_nr;
           }
         }
