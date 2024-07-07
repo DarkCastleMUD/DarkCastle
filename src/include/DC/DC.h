@@ -608,7 +608,7 @@ private:
   void game_loop_init(void);
   void game_loop(void);
   int init_socket(in_port_t port);
-  int count_IP_connections(Connection *new_conn);
+  int exceeded_connection_limit(Connection *new_conn);
   void nanny(class Connection *d, std::string arg = "");
 };
 

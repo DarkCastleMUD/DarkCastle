@@ -737,44 +737,43 @@ void Character::roll_and_display_stats(void)
    WAIT_STATE(this, DC::PULSE_TIMER / 10);
 }
 
-int DC::count_IP_connections(class Connection *new_conn)
+int DC::exceeded_connection_limit(class Connection *new_conn)
 {
-   int count = 0;
-   for (class Connection *d = descriptor_list; d; d = d->next)
+   if (new_conn->getPeerOriginalAddress().isNull() || new_conn->getPeerAddress().isLoopback())
    {
-      if (d->getPeerOriginalAddress().isNull())
-         continue;
+      return false;
+   }
+
+   quint64 count = 0;
+   QSet<Connection *> to_close_list;
+   for (auto d = descriptor_list; d; d = d->next)
+   {
       if (new_conn->getPeerOriginalAddress() == d->getPeerOriginalAddress())
+      {
          count++;
+         to_close_list.insert(d);
+      }
    }
 
    if (count > getConnectionLimit())
    {
-      SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from this IP address\r\n"
+      SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from IP %2\r\n"
                                "already logged into Dark Castle.  If you have a valid reason\r\n"
                                "for having this many connections from one IP please let an imm\r\n"
                                "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
-                    .arg(getConnectionLimit()),
+                    .arg(getConnectionLimit())
+                    .arg(new_conn->getPeerOriginalAddress().toString()),
                 new_conn);
 
-      class Connection *sd = {};
-      for (class Connection *d = descriptor_list; d; d = sd)
+      for (const auto &d : to_close_list)
       {
-         sd = d->next;
-         if (d->getPeerOriginalAddress().isNull())
-         {
-            continue;
-         }
-         if (new_conn->getPeerOriginalAddress() == d->getPeerOriginalAddress())
-         {
-            logsocket(QStringLiteral("Closed socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
-            close_socket(d);
-         }
+         logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+         close_socket(d);
       }
-      return 1;
+      return true;
    }
 
-   return 0;
+   return false;
 }
 
 void Character::check_hw(void)
@@ -890,7 +889,7 @@ void DC::nanny(class Connection *d, std::string arg)
          break;
       }
 
-      if (count_IP_connections(d))
+      if (exceeded_connection_limit(d))
          break;
 
       if (wizlock)
