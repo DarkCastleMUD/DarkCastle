@@ -30,6 +30,7 @@
 
 #include <fmt/format.h>
 
+#include "DC/obj.h"
 #include "DC/room.h"
 #include "DC/connect.h"
 #include "DC/DC.h"
