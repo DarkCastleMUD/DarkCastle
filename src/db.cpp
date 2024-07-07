@@ -1110,7 +1110,7 @@ void add_mobspec(int i)
 		return;
 
 	int mob = 0;
-	mob_prog_data *mprg{};
+	QSharedPointer<struct mob_prog_data> mprg{};
 
 	switch (a->c_class)
 	{
@@ -2828,7 +2828,7 @@ Character *read_mobile(int nr, FILE *fl)
 }
 
 // we write them recursively so they read in properly
-void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
+void write_mprog_recur(FILE *fl, QSharedPointer<struct mob_prog_data> mprg, bool mob)
 {
 	char *mprog_type_to_name(int type);
 
@@ -6453,7 +6453,7 @@ int mprog_name_to_type(QString name)
 
 void mprog_file_read(char *f, int32_t i)
 {
-	mob_prog_data *mprog{};
+	QSharedPointer<struct mob_prog_data> mprog{};
 	FILE *fp{};
 	char letter{};
 	char name[128]{};
@@ -6484,7 +6484,7 @@ void mprog_file_read(char *f, int32_t i)
 			return;
 		default:
 			SET_BIT(DC::getInstance()->mob_index[i].progtypes, type);
-			mprog = new mob_prog_data;
+			mprog = QSharedPointer<struct mob_prog_data>::create();
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, 0);
 			mprog->comlist = fread_string(fp, 0);
@@ -6525,10 +6525,8 @@ void load_mobprogs(FILE *fp)
 
 void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 {
-	mob_prog_data *mprog{};
 	char letter;
 	int type;
-	mob_prog_data lmprog;
 	for (;;)
 	{
 		if ((letter = fread_char(fp)) == '|')
@@ -6556,12 +6554,7 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 				else
 					SET_BIT(DC::getInstance()->obj_index[i].progtypes, type);
 			}
-			if (!ignore)
-			{
-				mprog = new mob_prog_data;
-			}
-			else
-				mprog = &lmprog;
+			auto mprog = QSharedPointer<struct mob_prog_data>::create();
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, 0);
 			mprog->comlist = fread_string(fp, 0);
@@ -6586,10 +6579,8 @@ void mprog_read_programs(FILE *fp, int32_t i, bool ignore)
 
 void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 {
-	mob_prog_data *mprog = {};
 	char letter = {};
 	int type = {};
-	mob_prog_data lmprog = {};
 	for (;;)
 	{
 		fp >> letter;
@@ -6621,12 +6612,7 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 				else
 					SET_BIT(DC::getInstance()->obj_index[i].progtypes, type);
 			}
-			if (!ignore)
-			{
-				mprog = new mob_prog_data;
-			}
-			else
-				mprog = &lmprog;
+			QSharedPointer<struct mob_prog_data> mprog = QSharedPointer<struct mob_prog_data>::create();
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, false);
 			mprog->comlist = fread_string(fp, false);

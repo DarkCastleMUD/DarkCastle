@@ -2626,7 +2626,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
 void update_mobprog_bits(int mob_num)
 {
-  mob_prog_data *prog = DC::getInstance()->mob_index[mob_num].mobprogs;
+  QSharedPointer<struct mob_prog_data> prog = DC::getInstance()->mob_index[mob_num].mobprogs;
   DC::getInstance()->mob_index[mob_num].progtypes = 0;
 
   while (prog)
@@ -2645,8 +2645,8 @@ int do_procedit(Character *ch, char *argument, int cmd)
   int mob_num = -1;
   int intval = 0;
   int x{}, i{};
-  mob_prog_data *prog{};
-  mob_prog_data *currprog{};
+  QSharedPointer<struct mob_prog_data> prog{};
+  QSharedPointer<struct mob_prog_data> currprog{};
 
   void mpstat(Character * ch, Character * victim);
 
@@ -2750,7 +2750,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
                    ch);
       return eFAILURE;
     }
-    prog = new mob_prog_data;
+    prog = QSharedPointer<struct mob_prog_data>::create();
     prog->type = GREET_PROG;
     prog->arglist = strdup("80");
     prog->comlist = strdup("say This is my new mob prog!\n\r");
@@ -2810,7 +2810,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
     currprog->type = 0;
     dc_free(currprog->arglist);
     dc_free(currprog->comlist);
-    dc_free(currprog);
+    currprog = {};
 
     update_mobprog_bits(mob_num);
 

@@ -137,7 +137,7 @@ bool can_modify_object(Character *ch, int32_t room);
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, Character *mob);
 void write_object(LegacyFile &lf, Object *obj);
-void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob);
+void write_mprog_recur(FILE *fl, QSharedPointer<struct mob_prog_data> mprg, bool mob);
 int load_new_help(FILE *fl, int reload = 0, Character *ch = nullptr);
 int count_hash_records(FILE *fl);
 void load_hints();
@@ -153,7 +153,7 @@ void string_to_file(auto &fl, QString str)
   fl << str.remove('\r').toStdString() << "~\n";
 }
 
-void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
+void write_mprog_recur(auto &fl, QSharedPointer<struct mob_prog_data> mprg, bool mob)
 {
   if (mprg->next)
   {
@@ -217,7 +217,7 @@ void affects_to_file(auto &out, Object *obj)
   }
 }
 
-auto &operator<<(auto &out, mob_prog_data *mobprogs)
+auto &operator<<(auto &out, QSharedPointer<struct mob_prog_data> mobprogs)
 {
   if (mobprogs)
   {

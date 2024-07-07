@@ -2055,7 +2055,7 @@ void opstat(Character *ch, int vnum)
 		return;
 	}
 	ch->sendln("");
-	mob_prog_data *mprg{};
+	QSharedPointer<struct mob_prog_data> mprg{};
 	int i{};
 	char buf2[MAX_STRING_LENGTH]{};
 	for (mprg = DC::getInstance()->obj_index[num].mobprogs, i = 1; mprg != nullptr;
@@ -2106,7 +2106,7 @@ int do_opstat(Character *ch, char *argument, int cmd)
 
 void update_objprog_bits(int num)
 {
-	mob_prog_data *prog = DC::getInstance()->obj_index[num].mobprogs;
+	QSharedPointer<struct mob_prog_data> prog = DC::getInstance()->obj_index[num].mobprogs;
 	DC::getInstance()->obj_index[num].progtypes = 0;
 
 	while (prog)
@@ -2149,7 +2149,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		opstat(ch, vnum);
 		return eSUCCESS;
 	  }*/
-	mob_prog_data *prog{}, *currprog{};
+	QSharedPointer<struct mob_prog_data> prog{}, currprog{};
 	if (!str_cmp(arg, "add"))
 	{
 		argument = one_argument(argument, arg);
@@ -2160,7 +2160,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 						 ch);
 			return eFAILURE;
 		}
-		prog = new mob_prog_data;
+		prog = QSharedPointer<struct mob_prog_data>::create();
 		prog->type = ALL_GREET_PROG;
 		prog->arglist = strdup("80");
 		prog->comlist = strdup("say This is my new obj prog!\n\r");
@@ -2208,7 +2208,6 @@ int do_opedit(Character *ch, char *argument, int cmd)
 		currprog->type = 0;
 		dc_free(currprog->arglist);
 		dc_free(currprog->comlist);
-		dc_free(currprog);
 
 		update_objprog_bits(num);
 

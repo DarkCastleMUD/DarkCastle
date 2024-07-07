@@ -650,8 +650,14 @@ void mob_stat(Character *ch, Character *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(DC::getInstance()->mob_index[k->mobdata->nr].mobspec), DC::getInstance()->mob_index[k->mobdata->nr].progtypes);
-    ch->send(buf);
+    if (!DC::getInstance()->mob_index[k->mobdata->nr].mobspec.isNull())
+    {
+      ch->sendln(QStringLiteral("$3Mobspec$R: Exists  $3Progtypes$R: %1").arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+    }
+    else
+    {
+      ch->sendln(QStringLiteral("$3Mobspec$R: Missing  $3Progtypes$R: %1").arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+    }
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);

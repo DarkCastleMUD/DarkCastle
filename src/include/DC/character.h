@@ -133,7 +133,7 @@ struct mob_prog_act_list
 
 struct mob_prog_data
 {
-    mob_prog_data *next{};
+    QSharedPointer<struct mob_prog_data> next;
     int type{};
     char *arglist{};
     char *comlist{};
