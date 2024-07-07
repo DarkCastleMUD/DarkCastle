@@ -395,6 +395,7 @@ public:
   static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
   static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
+  static constexpr quint64 PER_IP_CONNECTION_LIMIT = 20;
   static const QString HINTS_FILE_NAME;
   static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
@@ -525,6 +526,7 @@ public:
       logentry(str, god_level, type, vict);
     }
   }
+  [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void clean_socials_from_memory(void);
   void remove_all_mobs_from_world(void);
@@ -606,6 +608,8 @@ private:
   void game_loop_init(void);
   void game_loop(void);
   int init_socket(in_port_t port);
+  int count_IP_connections(Connection *new_conn);
+  void nanny(class Connection *d, std::string arg = "");
 };
 
 void produce_coredump(void *ptr = 0);

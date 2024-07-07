@@ -737,10 +737,10 @@ void Character::roll_and_display_stats(void)
    WAIT_STATE(this, DC::PULSE_TIMER / 10);
 }
 
-int count_IP_connections(class Connection *new_conn)
+int DC::count_IP_connections(class Connection *new_conn)
 {
    int count = 0;
-   for (class Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+   for (class Connection *d = descriptor_list; d; d = d->next)
    {
       if (d->getPeerOriginalAddress().isNull())
          continue;
@@ -748,14 +748,29 @@ int count_IP_connections(class Connection *new_conn)
          count++;
    }
 
-   if (count > 20)
+   if (count > getConnectionLimit())
    {
-      SEND_TO_Q("Sorry, there are more than 20 connections from this IP address\r\n"
-                "already logged into Dark Castle.  If you have a valid reason\r\n"
-                "for having this many connections from one IP please let an imm\r\n"
-                "know and they will speak with you.\r\n",
+      SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from this IP address\r\n"
+                               "already logged into Dark Castle.  If you have a valid reason\r\n"
+                               "for having this many connections from one IP please let an imm\r\n"
+                               "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
+                    .arg(getConnectionLimit()),
                 new_conn);
-      close_socket(new_conn);
+
+      class Connection *sd = {};
+      for (class Connection *d = descriptor_list; d; d = sd)
+      {
+         sd = d->next;
+         if (d->getPeerOriginalAddress().isNull())
+         {
+            continue;
+         }
+         if (new_conn->getPeerOriginalAddress() == d->getPeerOriginalAddress())
+         {
+            logsocket(QStringLiteral("Closed socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+            close_socket(d);
+         }
+      }
       return 1;
    }
 
@@ -798,7 +813,7 @@ void Character::set_hw(void)
 }
 
 // Deal with sockets that haven't logged in yet.
-void nanny(class Connection *d, std::string arg)
+void DC::nanny(class Connection *d, std::string arg)
 {
    char buf[MAX_STRING_LENGTH];
    std::stringstream str_tmp;
