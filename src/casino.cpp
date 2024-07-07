@@ -1992,9 +1992,7 @@ void save_slot_machines()
    char buf[180];
    char buf2[180];
 
-   extern world_file_list_item *obj_file_list;
-
-   curr = obj_file_list;
+   curr = DC::getInstance()->obj_file_list;
    while (curr && curr->filename != "21900-21999.obj")
       curr = curr->next;
 
@@ -2076,7 +2074,7 @@ void update_linked_slots(machine_data *machine)
             slot_obj->slot->jackpot = machine->jackpot;
 
          // Update instances of the original slot obj
-         for (Object *j = object_list; j; j = j->next)
+         for (Object *j = DC::getInstance()->object_list; j; j = j->next)
          {
             if (j->item_number == real_object(i))
             {

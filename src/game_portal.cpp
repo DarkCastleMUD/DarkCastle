@@ -178,7 +178,7 @@ void process_portals()
 */
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 {
-  extern class Object *object_list;
+
   class Object *from_portal;
   char log_buf[256];
 
@@ -215,8 +215,8 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
     from_portal->item_number = (-1);
 
     /* Only need to do this if I didn't clone it */
-    from_portal->next = object_list;
-    object_list = from_portal;
+    from_portal->next = DC::getInstance()->object_list;
+    DC::getInstance()->object_list = from_portal;
   }
   else /* Duplicate the object # duplicate */
   {
@@ -259,14 +259,13 @@ void find_and_remove_player_portal(Character *ch)
   class Object *k;
   class Object *next_k;
   char searchstr[180];
-  extern class Object *object_list;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));
   else
     sprintf(searchstr, "only %s", GET_NAME(ch));
 
-  for (k = object_list; k; k = next_k)
+  for (k = DC::getInstance()->object_list; k; k = next_k)
   {
     next_k = k->next;
     if (!k->isPortal() || !strstr(k->name, searchstr))

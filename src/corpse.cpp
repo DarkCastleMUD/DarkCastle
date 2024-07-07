@@ -45,7 +45,7 @@
 #define VIRTUAL 1
 
 /* External Structures / Variables */
-extern class Object *object_list;
+
 class Object *obj_proto;
 /* index table for object file   */
 int16_t frozen_start_room = 1;
@@ -224,7 +224,7 @@ void save_corpses(void)
 	}
 
 	/* Scan the object list */
-	for (i = object_list; i; i = next)
+	for (i = DC::getInstance()->object_list; i; i = next)
 	{
 		next = i->next;
 
@@ -587,8 +587,8 @@ class Object *create_obj_new(void)
 {
 	class Object *obj = new Object;
 	clear_object(obj);
-	obj->next = object_list;
-	object_list = obj;
+	obj->next = DC::getInstance()->object_list;
+	DC::getInstance()->object_list = obj;
 	/* Corpse saving stuff */
 	GET_OBJ_VROOM(obj) = DC::NOWHERE;
 	GET_OBJ_TIMER(obj) = 0;

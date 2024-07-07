@@ -644,12 +644,11 @@ private slots:
         DC dc(cf);
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
-        extern world_file_list_item *world_file_list;
 
         QString filename;
-        if (world_file_list)
+        if (dc.world_file_list)
         {
-            filename = world_file_list->filename;
+            filename = dc.world_file_list->filename;
         }
         else
         {
@@ -677,9 +676,9 @@ private slots:
                 QTextStream out(&qf);
                 QTextStream out2(&qsf);
 
-                if (world_file_list)
+                if (dc.world_file_list)
                 {
-                    for (int x = world_file_list->firstnum; x <= world_file_list->lastnum; x++)
+                    for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
                     {
                         write_one_room(lfw, x);
                         out << DC::getInstance()->world[x];

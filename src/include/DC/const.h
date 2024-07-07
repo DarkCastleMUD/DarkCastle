@@ -46,9 +46,7 @@ extern char *nonew_new_list[30];
 extern const char *zone_modes[];
 extern const char *equipment_types[];
 extern const char *utility_item_types[];
-extern world_file_list_item *world_file_list;
-extern world_file_list_item *mob_file_list;
-extern world_file_list_item *obj_file_list;
+
 extern int top_of_mobt;
 extern int top_of_objt;
 extern const char *action_bits[];
@@ -58,7 +56,7 @@ extern char *strs_damage_types[];
 extern char *obj_types[];
 extern std::vector<std::string> continent_names;
 extern int top_of_objt;
-extern world_file_list_item *obj_file_list;
+
 extern const char *drinks[];
 extern const char *portal_bits[];
 extern const char *player_bits[];

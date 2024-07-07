@@ -2262,7 +2262,7 @@ void check_silence_beacons(void)
 {
    Object *obj, *tmp_obj;
 
-   for (obj = object_list; obj; obj = tmp_obj)
+   for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
    {
       tmp_obj = obj->next;
       if (DC::getInstance()->obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
@@ -2286,7 +2286,7 @@ void checkConsecrate(int pulseType)
 
    if (pulseType == DC::PULSE_REGEN)
    {
-      for (obj = object_list; obj; obj = tmp_obj)
+      for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
          if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
@@ -2351,7 +2351,7 @@ void checkConsecrate(int pulseType)
    }
    else if (pulseType == DC::PULSE_TENSEC)
    {
-      for (obj = object_list; obj; obj = tmp_obj)
+      for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
       {
          tmp_obj = obj->next;
          if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)

@@ -843,7 +843,7 @@ void update_corpses_and_portals(void)
 	bool corpses_need_saving = false;
 	void extract_obj(class Object * obj); /* handler.c */
 	/* objects */
-	for (j = object_list; j; j = next_thing, proc++)
+	for (j = DC::getInstance()->object_list; j; j = next_thing, proc++)
 	{
 		if (j == (class Object *)0x95959595)
 			break;

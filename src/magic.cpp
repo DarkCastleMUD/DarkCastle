@@ -3033,7 +3033,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
   total = j = (int)(skill / 1.5);
 
   uint64_t skipped_nosee = 0, skipped_nolocate = 0, skipped_other = 0, skipped_god = 0, skipped_nowhere = 0;
-  for (i = object_list, n = 0; i && (j > 0) && (number > 0); i = i->next)
+  for (i = DC::getInstance()->object_list, n = 0; i && (j > 0) && (number > 0); i = i->next)
   {
     // TODO
     // Removed for now because it's keep locate spell from seeing portals or corpses
@@ -6535,7 +6535,7 @@ int spell_hellstream(uint8_t level, Character *ch, Character *victim, class Obje
 void make_portal(Character *ch, Character *vict)
 {
   class Object *ch_portal, *vict_portal;
-  extern class Object *object_list;
+
   char buf[250];
   qint64 chance{};
   room_t destination{};
@@ -6608,8 +6608,8 @@ void make_portal(Character *ch, Character *vict)
   vict_portal->setPortalDestinationRoom(ch->in_room);
 
   ch_portal->next = vict_portal;
-  vict_portal->next = object_list;
-  object_list = ch_portal;
+  vict_portal->next = DC::getInstance()->object_list;
+  DC::getInstance()->object_list = ch_portal;
 
   obj_to_room(ch_portal, ch->in_room);
   obj_to_room(vict_portal, destination);

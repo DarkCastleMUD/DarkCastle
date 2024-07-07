@@ -34,7 +34,6 @@
 #include "DC/move.h"
 #include "DC/corpse.h"
 
-extern class Object *object_list;
 extern int rev_dir[];
 
 int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
@@ -1586,7 +1585,7 @@ int do_fire(Character *ch, char *arg, int cmd)
       if (isSet(retval, eCH_DIED))
       {
         Object *corpse, *next;
-        for (corpse = object_list; corpse; corpse = next)
+        for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
         {
           next = corpse->next;
           if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isexact(GET_NAME(ch), GET_OBJ_NAME(corpse)))

@@ -32,7 +32,6 @@
 
 /* extern variables */
 
-extern class Object *object_list;
 extern int rev_dir[];
 
 /* procedures related to get */
@@ -1025,7 +1024,7 @@ int do_consent(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  for (obj = object_list; obj; obj = obj->next)
+  for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
   {
     if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || !obj->name)
       continue;

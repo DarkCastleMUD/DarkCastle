@@ -4426,7 +4426,7 @@ void make_corpse(Character *ch)
 {
   class Object *corpse, *o, *o_in_container, *next_o_in_container;
   class Object *money, *next_obj;
-  extern class Object *object_list;
+
   char buf[MAX_STRING_LENGTH];
   int i;
 
@@ -4658,8 +4658,8 @@ void make_corpse(Character *ch)
     } // for
   }
 
-  corpse->next = object_list;
-  object_list = corpse;
+  corpse->next = DC::getInstance()->object_list;
+  DC::getInstance()->object_list = corpse;
 
   // TODO - i think this is taken care of in "obj_to_obj"...check it, and if so
   // remove this line.  (It's updating in_obj pointer for everything in corpse)

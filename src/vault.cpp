@@ -60,8 +60,6 @@ void vault_log(Character *ch, char *owner);
 QString clanVName(uint64_t clan_id);
 void vault_search_usage(Character *ch);
 
-extern class Object *object_list;
-
 struct vault_data *has_vault(QString name)
 {
   struct vault_data *vault;
@@ -86,14 +84,14 @@ struct vault_data *has_vault(QString name)
 void remove_from_object_list(Object *obj)
 {
   Object *tObj, *pObj = nullptr;
-  for (tObj = object_list; tObj; tObj = tObj->next)
+  for (tObj = DC::getInstance()->object_list; tObj; tObj = tObj->next)
   {
     if (tObj == obj)
     {
       if (pObj)
         pObj->next = tObj->next;
       else
-        object_list = tObj->next;
+        DC::getInstance()->object_list = tObj->next;
       tObj->next = nullptr;
       break;
     }

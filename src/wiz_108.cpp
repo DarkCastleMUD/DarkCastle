@@ -117,7 +117,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
       }
     }
 
-    for (portal = object_list; portal; portal = portal->next)
+    for (portal = DC::getInstance()->object_list; portal; portal = portal->next)
     {
       if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != DC::NOWHERE) && !portal->hasPortalFlagNoLeave())
       {
@@ -179,7 +179,7 @@ int do_purloin(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  for (k = object_list, j = 1; k && (j <= nIndex); k = k->next)
+  for (k = DC::getInstance()->object_list, j = 1; k && (j <= nIndex); k = k->next)
   {
     if (!(isexact(pBuf, k->name)))
       continue;

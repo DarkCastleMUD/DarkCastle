@@ -705,9 +705,9 @@ int do_range(Character *ch, char *arg, int cmd)
   char message[256];
 
   /*
-    extern world_file_list_item * world_file_list;
-    extern world_file_list_item *   mob_file_list;
-    extern world_file_list_item *   obj_file_list;
+
+
+
   */
   if (!ch->has_skill(COMMAND_RANGE))
   {
@@ -960,7 +960,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 int do_export(Character *ch, char *args, int cmdnum)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
-  world_file_list_item *curr = obj_file_list;
+  world_file_list_item *curr = DC::getInstance()->obj_file_list;
 
   args = one_argument(args, export_type);
   one_argument(args, filename);
@@ -1016,7 +1016,7 @@ command_return_t do_world(Character *ch, std::string args, int cmd)
 
   if (args == "rename")
   {
-    auto world = world_file_list;
+    auto world = DC::getInstance()->world_file_list;
     while (world != nullptr)
     {
       QString potential_filename = QStringLiteral("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);

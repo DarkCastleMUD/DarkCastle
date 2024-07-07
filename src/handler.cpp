@@ -56,8 +56,6 @@
 #include "DC/corpse.h"
 #include "DC/shop.h"
 
-extern class Object *object_list;
-
 void huntclear_item(class Object *obj);
 
 #ifdef WIN32
@@ -2810,7 +2808,7 @@ class Object *get_obj(char *name)
 	if ((number = get_number(&tmp)) < 0)
 		return (0);
 
-	for (i = object_list, j = 1; i && (j <= number); i = i->next)
+	for (i = DC::getInstance()->object_list, j = 1; i && (j <= number); i = i->next)
 		if (isexact(tmp, i->name))
 		{
 			if (j == number)
@@ -2833,7 +2831,7 @@ class Object *get_obj_num(int nr)
 {
 	class Object *i;
 
-	for (i = object_list; i; i = i->next)
+	for (i = DC::getInstance()->object_list; i; i = i->next)
 		if (i->item_number == nr)
 			return (i);
 
@@ -3621,11 +3619,11 @@ void extract_obj(class Object *obj)
 		;
 	/* leaves nothing ! */
 
-	if (object_list == obj) /* head of list */
-		object_list = obj->next;
+	if (DC::getInstance()->object_list == obj) /* head of list */
+		DC::getInstance()->object_list = obj->next;
 	else
 	{
-		for (temp1 = object_list; temp1 && (temp1->next != obj); temp1 = temp1->next)
+		for (temp1 = DC::getInstance()->object_list; temp1 && (temp1->next != obj); temp1 = temp1->next)
 			;
 
 		if (temp1)
@@ -4217,7 +4215,7 @@ Object *get_obj_vnum(int vnum)
 {
 	Object *i;
 	int num = real_object(vnum);
-	for (i = object_list; i; i = i->next)
+	for (i = DC::getInstance()->object_list; i; i = i->next)
 		if (i->item_number == num)
 			return i;
 	return nullptr;
@@ -4619,7 +4617,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 		return (0);
 
 	/* ok.. no luck yet. scan the entire obj list   */
-	for (i = object_list, j = 1; i && (j <= number); i = i->next)
+	for (i = DC::getInstance()->object_list, j = 1; i && (j <= number); i = i->next)
 	{
 		// TODO
 		// For now they want me to remove this becuase portals and corpses are item_number -1
@@ -4683,8 +4681,8 @@ class Object *create_money(int amount)
 	obj->obj_flags.cost = amount;
 	obj->item_number = -1;
 
-	obj->next = object_list;
-	object_list = obj;
+	obj->next = DC::getInstance()->object_list;
+	DC::getInstance()->object_list = obj;
 
 	return (obj);
 }

@@ -37,8 +37,6 @@
 
 #define EMOTING_FILE "emoting-objects.txt"
 
-extern class Object *object_list;
-
 extern struct mprog_throw_type *g_mprog_throw_list;
 
 // TODO - go over emoting object stuff and make sure it's as efficient as we can get it
@@ -2454,7 +2452,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
   if (obj->obj_flags.timer == 0)
   { // Just created - check if this is the first pass in existence and if so, repop zone 161
     bool first = true;
-    for (p = object_list; p; p = p->next)
+    for (p = DC::getInstance()->object_list; p; p = p->next)
     {
       if (DC::getInstance()->obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
       {
@@ -2507,7 +2505,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
   if (obj->obj_flags.timer >= 1800)
   {
     // once one expires, ALL expire.
-    for (p = object_list; p; p = n)
+    for (p = DC::getInstance()->object_list; p; p = n)
     {
       n = p->next;
       if (DC::getInstance()->obj_index[p->item_number].virt == 30097)
@@ -2841,7 +2839,7 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
   case 9532: // dk boat ramp
     // find the dk boat (9531)
     i = real_object(9531);
-    for (obj2 = object_list; obj2; obj2 = obj2->next)
+    for (obj2 = DC::getInstance()->object_list; obj2; obj2 = obj2->next)
     {
       if (obj2->item_number == i)
         break;
@@ -3192,7 +3190,7 @@ int TOHS_locator(Character *ch, class Object *obj, int cmd, const char *arg,
   // 1406 is the portal 'rock' you enter to get to Tohs
   int searchnum = real_object(1406);
 
-  for (victim = object_list; victim; victim = victim->next)
+  for (victim = DC::getInstance()->object_list; victim; victim = victim->next)
     if (victim->item_number == searchnum)
       break;
 

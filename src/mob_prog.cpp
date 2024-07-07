@@ -62,7 +62,6 @@
 // Extern variables
 
 Character *rndm2;
-extern class Object *object_list;
 
 int activeProgs = 0; // loop protection
 
@@ -424,7 +423,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		left += 6;
 		Object *otmp;
 		int z = DC::getInstance()->world[mob->in_room].zone;
-		for (otmp = object_list; otmp; otmp = otmp->next)
+		for (otmp = DC::getInstance()->object_list; otmp; otmp = otmp->next)
 		{
 			Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
 			if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
@@ -1799,7 +1798,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		int count = 0;
 
 		Object *p;
-		for (p = object_list; p; p = p->next)
+		for (p = DC::getInstance()->object_list; p; p = p->next)
 		{
 			if (DC::getInstance()->obj_index[p->item_number].virt == target)
 			{
@@ -3857,7 +3856,7 @@ bool objExists(Object *obj)
 {
 	Object *tobj;
 
-	for (tobj = object_list; tobj; tobj = tobj->next)
+	for (tobj = DC::getInstance()->object_list; tobj; tobj = tobj->next)
 		if (tobj == obj)
 			break;
 	if (tobj)

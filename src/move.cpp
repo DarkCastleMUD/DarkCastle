@@ -1030,7 +1030,7 @@ int do_leave(Character *ch, char *arguement, int cmd)
 	char buf[200];
 	int retval;
 
-	for (k = object_list; k; k = k->next)
+	for (k = DC::getInstance()->object_list; k; k = k->next)
 	{
 		if (k->isPortal())
 		{

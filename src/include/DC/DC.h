@@ -344,6 +344,14 @@ struct wizlist_info
   QString name;
   level_t level = {};
 };
+struct world_file_list_item
+{
+  QString filename;
+  vnum_t firstnum;
+  vnum_t lastnum;
+  int32_t flags;
+  world_file_list_item *next;
+};
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -420,14 +428,18 @@ public:
 
   class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
-
-  int top_of_helpt = 0;          /* top of help index table         */
-  int new_top_of_helpt = 0;      /* top of help index table         */
-  room_t top_of_world_alloc = 0; // index of last alloc'd memory in world
+  struct world_file_list_item *world_file_list = 0; // List of the world files
+  struct world_file_list_item *mob_file_list = 0;   // List of the mob files
+  struct world_file_list_item *obj_file_list = 0;   // List of the obj files
+  class Object *object_list = 0;                    // the global linked list of obj's
+  struct pulse_data *bard_list = 0;                 // global l-list of bards
+  int top_of_helpt = 0;                             // top of help index table
+  int new_top_of_helpt = 0;                         // top of help index table
+  room_t top_of_world_alloc = 0;                    // index of last alloc'd memory in world
   room_t top_of_world = 0;
-  int total_rooms = 0; /* total amount of rooms in memory */
+  int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
-  QList<struct wizlist_info> wizlist; /* the actual wizlist            */
+  QList<struct wizlist_info> wizlist;
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -626,7 +638,6 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
 
 extern std::vector<std::string> continent_names;
 
-extern class Object *object_list;
 extern struct spell_info_type spell_info[];
 void renum_world(void);
 void renum_zone_table(void);

@@ -1757,7 +1757,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   if (ch->cRooms)
   {
-    for (obj = object_list; obj; obj = tmp_obj)
+    for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
       if (DC::getInstance()->obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)

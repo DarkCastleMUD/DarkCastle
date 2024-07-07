@@ -39,8 +39,6 @@
 #include "DC/inventory.h"
 #include "DC/corpse.h"
 
-extern class Object *object_list;
-
 extern int class_restricted(Character *ch, class Object *obj);
 extern int size_restricted(Character *ch, class Object *obj);
 
@@ -426,7 +424,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 	{
 		sprintf(buf, "%s_consent", GET_NAME(ch));
 		ch->send("Available corpses (freshest first):\n\r$B");
-		for (obj = object_list; obj; obj = obj->next)
+		for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
 		{
 			if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
 				continue;
@@ -472,7 +470,7 @@ int mortician(Character *ch, class Object *obj, int cmd, const char *arg, Charac
 		return eSUCCESS;
 	}
 
-	for (obj = object_list; obj; obj = obj->next)
+	for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
 	{
 		sprintf(buf, "%s_consent", GET_NAME(ch));
 

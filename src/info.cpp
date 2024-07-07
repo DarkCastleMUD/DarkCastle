@@ -56,8 +56,6 @@
 
 /* extern variables */
 
-extern class Object *object_list;
-
 extern char credits[MAX_STRING_LENGTH];
 extern char info[MAX_STRING_LENGTH];
 extern char story[MAX_STRING_LENGTH];
@@ -1665,7 +1663,7 @@ int do_look(Character *ch, const char *argument, int cmd)
       break;
       case 8:
       { // look out
-         for (tmp_object = object_list; tmp_object;
+         for (tmp_object = DC::getInstance()->object_list; tmp_object;
               tmp_object = tmp_object->next)
          {
             if (tmp_object->isPortal() && tmp_object->getPortalDestinationRoom() == ch->in_room && tmp_object->in_room != DC::NOWHERE && tmp_object->isPortalTypePermanent())
@@ -2588,7 +2586,7 @@ int do_olocate(Character *ch, char *name, int cmd)
 
    ch->sendln("-#-- Short Description ------- Room Number\n");
 
-   for (k = object_list; k; k = k->next)
+   for (k = DC::getInstance()->object_list; k; k = k->next)
    {
 
       // allow search by vnum

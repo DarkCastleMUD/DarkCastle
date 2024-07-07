@@ -33,8 +33,6 @@
 #include "DC/DC.h"
 #include "DC/utility.h"
 
-extern class Object *object_list;
-
 struct error_eof
 {
 };
@@ -407,14 +405,5 @@ extern int exp_table[61 + 1];
 #define WORLD_FILE_IN_PROGRESS 1 << 1
 #define WORLD_FILE_READY 1 << 2
 #define WORLD_FILE_APPROVED 1 << 3
-
-struct world_file_list_item
-{
-  QString filename;
-  int32_t firstnum;
-  int32_t lastnum;
-  int32_t flags;
-  world_file_list_item *next;
-};
 
 #endif

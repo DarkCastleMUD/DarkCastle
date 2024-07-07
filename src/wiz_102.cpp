@@ -2560,7 +2560,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
     Object *next_k;
     // remove the item from players in world
-    for (Object *k = object_list; k; k = next_k)
+    for (Object *k = DC::getInstance()->object_list; k; k = next_k)
     {
       next_k = k->next;
       if (k->item_number == rnum)
@@ -3982,6 +3982,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       ch->sendln("You cannot create mobiles in that range.");
       return eFAILURE;
     }
+    mob_num = intval;
     x = create_blank_mobile(intval);
     if (x < 0)
     {
@@ -4933,7 +4934,7 @@ int do_rsave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  curr = world_file_list;
+  curr = DC::getInstance()->world_file_list;
   while (curr)
     if (curr->firstnum <= ch->in_room && curr->lastnum >= ch->in_room)
       break;
@@ -4987,7 +4988,7 @@ int do_msave(Character *ch, char *arg, int cmd)
 
   int r = real_mobile(v);
 
-  curr = mob_file_list;
+  curr = DC::getInstance()->mob_file_list;
   while (curr)
     if (curr->firstnum <= r && curr->lastnum >= r)
       break;
@@ -5039,7 +5040,7 @@ int do_osave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
   int r = real_object(v);
-  curr = obj_file_list;
+  curr = DC::getInstance()->obj_file_list;
   while (curr)
     if (curr->firstnum <= r && curr->lastnum >= r)
       break;
@@ -5189,8 +5190,8 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
         count = 0;
 
-        for (obj_list = object_list; obj_list; obj_list =
-                                                   obj_list->next)
+        for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
+                                                                      obj_list->next)
         {
           if (obj_list->item_number == obj->item_number)
             count++;
@@ -5211,8 +5212,8 @@ int do_instazone(Character *ch, char *arg, int cmd)
                  tmp_obj = tmp_obj->next_content)
             {
               count = 0;
-              for (obj_list = object_list; obj_list; obj_list =
-                                                         obj_list->next)
+              for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
+                                                                            obj_list->next)
               {
                 if (obj_list->item_number == tmp_obj->item_number)
                   count++;
@@ -5274,8 +5275,8 @@ int do_instazone(Character *ch, char *arg, int cmd)
             obj = mob->equipment[pos];
 
             count = 0;
-            for (obj_list = object_list; obj_list; obj_list =
-                                                       obj_list->next)
+            for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
+                                                                          obj_list->next)
             {
               if (obj_list->item_number == obj->item_number)
                 count++;
@@ -5297,7 +5298,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
                                                            tmp_obj->next_content)
                 {
                   count = 0;
-                  for (obj_list = object_list; obj_list;
+                  for (obj_list = DC::getInstance()->object_list; obj_list;
                        obj_list = obj_list->next)
                   {
                     if (obj_list->item_number == tmp_obj->item_number)
@@ -5325,8 +5326,8 @@ int do_instazone(Character *ch, char *arg, int cmd)
           {
 
             count = 0;
-            for (obj_list = object_list; obj_list; obj_list =
-                                                       obj_list->next)
+            for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
+                                                                          obj_list->next)
             {
               if (obj_list->item_number == obj->item_number)
                 count++;
@@ -5347,7 +5348,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
                                                            tmp_obj->next_content)
                 {
                   count = 0;
-                  for (obj_list = object_list; obj_list;
+                  for (obj_list = DC::getInstance()->object_list; obj_list;
                        obj_list = obj_list->next)
                   {
                     if (obj_list->item_number == tmp_obj->item_number)

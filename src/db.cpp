@@ -63,18 +63,6 @@ int load_debug = 0;
 #include "DC/wizard.h"
 #include "DC/Command.h"
 
-/**************************************************************************
- *  declarations of most of the 'global' variables                         *
- ************************************************************************ */
-
-world_file_list_item *world_file_list = 0; // List of the world files
-world_file_list_item *mob_file_list = 0;   // List of the mob files
-world_file_list_item *obj_file_list = 0;   // List of the obj files
-
-class Object *object_list = 0; /* the global linked list of obj's */
-
-pulse_data *bard_list = 0; /* global l-list of bards          */
-
 Room &World::operator[](room_t room_key)
 {
 	static Room generic_room = {};
@@ -328,8 +316,8 @@ void Character::add_to_bard_list(void)
 #endif
 
 	curr->thechar = this;
-	curr->next = bard_list;
-	bard_list = curr;
+	curr->next = DC::getInstance()->bard_list;
+	DC::getInstance()->bard_list = curr;
 }
 
 void Character::remove_from_bard_list(void)
@@ -337,19 +325,19 @@ void Character::remove_from_bard_list(void)
 	pulse_data *curr = nullptr;
 	pulse_data *last = nullptr;
 
-	if (!bard_list)
+	if (!DC::getInstance()->bard_list)
 		return;
 
-	if (bard_list->thechar == this)
+	if (DC::getInstance()->bard_list->thechar == this)
 	{
-		curr = bard_list;
-		bard_list = bard_list->next;
+		curr = DC::getInstance()->bard_list;
+		DC::getInstance()->bard_list = DC::getInstance()->bard_list->next;
 		dc_free(curr);
 	}
 	else
 	{
-		last = bard_list;
-		for (curr = bard_list->next; curr; curr = curr->next)
+		last = DC::getInstance()->bard_list;
+		for (curr = DC::getInstance()->bard_list->next; curr; curr = curr->next)
 		{
 			if (curr->thechar == this)
 			{
@@ -1301,7 +1289,7 @@ void DC::remove_all_objs_from_world()
 {
 	Object *curr = nullptr;
 
-	while ((curr = object_list))
+	while ((curr = DC::getInstance()->object_list))
 		extract_obj(curr);
 }
 
@@ -1809,7 +1797,6 @@ void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 void DC::set_zone_modified_world(int32_t room)
 {
-	extern world_file_list_item *world_file_list;
 
 	set_zone_modified(room, world_file_list);
 }
@@ -1817,17 +1804,15 @@ void DC::set_zone_modified_world(int32_t room)
 // rnum of mob
 void DC::set_zone_modified_mob(int32_t mob)
 {
-	extern world_file_list_item *mob_file_list;
 
-	set_zone_modified(mob, mob_file_list);
+	set_zone_modified(mob, DC::getInstance()->mob_file_list);
 }
 
 // rnum of mob
 void DC::set_zone_modified_obj(int32_t obj)
 {
-	extern world_file_list_item *obj_file_list;
 
-	set_zone_modified(obj, obj_file_list);
+	set_zone_modified(obj, DC::getInstance()->obj_file_list);
 }
 
 void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
@@ -1851,23 +1836,20 @@ void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
 
 void DC::set_zone_saved_world(int32_t room)
 {
-	extern world_file_list_item *world_file_list;
 
 	set_zone_saved(room, world_file_list);
 }
 
 void DC::set_zone_saved_mob(int32_t mob)
 {
-	extern world_file_list_item *mob_file_list;
 
-	set_zone_saved(mob, mob_file_list);
+	set_zone_saved(mob, DC::getInstance()->mob_file_list);
 }
 
 void DC::set_zone_saved_obj(int32_t obj)
 {
-	extern world_file_list_item *obj_file_list;
 
-	set_zone_saved(obj, obj_file_list);
+	set_zone_saved(obj, DC::getInstance()->obj_file_list);
 }
 
 /* destruct the world */
@@ -1985,17 +1967,17 @@ world_file_list_item *new_w_file_item(QString filename, int32_t room_nr, world_f
 
 world_file_list_item *new_world_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(filename, room_nr, world_file_list);
+	return new_w_file_item(filename, room_nr, DC::getInstance()->world_file_list);
 }
 
 world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(filename, room_nr, mob_file_list);
+	return new_w_file_item(filename, room_nr, DC::getInstance()->mob_file_list);
 }
 
 world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(filename, room_nr, obj_file_list);
+	return new_w_file_item(filename, room_nr, DC::getInstance()->obj_file_list);
 }
 
 /* load the rooms */
@@ -2008,7 +1990,7 @@ void DC::boot_world(void)
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 	struct world_file_list_item *pItem = nullptr;
 
-	object_list = 0;
+	DC::getInstance()->object_list = 0;
 
 	DC::config &cf = DC::getInstance()->cf;
 
@@ -3437,7 +3419,7 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 	DC::getInstance()->obj_index[cur_index].item = obj;
 
 	// update index of all items in game
-	for (curr = object_list; curr; curr = curr->next)
+	for (curr = DC::getInstance()->object_list; curr; curr = curr->next)
 		if (curr->item_number >= cur_index)
 			curr->item_number++;
 
@@ -3448,9 +3430,7 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
 
-	extern world_file_list_item *obj_file_list;
-
-	wcurr = obj_file_list;
+	wcurr = DC::getInstance()->obj_file_list;
 	while (wcurr)
 	{
 		if (wcurr->firstnum >= cur_index)
@@ -3588,9 +3568,7 @@ int create_blank_mobile(int nr)
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
 
-	extern world_file_list_item *mob_file_list;
-
-	wcurr = mob_file_list;
+	wcurr = DC::getInstance()->mob_file_list;
 	while (wcurr)
 	{
 		if (wcurr->firstnum >= cur_index)
@@ -3654,9 +3632,7 @@ void delete_mob_from_index(int nr)
 	// update mob file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;
 
-	extern world_file_list_item *mob_file_list;
-
-	wcurr = mob_file_list;
+	wcurr = DC::getInstance()->mob_file_list;
 
 	while (wcurr)
 	{
@@ -3721,7 +3697,7 @@ void delete_item_from_index(int nr)
 	top_of_objt--;
 
 	// update index of all items in game - these store rnums
-	for (curr = object_list; curr; curr = curr->next)
+	for (curr = DC::getInstance()->object_list; curr; curr = curr->next)
 		if (curr->item_number >= nr)
 			curr->item_number--;
 
@@ -3732,9 +3708,7 @@ void delete_item_from_index(int nr)
 	// update obj file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;
 
-	extern world_file_list_item *obj_file_list;
-
-	wcurr = obj_file_list;
+	wcurr = DC::getInstance()->obj_file_list;
 
 	while (wcurr)
 	{
@@ -4510,8 +4484,8 @@ class Object *clone_object(int nr)
 	obj->table = 0;
 	obj->next_skill = 0;
 	obj->next_content = 0;
-	obj->next = object_list;
-	object_list = obj;
+	obj->next = DC::getInstance()->object_list;
+	DC::getInstance()->object_list = obj;
 	DC::getInstance()->obj_index[nr].number++;
 	obj->save_expiration = 0;
 	obj->no_sell_expiration = 0;

@@ -1733,15 +1733,15 @@ int do_show(Character *ch, char *argument, int cmd)
 	}
 	else if (is_abbrev(type, "rfiles") && has_range)
 	{
-		show_legacy_files(ch, world_file_list);
+		show_legacy_files(ch, DC::getInstance()->world_file_list);
 	}
 	else if (is_abbrev(type, "mfiles") && has_range)
 	{
-		show_legacy_files(ch, mob_file_list);
+		show_legacy_files(ch, DC::getInstance()->mob_file_list);
 	}
 	else if (is_abbrev(type, "ofiles") && has_range)
 	{
-		show_legacy_files(ch, obj_file_list);
+		show_legacy_files(ch, DC::getInstance()->obj_file_list);
 	}
 	else if (is_abbrev(type, "keydoorcombo"))
 	{
@@ -2433,7 +2433,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 		   v1, ((Object *)DC::getInstance()->obj_index[real_object(v1)].item)->short_description,
 		   v2, ((Object *)DC::getInstance()->obj_index[real_object(v2)].item)->short_description);
 
-	object_list = object_list->next;
+	DC::getInstance()->object_list = DC::getInstance()->object_list->next;
 	otmp = (Object *)DC::getInstance()->obj_index[r2].item;
 	obj->item_number = r2;
 	DC::getInstance()->obj_index[r2].item = (void *)obj;
