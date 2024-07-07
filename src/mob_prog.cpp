@@ -4014,8 +4014,8 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 	char temp1[MAX_STRING_LENGTH]{};
 	char temp2[MAX_STRING_LENGTH]{};
 	char word[MAX_INPUT_LENGTH]{};
-	QSharedPointer<struct mob_prog_data> mprg{};
-	QSharedPointer<struct mob_prog_data> next{};
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	char *list{};
 	char *start{};
 	char *dupl{};
@@ -4109,8 +4109,8 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
 void mprog_percent_check(Character *mob, Character *actor, Object *obj,
 						 void *vo, int type)
 {
-	QSharedPointer<struct mob_prog_data> mprg{};
-	QSharedPointer<struct mob_prog_data> next{};
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	bool done = false;
 	mprg = DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs;
 	if (!mprg)
@@ -4160,7 +4160,7 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
 
 	//  mob_prog_act_list * tmp_act;
 	// mob_prog_act_list * curr;
-	//  QSharedPointer<struct mob_prog_data> mprg;
+	//  QSharedPointer<class MobProgram> mprg;
 	mprog_cur_result = eSUCCESS;
 
 	if (!MOBtrigger)
@@ -4205,8 +4205,8 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
 int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 {
 
-	QSharedPointer<struct mob_prog_data> mprg = 0;
-	QSharedPointer<struct mob_prog_data> next = 0;
+	QSharedPointer<class MobProgram> mprg = 0;
+	QSharedPointer<class MobProgram> next = 0;
 	Object *obj = 0;
 	bool done = false;
 
@@ -4249,8 +4249,8 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 {
 
-	QSharedPointer<struct mob_prog_data> mprg = 0;
-	QSharedPointer<struct mob_prog_data> next = 0;
+	QSharedPointer<class MobProgram> mprg = 0;
+	QSharedPointer<class MobProgram> next = 0;
 	Object *obj = 0;
 	bool done = false;
 	if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
@@ -4330,8 +4330,8 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 {
 
 	char buf[MAX_INPUT_LENGTH];
-	QSharedPointer<struct mob_prog_data> mprg{};
-	QSharedPointer<struct mob_prog_data> next{};
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	bool done = false, okay = false;
 	if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
 	{
@@ -4403,8 +4403,8 @@ int mprog_greet_trigger(Character *ch)
 
 int mprog_hitprcnt_trigger(Character *mob, Character *ch)
 {
-	QSharedPointer<struct mob_prog_data> mprg{};
-	QSharedPointer<struct mob_prog_data> next{};
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	bool done = false;
 
 	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
@@ -4523,8 +4523,8 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 		return eFAILURE;
 	}
 
-	QSharedPointer<struct mob_prog_data> mprg{};
-	QSharedPointer<struct mob_prog_data> next{};
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	int curr_catch;
 	bool done = false;
 	mprog_cur_result = eFAILURE;
@@ -4827,7 +4827,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
 {
-	QSharedPointer<struct mob_prog_data> mprg{};
+	QSharedPointer<class MobProgram> mprg{};
 	int curr_catch;
 	mprog_cur_result = eFAILURE;
 	Character *vmob;

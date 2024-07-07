@@ -135,7 +135,7 @@ void mpstat(Character *ch, Character *victim)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  QSharedPointer<struct mob_prog_data> mprg{};
+  QSharedPointer<class MobProgram> mprg{};
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",

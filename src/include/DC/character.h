@@ -131,9 +131,10 @@ struct mob_prog_act_list
     void *vo{};
 };
 
-struct mob_prog_data
+class MobProgram
 {
-    QSharedPointer<struct mob_prog_data> next;
+public:
+    QSharedPointer<class MobProgram> next;
     int type{};
     char *arglist{};
     char *comlist{};
