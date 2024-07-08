@@ -182,8 +182,7 @@ int do_check(Character *ch, char *arg, int cmd)
 
   if (ch->getLevel() >= OVERSEER && !IS_MOB(vict) && ch->getLevel() >= vict->getLevel())
   {
-    sprintf(buf, "$3Last connected from$R: %s\n\r", vict->player->last_site);
-    ch->send(buf);
+    ch->sendln(QStringLiteral("$3Last connected from$R: %1").arg(vict->player->last_site));
 
     /* ctime adds a \n to the std::string it returns! */
     const time_t tBuffer = vict->player->time.logon;
