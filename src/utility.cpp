@@ -2744,10 +2744,9 @@ QString replaceString(QString message, QString find, QString replace)
   if (find == replace)
     return message;
 
-  qsizetype find_length = find.length();
-  while (qsizetype j = message.indexOf(find) != -1)
+  while (message.indexOf(find) != -1)
   {
-    message.replace(j, find_length, replace);
+    message.replace(message.indexOf(find), find.length(), replace);
   }
   return message;
 }
