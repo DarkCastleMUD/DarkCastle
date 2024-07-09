@@ -6944,13 +6944,17 @@ FILE *LegacyFile::openFile(void)
 		fclose(file_handle_);
 	}
 
-	QString file = directory_.arg(filename_);
-	QString syscmd = QStringLiteral("cp -f %1 %1.last").arg(file);
-	system(syscmd.toStdString().c_str());
-
-	if ((file_handle_ = fopen(qPrintable(file), "w")) == nullptr)
+	QFileInfo fi(QStringLiteral("%1/%2").arg(directory_).arg(filename_));
+	QString fileName = fi.canonicalFilePath();
+	QString newName = QStringLiteral("%1/%2.last").arg(directory_).arg(filename_);
+	if (!QFile::copy(fileName, newName))
 	{
-		qCritical() << error_message_.arg(file);
+		logentry(QStringLiteral("Unable to copy %1 to %2.").arg(fileName).arg(newName));
+	}
+
+	if ((file_handle_ = fopen(qPrintable(fileName), "w")) == nullptr)
+	{
+		qCritical() << error_message_.arg(fileName);
 		return nullptr;
 	}
 
