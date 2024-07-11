@@ -145,7 +145,8 @@ public:
   time_t login_time = {};
   stat_data *stats = {}; // for rolling up a char
 
-  char **strnew = {}; /* for the modify-str system	*/
+  char **strnew = {};    /* for the modify-str system	*/
+  QString *qstrnew = {}; // for the modify-str system for QStrings */
   char *backstr = {};
   int idle_time = {}; // How long the descriptor has been idle, overall.
   bool color = {};
