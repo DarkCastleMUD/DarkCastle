@@ -7842,16 +7842,16 @@ void Character::send(QString buffer)
 
 void Character::sendRaw(std::string buffer)
 {
-  if (this->desc != nullptr)
+  if (desc)
   {
-    this->desc->allowColor = 0;
+    desc->allowColor = 0;
   }
 
-  this->send(buffer);
+  send(buffer);
 
-  if (this->desc != nullptr)
+  if (desc)
   {
-    this->desc->allowColor = 1;
+    desc->allowColor = 1;
   }
 }
 
