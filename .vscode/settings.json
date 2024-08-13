@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "**/include/**": "cpp"
+        "${workspaceFolder}/src/include/DC/*.h": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
@@ -46,4 +46,7 @@
     ],
     "editor.formatOnSave": true,
     "gitlens.telemetry.enabled": false,
+    "C_Cpp.refactoring.includeHeader": "never",
+    "cmake.configureOnOpen": false,
+    "debug.showVariableTypes": true,
 }
