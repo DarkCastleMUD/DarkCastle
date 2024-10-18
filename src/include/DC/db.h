@@ -124,7 +124,10 @@ public:
   }
   ~LegacyFileWorld()
   {
-    fprintf(file_handle_, "$~\n");
+    if (file_handle_)
+    {
+      fprintf(file_handle_, "$~\n");
+    }
   }
 };
 
