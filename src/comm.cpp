@@ -39,6 +39,7 @@
 #include <QHttpServer>
 #include <QtConcurrent>
 #include <QMap>
+#include <QtNetwork>
 
 #include "DC/terminal.h"
 #include "DC/fileinfo.h"
@@ -904,17 +905,13 @@ void DC::game_loop_init(void)
 
                  return QHttpServerResponse("Rebooting.\r\n"); });
 
-  server.afterRequest([](QHttpServerResponse &&resp, const QHttpServerRequest &request)
-                      { return std::move(resp); });
-
-  server.afterRequest([](const QHttpServerRequest &request, QHttpServerResponse &&resp)
-                      { return std::move(resp); });
-
-  server.afterRequest([](QHttpServerResponse &&resp)
-                      { return std::move(resp); });
-
   QLoggingCategory::setFilterRules("qt.httpserver=true");
-  server.listen(QHostAddress::LocalHost, 6980);
+
+  auto tcpserver = new QTcpServer();
+  if (!tcpserver || !tcpserver->listen(QHostAddress::LocalHost, 6980) || !server.bind(tcpserver))
+  {
+    return;
+  }
 
   exec();
 
