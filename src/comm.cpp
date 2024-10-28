@@ -908,9 +908,14 @@ void DC::game_loop_init(void)
   QLoggingCategory::setFilterRules("qt.httpserver=true");
 
   auto tcpserver = new QTcpServer();
-  if (!tcpserver || !tcpserver->listen(QHostAddress::LocalHost, 6980) || !server.bind(tcpserver))
+  if (!tcpserver->listen(QHostAddress::LocalHost, 6980))
   {
-    return;
+    logmisc(QStringLiteral("Unable to listen to port 6980."));
+  }
+
+  if (!server.bind(tcpserver))
+  {
+    logmisc(QStringLiteral("Unable to bind HTTP server."));
   }
 
   exec();
