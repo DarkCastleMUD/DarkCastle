@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 
 DC::config parse_arguments(int argc, char **argv)
 {
-  char opt;
-  uint32_t port;
+  int opt{};
+  uint32_t port{};
   DC::config cf(argc, argv);
 
   while ((opt = getopt(argc, argv, "tvp:Pmbd:shwcn?i:")) != -1)
