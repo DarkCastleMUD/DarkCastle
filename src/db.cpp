@@ -5333,7 +5333,7 @@ char *fread_string(FILE *fl, int hasher)
 			}
 			return pAlloc;
 			// end of ~ case
-		case EOF:
+		case (char)EOF:
 			perror("fread_string: EOF");
 			throw error_eof();
 			break;
@@ -5373,7 +5373,7 @@ char *fread_word(FILE *fl, int hasher)
 			pBufLast++;
 			break;
 
-		case EOF:
+		case (char)EOF:
 			perror("fread_word: EOF");
 			abort();
 			break;
@@ -5624,7 +5624,7 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 			}
 			break;
 
-		case EOF:
+		case (char)EOF:
 			perror("fread_int: EOF");
 			abort();
 			break;
@@ -5787,7 +5787,7 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 			}
 			break;
 
-		case EOF:
+		case (char)EOF:
 			perror("fread_int: EOF");
 			abort();
 			break;
