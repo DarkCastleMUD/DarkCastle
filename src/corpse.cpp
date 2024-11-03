@@ -548,7 +548,7 @@ int get_line_new(FILE *fl, char *buf)
 	{
 		switch ((temp[a++] = fgetc(fl)))
 		{
-		case EOF:
+		case (char)EOF:
 			return 0;
 		case '|':
 		case '\n':
