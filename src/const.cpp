@@ -3635,7 +3635,8 @@ const char *reserved[] = {
     "profession",
     "lilith ring reuse timer",
     "dawn reuse timer",
-    "durendal resue timer"};
+    "durendal resue timer",
+    "vampiric aura timer"};
 
 QList<bestowable_god_commands_type> DC::bestowable_god_commands =
     {
