@@ -1864,7 +1864,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				}
 			}
 		if (!(flags & SUPPRESS_MESSAGES))
-			ch->sendln("You can no longer wield two handed weapons.");
+			ch->sendln("You can no longer wield multiple two handed weapons.");
 		check_weapon_weights(ch);
 		break;
 	case SKILL_BLADESHIELD:
@@ -5219,6 +5219,13 @@ skill_results_t find_skills_by_name(std::string name)
 		}
 		break;
 
+	case 'v':
+		if (add_matching_results(results, name, "vampiric aura timer", SPELL_VAMPIRIC_AURA_TIMER) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
 	default:
 		break;
 	};
@@ -5307,6 +5314,10 @@ int find_skill_num(char *name)
 	case 'q':
 		if (name_length <= strlen("quiver reuse timer") && !str_n_nosp_cmp(name, "quiver reuse timer", name_length))
 			return SKILL_QUIVERING_PALM;
+		break;
+	case 'v':
+		if (name_length <= strlen("vampiric aura timer") && !str_n_nosp_cmp(name, "vampiric aura timerr", name_length))
+			return SPELL_VAMPIRIC_AURA_TIMER;
 		break;
 	default:
 		break;
