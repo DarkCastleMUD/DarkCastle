@@ -598,7 +598,8 @@ int dam_percent(int learned, int damage);
 #define OBJ_LILITHRING 4020
 #define OBJ_DAWNSWORD 4021
 #define OBJ_DURENDAL 4022
-#define RESERVED_MAX 4022
+#define SPELL_VAMPIRIC_AURA_TIMER 4023
+#define RESERVED_MAX 4023
 
 ///////////////////////////////////////////////////////////////////////
 
