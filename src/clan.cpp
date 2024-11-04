@@ -1024,16 +1024,17 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   }
 
   QString arg1 = arguments.value(0).trimmed().toLower();
-  if (!arg1.isEmpty())
-  {
-    arg1 = arg1[0].toUpper();
-  }
+  // if (!arg1.isEmpty())
+  // {
+  //   arg1 = arg1.toUpper();
+  // }
 
   Character *victim = get_char(arg1);
-  bool victim_connected = false;
-  Connection d = {};
+  bool victim_connected = true;
   if (!victim)
   {
+    bool victim_connected = false;
+    Connection d = {};
     if (!(load_char_obj(&d, arg1)))
     {
       if (file_exists(QStringLiteral("../archive/%1.gz").arg(arg1)))
