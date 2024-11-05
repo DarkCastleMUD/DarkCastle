@@ -511,12 +511,6 @@ int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, class 
   dam = 225;
   int adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
 
-  if (saves_spell(ch, victim, (skill / 3), SAVE_TYPE_COLD) >= 0)
-  {
-    dam >>= 1;
-    adam /= 2;
-  }
-
   int i = victim->getHP();
   int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
   if (!SOMEONE_DIED(retval) && victim->getHP() >= i)
@@ -13918,9 +13912,9 @@ int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class O
      return eFAILURE;
   }
 */
-  if (victim->affected_by_spell(SPELL_VAMPIRIC_AURA))
+  if (ch->affected_by_spell(SPELL_VAMPIRIC_AURA_TIMER))
   {
-    act("$N is already covered in a film of shadows.", ch, 0, victim, TO_CHAR, 0);
+    ch->sendln("Your dark power is not available to you so soon.");
     return eFAILURE;
   }
   act("A film of $B$0shadow$R encompasses $n then fades from view.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -13933,10 +13927,14 @@ int spell_vampiric_aura(uint8_t level, Character *ch, Character *victim, class O
   af.bitvector = -1;
   affect_to_char(victim, &af);
 
+  af.type = SPELL_VAMPIRIC_AURA_TIMER;
+  af.duration = 20;
+  affect_to_char(victim, &af);
+
   return eSUCCESS;
 }
 
-/* VAMPIRIC AURA (potion, scroll, wands, staves) */
+/* VAMPIRIC AURA */
 
 int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
@@ -13949,20 +13947,6 @@ int cast_vampiric_aura(uint8_t level, Character *ch, char *arg, int type, Charac
       return eFAILURE;
     }
     return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
-    break;
-  case SPELL_TYPE_POTION:
-    return spell_vampiric_aura(level, ch, ch, 0, skill);
-    break;
-  case SPELL_TYPE_SCROLL:
-    if (tar_obj)
-      return eFAILURE;
-    if (!tar_ch)
-      tar_ch = ch;
-    return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
-    break;
-  case SPELL_TYPE_STAFF:
-    for (tar_ch = DC::getInstance()->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
-      spell_vampiric_aura(level, ch, tar_ch, 0, skill);
     break;
   default:
     logentry(QStringLiteral("Serious screw-up in vampiric aura!"), ANGEL, LogChannels::LOG_BUG);

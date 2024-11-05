@@ -1039,7 +1039,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
     return eFAILURE;
 
   // ch just hit vict...vict has Vampiric aura up
-  if (number(0, 101) < ((af->modifier) / 10))
+  if (number(0, 101) < ((af->modifier) / 1.7))
   {
     int level = MAX(1, af->modifier / 6);
     int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
