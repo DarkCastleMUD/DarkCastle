@@ -1,6 +1,10 @@
 {
     "files.associations": {
-        "${workspaceFolder}/src/include/DC/*.h": "cpp"
+        "${workspaceFolder}/src/include/DC/*.h": "cpp",
+        "set": "cpp",
+        "fstream": "cpp",
+        "complex": "cpp",
+        "string": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
