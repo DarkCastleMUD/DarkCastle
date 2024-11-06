@@ -1,22 +1,35 @@
 #ifndef TRACE_H
 #define TRACE_H
-#include <string>
-#include <vector>
-#include <sstream>
-#include <fstream>
+#include <QVector>
+#include <QDebug>
 
 class Trace
 {
 public:
-    Trace(std::string source = "unknown");
+    typedef QVector<QString> tracks_t;
+    Trace(QString source = "unknown");
     ~Trace();
-    std::vector<std::string> &getTracks();
-    void addTrack(std::string source);
+    const tracks_t &getTracks();
+    void addTrack(QString source);
 
 private:
-    std::vector<std::string> tracks;
+    tracks_t tracks;
 };
 
-std::ostream &operator<<(std::ostream &out, Trace &t);
+std::ostream &operator<<(std::ostream &out, const QString &str);
+
+auto &operator<<(auto &out, Trace &t)
+{
+    qsizetype track_index{};
+    for (auto &track : t.getTracks())
+    {
+        out << track;
+        if (++track_index != t.getTracks().length())
+        {
+            out << "->";
+        }
+    }
+    return out;
+}
 
 #endif

@@ -1741,7 +1741,7 @@ int do_quit(Character *ch, char *argument, int cmd)
         DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
-      extract_char(fol->follower, false);
+      extract_char(fol->follower, false, QStringLiteral("do_quit/followers"));
     }
   }
   affect_from_char(ch, SPELL_IRON_ROOTS);
@@ -1813,7 +1813,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   while (ch->carrying)
     extract_obj(ch->carrying);
 
-  extract_char(ch, true);
+  extract_char(ch, true, QStringLiteral("do_quit"));
   return eSUCCESS | eCH_DIED;
 }
 

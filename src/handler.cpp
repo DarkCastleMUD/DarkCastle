@@ -3710,6 +3710,7 @@ void update_char_objects(Character *ch)
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char(Character *ch, bool pull, Trace t)
 {
+	t.addTrack("extract_char");
 	Character *k, *next_char;
 	class Connection *t_desc;
 	int l, was_in;
