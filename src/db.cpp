@@ -1278,7 +1278,7 @@ void DC::remove_all_mobs_from_world(void)
 			 [](Character *const &curr)
 			 {
 				 if (IS_NPC(curr))
-					 extract_char(curr, true);
+					 extract_char(curr, true, QStringLiteral("DC::remove_all_mobs_from_world"));
 				 else
 					 do_quit(curr, "", 666);
 			 });
