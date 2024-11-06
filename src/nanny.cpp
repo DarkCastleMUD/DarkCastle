@@ -2038,6 +2038,10 @@ bool check_deny(class Connection *d, char *name)
 // Look for link-dead player to reconnect.
 bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 {
+   if (!DC::getInstance()->death_list.empty())
+   {
+      DC::getInstance()->removeDead();
+   }
    const auto &character_list = DC::getInstance()->character_list;
    for (const auto &tmp_ch : character_list)
    {
