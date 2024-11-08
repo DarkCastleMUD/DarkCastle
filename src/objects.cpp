@@ -2693,6 +2693,22 @@ void Character::heightweight(bool add)
   }
 }
 
+bool Character::allowColor(void)
+{
+  if (player)
+  {
+    if (isSet(player->toggles, Player::PLR_ANSI))
+    {
+      return true;
+    }
+  }
+  else if (desc && desc->allowColor)
+  {
+    return true;
+  }
+  return false;
+}
+
 int obj_from(Object *obj)
 {
   if (obj == nullptr)

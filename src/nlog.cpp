@@ -266,21 +266,21 @@ QString handle_ansi(QString haystack, Character *ch)
 QByteArray handle_ansi(QByteArray haystack, Character *ch)
 {
   QMap<size_t, bool> ignore;
-  QMap<char, QByteArray> rep;
-  rep['$'] = "$";
-  rep['0'] = BLACK;
-  rep['1'] = BLUE;
-  rep['2'] = GREEN;
-  rep['3'] = CYAN;
-  rep['4'] = RED;
-  rep['5'] = YELLOW;
-  rep['6'] = PURPLE;
-  rep['7'] = GREY;
-  rep['B'] = BOLD;
-  rep['R'] = NTEXT;
-  rep['L'] = FLASH;
-  rep['K'] = BLINK;
-  rep['I'] = INVERSE;
+  QMap<char, QPair<QByteArray, QByteArray>> rep;
+  rep['$'] = {"$", "$"};
+  rep['0'] = {BLACK, ""};
+  rep['1'] = {BLUE, ""};
+  rep['2'] = {GREEN, ""};
+  rep['3'] = {CYAN, ""};
+  rep['4'] = {RED, ""};
+  rep['5'] = {YELLOW, ""};
+  rep['6'] = {PURPLE, ""};
+  rep['7'] = {GREY, ""};
+  rep['B'] = {BOLD, ""};
+  rep['R'] = {NTEXT, ""};
+  rep['L'] = {FLASH, ""};
+  rep['K'] = {BLINK, ""};
+  rep['I'] = {INVERSE, ""};
 
   QByteArray result;
   bool code = false;
@@ -288,15 +288,19 @@ QByteArray handle_ansi(QByteArray haystack, Character *ch)
   {
     if (code == true)
     {
-      if (ch == nullptr || IS_MOB(ch) || (ch->player != nullptr && isSet(ch->player->toggles, Player::PLR_ANSI)) || (ch->desc && ch->desc->color))
+      if (rep.contains(c))
       {
-        if (rep.contains(c))
+        if (ch && ch->allowColor())
         {
-          result += rep.value(c);
+          result += rep.value(c).first;
         }
-        code = false;
-        continue;
+        else
+        {
+          result += rep.value(c).second;
+        }
       }
+      code = false;
+      continue;
     }
 
     if (c == '$' && code == false)
