@@ -1038,6 +1038,7 @@ public:
     bool isPlayerObjectThief(void) { return affected_by_spell(PLAYER_OBJECT_THIEF); }
     bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
     bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
+    bool allowColor(void);
 
 private:
     gold_t gold_ = {}; /* Money carried */
