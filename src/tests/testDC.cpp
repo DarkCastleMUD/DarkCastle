@@ -11,10 +11,17 @@
 #include "DC/db.h"
 #include "DC/spells.h"
 #include "DC/vault.h"
+#include "DC/terminal.h"
 
 using namespace std::literals;
 
 #define STRING_LITERAL1 "$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"
+#define STRING_LITERAL1_NOCOLOR "0123456789IL*RB$"
+#define STRING_LITERAL1_COLOR BLACK "0" BLUE "1" GREEN "2" CYAN "3" RED "4" YELLOW "5" PURPLE "6" GREY "7" \
+                                    "8"                                                                    \
+                                    "9" INVERSE "I" FLASH "L"                                              \
+                                    "*" NTEXT "R" BOLD "B"                                                 \
+                                    "$"
 #define STRING_LITERAL2 "$0$1$2$3$4$5$6$7$8$9$I$L$*$R$B"
 #define STRING_LITERAL3 ""
 #define STRING_LITERAL4 "$"
@@ -91,6 +98,20 @@ private slots:
         {
             QCOMPARE(nocolor_strlen(QString(string_literal)), expected);
         }
+    }
+
+    void test_handle_ansi()
+    {
+        std::unique_ptr<Character> ch = std::make_unique<Character>();
+        std::unique_ptr<Player> player = std::make_unique<Player>();
+        ch->player = player.get();
+        ch->do_toggle({"ansi"});
+        QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
+
+        ch->do_toggle({"ansi"});
+        QVERIFY(!isSet(ch->player->toggles, Player::PLR_ANSI));
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
     }
 
     void test_str_dup0()
@@ -230,7 +251,7 @@ private slots:
         redo_ki(&ch);
         ch.ki = ki_limit(&ch);
         do_sing(&ch, str_hsh("'flight of the bumblebee'"));
-        QCOMPARE(conn.output, "R$B$5You feel more competent in your flight of the bumblebee ability. It increased to 2 out of 75.$R\r\nYou forgot the words!\r\n");
+        QCOMPARE(conn.output, "You feel more competent in your flight of the bumblebee ability. It increased to 2 out of 75.\r\nYou forgot the words!\r\n");
         conn.output = {};
         QVERIFY(ch.songs.empty());
 
@@ -810,12 +831,12 @@ private slots:
         conn2.output = {};
 
         auto rc = do_channel(&ch, str_hsh("auction"));
-        QCOMPARE(conn.output, "auction channel turned B$2ON$R.\r\n");
+        QCOMPARE(conn.output, "auction channel turned ON.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
 
         rc = do_channel(&ch2, str_hsh("auction"));
-        QCOMPARE(conn2.output, "auction channel turned B$2ON$R.\r\n");
+        QCOMPARE(conn2.output, "auction channel turned ON.\r\n");
         conn2.output = {};
         QCOMPARE(rc, eSUCCESS);
 
@@ -892,9 +913,9 @@ private slots:
         rc = do_vend(&ch, str_hsh("list mine"));
         QCOMPARE(conn.output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\n\r"
                               "You are using 1 of your 1 available tickets.\r\n\n\r"
-                              "00002) 7$B            $R $51,000,000 $R $2PUBLIC$R     a reflecty test item          \n\r\n\r"
-                              "'$4N$R' indicates an item is NO_TRADE and requires a Genuine Wendy $B$3W$5i$6n$3g$7d$4i$3n$5g$R to purchase.\r\n"
-                              "'$4*$R' indicates you are unable to use this item.\r\n");
+                              "00002)              1,000,000  PUBLIC     a reflecty test item          \n\r\n\r"
+                              "'N' indicates an item is NO_TRADE and requires a Genuine Wendy Wingding to purchase.\r\n"
+                              "'*' indicates you are unable to use this item.\r\n");
         conn.output = {};
         QCOMPARE(rc, eSUCCESS);
 
