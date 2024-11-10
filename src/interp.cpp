@@ -317,7 +317,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         break;
 
       case CommandType::immortals_only:
-        if (this == nullptr || this->player == nullptr || this->isMortal())
+        if (!isImmortalPlayer())
         {
           return eFAILURE;
         }

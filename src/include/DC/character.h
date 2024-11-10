@@ -945,14 +945,14 @@ public:
     QString getSetting(QString key, QString defaultValue = QString());
     QString getSettingAsColor(QString key, QString defaultValue = QString());
 
-    bool isMortal(void);
-    bool isImmortal(void);
-    bool isImplementer(void);
+    bool isMortalPlayer(void);
+    bool isImmortalPlayer(void);
+    bool isImplementerPlayer(void);
 
     bool isPlayer(void);
     bool isNPC(void);
 
-    uint64_t getGold(void);
+        uint64_t getGold(void);
     uint64_t &getGoldReference(void);
     void setGold(uint64_t gold);
 

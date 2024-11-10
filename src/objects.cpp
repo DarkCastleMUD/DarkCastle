@@ -926,7 +926,7 @@ int do_drink(Character *ch, char *argument, int cmd)
     act("You are full.", ch, 0, 0, TO_CHAR, 0);
     act("You are not thirsty anymore.", ch, 0, 0, TO_CHAR, 0);
 
-    if (ch->getLevel() >= IMMORTAL)
+    if (ch->isImmortalPlayer())
       return eSUCCESS;
 
     if (GET_COND(ch, FULL) != -1)
@@ -964,7 +964,7 @@ int do_drink(Character *ch, char *argument, int cmd)
       sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
       ch->send(buf);
 
-      if (ch->getLevel() >= IMMORTAL)
+      if (ch->isImmortalPlayer())
         return eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
@@ -1000,7 +1000,7 @@ int do_drink(Character *ch, char *argument, int cmd)
         ch->addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (ch->isMortal()))
+      if (temp->obj_flags.value[3] && (!ch->isImmortalPlayer()))
       {
         /* The shit was poisoned ! */
         act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);
@@ -1063,7 +1063,7 @@ int do_eat(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (ch->isMortal()))
+  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!ch->isImmortalPlayer()))
   {
     act("Your stomach refuses to eat that!?!", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -1083,7 +1083,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   if (GET_COND(ch, FULL) > 20)
     act("You are full.", ch, 0, 0, TO_CHAR, 0);
 
-  if (temp->obj_flags.value[3] && (ch->isMortal()))
+  if (temp->obj_flags.value[3] && (!ch->isImmortalPlayer()))
   {
     /* The shit was poisoned ! */
     act("Ooups, it tasted rather strange ?!!?", ch, 0, 0, TO_CHAR, 0);

@@ -2041,7 +2041,7 @@ int portal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("magiskhal", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2102,7 +2102,7 @@ int full_heal_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("heltlaka", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2184,7 +2184,7 @@ int fireshield_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("feuerschild", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2239,7 +2239,7 @@ int teleport_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("sbiadirsivia", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2307,7 +2307,7 @@ int alignment_word(Character *ch, class Object *obj, int cmd, char *arg,
 
   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You quietly whisper 'moralevalore' into your hands.");
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return eSUCCESS;
@@ -2367,7 +2367,7 @@ int protection_word(Character *ch, class Object *obj, int cmd, char *arg,
   if (str_cmp("protezione", arg1))
     return eFAILURE;
 
-  if (ch->equipment[HOLD]->obj_flags.value[3] && ch->isMortal())
+  if (ch->equipment[HOLD]->obj_flags.value[3] && !ch->isImmortalPlayer())
   {
     ch->sendln("The item seems to be recharging.");
     return true;
@@ -3818,7 +3818,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
   if (obj->obj_flags.value[3] < 0) // not active yet:)
     return eFAILURE;
 
-  if (vict->isMortal())
+  if (vict->isMortalPlayer())
   {
     if (cmd == CMD_SLIP)
     {
@@ -3861,13 +3861,13 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     Character *give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
       return eFAILURE; // Not giving to char/mob, so ok
-    if (IS_MOB(give_vict) && vict->isMortal())
+    if (IS_MOB(give_vict) && vict->isMortalPlayer())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return eSUCCESS;
     }
     if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) &&
-        vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortal())
+        vict->room().isArena() && arena.isPotato() && arena.isOpened() && vict->isMortalPlayer())
     {
       vict->sendln("Wait until the potato arena is open before you start passing out the potatos!");
       return eSUCCESS;

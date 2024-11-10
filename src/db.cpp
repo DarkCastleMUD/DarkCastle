@@ -785,7 +785,7 @@ void DC::update_wizlist(Character *ch)
 	{
 		if (entry.name.startsWith('@'))
 		{
-			if (ch->isMortal())
+			if (ch->isMortalPlayer())
 				return;
 			entry.name = ch->getName();
 			entry.level = ch->getLevel();

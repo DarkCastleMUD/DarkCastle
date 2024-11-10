@@ -408,7 +408,7 @@ int do_brew(Character *ch, char *argument, int cmd)
 
   int learned = ch->has_skill(SKILL_BREW);
 
-  if (IS_PC(ch) && ch->isMortal() && !learned)
+  if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You just don't have the mind for potion brewing.");
     return eFAILURE;
@@ -916,7 +916,7 @@ int do_scribe(Character *ch, char *argument, int cmd)
 
   int learned = ch->has_skill(SKILL_SCRIBE);
 
-  if (IS_PC(ch) && ch->isMortal() && !learned)
+  if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You just don't have the mind for scribing.");
     return eFAILURE;

@@ -94,7 +94,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
   {
-    if (ch->isMortal())
+    if (ch->isMortalPlayer())
     {
       ch->sendln("You are unable to destroy this item, it must be CURSED!");
       return eFAILURE;
@@ -1438,7 +1438,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
 
 void CVoteData::DisplayResults(Character *ch)
 {
-  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && ch->isMortal())
+  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && ch->isMortalPlayer())
   {
     ch->sendln("Sorry, but you have to cast a vote before you can see the results.");
     return;
@@ -1457,7 +1457,7 @@ void CVoteData::DisplayResults(Character *ch)
   ch->sendln("");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    if (ch->isMortal())
+    if (ch->isMortalPlayer())
     {
       percent = (answer_it->votes * 100) / total_votes;
       csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());

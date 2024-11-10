@@ -110,7 +110,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (ch->isMortal())
+    if (!ch->isImmortalPlayer())
       ch->send(new_help);
     else
       ch->send(new_ihelp);
@@ -254,7 +254,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
           "$1$B| | $B$5Related Help: $B$7%-57.57s $1$B| |\r\n"
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R",
-          buf, ((ch->getLevel() >= IMMORTAL) ? rec_level : " "),
+          buf, ch->isImmortalPlayer() ? rec_level : " ",
           ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
           this_help->entry, this_help->related);
 

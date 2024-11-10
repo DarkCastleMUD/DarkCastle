@@ -17,7 +17,7 @@
 auto Character::do_arena(QStringList arguments, int cmd) -> command_return_t
 {
   auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
-  if (isMortal() && !rufus)
+  if (!isImmortalPlayer() && !rufus)
   {
     sendln("You must be in the same room as Rufus the Arena-keeper to use this command.");
     return eFAILURE;

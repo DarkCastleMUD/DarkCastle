@@ -614,7 +614,7 @@ void gain_exp(Character *ch, int64_t gain)
 	int x = 0;
 	int64_t y;
 
-	if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+	if (ch->isImmortalPlayer())
 		return;
 
 	y = exp_table[ch->getLevel() + 1];

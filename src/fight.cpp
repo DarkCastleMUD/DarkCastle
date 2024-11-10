@@ -950,7 +950,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == position_t::DEAD)
     return eFAILURE;
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))
     return eFAILURE;
@@ -1065,7 +1065,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == position_t::DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_FIRESHIELD))
     return eFAILURE;
@@ -1154,7 +1154,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == position_t::DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
     return eFAILURE;
   if (!IS_AFFECTED(vict, AFF_ACID_SHIELD))
     return eFAILURE;
@@ -1239,7 +1239,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
 
   if (GET_POS(vict) == position_t::DEAD)
     return eFAILURE;
-  if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
     return eFAILURE;
   if (!vict->affected_by_spell(SPELL_BONESHIELD))
     return eFAILURE;
@@ -1414,9 +1414,9 @@ int get_monk_bare_damage(Character *ch)
     dam = dice(5, 5);
   else if (ch->getLevel() < 61)
     dam = dice(6, 5);
-  else if (ch->isMortal())
+  else if (ch->getLevel() < 100)
     dam = dice(10, 6);
-  else if (ch->getLevel() < IMPLEMENTER)
+  else if (ch->getLevel() < 110)
     dam = dice(10, 10);
   else
     dam = dice(50, 5);
@@ -2545,7 +2545,7 @@ int damage(Character *ch, Character *victim,
   int pre_stoneshield_dam = 0;
   std::stringstream string1;
   struct affected_type *pspell = nullptr;
-  if (victim->isMortal() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
+  if (!victim->isImmortalPlayer() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
   {
@@ -5439,7 +5439,7 @@ void raw_kill(Character *ch, Character *victim)
     REMBIT(victim->affected_by, AFF_CHAMPION);
     do_champ_flag_death(victim);
   }
-  if (ch && IS_NPC(victim) && IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+  if (ch && ch->isImmortalPlayer() && victim->isNPC())
   {
     special_log(QString(QStringLiteral("%1 killed %2 in room %3!")).arg(ch->getName()).arg(victim->getName()).arg(ch->in_room));
   }
@@ -5611,7 +5611,7 @@ void raw_kill(Character *ch, Character *victim)
     GET_RDEATHS(victim) += 1;
 
     /* gods don't suffer from stat loss */
-    if (victim->isMortal() && victim->getLevel() > 19)
+    if (victim->isMortalPlayer() && victim->getLevel() > 19)
     {
       /* New death system... dying is a BITCH!  */
       // thief + mob kill = stat loss
@@ -6841,7 +6841,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -6868,9 +6868,9 @@ void arena_kill(Character *ch, Character *victim, int type)
   auto &arena = DC::getInstance()->arena_;
   if (ch && arena.isChaos())
   {
-    if (ch && ch->clan && ch->isMortal())
+    if (ch && ch->clan && ch->isMortalPlayer())
       ch_clan = get_clan(ch);
-    if (victim->clan && victim->isMortal())
+    if (victim->clan && victim->isMortalPlayer())
       victim_clan = get_clan(victim);
 
     if (type == KILL_BINGO)
@@ -6934,7 +6934,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     {
 
       if (tmp->room().isArena())
-        if (victim->clan == tmp->clan && victim != tmp && tmp->isMortal())
+        if (victim->clan == tmp->clan && victim != tmp && tmp->isMortalPlayer())
           eliminated = 0;
     }
     if (eliminated)

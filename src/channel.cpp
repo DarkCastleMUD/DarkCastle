@@ -265,7 +265,7 @@ int do_pray(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
   {
     ch->sendln("Why pray? You are a god!");
     return eSUCCESS;

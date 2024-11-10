@@ -250,8 +250,10 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
     }
   }
   // success
-  else if (
-      ((victim->isMortal() && IS_PC(victim)) || IS_NPC(victim)) && (victim->getLevel() <= this->getLevel() + 19) && ((IS_PC(this) && this->getLevel() >= IMMORTAL) || itemp > 95 || (IS_PC(victim) && isSet(victim->player->punish, PUNISH_UNLUCKY))) && ((this->equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (this->equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
+  else if (!victim->isImmortalPlayer() &&
+           victim->getLevel() <= (getLevel() + 19) &&
+           (isImmortalPlayer() || itemp > 95 || (victim->isPlayer() && isSet(victim->player->punish, PUNISH_UNLUCKY))) &&
+           ((equipment[WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (equipment[WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -1665,7 +1667,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     if (!skill_success(ch, vict, SKILL_SLIP))
     {
       ch->sendln("Whoops!  You dropped the coins!");
-      if (ch->getLevel() >= IMMORTAL)
+      if (ch->isImmortalPlayer())
       {
         special_log(QString(QStringLiteral("%1 tries to slip %2 coins to %3 and drops them in room %4!")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
@@ -1690,7 +1692,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     {
       csendf(ch, "You slip %d coins to %s.\r\n", amount, GET_NAME(vict));
 
-      if (ch->getLevel() >= IMMORTAL)
+      if (ch->isImmortalPlayer())
       {
         special_log(QString(QStringLiteral("%1 slips %2 coins to %3 in room %4!")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
@@ -1861,7 +1863,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (ch->getLevel() >= IMMORTAL && ch->getLevel() <= DEITY)
+    if (ch->isImmortalPlayer())
     {
       special_log(QString(QStringLiteral("%1 slips %2 to %3 and fumbles it in room %4!")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
     }
@@ -1881,7 +1883,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   // Success
   else
   {
-    if (ch->getLevel() >= IMMORTAL && ch->getLevel() <= DEITY)
+    if (ch->isImmortalPlayer())
     {
       special_log(QString(QStringLiteral("%1 slips %2 to %3 in room %4.")).arg(ch->getName()).arg(obj->short_description).arg(vict->getName()).arg(ch->in_room));
     }
@@ -1904,7 +1906,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && ch->isMortal())
+  if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last vitalstrike technique.");
     return eFAILURE;
@@ -2043,7 +2045,7 @@ int do_jab(Character *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if (ch->affected_by_spell(SKILL_JAB) && ch->isMortal())
+  if (ch->affected_by_spell(SKILL_JAB) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your arm is still sore from your last attempt.");
     return eFAILURE;
@@ -2382,7 +2384,7 @@ int do_cripple(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ((ch->isMortal()) || IS_NPC(ch))
+  if (!ch->isImmortalPlayer())
     if (!can_attack(ch) || !can_be_attacked(ch, vict))
       return eFAILURE;
 

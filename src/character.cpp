@@ -167,19 +167,19 @@ player_config_t::const_iterator PlayerConfig::constEnd() const
     return config.constEnd();
 }
 
-bool Character::isMortal(void)
+bool Character::isMortalPlayer(void)
 {
-    return level_ < IMMORTAL;
+    return isPlayer() && level_ < IMMORTAL;
 }
 
-bool Character::isImmortal(void)
+bool Character::isImmortalPlayer(void)
 {
-    return level_ >= IMMORTAL;
+    return isPlayer() && level_ >= IMMORTAL;
 }
 
-bool Character::isImplementer(void)
+bool Character::isImplementerPlayer(void)
 {
-    return level_ == IMPLEMENTER;
+    return isPlayer() && level_ == IMPLEMENTER;
 }
 
 uint64_t Character::getGold(void)

@@ -1659,7 +1659,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
   if (ch->in_room == DC::NOWHERE)
   {
-    if (ch->getLevel() >= IMMORTAL)
+    if (ch->isImmortalPlayer())
       ch->in_room = real_room(17);
     else
       ch->in_room = real_room(START_ROOM);

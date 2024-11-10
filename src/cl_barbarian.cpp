@@ -825,7 +825,7 @@ int do_crazedassault(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 20;
-  if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && ch->isMortal())
+  if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last crazed assault technique.");
     return eFAILURE;

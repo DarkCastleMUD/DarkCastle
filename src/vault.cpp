@@ -326,7 +326,7 @@ int do_vault(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-      else if (ch->getLevel() >= IMMORTAL)
+      else if (ch->isImmortalPlayer())
       {
         vault_log(ch, arg1);
       }
@@ -1538,7 +1538,7 @@ void vault_get(Character *ch, QString object, QString owner)
       return;
     }
 
-    if (!self && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && ch->isMortal())
+    if (!self && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && !ch->isImmortalPlayer())
     {
       ch->sendln("That item seems to be bound to the vault.");
       return;
@@ -1547,7 +1547,7 @@ void vault_get(Character *ch, QString object, QString owner)
     if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch))
     {
       ch->sendln("You cannot hold any more.");
-      if (ch->isMortal())
+      if (!ch->isImmortalPlayer())
         return;
       else
         ch->sendln("But since you're an immortal, you get it anyway.");
@@ -1822,7 +1822,7 @@ int can_put_in_vault(class Object *obj, int self, struct vault_data *vault, Char
     return 0;
   }
 
-  if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && ch->isMortal())
+  if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
   { // no_trade
     ch->send(QStringLiteral("%1 seems bound to you.\r\n").arg(GET_OBJ_SHORT(obj)));
     return 0;
@@ -1908,7 +1908,7 @@ void vault_put(Character *ch, QString object, QString owner)
       }
 
       QString buffer;
-      if (ch->isMortal())
+      if (!ch->isImmortalPlayer())
         buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
         buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
@@ -1963,7 +1963,7 @@ void vault_put(Character *ch, QString object, QString owner)
       }
 
       QString buffer;
-      if (ch->isMortal())
+      if (!ch->isImmortalPlayer())
         buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
       else
         buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);
@@ -2001,7 +2001,7 @@ void vault_put(Character *ch, QString object, QString owner)
     }
 
     QString buffer;
-    if (ch->isMortal())
+    if (!ch->isImmortalPlayer())
       buffer = QStringLiteral("%1 added %2 to %3's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(owner);
     else
       buffer = QStringLiteral("%1 added %2[%3] to %4's vault.").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(GET_OBJ_VNUM(obj)).arg(owner);

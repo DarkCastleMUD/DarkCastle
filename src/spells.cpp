@@ -1822,7 +1822,7 @@ int do_cast(Character *ch, char *argument, int cmd)
   //    return eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortal())
+  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
     return eFAILURE;
@@ -2426,7 +2426,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && ch->affected_by_spell(SKILL_CRIPPLE))
           chance -= 1 + ch->affected_by_spell(SKILL_CRIPPLE)->modifier / 10;
 
-        if (ch->isMortal() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+        if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);

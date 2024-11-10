@@ -2478,7 +2478,7 @@ int process_input(class Connection *t)
     << "(" << buffer.length() << ")" << std::endl;
 #endif
 
-    if (t->character == nullptr || t->character->isMortal())
+    if (t->character == nullptr || t->character->isMortalPlayer())
     {
       buffer = remove_all_codes(buffer);
     }
@@ -3029,7 +3029,7 @@ void send_to_char_nosp(QString messg, Character *ch)
 
 void record_msg(QString messg, Character *ch)
 {
-  if (messg.isEmpty() || IS_NPC(ch) || ch->isMortal())
+  if (messg.isEmpty() || !ch->isImmortalPlayer())
     return;
 
   if (ch->player->away_msgs.size() < 1000)

@@ -1079,7 +1079,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     else if (isSet(prog, eEXTRA_VAL2))
       return false;
   }
-  if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->isMortal())
+  if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->isMortalPlayer())
     return true;
 
   if (obj->in_room == DC::NOWHERE)
@@ -1645,7 +1645,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && ch->isMortal())
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && !ch->isImmortalPlayer())
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return eFAILURE;
@@ -1882,7 +1882,7 @@ int do_home(Character *ch, char *argument, int cmd)
   struct clan_room_data *room;
   int found = 0;
 
-  if (ch->isMortal())
+  if (!ch->isImmortalPlayer())
   {
     if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) ||
         ch->room().isArena())

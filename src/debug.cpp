@@ -457,7 +457,7 @@ int main(int argc, char **argv)
       do_vault(c, "list");
       process_output(d);
 
-      if (c->isImmortal() && c->isPlayer())
+      if (c->isImmortalPlayer())
       {
         qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
       }
