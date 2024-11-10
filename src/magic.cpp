@@ -400,7 +400,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
   {
     if (number(1, 100) == 1)
     {
-      if (victim->isMortal())
+      if (victim->isMortalPlayer())
       {
         dam = victim->getHP() * 5 + 20;
         victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
@@ -408,7 +408,7 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
         return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
       }
-      else if (victim->isImmortal())
+      else if (victim->isImmortalPlayer())
       {
         victim->sendln(QStringLiteral("%1 attempts to tear you apart with a watery blast but fails because you are an Immortal.").arg(ch->getName()));
         act("$n attempts to tear $N apart with a watery blast but fails because they are an Immortal.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -3145,7 +3145,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
   if (j == 0)
     ch->sendln("The tremendous amount of information leaves you very confused.");
 
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
   {
     ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
@@ -4299,7 +4299,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
   assert(ch && victim);
 
   if (isSet(DC::getInstance()->world[victim->in_room].room_flags, NO_MAGIC) ||
-      (victim->getLevel() >= IMMORTAL && ch->isMortal()))
+      (victim->isImmortalPlayer() && !ch->isImmortalPlayer()))
   {
     ch->sendln("Your vision is too clouded to make out anything.");
     return eFAILURE;
@@ -4352,7 +4352,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
   }
 
   if (!OUTSIDE(victim) ||
-      (victim->getLevel() >= IMMORTAL && ch->isMortal()))
+      (victim->isImmortalPlayer() && !ch->isImmortalPlayer()))
   {
     ch->sendln("Your eagle cannot scan the area.");
     return eFAILURE;
@@ -11392,7 +11392,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
 
   if (bingo > 0)
   {
-    if (number(1, 100) <= bingo && victim->isMortal())
+    if (number(1, 100) <= bingo && !victim->isImmortalPlayer())
     {
       dam = 9999999;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "

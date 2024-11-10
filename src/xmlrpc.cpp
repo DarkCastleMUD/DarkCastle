@@ -26,7 +26,7 @@ protected:
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
     Character *ch = get_all_pc(buffer);
 
-    if (ch && IS_PC(ch) && ch->getLevel() >= IMMORTAL && ch->player->pwd &&
+    if (ch && ch->isImmortalPlayer() && ch->player->pwd &&
         !strncmp(crypt(password.c_str(), ch->player->pwd),
                  ch->player->pwd, (PASSWORD_LEN)))
     {
@@ -96,7 +96,7 @@ public:
       contents.erase(index, 1);
     }
 
-    if (IS_PC(ch) && ch->getLevel() >= IMMORTAL && ch->desc->strnew)
+    if (ch->isImmortalPlayer() && ch->desc->strnew)
     {
       switch (ch->desc->web_connected)
       {
@@ -182,7 +182,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && ch->getLevel() >= IMMORTAL)
+    if (ch->isImmortalPlayer())
     {
       switch (ch->desc->web_connected)
       {

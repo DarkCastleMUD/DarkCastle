@@ -1012,7 +1012,7 @@ bool identify(Character *ch, Object *obj)
    int i = 0, value = 0, bits = 0;
    bool found = false;
 
-   if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->isMortal())
+   if (obj->isDark() && !ch->isImmortalPlayer())
    {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return false;
@@ -1265,7 +1265,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
       }
       obj = (Object *)DC::getInstance()->obj_index[rnum].item;
 
-      if (isMortal() && obj->isDark())
+      if (obj->isDark() && !isImmortalPlayer())
       {
          send("This object cannot be identified by mortals.\r\n");
          return eFAILURE;
@@ -1971,7 +1971,7 @@ int do_score(Character *ch, char *argument, int cmd)
    if (IS_PC(ch)) // mobs can't view this part
    {
       QString experience_needed;
-      if (ch->isImplementer())
+      if (ch->isImmortalPlayer())
       {
          experience_needed = "0";
       }
@@ -2387,7 +2387,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    else
       ch->sendln("You have no feeling about the weather at all.");
 
-   if (ch->getLevel() >= IMMORTAL)
+   if (ch->isImmortalPlayer())
    {
       csendf(ch, "Pressure: %4d  Change: %d (- = worse)\r\n",
              weather_info.pressure, weather_info.change);
@@ -4387,7 +4387,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             continue;
          }
 
-         if (isMortal() && obj->isDark())
+         if (obj->isDark() && !isImmortalPlayer())
          {
             continue;
          }

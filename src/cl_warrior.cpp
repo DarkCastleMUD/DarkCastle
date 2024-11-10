@@ -911,7 +911,7 @@ int do_bladeshield(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->affected_by_spell(SKILL_BLADESHIELD) && ch->isMortal())
+  if (ch->affected_by_spell(SKILL_BLADESHIELD) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last use of the blade shield technique.");
     return eFAILURE;
@@ -1303,7 +1303,7 @@ int do_triage(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_TRIAGE);
   struct affected_type af;
 
-  if (IS_PC(ch) && ch->isMortal() && !learned)
+  if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You do not know how to aid your regeneration in that way.");
     return eFAILURE;
@@ -1630,7 +1630,7 @@ int do_onslaught(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_ONSLAUGHT);
   struct affected_type af;
 
-  if (IS_PC(ch) && ch->isMortal() && !learned)
+  if (ch->isMortalPlayer() && !learned)
   {
     ch->sendln("You do not know how to use this to your advantage.");
     return eFAILURE;

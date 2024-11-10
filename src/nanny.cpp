@@ -1071,7 +1071,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
-      if (ch->isMortal())
+      if (ch->isMortalPlayer())
          d->character->send(motd);
       else
          d->character->send(imotd);
@@ -2073,7 +2073,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
          QString log_buf = QStringLiteral("%1@%2 has reconnected.").arg(GET_NAME(tmp_ch)).arg(d->getPeerOriginalAddress().toString());
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-         if (tmp_ch->isMortal())
+         if (tmp_ch->isMortalPlayer())
          {
             logentry(log_buf, COORDINATOR, LogChannels::LOG_SOCKET);
          }
@@ -2161,7 +2161,7 @@ void short_activity()
 // commands, while still allowing other.
 void add_command_lag(Character *ch, int amount)
 {
-   if (ch->isMortal())
+   if (ch->isMortalPlayer())
       ch->timer += amount;
 }
 
@@ -2227,7 +2227,7 @@ void update_characters()
       }
 
       // handle drowning
-      if (IS_PC(i) && i->isMortal() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
+      if (IS_PC(i) && i->isMortalPlayer() && DC::getInstance()->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
       {
          tmp = GET_MAX_HIT(i) / 5;
          sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), DC::getInstance()->world[i->in_room].number);
@@ -2248,7 +2248,7 @@ void update_characters()
       // handle command lag
       if (i->timer > 0)
       {
-         if (i->isMortal())
+         if (i->isMortalPlayer())
             i->timer--;
          else
             i->timer = 0;
@@ -2342,7 +2342,7 @@ void checkConsecrate(int pulseType)
                      continue;
                   }
 
-                  if (IS_PC(tmp_ch) && tmp_ch->getLevel() >= IMMORTAL)
+                  if (tmp_ch->isImmortalPlayer())
                   {
                      continue;
                   }
@@ -2382,7 +2382,7 @@ void checkConsecrate(int pulseType)
             for (tmp_ch = DC::getInstance()->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
                next_ch = tmp_ch->next_in_room;
-               if (IS_PC(tmp_ch) && tmp_ch->getLevel() >= IMMORTAL)
+               if (tmp_ch->isImmortalPlayer())
                {
                   continue;
                }

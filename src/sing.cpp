@@ -290,7 +290,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 	int learned;
 	std::vector<songInfo>::iterator i;
 
-	if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && ch->isMortal())
+	if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
 	{
 		ch->check_social("sing");
 		return eSUCCESS;
@@ -859,7 +859,7 @@ void update_bard_singing()
 {
 	for (const auto &ch : DC::getInstance()->character_list)
 	{
-		if (ch->isPlayer() && ch->getClass() != CLASS_BARD && ch->isMortal())
+		if (ch->isPlayer() && ch->getClass() != CLASS_BARD && !ch->isImmortalPlayer())
 		{
 			continue;
 		}
@@ -1424,7 +1424,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 	ch->sendln("Available Songs\n\r---------------");
 	for (qsizetype i = 0; i < Character::song_names.length(); i++)
 	{
-		if (ch->isMortal() && !ch->has_skill(song_info[i].skill_num))
+		if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num))
 			continue;
 
 		sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski);

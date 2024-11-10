@@ -94,7 +94,7 @@ int do_eagle_claw(Character *ch, char *argument, int cmd)
   else
   {
     // 1% bingo chance
-    if (number(1, 100) == 1 && (victim->isNPC() || victim->isMortal()))
+    if (number(1, 100) == 1 && !victim->isImmortalPlayer())
     {
       time(&time_raw_format);
       ptr_time = localtime(&time_raw_format);
@@ -264,7 +264,7 @@ int do_stun(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->isMortal() && IS_PC(victim) && victim->getLevel() >= IMMORTAL)
+  if (!ch->isImmortalPlayer() && victim->isImmortalPlayer())
   {
     act_return ar = act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
     retval = ar.retval;

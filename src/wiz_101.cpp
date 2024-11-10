@@ -32,7 +32,7 @@ std::queue<std::string> imp_history;
 
 command_return_t Character::do_wizhelp(QStringList arguments, int cmd)
 {
-  if (isNPC() || isMortal())
+  if (!isImmortalPlayer())
   {
     return eFAILURE;
   }
@@ -554,12 +554,6 @@ int do_highfive(Character *ch, char *argument, int cmd)
   if (!(victim = get_char_vis(ch, buf)))
   {
     ch->sendln("No-one by that name in the world.");
-    return eFAILURE;
-  }
-
-  if (victim->isMortal())
-  {
-    ch->sendln("What you wanna give a mortal a high-five for?! *smirk* ");
     return eFAILURE;
   }
 

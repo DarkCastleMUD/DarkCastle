@@ -142,7 +142,7 @@ void record_track_data(Character *ch, int cmd)
 //{
 //   short chance = number(0,30);
 //
-//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || ch->getLevel() >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || ch->isImmortalPlayer() || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
 //     ; //poop on a stick!
 //   } else if(GET_DEX(ch) > chance) {
 //      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
@@ -164,7 +164,7 @@ int do_unstable(Character *ch)
 	short chance = number(0, 30);
 
 	if (IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) ||
-		ch->getLevel() >= IMMORTAL)
+		ch->isImmortalPlayer())
 		return eFAILURE;
 
 	if (GET_DEX(ch) > chance)
@@ -205,7 +205,7 @@ int do_fall(Character *ch, short dir)
 	else if (GET_MAX_HIT(ch) > 1000)
 		dam = number(200, 400);
 
-	if (ch->getLevel() >= IMMORTAL)
+	if (ch->isImmortalPlayer())
 	{
 		return eFAILURE;
 	}
@@ -510,7 +510,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 					if (ch->equipment[x])
 						if (ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
 							has_boat = true;
-			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && ch->isMortal() &&
+			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && !ch->isImmortalPlayer() &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
 				ch->sendln("You need a boat to go there.");
@@ -565,7 +565,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (ch->isMortal())
+	if (!ch->isImmortalPlayer())
 	{
 		bool classRestrictions = false;
 		// Determine if any class restrictions are in place
@@ -640,7 +640,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		}
 	}
 
-	if (ch->isMortal() && IS_PC(ch))
+	if (!ch->isImmortalPlayer())
 		ch->decrementMove(need_movement);
 
 	// Everyone

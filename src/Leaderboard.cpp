@@ -604,7 +604,7 @@ void Leaderboard::check_offline(void)
 
 	for (const auto &ch : DC::getInstance()->character_list)
 	{
-		if (ch->getLevel() >= IMMORTAL || IS_NPC(ch))
+		if (!ch->isMortalPlayer())
 			continue;
 
 		if (ch->player == nullptr)

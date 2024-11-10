@@ -839,7 +839,7 @@ void clan_death(Character *ch, Character *killer)
     return;
 
   // Don't give away any imms listening in
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
     return;
 
   if (!(curr = strstr(clan->death_message, "%")))
@@ -881,7 +881,7 @@ void clan_login(Character *ch)
   }
 
   // Don't give away any imms listening in
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
   {
     return;
   }
@@ -925,7 +925,7 @@ void clan_logout(Character *ch)
   }
 
   // Don't give away any imms listening in
-  if (ch->getLevel() >= IMMORTAL)
+  if (ch->isImmortalPlayer())
   {
     return;
   }

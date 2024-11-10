@@ -848,7 +848,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   if (cmd == 171 && !IS_MOB(ch))
   { /*   gain crap...  */
 
-    if ((ch->getLevel() >= IMMORTAL) || (ch->getLevel() == DC::MAX_MORTAL_LEVEL))
+    if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
     {
       ch->sendln("You have already reached the highest level!");
       return eSUCCESS;

@@ -213,7 +213,8 @@ private slots:
         ch.do_on_login_stuff();
 
         QVERIFY(ch.isPlayer());
-        QVERIFY(ch.isMortal());
+        QVERIFY(ch.isMortalPlayer());
+        QVERIFY(!ch.isImmortalPlayer());
         QVERIFY(!ch.isNPC());
         QVERIFY(!dc.character_list.empty());
 

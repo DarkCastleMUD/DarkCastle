@@ -169,7 +169,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
       randomize_object(obj);
     }
 
-    if (obj->obj_flags.type_flag == ITEM_MONEY && !ch->isImplementer())
+    if (obj->obj_flags.type_flag == ITEM_MONEY && !ch->isImplementerPlayer())
     {
       extract_obj(obj);
       ch->send("Denied.\r\n");
