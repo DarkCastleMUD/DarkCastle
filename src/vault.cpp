@@ -198,7 +198,7 @@ void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
 
   ch->sendln("You have access to the following vaults:");
   for (vault = vault_table; vault; vault = vault->next)
-    if (vault && has_vault_access(GET_NAME(ch), vault))
+    if (vault && has_vault_access(ch, vault))
       ch->send(QStringLiteral("%1\r\n").arg(vault->owner));
 }
 

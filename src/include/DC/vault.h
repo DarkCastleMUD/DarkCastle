@@ -40,6 +40,7 @@ class Object *get_obj_in_all_vaults(char *object, int num);
 struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 bool has_vault_access(QString owner, struct vault_data *vault);
+bool has_vault_access(Character *ch, struct vault_data *vault);
 int vault_search(Character *ch, const char *keyword);
 void sort_vault(const vault_data &vault, struct sorted_vault &sv);
 
