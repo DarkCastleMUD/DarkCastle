@@ -198,7 +198,7 @@ void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
 
   ch->sendln("You have access to the following vaults:");
   for (vault = vault_table; vault; vault = vault->next)
-    if (vault && has_vault_access(GET_NAME(ch), vault))
+    if (vault && has_vault_access(ch, vault))
       ch->send(QStringLiteral("%1\r\n").arg(vault->owner));
 }
 
@@ -1283,15 +1283,26 @@ bool has_vault_access(Character *ch, struct vault_data *vault)
   return false;
 }
 
-bool has_vault_access(QString who, struct vault_data *vault)
+bool has_vault_access(QString name, struct vault_data *vault)
 {
-  Character *ch = find_owner(who);
-  if (ch == nullptr)
+  Connection d{};
+  Character *ch = get_pc(name);
+
+  if (!ch)
   {
-    return false;
+    if (!(load_char_obj(&d, name)))
+    {
+      return false;
+    }
+    ch = d.character;
   }
 
-  return has_vault_access(ch, vault);
+  auto ch_has_vault_access = has_vault_access(ch, vault);
+  if (d.character)
+  {
+    free_char(d.character, Trace("add_vault_access 2"));
+  }
+  return ch_has_vault_access;
 }
 
 struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char *object, int num)
