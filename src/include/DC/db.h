@@ -119,7 +119,7 @@ class LegacyFileWorld : public LegacyFile
 {
 public:
   LegacyFileWorld(QString filename)
-      : LegacyFile("world/%1", filename, "Unable to open world file '%1")
+      : LegacyFile("world", filename, "Unable to open world file '%1")
   {
   }
   ~LegacyFileWorld()
