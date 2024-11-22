@@ -1428,8 +1428,16 @@ void write_one_room(LegacyFile &lf, int a)
 	} /* exits */
 
 	/* extra descriptions */
+	// We push C-style linked list into QStack so we can maintain the order when writing
+	QStack<extra_descr_data *> room_extra_descriptions;
 	for (extra = DC::getInstance()->world[a].ex_description; extra; extra = extra->next)
 	{
+		room_extra_descriptions.push(extra);
+	}
+
+	while (!room_extra_descriptions.isEmpty())
+	{
+		extra = room_extra_descriptions.pop();
 		if (!extra)
 			break;
 		fprintf(f, "E\n");
@@ -6946,10 +6954,20 @@ FILE *LegacyFile::openFile(void)
 
 	QFileInfo fi(QStringLiteral("%1/%2").arg(directory_).arg(filename_));
 	QString fileName = fi.canonicalFilePath();
-	QString newName = QStringLiteral("%1/%2.last").arg(directory_).arg(filename_);
-	if (!QFile::copy(fileName, newName))
+
+	QFileInfo nfi(QStringLiteral("%1/%2.last").arg(directory_).arg(filename_));
+	QString newFileName = nfi.canonicalFilePath();
+
+	if (QFile::exists(newFileName))
 	{
-		logentry(QStringLiteral("Unable to copy %1 to %2.").arg(fileName).arg(newName));
+		if (!QFile::remove(newFileName))
+		{
+			logentry(QStringLiteral("Unable to remove '%1'.").arg(newFileName));
+		}
+	}
+	if (!QFile::copy(fileName, newFileName))
+	{
+		logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(fileName).arg(newFileName));
 	}
 
 	if ((file_handle_ = fopen(qPrintable(fileName), "w")) == nullptr)

@@ -2002,7 +2002,7 @@ void save_slot_machines()
       return;
    }
 
-   LegacyFile lf("objects/%1", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
    if (lf.isOpen())
    {
       for (int x = curr->firstnum; x <= curr->lastnum; x++)

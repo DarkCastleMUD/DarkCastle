@@ -985,7 +985,7 @@ void save_player_shop_world_range()
   world_file_list_item *curr;
   char buf[180];
 
-    curr = DC::getInstance()->world_file_list;
+  curr = DC::getInstance()->world_file_list;
   while (curr && curr->firstnum != 23000)
     curr = curr->next;
 
@@ -996,7 +996,7 @@ void save_player_shop_world_range()
     exit(1);
   }
 
-  LegacyFile lf("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.");
+  LegacyFile lf("world", curr->filename, "Couldn't open room save file %1 for player shops.");
   if (lf.isOpen())
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)

@@ -5006,7 +5006,7 @@ int do_msave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  LegacyFile lf("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.");
+  LegacyFile lf("mobs", curr->filename, "Couldn't open legacy mob save file %1.");
   if (lf.isOpen())
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)
@@ -5058,7 +5058,7 @@ int do_osave(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  LegacyFile lf("objects/%1", curr->filename, "Couldn't open legacy obj save file %1.");
+  LegacyFile lf("objects", curr->filename, "Couldn't open legacy obj save file %1.");
   if (lf.isOpen())
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)
