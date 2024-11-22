@@ -2724,9 +2724,6 @@ int do_mlocate(Character *ch, char *name, int cmd)
 
       if (i->in_room == DC::NOWHERE)
       {
-         logf(ANGEL, LogChannels::LOG_BUG, "do_mlocate: %s is in_room %d, averting crash. IS_NPC(i)==%s, IS_PC(i)==%s, IS_MOB(i)==%s",
-              GET_NAME(i), i->in_room, IS_NPC(i) ? "true" : "false", IS_PC(i) ? "true" : "false", IS_MOB(i) ? "true" : "false");
-         produce_coredump(i);
          continue;
       }
 
