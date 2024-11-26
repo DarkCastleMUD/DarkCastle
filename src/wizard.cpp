@@ -569,8 +569,12 @@ void boro_mob_stat(Character *ch, Character *k)
   ch->send(buf);
 }
 
-void mob_stat(Character *ch, Character *k)
+command_return_t mob_stat(Character *ch, Character *k)
 {
+  if (!ch || !k)
+  {
+    return eFAILURE;
+  }
 
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -650,7 +654,7 @@ void mob_stat(Character *ch, Character *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(DC::getInstance()->mob_index[k->mobdata->nr].mobspec), DC::getInstance()->mob_index[k->mobdata->nr].progtypes);
+    sprintf(buf, "$3Mobspec$R: %s  $3Progtypes$R: %s\r\n", DC::getInstance()->mob_index[k->mobdata->nr].mobspec ? "Exists" : "Absent", DC::getInstance()->mob_index[k->mobdata->nr].progtypes ? "Exists" : "Absent");
     ch->send(buf);
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
@@ -943,6 +947,8 @@ void mob_stat(Character *ch, Character *k)
       break;
     }
   }
+
+  return eSUCCESS;
 }
 
 void obj_stat(Character *ch, class Object *j)
