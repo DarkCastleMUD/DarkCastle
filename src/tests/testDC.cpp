@@ -682,47 +682,44 @@ private slots:
         QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
         QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
         uint64_t rooms_written{};
-
         {
             LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
             QFile qf(qfile_filename);
             QSaveFile qsf(qsavefile_filename);
             std::fstream fstream_world_file;
             fstream_world_file.open(fstream_filename.toStdString(), std::ios::out);
+            QVERIFY(lfw.isOpen());
+            QVERIFY(qf.open(QIODeviceBase::WriteOnly));
+            QVERIFY(qsf.open(QIODeviceBase::WriteOnly));
+            QVERIFY(fstream_world_file.is_open());
 
-            if (lfw.isOpen() &&
-                qf.open(QIODeviceBase::WriteOnly) &&
-                qsf.open(QIODeviceBase::WriteOnly) &&
-                fstream_world_file.is_open())
+            QTextStream out(&qf);
+            QTextStream out2(&qsf);
+
+            if (dc.world_file_list)
             {
-                QTextStream out(&qf);
-                QTextStream out2(&qsf);
-
-                if (dc.world_file_list)
+                for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
                 {
-                    for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
-                    {
-                        write_one_room(lfw, x);
-                        out << DC::getInstance()->world[x];
-                        out2 << DC::getInstance()->world[x];
-                        fstream_world_file << DC::getInstance()->world[x];
-                        rooms_written++;
-                    }
+                    write_one_room(lfw, x);
+                    out << DC::getInstance()->world[x];
+                    out2 << DC::getInstance()->world[x];
+                    fstream_world_file << DC::getInstance()->world[x];
+                    rooms_written++;
                 }
-                else
-                {
-                    write_one_room(lfw, 1);
-                    out << DC::getInstance()->world[1];
-                    out2 << DC::getInstance()->world[1];
-                    fstream_world_file << DC::getInstance()->world[1];
-                    rooms_written = 1;
-                }
-
-                out << "$~\n";
-                out2 << "$~\n";
-                qsf.commit();
-                fstream_world_file << "$~\n";
             }
+            else
+            {
+                write_one_room(lfw, 1);
+                out << DC::getInstance()->world[1];
+                out2 << DC::getInstance()->world[1];
+                fstream_world_file << DC::getInstance()->world[1];
+                rooms_written = 1;
+            }
+
+            out << "$~\n";
+            out2 << "$~\n";
+            qsf.commit();
+            fstream_world_file << "$~\n";
         }
 
         qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
