@@ -19,6 +19,7 @@ jobs:
       - name: make
         run: |
           set -x
+          git config --global --add safe.directory /__w/DarkCastle/DarkCastle
           git describe --tags --always --abbrev=8
           cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
           ninja -C build
