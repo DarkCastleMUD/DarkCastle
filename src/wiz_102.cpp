@@ -4914,7 +4914,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
-    std::cerr << QStringLiteral("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << std::endl;
+    logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
     return eFAILURE;
   }
 
