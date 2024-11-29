@@ -656,7 +656,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   {
     QString mobspec_status;
 
-    if (DC::getInstance()->mob_index[k->mobdata->nr].mobspec.isNull())
+    if (DC::getInstance()->mob_index[k->mobdata->nr].mobspec == nullptr)
     {
       mobspec_status = "none";
     }
