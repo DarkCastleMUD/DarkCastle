@@ -39,7 +39,7 @@ void save_ban_list(void);
 void save_nonew_new_list(void);
 int is_in_range(Character *ch, int virt);
 void isr_set(Character *ch);
-void mob_stat(Character *ch, Character *k);
+command_return_t mob_stat(Character *ch, Character *k);
 void obj_stat(Character *ch, class Object *j);
 int number_or_name(char **name, int *num);
 int mob_in_index(char *name, int index);

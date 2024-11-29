@@ -3055,6 +3055,10 @@ int do_mscore(Character *ch, char *argument, int cmd)
 
 int do_medit(Character *ch, char *argument, int cmd)
 {
+  if (!ch || !argument)
+  {
+    return eFAILURE;
+  }
   char buf[MAX_INPUT_LENGTH] = {};
   char buf2[MAX_INPUT_LENGTH] = {};
   char buf3[MAX_INPUT_LENGTH] = {};
@@ -3072,7 +3076,7 @@ int do_medit(Character *ch, char *argument, int cmd)
                           "constitution", "new", "delete", "type", "v1", "v2", "v3", "v4",
                           "\n"};
 
-  if (IS_NPC(ch))
+  if (!ch->isPlayer())
     return eFAILURE;
 
   half_chop(argument, buf, buf2);
@@ -3100,14 +3104,15 @@ int do_medit(Character *ch, char *argument, int cmd)
   }
 
   vnum_t mobvnum = {};
-  if (isdigit(*buf))
+  if (is_number(buf))
   {
     mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
     mobvnum = mob_num;
-    if (((mob_num = real_mobile(mobvnum)) < 0))
+    mob_num = real_mobile(mobvnum);
+    if (mobvnum == DC::INVALID_VNUM || mob_num == DC::INVALID_VNUM)
     {
-      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
-      return eSUCCESS;
+      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", buf));
+      return eFAILURE;
     }
   }
   else
@@ -3116,7 +3121,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     if (((mob_num = real_mobile(mobvnum)) < 0 && strcmp(buf, "new")))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
-      return eSUCCESS;
+      return eFAILURE;
     }
     // put the buffs where they should be
     if (*buf4)
@@ -3131,8 +3136,7 @@ int do_medit(Character *ch, char *argument, int cmd)
 
   if (!*buf3) // no field.  Stat the item.
   {
-    mob_stat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
-    return eSUCCESS;
+    return mob_stat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
   }
 
   if (mobvnum == -1)
@@ -3839,8 +3843,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     // stat
   case 24:
   {
-    mob_stat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
-    return eSUCCESS;
+    return mob_stat(ch, (Character *)DC::getInstance()->mob_index[mob_num].item);
     break;
   }
     // strength

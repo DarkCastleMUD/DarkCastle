@@ -383,6 +383,7 @@ public:
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0ULL;
+  static constexpr vnum_t INVALID_VNUM = -1ULL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
@@ -563,6 +564,7 @@ public:
 
   ~DC(void)
   {
+    /* TODO enable and fix all memory leaks
     remove_all_mobs_from_world();
     remove_all_objs_from_world();
     clean_socials_from_memory();
@@ -581,6 +583,7 @@ public:
     free_ban_list_from_memory();
     free_buff_pool_from_memory();
     removeDead();
+    */
   }
 
   QRandomGenerator random_;

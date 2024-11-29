@@ -569,8 +569,12 @@ void boro_mob_stat(Character *ch, Character *k)
   ch->send(buf);
 }
 
-void mob_stat(Character *ch, Character *k)
+command_return_t mob_stat(Character *ch, Character *k)
 {
+  if (!ch || !k)
+  {
+    return eFAILURE;
+  }
 
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -949,6 +953,8 @@ void mob_stat(Character *ch, Character *k)
       break;
     }
   }
+
+  return eSUCCESS;
 }
 
 void obj_stat(Character *ch, class Object *j)

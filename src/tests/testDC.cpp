@@ -682,47 +682,44 @@ private slots:
         QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
         QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
         uint64_t rooms_written{};
-
         {
             LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
             QFile qf(qfile_filename);
             QSaveFile qsf(qsavefile_filename);
             std::fstream fstream_world_file;
             fstream_world_file.open(fstream_filename.toStdString(), std::ios::out);
+            QVERIFY(lfw.isOpen());
+            QVERIFY(qf.open(QIODeviceBase::WriteOnly));
+            QVERIFY(qsf.open(QIODeviceBase::WriteOnly));
+            QVERIFY(fstream_world_file.is_open());
 
-            if (lfw.isOpen() &&
-                qf.open(QIODeviceBase::WriteOnly) &&
-                qsf.open(QIODeviceBase::WriteOnly) &&
-                fstream_world_file.is_open())
+            QTextStream out(&qf);
+            QTextStream out2(&qsf);
+
+            if (dc.world_file_list)
             {
-                QTextStream out(&qf);
-                QTextStream out2(&qsf);
-
-                if (dc.world_file_list)
+                for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
                 {
-                    for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
-                    {
-                        write_one_room(lfw, x);
-                        out << DC::getInstance()->world[x];
-                        out2 << DC::getInstance()->world[x];
-                        fstream_world_file << DC::getInstance()->world[x];
-                        rooms_written++;
-                    }
+                    write_one_room(lfw, x);
+                    out << DC::getInstance()->world[x];
+                    out2 << DC::getInstance()->world[x];
+                    fstream_world_file << DC::getInstance()->world[x];
+                    rooms_written++;
                 }
-                else
-                {
-                    write_one_room(lfw, 1);
-                    out << DC::getInstance()->world[1];
-                    out2 << DC::getInstance()->world[1];
-                    fstream_world_file << DC::getInstance()->world[1];
-                    rooms_written = 1;
-                }
-
-                out << "$~\n";
-                out2 << "$~\n";
-                qsf.commit();
-                fstream_world_file << "$~\n";
             }
+            else
+            {
+                write_one_room(lfw, 1);
+                out << DC::getInstance()->world[1];
+                out2 << DC::getInstance()->world[1];
+                fstream_world_file << DC::getInstance()->world[1];
+                rooms_written = 1;
+            }
+
+            out << "$~\n";
+            out2 << "$~\n";
+            qsf.commit();
+            fstream_world_file << "$~\n";
         }
 
         qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
@@ -943,6 +940,59 @@ private slots:
         ch.player = nullptr;
         ch2.desc = nullptr;
         ch2.player = nullptr;
+    }
+
+    void test_do_medit()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character ch;
+        ch.setName(QStringLiteral("Test"));
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = do_medit(&ch, str_hsh(""));
+        QCOMPARE(conn.output, "Syntax:  medit [mob_num] [field] [arg]\r\n  Edit a mob_num with no field or arg to view the item.\r\n  Edit a field with no args for help on that field.\r\n\r\nThe field must be one of the following:\n\r          keywords         shortdesc          longdesc       description\r\n               sex             class              race             level\r\n         alignment      loadposition   defaultposition          actflags\r\n       affectflags        numdamdice       sizedamdice           damroll\r\n           hitroll       hphitpoints              gold  experiencepoints\r\n            immune           suscept            resist        armorclass\r\n              stat          strength         dexterity      intelligence\r\n            wisdom      constitution               new            delete\r\n              type                v1                v2                v3\r\n                v4\r\n");
+        conn.output = {};
+        ch.player->last_mob_edit = {};
+        QCOMPARE(rc, eFAILURE);
+
+        rc = do_medit(&ch, str_hsh("0"));
+        QCOMPARE(conn.output, "0 is an invalid mob vnum.\r\n");
+        conn.output = {};
+        ch.player->last_mob_edit = {};
+        QCOMPARE(rc, eFAILURE);
+
+        rc = do_medit(&ch, str_hsh("-1"));
+        QCOMPARE(conn.output, "-1 is an invalid mob vnum.\r\n");
+        conn.output = {};
+        ch.player->last_mob_edit = {};
+        QCOMPARE(rc, eFAILURE);
+
+        rc = do_medit(&ch, str_hsh("1"));
+        QCOMPARE(conn.output, "Changing last mob vnum from 0 to 1.\r\nMOB - Name: [chain]  VNum: 1  RNum: 0  In room: -1 Mobile type: NORMAL\n\rShort description: Chain\n\rTitle: None\n\rLong description: Chain is here, looking for ideas to steal.\r\nDetailed description:\r\nKevin looks like he's between the ages of 22-24.  He is picking his nose.\r\nEvery few seconds he types \"score\" then he jots down some notes.  He\r\nappears to be reading as many help files as he can find.  He also seems\r\ninterested in finding a copy of the DC code, and is keeping an eye out for\r\nany Imps that might be nearby.\r\n\r\nClass: Mage   Level:[105] Alignment:[0] Spelldamage:[30] Race: Rodent\r\nMobspec: Exists  Progtypes: Exists\r\nHeight:[198]  Weight:[200]  Sex:[FEMALE]  Hometown:[3001]\n\rStr:[15]+[ 0]=15 Int:[15]+[ 0]=15 Wis:[10]+[ 0]=10\r\nDex:[20]+[ 0]=20 Con:[20]+[ 0]=20\n\rMana:[ 1150/ 1150+27  ]  Hit:[ 4000/ 4000+166]  Move:[ 1150/ 1150+105]  Ki:[175/175]\n\rAC:[-40]  Exp:[0]  Hitroll:[21]  Damroll:[33]  Gold: [0]\n\rPosition: Standing  Fighting: Nobody  Default position: Standing  Timer:[0] \n\rNPC flags: [134217731 0]SPEC SENTINEL NOMATRIX \n\rNon-Combat Special Proc: Exists  Combat Special Proc: None  Mob Progs: Exist\r\nNPC Bare Hand Damage: 0d0.\r\nCarried weight: 0   Carried items: 0\n\rItems in inventory: 0  Items in equipment: 0\n\rSave Vs: FIRE[35] COLD[35] ENERGY[35] ACID[35] MAGIC[35] POISON[-15]\n\rThirst: -1  Hunger: -1  Drunk: -1\n\rMelee: [0] Spell: [0] Song: [0] Reflect: [0]\r\nTracking: 'NOBODY'\n\rHates: 'NOBODY'\n\rFears: 'NOBODY'\n\rMaster: 'NOBODY'\n\rFollowers:\r\nCombat flags: NoBits \n\rAffected by: [35914280 0] DETECT-INVISIBLE SENSE-LIFE EAS true-SIGHT INFARED \r\nImmune: [3669751] PIERCE SLASH MAGIC FIRE ENERGY ACID POISON COLD PARA BLUDGEON WHIP CRUSH HIT BITE STING CLAW PHYSICAL KI SONG \n\rSusceptible: [128] POISON \n\rResistant: [0] NoBits \n\rLag Left:  0\r\n");
+        conn.output = {};
+        ch.player->last_mob_edit = {};
+        QCOMPARE(rc, eSUCCESS);
+
+        rc = do_medit(&ch, str_hsh("abc"));
+        QCOMPARE(conn.output, "Invalid field.\r\n");
+        conn.output = {};
+        ch.player->last_mob_edit = {};
+        QCOMPARE(rc, eFAILURE);
     }
 };
 

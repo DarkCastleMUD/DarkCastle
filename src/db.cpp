@@ -3481,10 +3481,10 @@ int create_blank_mobile(int nr)
 	if (DC::getInstance()->mob_index[cur_index].virt == nr) // item already exists
 		return -1;
 
-		// theoretically if top_of_objt+1 wasn't initialized properly it could
-		// be junk data, which could be == nr, returning -1, but i'm not gonna worry
+	// theoretically if top_of_objt+1 wasn't initialized properly it could
+	// be junk data, which could be == nr, returning -1, but i'm not gonna worry
 
-		// create
+	// create
 
 #ifdef LEAK_CHECK
 	mob = (Character *)calloc(1, sizeof(Character));
@@ -6939,21 +6939,34 @@ FILE *LegacyFile::openFile(void)
 	}
 
 	QFileInfo fi(QStringLiteral("%1/%2").arg(directory_).arg(filename_));
-	QString fileName = fi.canonicalFilePath();
-
-	QFileInfo nfi(QStringLiteral("%1/%2.last").arg(directory_).arg(filename_));
-	QString newFileName = nfi.canonicalFilePath();
-
-	if (QFile::exists(newFileName))
+	QString fileName;
+	if (fi.exists())
 	{
-		if (!QFile::remove(newFileName))
+		fileName = fi.canonicalFilePath();
+		QFileInfo nfi(QStringLiteral("%1/%2.last").arg(directory_).arg(filename_));
+		QString newFileName = nfi.canonicalFilePath();
+		if (QFile::exists(newFileName))
 		{
-			logentry(QStringLiteral("Unable to remove '%1'.").arg(newFileName));
+			if (!QFile::remove(newFileName))
+			{
+				logentry(QStringLiteral("Unable to remove '%1'.").arg(newFileName));
+			}
+		}
+		if (!QFile::copy(fileName, newFileName))
+		{
+			logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(fileName).arg(newFileName));
 		}
 	}
-	if (!QFile::copy(fileName, newFileName))
+	else
 	{
-		logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(fileName).arg(newFileName));
+		if (QDir(directory_).exists())
+		{
+			fileName = QDir(directory_).canonicalPath() + QStringLiteral("/") + filename_;
+		}
+		else
+		{
+			qCritical() << QStringLiteral("directory '%1/%2/' does not exist").arg(QDir(".").canonicalPath()).arg(directory_);
+		}
 	}
 
 	if ((file_handle_ = fopen(qPrintable(fileName), "w")) == nullptr)
