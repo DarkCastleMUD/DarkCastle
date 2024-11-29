@@ -3,17 +3,14 @@ name: C/C++ CI
 on: [push, pull_request]
 
 jobs:
-  fetch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: get code
-        uses: actions/checkout@v4
-
   build:
     runs-on: ubuntu-latest
     container: opensuse/tumbleweed
 
     steps:
+      - name: get code
+        uses: actions/checkout@v4
+
       - name: install dependencies
         run: |
           zypper -n dup --auto-agree-with-licenses
