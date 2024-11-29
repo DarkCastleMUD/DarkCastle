@@ -654,14 +654,18 @@ command_return_t mob_stat(Character *ch, Character *k)
   }
   if (IS_NPC(k))
   {
-    if (!DC::getInstance()->mob_index[k->mobdata->nr].mobspec.isNull())
+    QString mobspec_status;
+
+    if (DC::getInstance()->mob_index[k->mobdata->nr].mobspec.isNull())
     {
-      ch->sendln(QStringLiteral("$3Mobspec$R: Exists  $3Progtypes$R: %1").arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+      mobspec_status = "none";
     }
     else
     {
-      ch->sendln(QStringLiteral("$3Mobspec$R: Missing  $3Progtypes$R: %1").arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+      mobspec_status = "exists";
     }
+
+    ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
@@ -754,13 +758,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (IS_MOB(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
     strcpy(buf, "$3Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "Exists  " : "None  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     strcpy(buf, "$3Mob Progs$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
@@ -1301,13 +1305,13 @@ void obj_stat(Character *ch, class Object *j)
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\n\r" : "none\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
   strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
+    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\n\r" : "none\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
