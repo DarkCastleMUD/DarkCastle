@@ -12,9 +12,12 @@ jobs:
         run: |
           zypper -n dup --auto-agree-with-licenses
           zypper -n in --no-recommends gcc14-c++ clang18 libpq5 fmt-devel libfmt9 zlib-devel cmake postgresql-devel qt6-sql-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git libQt6Test6 qt6-test-devel mold
-
+          
       - name: get code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          fetch-tags: 'true'
   
       - name: make
         run: |
