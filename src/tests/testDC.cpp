@@ -994,6 +994,57 @@ private slots:
         ch.player->last_mob_edit = {};
         QCOMPARE(rc, eFAILURE);
     }
+
+    void do_test_shop()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character ch;
+        ch.setName(QStringLiteral("Test"));
+        ch.setPosition(position_t::STANDING);
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = move_char(&ch, 3009);
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(ch.in_room, 3009);
+        ch.setPosition(position_t::STANDING);
+
+        rc = do_look(&ch, str_hsh(""));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Sadus' House of Fish and Pastries\r\n"
+                              "   You are standing inside a small bakery, filled with the aromatic smells of\r\n"
+                              "baking bread and sweet rolls.  Pastries and cakes are arranged behind a large\r\n"
+                              "glass walled counter.  A rack along the east wall holds an assortment of smoked\r\n"
+                              "fish and frozen pizzas.  A small sign sits on the counter, next to the large\r\n"
+                              "brass-keyed cash register, which gleams beneath its dusting of flour.\r\n"
+                              "Bob Baker is here, wiping flour from his face with one hand.\r\n"
+                              "-Bob Baker has: aura! flying!\r\n"
+                              "Exits: south \r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("list");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "[Amt] [ Price ] Item\r\n"
+                              "[  1] [     55] a delicious DONUT.\r\n"
+                              "[  1] [    165] a chewy salted fish.\r\n"
+                              "[  1] [    110] a zesty tombstone pizza.\r\n"
+                              "[  1] [     82] a slice of cherry pie.\r\n");
+    }
 };
 
 QTEST_MAIN(TestDC)
