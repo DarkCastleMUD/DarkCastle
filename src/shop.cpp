@@ -623,8 +623,9 @@ void shopping_list(const char *arg, Character *ch,
     restock_keeper(keeper, shop_nr);
   }
   i = 0;
-  ch->sendln("[Amt] [ Price ] Item");
+  ch->sendln("[Amt] [ Price ] [ VNUM ] Item");
   found = false;
+  vnum_t first_vnum{};
   for (obj = keeper->carrying; obj; obj = obj->next_content)
   {
     if (!CAN_SEE_OBJ(ch, obj) || obj->obj_flags.cost <= 0)
@@ -657,10 +658,17 @@ void shopping_list(const char *arg, Character *ch,
             }
             else
             {*/
-    sprintf(buf, "[%3d] [%7d] %s.\r\n",
-            a, cost, obj->short_description);
+
     //        }
-    ch->send(buf);
+    if (!first_vnum || first_vnum == DC::INVALID_VNUM)
+    {
+      first_vnum = DC::getInstance()->getObjectVNUM(obj);
+    }
+    ch->sendln(QStringLiteral("[%1] [%2] [%3] %4.").arg(a, 3).arg(cost, 7).arg(DC::getInstance()->getObjectVNUM(obj), 6).arg(obj->short_description));
+  }
+  if (first_vnum && first_vnum != DC::INVALID_VNUM)
+  {
+    ch->sendln(QStringLiteral("Type 'identify vVNUM' for details about a specific object. Example: identify v%1").arg(first_vnum));
   }
 
   if (!found)

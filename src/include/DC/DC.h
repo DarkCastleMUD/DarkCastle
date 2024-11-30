@@ -100,6 +100,8 @@
 #include "DC/DC_global.h"
 
 typedef uint64_t vnum_t;
+typedef uint64_t rnum_t;
+typedef int32_t legacy_rnum_t;
 typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
@@ -384,6 +386,7 @@ public:
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0ULL;
   static constexpr vnum_t INVALID_VNUM = -1ULL;
+  static constexpr vnum_t INVALID_RNUM = -1ULL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
@@ -561,6 +564,9 @@ public:
   void load_corpses(void);
   int write_hotboot_file(void);
   int load_hotboot_descs(void);
+  vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
+  vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
+  vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
 
   ~DC(void)
   {

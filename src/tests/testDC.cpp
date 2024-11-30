@@ -1039,11 +1039,38 @@ private slots:
 
         rc = ch.command_interpreter("list");
         QCOMPARE(rc, eSUCCESS);
-        QCOMPARE(conn.output, "[Amt] [ Price ] Item\r\n"
-                              "[  1] [     55] a delicious DONUT.\r\n"
-                              "[  1] [    165] a chewy salted fish.\r\n"
-                              "[  1] [    110] a zesty tombstone pizza.\r\n"
-                              "[  1] [     82] a slice of cherry pie.\r\n");
+        QCOMPARE(conn.output, "[Amt] [ Price ] [ VNUM ] Item\r\n"
+                              "[  1] [     55] [  3011] a delicious DONUT.\r\n"
+                              "[  1] [    165] [  3010] a chewy salted fish.\r\n"
+                              "[  1] [    110] [  3009] a zesty tombstone pizza.\r\n"
+                              "[  1] [     82] [  3008] a slice of cherry pie.\r\n"
+                              "Type 'identify vVNUM' for details about a specific object. Example: identify v3011\r\n");
+        conn.output = {};
+    }
+    void test_getObjectVNUM()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        auto obj = reinterpret_cast<Object *>(DC::getInstance()->obj_index[0].item);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
+
+        bool ok = false;
+        DC::getInstance()->getObjectVNUM(obj, &ok);
+        QCOMPARE(ok, true);
+        ok = false;
+        DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].virt;
+        QCOMPARE(ok, true);
+        DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
+        QCOMPARE(ok, false);
+
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
     }
 };
 
