@@ -994,6 +994,84 @@ private slots:
         ch.player->last_mob_edit = {};
         QCOMPARE(rc, eFAILURE);
     }
+
+    void do_test_shop()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character ch;
+        ch.setName(QStringLiteral("Test"));
+        ch.setPosition(position_t::STANDING);
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = move_char(&ch, 3009);
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(ch.in_room, 3009);
+        ch.setPosition(position_t::STANDING);
+
+        rc = do_look(&ch, str_hsh(""));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Sadus' House of Fish and Pastries\r\n"
+                              "   You are standing inside a small bakery, filled with the aromatic smells of\r\n"
+                              "baking bread and sweet rolls.  Pastries and cakes are arranged behind a large\r\n"
+                              "glass walled counter.  A rack along the east wall holds an assortment of smoked\r\n"
+                              "fish and frozen pizzas.  A small sign sits on the counter, next to the large\r\n"
+                              "brass-keyed cash register, which gleams beneath its dusting of flour.\r\n"
+                              "Bob Baker is here, wiping flour from his face with one hand.\r\n"
+                              "-Bob Baker has: aura! flying!\r\n"
+                              "Exits: south \r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("list");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "[Amt] [ Price ] [ VNUM ] Item\r\n"
+                              "[  1] [     55] [  3011] a delicious DONUT.\r\n"
+                              "[  1] [    165] [  3010] a chewy salted fish.\r\n"
+                              "[  1] [    110] [  3009] a zesty tombstone pizza.\r\n"
+                              "[  1] [     82] [  3008] a slice of cherry pie.\r\n"
+                              "Type 'identify vVNUM' for details about a specific object. Example: identify v3011\r\n");
+        conn.output = {};
+    }
+    void test_getObjectVNUM()
+    {
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        dc.boot_db();
+        auto obj = reinterpret_cast<Object *>(DC::getInstance()->obj_index[0].item);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
+
+        bool ok = false;
+        DC::getInstance()->getObjectVNUM(obj, &ok);
+        QCOMPARE(ok, true);
+        ok = false;
+        DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].virt;
+        QCOMPARE(ok, true);
+        DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
+        QCOMPARE(ok, false);
+
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+    }
 };
 
 QTEST_MAIN(TestDC)
