@@ -847,7 +847,7 @@ void DC::nanny(class Connection *d, std::string arg)
    {
 
    default:
-      logentry(QStringLiteral("Nanny: illegal STATE(d)"), 0, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, LogChannels::LOG_BUG);
       close_socket(d);
       return;
 
