@@ -362,7 +362,7 @@ char *funnybootmessages[] =
 		"Reassigning room pointers...\r\n",
 		"Rebuilding virtual exits...\r\n",
 		"Decoding human genome...\r\n",
-		"Booting help files...\r\n",
+		"Loading help entries...\r\n",
 		"Booting shops...\r\n",
 		"Generating dynamic areas...\r\n",
 		"Assigning mobile process pointers...\r\n",
@@ -6934,6 +6934,21 @@ bool verify_item(class Object **obj)
 LegacyFile::LegacyFile(QString directory, QString filename, QString error_message)
 	: directory_(directory), filename_(filename), error_message_(error_message), file_handle_(nullptr)
 {
+	if (directory_.isEmpty())
+	{
+		directory_ = "./";
+	}
+	else if (!directory_.endsWith('/'))
+	{
+		directory_ += "/";
+	}
+	filepath_ = QStringLiteral("%1%2").arg(directory_).arg(filename_);
+
+	if (!QDir(directory_).exists())
+	{
+		logentry(QStringLiteral("LegacyFile::openFile: Directory '%1' does not exist.").arg(directory_));
+	}
+
 	openFile();
 }
 
@@ -6952,44 +6967,41 @@ FILE *LegacyFile::openFile(void)
 		fclose(file_handle_);
 	}
 
-	QFileInfo fi(QStringLiteral("%1/%2").arg(directory_).arg(filename_));
-	QString fileName;
-	if (fi.exists())
+	if ((file_handle_ = fopen(qPrintable(filepath_), "w")) == nullptr)
 	{
-		fileName = fi.canonicalFilePath();
-		QFileInfo nfi(QStringLiteral("%1/%2.last").arg(directory_).arg(filename_));
-		QString newFileName = nfi.canonicalFilePath();
-		if (QFile::exists(newFileName))
-		{
-			if (!QFile::remove(newFileName))
-			{
-				logentry(QStringLiteral("Unable to remove '%1'.").arg(newFileName));
-			}
-		}
-		if (!QFile::copy(fileName, newFileName))
-		{
-			logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(fileName).arg(newFileName));
-		}
-	}
-	else
-	{
-		if (QDir(directory_).exists())
-		{
-			fileName = QDir(directory_).canonicalPath() + QStringLiteral("/") + filename_;
-		}
-		else
-		{
-			qCritical() << QStringLiteral("directory '%1/%2/' does not exist").arg(QDir(".").canonicalPath()).arg(directory_);
-		}
-	}
-
-	if ((file_handle_ = fopen(qPrintable(fileName), "w")) == nullptr)
-	{
-		qCritical() << error_message_.arg(fileName);
+		qCritical() << error_message_.arg(filepath_);
 		return nullptr;
 	}
 
 	return file_handle_;
+}
+
+bool LegacyFile::backupFile(void)
+{
+	QFileInfo fi(filepath_);
+	if (fi.exists())
+	{
+		QString originalfileName = fi.canonicalFilePath();
+		QString backupFileName = QStringLiteral("%1.last").arg(originalfileName);
+
+		if (QFile::exists(backupFileName))
+		{
+			if (!QFile::remove(backupFileName))
+			{
+				logentry(QStringLiteral("Unable to remove '%1'.").arg(backupFileName));
+			}
+		}
+		if (!QFile::copy(originalfileName, backupFileName))
+		{
+			logentry(QStringLiteral("Unable to copy '%1' to '%2'.").arg(originalfileName).arg(backupFileName));
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 QDebug operator<<(QDebug debug, const Room::room_errors_t &errors)
