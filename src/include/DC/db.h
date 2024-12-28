@@ -99,6 +99,7 @@ public:
   LegacyFile(QString directory, QString filename, QString error_message);
   ~LegacyFile();
   FILE *openFile(void);
+  bool backupFile(void);
   bool isOpen(void)
   {
     if (!file_handle_ || feof(file_handle_) || ferror(file_handle_))
@@ -110,6 +111,7 @@ public:
   FILE *file_handle_;
   QString directory_;
   QString filename_;
+  QString filepath_;
   QString error_message_;
 
 private:
