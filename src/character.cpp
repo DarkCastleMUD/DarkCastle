@@ -332,12 +332,12 @@ void Connection::send(QString txt)
         return;
     }
 
-    if (allowColor && connected != states::EDITING && connected != states::WRITE_BOARD && connected != states::EDIT_MPROG)
+    if (allowColor && !isEditing())
     {
         txt = handle_ansi(txt, character);
     }
 
-    if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && connected == Connection::states::PLAYING)
+    if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && isPlaying())
     {
         txt = scramble_text(txt);
     }
@@ -351,7 +351,7 @@ QString Connection::getName(void)
     {
         return character->getName();
     }
-    return "";
+    return {};
 }
 
 const QStringList Object::apply_types =

@@ -3730,31 +3730,32 @@ const QStringList DC::connected_states =
         "OLD_GET_RACE",
         "WRITE_BOARD",
         "EDITING", // 15
+        "EDITING_V2",
         "SEND_MAIL",
         "DELETE_CHAR",
         "OLD_CHOOSE_STATS",
-        "PFILE_WIPE",
-        "ARCHIVE_CHAR", // 20
+        "PFILE_WIPE", // 20
+        "ARCHIVE_CHAR",
         "CLOSE",
         "CONFIRM_PASSWORD_CHANGE",
         "EDIT_MPROG",
-        "DISPLAY_ENTRANCE",
-        "PRE_DISPLAY_ENTRANCE", // 25
+        "DISPLAY_ENTRANCE", // 25
+        "PRE_DISPLAY_ENTRANCE",
         "SELECT_RECOVERY_MENU",
         "GET_NEW_RECOVERY_QUESTION",
         "GET_NEW_RECOVERY_ANSWER",
-        "GET_NEW_RECOVERY_EMAIL",
-        "QUESTION_ANSI", // 30
+        "GET_NEW_RECOVERY_EMAIL", // 30
+        "QUESTION_ANSI",
         "GET_ANSI",
         "QUESTION_SEX",
         "QUESTION_STAT_METHOD",
-        "GET_STAT_METHOD",
-        "OLD_STAT_METHOD", // 35
+        "GET_STAT_METHOD", // 35
+        "OLD_STAT_METHOD",
         "NEW_STAT_METHOD",
         "NEW_PLAYER",
         "QUESTION_RACE",
-        "GET_RACE",
-        "QUESTION_CLASS", // 40
+        "GET_RACE", // 40
+        "QUESTION_CLASS",
         "GET_CLASS",
         "QUESTION_STATS",
         "GET_STATS"};

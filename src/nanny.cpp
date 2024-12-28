@@ -346,16 +346,9 @@ void update_max_who(void)
    uint64_t players = 0;
    for (auto d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
    {
-      switch (d->connected)
+      if (d->isPlaying() || d->isEditing())
       {
-      case Connection::states::PLAYING:
-      case Connection::states::EDIT_MPROG:
-      case Connection::states::EDITING:
-      case Connection::states::EXDSCR:
-      case Connection::states::SEND_MAIL:
-      case Connection::states::WRITE_BOARD:
          players++;
-         break;
       }
    }
 
@@ -847,7 +840,7 @@ void DC::nanny(class Connection *d, std::string arg)
    {
 
    default:
-      logentry(QStringLiteral("Nanny: illegal STATE(d)"), 0, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, LogChannels::LOG_BUG);
       close_socket(d);
       return;
 

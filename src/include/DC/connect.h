@@ -81,6 +81,7 @@ public:
     OLD_GET_RACE,
     WRITE_BOARD,
     EDITING,
+    EDITING_V2,
     SEND_MAIL,
     DELETE_CHAR,
     OLD_CHOOSE_STATS,
@@ -152,6 +153,7 @@ public:
   bool color = {};
   bool server_size_echo = false;
   bool allowColor = 1;
+
   void send(QString txt);
 
   const char *getPeerOriginalAddressC(void);
@@ -192,6 +194,18 @@ public:
   }
 
   QString getName(void);
+  inline bool isEditing(void) const noexcept
+  {
+    return connected == Connection::states::EDITING ||
+           connected == Connection::states::EDITING_V2 ||
+           connected == Connection::states::WRITE_BOARD ||
+           connected == Connection::states::EDIT_MPROG ||
+           connected == Connection::states::SEND_MAIL;
+  }
+  inline bool isPlaying(void) const noexcept
+  {
+    return connected == Connection::states::PLAYING;
+  }
 
 private:
   QHostAddress peer_address_ = {};

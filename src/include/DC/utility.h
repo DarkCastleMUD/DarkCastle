@@ -642,7 +642,7 @@ void automail(char *name);
 bool file_exists(const char *);
 void util_archive(const char *, Character *);
 void util_unarchive(char *, Character *);
-int is_busy(Character *ch);
+bool is_busy(Character *ch);
 int is_ignoring(const Character *const ch, const Character *const i);
 void colorCharSend(char *s, Character *ch);
 void send_to_char_regardless(QString messg, Character *ch);

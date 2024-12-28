@@ -38,9 +38,6 @@
 
 extern bool MOBtrigger;
 
-/* extern functions */
-int is_busy(Character *ch);
-
 int do_report(Character *ch, char *argument, int cmd)
 {
   char buf[256];
