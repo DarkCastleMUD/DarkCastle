@@ -2300,15 +2300,9 @@ bool is_in_game(Character *ch)
     return true;
   }
 
-  switch (STATE(ch->desc))
+  if (ch->desc->isEditing() || ch->desc->isPlaying())
   {
-  case Connection::states::PLAYING:
-  case Connection::states::EDIT_MPROG:
-  case Connection::states::WRITE_BOARD:
-  case Connection::states::EDITING:
-  case Connection::states::SEND_MAIL:
     return true;
-    break;
   }
 
   return false;

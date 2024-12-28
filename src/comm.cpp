@@ -2095,7 +2095,7 @@ void write_to_output(QByteArray txt, class Connection *t)
   if (t->descriptor == 0)
     return;
 
-  if (t->allowColor && t->connected != Connection::states::EDITING && t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDIT_MPROG)
+  if (t->allowColor && !t->isEditing())
   {
     txt = handle_ansi(txt, t->character);
   }
@@ -2538,7 +2538,7 @@ int process_input(class Connection *t)
     }
 
     // Only search for pipe (|) when not editing
-    if (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG)
+    if (!t->isEditing())
     {
       size_t pipe_pos = 0;
       do
@@ -2746,8 +2746,7 @@ int close_socket(class Connection *d)
   if (d->character)
   {
     // target_idnum = GET_IDNUM(d->character);
-    if (d->connected == Connection::states::PLAYING || d->connected == Connection::states::WRITE_BOARD ||
-        d->connected == Connection::states::EDITING || d->connected == Connection::states::EDIT_MPROG)
+    if (d->isPlaying() || d->isEditing())
     {
       save_char_obj(d->character);
       // clan area stuff
@@ -2775,7 +2774,7 @@ int close_socket(class Connection *d)
       sprintf(buf, "Losing player: %s.",
               GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
       logentry(buf, 111, LogChannels::LOG_SOCKET);
-      if (d->connected == Connection::states::WRITE_BOARD || d->connected == Connection::states::EDITING || d->connected == Connection::states::EDIT_MPROG)
+      if (d->isEditing())
       {
         //		sprintf(buf, "Suspicious: %s.",
         //			GET_NAME(d->character));
@@ -3287,16 +3286,14 @@ void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
           SEND_TO_Q(messg, i->desc);
 }
 
-int is_busy(Character *ch)
+bool is_busy(Character *ch)
 {
-  if (ch->desc &&
-      ((ch->desc->connected == Connection::states::WRITE_BOARD) ||
-       (ch->desc->connected == Connection::states::SEND_MAIL) ||
-       (ch->desc->connected == Connection::states::EDITING) ||
-       (ch->desc->connected == Connection::states::EDIT_MPROG)))
-    return 1;
+  if (ch->desc && ch->desc->isEditing())
+  {
+    return true;
+  }
 
-  return (0);
+  return false;
 }
 
 QString Player::perform_alias(QString orig)
