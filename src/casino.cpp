@@ -850,7 +850,6 @@ void create_table(class Object *obj)
    else
       table->gold = true;
    table->deck = create_deck(6);
-   shuffle_deck(table->deck);
    table->plr = table->cr = nullptr;
    table->deck->table = table;
    for (int i = 0; i < 21; i++)
@@ -859,6 +858,7 @@ void create_table(class Object *obj)
    table->state = 0;
    //  add_timer_bj_dealer2(table);
    obj->table = table;
+   shuffle_deck(table->deck);
 }
 
 void destroy_table(table_data *tbl)
