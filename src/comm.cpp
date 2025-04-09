@@ -3142,7 +3142,10 @@ void check_for_awaymsgs(Character *ch)
 
 void send_to_char(const char *mesg, Character *ch)
 {
-  send_to_char(std::string(mesg), ch);
+  if (mesg)
+  {
+    send_to_char(std::string(mesg), ch);
+  }
 }
 
 void send_to_char(QString messg, Character *ch)
