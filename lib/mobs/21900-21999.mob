@@ -1,0 +1,256 @@
+#21901
+dealer casino croupier~
+the blackjack dealer~
+A blackjack dealer stands here, smiling and waiting for the patrons.
+~
+   An average-looking woman stands before you, with a pleasant
+smile on her face. She waits patiently for people to sit down and
+place their bets for blackjack.
+~
+135169858 0 -1
+2097792 0 0 -1
+0 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 1 65537 0 0
+>greet_prog 100~
+if isnpc($n)
+else
+  if isimmort($n)
+  else
+    if numpcs() == 1
+      if sex($n) == 2
+        say Welcome to the Platinum Towers blackjack madam!  Type "look table" to see this table's options.
+      else
+        say Welcome to the Platinum Towers blackjack sir!  Type "look table" to see this table's options.
+      endif
+    endif
+  endif
+endif
+~
+|
+S
+#21902
+waitress cocktail casino~
+a sexy cocktail waitress~
+A cocktail waitress in a short short skirt dashes around, serving drinks to people.
+~
+   A hot little platinum blonde number with well-rounded curves
+dashes by with a tray full of drinks in one hand. She meets your
+gaze and gives you a sparkling smile as she rushes off.
+Her name tag reads "Angela".
+~
+135137024 0 -1
+2097792 0 0 -1
+900 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 2 65537 0 0
+>rand_prog 5~
+if ispc($r)
+MPSETTEMP $i gambler $r
+   MPJUNK all
+   if rand(50)
+      if rand(50)
+         MPOLOAD 3100
+         give tea $v[gambler]
+      else
+         MPOLOAD 3101
+         give coffee $v[gambler]
+      endif
+   else
+      if rand(50)
+         MPOLOAD 3102
+         give water $v[gambler]
+      else
+         MPOLOAD 29
+         give soda $v[gambler]
+      endif
+   endif
+endif
+~
+|
+S
+#21903
+guard security casino~
+a husky security guard~
+A husky security guard is here collecting the sitting fees for the Platinum Club.
+~
+   A fairly husky man wanders about the casino, searching for
+troublemakers. His silver shirt with the Platinum Towers Hotel
+& Casino shirt also bears the embroidered name, 'Paul'.
+~
+1208125250 0 -1
+2097792 0 0 -1
+900 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 1 65537 0 0
+>bribe_prog 500000~
+say Thank you!  Enjoy your stay in the Platinum Club!
+mpsettemp $n SpaPaid true
+~
+>catch_prog 1~
+say I'm sorry but these tables are for our Platinum Club members and have a 500000 coin sitting fee to begin playing.
+~
+>all_greet_prog 100~
+if isnpc($n)
+else
+  if isimmort($n)
+  else
+    if tempvar($n[SpaPaid]) == True
+      say Welcome back, $n!
+    else
+      say Greetings and welcome to the Platinum Club area.  It will cost you 500000 coins to play at these prestigious tables.
+    endif
+  endif
+endif
+~
+|
+S
+#21904
+guard security casino~
+a skinny security guard~
+A skinny security guard collects the entry fees to the thermal spa.
+~
+A fairly skinny man wanders about the casino, searching for
+troublemakers. His silver shirt with the Platinum Towers Hotel
+& Casino shirt also bears the embroidered name, 'Nick'.
+~
+135137026 0 -1
+2359944 0 0 -1
+900 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 1 0 0 0
+>bribe_prog 50000~
+say Thank you! Enjoy your stay in the Spa!
+mpsettemp $n PlatPaid true
+~
+>catch_prog 1~
+if ispc($n)
+MPECHOAT $n A skinny security guard draws you back into the public part of the spa.
+MPECHOAROUND $n A skinny security guard pulls $n back into the public part of the spa.
+say Im sorry but there is a 50000 gold fee for entering the private parts of the spa.
+else
+endif
+~
+>all_greet_prog 100~
+if ispc($n)
+	if isimmort($n)
+  	else
+		if tempvar($n[PlatPaid]) == True
+		say Welcome back, $n!
+		else
+		say Greetings and welcome to the Platinum Spa area.  It will cost you 50000 coins to enter the private part of the spa.
+    endif
+  endif
+else
+endif
+~
+|
+S
+#21905
+spa attendant casino~
+a spa attendant~
+A sensitive spa attendant is here to service your needs.
+~
+  This delicate looking man is here ensuring the steam and relaxing aromas
+of the thermal spa are maintained at comfortable level to all patrons.
+He also has a small tray with him and offers a variety of oils, ointments
+and spa products for your personal use.
+His name tag reads "Mike".
+~
+134383426 0 -1
+2359944 0 0 -1
+900 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 1 65537 0 0
+>all_greet_prog 100~
+if isnpc($n)
+else
+  if isimmort($n)
+  else
+    if tempvar($n[PlatPaid]) == true
+    else
+      MPTHROW 21904 1 0 $n
+    endif
+  endif
+endif
+~
+|
+S
+#21906
+dealer casino croupier~
+the roulette croupier~
+A roulette croupier awaits your bet with ball in hand.
+~
+   The croupier stands before you, waiting for you to place
+your bets on the table. He is tall and very skinny, and has
+the distinct faraway stare of a Swede.
+~
+165634 0 -1
+2359432 0 0 -1
+0 1 101
+14 9 50d1+0 2d2+2
+2500 2500
+8 8 1 0 0 0
+>all_greet_prog 100~
+if isnpc($n)
+else
+  if isimmort($n)
+  else
+    say Welcome to the Platinum Towers roulette table! Type "look table" to see how to place a bet.
+  endif
+endif
+~
+|
+S
+#21907
+guard security casino~
+a lanky security guard~
+A lanky security guard is here working the doors of the casino.
+~
+   A fairly lanky man stands guard at the casino entrance to ensure
+troublemakers are kept out of the casino.  His silver shirt with the Platinum
+Towers Hotel & Casino shirt also bears the embroidered name, 'George'.
+~
+1208125250 0 -1
+2359944 0 0 -1
+900 1 101
+-60 9 30000d1+0 2d2+20
+0 2500
+8 8 1 65537 0 0
+>all_greet_prog 100~
+if inroom($i) == 21900
+    if ispc($n)
+        if tempvar($n[casino]) == null
+            mpsettemp $n casino sorpigal
+        else
+        if tempvar($n[casino]) == far_reach
+            MPAT $n MPTRANSFER $n 21901
+            mpsettemp $n casino far_reach
+            MPAT $n MPECHORAROUND $n $$BA security guard has escorted $n back into the casino's lobby.$$R
+            MPAT $n MPECHOAT $n $$BA security guard has escorted you back into the casino's lobby.$$R
+            endif
+            endif
+            endif
+            endif
+if inroom($i) == 21923
+    if ispc($n)
+        if tempvar($n[casino]) == null
+            mpsettemp $n casino far_reach
+        else
+        if tempvar($n[casino]) == sorpigal
+            MPAT $n MPTRANSFER $n 21916
+            mpsettemp $n casino sorpigal
+            MPAT $n MPECHOAROUND $n $$BA security guard has escorted $n back into the casino's lobby.$$R
+            MPAT $n MPECHOAT $n $$BA security guard has escorted you back into the casino's lobby.$$R
+endif
+endif
+endif
+endif~
+|
+S
+$~

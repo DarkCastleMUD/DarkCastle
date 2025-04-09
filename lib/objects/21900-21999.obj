@@ -2,7 +2,7 @@
 table blackjack proc obj casino~
 a blackjack table~
 A blackjack table covered in deep purple felt stands here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 500 50000 0 0 0
 0 0 0
@@ -24,7 +24,7 @@ S
 table blackjack proc obj casino~
 a blackjack table~
 A table covered in deep purple felt stands here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 50000 100000 0 0 0
 0 0 0
@@ -46,7 +46,7 @@ S
 table blackjack proc obj casino~
 a blackjack table~
 A table covered in deep purple felt stands here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 100000 500000 0 0 0
 0 0 0
@@ -68,7 +68,7 @@ S
 table blackjack proc obj casino~
 a blackjack table~
 A table covered in deep purple felt stands here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 500000 1000000 5 250 0
 0 0 0
@@ -104,7 +104,7 @@ S
 ATM teller machine~
 an ATM machine~
 An automatic teller machine is here waiting for customers.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 0 0 0 0 0
 0 0 0
@@ -119,7 +119,7 @@ S
 fountain casino~
 a fountain~
 An elaborate fountain bubbles here.~
-PÅC~
+Pï¿½C~
 25 0 0 0
 0 0 0 0 0
 0 0 0
@@ -127,10 +127,10 @@ S
 #21906
 slot machine casino~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 1022800 coins!$1' sits here.~
+A slot machine which displays '$R$BJackpot: 1083840 coins!$1' sits here.~
 slot machine~
 12 0 0 0
-1000 1022800 0 21906 0
+1000 1083840 0 21906 0
 0 0 0
 E
 slot machine~
@@ -149,10 +149,10 @@ S
 #21907
 slot machine casino~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 10690000 coins!$1' sits here.~
-PÅC~
+A slot machine which displays '$R$BJackpot: 10856800 coins!$1' sits here.~
+Pï¿½C~
 12 0 0 0
-10000 10690000 0 21907 0
+10000 10856800 0 21907 0
 0 0 0
 E
 slot machine~
@@ -171,10 +171,10 @@ S
 #21908
 slot machine casino~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 180444000 coins!$1' sits here.~
+A slot machine which displays '$R$BJackpot: 110064000 coins!$1' sits here.~
 slot machine which displays '$B$7 Jackpot: 0 coins!$B$1' sits here.~
 12 0 0 0
-100000 180444000 0 21908 0
+100000 110064000 0 21908 0
 0 0 0
 E
 slot machine~
@@ -193,10 +193,10 @@ S
 #21909
 slot machine casino~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 5655 plats!$1' sits here.~
+A slot machine which displays '$R$BJackpot: 5126 plats!$1' sits here.~
 slot machine which displays '$B$7 Jackpot: 0 coins!$B$1' sits here.~
 12 0 0 0
-5 5655 1 21909 0
+5 5126 1 21909 0
 0 0 0
 E
 slot machine~
@@ -212,18 +212,18 @@ Enter $BPull handle$R to place money into the machine and start it!
 Enter $BBET <multiplier>$R to bet 1, 2, 3, 4, or 5 times the Min Bet.
 ~
 \all_greet_prog 100~
-if isnpc($n)
-else
-  if isimmort($n)
-  else
-    if tempvar($n[SpaPaid]) == true
-    else
-      mpechoat $n A husky security guard draws you back into the lounge.
-      mpat 21914 mptrans 0.$n
-      mpat 21914 mpthrow 21903 1 0
-      mpat 21914 mpforce 0.$n look
+if ispc($n)
+    if isimmort($n)
+     else
+        if tempvar($n[SpaPaid]) == true
+        else
+            mpechoat $n A husky security guard draws you back into the lounge.
+            mpat 21914 mptrans 0.$n
+            mpat 21914 mpthrow 21903 1 0
+            mpat 21914 mpforce 0.$n look
+        endif
     endif
-  endif
+else
 endif
 ~
 |
@@ -231,10 +231,10 @@ S
 #21910
 slot machine~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 1022800 coins!$1' sits here.~
-PÅC~
+A slot machine which displays '$R$BJackpot: 1083840 coins!$1' sits here.~
+Pï¿½C~
 12 0 0 0
-1000 1022800 0 21906 0
+1000 1083840 0 21906 0
 0 0 0
 E
 slot machine~
@@ -253,10 +253,10 @@ S
 #21911
 slot machine~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 10690000 coins!$1' sits here.~
-PÅC~
+A slot machine which displays '$R$BJackpot: 10856800 coins!$1' sits here.~
+Pï¿½C~
 12 0 0 0
-10000 10690000 0 21907 0
+10000 10856800 0 21907 0
 0 0 0
 E
 slot machine~
@@ -275,10 +275,10 @@ S
 #21912
 slot machine~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 180444000 coins!$1' sits here.~
-PÅC~
+A slot machine which displays '$R$BJackpot: 110064000 coins!$1' sits here.~
+Pï¿½C~
 12 0 0 0
-100000 180444000 0 21908 0
+100000 110064000 0 21908 0
 0 0 1073741824
 E
 slot machine~
@@ -297,10 +297,10 @@ S
 #21913
 slot machine~
 a slot machine~
-A slot machine which displays '$R$BJackpot: 5655 plats!$1' sits here.~
-PÅC~
+A slot machine which displays '$R$BJackpot: 5126 plats!$1' sits here.~
+Pï¿½C~
 12 0 0 0
-5 5655 1 21909 0
+5 5126 1 21909 0
 0 0 0
 E
 slot machine~
@@ -320,7 +320,7 @@ S
 slot machine~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -329,7 +329,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -338,7 +338,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -347,7 +347,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -356,7 +356,7 @@ S
 roulette table casino~
 a roulette table~
 An enormous, velvet roulette table stands here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 0 0 0 0 0
 0 0 0
@@ -377,7 +377,7 @@ S
 imm obj~
 get this replaced by an imm~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 1 0
 0 0 0 0 0
 0 0 0
@@ -386,7 +386,7 @@ S
 device security casino~
 a security device made of platinum~
 A platinum bauble has been left here.~
-PÅC~
+Pï¿½C~
 1 134217728 0 0
 0 0 0 0 0
 0 0 48
@@ -415,7 +415,7 @@ S
 sign~
 the sign~
 A small sign with ornate lettering has been placed in the corner here.~
-PÅC~
+Pï¿½C~
 12 0 0 0
 0 0 0 0 0
 0 0 0
@@ -429,7 +429,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -438,7 +438,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -447,7 +447,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -456,7 +456,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -465,7 +465,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -474,7 +474,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -483,7 +483,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -492,7 +492,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -501,7 +501,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -510,7 +510,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -519,7 +519,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -528,7 +528,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -537,7 +537,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -546,7 +546,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -555,7 +555,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -564,7 +564,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -573,7 +573,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -582,7 +582,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -591,7 +591,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -600,7 +600,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -609,7 +609,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -618,7 +618,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -627,7 +627,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -636,7 +636,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -645,7 +645,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -654,7 +654,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -663,7 +663,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -672,7 +672,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -681,7 +681,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -690,7 +690,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -699,7 +699,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -708,7 +708,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -717,7 +717,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -726,7 +726,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -735,7 +735,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -744,7 +744,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -753,7 +753,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -762,7 +762,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -771,7 +771,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -780,7 +780,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -789,7 +789,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -798,7 +798,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -807,7 +807,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -816,7 +816,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -825,7 +825,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -834,7 +834,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -843,7 +843,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -852,7 +852,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -861,7 +861,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -870,7 +870,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -879,7 +879,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -888,7 +888,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -897,7 +897,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -906,7 +906,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -915,7 +915,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -924,7 +924,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -933,7 +933,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -942,7 +942,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -951,7 +951,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -960,7 +960,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -969,7 +969,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -978,7 +978,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -987,7 +987,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -996,7 +996,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1005,7 +1005,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1014,7 +1014,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1023,7 +1023,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1032,7 +1032,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1041,7 +1041,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1050,7 +1050,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1059,7 +1059,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1068,7 +1068,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1077,7 +1077,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1086,7 +1086,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1095,7 +1095,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1104,7 +1104,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1113,7 +1113,7 @@ S
 empty obj~
 an empty obj~
 An empty obj sits here waiting to be created.~
-PÅC~
+Pï¿½C~
 1 0 0 0
 0 0 0 0 0
 0 0 0
@@ -1122,7 +1122,7 @@ S
 fountain~
 A marble fountain~
 A marble fountain has been chiseled into the shape of a busty cocktail waitress.~
-PÅC~
+Pï¿½C~
 25 0 0 0
 0 0 0 0 0
 0 0 0
