@@ -938,12 +938,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   extern void addtimer(struct timer_data * add);
 
   // Reset bullrush AFF in 5 seconds
-  struct timer_data *timer;
-#ifdef LEAK_CHECK
-  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+  struct timer_data *timer = new timer_data;
   timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;

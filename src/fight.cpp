@@ -4160,12 +4160,7 @@ void set_fighting(Character *ch, Character *vict)
       if (level_difference > 0 || ch->getLevel() == 60)
       {
         vict->add_memory(GET_NAME(ch), 't');
-        struct timer_data *timer;
-#ifdef LEAK_CHECK
-        timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-        timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+        struct timer_data *timer = new timer_data;
         timer->var_arg1 = vict->hunting;
         timer->arg2 = (void *)vict;
         timer->function = clear_hunt;
@@ -4180,14 +4175,7 @@ void set_fighting(Character *ch, Character *vict)
           if (level_difference > 0 || vict->getLevel() == 60)
           {
             ch->add_memory(vict->getName(), 't');
-            struct timer_data *timer;
-#ifdef LEAK_CHECK
-            timer = (struct timer_data *)calloc(1, sizeof(struct
-                                                          timer_data));
-#else
-            timer = (struct timer_data *)dc_alloc(1, sizeof(struct
-                                                            timer_data));
-#endif
+            struct timer_data *timer = new timer_data;
             timer->var_arg1 = ch->hunting;
             timer->arg2 = (void *)ch;
             timer->function = clear_hunt;

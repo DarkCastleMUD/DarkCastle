@@ -728,12 +728,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 			if (level_difference >= 0 || ch->getLevel() >= 50)
 			{
 				chaser->add_memory(GET_NAME(ch), 't');
-				struct timer_data *timer;
-#ifdef LEAK_CHECK
-				timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-				timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+				struct timer_data *timer = new timer_data;
 				timer->var_arg1 = chaser->hunting;
 				timer->arg2 = (void *)chaser;
 				timer->function = clear_hunt;

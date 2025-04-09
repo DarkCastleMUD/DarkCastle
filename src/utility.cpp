@@ -2212,7 +2212,7 @@ void check_timer()
         las->next = curr->next;
       else
         timer_list = curr->next;
-      dc_free(curr);
+      delete curr;
       continue;
     }
     las = curr;

@@ -3263,12 +3263,7 @@ void check_quitter(Character *ch)
   if (!ch->clan || ch->getLevel() >= 100)
     return;
 
-  struct timer_data *timer;
-#ifdef LEAK_CHECK
-  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+  struct timer_data *timer = new timer_data;
   timer->arg1.clan = ch->clan;
   timer->function = check_quitter;
   timer->timeleft = 30;

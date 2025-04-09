@@ -2091,13 +2091,7 @@ void update_linked_slots(machine_data *machine)
 
 void slot_timer(machine_data *machine, int stop1, int stop2, int delay)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
-
+   struct timer_data *timer = new timer_data;
    timer->arg1.machine = machine;
    timer->arg2 = (void *)(int64_t)stop1;
    timer->arg3 = (void *)(int64_t)stop2;
@@ -2610,13 +2604,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
 
 void roulette_timer(wheel_data *wheel, int spin)
 {
-   struct timer_data *timer;
-#ifdef LEAK_CHECK
-   timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
-
+   struct timer_data *timer = new timer_data;
    timer->arg1.wheel = wheel;
    timer->arg2 = (void *)(int64_t)spin;
    timer->function = pulse_countdown;

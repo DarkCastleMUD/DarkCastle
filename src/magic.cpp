@@ -1227,12 +1227,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
                     if (level_difference > 0)
                     {
                       tmp_victim->add_memory(GET_NAME(ch), 't');
-                      struct timer_data *timer;
-#ifdef LEAK_CHECK
-                      timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-                      timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+                      struct timer_data *timer = new timer_data;
                       timer->var_arg1 = tmp_victim->hunting;
                       timer->arg2 = (void *)tmp_victim;
                       timer->function = clear_hunt;
