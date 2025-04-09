@@ -1072,6 +1072,101 @@ private slots:
         QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
         QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
     }
+    void test_blackjack()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character ch;
+        ch.setName(QStringLiteral("Test"));
+        ch.setPosition(position_t::STANDING);
+        Player player;
+        ch.player = &player;
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = move_char(&ch, 21905);
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(ch.in_room, 21905);
+        ch.setPosition(position_t::STANDING);
+
+        rc = do_look(&ch, str_hsh(""));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The Platinum Club blackjack tables\r\n"
+                              "   People scurry about the blackjack area, searching for perhaps a lively\r\n"
+                              "table, the bar, or possibly the ATM machine.  A cocktail waitress in a short\r\n"
+                              "skirt rushes by, a tray of drinks on one hand.\r\n"
+                              "A table covered in deep purple felt stands here.\n\r"
+                              "A blackjack dealer stands here, smiling and waiting for the patrons.\r\n"
+                              "-the blackjack dealer has: aura! \r\n"
+                              "Exits: south \r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("list");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Sorry, but you cannot do that here!\r\n"
+                              "\x1B[1m\x1B[0m\x1B[37m");
+        conn.output = {};
+
+        rc = ch.command_interpreter("look table");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "@---------------------------------@\r\n"
+                              "|    Platinum Towers Blackjack    |\r\n"
+                              "|                                 |\r\n"
+                              "|      Min Bet: 5 platinum        |\r\n"
+                              "|     Max Bet: 250 platinum       |\r\n"
+                              "|                                 |\r\n"
+                              "@---------------------------------@\r\n"
+                              "Enter \"help CASINO\" for more information\r\nor BET <amount> to place a bet.\r\n"
+                              "\x1B[1m\x1B[0m\x1B[37m");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet abc");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer shuffles the deck.\r\n"
+                              "Bet how much?\r\n"
+                              "Syntax: bet <amount>\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 0");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet -1");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 100000");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 250");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You cannot afford that.\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+    }
 };
 
 QTEST_MAIN(TestDC)
