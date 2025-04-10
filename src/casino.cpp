@@ -971,7 +971,7 @@ int hand_number(player_data *plr)
 void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
 {
    bool showColor = false;
-   if (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100))
+   if (ch && (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100)))
    {
       showColor = true;
    }
@@ -1125,7 +1125,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
                     Character *invoker)
 {
    bool showColor = false;
-   if (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100))
+   if (ch && (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100)))
    {
       showColor = true;
    }
