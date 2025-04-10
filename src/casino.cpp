@@ -904,7 +904,7 @@ char lineTop[MAX_STRING_LENGTH];
 int padnext = 0;
 // Not pretty, but don't feel like redoing the prompt functions, so whatever.
 
-char *show_hand(int hand_data[21], int hide, bool ascii)
+char *show_hand(int hand_data[21], int hide, bool ascii, bool showColor)
 {
    static char buf[MAX_STRING_LENGTH];
    int i = 0;
@@ -918,24 +918,24 @@ char *show_hand(int hand_data[21], int hide, bool ascii)
       if (!ascii)
       {
          if (i == 1 && hide)
-            sprintf(buf, "%s %sDC%s", buf, BOLD, NTEXT);
+            sprintf(buf, "%s %sDC%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
          else
-            sprintf(buf, "%s %s%s%c%s", buf, suitcol(hand_data[i]), valstri(hand_data[i]), suit(hand_data[i]), NTEXT);
+            sprintf(buf, "%s %s%s%c%s", buf, showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), suit(hand_data[i]), showColor ? NTEXT : "");
          i++;
       }
       else
       {
          if (i == 1 && hide)
          {
-            sprintf(buf, "%s%s| D |%s", buf, BOLD, NTEXT);
-            sprintf(lineTwo, "%s%s| C |%s", lineTwo, BOLD, NTEXT);
-            sprintf(lineTop, "%s%s,---,%s", lineTop, BOLD, NTEXT);
+            sprintf(buf, "%s%s| D |%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "");
+            sprintf(lineTwo, "%s%s| C |%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "");
+            sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
          }
          else
          {
-            sprintf(buf, "%s%s|%s %s%s%s %s|%s", buf, BOLD, NTEXT, suitcol(hand_data[i]), valstri(hand_data[i]), NTEXT, BOLD, NTEXT);
-            sprintf(lineTwo, "%s%s|%s %s%c%s %s|%s", lineTwo, BOLD, NTEXT, suitcol(hand_data[i]), suit(hand_data[i]), NTEXT, BOLD, NTEXT);
-            sprintf(lineTop, "%s%s,---,%s", lineTop, BOLD, NTEXT);
+            sprintf(buf, "%s%s|%s %s%s%s %s|%s", buf, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", valstri(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
+            sprintf(lineTwo, "%s%s|%s %s%c%s %s|%s", lineTwo, showColor ? BOLD : "", showColor ? NTEXT : "", showColor ? suitcol(hand_data[i]) : "", suit(hand_data[i]), showColor ? NTEXT : "", showColor ? BOLD : "", showColor ? NTEXT : "");
+            sprintf(lineTop, "%s%s,---,%s", lineTop, showColor ? BOLD : "", showColor ? NTEXT : "");
          }
          i++;
       }
@@ -970,6 +970,12 @@ int hand_number(player_data *plr)
 }
 void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
 {
+   bool showColor = false;
+   if (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100))
+   {
+      showColor = true;
+   }
+
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)
          return;
@@ -1013,21 +1019,21 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
          if (buf2[0] != '\0')
          {
             prompt += "You can: ";
-            prompt += BOLD CYAN;
+            prompt += showColor ? BOLD CYAN : "";
             prompt += buf2;
-            prompt += NTEXT;
+            prompt += showColor ? NTEXT : "";
             prompt += "\r\n";
          }
          if (hands(plr) > 1)
          {
             sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-            sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), hand_number(plr), NTEXT, show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+            sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", GET_NAME(plr->ch), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
             padnext = hand_strength(plr) > 9 ? 8 : 7;
          }
          else
          {
             sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
-            sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), NTEXT, show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+            sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, showColor ? BOLD : "", plr == plr->table->cr && showColor ? GREEN : "", GET_NAME(plr->ch), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor), hand_strength(plr));
             padnext = hand_strength(plr) > 9 ? 8 : 7;
          }
       }
@@ -1037,16 +1043,13 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
          if (hands(plr) > 1)
          {
             sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-            sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch), hand_number(plr),
-                    NTEXT, show_hand(plr->hand_data, 0, ascii));
+            sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", GET_NAME(plr->ch), hand_number(plr), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
             padnext = 1;
          }
          else
          {
             sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
-
-            sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch),
-                    NTEXT, show_hand(plr->hand_data, 0, ascii));
+            sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr && showColor ? BOLD GREEN : "", GET_NAME(plr->ch), showColor ? NTEXT : "", show_hand(plr->hand_data, 0, ascii, showColor));
             padnext = 1;
          }
       }
@@ -1087,7 +1090,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    if (obj->table->hand_data[0])
    {
       sprintf(tempBuf, "Dealer: ");
-      sprintf(buf, "%s%sDealer%s: %s", buf, BOLD YELLOW, NTEXT, obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii) : show_hand(obj->table->hand_data, 0, ascii));
+      sprintf(buf, "%s%sDealer%s: %s", buf, showColor ? BOLD YELLOW : "", showColor ? NTEXT : "", obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii, showColor) : show_hand(obj->table->hand_data, 0, ascii, showColor));
       sprintf(buf, "%s\r\n", buf);
    }
    // fixPadding(&buf[0]);
