@@ -1166,6 +1166,176 @@ private slots:
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
         conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        ch.do_toggle({"ansi"});
+        QVERIFY(isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(conn.output, "ANSI COLOR on.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
+                              "\r\n"
+                              "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m5h\x1B[0m\x1B[37m \x1B[1m\x1B[30m3s\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m6h\x1B[0m\x1B[37m \x1B[1mDC\x1B[0m\x1B[37m\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, true);
+        QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
+                              "\r\n"
+                              "      \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m               \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m\r\n"
+                              "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m5\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30m3\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m6\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| D |\x1B[0m\x1B[37m\r\n"
+                              "      \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30ms\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m               \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| C |\x1B[0m\x1B[37m\r\n      \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m               \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m\r\n");
+        conn.output = {};
+
+        ch.do_toggle({"ansi"});
+        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(conn.output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "Test:  5h 3s = 8   Dealer:  6h DC\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, true);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "      ,---,,---,               ,---,,---,\r\n"
+                              "Test: | 5 || 3 | = 8   Dealer: | 6 || D |\r\n"
+                              "      | h || s |               | h || C |\r\n"
+                              "      '---''---'               '---''---'\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("hit");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You hit and receive a Qc.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY \r\n"
+                              "\r\n"
+                              "Test:  5h 3s Qc = 18   Dealer:  6h DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("hit");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You hit and receive a 5d.\r\n"
+                              "You BUSTED!\r\n"
+                              "The dealer takes your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        check_timer();
+        QCOMPARE(conn.output, "It is now the dealer's turn.\r\n"
+                              "The dealer flips over his card revealing a \x1B[1m\x1B[31mAd\x1B[0m\x1B[37m.\r\n"
+                              "The dealer has 17!\r\n");
+        conn.output = {};
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'Place your bets!'\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "Test:  7d Jh = 17   Dealer:  Qs DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("stay");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Test stays.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "It is now the dealer's turn.\r\n"
+                              "The dealer flips over his card revealing a \x1B[1m\x1B[30m8s\x1B[0m\x1B[37m.\r\n"
+                              "The dealer has 18!\r\n"
+                              "You LOSE your bet!\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'Place your bets!'\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: INSURANCE \r\n"
+                              "\r\n"
+                              "Test:  Qd 4s = 14   Dealer:  As DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("insurance");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You cannot afford an insurance bet right now.\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("insurance");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You make an insurance bet.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "\r\nTest:  Qd 4s = 14   Dealer:  As DC\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
     }
 };
 
