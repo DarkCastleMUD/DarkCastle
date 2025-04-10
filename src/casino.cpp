@@ -1124,6 +1124,12 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
 int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
                     Character *invoker)
 {
+   bool showColor = false;
+   if (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100))
+   {
+      showColor = true;
+   }
+
    char arg1[MAX_INPUT_LENGTH];
    arg = one_argument(arg, arg1);
    if (cmd < 189 || cmd > 194)
@@ -1309,11 +1315,11 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
 
       plr->hand_data[2] = pickCard(plr->table->deck);
       sprintf(buf, "%s receives a %s%s%c%s.\r\n", GET_NAME(ch),
-              suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]),
-              suit(plr->hand_data[2]), NTEXT);
+              showColor ? suitcol(plr->hand_data[2]) : "", valstri(plr->hand_data[2]),
+              suit(plr->hand_data[2]), showColor ? NTEXT : "");
       send_to_table(buf, plr->table, plr);
-      sprintf(buf, "You receive a %s%s%c%s.\r\n", suitcol(plr->hand_data[2]),
-              valstri(plr->hand_data[2]), suit(plr->hand_data[2]), NTEXT);
+      sprintf(buf, "You receive a %s%s%c%s.\r\n", showColor ? suitcol(plr->hand_data[2]) : "",
+              valstri(plr->hand_data[2]), suit(plr->hand_data[2]), showColor ? NTEXT : "");
       ch->send(buf);
 
       if (hand_strength(plr) > 21) // busted
@@ -1409,12 +1415,12 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       plr->hand_data[i] = pickCard(plr->table->deck);
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n", GET_NAME(ch),
-              suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]),
-              suit(plr->hand_data[i]), NTEXT);
+              showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
+              suit(plr->hand_data[i]), showColor ? NTEXT : "");
       send_to_table(buf, plr->table, plr);
       sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
-              suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]),
-              suit(plr->hand_data[i]), NTEXT);
+              showColor ? suitcol(plr->hand_data[i]) : "", valstri(plr->hand_data[i]),
+              suit(plr->hand_data[i]), showColor ? NTEXT : "");
       ch->send(buf);
       if (hand_strength(plr) > 21) // busted
       {
