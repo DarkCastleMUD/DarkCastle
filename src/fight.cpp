@@ -1837,7 +1837,7 @@ void eq_damage(Character *ch, Character *victim,
       act("$p worn by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
     }
   } // number(0, 3) == 0
-  else if (victim->carrying && (number(0, 7) == 0))
+  else if (victim->carrying && (number(0, 19) == 0))
   {
     // let's scrap something in the inventory
     for (count = 0, obj = victim->carrying; obj; obj = obj->next_content)
