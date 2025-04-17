@@ -84,26 +84,26 @@ int eq_max_damage(Object *obj)
   switch (GET_ITEM_TYPE(obj))
   {
   case ITEM_WEAPON:
-    amount = 5;
+    amount = 7;
     break;
   case ITEM_ARMOR:
-    amount = 3;
+    amount = 5;
     amount += ((obj->obj_flags.value[0]) / 2); // + 1 hit per 2ac
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
   case ITEM_INSTRUMENT:
   case ITEM_LIGHT:
-    amount = 3;
+    amount = 5;
     break;
   case ITEM_FIREWEAPON:
   case ITEM_CONTAINER:
   case ITEM_KEYRING:
   case ITEM_KEY:
-    amount = 2;
+    amount = 4;
     break;
   default:
-    amount = 1;
+    amount = 3;
     break;
   }
 
