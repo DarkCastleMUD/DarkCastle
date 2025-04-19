@@ -853,17 +853,29 @@ void update_corpses_and_portals(void)
 		 |  Type 4 is a no look permanent game portal
 		 */
 
-		if ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp()))
+		if ((j->isTotem() && isSet(j->obj_flags.more_flags, ITEM_POOF_AFTER_24H)) || ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp())))
 		{
 			if (j->obj_flags.timer > 0)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
+				if (j->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_room].people)
 				{
 					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
-					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
 				}
+				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_obj->in_room].people)
+				{
+					act("$p shimmers brightly for a moment.", DC::getInstance()->world[j->in_obj->in_room].people, j->in_obj, 0, TO_ROOM, INVIS_NULL);
+				}
+				else if (j->in_obj && j->in_obj->carried_by)
+				{
+					act("$p shimmers brightly for a moment.", j->in_obj->carried_by, j->in_obj, 0, TO_CHAR, INVIS_NULL);
+				}
+				else if (j->carried_by)
+				{
+					act("$p shimmers brightly and then fades away.", j->carried_by, j, 0, TO_CHAR, INVIS_NULL);
+				}
+
 				extract_obj(j);
 				continue;
 			}
