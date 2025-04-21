@@ -146,6 +146,7 @@
 #define ITEM_NO_CUSTOM 1U << 14
 #define ITEM_24H_NO_SELL 1U << 15 // Item can't be sold for 24 RL hours
 #define ITEM_POOF_AFTER_24H 1U << 16
+#define ITEM_POOF_NEVER 1U << 17
 
 /* Bitvector for 'size' */
 #define SIZE_ANY 1U

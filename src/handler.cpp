@@ -3276,7 +3276,7 @@ int obj_to_char(class Object *object, Character *ch)
 
 	pick_up_item(ch, object);
 
-	if (ch->isPlayer() && object->isTotem() && object->obj_flags.timer == 0)
+	if (ch->isPlayer() && object->isTotem() && !isSet(object->obj_flags.more_flags, ITEM_POOF_NEVER) && object->obj_flags.timer == 0)
 	{
 		object->obj_flags.timer = 1440;
 		SET_BIT(object->obj_flags.more_flags, ITEM_POOF_AFTER_24H);
