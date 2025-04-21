@@ -4815,7 +4815,7 @@ void Zone::reset(ResetType reset_type)
 				}
 				break;
 
-			case 'O': /* read an object */
+			case 'O': /* Load object on the ground */
 				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
 				{
 					if (cmd[cmd_no]->arg3 >= 0)
@@ -4893,7 +4893,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2) && (obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4940,7 +4940,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2) && (obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					randomize_object(obj);
 
