@@ -4882,38 +4882,53 @@ int do_oneway(Character *ch, char *arg, int cmd)
 
 command_return_t Character::do_zsave(QStringList arguments, int cmd)
 {
-  FILE *f = nullptr;
+  zone_t zone_key{};
+  auto &zones = DC::getInstance()->zones;
 
-  if (!can_modify_room(this, in_room))
+  if (arguments.isEmpty())
   {
-    send("You may only zsave inside of the room range you are assigned to.\r\n");
-    return eFAILURE;
+    zone_key = DC::getInstance()->world[in_room].zone;
+  }
+  else
+  {
+    bool ok = false;
+    zone_key = arguments.value(0).toULongLong(&ok);
+    if (!ok)
+    {
+      sendln(QStringLiteral("Invalid zone number. Valid zone numbers are %1-%2.").arg(zones.firstKey()).arg(zones.lastKey()));
+      return eFAILURE;
+    }
   }
 
-  auto zone_key = DC::getInstance()->world[in_room].zone;
-  auto &zones = DC::getInstance()->zones;
   if (zones.contains(zone_key) == false)
   {
-    send(QStringLiteral("Current room is in zone %1 but that zone is not found out of %2 zones loaded.\r\n").arg(zone_key).arg(zones.size()));
+    sendln(QStringLiteral("Zone %1 not found. Valid zone numbers are %2-%3.").arg(zone_key).arg(zones.firstKey()).arg(zones.lastKey()));
     return eFAILURE;
   }
   auto &zone = zones[zone_key];
 
-  if (zone.getFilename().isEmpty())
+  if (!can_modify_room(this, zone.getRealBottom()))
   {
-    send(QStringLiteral("Zone %1 has an empty filename.\r\n").arg(zone_key));
+    sendln("You may only zsave zones that include the room range you are assigned to.");
     return eFAILURE;
   }
 
-  if (zone.isModified() == false)
+  if (zone.getFilename().isEmpty())
   {
-    send(QStringLiteral("Zone %1 has not been modified. Saving anyway.\r\n").arg(zone_key));
+    sendln(QStringLiteral("Zone %1 has an empty filename.").arg(zone_key));
+    return eFAILURE;
+  }
+
+  if (!zone.isModified())
+  {
+    sendln(QStringLiteral("Zone %1 has not been modified. Saving anyway.").arg(zone_key));
   }
 
   QString filename = QStringLiteral("zonefiles/%1").arg(zone.getFilename());
   QString command = QStringLiteral("cp %1 %1.last").arg(filename);
   system(command.toStdString().c_str());
 
+  FILE *f = nullptr;
   if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
     logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
@@ -4923,8 +4938,8 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
   zone.write(f);
 
   fclose(f);
-  send("Saved.\r\n");
-  DC::getInstance()->set_zone_saved_zone(in_room);
+  sendln(QStringLiteral("Saved zone %1.").arg(zone_key));
+  zone.setModified(false);
   return eSUCCESS;
 }
 
