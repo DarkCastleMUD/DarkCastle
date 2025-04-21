@@ -1341,10 +1341,12 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
   case 13:
     zone.show_info(ch);
+    return eSUCCESS;
     break;
 
   default:
     ch->sendln("Error:  Couldn't find item in switch.");
+    return eFAILURE;
     break;
   }
   DC::getInstance()->set_zone_modified_zone(ch->in_room);
