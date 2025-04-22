@@ -504,8 +504,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       numPC++;
     }
 
-    if ((d->connected) == Connection::states::WRITE_BOARD || (d->connected) == Connection::states::EDITING ||
-        (d->connected) == Connection::states::EDIT_MPROG)
+    if (d->isEditing())
     {
       tailBuf = "$1$B(writing) ";
     }
