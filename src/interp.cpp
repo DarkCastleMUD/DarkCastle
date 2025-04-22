@@ -131,7 +131,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-  if (desc == nullptr || desc->connected != Connection::states::EDITING)
+  if (desc == nullptr || !desc->isEditing())
   {
     pcomm = pcomm.trimmed();
   }
