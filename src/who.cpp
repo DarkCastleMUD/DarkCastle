@@ -367,7 +367,8 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
       break;
     }
 
-    if ((d->connected) && (d->connected) != Connection::states::WRITE_BOARD && (d->connected) != Connection::states::EDITING && (d->connected) != Connection::states::EDIT_MPROG)
+    // Don't show any connection that's not playing or editing on who list
+    if (d->connected != Connection::states::PLAYING && !d->isEditing())
     {
       continue;
     }

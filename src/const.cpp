@@ -3717,47 +3717,48 @@ const QList<int> Character::wear_to_item_wear =
 const QStringList DC::connected_states =
     {
         "PLAYING", // 0
+        "GET_PROXY",
         "GET_NAME",
         "GET_OLD_PASSWORD",
         "CONFIRM_NEW_NAME",
-        "GET_NEW_PASSWORD",
-        "CONFIRM_NEW_PASSWORD", // 5
+        "GET_NEW_PASSWORD", // 5
+        "CONFIRM_NEW_PASSWORD",
         "GET_NEW_SEX",
         "OLD_GET_CLASS",
         "READ_MOTD",
-        "SELECT_MENU",
-        "RESET_PASSWORD", // 10
+        "SELECT_MENU", // 10
+        "RESET_PASSWORD",
         "CONFIRM_RESET_PASSWORD",
         "EXDSCR",
         "OLD_GET_RACE",
-        "WRITE_BOARD",
-        "EDITING", // 15
+        "WRITE_BOARD", // 15
+        "EDITING",
         "EDITING_V2",
         "SEND_MAIL",
         "DELETE_CHAR",
-        "OLD_CHOOSE_STATS",
-        "PFILE_WIPE", // 20
+        "OLD_CHOOSE_STATS", // 20
+        "PFILE_WIPE",
         "ARCHIVE_CHAR",
         "CLOSE",
         "CONFIRM_PASSWORD_CHANGE",
-        "EDIT_MPROG",
-        "DISPLAY_ENTRANCE", // 25
+        "EDIT_MPROG", // 25
+        "DISPLAY_ENTRANCE",
         "PRE_DISPLAY_ENTRANCE",
         "SELECT_RECOVERY_MENU",
         "GET_NEW_RECOVERY_QUESTION",
-        "GET_NEW_RECOVERY_ANSWER",
-        "GET_NEW_RECOVERY_EMAIL", // 30
+        "GET_NEW_RECOVERY_ANSWER", // 30
+        "GET_NEW_RECOVERY_EMAIL",
         "QUESTION_ANSI",
         "GET_ANSI",
         "QUESTION_SEX",
-        "QUESTION_STAT_METHOD",
-        "GET_STAT_METHOD", // 35
+        "QUESTION_STAT_METHOD", // 35
+        "GET_STAT_METHOD",
         "OLD_STAT_METHOD",
         "NEW_STAT_METHOD",
         "NEW_PLAYER",
-        "QUESTION_RACE",
-        "GET_RACE", // 40
+        "QUESTION_RACE", // 40
+        "GET_RACE",
         "QUESTION_CLASS",
         "GET_CLASS",
         "QUESTION_STATS",
-        "GET_STATS"};
+        "GET_STATS"}; // 45
