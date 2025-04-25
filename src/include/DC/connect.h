@@ -200,7 +200,8 @@ public:
            connected == Connection::states::EDITING_V2 ||
            connected == Connection::states::WRITE_BOARD ||
            connected == Connection::states::EDIT_MPROG ||
-           connected == Connection::states::SEND_MAIL;
+           connected == Connection::states::SEND_MAIL ||
+           connected == Connection::states::EXDSCR;
   }
   inline bool isPlaying(void) const noexcept
   {
