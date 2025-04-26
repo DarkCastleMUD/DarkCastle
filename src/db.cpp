@@ -4893,7 +4893,16 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2) && (obj = clone_object(cmd[cmd_no]->arg1)))
+				// Never load the same totem as long as it exists in the world
+				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
+					cmd[cmd_no]->arg2 != -1 &&
+					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+				{
+					last_cmd = 0;
+					last_obj = 0;
+					break;
+				}
+				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4940,7 +4949,16 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2) && (obj = clone_object(cmd[cmd_no]->arg1)))
+				// Never load the same totem as long as it exists in the world
+				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
+					cmd[cmd_no]->arg2 != -1 &&
+					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+				{
+					last_cmd = 0;
+					last_obj = 0;
+					break;
+				}
+				if ((obj = clone_object(cmd[cmd_no]->arg1)))
 				{
 					randomize_object(obj);
 
