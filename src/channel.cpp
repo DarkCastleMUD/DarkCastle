@@ -31,15 +31,15 @@
 class channel_msg
 {
 public:
-  channel_msg(const Character *sender, const int32_t type, const char *msg)
-      : type(type), msg(std::string(msg))
+  channel_msg(const Character *sender, const LibDC::LogChannels type, const char *msg)
+      : type_(type), msg(std::string(msg))
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const Character *sender, const int32_t type, const std::string &msg)
-      : type(type), msg(msg)
+  channel_msg(const Character *sender, const LibDC::LogChannels type, const std::string &msg)
+      : type_(type), msg(msg)
   {
     set_wizinvis(sender);
     set_name(sender);
@@ -59,7 +59,7 @@ public:
       sender = name;
     }
 
-    switch (type)
+    switch (type_)
     {
     case LibDC::LogChannels::CHANNEL_GOSSIP:
       output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
@@ -90,14 +90,14 @@ public:
     else
     {
       name = std::string("Unknown");
-      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type, msg.c_str());
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type_, msg.c_str());
     }
   }
 
 private:
   std::string name;
   int32_t wizinvis;
-  int32_t type;
+  LibDC::LogChannels type_;
   std::string msg;
 };
 
