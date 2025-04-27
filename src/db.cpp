@@ -4886,8 +4886,7 @@ void Zone::reset(ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_,
-							cmd_no + 1);
+					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, cmd_no + 1);
 					logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
@@ -4942,8 +4941,7 @@ void Zone::reset(ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_,
-							cmd_no + 1);
+					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, cmd_no + 1);
 					logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
@@ -5012,8 +5010,7 @@ void Zone::reset(ResetType reset_type)
 				}
 				if (cmd[cmd_no]->arg2 < 0 || cmd[cmd_no]->arg2 >= 6)
 				{
-					sprintf(log_buf,
-							"Illegal direction %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
+					sprintf(log_buf, "Illegal direction %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					break;
 				}
