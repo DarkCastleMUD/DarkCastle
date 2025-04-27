@@ -912,7 +912,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     }
 
     ch->sendln("You raise a level!");
-    logf(IMMORTAL, LogChannels::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
+    logf(IMMORTAL, LibDC::LogChannels::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
     advance_level(ch, 0);
@@ -1286,7 +1286,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 
   if (difficulty < 1)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
+    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
@@ -1404,7 +1404,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     break;
   }
 
@@ -1418,7 +1418,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
   if (skillname.isEmpty())
   {
     send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
-    logf(IMMORTAL, LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
+    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }
 

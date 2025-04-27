@@ -39,7 +39,7 @@ void DC::assign_mobiles(void)
   assign_combat_procs();
 
   boot_the_shops();
-  logf(IMMORTAL, LogChannels::LOG_WORLD, "Booting player shops.");
+  logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Booting player shops.");
   boot_player_shops();
   assign_the_shopkeepers();
   assign_the_player_shopkeepers();

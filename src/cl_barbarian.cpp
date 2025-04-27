@@ -1358,7 +1358,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    logf(OVERSEER, LogChannels::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
+    logf(OVERSEER, LibDC::LogChannels::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
   }
 
   // rest already set

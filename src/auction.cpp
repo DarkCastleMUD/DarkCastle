@@ -203,7 +203,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
     }
   }
 
-  logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, LogChannels::LOG_OBJECTS);
+  logentry(QStringLiteral("VEND: %1 modified ticket %2 (%3): old price %4, new price %5.\r\n").arg(GET_NAME(ch)).arg(Item_it.key()).arg(Item_it->item_name).arg(Item_it->price).arg(new_price), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
   Item_it->price = new_price;
   Save();
   return;
@@ -258,7 +258,7 @@ void AuctionHouse::HandleDelete(QString name)
     plural = "s ";
   }
 
-  logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 auction%2 belonging to %3 have been deleted.").arg(tickets_to_delete.size()).arg(plural).arg(name), ANGEL, LibDC::LogChannels::LOG_GOD);
 
   while (!tickets_to_delete.isEmpty())
   {
@@ -271,7 +271,7 @@ void AuctionHouse::HandleDelete(QString name)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        logf(IMMORTAL, LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -303,7 +303,7 @@ void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_nam
   {
     plural = "s ";
   }
-  logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 auction%2 have been converted from %3 to %4.").arg(i).arg(plural).arg(old_name).arg(new_name), ch->getLevel(), LibDC::LogChannels::LOG_GOD);
   Save();
   return;
 }
@@ -359,7 +359,7 @@ Identify an item.
 */
 void AuctionHouse::Identify(Character *ch, unsigned int ticket)
 {
-  int spell_identify(uint8_t level, Character * ch, Character * victim, class Object * obj, int skill);
+  int spell_identify(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill);
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
 
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
@@ -392,7 +392,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
   if (!obj)
   {
 
-    logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Major screw up in auction(identify)! Item %1 belonging to %2 could not be created!").arg(Item_it->item_name).arg(Item_it->seller), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -619,7 +619,7 @@ void AuctionHouse::AddRoom(Character *ch, int room)
   {
     auction_rooms[room] = 1;
     ch->send(QStringLiteral("Done. Room %1 added to auction houses.\r\n").arg(room));
-    logf(ch->getLevel(), LogChannels::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
+    logf(ch->getLevel(), LibDC::LogChannels::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -636,7 +636,7 @@ void AuctionHouse::RemoveRoom(Character *ch, int room)
   if (1 == auction_rooms.remove(room))
   {
     ch->send(QStringLiteral("Done. Room %1 has been removed from auction houses.\r\n").arg(room));
-    logf(ch->getLevel(), LogChannels::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
+    logf(ch->getLevel(), LibDC::LogChannels::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
@@ -692,7 +692,7 @@ void AuctionHouse::Load()
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Unable to open the save file \"%s\" for Auction files!!", file_name.toStdString().c_str());
-    logentry(buf, 0, LogChannels::LOG_MISC);
+    logentry(buf, 0, LibDC::LogChannels::LOG_MISC);
     return;
   }
 
@@ -760,7 +760,7 @@ void AuctionHouse::Save()
 
   if (DC::getInstance()->cf.bport)
   {
-    logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Unable to save auction files because this is the testport!"), ANGEL, LibDC::LogChannels::LOG_MISC);
     return;
   }
   QString temp_file_name = file_name + ".temp";
@@ -770,7 +770,7 @@ void AuctionHouse::Save()
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Unable to open/create the save file \"%s\" for Auction files!!", file_name.toStdString().c_str());
-    logentry(buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(buf, ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -818,7 +818,7 @@ void AuctionHouse::Save()
       catch (...)
       {
         perror("AuctionHouse::Save()");
-        logf(IMMORTAL, LogChannels::LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it.key());
+        logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it.key());
       }
     }
   }
@@ -834,7 +834,7 @@ void AuctionHouse::Save()
   if (rename(temp_file_name.toStdString().c_str(), file_name.toStdString().c_str()) != 0)
   {
     perror("AuctionHouse::save() rename");
-    logf(IMMORTAL, LogChannels::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
+    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
   }
 
   return;
@@ -1030,7 +1030,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1041,7 +1041,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), rnum, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1078,7 +1078,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       return;
     }
   }
@@ -1107,7 +1107,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
           GET_NAME(ch), Item_it->seller.toStdString().c_str(), Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->price);
-  logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+  logentry(log_buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
   obj_to_char(obj, ch);
   ch->save();
 
@@ -1116,7 +1116,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     errno = 0;
     if (!(fl = fopen(WEB_AUCTION_FILE, "r")))
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
@@ -1131,7 +1131,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     errno = 0;
     if (!(fl = fopen(WEB_AUCTION_FILE, "w")))
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
@@ -1144,7 +1144,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   }
   else
   {
-    logentry(QStringLiteral("bport mode: Not saving auction file to web dir."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("bport mode: Not saving auction file to web dir."), 0, LibDC::LogChannels::LOG_MISC);
   }
 }
 
@@ -1172,25 +1172,25 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
       {
         if ((auction_obj_file.rdstate() & std::ios_base::eofbit) == std::ios_base::eofbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
+          logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::eofbit", ticket);
         }
         else if ((auction_obj_file.rdstate() & std::ios_base::badbit) == std::ios_base::badbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
+          logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::badbit", ticket);
         }
         else if ((auction_obj_file.rdstate() & std::ios_base::failbit) == std::ios_base::failbit)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
+          logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to std::ios_base::failbit", ticket);
         }
         else
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
+          logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
         }
         Item_it->obj = nullptr;
       }
       catch (...)
       {
-        logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): unknown error");
+        logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "ticket_object_load(): unknown error");
         Item_it->obj = nullptr;
       }
     }
@@ -1257,7 +1257,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             GET_NAME(ch), Item_it->price, Item_it->item_name.toStdString().c_str(), ticket);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
   }
   break;
   case AUC_EXPIRED: // intentional fallthrough
@@ -1273,7 +1273,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
-      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
       return;
     }
 
@@ -1289,7 +1289,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), rnum, Item_it->seller.toStdString().c_str());
-      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
       return;
     }
 
@@ -1297,7 +1297,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
             GET_NAME(ch), ticket, Item_it->item_name.toStdString().c_str(), Item_it->price);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
     obj_to_char(obj, ch);
   }
   break;
@@ -1305,7 +1305,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", GET_NAME(ch), ticket);
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     Items_For_Sale.remove(ticket);
 
     std::stringstream obj_filename;
@@ -1315,7 +1315,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     {
       if (unlink(obj_filename.str().c_str()) == -1)
       {
-        logf(IMMORTAL, LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+        logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
       }
     }
 
@@ -1323,7 +1323,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   }
   break;
   default:
-    logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default case reached in Removeticket, contact a coder!"), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     break;
   }
 
@@ -1335,7 +1335,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(cancel)! Ticket %d belonging to %s could not be removed!",
             ticket, Item_it->seller.toStdString().c_str());
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1346,7 +1346,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
   {
     if (unlink(obj_filename.str().c_str()) == -1)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
     }
   }
 
@@ -1678,7 +1678,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   {
     sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.toStdString().c_str());
   }
-  logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+  logentry(log_buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
 
   // If this is a custom item we need it to continue existing otherwise we remove the clone
   if (fullSave(obj))

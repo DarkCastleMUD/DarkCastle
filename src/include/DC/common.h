@@ -5,6 +5,40 @@
 #include <QString>
 #include <QStringList>
 
+namespace LibDC
+{
+    enum LogChannels
+    {
+        LOG_BUG = 1U,
+        LOG_PRAYER = 1U << 1,
+        LOG_GOD = 1U << 2,
+        LOG_MORTAL = 1U << 3,
+        LOG_SOCKET = 1U << 4,
+        LOG_MISC = 1U << 5,
+        LOG_PLAYER = 1U << 6,
+        CHANNEL_GOSSIP = 1U << 7,
+        CHANNEL_AUCTION = 1U << 8,
+        CHANNEL_INFO = 1U << 9,
+        CHANNEL_TRIVIA = 1U << 10,
+        CHANNEL_DREAM = 1U << 11,
+        CHANNEL_CLAN = 1U << 12,
+        CHANNEL_NEWBIE = 1U << 13,
+        CHANNEL_SHOUT = 1U << 14,
+        LOG_WORLD = 1U << 15,
+        LOG_ARENA = 1U << 16,
+        LOG_CLAN = 1U << 17,
+        LOG_WARNINGS = 1U << 18,
+        LOG_HELP = 1U << 19,
+        LOG_DATABASE = 1U << 20,
+        LOG_OBJECTS = 1U << 21,
+        CHANNEL_TELL = 1U << 22,
+        CHANNEL_HINTS = 1U << 23,
+        LOG_VAULT = 1U << 24,
+        LOG_QUEST = 1U << 25,
+        LOG_DEBUG = 1U << 26
+    };
+}
+
 enum class attribute_t : uint_fast8_t
 {
     UNDEFINED = 0,
@@ -155,37 +189,6 @@ enum class load_status_t
     missing,  // not found
     error,    // error loading
     bad_input // bad input
-};
-
-enum LogChannels
-{
-    LOG_BUG = 1U,
-    LOG_PRAYER = 1U << 1,
-    LOG_GOD = 1U << 2,
-    LOG_MORTAL = 1U << 3,
-    LOG_SOCKET = 1U << 4,
-    LOG_MISC = 1U << 5,
-    LOG_PLAYER = 1U << 6,
-    CHANNEL_GOSSIP = 1U << 7,
-    CHANNEL_AUCTION = 1U << 8,
-    CHANNEL_INFO = 1U << 9,
-    CHANNEL_TRIVIA = 1U << 10,
-    CHANNEL_DREAM = 1U << 11,
-    CHANNEL_CLAN = 1U << 12,
-    CHANNEL_NEWBIE = 1U << 13,
-    CHANNEL_SHOUT = 1U << 14,
-    LOG_WORLD = 1U << 15,
-    LOG_ARENA = 1U << 16,
-    LOG_CLAN = 1U << 17,
-    LOG_WARNINGS = 1U << 18,
-    LOG_HELP = 1U << 19,
-    LOG_DATABASE = 1U << 20,
-    LOG_OBJECTS = 1U << 21,
-    CHANNEL_TELL = 1U << 22,
-    CHANNEL_HINTS = 1U << 23,
-    LOG_VAULT = 1U << 24,
-    LOG_QUEST = 1U << 25,
-    LOG_DEBUG = 1U << 26
 };
 
 bool operator!(load_status_t ls);

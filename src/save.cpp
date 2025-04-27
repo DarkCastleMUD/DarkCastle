@@ -710,19 +710,19 @@ void read_skill(Character *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -866,7 +866,7 @@ void save_char_obj_db(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LibDC::LogChannels::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -917,7 +917,7 @@ void save_char_obj(Character *ch)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -962,7 +962,7 @@ void save_char_obj(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LibDC::LogChannels::LOG_BUG);
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -976,7 +976,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(log_buf.toStdString().c_str());
-  logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+  logentry(log_buf, ANGEL, LibDC::LogChannels::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }

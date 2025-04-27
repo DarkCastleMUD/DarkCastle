@@ -159,7 +159,7 @@ void save_golem_data(Character *ch)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
@@ -191,11 +191,11 @@ void save_charmie_data(Character *ch)
       continue;
     }
 
-    // logf(IMMORTAL, LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
+    // logf(IMMORTAL, LibDC::LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      logf(ANGEL, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      logf(ANGEL, LibDC::LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);

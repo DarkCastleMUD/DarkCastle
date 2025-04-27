@@ -110,14 +110,14 @@ int do_log(Character *ch, char *argument, int cmd)
     ch->sendln("LOG removed.");
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
-    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
   }
   else
   {
     ch->sendln("LOG set.");
     SET_BIT(vict->player->punish, PUNISH_LOG);
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
-    logentry(buf2, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf2, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }
@@ -433,7 +433,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
           GET_NAME(ch), victim->getNameC(), flag);
-  logentry(log_buf, ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(log_buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -713,7 +713,7 @@ int do_sqedit(Character *ch, char *argument, int cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, LogChannels::LOG_WORLD);
+    logentry(QStringLiteral("Incorrect -i- in do_sqedit"), 0, LibDC::LogChannels::LOG_WORLD);
     return eFAILURE;
   }
   return eSUCCESS;

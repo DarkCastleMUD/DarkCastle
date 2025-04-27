@@ -1266,7 +1266,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			GET_AC(ch) -= 2;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
+			logf(110, LibDC::LogChannels::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1288,7 +1288,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			GET_EXP(ch) += 2000000;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
+			logf(110, LibDC::LogChannels::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1498,8 +1498,8 @@ void Character::set_heightweight(void)
 		this->weight = number(240, 280);
 		break;
 	}
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+	logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+	logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 int changecost(int oldrace, int newrace)
@@ -1803,22 +1803,22 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			if (choice == 3)
 			{
 				ch->height++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 4)
 			{
 				ch->height--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 5)
 			{
 				ch->weight++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			if (choice == 6)
 			{
 				ch->weight--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			return eSUCCESS;
 		}
@@ -1844,7 +1844,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			GET_AGE_METAS(ch) += 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
+			logf(110, LibDC::LogChannels::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1871,7 +1871,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			GET_AGE_METAS(ch) -= 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
+			logf(110, LibDC::LogChannels::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;

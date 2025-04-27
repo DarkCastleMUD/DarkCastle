@@ -72,7 +72,7 @@ command_return_t Character::do_linkload(QStringList arguments, int cmd)
   char_to_room(new_new, in_room);
   act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
   act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
-  logf(level_, LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
+  logf(level_, LibDC::LogChannels::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
   return eSUCCESS;
 }
 
@@ -89,7 +89,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
     logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
-             LogChannels::LOG_BUG);
+             LibDC::LogChannels::LOG_BUG);
     return eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
@@ -104,7 +104,7 @@ int do_processes(Character *ch, char *arg, int cmd)
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
     logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
-             LogChannels::LOG_BUG);
+             LibDC::LogChannels::LOG_BUG);
     return eFAILURE;
   }
   tmp = fread_string(fl, 0);
@@ -248,7 +248,7 @@ int do_advance(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
           victim->getNameC(), new_newlevel);
-  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
 
   if (victim->getLevel() == 0)
     do_start(victim);
@@ -333,7 +333,7 @@ command_return_t Character::do_zap(QStringList arguments, int cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, LogChannels::LOG_GOD);
+    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, LibDC::LogChannels::LOG_GOD);
   }
 
   else
@@ -408,7 +408,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
   {
     QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    logentry(buffer, ANGEL, LogChannels::LOG_GOD);
+    logentry(buffer, ANGEL, LibDC::LogChannels::LOG_GOD);
     _shutdown = 1;
     DC::getInstance()->quit();
   }
@@ -436,12 +436,12 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
     do_not_save_corpses = 1;
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    logentry(buffer, ANGEL, LogChannels::LOG_GOD);
-    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LogChannels::LOG_MISC);
+    logentry(buffer, ANGEL, LibDC::LogChannels::LOG_GOD);
+    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, LibDC::LogChannels::LOG_MISC);
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
     {
-      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, LibDC::LogChannels::LOG_MISC);
       this->sendln("Hot reboot failed.");
     }
   }
@@ -470,7 +470,7 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    logentry(QStringLiteral("Corefile produced."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Corefile produced."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
   }
   else if (arg1 == "die")
   {
@@ -556,7 +556,7 @@ int do_testport(Character *ch, char *argument, int cmd)
       exit(0);
     }
 
-    logf(105, LogChannels::LOG_MISC, "Starting testport.");
+    logf(105, LibDC::LogChannels::LOG_MISC, "Starting testport.");
     ch->sendln("Testport successfully started.");
   }
   else if (!str_cmp(arg1, "stop"))
@@ -568,7 +568,7 @@ int do_testport(Character *ch, char *argument, int cmd)
       exit(0);
     }
 
-    logf(105, LogChannels::LOG_MISC, "Shutdown testport under pid %d", child);
+    logf(105, LibDC::LogChannels::LOG_MISC, "Shutdown testport under pid %d", child);
     ch->sendln("Testport successfully shutdown.");
   }
 
@@ -639,7 +639,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  logf(110, LogChannels::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
+  logf(110, LibDC::LogChannels::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
 
   if (system(command))
   {

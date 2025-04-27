@@ -520,7 +520,7 @@ void advance_level(Character *ch, int is_conversion)
 		break;
 
 	default:
-		logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, LibDC::LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -950,7 +950,7 @@ void update_corpses_and_portals(void)
 					}
 					else
 					{
-						logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, LogChannels::LOG_BUG);
+						logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, LibDC::LogChannels::LOG_BUG);
 						return;
 					}
 				}
@@ -969,7 +969,7 @@ void update_corpses_and_portals(void)
 		save_corpses();
 	}
 	// sprintf(buf, "DEBUG: Processed Objects: %d", proc);
-	// logentry(buf, 108, LogChannels::LOG_BUG);
+	// logentry(buf, 108, LibDC::LogChannels::LOG_BUG);
 	/* Now process the portals */
 	// process_portals();
 }

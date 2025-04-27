@@ -241,7 +241,7 @@ private:
   gold_t entry_fee_{};
 };
 
-void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
+void logentry(QString str, uint64_t god_level = 0, LibDC::LogChannels type = LibDC::LogChannels::LOG_MISC, Character *vict = nullptr);
 
 #define auction_duration 1209600
 #define AUC_MIN_PRICE 1000
@@ -523,7 +523,7 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(currentVNUM()).arg(currentFilename());
   }
 
-  void logverbose(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr)
+  void logverbose(QString str, uint64_t god_level = 0, LibDC::LogChannels type = LibDC::LogChannels::LOG_MISC, Character *vict = nullptr)
   {
     if (cf.verbose_mode)
     {
@@ -753,7 +753,7 @@ auto &operator>>(auto &in, Room &room)
       {
         // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
         // logentry(error);
-        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LogChannels::LOG_BUG);
+        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LibDC::LogChannels::LOG_BUG);
       }
       else
       {

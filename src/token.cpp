@@ -183,20 +183,20 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
         if (current->IsCode())
           // std::cerr << "Code token" << std::endl;
           if (current->IsText())
-          // std::cerr << "Text token" << std::endl;
+    // std::cerr << "Text token" << std::endl;
 #endif
 
             if (current->IsText())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's a text token" << std::endl;
+      // std::cerr << "It's a text token" << std::endl;
 #endif
               interp += current->GetBuf();
             }
             else if (current->IsAnsi() || current->IsVt100())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's ansi or vt100 code" << std::endl;
+      // std::cerr << "It's ansi or vt100 code" << std::endl;
 #endif
               if (IS_MOB(send_to) ||
                   (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
@@ -254,7 +254,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             else if (current->IsCode())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's a special code" << std::endl;
+      // std::cerr << "It's a special code" << std::endl;
 #endif
               switch ((current->GetBuf())[1])
               {
@@ -507,10 +507,10 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             } /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
-              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, LibDC::LogChannels::LOG_BUG);
             }
 #ifdef DEBUG_TOKEN
-            // std::cerr << "Output after this loop: " << interp << std::endl;
+    // std::cerr << "Output after this loop: " << interp << std::endl;
 #endif
   } /* for loop */
 

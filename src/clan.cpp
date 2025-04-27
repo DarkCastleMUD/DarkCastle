@@ -108,13 +108,13 @@ void boot_clans(void)
     new_new_clan->number = fread_int(fl, 0, 2147483467);
     if (new_new_clan->number < 1 || new_new_clan->number >= 2147483467)
     {
-      logf(0, LogChannels::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      logf(0, LibDC::LogChannels::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
     }
 
     if (get_clan(new_new_clan->number) != nullptr)
     {
-      logf(0, LogChannels::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+      logf(0, LibDC::LogChannels::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
     }
 
@@ -220,15 +220,15 @@ void boot_clans(void)
         break;
       }
       default:
-        logentry(QStringLiteral("Illegal switch hit in boot_clans."), 0, LogChannels::LOG_MISC);
-        logentry(buf, 0, LogChannels::LOG_MISC);
+        logentry(QStringLiteral("Illegal switch hit in boot_clans."), 0, LibDC::LogChannels::LOG_MISC);
+        logentry(buf, 0, LibDC::LogChannels::LOG_MISC);
         break;
       }
     }
     if (skip_clan)
     {
       skip_clan = false;
-      logf(0, LogChannels::LOG_BUG, "Deleting clan number %d.", new_new_clan->number);
+      logf(0, LibDC::LogChannels::LOG_BUG, "Deleting clan number %d.", new_new_clan->number);
       delete_clan(new_new_clan);
       changes_made = true;
     }
@@ -242,7 +242,7 @@ void boot_clans(void)
 
   if (changes_made)
   {
-    logf(0, LogChannels::LOG_BUG, "Changes made to clans. Saving ../lib/clan.txt.");
+    logf(0, LibDC::LogChannels::LOG_BUG, "Changes made to clans. Saving ../lib/clan.txt.");
     save_clans();
   }
 }
@@ -376,7 +376,7 @@ void save_clans(void)
   ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
   if (!(fl = fopen(ssbuffer.str().c_str(), "w")))
   {
-    logf(0, LogChannels::LOG_MISC, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
+    logf(0, LibDC::LogChannels::LOG_MISC, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
     return;
   }
 
@@ -524,7 +524,7 @@ void add_clan_member(clan_data *theClan, Character *ch)
 
   if (!ch || !theClan)
   {
-    logentry(QStringLiteral("add_clan_member(clan, ch) called with a null."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_clan_member(clan, ch) called with a null."), ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -542,13 +542,13 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (!new_new_member || !theClan)
   {
-    logentry(QStringLiteral("add_clan_member(clan, member) called with a null."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_clan_member(clan, member) called with a null."), ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
   if (new_new_member->Name().isEmpty())
   {
-    logentry(QStringLiteral("Attempt to add a blank member name to a clan."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Attempt to add a blank member name to a clan."), ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -575,7 +575,7 @@ void add_clan_member(clan_data *theClan, ClanMember *new_new_member)
 
   if (member_found)
   { // found um, get out
-    logentry(QStringLiteral("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Tried to add already existing clan member '%1'.").arg(new_new_member->Name()), ANGEL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1001,7 +1001,7 @@ int do_accept(Character *ch, char *arg, int cmd)
   victim->send(buf);
 
   sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
-  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
+  logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_CLAN);
 
   add_totem_stats(victim);
 
@@ -1076,7 +1076,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
 
   if (victim == this)
   {
-    logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
+    logentry(QStringLiteral("%1 just quit clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LibDC::LogChannels::LOG_CLAN);
     this->sendln("You quit your clan.");
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1098,7 +1098,7 @@ command_return_t Character::do_outcast(QStringList arguments, int cmd)
   sendln(QStringLiteral("You cast %1 out of your clan.").arg(victim->getName()));
   victim->sendln(QStringLiteral("You are cast out of %1.").arg(clanPtr->name));
 
-  logentry(QStringLiteral("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LogChannels::LOG_CLAN);
+  logentry(QStringLiteral("%1 was outcasted from clan [%2].").arg(victim->getName()).arg(clanPtr->name), IMPLEMENTER, LibDC::LogChannels::LOG_CLAN);
 
   victim->save(666);
   if (!victim_connected)
@@ -1166,7 +1166,7 @@ int do_cpromote(Character *ch, char *arg, int cmd)
   victim->send(buf);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
-  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
+  logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_CLAN);
   return eSUCCESS;
 }
 
@@ -1528,7 +1528,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!(isSet(ch->misc, LogChannels::CHANNEL_CLAN)))
+  if (!(isSet(ch->misc, LibDC::LogChannels::CHANNEL_CLAN)))
   {
     ch->sendln("You have that channel off!!");
     return eFAILURE;
@@ -1566,7 +1566,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
     if (desc->connected || !(pch = desc->character))
       continue;
     if (pch == ch || pch->clan != ch->clan ||
-        !isSet(pch->misc, LogChannels::CHANNEL_CLAN))
+        !isSet(pch->misc, LibDC::LogChannels::CHANNEL_CLAN))
       continue;
     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->getLevel() <= DC::MAX_MORTAL_LEVEL)
       continue;

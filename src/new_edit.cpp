@@ -492,7 +492,7 @@ void parse_action(int command, char *str, class Connection *d)
       break;
    default:
       SEND_TO_Q("Invalid option.\r\n", d);
-      logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("SYSERR: invalid command passed to parse_action"), OVERSEER, LibDC::LogChannels::LOG_MISC);
       return;
    }
 }

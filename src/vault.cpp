@@ -125,7 +125,7 @@ void save_vault(QString name)
   QFile file(fname);
   if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
   {
-    logentry(QStringLiteral("save_vault: could not open vault file for [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("save_vault: could not open vault file for [%1].").arg(fname), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -624,7 +624,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LogChannels::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
+    logf(108, LibDC::LogChannels::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
          name.toStdString().c_str());
     break;
   }
@@ -688,7 +688,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
   snprintf(buf, sizeof(buf), "Deleting %s's vault.", name.toStdString().c_str());
-  logentry(buf, ANGEL, LogChannels::LOG_VAULT);
+  logentry(buf, ANGEL, LibDC::LogChannels::LOG_VAULT);
 
   if (!(vault = has_vault(name)))
     return;
@@ -779,14 +779,14 @@ void DC::testing_load_vaults(void)
     QFile vault_file(fname);
     if (!vault_file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
     {
-      logentry(QStringLiteral("boot_vaults: unable to open file [%1].").arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("boot_vaults: unable to open file [%1].").arg(fname), IMMORTAL, LibDC::LogChannels::LOG_BUG);
       line = vault_index_stream.readLine();
       continue;
     }
     else
     {
       // sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname.toStdString().c_str());
-      //       logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      //       logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     }
     QTextStream vault_file_stream(&vault_file);
     CREATE(vault, struct vault_data, 1);
@@ -855,7 +855,7 @@ void DC::testing_load_vaults(void)
             }
           }
 
-          logentry(QStringLiteral("boot_vaults: bad item vnum (#%1) in vault: %2").arg(vnum).arg(vault->owner), IMMORTAL, LogChannels::LOG_BUG);
+          logentry(QStringLiteral("boot_vaults: bad item vnum (#%1) in vault: %2").arg(vnum).arg(vault->owner), IMMORTAL, LibDC::LogChannels::LOG_BUG);
           saveChanges = true;
         }
         else
@@ -869,7 +869,7 @@ void DC::testing_load_vaults(void)
           sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname.toStdString().c_str());
           if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
                              (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
-            logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+            logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
           */
         }
         break;
@@ -884,7 +884,7 @@ void DC::testing_load_vaults(void)
           access->next = vault->access;
           vault->access = access;
           // sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, filename);
-          //         logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          //         logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
         }
         else
         {
@@ -894,7 +894,7 @@ void DC::testing_load_vaults(void)
 
         break;
       default:
-        logentry(QStringLiteral("boot_vaults: unknown type [%1] in file [%2].").arg(type).arg(fname), IMMORTAL, LogChannels::LOG_BUG);
+        logentry(QStringLiteral("boot_vaults: unknown type [%1] in file [%2].").arg(type).arg(fname), IMMORTAL, LibDC::LogChannels::LOG_BUG);
         break;
       }
 
@@ -906,7 +906,7 @@ void DC::testing_load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -990,7 +990,7 @@ void DC::load_vaults(void)
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1004,14 +1004,14 @@ void DC::load_vaults(void)
     if (!(fl = fopen(filename, "r")))
     {
       sprintf(buf, "boot_vaults: unable to open file [%s].", filename);
-      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
       fscanf(index, "%s\n", line);
       continue;
     }
     else
     {
       sprintf(buf, "boot_vaults: sucessfully opened file [%s].", filename);
-      //      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      //      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     }
 
     CREATE(vault, struct vault_data, 1);
@@ -1036,7 +1036,7 @@ void DC::load_vaults(void)
 
         /*
         if (vault->size > 2000) {
-            logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
+            logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
             FILE *oldfl;
             char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
@@ -1044,14 +1044,14 @@ void DC::load_vaults(void)
             sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
             if(!(oldfl = fopen(oldfname, "r"))) {
           sprintf(buf, "boot_vaults: unable to open file [%s].", oldfname);
-          logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
             } else {
           get_line(oldfl, oldtype);
 
           if (*oldtype == 'S') {
               sscanf(oldtype, "%s %d", tmp, &vnum);
               vault->size = vnum;
-              logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
+              logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
               saveChanges = true;
           }
 
@@ -1073,7 +1073,7 @@ void DC::load_vaults(void)
         else
         {
           sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", filename, type);
-          logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
           break;
         }
 
@@ -1105,7 +1105,7 @@ void DC::load_vaults(void)
 
           snprintf(buf, sizeof(buf), "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
                    vault->owner.toStdString().c_str());
-          logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
           saveChanges = true;
         }
         else
@@ -1119,7 +1119,7 @@ void DC::load_vaults(void)
           sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
           if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
                              (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
-            logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+            logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
           */
         }
         break;
@@ -1136,7 +1136,7 @@ void DC::load_vaults(void)
           access->next = vault->access;
           vault->access = access;
           snprintf(buf, sizeof(buf), "boot_vaults: got access [%s] from file [%s].", access->name.toStdString().c_str(), filename);
-          //        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+          //        logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
         }
         else
         {
@@ -1147,7 +1147,7 @@ void DC::load_vaults(void)
         break;
       default:
         sprintf(buf, "boot_vaults: unknown type in file [%s].", filename);
-        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
         break;
       }
       get_line(fl, type);
@@ -1160,7 +1160,7 @@ void DC::load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
+      logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
@@ -2173,12 +2173,12 @@ void add_new_vault(const char *name, int indexonly)
   char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
   {
-    logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
   }
 
   if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
   {
-    logentry(QStringLiteral("add_new_vault: error opening temp index file."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_new_vault: error opening temp index file."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -2212,7 +2212,7 @@ void add_new_vault(const char *name, int indexonly)
   sprintf(filename, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = fopen(filename, "w")))
   {
-    logentry(QStringLiteral("add_new_vault: error opening new vault file [%1].").arg(filename), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("add_new_vault: error opening new vault file [%1].").arg(filename), IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -2319,7 +2319,7 @@ void logvault(QString message, QString name)
       "Dec",
   };
 
-  logentry(message, IMMORTAL, LogChannels::LOG_VAULT);
+  logentry(message, IMMORTAL, LibDC::LogChannels::LOG_VAULT);
 
   sprintf(fname, "../vaults/%c/%s.vault.log", name[0], name.toStdString().c_str());
   sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0], name.toStdString().c_str());
@@ -2329,7 +2329,7 @@ void logvault(QString message, QString name)
     if (!(ofile = fopen(fname, "w")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
       return;
     }
     fprintf(ofile, "$\n");
@@ -2337,7 +2337,7 @@ void logvault(QString message, QString name)
     if (!(ofile = fopen(fname, "r")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
       return;
     }
   }
@@ -2345,7 +2345,7 @@ void logvault(QString message, QString name)
   if (!(nfile = fopen(nfname, "w")))
   {
     sprintf(buf, "vault_log: could not open vault log file [%s].", nfname);
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
     return;
   }
 

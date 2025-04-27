@@ -1790,7 +1790,7 @@ int handcompare(int hand1[5], int hand2[5])
       if (a == b)
          return 3; //
    }
-   logentry(QStringLiteral("Error in handcompare."), 110, LogChannels::LOG_MORTAL);
+   logentry(QStringLiteral("Error in handcompare."), 110, LibDC::LogChannels::LOG_MORTAL);
 
    return -1;
 }
@@ -2007,7 +2007,7 @@ void save_slot_machines()
 
    if (!curr)
    {
-      logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
       return;
    }
 
@@ -2185,7 +2185,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
          send_info(buf);
 
-         logf(IMMORTAL, LogChannels::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
+         logf(IMMORTAL, LibDC::LogChannels::LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
               GET_NAME(machine->ch), (int)machine->jackpot, machine->gold ? "coins" : "plats");
          if (machine->gold)
             machine->ch->addGold((int)machine->jackpot);

@@ -6,7 +6,7 @@
  */
 
 #include "DC/CommandStack.h"
-#include "DC/player.h"	// LogChannels::LOG_BUG
+#include "DC/player.h"	// LibDC::LogChannels::LOG_BUG
 #include "DC/levels.h"	// IMMORTAL
 #include "DC/utility.h" // logf
 
@@ -57,7 +57,7 @@ CommandStack::~CommandStack()
 	}
 	else
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
+		logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Attempt to decrement CommandStack::depth when already 0");
 		produce_coredump();
 	}
 }

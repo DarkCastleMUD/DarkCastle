@@ -158,7 +158,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -243,7 +243,7 @@ void mobile_activity(void)
         int room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
+          logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];
@@ -350,7 +350,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, LibDC::LogChannels::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -937,7 +937,7 @@ void scavenge(Character *ch)
             break;
 
           default:
-            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, LogChannels::LOG_BUG);
+            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, LibDC::LogChannels::LOG_BUG);
             break;
 
           } /* end switch */

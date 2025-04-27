@@ -1133,7 +1133,7 @@ void Leaderboard::read_file(void)
 
 	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
-		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+		logf(0, LibDC::LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
 	}
 	else
 	{
@@ -1272,11 +1272,11 @@ void Leaderboard::read_file(void)
 		}
 		catch (error_eof &)
 		{
-			logf(0, LogChannels::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
+			logf(0, LibDC::LogChannels::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
 		}
 		catch (error_negative_int &)
 		{
-			logf(0, LogChannels::LOG_BUG, "Corrupt leaderboard file '%s': negative int found where positive expected", LEADERBOARD_FILE);
+			logf(0, LibDC::LogChannels::LOG_BUG, "Corrupt leaderboard file '%s': negative int found where positive expected", LEADERBOARD_FILE);
 		}
 
 		fclose(fl);
@@ -1305,7 +1305,7 @@ void Leaderboard::write_file(const char filename[])
 
 	if (!(fl = fopen(filename, "w")))
 	{
-		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
+		logf(0, LibDC::LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
 		return;
 	}
 	for (i = 0; i < 5; i++)
@@ -1395,7 +1395,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 			{
 				DC::getInstance()->cf.leaderboard_check = "suspend";
 				ch->sendln("Leaderboard writes suspended.");
-				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
+				logf(IMPLEMENTER, LibDC::LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
 			}
 
 			return eSUCCESS;
@@ -1410,7 +1410,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 			{
 				DC::getInstance()->cf.leaderboard_check = "";
 				ch->sendln("Leaderboard writes resumed.");
-				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
+				logf(IMPLEMENTER, LibDC::LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
 			}
 
 			return eSUCCESS;
@@ -1452,7 +1452,7 @@ int do_leaderboard(Character *ch, char *argument, int cmd)
 
 	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
-		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+		logf(0, LibDC::LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
 		return eFAILURE;
 	}
 	for (i = 0; i < 5; i++)
@@ -2014,7 +2014,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 
 	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
-		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+		logf(0, LibDC::LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
 		abort();
 	}
 
@@ -2038,13 +2038,13 @@ void Leaderboard::rename(QString oldname, QString newname)
 
 	if (DC::getInstance()->cf.leaderboard_check == "suspend")
 	{
-		logf(IMMORTAL, LogChannels::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname.toStdString().c_str(), newname.toStdString().c_str());
+		logf(IMMORTAL, LibDC::LogChannels::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname.toStdString().c_str(), newname.toStdString().c_str());
 	}
 	else
 	{
 		if (!(fl = fopen(LEADERBOARD_FILE, "w")))
 		{
-			logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+			logf(0, LibDC::LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
 			abort();
 		}
 

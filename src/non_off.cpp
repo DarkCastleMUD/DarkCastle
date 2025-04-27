@@ -43,16 +43,16 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
+    logf(IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
@@ -253,7 +253,7 @@ int do_donate(Character *ch, char *argument, int cmd)
       {
         sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
                 GET_NAME(ch));
-        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_BUG);
         return eFAILURE;
       }
     }
@@ -309,9 +309,9 @@ int do_donate(Character *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, DC::getInstance()->obj_index[obj->item_number].virt);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
+      logf(IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
@@ -1496,7 +1496,7 @@ void CVoteData::OutToFile()
   if (!the_file)
   {
     logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
-             LogChannels::LOG_BUG);
+             LibDC::LogChannels::LOG_BUG);
     return;
   }
 
@@ -1580,7 +1580,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    logentry(QStringLiteral("Error reading question from vote file."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Error reading question from vote file."), 0, LibDC::LogChannels::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = 0;
@@ -1594,7 +1594,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading answers from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading answers from vote file."), 0, LibDC::LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1612,7 +1612,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, LibDC::LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1627,7 +1627,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading char names from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading char names from vote file."), 0, LibDC::LogChannels::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1676,7 +1676,7 @@ int do_vote(Character *ch, char *arg, int cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    logf(IMMORTAL, LogChannels::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
+    logf(IMMORTAL, LibDC::LogChannels::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;
 }
