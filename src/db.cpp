@@ -4943,7 +4943,7 @@ void Zone::reset(ResetType reset_type)
 				if (mob == nullptr)
 				{
 					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_,
-							cmd_no);
+							cmd_no + 1);
 					logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
@@ -4978,8 +4978,7 @@ void Zone::reset(ResetType reset_type)
 					{
 						if (!equip_char(mob, obj, cmd[cmd_no]->arg3))
 						{
-							sprintf(buf, "Bad equip_char zone %d cmd %d", id_,
-									cmd_no);
+							sprintf(buf, "Bad equip_char zone %d cmd %d", id_, cmd_no + 1);
 							logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 						}
 					}
@@ -5007,23 +5006,20 @@ void Zone::reset(ResetType reset_type)
 			case 'D': /* set state of door */
 				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > DC::getInstance()->top_of_world)
 				{
-					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_,
-							cmd_no);
+					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					break;
 				}
 				if (cmd[cmd_no]->arg2 < 0 || cmd[cmd_no]->arg2 >= 6)
 				{
 					sprintf(log_buf,
-							"Illegal direction %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no]->arg2, id_, cmd_no);
+							"Illegal direction %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					break;
 				}
 				if (!DC::getInstance()->rooms.contains(cmd[cmd_no]->arg1))
 				{
-					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
-							cmd[cmd_no]->arg1, id_, cmd_no);
+					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg1, id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 					break;
 				}
@@ -5113,10 +5109,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			default:
-				sprintf(
-					log_buf,
-					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .",
-					id_, cmd_no, cmd[cmd_no]->command);
+				sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .", id_, cmd_no + 1, cmd[cmd_no]->command);
 				logentry(log_buf, IMMORTAL, LibDC::LogChannels::LOG_WORLD);
 				age = 0;
 				return;
