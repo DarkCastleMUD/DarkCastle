@@ -167,17 +167,17 @@ player_config_t::const_iterator PlayerConfig::constEnd() const
     return config.constEnd();
 }
 
-bool Character::isMortalPlayer(void)
+bool Character::isMortalPlayer(void) const
 {
     return isPlayer() && level_ < IMMORTAL;
 }
 
-bool Character::isImmortalPlayer(void)
+bool Character::isImmortalPlayer(void) const
 {
     return isPlayer() && level_ >= IMMORTAL;
 }
 
-bool Character::isImplementerPlayer(void)
+bool Character::isImplementerPlayer(void) const
 {
     return isPlayer() && level_ == IMPLEMENTER;
 }
@@ -662,14 +662,29 @@ void Character::setLevel(level_t level)
     }
 }
 
-bool Character::isPlayer(void)
+bool Character::isPlayer(void) const
 {
-    return !isNPC() && player;
+    return getType() == Type::Player && player;
 }
 
-bool Character::isNPC(void)
+bool Character::isNPC(void) const
 {
-    return isSet(misc, MISC_IS_MOB);
+    return (getType() == Type::NPC || getType() == Type::ObjectProgram) && mobdata;
+}
+
+bool Character::isObjectProgram(void) const
+{
+    return getType() == Type::ObjectProgram && mobdata && objdata;
+}
+
+auto Character::getType(void) const -> Type
+{
+    return type_;
+}
+
+void Character::setType(const Type type)
+{
+    type_ = type;
 }
 
 auto Entity::room(void) -> Room &

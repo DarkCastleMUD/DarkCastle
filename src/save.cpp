@@ -616,6 +616,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   {
     ch->mobdata = nullptr;
     ch->player = new Player;
+    ch->setType(Character::Type::Player);
     if (!ch->player->read(fpsave, ch, filename))
     {
       return false;

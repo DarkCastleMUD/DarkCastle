@@ -443,8 +443,19 @@ typedef int32_t move_t;
 // PC/MOB specific data are held in the appropriate pointed-to structs
 class Character : public Entity
 {
-
+    Q_GADGET
 public:
+    enum Type
+    {
+        Undefined,
+        Player,
+        NPC,
+        ObjectProgram
+    };
+    Q_ENUM(Type)
+    void setType(const Type type);
+    auto getType(void) const -> Type;
+
     enum sex_t : int8_t
     {
         NEUTRAL = 0,
@@ -757,7 +768,7 @@ public:
 
     uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
     uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
-    uint32_t misc = {};                             // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
+    uint32_t misc = {};                             // Bitvector for logs/channels.  So possessed mobs can channel
 
     Character *fighting = {};      /* Opponent     */
     Character *next = {};          /* Next anywhere in game */
@@ -944,14 +955,14 @@ public:
     QString getSetting(QString key, QString defaultValue = QString());
     QString getSettingAsColor(QString key, QString defaultValue = QString());
 
-    bool isMortalPlayer(void);
-    bool isImmortalPlayer(void);
-    bool isImplementerPlayer(void);
+    bool isMortalPlayer(void) const;
+    bool isImmortalPlayer(void) const;
+    bool isImplementerPlayer(void) const;
+    bool isPlayer(void) const;
+    bool isNPC(void) const;
+    bool isObjectProgram(void) const;
 
-    bool isPlayer(void);
-    bool isNPC(void);
-
-        uint64_t getGold(void);
+    uint64_t getGold(void);
     uint64_t &getGoldReference(void);
     void setGold(uint64_t gold);
 
@@ -1041,6 +1052,7 @@ public:
     bool allowColor(void);
 
 private:
+    Type type_ = Type::Undefined;
     gold_t gold_ = {}; /* Money carried */
     level_t level_ = {};
     bool debug_ = false;

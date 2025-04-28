@@ -42,6 +42,7 @@ void test_handle_ansi(QString test)
   // std::cerr <<  "Testing '" << test << "'" << std::endl;
   Character *ch = new Character;
   ch->player = new Player;
+  ch->setType(Character::Type::Player);
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
   ch->setLevel(1);
 
@@ -276,6 +277,7 @@ int main(int argc, char **argv)
   Character *ch = new Character;
   ch->setName("Debugimp");
   ch->player = new Player;
+  ch->setType(Character::Type::Player);
 
   ch->desc = d;
   ch->setLevel(110);

@@ -234,7 +234,8 @@ void set_golem(Character *golem, int golemtype)
   SETBIT(golem->affected_by, AFF_DETECT_INVISIBLE);
   SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
   SETBIT(golem->mobdata->actflags, ACT_3RD_ATTACK);
-  golem->misc = MISC_IS_MOB;
+  golem->setType(Character::Type::NPC);
+  golem->misc = 0;
   golem->armor = 0;
   golem->setLevel(1);
   golem->hitroll = golem_list[golemtype].hit / 20;

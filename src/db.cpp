@@ -2666,7 +2666,7 @@ Character *read_mobile(int nr, FILE *fl)
 		mob->mobdata->actflags[j] = 0;
 	if (ISSET(mob->mobdata->actflags, ACT_NOTRACK))
 		REMBIT(mob->mobdata->actflags, ACT_NOTRACK);
-	SET_BIT(mob->misc, MISC_IS_MOB);
+	mob->setType(Character::Type::NPC);
 
 	j = 0;
 	while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1)
@@ -3526,7 +3526,8 @@ int create_blank_mobile(int nr)
 	mob->mobdata->default_pos = position_t::STANDING;
 	mob->mobdata->last_room = 0;
 	mob->mobdata->nr = cur_index;
-	mob->misc = MISC_IS_MOB;
+	mob->setType(Character::Type::NPC);
+	mob->misc = 0;
 
 	// shift > items right
 	memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));

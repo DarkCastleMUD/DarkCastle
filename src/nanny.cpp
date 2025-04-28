@@ -1120,6 +1120,7 @@ void DC::nanny(class Connection *d, std::string arg)
          // at this point, player hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
          ch->player = new Player;
+         ch->setType(Character::Type::Player);
          assert(ch->player);
          break;
 

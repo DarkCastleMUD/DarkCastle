@@ -1834,7 +1834,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			return 0;
 		case 'z':
 			if (mob->beacon)
-				return (IS_NPC((Character *)mob->beacon));
+				return IS_NPC(reinterpret_cast<Character *>(mob->beacon));
 			else
 				return -1;
 		case 'n':
@@ -4728,7 +4728,7 @@ Character *initiate_oproc(Character *ch, Object *obj)
 		}
 	temp->setName(buf);
 
-	SET_BIT(temp->misc, MISC_IS_OBJ);
+	temp->setType(Character::Type::ObjectProgram);
 	temp->objdata = obj;
 
 	return temp;

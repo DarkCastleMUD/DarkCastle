@@ -105,6 +105,7 @@ private slots:
         std::unique_ptr<Character> ch = std::make_unique<Character>();
         std::unique_ptr<Player> player = std::make_unique<Player>();
         ch->player = player.get();
+        ch->setType(Character::Type::Player);
         ch->do_toggle({"ansi"});
         QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
         QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
@@ -205,6 +206,7 @@ private slots:
         ch.weight = 150;
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         conn.descriptor = 1;
         conn.character = &ch;
@@ -336,6 +338,7 @@ private slots:
         ch.setClass(CLASS_WARRIOR);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         conn.descriptor = 1;
         conn.character = &ch;
@@ -787,6 +790,7 @@ private slots:
         ch.setClass(CLASS_WARRIOR);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -812,6 +816,7 @@ private slots:
         ch2.setClass(CLASS_WARRIOR);
         Player player2;
         ch2.player = &player2;
+        ch2.setType(Character::Type::Player);
         Connection conn2;
         dc.descriptor_list->next = &conn2;
         conn2.descriptor = 1;
@@ -956,6 +961,7 @@ private slots:
         ch.setName(QStringLiteral("Test"));
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -1010,6 +1016,7 @@ private slots:
         ch.setPosition(position_t::STANDING);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -1086,6 +1093,7 @@ private slots:
         ch.setPosition(position_t::STANDING);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;

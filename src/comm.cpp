@@ -996,6 +996,7 @@ void game_test_init(void)
   Character *ch = new Character;
   ch->setName("Debugimp");
   ch->player = new Player;
+  ch->setType(Character::Type::Player);
 
   ch->desc = d;
   ch->setLevel(110);
