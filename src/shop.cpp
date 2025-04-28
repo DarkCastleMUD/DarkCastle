@@ -176,7 +176,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+  if (!IS_NPC(ch) && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -284,7 +284,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -691,7 +691,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( IS_MOB(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -861,7 +861,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (IS_MOB(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -1417,7 +1417,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
     return eFAILURE;
   }
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return eFAILURE;
 
   switch (cmd)
@@ -1836,7 +1836,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
 int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Character *owner)
 {
-  if (ch == nullptr || IS_MOB(ch))
+  if (ch == nullptr || IS_NPC(ch))
   {
     return eFAILURE;
   }

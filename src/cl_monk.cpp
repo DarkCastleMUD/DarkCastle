@@ -310,19 +310,19 @@ int do_stun(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     ch->sendln("You cannot stun something that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one of them to stun!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;

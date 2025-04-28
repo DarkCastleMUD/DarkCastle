@@ -602,7 +602,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
 
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 {
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->player = nullptr;
 #ifdef LEAK_CHECK
@@ -1048,7 +1048,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
   }
 
   // stored names only matter for mobs
-  if (!IS_MOB(ch))
+  if (!IS_NPC(ch))
   {
     ch->setName(name);
   }
@@ -1739,7 +1739,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     st->armor = ch->armor;
     st->hitroll = ch->hitroll;

@@ -87,7 +87,7 @@ int do_log(Character *ch, char *argument, int cmd)
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
-  if (IS_MOB(ch) || !ch->has_skill(COMMAND_LOG))
+  if (IS_NPC(ch) || !ch->has_skill(COMMAND_LOG))
   {
     ch->sendln("Huh?");
     return eFAILURE;

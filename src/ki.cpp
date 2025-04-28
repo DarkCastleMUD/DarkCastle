@@ -760,7 +760,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
@@ -1136,7 +1136,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   int learned, chance, percent;
   struct affected_type af;
 
-  if (IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
+  if (IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {

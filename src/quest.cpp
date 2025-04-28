@@ -1211,7 +1211,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
@@ -1231,7 +1231,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
@@ -1259,7 +1259,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
@@ -1479,7 +1479,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eFAILURE;
    }
 
-   if (IS_MOB(ch))
+   if (IS_NPC(ch))
    {
       return eFAILURE;
    }

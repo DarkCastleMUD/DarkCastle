@@ -3564,7 +3564,7 @@ int create_blank_mobile(int nr)
 	for_each(character_list.begin(), character_list.end(),
 			 [&cur_index](Character *const &curr)
 			 {
-				 if (IS_MOB(curr))
+				 if (IS_NPC(curr))
 					 if (curr->mobdata->nr >= cur_index)
 						 curr->mobdata->nr++;
 			 });

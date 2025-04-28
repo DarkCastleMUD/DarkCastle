@@ -651,25 +651,25 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
     ch->sendln("You are too puny to headbutt someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to headbutt!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
   {
     ch->sendln("That would be like smashing your head into a wall!");
     return eFAILURE;
@@ -698,7 +698,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   }
 
   int mod = 0;
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
@@ -1121,19 +1121,19 @@ int do_knockback(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
     {
       ch->sendln("You are too tiny to knock someone that HUGE anywhere!");
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
     {
       ch->sendln("You cannot pick just one to knockback!");
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
     {
       act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;

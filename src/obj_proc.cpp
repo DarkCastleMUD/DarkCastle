@@ -802,7 +802,7 @@ int bank(Character *ch, class Object *obj, int cmd, const char *arg,
   /* deposit */
   if (cmd == CMD_DEPOSIT)
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -3861,7 +3861,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
     Character *give_vict;
     if (!(give_vict = ch->get_char_room_vis(target)))
       return eFAILURE; // Not giving to char/mob, so ok
-    if (IS_MOB(give_vict) && vict->isMortalPlayer())
+    if (IS_NPC(give_vict) && vict->isMortalPlayer())
     {
       vict->sendln("You can only give things to other players when you have a hot potato!");
       return eSUCCESS;
@@ -3915,7 +3915,7 @@ int hot_potato(Character *ch, class Object *obj, int cmd, const char *arg,
         "$n has been KILLED!!",
         vict, 0, 0, TO_ROOM, 0);
 
-    if (IS_MOB(vict))
+    if (IS_NPC(vict))
     {
       act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
       do_say(vict, "HA!  Fooled ya!", CMD_DEFAULT);

@@ -66,7 +66,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
   // Any friends in the room?  Call for help!   int friends = 0;
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (!IS_NPC(ally))
       continue;
     if (ally == ch)
       continue;
@@ -111,7 +111,7 @@ int protect(Character *ch, int iFriendId)
   // Any one I need to protect in the room?
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (!IS_NPC(ally))
       continue;
     if (!ally->fighting) // if they arne't fighting, they're safe
       continue;
@@ -228,7 +228,7 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &victim : character_list)
   {
-    if (!IS_MOB(victim))
+    if (!IS_NPC(victim))
       continue;
     if (real_mobile(iFriendId) == victim->mobdata->nr)
     {
@@ -251,7 +251,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
   // Is my friend in the room?
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
   {
-    if (!IS_MOB(ally))
+    if (!IS_NPC(ally))
       continue;
     if (real_mobile(iFriendId) == ally->mobdata->nr)
       return ally;
@@ -654,7 +654,7 @@ int backstabber(Character *ch, class Object *obj, int cmd, const char *arg, Char
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           return eFAILURE;
 
-        if (!IS_MOB(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
@@ -993,7 +993,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   // 1 = north, 4  = west, 6 = down
 
   // If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
-  if (IS_MOB(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
     guard_room = owner->mobdata->mob_flags.value[0];
     guard_direction = owner->mobdata->mob_flags.value[1];
@@ -1058,7 +1058,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
     }
   }
 
-  if (IS_MOB(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
+  if (IS_NPC(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
@@ -2393,7 +2393,7 @@ int humaneater(Character *ch, class Object *obj, int cmd, const char *arg,
         if (!can_attack(ch) || !can_be_attacked(ch, tch))
           continue;
 
-        if (!IS_MOB(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_NPC(tch) && isSet(tch->player->toggles, Player::PLR_NOHASSLE))
           continue;
 
         if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))

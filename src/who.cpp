@@ -78,7 +78,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
 
   one_argument(argument, target);
 
-  hasholylight = IS_MOB(ch) ? 0 : ch->player->holyLite;
+  hasholylight = IS_NPC(ch) ? 0 : ch->player->holyLite;
 
   send_to_char(
       "$B$7($4:$7)=======================================================================($4:$7)\n\r"
@@ -117,9 +117,9 @@ int do_whogroup(Character *ch, char *argument, int cmd)
                           "   $B$7[$4: $5%s $4:$7]$R\n\r"
                           "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
               k->group_name,
-              IS_MOB(k) ? 0 : k->player->group_pkills,
-              IS_MOB(k) ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0),
-              IS_MOB(k) ? 0 : k->player->group_kills);
+              IS_NPC(k) ? 0 : k->player->group_pkills,
+              IS_NPC(k) ? 0 : (k->player->group_pkills ? (k->player->grpplvl / k->player->group_pkills) : 0),
+              IS_NPC(k) ? 0 : k->player->group_kills);
       add_to_who(tempbuffer);
 
       // If we're searching, see if this is the target
@@ -127,7 +127,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
         foundtarget = 1;
 
       // First, if they're not anonymous
-      if ((!IS_MOB(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
+      if ((!IS_NPC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
                 "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
@@ -231,17 +231,17 @@ int do_whosolo(Character *ch, char *argument, int cmd)
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
-                  IS_MOB(i) ? 0 : i->player->totalpkills,
-                  IS_MOB(i) ? 0 : i->player->pdeathslogin,
-                  IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
+                  IS_NPC(i) ? 0 : i->player->totalpkills,
+                  IS_NPC(i) ? 0 : i->player->pdeathslogin,
+                  IS_NPC(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         else
           sprintf(tempbuffer,
                   "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
-                  IS_MOB(i) ? 0 : i->player->totalpkills,
-                  IS_MOB(i) ? 0 : i->player->pdeathslogin,
-                  IS_MOB(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
+                  IS_NPC(i) ? 0 : i->player->totalpkills,
+                  IS_NPC(i) ? 0 : i->player->pdeathslogin,
+                  IS_NPC(i) ? 0 : (i->player->totalpkills ? (i->player->totalpkillslv / i->player->totalpkills) : 0));
         add_to_who(tempbuffer);
       } // if is affected by group
   } // End For Loop.
@@ -353,7 +353,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
 
   QString buf;
   QString immbuf;
-  bool hasholylight = IS_MOB(this) ? false : player->holyLite;
+  bool hasholylight = IS_NPC(this) ? false : player->holyLite;
   for (auto d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     QString infoBuf;
@@ -477,9 +477,9 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
         infoBuf = immortFields.value(i->getLevel() - IMMORTAL);
       }
 
-      if (level_ >= IMMORTAL && !IS_MOB(i) && i->player->wizinvis > 0)
+      if (level_ >= IMMORTAL && !IS_NPC(i) && i->player->wizinvis > 0)
       {
-        if (!IS_MOB(i) && i->player->incognito == true)
+        if (!IS_NPC(i) && i->player->incognito == true)
         {
           extraBuf = QStringLiteral(" (Incognito / WizInvis %1)").arg(i->player->wizinvis);
         }
@@ -686,7 +686,7 @@ int do_where(Character *ch, char *argument, int cmd)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (d->character->in_room != DC::NOWHERE) &&
           !isSet(DC::getInstance()->world[d->character->in_room].room_flags, NO_WHERE) &&
-          CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
+          CAN_SEE(ch, d->character) && !IS_NPC(d->character) /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
           csendf(ch, "%-20s - %s$R\n\r", d->character->getNameC(),

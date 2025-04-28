@@ -96,7 +96,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 
 int do_incognito(Character *ch, char *argument, int cmd)
 {
-	if (IS_MOB(ch))
+	if (IS_NPC(ch))
 		return eFAILURE;
 
 	if (ch->player->incognito == true)

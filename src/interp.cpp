@@ -1111,7 +1111,7 @@ command_return_t Character::special(QString arguments, int cmd)
   /* special in mobile present? */
   for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
   {
-    if (IS_MOB(k))
+    if (IS_NPC(k))
     {
       if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {

@@ -235,7 +235,7 @@ void perform_violence(void)
     // DEBUG CODE
     int last_virt = -1;
     int last_class = GET_CLASS(ch);
-    if (IS_MOB(ch))
+    if (IS_NPC(ch))
       last_virt = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     // DEBUG CODE
     if (!ch->fighting)
@@ -277,7 +277,7 @@ void perform_violence(void)
 
     if (can_attack(ch))
     {
-      is_mob = IS_MOB(ch);
+      is_mob = IS_NPC(ch);
       if (is_mob)
       {
         if ((DC::getInstance()->mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
@@ -1699,7 +1699,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
       return debug_retval(ch, vict, retval) | eSUCCESS;
   }
 
-  if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
+  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
   {
     if (number(1, 100) <= 10)
     {
@@ -4535,7 +4535,7 @@ void make_corpse(Character *ch)
   }
 
   // level 1-19 PC's can keep their eq
-  if (IS_MOB(ch) || ch->getLevel() > 19)
+  if (IS_NPC(ch) || ch->getLevel() > 19)
   {
     for (i = 0; i < MAX_WEAR; i++)
       if (ch->equipment[i])
@@ -4548,7 +4548,7 @@ void make_corpse(Character *ch)
       obj_to_obj(money, corpse);
     }
 
-    if (IS_MOB(ch) && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
+    if (IS_NPC(ch) && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
       class Object *recipeitem = nullptr;
       int rarity = number(1, 100);
@@ -5350,21 +5350,21 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   }
   if (type == TYPE_BLUDGEON || type == TYPE_CRUSH)
   {
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
     {
       act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
     {
       act("$N swarms around your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N swarms around $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You swarm around $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
     {
       act("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -5943,7 +5943,7 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&     // if grouped
         f->follower->in_room == killer->in_room && // and in the room
-        !IS_MOB(f->follower))
+        !IS_NPC(f->follower))
     {
       if (f->follower->getLevel() > highest->getLevel())
         highest = f->follower;
@@ -5973,7 +5973,7 @@ int32_t count_xp_eligibles(Character *leader, Character *killer,
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&     // if grouped
         f->follower->in_room == killer->in_room && // and in the room
-        !IS_MOB(f->follower) &&
+        !IS_NPC(f->follower) &&
         (highest_level - f->follower->getLevel()) < 25)
     {
       num_eligibles += 1;
@@ -6648,7 +6648,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
-    if (!IS_MOB(ch)
+    if (!IS_NPC(ch)
         // && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {

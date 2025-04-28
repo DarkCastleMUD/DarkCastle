@@ -80,7 +80,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (!IS_MOB(ch))
+    if (!IS_NPC(ch))
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
@@ -277,7 +277,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
@@ -363,7 +363,7 @@ void mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+            if ((!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
                                                                                               isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 

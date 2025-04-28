@@ -469,7 +469,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to souldrain you!", ch, nullptr, victim, TO_VICT, 0);
     int retval;
-    if (IS_MOB(victim) && !victim->fighting)
+    if (IS_NPC(victim) && !victim->fighting)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
       retval = SWAP_CH_VICT(retval);
@@ -491,7 +491,7 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
     GET_MANA(ch) = GET_MAX_MANA(ch);
 
   int retval;
-  if (IS_MOB(victim) && !victim->fighting)
+  if (IS_NPC(victim) && !victim->fighting)
   {
     retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
@@ -1740,7 +1740,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
               DC::getInstance()->zones.value(DC::getInstance()->world[victim->in_room].zone).continent != DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).continent));
   }
 
-  if ((IS_MOB(victim)) && (!IS_MOB(ch)))
+  if ((IS_NPC(victim)) && (!IS_NPC(ch)))
     victim->add_memory(GET_NAME(ch), 'h');
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
@@ -3966,7 +3966,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
 
   set_cantquit(ch, victim);
 
-  if (!IS_MOB(victim) && victim->getLevel() <= 15)
+  if (!IS_NPC(victim) && victim->getLevel() <= 15)
   {
     ch->sendln("Oh come on....at least wait till $e's high enough level to have decent gear.");
     return eFAILURE;
@@ -4036,7 +4036,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     return retval;
   }
 
-  if (IS_MOB(victim) || number(1, 2) == 1)
+  if (IS_NPC(victim) || number(1, 2) == 1)
   {
     if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
     {
@@ -4525,7 +4525,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   if (isSet(victim->immune, ISR_CHARM) ||
-      (IS_MOB(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
+      (IS_NPC(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
   {
     act("$N laughs at your feeble charm attempt.", ch, nullptr, victim,
         TO_CHAR, 0);
@@ -5492,7 +5492,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
 
   set_cantquit(ch, victim);
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
@@ -5716,7 +5716,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
 
   set_cantquit(ch, victim);
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
@@ -11074,7 +11074,7 @@ int cast_portal(uint8_t level, Character *ch, char *arg,
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (!IS_MOB(ch) && GET_CLASS(ch) == CLASS_CLERIC)
+    if (!IS_NPC(ch) && GET_CLASS(ch) == CLASS_CLERIC)
     {
       if ((GET_MANA(ch) - 90) < 0)
       {
@@ -11708,7 +11708,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
+    if (IS_NPC(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
         k->follower->in_room != ch->in_room)
     {
       victim = k->follower;
@@ -14051,7 +14051,7 @@ int spell_dismiss_familiar(uint8_t level, Character *ch, Character *victim, clas
   victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -14112,7 +14112,7 @@ int spell_dismiss_corpse(uint8_t level, Character *ch, Character *victim, class 
   // return eFAILURE;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
+    if (IS_NPC(k->follower) && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
     {
       victim = k->follower;
       break;
@@ -14169,7 +14169,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
   // return eFAILURE;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
+    if (IS_NPC(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
     {
       victim = k->follower;
       break;

@@ -377,7 +377,7 @@ command_return_t do_ignore(Character *ch, std::string args, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->send("You're a mob! You can't ignore people.\r\n");
     return eFAILURE;
@@ -436,7 +436,7 @@ command_return_t do_ignore(Character *ch, std::string args, int cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (IS_MOB(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
+  if (IS_NPC(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
   {
     return false;
   }
@@ -633,7 +633,7 @@ int do_emote(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     ch->sendln("You can't show your emotions!!");
     return eSUCCESS;

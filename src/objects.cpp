@@ -257,7 +257,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
   int i /*,j*/;
   bool equipped;
   int retval = eSUCCESS;
-  int is_mob = IS_MOB(ch);
+  int is_mob = IS_NPC(ch);
   int lvl;
 
   equipped = false;
@@ -354,7 +354,7 @@ int do_recite(Character *ch, char *argument, int cmd)
   int i, bits;
   bool equipped;
   int retval = eSUCCESS;
-  int is_mob = IS_MOB(ch);
+  int is_mob = IS_NPC(ch);
   int lvl;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
@@ -806,7 +806,7 @@ int do_name(Character *ch, char *arg, int cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NONAME))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -1492,7 +1492,7 @@ int size_restricted(Character *ch, class Object *obj)
   if (GET_RACE(ch) == RACE_HUMAN) // human can wear all sizes
     return false;
 
-  if (IS_MOB(ch)) // mobs (ie charmies) can wear all sizes
+  if (IS_NPC(ch)) // mobs (ie charmies) can wear all sizes
     return false;
 
   if (GET_HEIGHT(ch) < 42)

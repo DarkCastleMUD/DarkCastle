@@ -356,7 +356,7 @@ int do_set(Character *ch, char *argument, int cmd)
   {
   case 0: /* age */
   {
-    if (IS_MOB(vict))
+    if (IS_NPC(vict))
     {
       ch->sendln("Can't set a mob's age.");
       return eFAILURE;
@@ -612,7 +612,7 @@ int do_set(Character *ch, char *argument, int cmd)
   break;
   case 17: /* sessions */
   {
-    if (IS_MOB(vict))
+    if (IS_NPC(vict))
     {
       ch->sendln("Can't set a mob's pracs...");
       return eFAILURE;

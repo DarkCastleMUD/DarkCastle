@@ -205,7 +205,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     buffer = fmt::format("There was {} coins.",
                          obj_object->obj_flags.value[0]);
-    if (IS_MOB(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (IS_NPC(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
       ch->sendln("");
@@ -218,7 +218,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
-      if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
@@ -240,7 +240,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
-      if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
@@ -270,7 +270,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       buffer = fmt::format("{}\r\n", buffer);
     }
 
-    if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       ch->send(buffer);
     extract_obj(obj_object);
   }
@@ -1113,7 +1113,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   if (is_number(arg))
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1167,7 +1167,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
-        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1233,7 +1233,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       if (tmp_object)
       {
 
-        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1607,7 +1607,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1770,7 +1770,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1832,7 +1832,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && ch->isPlayerObjectThief() && !vict->desc)
+  if (!IS_NPC(ch) && ch->isPlayerObjectThief() && !vict->desc)
   {
     ch->sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;

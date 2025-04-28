@@ -785,7 +785,7 @@ void DC::game_loop(void)
         new_string_add(d, comm.data());
       else if (d->hashstr)
         string_hash_add(d, comm.data());
-      else if (d->strnew && (IS_MOB(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+      else if (d->strnew && (IS_NPC(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
         new_string_add(d, comm.data());
       else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
@@ -1291,7 +1291,7 @@ int do_prompt(Character *ch, char *arg, int cmd)
   while (*arg == ' ')
     arg++;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->sendln("You're a mob!  You can't set your prompt.");
     return eFAILURE;
@@ -1508,7 +1508,7 @@ void make_prompt(class Connection *d, std::string &prompt)
   {
     return;
   }
-  else if (IS_MOB(d->character))
+  else if (IS_NPC(d->character))
   {
     prompt += generate_prompt(d->character);
   }
@@ -2737,7 +2737,7 @@ int close_socket(class Connection *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if (d->strnew && (IS_MOB(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
+  if (d->strnew && (IS_NPC(d->character) || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
     strcpy(idiotbuf, "/s\n\r");
     strcat(idiotbuf, "\0");
@@ -3203,11 +3203,11 @@ void ansi_color(const char *txt, Character *ch)
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
   {
-    if (!IS_MOB(ch) &&
+    if (!IS_NPC(ch) &&
         !isSet(GET_TOGGLES(ch), Player::PLR_ANSI) &&
         !isSet(GET_TOGGLES(ch), Player::PLR_VT100))
       return;
-    else if (!IS_MOB(ch) &&
+    else if (!IS_NPC(ch) &&
              isSet(GET_TOGGLES(ch), Player::PLR_VT100) &&
              !isSet(GET_TOGGLES(ch), Player::PLR_ANSI))
     {
@@ -3398,7 +3398,7 @@ int do_editor(Character *ch, char *argument, int cmd)
   if (argument == 0)
     return eFAILURE;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return eFAILURE;
 
   csendf(ch, "Current editor: %s\n\r\n\r", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");

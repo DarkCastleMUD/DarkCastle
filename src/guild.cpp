@@ -845,7 +845,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == 171 && !IS_MOB(ch))
+  if (cmd == 171 && !IS_NPC(ch))
   { /*   gain crap...  */
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
@@ -992,7 +992,7 @@ int guild(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   if ((cmd != 164))
     return eFAILURE;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
     return eFAILURE;
@@ -1025,7 +1025,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
   int learned = 0;
   class_skill_defines *skilllist = ch->get_skill_list();
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
     return eFAILURE;
@@ -1264,7 +1264,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 {
   int chance, maximum;
 
-  if (IS_MOB(this))
+  if (IS_NPC(this))
   {
     return;
   }

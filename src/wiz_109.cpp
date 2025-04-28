@@ -533,7 +533,7 @@ int do_testport(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTPORT))
+  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTPORT))
   {
     ch->sendln("Huh?");
     return eFAILURE;
@@ -589,7 +589,7 @@ int do_testuser(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch) || !ch->has_skill(COMMAND_TESTUSER))
+  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTUSER))
   {
     ch->sendln("Huh?");
     return eFAILURE;

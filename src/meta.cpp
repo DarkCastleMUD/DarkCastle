@@ -683,7 +683,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	move_cost = ch->meta_get_moves_plat_cost(1);
 	mana_cost = ch->meta_get_mana_plat_cost(1);
 
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 	{
 		ki_exp = ch->meta_get_ki_exp_cost();
 		ki_cost = ch->meta_get_ki_plat_cost();
@@ -789,11 +789,11 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 		ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
 
-		if (!IS_MOB(ch) && ki_cost && ki_exp)
+		if (!IS_NPC(ch) && ki_cost && ki_exp)
 		{ // mobs can't meta ki
 			csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
 		}
-		else if (!IS_MOB(ch))
+		else if (!IS_NPC(ch))
 			ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
 
 		ch->sendln("$BMonetary Exchange:$R");
@@ -808,7 +808,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			"$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
 			"$B$320)$R Buy a practice session for 25 plats.\r\n",
 			ch);
-		if (!IS_MOB(ch))
+		if (!IS_NPC(ch))
 		{
 			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
@@ -1073,7 +1073,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		}
 		if (choice == 12 && ki_exp && ki_cost)
 		{
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("Mobs cannot meta ki.");
 				return eSUCCESS;
@@ -1138,7 +1138,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		}
 		if (choice == 15)
 		{
-			if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+			if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 			{
 				ch->sendln("Your criminal acts prohibit it.");
 				return eSUCCESS;
@@ -1186,7 +1186,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("What would you have to spend $B$5gold$R on chode?");
 				return eSUCCESS;
@@ -1232,7 +1232,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 25 plats...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy practices chode...");
 				return eSUCCESS;
@@ -1250,7 +1250,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 10 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy AC, chode...");
 				return eSUCCESS;
@@ -1278,7 +1278,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 1 qpoint...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy experience, chode...");
 				return eSUCCESS;
@@ -1829,7 +1829,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;
@@ -1856,7 +1856,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;

@@ -1074,7 +1074,7 @@ void extractFamiliar(Character *ch)
 {
   Character *victim = nullptr;
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -1955,7 +1955,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (!IS_MOB(ch))
+      if (!IS_NPC(ch))
       {
         if (!(learned = ch->has_skill(spl)))
         {
@@ -2346,7 +2346,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (ch->getLevel() < ARCHANGEL && !IS_MOB(ch))
+      if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch))
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -2400,7 +2400,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       {
         int chance = 50;
 
-        if (IS_MOB(ch))
+        if (IS_NPC(ch))
         {
           learned = ch->getLevel();
         }

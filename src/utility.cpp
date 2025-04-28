@@ -930,7 +930,7 @@ void util_unarchive(char *char_name, Character *caller)
 bool ARE_CLANNED(Character *sub, Character *obj)
 {
   if (IS_PC(sub) &&
-      IS_MOB(obj) &&
+      IS_NPC(obj) &&
       obj->master &&
       ARE_CLANNED(sub, obj->master) &&
       (IS_AFFECTED(obj, AFF_CHARM) || IS_AFFECTED(obj, AFF_FAMILIAR)))
@@ -1050,7 +1050,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     return false;
   }
 
-  if (!IS_MOB(obj))
+  if (!IS_NPC(obj))
   {
     if (!obj->player) // noncreated char
       return true;
@@ -1139,7 +1139,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   int skill = 0;
   struct affected_type *cur_af;
 
-  if (!IS_MOB(sub) && sub->player->holyLite)
+  if (!IS_NPC(sub) && sub->player->holyLite)
     return true;
 
   int prog = oprog_can_see_trigger(sub, obj);
@@ -1604,7 +1604,7 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
       stop_fighting(loop_ch);
 
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  is_mob = IS_MOB(victim);
+  is_mob = IS_NPC(victim);
   retval = move_char(victim, location);
 
   if (!is_mob && !isSet(retval, eCH_DIED))
@@ -2490,7 +2490,7 @@ bool check_make_camp(int room)
 
     if (i->fighting)
       return false;
-    if (IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
+    if (IS_NPC(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
       return false;
     if (i->affected_by_spell(SKILL_MAKE_CAMP) && i->affected_by_spell(SKILL_MAKE_CAMP)->modifier == room)
       campok = true;
@@ -2510,7 +2510,7 @@ int get_leadership_bonus(Character *ch)
   else
     leader = ch;
 
-  if (IS_MOB(ch) || ch->in_room != leader->in_room)
+  if (IS_NPC(ch) || ch->in_room != leader->in_room)
     return 0;
   if (!leader->affected_by_spell(SKILL_LEADERSHIP))
     return 0;
@@ -2530,7 +2530,7 @@ int get_leadership_bonus(Character *ch)
   {
     next_f = f->next;
 
-    if (IS_MOB(f->follower))
+    if (IS_NPC(f->follower))
       continue;
     if (leader->in_room != f->follower->in_room)
       continue;

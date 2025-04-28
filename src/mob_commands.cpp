@@ -1395,7 +1395,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
-    if (victim && (victim->getLevel() > MORTAL || IS_MOB(victim))) // don't target immortals
+    if (victim && (victim->getLevel() > MORTAL || IS_NPC(victim))) // don't target immortals
       victim = nullptr;
 
     if (!victim)
@@ -1797,7 +1797,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
     throwitem->data_num = -999;
   }
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     throwitem->mob = true; // This is, suprisingly, a mob
@@ -1942,7 +1942,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
       prog_error(ch, "Mppeace - Vict not found.");
       return eFAILURE;
     }
-    if (IS_MOB(vict) && vict->mobdata->hated != nullptr)
+    if (IS_NPC(vict) && vict->mobdata->hated != nullptr)
       remove_memory(vict, 'h');
     if (vict->fighting != nullptr)
       stop_fighting(vict);
@@ -1950,7 +1950,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
   }
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hated != nullptr)
+    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
@@ -2282,7 +2282,7 @@ void prog_error(Character *ch, char *format, ...)
          DC::getInstance()->obj_index[ch->objdata->item_number].virt, mprog_command_num,
          mprog_line_num, buffer);
   }
-  else if (ch && IS_MOB(ch))
+  else if (ch && IS_NPC(ch))
   {
     logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Mob %d, com %d, line %d: %s",
          DC::getInstance()->mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,

@@ -414,7 +414,7 @@ void Character::do_on_login_stuff(void)
    isr_set(this);
    this->altar = clan_altar();
 
-   if (!IS_MOB(this) && this->getLevel() >= IMMORTAL)
+   if (!IS_NPC(this) && this->getLevel() >= IMMORTAL)
    {
       this->player->holyLite = true;
       GET_COND(this, THIRST) = -1;

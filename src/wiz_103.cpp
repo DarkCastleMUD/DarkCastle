@@ -45,7 +45,7 @@ int do_boot(Character *ch, char *arg, int cmd)
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return eFAILURE;
     }
-    if (!IS_MOB(victim) && victim->player->possesing)
+    if (!IS_NPC(victim) && victim->player->possesing)
     {
       ch->send("Oops! They ain't linkdead! Just possessing.");
       return eFAILURE;
@@ -301,7 +301,7 @@ int do_peace(Character *ch, char *argument, int cmd)
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hated != nullptr)
+    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);

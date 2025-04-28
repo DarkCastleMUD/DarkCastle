@@ -87,7 +87,7 @@ int repair_guy(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -165,7 +165,7 @@ int super_repair_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -266,7 +266,7 @@ int repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, Char
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;
@@ -793,7 +793,7 @@ int gl_repair_shop(Character *ch, class Object *obj, int cmd, const char *arg, C
 	if ((cmd != 66) && (cmd != 65))
 		return eFAILURE;
 
-	if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+	if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 	{
 		ch->sendln("Your criminal acts prohibit it.");
 		return eSUCCESS;

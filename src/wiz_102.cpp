@@ -180,7 +180,7 @@ int do_check(Character *ch, char *arg, int cmd)
           GET_KI(vict), GET_MAX_KI(vict));
   ch->send(buf);
 
-  if (ch->getLevel() >= OVERSEER && !IS_MOB(vict) && ch->getLevel() >= vict->getLevel())
+  if (ch->getLevel() >= OVERSEER && !IS_NPC(vict) && ch->getLevel() >= vict->getLevel())
   {
     ch->sendln(QStringLiteral("$3Last connected from$R: %1").arg(vict->player->last_site));
 
@@ -4422,7 +4422,7 @@ int do_redit(Character *ch, char *argument, int cmd)
 
     ch->sendln("Ok.");
 
-    if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
+    if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
                    "that room...\r\n",
@@ -4862,7 +4862,7 @@ int do_rdelete(Character *ch, char *arg, int cmd)
 
 int do_oneway(Character *ch, char *arg, int cmd)
 {
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return eFAILURE;
 
   if (cmd == 1)
@@ -5277,7 +5277,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
         for (mob_list = character_list; mob_list;
              mob_list = mob_list->next)
         {
-          if (IS_MOB(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
+          if (IS_NPC(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
             count++;
         }
 
@@ -5494,7 +5494,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     {
       strcat(buf, GET_NAME(k));
       strcat(buf,
-             (IS_PC(k) ? "(PC)\n\r" : (!IS_MOB(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
+             (IS_PC(k) ? "(PC)\n\r" : (!IS_NPC(k) ? "(NPC)\n\r" : "(MOB)\n\r")));
     }
   }
   strcat(buf, "\n\r");
@@ -5610,7 +5610,7 @@ int do_possess(Character *ch, char *argument, int cmd)
 int do_return(Character *ch, char *argument, int cmd)
 {
 
-  //    if(IS_MOB(ch))
+  //    if(IS_NPC(ch))
   //        return eFAILURE;
 
   if (!ch->desc)
@@ -5743,7 +5743,7 @@ int do_punish(Character *ch, char *arg, int cmd)
 
   int i;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->sendln("Punish yourself!  Bad mob!");
     return eFAILURE;

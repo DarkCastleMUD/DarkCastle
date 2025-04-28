@@ -308,7 +308,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   ch->send(buf); // this sends to char, now we can overwrite buf
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
@@ -365,7 +365,7 @@ void boro_mob_stat(Character *ch, Character *k)
           buf2); /* buf is the sex... */
   ch->send(buf); /* THIRD sprintf */
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       strcpy(buf2, "Exists");
@@ -443,7 +443,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
   ch->send(buf);
 
-  if (IS_MOB(k)) // AND THIS
+  if (IS_NPC(k)) // AND THIS
     sprintbit(k->mobdata->actflags, action_bits, buf2);
   else
     strcpy(buf2, "Not a mob");
@@ -478,7 +478,7 @@ void boro_mob_stat(Character *ch, Character *k)
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -491,7 +491,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
@@ -510,7 +510,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);
@@ -557,7 +557,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
     display_punishes(ch, k);
 
   if (k->desc)
@@ -584,7 +584,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   class Object *j = 0;
   struct affected_type *aff;
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
@@ -640,7 +640,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   ch->send(buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -714,7 +714,7 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
@@ -755,7 +755,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   strcat(buf, buf2);
   ch->send(buf);
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
     strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
@@ -824,7 +824,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
   ch->send(buf);
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
             (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
@@ -846,7 +846,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->combat, combat_bits, buf);
   ch->send(QStringLiteral("$3Combat flags$R: %1\n\r").arg(buf));
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
@@ -861,7 +861,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);
@@ -925,7 +925,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     switch (k->mobdata->mob_flags.type)
     {
@@ -1350,7 +1350,7 @@ void do_start(Character *ch)
 
   ch->sendln("This is now your character in Dark Castle MUD");
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return;
 
   ch->setLevel(1);

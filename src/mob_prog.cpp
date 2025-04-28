@@ -1816,7 +1816,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Character *p;
 		int count = 0;
 		for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
-			if (IS_MOB(p) && DC::getInstance()->mob_index[p->mobdata->nr].virt == target)
+			if (IS_NPC(p) && DC::getInstance()->mob_index[p->mobdata->nr].virt == target)
 				count++;
 
 		return mprog_veval(count, opr, atoi(val));

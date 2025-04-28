@@ -68,7 +68,7 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
     ch->sendln("The arena is not open for anyone your level.");
     return eFAILURE;
   }
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOARENA))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOARENA))
   {
     ch->sendln("You have been banned from arenas.");
     return eFAILURE;
