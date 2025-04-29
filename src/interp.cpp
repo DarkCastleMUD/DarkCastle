@@ -90,7 +90,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(getName()).arg(pcomm), IMMORTAL, DC::LogChannel::LOG_BUG);
     }
     return eFAILURE;
   }
@@ -100,7 +100,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // Handle logged players.
   if (isPlayer() && isSet(player->punish, PUNISH_LOG))
   {
-    logentry(QStringLiteral("Log %1: %2").arg(getName()).arg(pcomm), 110, LibDC::LogChannels::LOG_PLAYER);
+    logentry(QStringLiteral("Log %1: %2").arg(getName()).arg(pcomm), 110, DC::LogChannel::LOG_PLAYER);
   }
 
   // Implement freeze command.
@@ -270,7 +270,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       // -Sadus
       char DEBUGbuf[MAX_STRING_LENGTH];
       sprintf(DEBUGbuf, "%s: %s", GET_NAME(this), pcomm);
-      log (DEBUGbuf, 0, LibDC::LogChannels::LOG_MISC);
+      log (DEBUGbuf, 0, DC::LogChannel::LOG_MISC);
       */
       if (!can_use_command(found->getNumber()))
       {
@@ -284,7 +284,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         // Don't log communication
         if (found->getNumber() != CMD_GTELL && found->getNumber() != CMD_CTELL && found->getNumber() != CMD_SAY && found->getNumber() != CMD_TELL && found->getNumber() != CMD_WHISPER && found->getNumber() != CMD_REPLY && (this->getLevel() >= 100 || (this->player->multi == true && dc->cf.allow_multi == false)) && isSet(this->player->punish, PUNISH_LOG) == false)
         {
-          logentry(QStringLiteral("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, LibDC::LogChannels::LOG_PLAYER, this);
+          logentry(QStringLiteral("Log %1: %2").arg(GET_NAME(this)).arg(pcomm), 110, DC::LogChannel::LOG_PLAYER, this);
         }
       }
 
@@ -1005,7 +1005,7 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
   }
   catch (...)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Error in last_argument(%s)",
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
          arguments.c_str());
   }
 

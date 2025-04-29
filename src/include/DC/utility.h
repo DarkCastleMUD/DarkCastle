@@ -486,9 +486,6 @@ char *str_dup0(const char *str);
 void logbug(QString message);
 void logsocket(QString message);
 void logmisc(QString message);
-void logf(int level, LibDC::LogChannels type, const char *arg, ...);
-void logf(int level, LibDC::LogChannels type, QString arg);
-int send_to_gods(QString message, uint64_t god_level, LibDC::LogChannels type);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);

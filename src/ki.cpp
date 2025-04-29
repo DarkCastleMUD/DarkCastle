@@ -269,7 +269,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!tar_char)
       {
         logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
-                 LibDC::LogChannels::LOG_BUG);
+                 DC::LogChannel::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
             "game.  Tell a god what you did immediately.\r\n",
@@ -414,7 +414,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -492,7 +492,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logf(ANGEL, LibDC::LogChannels::LOG_BUG, "Serious problem in ki punch!", ANGEL, LibDC::LogChannels::LOG_BUG);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -609,7 +609,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -640,7 +640,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
   if (!arg)
@@ -703,7 +703,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   if (!victim)
   {
-    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 

@@ -2815,7 +2815,7 @@ int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   mob = clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
   // put it in the room ch is in
@@ -3344,7 +3344,7 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
     return eFAILURE;
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
@@ -3399,7 +3399,7 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char 
 
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
@@ -3487,7 +3487,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
   {
     if (!ch->master)
     {
-      logentry(QStringLiteral("Familiar without a master."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
       extract_char(ch, true);
       return (eCH_DIED | eSUCCESS);
     }
@@ -3533,7 +3533,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const
 
   if (!ch->master)
   {
-    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Familiar without a master."), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }

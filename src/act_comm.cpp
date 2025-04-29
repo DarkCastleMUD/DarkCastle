@@ -46,7 +46,7 @@ int do_report(Character *ch, char *argument, int cmd)
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return eSUCCESS;
   }
 
@@ -130,7 +130,7 @@ int do_report(Character *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(QString message, uint64_t god_level, LibDC::LogChannels type)
+int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
 {
   QString buf1;
   QString buf;
@@ -139,7 +139,7 @@ int send_to_gods(QString message, uint64_t god_level, LibDC::LogChannels type)
 
   if (message.isEmpty())
   {
-    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
@@ -150,55 +150,55 @@ int send_to_gods(QString message, uint64_t god_level, LibDC::LogChannels type)
 
   switch (type)
   {
-  case LibDC::LogChannels::LOG_BUG:
+  case DC::LogChannel::LOG_BUG:
     typestr = "bug";
     break;
-  case LibDC::LogChannels::LOG_PRAYER:
+  case DC::LogChannel::LOG_PRAYER:
     typestr = "pray";
     break;
-  case LibDC::LogChannels::LOG_GOD:
+  case DC::LogChannel::LOG_GOD:
     typestr = "god";
     break;
-  case LibDC::LogChannels::LOG_MORTAL:
+  case DC::LogChannel::LOG_MORTAL:
     typestr = "mortal";
     break;
-  case LibDC::LogChannels::LOG_SOCKET:
+  case DC::LogChannel::LOG_SOCKET:
     typestr = "socket";
     break;
-  case LibDC::LogChannels::LOG_MISC:
+  case DC::LogChannel::LOG_MISC:
     typestr = "misc";
     break;
-  case LibDC::LogChannels::LOG_PLAYER:
+  case DC::LogChannel::LOG_PLAYER:
     typestr = "player";
     break;
-  case LibDC::LogChannels::LOG_WORLD:
+  case DC::LogChannel::LOG_WORLD:
     typestr = "world";
     break;
-  case LibDC::LogChannels::LOG_ARENA:
+  case DC::LogChannel::LOG_ARENA:
     typestr = "arena";
     break;
-  case LibDC::LogChannels::LOG_CLAN:
+  case DC::LogChannel::LOG_CLAN:
     typestr = "logclan";
     break;
-  case LibDC::LogChannels::LOG_WARNINGS:
+  case DC::LogChannel::LOG_WARNINGS:
     typestr = "warnings";
     break;
-  case LibDC::LogChannels::LOG_DATABASE:
+  case DC::LogChannel::LOG_DATABASE:
     typestr = "database";
     break;
-  case LibDC::LogChannels::LOG_VAULT:
+  case DC::LogChannel::LOG_VAULT:
     typestr = "vault";
     break;
-  case LibDC::LogChannels::LOG_HELP:
+  case DC::LogChannel::LOG_HELP:
     typestr = "help";
     break;
-  case LibDC::LogChannels::LOG_OBJECTS:
+  case DC::LogChannel::LOG_OBJECTS:
     typestr = "objects";
     break;
-  case LibDC::LogChannels::LOG_QUEST:
+  case DC::LogChannel::LOG_QUEST:
     typestr = "quest";
     break;
-  case LibDC::LogChannels::LOG_DEBUG:
+  case DC::LogChannel::LOG_DEBUG:
     typestr = "debug";
     break;
   default:
@@ -755,7 +755,7 @@ void DC::send_hint(void)
       continue;
     }
 
-    if (isSet(i->character->misc, LibDC::LogChannels::CHANNEL_HINTS))
+    if (isSet(i->character->misc, DC::LogChannel::CHANNEL_HINTS))
     {
       i->character->send(hint);
     }

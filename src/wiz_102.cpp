@@ -90,7 +90,7 @@ void rebuild_rnum_references(int startAt, int type)
       case 'J':
         break;
       default:
-        logentry(QStringLiteral("Illegal char hit in rebuild_rnum_references"), 0, LibDC::LogChannels::LOG_WORLD);
+        logentry(QStringLiteral("Illegal char hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -261,7 +261,7 @@ int do_find(Character *ch, char *arg, int cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_find.");
-    logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name, CMD_DEFAULT);
@@ -333,7 +333,7 @@ int do_stat(Character *ch, char *arg, int cmd)
   {
   default:
     ch->sendln("Problem...fuck up in do_stat.");
-    logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Default in do_stat...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     if ((vict = get_mob_vis(ch, name)))
@@ -1468,7 +1468,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     vict->learn_skill(skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-    logentry(buf.c_str(), ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch)));
     break;
   }
@@ -1486,7 +1486,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
       ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
-      logentry(buf.c_str(), ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
       ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, GET_NAME(vict)));
     }
     else
@@ -1518,7 +1518,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
     vict->learn_skill(skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
-    logentry(buf.c_str(), ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", GET_NAME(vict), text, i, learned));
     break;
   }
@@ -2553,7 +2553,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
             void item_remove(Object * obj, struct vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
-            logf(0, LibDC::LogChannels::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
+            logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
           }
         }
       }
@@ -5433,7 +5433,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   {
     ch->sendln("And you are rstating a clan room because?");
     sprintf(buf, "%s just rstat'd clan room %d.", GET_NAME(ch), rm->number);
-    logentry(buf, PATRON, LibDC::LogChannels::LOG_GOD);
+    logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
     return eFAILURE;
   }
   sprintf(buf,
@@ -5594,7 +5594,7 @@ int do_possess(Character *ch, char *argument, int cmd)
       {
         ch->sendln("Ok.");
         sprintf(buf, "%s possessed %s", GET_NAME(ch), victim->getNameC());
-        logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+        logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;
         ch->desc->original = ch;
@@ -5792,7 +5792,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->sendln("You feel a sudden onslaught of wisdom!");
       ch->sendln("STUPID removed.");
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
       REMOVE_BIT(vict->player->punish, PUNISH_STUPID);
       REMOVE_BIT(vict->player->punish, PUNISH_SILENCED);
       REMOVE_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5807,7 +5807,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->send(buf);
       ch->sendln("STUPID set.");
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
       SET_BIT(vict->player->punish, PUNISH_STUPID);
       SET_BIT(vict->player->punish, PUNISH_SILENCED);
       SET_BIT(vict->player->punish, PUNISH_NOEMOTE);
@@ -5822,7 +5822,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->sendln("The gods take pity on you and lift your silence.");
       ch->sendln("SILENCE removed.");
       sprintf(buf, "%s removes %s's silence", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
@@ -5830,7 +5830,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->send(buf);
       ch->sendln("SILENCE set.");
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_SILENCED);
   }
@@ -5841,7 +5841,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->sendln("You now can do things again.");
       ch->sendln("FREEZE removed.");
       sprintf(buf, "%s unfrozen by %s", GET_NAME(vict), GET_NAME(ch));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
@@ -5849,7 +5849,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       vict->send(buf);
       ch->sendln("FREEZE set.");
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_FREEZE);
   }
@@ -5938,7 +5938,7 @@ int do_punish(Character *ch, char *arg, int cmd)
         vict->sendln("The gods remove your poor luck.");
       ch->sendln("UNLUCKY removed.");
       sprintf(buf, "%s removes %s's unlucky.", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     else
     {
@@ -5949,7 +5949,7 @@ int do_punish(Character *ch, char *arg, int cmd)
       }
       vict->send(buf);
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
-      logentry(buf, ch->getLevel(), LibDC::LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     }
     TOGGLE_BIT(vict->player->punish, PUNISH_UNLUCKY);
   }

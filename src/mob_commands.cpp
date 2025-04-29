@@ -672,7 +672,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // logf(0, LibDC::LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+    // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -2278,18 +2278,18 @@ void prog_error(Character *ch, char *format, ...)
 
   if (ch && IS_OBJ(ch))
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Obj %d, com %d, line %d: %s",
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Obj %d, com %d, line %d: %s",
          DC::getInstance()->obj_index[ch->objdata->item_number].virt, mprog_command_num,
          mprog_line_num, buffer);
   }
   else if (ch && IS_NPC(ch))
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Mob %d, com %d, line %d: %s",
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d, com %d, line %d: %s",
          DC::getInstance()->mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
          buffer);
   }
   else
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Unknown prog: %s", buffer);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Unknown prog: %s", buffer);
   }
 }

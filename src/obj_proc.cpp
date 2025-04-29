@@ -1055,7 +1055,7 @@ int search_assemble_items(int vnum)
   // This should never happen
   if (vnum < 1)
   {
-    logf(ANGEL, LibDC::LogChannels::LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
     produce_coredump();
     return -1;
   }
@@ -1081,7 +1081,7 @@ bool assemble_item_index(Character *ch, int item_index)
   // This should never happen
   if (item_index < 0)
   {
-    logf(ANGEL, LibDC::LogChannels::LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
     produce_coredump();
     return false;
   }
@@ -1099,7 +1099,7 @@ bool assemble_item_index(Character *ch, int item_index)
     int component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, LibDC::LogChannels::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
@@ -1144,7 +1144,7 @@ bool assemble_item_index(Character *ch, int item_index)
     int component_real = real_object(component_virt);
     if (component_real < 0)
     {
-      logf(ANGEL, LibDC::LogChannels::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
+      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
@@ -1160,7 +1160,7 @@ bool assemble_item_index(Character *ch, int item_index)
   Object *reward_item = clone_object(item_real);
   if (reward_item == 0)
   {
-    logf(ANGEL, LibDC::LogChannels::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
     ch->sendln("There was an internal malfunction cloning the new item. Contact an Immortal.");
     return true;
   }
@@ -1996,7 +1996,7 @@ int generic_push_proc(Character *ch, class Object *obj, int cmd, const char *arg
 
   default:
     ch->sendln("Whatever you pushed doesn't have an entry in the button push table.  Tell a god.");
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2422,7 +2422,7 @@ int pull_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
     break;
   }
 
@@ -2768,7 +2768,7 @@ int boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
     boat_list = dk_boat;
     break;
   default:
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
     break;
   }
 
@@ -2875,7 +2875,7 @@ int leave_boat_proc(Character *ch, class Object *obj, int cmd, const char *arg, 
     return eSUCCESS;
     break;
   default:
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].virt);
     break;
   }
 
@@ -3009,7 +3009,7 @@ int hornoplenty(Character *ch, class Object *obj, int cmd, const char *arg, Char
   int objnum = real_object(3170); // chewy tuber
   if (objnum < 0)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Horn o plenty load obj incorrent.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
     return eFAILURE;
   }
 
@@ -3143,7 +3143,7 @@ int generic_weapon_combat(Character *ch, class Object *obj, int cmd, char *arg,
 
   if (obj->item_number < 0 || obj->item_number > top_of_objt)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
     return eFAILURE;
   }
 
@@ -3965,7 +3965,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, int cmd, const cha
 
   if (obj->in_room <= 0)
   {
-    logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Mortar round without a room?"), IMMORTAL, DC::LogChannel::LOG_BUG);
     extract_obj(obj);
     return eFAILURE;
   }

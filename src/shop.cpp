@@ -145,7 +145,7 @@ void restock_keeper(Character *keeper, int shop_nr)
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  logentry(buf, OVERSEER, LibDC::LogChannels::LOG_MISC);
+  logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -699,7 +699,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
 
@@ -709,7 +709,7 @@ int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Char
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, LibDC::LogChannels::LOG_BUG);
+  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
   return eFAILURE;
 
 LFound2:
@@ -811,7 +811,7 @@ void boot_the_shops()
     int room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
     {
-      logf(100, LibDC::LogChannels::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+      logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = 0;
     }
 
@@ -905,8 +905,8 @@ player_shop *read_one_player_shop(FILE *fp)
   {
     // add future stuff here
 
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Illegal code in player shop %s", shop->owner);
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
     exit(1);
   }
 
@@ -941,7 +941,7 @@ void write_one_player_shop(player_shop *shop)
 
   if ((fp = fopen(buf, "w")) == nullptr)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Could not open %s for writing.", buf);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
@@ -1000,7 +1000,7 @@ void save_player_shop_world_range()
   if (!curr)
   {
     // panic!
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Could not find player shop range to save files.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
 
@@ -1413,7 +1413,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
 
   if (!(keeper = invoker))
   {
-    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1795,7 +1795,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
           sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
                   GET_NAME(owner));
-          logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+          logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         }
         else
         {
@@ -1819,7 +1819,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
         sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
                 GET_NAME(ch));
-        logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1954,7 +1954,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1963,7 +1963,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -2013,7 +2013,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2030,7 +2030,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2048,7 +2048,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2076,7 +2076,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+      logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

@@ -337,6 +337,14 @@ Object *DC::getObject(vnum_t vnum)
 	return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
 }
 
+void DC::logverbose(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
+{
+	if (cf.verbose_mode)
+	{
+		logentry(str, god_level, type, vict);
+	}
+}
+
 void close_file(std::FILE *fp)
 {
 	if (fp)
@@ -375,7 +383,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
 	  arena.type = CHAOS; // -2
 	  sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
 	  send_info(buf);
-	  logf(IMMORTAL, LibDC::LogChannels::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
+	  logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
 	}
 
 	if (!strcmp(arg4, "potato"))

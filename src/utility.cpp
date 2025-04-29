@@ -235,7 +235,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   if (!arg1 || !arg2)
   {
-    logentry(QStringLiteral("nullptr args sent to str_cmp in utility.c!"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr args sent to str_cmp in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
     return -1;
   }
 
@@ -314,7 +314,7 @@ FILE *quest_log = 0;
 FILE *vault_log = 0;
 
 // writes a std::string to the log
-void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Character *vict)
+void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -331,7 +331,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
     logpath << "../log/";
   }
 
-  if (type == LibDC::LogChannels::LOG_PLAYER && vict && !vict->getName().isEmpty())
+  if (type == DC::LogChannel::LOG_PLAYER && vict && !vict->getName().isEmpty())
   {
     logpath << PLAYER_DIR;
   }
@@ -355,7 +355,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
   default:
     stream = 0;
     break;
-  case LibDC::LogChannels::LOG_BUG:
+  case DC::LogChannel::LOG_BUG:
     f = &bug_log;
     logpath << BUG_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -371,7 +371,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
     //  -Sadus
 
     break;
-  case LibDC::LogChannels::LOG_GOD:
+  case DC::LogChannel::LOG_GOD:
     f = &god_log;
     logpath << GOD_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -379,7 +379,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open god log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_MORTAL:
+  case DC::LogChannel::LOG_MORTAL:
     f = &mortal_log;
     logpath << MORTAL_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -387,7 +387,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open mortal log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_SOCKET:
+  case DC::LogChannel::LOG_SOCKET:
     f = &socket_log;
     logpath << SOCKET_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -395,7 +395,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal(qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
     }
     break;
-  case LibDC::LogChannels::LOG_PLAYER:
+  case DC::LogChannel::LOG_PLAYER:
     f = &player_log;
     if (vict && !vict->getName().isEmpty())
     {
@@ -414,7 +414,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       }
     }
     break;
-  case LibDC::LogChannels::LOG_WORLD:
+  case DC::LogChannel::LOG_WORLD:
     f = &world_log;
     logpath << WORLD_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -422,7 +422,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open world log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_ARENA:
+  case DC::LogChannel::LOG_ARENA:
     f = &arena_log;
     logpath << ARENA_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -430,7 +430,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open arena log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_CLAN:
+  case DC::LogChannel::LOG_CLAN:
     f = &clan_log;
     logpath << CLAN_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -438,7 +438,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open clan log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_OBJECTS:
+  case DC::LogChannel::LOG_OBJECTS:
     f = &objects_log;
     logpath << OBJECTS_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -446,7 +446,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open objects log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_QUEST:
+  case DC::LogChannel::LOG_QUEST:
     f = &quest_log;
     logpath << QUEST_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -454,7 +454,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
       qFatal("Unable to open quest log.\n");
     }
     break;
-  case LibDC::LogChannels::LOG_VAULT:
+  case DC::LogChannel::LOG_VAULT:
     f = &vault_log;
     logpath << VAULT_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
@@ -469,7 +469,7 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
   char *tmstr = asctime(lt);
   *(tmstr + strlen(tmstr) - 1) = '\0';
 
-  if (stream == STDIN_FILENO || type == LibDC::LogChannels::LOG_BUG)
+  if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
   {
     if (cf.stderr_timestamp == true)
     {
@@ -493,17 +493,17 @@ void logentry(QString str, uint64_t god_level, LibDC::LogChannels type, Characte
 
 void logsocket(QString message)
 {
-  logentry(message, IMMORTAL, LibDC::LogChannels::LOG_SOCKET);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_SOCKET);
 }
 
 void logbug(QString message)
 {
-  logentry(message, IMMORTAL, LibDC::LogChannels::LOG_BUG);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_BUG);
 }
 
 void logmisc(QString message)
 {
-  logentry(message, IMMORTAL, LibDC::LogChannels::LOG_MISC);
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
 }
 
 // function for new SETBIT et al. commands
@@ -570,7 +570,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -604,7 +604,7 @@ void sprintbit(uint32_t vektor, QStringList names, char *result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -635,7 +635,7 @@ QString sprintbit(uint32_t vektor, QStringList names)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return {};
   }
 
@@ -671,7 +671,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Negative value sent to sprintbit");
     return result;
   }
 
@@ -832,13 +832,13 @@ void util_archive(const char *char_name, Character *caller)
       {
         sprintf(buf, "Illegal archive attempt: %s by %s.",
                 char_name, GET_NAME(caller));
-        logentry(buf, OVERSEER, LibDC::LogChannels::LOG_GOD);
+        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
         sprintf(buf, "Someone got a weird char name in there: %s.", char_name);
-        logentry(buf, OVERSEER, LibDC::LogChannels::LOG_GOD);
+        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
@@ -851,7 +851,7 @@ void util_archive(const char *char_name, Character *caller)
     if (caller)
       caller->sendln("That character does not exist.");
     else
-      logentry(QStringLiteral("Attempt to archive a non-existent char."), IMMORTAL, LibDC::LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Attempt to archive a non-existent char."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
   sprintf(buf, "%s -9 %s/%c/%s", GZIP, SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -861,7 +861,7 @@ void util_archive(const char *char_name, Character *caller)
     if (caller)
       caller->send(QStringLiteral("%1\n\r").arg(buf));
     else
-      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_GOD);
+      logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
   sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -870,7 +870,7 @@ void util_archive(const char *char_name, Character *caller)
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
     caller->send(QStringLiteral("%1\n\r").arg(buf));
-  logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_GOD);
+  logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 void util_unarchive(char *char_name, Character *caller)
@@ -887,14 +887,14 @@ void util_unarchive(char *char_name, Character *caller)
       {
         sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
                 GET_NAME(caller));
-        logentry(buf, OVERSEER, LibDC::LogChannels::LOG_GOD);
+        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
       else
       {
         sprintf(buf, "Someone got a weird char name in there: %s.",
                 char_name);
-        logentry(buf, OVERSEER, LibDC::LogChannels::LOG_GOD);
+        logentry(buf, OVERSEER, DC::LogChannel::LOG_GOD);
         return;
       }
     }
@@ -915,7 +915,7 @@ void util_unarchive(char *char_name, Character *caller)
     if (caller)
       caller->send(QStringLiteral("%1\n\r").arg(buf));
     else
-      logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_GOD);
+      logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
   }
   sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
@@ -924,7 +924,7 @@ void util_unarchive(char *char_name, Character *caller)
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
     caller->send(QStringLiteral("%1\n\r").arg(buf));
-  logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_GOD);
+  logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
 bool ARE_CLANNED(Character *sub, Character *obj)
@@ -1046,7 +1046,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!sub || !obj)
   {
-    logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Invalid pointer passed to CAN_SEE!"), ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -1638,7 +1638,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   */
   if (ch == 0)
   {
-    logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("do_quit received null char - problem!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -2255,7 +2255,7 @@ int number(int from, int to)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
-    logentry(buf, ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
     produce_coredump();
     return to;
   }
@@ -2284,7 +2284,7 @@ bool is_in_game(Character *ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, LibDC::LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr args sent to is_pc_playing in utility.c!"), ANGEL, DC::LogChannel::LOG_BUG);
     return false;
   }
 
@@ -2310,13 +2310,13 @@ bool is_in_game(Character *ch)
 
 void produce_coredump(void *ptr)
 {
-  logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "produce_coredump called with pointer %p", ptr);
+  logf(IMMORTAL, DC::LogChannel::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
   static int counter = 0;
 
   if (++counter > COREDUMP_MAX)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
   }
 
@@ -2329,11 +2329,11 @@ void produce_coredump(void *ptr)
   else if (pid > 0)
   {
     // Parent process
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
   }
   else
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Error detected: Unable to fork process.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error detected: Unable to fork process.");
   }
 
   return;
@@ -2379,7 +2379,7 @@ void remove_character(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LibDC::LogChannels::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
@@ -2456,7 +2456,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LibDC::LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
+    logf(108, DC::LogChannel::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.", backup, name.toStdString().c_str());
     break;
   }
 
@@ -2699,10 +2699,10 @@ void unique_scan(Character *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WARNINGS, "Player %s has duplicate unique items.", victim->getNameC());
+    logf(IMMORTAL, DC::LogChannel::LOG_WARNINGS, "Player %s has duplicate unique items.", victim->getNameC());
     while (!found_items.empty())
     {
-      logf(IMMORTAL, LibDC::LogChannels::LOG_WARNINGS, "%s", found_items.front()->short_description);
+      logf(IMMORTAL, DC::LogChannel::LOG_WARNINGS, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
@@ -3058,13 +3058,13 @@ bool str_prefix(const char *astr, const char *bstr)
 {
   if (astr == nullptr)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Str_prefix: null astr.", 0);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr == nullptr)
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3081,13 +3081,13 @@ bool str_prefix(QString astr, QString bstr)
 {
   if (astr.isEmpty())
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Str_prefix: null astr.", 0);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
   if (bstr.isEmpty())
   {
-    logf(IMMORTAL, LibDC::LogChannels::LOG_WORLD, "Str_prefix: null bstr.", 0);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;
   }
 
@@ -3136,7 +3136,7 @@ void special_log(QString message)
 
   if (!special_logfile.open(QIODevice::Append | QIODevice::Text))
   {
-    logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, LibDC::LogChannels::LOG_GOD);
+    logentry(QStringLiteral("Unable to open SPECIAL LOG FILE in special_log."), IMPLEMENTER, DC::LogChannel::LOG_GOD);
     return;
   }
 

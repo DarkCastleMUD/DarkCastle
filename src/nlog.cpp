@@ -102,13 +102,13 @@ char *str_hsh(const char *arg)
   return (current->name);
 }
 
-void logf(int level, LibDC::LogChannels type, QString arg)
+void logf(int level, DC::LogChannel type, QString arg)
 {
   logentry(arg, level, type);
 }
 
-/* logf(ch->getLevel(), LibDC::LogChannels::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void logf(int level, LibDC::LogChannels type, const char *arg, ...)
+/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
+void logf(int level, DC::LogChannel type, const char *arg, ...)
 {
   va_list args;
   char s[MAX_STRING_LENGTH];

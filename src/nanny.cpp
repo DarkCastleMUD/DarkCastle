@@ -458,7 +458,7 @@ void Character::do_on_login_stuff(void)
    {
       if (vault->size < (unsigned)(this->getLevel() * 10))
       {
-         logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
+         logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(this), vault->size, this->getLevel() * 10);
          vault->size = this->getLevel() * 10;
       }
 
@@ -474,7 +474,7 @@ void Character::do_on_login_stuff(void)
          this->player->quest_complete[i] = 0;
    }
    if (this->player->time.logon < 1151504181)
-      SET_BIT(this->misc, LibDC::LogChannels::CHANNEL_TELL);
+      SET_BIT(this->misc, DC::LogChannel::CHANNEL_TELL);
 
    if (this->player->time.logon < 1171757100)
    {
@@ -603,7 +603,7 @@ void Character::do_on_login_stuff(void)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, LibDC::LogChannels::LOG_PLAYER);
+            logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, DC::LogChannel::LOG_PLAYER);
             // this->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
@@ -656,7 +656,7 @@ void Character::do_on_login_stuff(void)
 
    while (!todelete.empty())
    {
-      logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, LibDC::LogChannels::LOG_MORTAL);
+      logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
       remove_vault_access(this, todelete.front(), vault);
       todelete.pop();
    }
@@ -774,23 +774,23 @@ void Character::check_hw(void)
    heightweight(false);
    if (this->height > races[this->race].max_height)
    {
-      logf(IMPLEMENTER, LibDC::LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
+      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(this), GET_HEIGHT(this), races[this->race].max_height);
       this->height = races[this->race].max_height;
    }
    if (this->height < races[this->race].min_height)
    {
-      logf(IMPLEMENTER, LibDC::LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
+      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(this), GET_HEIGHT(this), races[this->race].min_height);
       this->height = races[this->race].min_height;
    }
 
    if (this->weight > races[this->race].max_weight)
    {
-      logf(IMPLEMENTER, LibDC::LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
+      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(this), GET_WEIGHT(this), races[this->race].max_weight);
       this->weight = races[this->race].max_weight;
    }
    if (this->weight < races[this->race].min_weight)
    {
-      logf(IMPLEMENTER, LibDC::LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
+      logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(this), GET_WEIGHT(this), races[this->race].min_weight);
       this->weight = races[this->race].min_weight;
    }
    heightweight(true);
@@ -799,9 +799,9 @@ void Character::check_hw(void)
 void Character::set_hw(void)
 {
    this->height = number(races[this->race].min_height, races[this->race].max_height);
-   // logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+   // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
    this->weight = number(races[this->race].min_weight, races[this->race].max_weight);
-   // logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+   // logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -840,7 +840,7 @@ void DC::nanny(class Connection *d, std::string arg)
    {
 
    default:
-      logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, LibDC::LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Nanny: invalid STATE(d) == %1").arg(STATE(d)), 0, DC::LogChannel::LOG_BUG);
       close_socket(d);
       return;
 
@@ -936,7 +936,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
       // Uncomment this if you think a playerfile may be crashing the mud. -pir
       //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-      //    logentry(str_tmp, 0, LibDC::LogChannels::LOG_MISC);
+      //    logentry(str_tmp, 0, DC::LogChannel::LOG_MISC);
 
       // ch is allocated in load_char_obj
       ls = load_char_obj(d, tmp_name);
@@ -1015,7 +1015,7 @@ void DC::nanny(class Connection *d, std::string arg)
                if (ad->character && ad->character->getLevel() == IMPLEMENTER && IS_PC(ad->character))
                {
                   password = ad->character->player->pwd;
-                  logf(OVERSEER, LibDC::LogChannels::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
+                  logf(OVERSEER, DC::LogChannel::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
                   break;
                }
             }
@@ -1026,7 +1026,7 @@ void DC::nanny(class Connection *d, std::string arg)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
-         logentry(log_buf, OVERSEER, LibDC::LogChannels::LOG_SOCKET);
+         logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
@@ -1039,7 +1039,7 @@ void DC::nanny(class Connection *d, std::string arg)
             if (d->character->player->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
-               logentry(log_buf, SERAPH, LibDC::LogChannels::LOG_SOCKET);
+               logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
             }
             else
             {
@@ -1058,9 +1058,9 @@ void DC::nanny(class Connection *d, std::string arg)
 
       buffer = QStringLiteral("%1@%2 has connected.").arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString().toStdString().c_str());
       if (ch->getLevel() < ANGEL)
-         logentry(buffer, OVERSEER, LibDC::LogChannels::LOG_SOCKET);
+         logentry(buffer, OVERSEER, DC::LogChannel::LOG_SOCKET);
       else
-         logentry(buffer, ch->getLevel(), LibDC::LogChannels::LOG_SOCKET);
+         logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
@@ -1106,7 +1106,7 @@ void DC::nanny(class Connection *d, std::string arg)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                     GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
-            logentry(buf, OVERSEER, LibDC::LogChannels::LOG_SOCKET);
+            logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
@@ -1695,7 +1695,7 @@ void DC::nanny(class Connection *d, std::string arg)
       init_char(ch);
 
       sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
-      logentry(log_buf, OVERSEER, LibDC::LogChannels::LOG_SOCKET);
+      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
@@ -1756,12 +1756,12 @@ void DC::nanny(class Connection *d, std::string arg)
          if (ch->getGold() > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-            logentry(log_buf, 100, LibDC::LogChannels::LOG_WARNINGS);
+            logentry(log_buf, 100, DC::LogChannel::LOG_WARNINGS);
          }
          if (GET_BANK(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
-            logentry(log_buf, 100, LibDC::LogChannels::LOG_WARNINGS);
+            logentry(log_buf, 100, DC::LogChannel::LOG_WARNINGS);
          }
          ch->sendln("\n\rWelcome to Dark Castle.");
          character_list.insert(ch);
@@ -1874,7 +1874,7 @@ void DC::nanny(class Connection *d, std::string arg)
       if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->getNameC());
-         logentry(buf, IMMORTAL, LibDC::LogChannels::LOG_MORTAL);
+         logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 
          DC::getInstance()->TheAuctionHouse.HandleDelete(d->character->getName());
          // To remove the vault from memory
@@ -1959,7 +1959,7 @@ void DC::nanny(class Connection *d, std::string arg)
          strcpy(ch->player->pwd, blah2);
          save_char_obj(ch);
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
-         logentry(log_buf, SERAPH, LibDC::LogChannels::LOG_SOCKET);
+         logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
       }
 
       break;
@@ -2022,7 +2022,7 @@ bool check_deny(class Connection *d, char *name)
 
    char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddress().toString().toStdString().c_str());
-   logentry(log_buf, ARCHANGEL, LibDC::LogChannels::LOG_MORTAL);
+   logentry(log_buf, ARCHANGEL, DC::LogChannel::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
@@ -2069,11 +2069,11 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 
          if (tmp_ch->isMortalPlayer())
          {
-            logentry(log_buf, COORDINATOR, LibDC::LogChannels::LOG_SOCKET);
+            logentry(log_buf, COORDINATOR, DC::LogChannel::LOG_SOCKET);
          }
          else
          {
-            logentry(log_buf, tmp_ch->getLevel(), LibDC::LogChannels::LOG_SOCKET);
+            logentry(log_buf, tmp_ch->getLevel(), DC::LogChannel::LOG_SOCKET);
          }
 
          STATE(d) = Connection::states::PLAYING;
@@ -2193,7 +2193,7 @@ void update_characters()
       }
       if (IS_AFFECTED(i, AFF_POISON) && !(i->affected_by_spell(SPELL_POISON)))
       {
-         logf(IMMORTAL, LibDC::LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
+         logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->getNameC());
          REMBIT(i->affected_by, AFF_POISON);
       }
 
@@ -2512,7 +2512,7 @@ bool on_forbidden_name_list(const char *name)
    nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      logentry(QStringLiteral("Failed to open forbidden name file!"), 0, LibDC::LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
       return false;
    }
    else

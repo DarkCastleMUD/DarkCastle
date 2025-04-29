@@ -1008,9 +1008,9 @@ int do_steal(Character *ch, char *argument, int cmd)
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
                     DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
-            logentry(log_buf, ANGEL, LibDC::LogChannels::LOG_MORTAL);
+            logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, LibDC::LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
                    DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -1179,7 +1179,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
-        logentry(buf, ANGEL, LibDC::LogChannels::LOG_MORTAL);
+        logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!IS_NPC(victim))
         {
           victim->save(666);
@@ -1423,7 +1423,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      logf(0, LibDC::LogChannels::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
+      logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {
@@ -1704,7 +1704,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
-      logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+      logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
@@ -1890,7 +1890,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
     sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
             GET_NAME(vict));
-    logentry(buf, IMPLEMENTER, LibDC::LogChannels::LOG_OBJECTS);
+    logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
