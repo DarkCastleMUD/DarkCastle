@@ -23,7 +23,6 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/const.h"
-#include "DC/Command.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;

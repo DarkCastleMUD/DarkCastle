@@ -61,7 +61,6 @@ int load_debug = 0;
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/wizard.h"
-#include "DC/Command.h"
 
 Room &World::operator[](room_t room_key)
 {

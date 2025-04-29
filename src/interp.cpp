@@ -47,7 +47,6 @@
 #include "DC/CommandStack.h"
 #include "DC/const.h"
 #include "DC/DC.h"
-#include "DC/Command.h"
 
 #define SKILL_HIDE 337
 

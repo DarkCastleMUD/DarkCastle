@@ -34,7 +34,6 @@
 #include "DC/guild.h"
 #include "DC/const.h"
 #include "DC/vault.h"
-#include "DC/Command.h"
 #include "DC/meta.h"
 
 int get_max_stat_bonus(Character *ch, int attrs)
