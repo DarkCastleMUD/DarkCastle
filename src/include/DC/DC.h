@@ -107,20 +107,17 @@ typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
 #include "DC/levels.h"
-#include "DC/fileinfo.h"
 #include "DC/Trace.h"
 #include "DC/SSH.h"
-#include "DC/weather.h"
 #include "DC/Zone.h"
 #include "DC/Shops.h"
 #include "DC/room.h"
 #include "DC/Database.h"
-#include "DC/interp.h"
 #include "DC/Command.h"
-#include "DC/clan.h"
 
 class Connection;
 class index_data;
+class clan_data;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
 void close_file(std::FILE *fp);
