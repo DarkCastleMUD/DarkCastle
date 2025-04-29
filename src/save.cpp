@@ -31,7 +31,6 @@
 #include "DC/spells.h"
 #include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/handler.h"

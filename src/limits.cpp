@@ -26,7 +26,6 @@
 #include "DC/mobile.h"
 #include "DC/isr.h"
 #include "DC/spells.h" // TYPE
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/connect.h"

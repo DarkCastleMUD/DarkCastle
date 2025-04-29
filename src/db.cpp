@@ -44,7 +44,6 @@ int load_debug = 0;
 #include "DC/player.h"	 // log info
 #include "DC/fileinfo.h" // file names
 #include "DC/utility.h"	 // assign..
-#include "DC/levels.h"
 #include "DC/character.h"
 #include "DC/mobile.h"
 #include "DC/room.h"

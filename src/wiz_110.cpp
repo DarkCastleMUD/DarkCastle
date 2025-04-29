@@ -19,7 +19,7 @@
 
 #include "DC/wizard.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
+
 #include "DC/player.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"

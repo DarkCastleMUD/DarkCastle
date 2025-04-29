@@ -48,7 +48,6 @@
 
 #include "DC/innate.h"
 #include "DC/structs.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/timeinfo.h"
 #include "DC/character.h"

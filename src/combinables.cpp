@@ -21,7 +21,6 @@
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/magic.h"
 #include "DC/act.h"

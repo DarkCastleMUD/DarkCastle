@@ -11,7 +11,6 @@
 #include "DC/character.h"
 #include "DC/affect.h"
 #include "DC/room.h"
-#include "DC/levels.h"
 #include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/fight.h"

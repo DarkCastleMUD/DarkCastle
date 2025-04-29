@@ -12,7 +12,6 @@ one liner quest shit
 #include "DC/returnvals.h"
 #include "DC/DC.h"
 #include "DC/act.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"

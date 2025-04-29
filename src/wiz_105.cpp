@@ -10,7 +10,7 @@
 #include "DC/player.h"
 #include "DC/fight.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
+
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/innate.h"

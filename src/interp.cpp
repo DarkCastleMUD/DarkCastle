@@ -33,7 +33,6 @@
 #include "DC/structs.h" // MAX_STRING_LENGTH
 #include "DC/character.h"
 #include "DC/interp.h"
-#include "DC/levels.h"
 #include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/fight.h"

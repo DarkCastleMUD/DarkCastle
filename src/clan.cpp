@@ -29,11 +29,10 @@ uint64_t i = UINT64_MAX;
 #include "DC/player.h"
 #include "DC/utility.h"
 #include "DC/character.h"
-#include "DC/connect.h"  // Connection
-#include "DC/mobile.h"   // utility.h stuff
-#include "DC/clan.h"     // duh
-#include "DC/interp.h"   // do_outcast, etc..
-#include "DC/levels.h"   // levels
+#include "DC/connect.h" // Connection
+#include "DC/mobile.h"  // utility.h stuff
+#include "DC/clan.h"    // duh
+#include "DC/interp.h"  // do_outcast, etc..
 #include "DC/handler.h"  // get_char_room_vis
 #include "DC/terminal.h" // get_char_room_vis
 #include "DC/room.h"     // CLAN_ROOM flag

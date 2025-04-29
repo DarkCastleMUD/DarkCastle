@@ -13,7 +13,6 @@
 #include "DC/structs.h"
 #include "DC/fileinfo.h"
 #include "DC/connect.h"
-#include "DC/levels.h"
 #include <climits>
 #include "DC/db.h"
 #include "DC/interp.h"

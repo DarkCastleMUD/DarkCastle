@@ -6,7 +6,6 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/fight.h"
 #include "DC/utility.h"
 #include "DC/character.h"

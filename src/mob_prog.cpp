@@ -42,7 +42,6 @@
 #include "DC/fileinfo.h"
 #include "DC/act.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/room.h"
 #include "DC/structs.h"
 #include "DC/fight.h"

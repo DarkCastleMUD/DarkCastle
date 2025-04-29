@@ -24,7 +24,6 @@
 #include "DC/room.h"
 #include "DC/handler.h"
 #include "DC/magic.h"
-#include "DC/levels.h"
 #include "DC/fight.h"
 #include "DC/DC.h"
 #include "DC/player.h"

@@ -24,7 +24,6 @@
 #include "DC/player.h" // *app_type
 #include "DC/character.h"
 #include "DC/spells.h"
-#include "DC/levels.h"
 #include "DC/mobile.h"
 
 room_t IMM_PIRAHNA_ROOM = 25;

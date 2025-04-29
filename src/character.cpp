@@ -2,7 +2,6 @@
 #include <QFile>
 
 #include "DC/character.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/obj.h"

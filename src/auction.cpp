@@ -21,7 +21,6 @@ External: (explained more below)
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/terminal.h"
-#include "DC/levels.h"
 #include "DC/character.h"
 #include "DC/room.h"
 #include "DC/utility.h"

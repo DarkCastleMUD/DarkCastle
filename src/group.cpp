@@ -14,7 +14,6 @@
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/clan.h"
-#include "DC/levels.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/player.h"

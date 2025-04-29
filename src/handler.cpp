@@ -40,7 +40,6 @@
 #include "DC/player.h"	// APPLY
 #include "DC/utility.h" // LOWER
 #include "DC/clan.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/mobile.h"
 #include "DC/connect.h" // Connection

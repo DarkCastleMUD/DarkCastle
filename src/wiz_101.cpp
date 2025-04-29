@@ -11,7 +11,7 @@
 #include "DC/wizard.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
-#include "DC/levels.h"
+
 #include "DC/interp.h"
 #include "DC/room.h"
 #include "DC/DC.h"

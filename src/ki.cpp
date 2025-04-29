@@ -14,7 +14,6 @@
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/levels.h"
 #include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/interp.h"

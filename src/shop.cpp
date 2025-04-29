@@ -24,7 +24,6 @@
 #include "DC/utility.h"
 #include "DC/interp.h"
 #include "DC/DC.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/mobile.h"

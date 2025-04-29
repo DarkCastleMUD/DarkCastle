@@ -50,7 +50,6 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/connect.h"  // Connection::states::WRITE_BOARD
 #include "DC/terminal.h" // BOLD
 #include "DC/fileinfo.h" // for the board files
-#include "DC/levels.h"   // levels..
 #include "DC/clan.h"
 #include "DC/character.h"
 #include "DC/utility.h" // false

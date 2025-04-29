@@ -9,7 +9,6 @@
 #include "DC/structs.h"
 #include "DC/utility.h"
 #include "DC/spells.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/room.h"

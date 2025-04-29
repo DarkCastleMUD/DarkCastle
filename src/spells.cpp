@@ -30,7 +30,6 @@
 #include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/race.h"
-#include "DC/levels.h"
 #include "DC/spells.h"
 #include "DC/magic.h"
 #include "DC/player.h"

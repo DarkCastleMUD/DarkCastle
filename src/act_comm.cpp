@@ -23,7 +23,6 @@
 #include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
-#include "DC/levels.h"
 #include "DC/room.h"
 #include "DC/mobile.h"
 #include "DC/player.h"

@@ -17,7 +17,6 @@
 #include "DC/fight.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
-#include "DC/levels.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/room.h"

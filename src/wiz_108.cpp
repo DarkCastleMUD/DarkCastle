@@ -5,7 +5,7 @@
 #include "DC/wizard.h"
 #include "DC/interp.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
+
 #include "DC/mobile.h"
 #include "DC/player.h"
 #include "DC/handler.h"

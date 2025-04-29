@@ -31,7 +31,6 @@
 #include <sstream>
 
 #include "DC/fight.h"
-#include "DC/levels.h"
 #include "DC/race.h"
 #include "DC/player.h" // log
 #include "DC/character.h"

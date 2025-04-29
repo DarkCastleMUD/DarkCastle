@@ -17,7 +17,6 @@
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/affect.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/character.h"
 #include "DC/act.h"

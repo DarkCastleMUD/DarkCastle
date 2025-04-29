@@ -21,7 +21,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cctype>
-// #include <arpa/telnet.h>
 #include <unistd.h>
 #include <cstring>
 #include <queue>
@@ -34,7 +33,6 @@
 #include "DC/player.h"
 #include "DC/structs.h" // true
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/ki.h"
 #include "DC/clan.h"
 #include "DC/fileinfo.h" // SAVE_DIR

@@ -7,7 +7,6 @@
 #include "DC/structs.h"
 #include "DC/spells.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"

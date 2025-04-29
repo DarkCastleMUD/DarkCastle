@@ -6,8 +6,7 @@
  */
 
 #include "DC/CommandStack.h"
-#include "DC/player.h"	// DC::LogChannel::LOG_BUG
-#include "DC/levels.h"	// IMMORTAL
+#include "DC/player.h" // DC::LogChannel::LOG_BUG
 #include "DC/utility.h" // logf
 
 uint32_t CommandStack::depth = 0;

@@ -1,7 +1,6 @@
 #ifndef CONST_H
 #define CONST_H
 #include "DC/obj.h"
-#include "DC/levels.h"
 #include "DC/mobile.h"
 #include "DC/db.h"
 #include "DC/character.h"

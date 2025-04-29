@@ -20,7 +20,6 @@
 #include "DC/structs.h"
 #include "DC/utility.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"

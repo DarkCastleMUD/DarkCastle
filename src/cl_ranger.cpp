@@ -22,7 +22,6 @@
 #include "DC/room.h"
 #include "DC/terminal.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/fight.h"
 #include "DC/interp.h"

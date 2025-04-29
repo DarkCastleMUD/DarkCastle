@@ -12,7 +12,6 @@
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/utility.h"

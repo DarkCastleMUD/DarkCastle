@@ -18,7 +18,6 @@
 #include "DC/DC.h"
 #include "DC/mobile.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/interp.h"

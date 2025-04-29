@@ -32,7 +32,6 @@
 #include "DC/fight.h"
 #include "DC/db.h" // index_data
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/interp.h"

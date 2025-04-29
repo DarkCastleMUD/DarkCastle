@@ -27,7 +27,6 @@
 #include "DC/character.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/spells.h"
