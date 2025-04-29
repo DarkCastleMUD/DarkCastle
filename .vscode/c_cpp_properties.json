@@ -14,7 +14,7 @@
                 "${workspaceFolder}/build/_deps/tracy-src/public",
                 "/usr/include/qt6/QtHttpServer"
             ],
-            "compilerPath": "/usr/bin/clang++-17",
+            "compilerPath": "/usr/bin/clang++-20",
             "compilerArgs": [
                 "-std=c++23",
                 "-stdlib=libc++"
