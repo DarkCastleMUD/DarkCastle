@@ -5,6 +5,7 @@
 |
 | File create with do_layhands -Pirahna 7/6/1999
 */
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/player.h"

@@ -12,6 +12,7 @@
 #include "DC/spells.h"
 #include "DC/vault.h"
 #include "DC/terminal.h"
+#include "DC/connect.h"
 
 using namespace std::literals;
 

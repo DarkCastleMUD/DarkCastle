@@ -12,6 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/levels.h"

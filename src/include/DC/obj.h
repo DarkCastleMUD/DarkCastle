@@ -21,10 +21,10 @@
 
 #include "DC/common.h"
 #include "DC/structs.h" // uint8_t
-#include "DC/character.h"
-#include "DC/DC.h"
 #include "DC/casino.h"
 #include "DC/room.h"
+
+class Character;
 
 /* The following defs are for Object  */
 

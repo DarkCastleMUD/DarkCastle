@@ -4,6 +4,7 @@
 */
 #include <cstring>
 
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/levels.h"

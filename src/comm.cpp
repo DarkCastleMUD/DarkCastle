@@ -63,6 +63,7 @@
 #include "Backend/Database.h"
 #endif
 #include "DC/Timer.h"
+#include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/CommandStack.h"
 #include "DC/SSH.h"

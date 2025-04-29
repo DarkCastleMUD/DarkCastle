@@ -1,3 +1,6 @@
+#ifndef CONST_H
+#define CONST_H
+#include "DC/obj.h"
 #include "DC/levels.h"
 #include "DC/mobile.h"
 #include "DC/db.h"
@@ -75,3 +78,4 @@ extern const char *ki[];
 extern const char *innate_skills[];
 extern const char *reserved[];
 extern room_t IMM_PIRAHNA_ROOM;
+#endif

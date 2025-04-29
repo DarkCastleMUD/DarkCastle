@@ -5,6 +5,7 @@
 */
 #include <cstring>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/structs.h"
 #include "DC/spells.h"

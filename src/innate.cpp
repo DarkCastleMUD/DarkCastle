@@ -1,5 +1,6 @@
 // This file takes care of all innate race abilities
 
+#include "DC/obj.h"
 #include "DC/innate.h"
 #include "DC/race.h"
 #include "DC/db.h"

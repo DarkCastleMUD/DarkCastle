@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 #include <tracy/Tracy.hpp>
 
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/db.h"
 #include "DC/utility.h"

@@ -31,6 +31,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "DC/obj.h"
 #include "DC/magic.h"
 #include "DC/spells.h"
 #include "DC/room.h"

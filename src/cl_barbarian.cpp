@@ -24,6 +24,7 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/move.h"
+#include "DC/obj.h"
 
 extern int rev_dir[];
 

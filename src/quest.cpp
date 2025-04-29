@@ -3,6 +3,8 @@ one liner quest shit
 *****************************************************/
 
 #include <math.h>
+
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/comm.h"

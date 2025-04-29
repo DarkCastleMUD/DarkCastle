@@ -58,6 +58,7 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/stat.h"
+#include "DC/obj.h"
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 

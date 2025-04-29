@@ -63,6 +63,7 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <vector>
 #include "DC/interp.h"
 #include <sstream>
+#include "DC/obj.h"
 
 #define MAX_MESSAGE_LENGTH 2048
 

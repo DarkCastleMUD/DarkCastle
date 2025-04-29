@@ -4,6 +4,7 @@
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
 */
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/structs.h"
 #include "DC/utility.h"

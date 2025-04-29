@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/player.h"

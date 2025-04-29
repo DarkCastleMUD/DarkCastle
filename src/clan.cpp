@@ -23,6 +23,7 @@ uint64_t i = UINT64_MAX;
 #include <fmt/format.h>
 #include <QFile>
 
+#include "DC/obj.h"
 #include "DC/fileinfo.h"
 #include "DC/db.h" // real_room
 #include "DC/player.h"

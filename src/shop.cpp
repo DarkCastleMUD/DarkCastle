@@ -18,6 +18,7 @@
 #include <cstring>
 #include <fmt/format.h>
 
+#include "DC/obj.h"
 #include "DC/affect.h"
 #include "DC/character.h"
 #include "DC/utility.h"

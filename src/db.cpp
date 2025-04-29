@@ -34,6 +34,7 @@ int load_debug = 0;
 
 #include <QDebug>
 
+#include "DC/obj.h"
 #include "DC/affect.h"
 #include "DC/db.h"
 #include "DC/memory.h"

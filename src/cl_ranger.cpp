@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/affect.h"
 #include "DC/mobile.h"

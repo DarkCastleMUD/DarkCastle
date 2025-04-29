@@ -35,6 +35,7 @@
 #include "DC/returnvals.h"
 #include "DC/fileinfo.h"
 #include "DC/const.h"
+#include "DC/obj.h"
 
 extern bool MOBtrigger;
 

@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 
+#include "DC/obj.h"
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/DC.h"

@@ -4,6 +4,8 @@
 |   move throughout the game.
 */
 #include <cstdio>
+
+#include "DC/obj.h"
 #include "DC/game_portal.h"
 #include "DC/fileinfo.h"
 #include "DC/structs.h"

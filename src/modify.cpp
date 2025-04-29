@@ -21,6 +21,7 @@
 #include <ctime>
 #include <cstdlib>
 
+#include "DC/obj.h"
 #include "DC/connect.h" // Connection
 #include "DC/utility.h"
 #include "DC/character.h"

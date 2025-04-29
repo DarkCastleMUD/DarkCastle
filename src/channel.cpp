@@ -27,6 +27,7 @@
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
+#include "DC/obj.h"
 
 class channel_msg
 {

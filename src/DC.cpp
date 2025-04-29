@@ -12,6 +12,8 @@
 #include "DC/db.h"
 #include "DC/Version.h"
 #include "DC/character.h"
+#include "DC/connect.h"
+#include "DC/obj.h"
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";

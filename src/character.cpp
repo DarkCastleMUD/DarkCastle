@@ -4,6 +4,8 @@
 #include "DC/character.h"
 #include "DC/levels.h"
 #include "DC/db.h"
+#include "DC/connect.h"
+#include "DC/obj.h"
 
 void set_golem(Character *golem, int golemtype);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);

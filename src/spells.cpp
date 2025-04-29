@@ -27,6 +27,7 @@
 #include <cassert>
 #include <cstdlib>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/race.h"
 #include "DC/levels.h"

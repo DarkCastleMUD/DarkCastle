@@ -29,6 +29,7 @@
 #include "DC/returnvals.h"
 #include "DC/timeinfo.h"
 #include "DC/casino.h"
+#include "DC/obj.h"
 #include <algorithm>
 #include <fmt/format.h>
 

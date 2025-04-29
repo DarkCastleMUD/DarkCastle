@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/fight.h"
 #include "DC/room.h"

@@ -107,9 +107,6 @@ typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
 #include "DC/levels.h"
-#include "DC/connect.h"
-#include "DC/character.h"
-#include "DC/obj.h"
 #include "DC/fileinfo.h"
 #include "DC/Trace.h"
 #include "DC/SSH.h"

@@ -12,7 +12,8 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstdio>
-// DarkCastle header files
+
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/character.h" // Character
