@@ -11,7 +11,6 @@
 #include "DC/utility.h"
 #include "DC/mobile.h"
 #include "DC/connect.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/social.h"
 #include "DC/handler.h"
@@ -132,7 +131,7 @@ char *fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
   }
 

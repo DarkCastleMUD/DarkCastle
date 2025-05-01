@@ -10,13 +10,14 @@
 
 #include <cctype>
 #include <cstring>
+
+#include "DC/obj.h"
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/mobile.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/interp.h"
@@ -43,16 +44,16 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
@@ -121,7 +122,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -207,7 +208,7 @@ int do_donate(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->isPlayerCantQuit() && !IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (ch->isPlayerCantQuit() && !IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -253,7 +254,7 @@ int do_donate(Character *ch, char *argument, int cmd)
       {
         sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
                 GET_NAME(ch));
-        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return eFAILURE;
       }
     }
@@ -309,9 +310,9 @@ int do_donate(Character *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, DC::getInstance()->obj_index[obj->item_number].virt);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
@@ -342,7 +343,7 @@ int do_title(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOTITLE))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTITLE))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -384,7 +385,7 @@ int do_title(Character *ch, char *argument, int cmd)
 
 command_return_t Character::do_toggle(QStringList arguments, int cmd)
 {
-  if (IS_MOB(this))
+  if (IS_NPC(this))
   {
     send("You can't toggle anything, you're a mob!\r\n");
     return eFAILURE;
@@ -1496,7 +1497,7 @@ void CVoteData::OutToFile()
   if (!the_file)
   {
     logentry(QStringLiteral("Unable to open/create save file for vote data"), ANGEL,
-             LogChannels::LOG_BUG);
+             DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -1580,7 +1581,7 @@ CVoteData::CVoteData()
   {
     fclose(the_file);
     this->Reset(nullptr);
-    logentry(QStringLiteral("Error reading question from vote file."), 0, LogChannels::LOG_MISC);
+    logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = 0;
@@ -1594,7 +1595,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading answers from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1612,7 +1613,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1627,7 +1628,7 @@ CVoteData::CVoteData()
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       fclose(the_file);
-      logentry(QStringLiteral("Error reading char names from vote file."), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Error reading char names from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
     }
@@ -1676,7 +1677,7 @@ int do_vote(Character *ch, char *arg, int cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    logf(IMMORTAL, LogChannels::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
+    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;
 }

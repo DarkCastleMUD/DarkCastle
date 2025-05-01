@@ -34,7 +34,6 @@
 #include "DC/utility.h"
 #include "DC/terminal.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/mobile.h"
 #include "DC/clan.h"
 #include "DC/handler.h"
@@ -472,7 +471,7 @@ void show_spells(Character *i, Character *ch)
 
    if (!strbuf.empty())
    {
-      if (IS_MOB(i))
+      if (IS_NPC(i))
          strbuf = std::string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\r\n";
       else
          strbuf = std::string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\r\n";
@@ -503,7 +502,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       }
       ch->send("$B$3");
 
-      if (!(i->long_desc) || (IS_MOB(i) && (GET_POS(i) != i->mobdata->default_pos)))
+      if (!(i->long_desc) || (IS_NPC(i) && (GET_POS(i) != i->mobdata->default_pos)))
       {
          /* A char without long descr, or not in default pos. */
          if (IS_PC(i))
@@ -532,7 +531,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             }
             else
             {
-               if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+               if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
                {
                   buffer.append(" ");
                   buffer.append(GET_TITLE(i));
@@ -867,7 +866,7 @@ void Character::list_char_to_char(Character *list, int mode)
    {
       if (this == i)
          continue;
-      if (!IS_MOB(i) && (i->player->wizinvis > this->getLevel()))
+      if (!IS_NPC(i) && (i->player->wizinvis > this->getLevel()))
          if (!i->player->incognito || !(this->in_room == i->in_room))
             continue;
       if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
@@ -1322,7 +1321,7 @@ int do_look(Character *ch, const char *argument, int cmd)
       ansi_color(GREY, ch);
       return eSUCCESS;
    }
-   else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->player->holyLite))
+   else if (IS_DARK(ch->in_room) && (!IS_NPC(ch) && !ch->player->holyLite))
    {
       ch->sendln("It is pitch black...");
       ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
@@ -1420,7 +1419,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      temp = ((tmp_object->obj_flags.value[1] * 3) / tmp_object->obj_flags.value[0]);
                      if (temp > 3)
                      {
-                        logf(IMMORTAL, LogChannels::LOG_WORLD,
+                        logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. v2: %d > v1: %d. Resetting.",
                              DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.value[1],
@@ -1475,7 +1474,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      else if (temp > 3)
                      {
                         temp = 3;
-                        logf(IMMORTAL, LogChannels::LOG_WORLD,
+                        logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. Weight: %d v1: %d",
                              DC::getInstance()->obj_index[tmp_object->item_number].virt,
                              tmp_object->obj_flags.weight,
@@ -1534,7 +1533,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                   show_char_to_char(tmp_char, ch, 1);
                if (ch != tmp_char)
                {
-                  if (!IS_MOB(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
+                  if (!IS_NPC(ch) && (tmp_char->getLevel() < ch->player->wizinvis))
                   {
                      return eSUCCESS;
                   }
@@ -1733,7 +1732,7 @@ int do_look(Character *ch, const char *argument, int cmd)
          ansi_color(GREY, ch);
 
          // PUT SECTOR AND ROOMFLAG STUFF HERE
-         if (!IS_MOB(ch) && ch->player->holyLite)
+         if (!IS_NPC(ch) && ch->player->holyLite)
          {
             sprinttype(DC::getInstance()->world[ch->in_room].sector_type, sector_types,
                        sector_buf);
@@ -1750,7 +1749,7 @@ int do_look(Character *ch, const char *argument, int cmd)
 
          ch->sendln("");
 
-         if (!IS_MOB(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
+         if (!IS_NPC(ch) && !isSet(ch->player->toggles, Player::PLR_BRIEF))
             send_to_char(DC::getInstance()->world[ch->in_room].description, ch);
 
          ansi_color(BLUE, ch);
@@ -1779,7 +1778,7 @@ int do_look(Character *ch, const char *argument, int cmd)
             is_closed = isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
             is_hidden = isSet(EXIT(ch, door)->exit_info, EX_HIDDEN);
 
-            if (IS_MOB(ch) || ch->player->holyLite)
+            if (IS_NPC(ch) || ch->player->holyLite)
             {
                if (is_closed && is_hidden)
                   sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
@@ -1884,7 +1883,7 @@ int do_exits(Character *ch, char *argument, int cmd)
       if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
          continue;
 
-      if (!IS_MOB(ch) && ch->player->holyLite)
+      if (!IS_NPC(ch) && ch->player->holyLite)
          sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);
@@ -3387,7 +3386,7 @@ void check_champion_and_website_who_list()
       }
       else
       {
-         logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, LogChannels::LOG_MISC);
+         logentry(QStringLiteral("CHAMPION_ITEM obj not found. Please create one."), 0, DC::LogChannel::LOG_MISC);
       }
    }
 

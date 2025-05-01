@@ -45,7 +45,7 @@ int do_boot(Character *ch, char *arg, int cmd)
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
       return eFAILURE;
     }
-    if (!IS_MOB(victim) && victim->player->possesing)
+    if (!IS_NPC(victim) && victim->player->possesing)
     {
       ch->send("Oops! They ain't linkdead! Just possessing.");
       return eFAILURE;
@@ -79,7 +79,7 @@ int do_boot(Character *ch, char *arg, int cmd)
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
-    logentry(name, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (!strcmp(type, "boot"))
     {
@@ -233,7 +233,7 @@ int do_fsave(Character *ch, std::string argument, int cmd)
   }
   vict->save();
 
-  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return eSUCCESS;
 }
@@ -301,7 +301,7 @@ int do_peace(Character *ch, char *argument, int cmd)
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hated != nullptr)
+    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);

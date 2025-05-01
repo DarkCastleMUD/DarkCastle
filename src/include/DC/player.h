@@ -9,17 +9,6 @@
 #include "DC/punish.h"  // punishment vectors
 #include "DC/structs.h" // uint8_t
 #include "DC/class.h"
-/************************************************************************
-| Character.misc vector
-|  These should probably not be combined, and they probably shouldn't
-|  be here, but they are.  Morc XXX
-|  I really shouldn't have the flag here to differentiate mob's from PC's
-|  but it's as good a place as any and this is all fubar'd anyway.
-|  -pir 7/30
-*/
-
-#define MISC_IS_OBJ 1U << 30
-#define MISC_IS_MOB 1U << 31
 
 /************************************************************************
 | Thirst, FULL, etc..

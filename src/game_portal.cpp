@@ -4,13 +4,14 @@
 |   move throughout the game.
 */
 #include <cstdio>
+
+#include "DC/obj.h"
 #include "DC/game_portal.h"
 #include "DC/fileinfo.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/db.h"
@@ -158,7 +159,7 @@ void process_portals()
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
                 game_portals[i].to_room);
-        logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
+        logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
@@ -193,14 +194,14 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     dc_free(from_portal);
-    logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
+    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
   if (from_room == to_room)
   {
     dc_free(from_portal);
-    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
@@ -226,7 +227,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       dc_free(from_portal);
-      logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
+      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       return 0;
     }
   }

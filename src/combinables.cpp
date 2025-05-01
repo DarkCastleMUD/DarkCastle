@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/fight.h"
 #include "DC/room.h"
@@ -20,7 +21,6 @@
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/magic.h"
 #include "DC/act.h"
@@ -438,13 +438,13 @@ int do_brew(Character *ch, char *argument, int cmd)
     if (!str_cmp(arg1, "load"))
     {
       b.load();
-      logf(108, LogChannels::LOG_WORLD, "Loaded %d brew recipes.", b.size());
+      logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
       return eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       b.save();
-      logf(108, LogChannels::LOG_WORLD, "Saved %d brew recipes.", b.size());
+      logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
       return eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
@@ -715,7 +715,7 @@ void Brew::load(void)
   std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -742,7 +742,7 @@ void Brew::load(void)
   }
   catch (loadError &)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
 
@@ -751,7 +751,7 @@ void Brew::save(void)
   std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -768,7 +768,7 @@ void Brew::save(void)
   }
   catch (...)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
   }
 }
 
@@ -946,13 +946,13 @@ int do_scribe(Character *ch, char *argument, int cmd)
     if (!str_cmp(arg1, "load"))
     {
       s.load();
-      logf(108, LogChannels::LOG_WORLD, "Loaded %d scribe recipes.", s.size());
+      logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d scribe recipes.", s.size());
       return eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       s.save();
-      logf(108, LogChannels::LOG_WORLD, "Saved %d scribe recipes.", s.size());
+      logf(108, DC::LogChannel::LOG_WORLD, "Saved %d scribe recipes.", s.size());
       return eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
@@ -1181,7 +1181,7 @@ void Scribe::load(void)
   std::ifstream ifs(RECIPES_FILENAME, std::ios_base::in);
   if (!ifs.is_open())
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -1209,7 +1209,7 @@ void Scribe::load(void)
   }
   catch (loadError &)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
 
@@ -1218,7 +1218,7 @@ void Scribe::save(void)
   std::ofstream ofs(RECIPES_FILENAME, std::ios_base::trunc);
   if (!ofs.is_open())
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
     return;
   }
 
@@ -1235,7 +1235,7 @@ void Scribe::save(void)
   }
   catch (...)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
   }
 }
 

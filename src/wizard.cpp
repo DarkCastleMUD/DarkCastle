@@ -6,7 +6,7 @@
 #include "DC/wizard.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
+
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/player.h"
@@ -133,7 +133,7 @@ void do_mload(Character *ch, int rnum, int cnt)
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
     }
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
@@ -143,7 +143,7 @@ void do_mload(Character *ch, int rnum, int cnt)
              DC::getInstance()->mob_index[rnum].virt,
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
 }
@@ -192,7 +192,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
                     obj->short_description,
                     DC::getInstance()->world[ch->in_room].number,
                     DC::getInstance()->world[ch->in_room].name);
-  logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return obj_list;
 }
@@ -254,7 +254,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
   }
-  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
 
 //
@@ -308,7 +308,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   ch->send(buf); // this sends to char, now we can overwrite buf
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
@@ -365,7 +365,7 @@ void boro_mob_stat(Character *ch, Character *k)
           buf2); /* buf is the sex... */
   ch->send(buf); /* THIRD sprintf */
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
       strcpy(buf2, "Exists");
@@ -443,7 +443,7 @@ void boro_mob_stat(Character *ch, Character *k)
           "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
   ch->send(buf);
 
-  if (IS_MOB(k)) // AND THIS
+  if (IS_NPC(k)) // AND THIS
     sprintbit(k->mobdata->actflags, action_bits, buf2);
   else
     strcpy(buf2, "Not a mob");
@@ -478,7 +478,7 @@ void boro_mob_stat(Character *ch, Character *k)
   for (fol = k->followers; fol; fol = fol->next)
     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -491,7 +491,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->player->bank);
@@ -510,7 +510,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);
@@ -557,7 +557,7 @@ void boro_mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
     display_punishes(ch, k);
 
   if (k->desc)
@@ -584,7 +584,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   class Object *j = 0;
   struct affected_type *aff;
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
@@ -640,7 +640,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   ch->send(buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
             k->player->time.birth,
@@ -714,7 +714,7 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
@@ -755,7 +755,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   strcat(buf, buf2);
   ch->send(buf);
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
     strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
@@ -824,7 +824,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting.isEmpty()) ? "NOBODY" : k->hunting.toStdString().c_str()));
   ch->send(buf);
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
             (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
@@ -846,7 +846,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->combat, combat_bits, buf);
   ch->send(QStringLiteral("$3Combat flags$R: %1\n\r").arg(buf));
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
     display_punishes(ch, k);
 
   sprintbit(k->affected_by, affected_bits, buf);
@@ -861,7 +861,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
 
-  if (!IS_MOB(k))
+  if (!IS_NPC(k))
   {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->player->wizinvis);
     ch->send(buf);
@@ -925,7 +925,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->sendln("");
   }
 
-  if (IS_MOB(k))
+  if (IS_NPC(k))
   {
     switch (k->mobdata->mob_flags.type)
     {
@@ -1350,7 +1350,7 @@ void do_start(Character *ch)
 
   ch->sendln("This is now your character in Dark Castle MUD");
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return;
 
   ch->setLevel(1);
@@ -1424,14 +1424,14 @@ command_return_t do_repop(Character *ch, std::string arguments, int cmd)
   {
     ch->sendln("Performing full zone reset!");
     std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
     std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
-    logentry(buf.c_str(), ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
@@ -1481,7 +1481,7 @@ int do_clear(Character *ch, char *argument, int cmd)
   }
   ch->sendln("You have just caused the destruction of countless creatures in ths area!");
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
-  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -1582,7 +1582,7 @@ int do_restore(Character *ch, char *argument, int cmd)
     }
 
     sprintf(buf, "%s restored %s.", GET_NAME(ch), victim->getNameC());
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1601,7 +1601,7 @@ int do_restore(Character *ch, char *argument, int cmd)
     {
       ch->sendln("You don't have the ability to do that!");
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
-      logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
       return eFAILURE;
     }
@@ -1632,7 +1632,7 @@ int do_restore(Character *ch, char *argument, int cmd)
         victim->save();
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("Trying to be Mister Popularity?");
   }
   return eSUCCESS;
@@ -2060,7 +2060,7 @@ void pulse_hunts()
   {
     if (&DC::getInstance()->world[6345] == nullptr)
     {
-      logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
@@ -2073,7 +2073,7 @@ void pulse_hunts()
   }
   catch (...)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
   }
 }
 
@@ -2153,13 +2153,13 @@ int do_huntstart(Character *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 
@@ -2224,13 +2224,13 @@ int do_huntstart(Character *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, DC::LogChannel::LOG_GOD);
   }
 #endif
 

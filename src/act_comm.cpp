@@ -23,7 +23,6 @@
 #include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
-#include "DC/levels.h"
 #include "DC/room.h"
 #include "DC/mobile.h"
 #include "DC/player.h"
@@ -35,6 +34,7 @@
 #include "DC/returnvals.h"
 #include "DC/fileinfo.h"
 #include "DC/const.h"
+#include "DC/obj.h"
 
 extern bool MOBtrigger;
 
@@ -46,7 +46,7 @@ int do_report(Character *ch, char *argument, int cmd)
   assert(ch != 0);
   if (ch->in_room == DC::NOWHERE)
   {
-    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("NOWHERE sent to do_report!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return eSUCCESS;
   }
 
@@ -130,7 +130,7 @@ int do_report(Character *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(QString message, uint64_t god_level, LogChannels type)
+int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
 {
   QString buf1;
   QString buf;
@@ -139,7 +139,7 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
 
   if (message.isEmpty())
   {
-    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr STRING sent to send_to_gods!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
@@ -150,55 +150,55 @@ int send_to_gods(QString message, uint64_t god_level, LogChannels type)
 
   switch (type)
   {
-  case LogChannels::LOG_BUG:
+  case DC::LogChannel::LOG_BUG:
     typestr = "bug";
     break;
-  case LogChannels::LOG_PRAYER:
+  case DC::LogChannel::LOG_PRAYER:
     typestr = "pray";
     break;
-  case LogChannels::LOG_GOD:
+  case DC::LogChannel::LOG_GOD:
     typestr = "god";
     break;
-  case LogChannels::LOG_MORTAL:
+  case DC::LogChannel::LOG_MORTAL:
     typestr = "mortal";
     break;
-  case LogChannels::LOG_SOCKET:
+  case DC::LogChannel::LOG_SOCKET:
     typestr = "socket";
     break;
-  case LogChannels::LOG_MISC:
+  case DC::LogChannel::LOG_MISC:
     typestr = "misc";
     break;
-  case LogChannels::LOG_PLAYER:
+  case DC::LogChannel::LOG_PLAYER:
     typestr = "player";
     break;
-  case LogChannels::LOG_WORLD:
+  case DC::LogChannel::LOG_WORLD:
     typestr = "world";
     break;
-  case LogChannels::LOG_ARENA:
+  case DC::LogChannel::LOG_ARENA:
     typestr = "arena";
     break;
-  case LogChannels::LOG_CLAN:
+  case DC::LogChannel::LOG_CLAN:
     typestr = "logclan";
     break;
-  case LogChannels::LOG_WARNINGS:
+  case DC::LogChannel::LOG_WARNINGS:
     typestr = "warnings";
     break;
-  case LogChannels::LOG_DATABASE:
+  case DC::LogChannel::LOG_DATABASE:
     typestr = "database";
     break;
-  case LogChannels::LOG_VAULT:
+  case DC::LogChannel::LOG_VAULT:
     typestr = "vault";
     break;
-  case LogChannels::LOG_HELP:
+  case DC::LogChannel::LOG_HELP:
     typestr = "help";
     break;
-  case LogChannels::LOG_OBJECTS:
+  case DC::LogChannel::LOG_OBJECTS:
     typestr = "objects";
     break;
-  case LogChannels::LOG_QUEST:
+  case DC::LogChannel::LOG_QUEST:
     typestr = "quest";
     break;
-  case LogChannels::LOG_DEBUG:
+  case DC::LogChannel::LOG_DEBUG:
     typestr = "debug";
     break;
   default:
@@ -377,7 +377,7 @@ command_return_t do_ignore(Character *ch, std::string args, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->send("You're a mob! You can't ignore people.\r\n");
     return eFAILURE;
@@ -436,7 +436,7 @@ command_return_t do_ignore(Character *ch, std::string args, int cmd)
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (IS_MOB(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
+  if (IS_NPC(ch) || (i->getLevel() >= IMMORTAL && IS_PC(i)) || ch->player->ignoring.empty())
   {
     return false;
   }
@@ -633,7 +633,7 @@ int do_emote(Character *ch, char *argument, int cmd)
   int i;
   char buf[MAX_STRING_LENGTH];
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
     ch->sendln("You can't show your emotions!!");
     return eSUCCESS;
@@ -755,7 +755,7 @@ void DC::send_hint(void)
       continue;
     }
 
-    if (isSet(i->character->misc, LogChannels::CHANNEL_HINTS))
+    if (isSet(i->character->misc, DC::LogChannel::CHANNEL_HINTS))
     {
       i->character->send(hint);
     }

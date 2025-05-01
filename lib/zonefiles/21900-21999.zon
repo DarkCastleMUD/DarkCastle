@@ -1,0 +1,41 @@
+V2
+#219
+ the $BPlatinum Towers$R Hotel and Casino~
+21999 18 2 101 9
+O  3 21900   1 21902 blackjack table 1
+O  3 21901   1 21903 blackjack table 2
+O  3 21902   1 21904 blackjack table 3
+O  3 21903   1 21905 blackjack dealer 1
+M  0 21901   1 21902 blackjack dealer 1
+M  0 21901   2 21903 blackjack dealer 2
+M  0 21901   3 21904 blackjack dealer 3
+M  0 21901   4 21905 blackjack dealer 4
+O  3 21905   1 21901 casino fountain
+O  3 21904   1 21901 ATM machine
+M  3 21904   1 21908 spa security (charges 50k)
+M  0 21903   1 21906 blackjack high roller security (charges 500k)
+M  3 21905  -1 21909 spa attendant
+M  0 21907   1 21900 sorpigal entrance guard
+M  0 21907   2 21923 far reach entrance guard
+O  0 21920   1 23000 security devices
+O  0 21920   2 17881 
+O  0 21920   3 21908 spa security
+M  0 21902   1 21901 casino waitress
+G  4  2392  -1     0 manhattan
+G  4  3001  -1     0 bottle of beer
+G  4  3101  -1     0 cup of coffee
+G  4  2393  -1     0 warm sake
+M  0 21903   2 21914 Slot Machine Security Guard
+* Slot Machines and Roulette Wheels Below
+O  3 21906  -1 21911 
+O  3 21907  -1 21912 
+O  3 21908  -1 21913 
+O  3 21909  -1 21915 
+O  3 21910  -1 21917 
+O  3 21911  -1 21918 
+O  3 21912  -1 21919 
+O  3 21913  -1 21920 
+O  3 21918  -1 21922 
+M  0 21906   1 21922 Roulette Croupier
+S
+$~

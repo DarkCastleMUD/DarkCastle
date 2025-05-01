@@ -5,11 +5,11 @@
 */
 #include <cstring>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/structs.h"
 #include "DC/spells.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/db.h"
 #include "DC/interp.h"
@@ -159,7 +159,7 @@ void save_golem_data(Character *ch)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
@@ -191,11 +191,11 @@ void save_charmie_data(Character *ch)
       continue;
     }
 
-    // logf(IMMORTAL, LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
+    // logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      logf(ANGEL, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
@@ -234,7 +234,8 @@ void set_golem(Character *golem, int golemtype)
   SETBIT(golem->affected_by, AFF_DETECT_INVISIBLE);
   SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
   SETBIT(golem->mobdata->actflags, ACT_3RD_ATTACK);
-  golem->misc = MISC_IS_MOB;
+  golem->setType(Character::Type::NPC);
+  golem->misc = 0;
   golem->armor = 0;
   golem->setLevel(1);
   golem->hitroll = golem_list[golemtype].hit / 20;

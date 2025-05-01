@@ -107,23 +107,17 @@ typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
 #include "DC/levels.h"
-#include "DC/connect.h"
-#include "DC/character.h"
-#include "DC/obj.h"
-#include "DC/fileinfo.h"
 #include "DC/Trace.h"
 #include "DC/SSH.h"
-#include "DC/weather.h"
 #include "DC/Zone.h"
 #include "DC/Shops.h"
 #include "DC/room.h"
 #include "DC/Database.h"
-#include "DC/interp.h"
 #include "DC/Command.h"
-#include "DC/clan.h"
 
 class Connection;
 class index_data;
+class clan_data;
 
 using special_function = int (*)(Character *, class Object *, int, const char *, Character *);
 void close_file(std::FILE *fp);
@@ -240,8 +234,6 @@ private:
   Statuses status_{};
   gold_t entry_fee_{};
 };
-
-void logentry(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
 
 #define auction_duration 1209600
 #define AUC_MIN_PRICE 1000
@@ -383,6 +375,38 @@ public:
     QString implementer;
   } cf;
 
+  enum LogChannel
+  {
+    LOG_BUG = 1U,
+    LOG_PRAYER = 1U << 1,
+    LOG_GOD = 1U << 2,
+    LOG_MORTAL = 1U << 3,
+    LOG_SOCKET = 1U << 4,
+    LOG_MISC = 1U << 5,
+    LOG_PLAYER = 1U << 6,
+    CHANNEL_GOSSIP = 1U << 7,
+    CHANNEL_AUCTION = 1U << 8,
+    CHANNEL_INFO = 1U << 9,
+    CHANNEL_TRIVIA = 1U << 10,
+    CHANNEL_DREAM = 1U << 11,
+    CHANNEL_CLAN = 1U << 12,
+    CHANNEL_NEWBIE = 1U << 13,
+    CHANNEL_SHOUT = 1U << 14,
+    LOG_WORLD = 1U << 15,
+    LOG_ARENA = 1U << 16,
+    LOG_CLAN = 1U << 17,
+    LOG_WARNINGS = 1U << 18,
+    LOG_HELP = 1U << 19,
+    LOG_DATABASE = 1U << 20,
+    LOG_OBJECTS = 1U << 21,
+    CHANNEL_TELL = 1U << 22,
+    CHANNEL_HINTS = 1U << 23,
+    LOG_VAULT = 1U << 24,
+    LOG_QUEST = 1U << 25,
+    LOG_DEBUG = 1U << 26
+  };
+  Q_ENUM(LogChannel);
+
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0ULL;
   static constexpr vnum_t INVALID_VNUM = -1ULL;
@@ -523,13 +547,7 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(currentVNUM()).arg(currentFilename());
   }
 
-  void logverbose(QString str, uint64_t god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr)
-  {
-    if (cf.verbose_mode)
-    {
-      logentry(str, god_level, type, vict);
-    }
-  }
+  void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void clean_socials_from_memory(void);
@@ -620,7 +638,10 @@ private:
   int exceeded_connection_limit(Connection *new_conn);
   void nanny(class Connection *d, std::string arg = "");
 };
-
+void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+void logf(int level, DC::LogChannel type, const char *arg, ...);
+void logf(int level, DC::LogChannel type, QString arg);
+int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
 void produce_coredump(void *ptr = 0);
 
 template <typename T>
@@ -753,7 +774,7 @@ auto &operator>>(auto &in, Room &room)
       {
         // QString error = QStringLiteral("Room %1 is outside of any zone.").arg(room_nr);
         // logentry(error);
-        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, LogChannels::LOG_BUG);
+        // logentry(QStringLiteral("Room outside of ANY zone.  ERROR"), IMMORTAL, DC::LogChannel::LOG_BUG);
       }
       else
       {

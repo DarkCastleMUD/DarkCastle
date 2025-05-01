@@ -31,6 +31,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "DC/obj.h"
 #include "DC/magic.h"
 #include "DC/spells.h"
 #include "DC/room.h"
@@ -39,7 +40,6 @@
 #include "DC/player.h"	// APPLY
 #include "DC/utility.h" // LOWER
 #include "DC/clan.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/mobile.h"
 #include "DC/connect.h" // Connection
@@ -847,7 +847,7 @@ void check_weapon_weights(Character *ch)
 	if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 		return;
 	// make sure we're still strong enough to wield our weapons
-	if (!IS_MOB(ch) && ch->equipment[WIELD] &&
+	if (!IS_NPC(ch) && ch->equipment[WIELD] &&
 		GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -1036,7 +1036,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		break;
 
 	case APPLY_AGE:
-		if (!IS_MOB(ch))
+		if (!IS_NPC(ch))
 			ch->player->time.birth -= ((int32_t)SECS_PER_MUD_YEAR * (int32_t)mod);
 		break;
 
@@ -1593,7 +1593,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
 						 "affect_modify.)",
 				loc);
-		logentry(log_buf, 0, LogChannels::LOG_BUG);
+		logentry(log_buf, 0, DC::LogChannel::LOG_BUG);
 		break;
 
 	} /* switch */
@@ -1706,9 +1706,9 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 
 		if (hjp->next != af)
 		{
-			logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)"), ANGEL, DC::LogChannel::LOG_BUG);
 			sprintf(buf, "Problem With: %s    Affect type: %d", ch->getNameC(), af->type);
-			logentry(buf, ANGEL, LogChannels::LOG_BUG);
+			logentry(buf, ANGEL, DC::LogChannel::LOG_BUG);
 			return;
 		}
 		hjp->next = af->next; /* skip the af element */
@@ -2347,7 +2347,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	if (DC::getInstance()->world[room].people == ch)
 	{
-		logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Error: DC::getInstance()->world[room].people == ch in char_to_room()."), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -2456,17 +2456,17 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (!ch || !obj)
 	{
-		logentry(QStringLiteral("Null ch or obj in equip_char()!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Null ch or obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
 	{
-		logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 	if (ch->equipment[pos])
 	{
-		logf(ANGEL, LogChannels::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
+		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
 		produce_coredump();
 		return 0;
 	}
@@ -2479,13 +2479,13 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 
 	if (obj->carried_by)
 	{
-		logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("EQUIP: Obj is carried_by when equip."), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
 	if (obj->in_room != DC::NOWHERE)
 	{
-		logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("EQUIP: Obj is in_room when equip."), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -2516,7 +2516,7 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		}
 		else
 		{
-			logentry(QStringLiteral("ch->in_room = DC::NOWHERE when equipping char."), 0, LogChannels::LOG_BUG);
+			logentry(QStringLiteral("ch->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
 		}
 	}
 
@@ -2954,7 +2954,7 @@ Character *get_mob(char *name)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
-		if(!IS_MOB(i)) {
+		if(!IS_NPC(i)) {
 			return false;
 		}
 		if (isexact(name, GET_NAME(i))) {
@@ -2976,7 +2976,7 @@ Character *get_char_num(int nr)
 	const auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
 						  {
-		if (IS_MOB(i) && i->mobdata->nr == nr) {
+		if (IS_NPC(i) && i->mobdata->nr == nr) {
 			return true;
 		}
 		return false; });
@@ -2999,7 +2999,7 @@ int move_obj(Object *obj, int dest)
 
 	if (!obj)
 	{
-		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3013,7 +3013,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3023,7 +3023,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", obj->name, GET_NAME(obj->carried_by));
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't remove it!", obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3041,7 +3041,7 @@ int move_obj(Object *obj, int dest)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->name, GET_NAME(obj->carried_by));
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't remove it !", obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
 	}
@@ -3066,7 +3066,7 @@ int move_obj(Object *obj, int dest)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
 		return 0;
 	}
 
@@ -3084,7 +3084,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (!obj)
 	{
-		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3098,7 +3098,7 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3108,8 +3108,8 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't "
-												 "remove it!",
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+													"remove it!",
 				 obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
@@ -3120,8 +3120,8 @@ int move_obj(Object *obj, Object *dest_obj)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't "
-												 "remove it!",
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+													"remove it!",
 				 obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
@@ -3147,7 +3147,7 @@ int move_obj(Object *obj, Object *dest_obj)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
 		return 0;
 	}
 	add_totem(dest_obj, obj);
@@ -3167,7 +3167,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (!obj)
 	{
-		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("nullptr object sent to move_obj!"), OVERSEER, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3181,7 +3181,7 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_room(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", obj->name, DC::getInstance()->world[obj_in_room].number);
 			return 0;
 		}
 	}
@@ -3191,8 +3191,8 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_char(obj) == 0)
 		{
 			// Couldn't move obj from the room
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was carried by %s, and I couldn't "
-												 "remove it!",
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was carried by %s, and I couldn't "
+													"remove it!",
 				 obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
@@ -3206,8 +3206,8 @@ int move_obj(Object *obj, Character *ch)
 		if (obj_from_obj(obj) == 0)
 		{
 			// Couldn't move obj from its container
-			logf(OVERSEER, LogChannels::LOG_BUG, "%s was in container %s, and I couldn't "
-												 "remove it!",
+			logf(OVERSEER, DC::LogChannel::LOG_BUG, "%s was in container %s, and I couldn't "
+													"remove it!",
 				 obj->name, GET_NAME(obj->carried_by));
 			return 0;
 		}
@@ -3246,7 +3246,7 @@ int move_obj(Object *obj, Character *ch)
 			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
 		}
 
-		logf(OVERSEER, LogChannels::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
+		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
 		return 0;
 	}
 
@@ -3275,6 +3275,13 @@ int obj_to_char(class Object *object, Character *ch)
 	extern void pick_up_item(Character * ch, class Object * obj);
 
 	pick_up_item(ch, object);
+
+	if (ch->isPlayer() && object->isTotem() && !isSet(object->obj_flags.more_flags, ITEM_POOF_NEVER) && object->obj_flags.timer == 0)
+	{
+		object->obj_flags.timer = 1440;
+		SET_BIT(object->obj_flags.more_flags, ITEM_POOF_AFTER_24H);
+	}
+
 	return 1;
 	/*
 	 }
@@ -3304,7 +3311,7 @@ int obj_from_char(class Object *object)
 	if (!object->carried_by)
 	{
 		logentry(QStringLiteral("Obj_from_char called on an object no one is carrying!"), OVERSEER,
-				 LogChannels::LOG_BUG);
+				 DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3346,7 +3353,7 @@ int obj_to_room(class Object *object, int room)
 
 	if (&DC::getInstance()->world[room] == nullptr)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}
@@ -3429,7 +3436,7 @@ int obj_from_room(class Object *object)
 	if (object->in_room == DC::NOWHERE)
 	{
 		logentry(QStringLiteral("obj_from_room called on an object that isn't in a room!"), OVERSEER,
-				 LogChannels::LOG_BUG);
+				 DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3506,7 +3513,7 @@ int obj_from_obj(class Object *obj)
 	if (!obj->in_obj)
 	{
 		logentry(QStringLiteral("obj_from_obj called on an item that isn't inside another item."),
-				 OVERSEER, LogChannels::LOG_BUG);
+				 OVERSEER, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 
@@ -3730,7 +3737,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 	if (ch->in_room == DC::NOWHERE)
 	{
-		logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Extract_char: DC::NOWHERE"), ANGEL, DC::LogChannel::LOG_BUG);
 		return;
 	}
 
@@ -3915,7 +3922,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		{
 			std::stringstream ss;
 			ss << "extract_char: " << t << std::endl;
-			logf(IMMORTAL, LogChannels::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
+			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
 			produce_coredump(ch);
 		}
 		else
@@ -4114,7 +4121,7 @@ Character *get_mob_room_vis(Character *ch, const char *name)
 
 	for (i = DC::getInstance()->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
 	{
-		if (!IS_MOB(i))
+		if (!IS_NPC(i))
 			continue;
 
 		if (number == 1)
@@ -4645,7 +4652,7 @@ class Object *create_money(int amount)
 
 	if (amount <= 0)
 	{
-		logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, DC::LogChannel::LOG_BUG);
 		return (0);
 	}
 
@@ -4917,7 +4924,7 @@ void Character::swap_hate_memory(void)
 
 int hates_someone(Character *ch)
 {
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 		return 0;
 
 	return (ch->mobdata->hated != nullptr);
@@ -4925,7 +4932,7 @@ int hates_someone(Character *ch)
 
 int fears_someone(Character *ch)
 {
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 		return 0;
 
 	return (ch->mobdata->fears != nullptr);
@@ -4939,7 +4946,7 @@ void remove_memory(Character *ch, char type, Character *vict)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 		return;
 
 	if (type == 'h')
@@ -4980,7 +4987,7 @@ void remove_memory(Character *ch, char type)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 		return;
 
 	if (type == 'h' && !ch->mobdata->hated.isEmpty())

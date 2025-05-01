@@ -12,9 +12,9 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/room.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/utility.h"
 
@@ -39,7 +39,7 @@ void DC::assign_mobiles(void)
   assign_combat_procs();
 
   boot_the_shops();
-  logf(IMMORTAL, LogChannels::LOG_WORLD, "Booting player shops.");
+  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Booting player shops.");
   boot_player_shops();
   assign_the_shopkeepers();
   assign_the_player_shopkeepers();

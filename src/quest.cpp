@@ -3,6 +3,8 @@ one liner quest shit
 *****************************************************/
 
 #include <math.h>
+
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/comm.h"
@@ -10,7 +12,6 @@ one liner quest shit
 #include "DC/returnvals.h"
 #include "DC/DC.h"
 #include "DC/act.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -53,7 +54,7 @@ int load_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "r")))
    {
-      logentry(QStringLiteral("Failed to open quest file for reading!"), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
       return eFAILURE;
    }
 
@@ -98,7 +99,7 @@ int save_quests(void)
 
    if (!(fl = fopen(QUEST_FILE, "w")))
    {
-      logentry(QStringLiteral("Failed to open quest file for writing!"), 0, LogChannels::LOG_MISC);
+      logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
       return eFAILURE;
    }
 
@@ -393,7 +394,7 @@ int show_one_quest(Character *ch, struct quest_info *quest, int count)
 
          if (!amount)
          {
-            logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, LogChannels::LOG_BUG);
+            logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
          }
 
          csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\r\n\r",
@@ -598,7 +599,7 @@ int start_quest(Character *ch, struct quest_info *quest)
    obj_to_char(obj, mob);
    wear(mob, obj, obj->keywordfind());
 
-   logf(IMMORTAL, LogChannels::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
+   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
 
    ch->player->quest_current[count] = quest->number;
    ch->player->quest_current_ticksleft[count] = quest->timer;
@@ -645,7 +646,7 @@ int cancel_quest(Character *ch, struct quest_info *quest)
          return eEXTRA_VALUE;
    }
 
-   logf(IMMORTAL, LogChannels::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
+   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
 
    ch->player->quest_cancel[count] = quest->number;
 
@@ -688,7 +689,7 @@ int complete_quest(Character *ch, struct quest_info *quest)
       SETBIT(ch->player->quest_complete, quest->number);
    quest->active = false;
 
-   logf(IMMORTAL, LogChannels::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
+   logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
 
    return eSUCCESS;
 }
@@ -773,7 +774,7 @@ void quest_update()
                   {
                      stop_current_quest(i, quest);
 
-                     logf(IMMORTAL, LogChannels::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
+                     logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
                      i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
                   }
@@ -911,7 +912,7 @@ int quest_handler(Character *ch, Character *qmaster, int cmd, char *name)
       }
       break;
    default:
-      logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Bug in quest_handler, how'd they get here?"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return eFAILURE;
    }
    return retval;
@@ -1211,7 +1212,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
@@ -1231,7 +1232,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
@@ -1259,13 +1260,13 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       else
       {
-         if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
+         if (!(vict = get_char_vis(ch, field)) || IS_NPC(vict))
          {
             ch->sendln("No living thing by that name.");
             return eFAILURE;
          }
 
-         logf(IMMORTAL, LogChannels::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
+         logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
               vict->player->quest_points, atoi(value));
          csendf(ch, "Setting %s's quest points from %d to %d.\r\n", GET_NAME(vict),
                 vict->player->quest_points, atoi(value));
@@ -1457,7 +1458,7 @@ int do_qedit(Character *ch, char *argument, int cmd)
       }
       break;
    default:
-      logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Screw up in do_edit_quest, whatsamaddahyou?"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return eFAILURE;
    }
    return eSUCCESS;
@@ -1479,7 +1480,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eFAILURE;
    }
 
-   if (IS_MOB(ch))
+   if (IS_NPC(ch))
    {
       return eFAILURE;
    }

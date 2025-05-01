@@ -42,7 +42,6 @@
 #include "DC/fileinfo.h"
 #include "DC/act.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/room.h"
 #include "DC/structs.h"
 #include "DC/fight.h"
@@ -198,7 +197,7 @@ int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs
 
 	prog_error(ch, "Improper MOBprog operator");
 
-	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
 	return 0;
 }
 
@@ -218,7 +217,7 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
 
 	prog_error(this, "Improper MOBprog operator");
 
-	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
 	return false;
 }
 
@@ -243,7 +242,7 @@ int mprog_veval( int lhs, char *opr, int rhs )
   if ( !str_cmp( opr, "|" ) )
 	return ( lhs | rhs );
 
-  logf( IMMORTAL, LogChannels::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
   return 0;
 
 }
@@ -268,7 +267,7 @@ int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
 	if (!str_cmp(opr, "|"))
 		return (lhs | rhs);
 
-	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
 	return 0;
 }
 /*
@@ -291,7 +290,7 @@ int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
   if ( !str_cmp( opr, "|" ) )
 	return ( lhs | rhs );
 
-  logf( IMMORTAL, LogChannels::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
   return 0;
 
 }
@@ -536,19 +535,19 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		{
 			if (mob == nullptr)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
 			}
 			else if (mob->mobdata == nullptr)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
 			}
 			else if (mob->mobdata->nr < 0)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
 			}
 			else
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			}
 		}
 		return;
@@ -863,7 +862,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				int skl = 0;
 				if (*half == '\0' || (skl = atoi(half)) < 0)
 				{
-					logf(IMMORTAL, LogChannels::LOG_WORLD,
+					logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
 						 "translate_value: Mob: %d invalid skillnumber in hasskill",
 						 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 					tError = true;
@@ -1348,21 +1347,21 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	}
 	if (tError)
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s target=%p actor=%p mob=%p", left, right, target, actor, mob);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s target=%p actor=%p mob=%p", left, right, target, actor, mob);
 
 		if (mob)
 		{
 			if (mob->mobdata == nullptr)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
 			}
 			else if (mob->mobdata->nr < 0)
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
 			}
 			else
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			}
 		}
 		return;
@@ -1509,7 +1508,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	if (*point == '\0')
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 		return -1;
 	}
 	/* skip leading spaces */
@@ -1536,7 +1535,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		else if (*point == '\0')
 		{
 			prog_error(mob, "ifchck syntax error");
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		else if (*point == ' ')
@@ -1558,7 +1557,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		else if (*point == ' ')
@@ -1584,7 +1583,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		while ((*point != ' ') && (!isalnum(*point)))
 			if (*point == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 				return -1;
 			}
 			else
@@ -1816,7 +1815,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Character *p;
 		int count = 0;
 		for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
-			if (IS_MOB(p) && DC::getInstance()->mob_index[p->mobdata->nr].virt == target)
+			if (IS_NPC(p) && DC::getInstance()->mob_index[p->mobdata->nr].virt == target)
 				count++;
 
 		return mprog_veval(count, opr, atoi(val));
@@ -1834,7 +1833,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			return 0;
 		case 'z':
 			if (mob->beacon)
-				return (IS_NPC((Character *)mob->beacon));
+				return IS_NPC(reinterpret_cast<Character *>(mob->beacon));
 			else
 				return -1;
 		case 'n':
@@ -1863,7 +1862,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ispc'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'ispc'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -1909,7 +1908,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -1947,7 +1946,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -1985,7 +1984,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -2021,7 +2020,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return false;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return false;
 		}
 		break;
@@ -2057,7 +2056,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2093,7 +2092,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2129,7 +2128,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2170,7 +2169,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 	}
@@ -2207,7 +2206,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2243,7 +2242,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2279,7 +2278,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
 		break;
@@ -2316,7 +2315,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ischarmed'",
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'ischarmed'",
 				 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 
 			return -1;
@@ -2353,7 +2352,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -2405,7 +2404,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 						return true;
 				break;
 			default:
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
 					 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return -1;
 			}
@@ -2450,7 +2449,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return 0;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
 				 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
@@ -2489,7 +2488,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isaffected'",
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isaffected'",
 				 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
@@ -2550,7 +2549,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 	}
@@ -2602,7 +2601,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				take = rndm;
 				break;
 			default:
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return -1;
 			}
 		}
@@ -2672,7 +2671,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 				take = rndm;
 				break;
 			default:
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return -1;
 			}
 		}
@@ -2787,7 +2786,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'number'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'number'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 	}
@@ -2798,7 +2797,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		char buf4[MAX_STRING_LENGTH], *buf4pt;
 		if (arg[2] != '[')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		buf4pt = &arg[3];
@@ -2808,7 +2807,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			buf4pt++;
 		if (*buf4pt == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad target to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad target to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		*buf4pt = '\0';
@@ -2850,7 +2849,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'p':
 			return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 	}
@@ -2917,7 +2916,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -2944,7 +2943,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -2968,7 +2967,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			else
 				return -1;
 		default:
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'clan'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'clan'", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return -1;
 		}
 		break;
@@ -2989,7 +2988,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		/* Ok... all the ifchcks are done, so if we didnt find ours then something
 		 * odd happened.  So report the bug and abort the MOBprogram (return error)
 		 */
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d unknown ifchck  \"%s\" value %d",
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d unknown ifchck  \"%s\" value %d",
 			 DC::getInstance()->mob_index[mob->mobdata->nr].virt, buf, ifcheck[buf]);
 		return -1;
 	}
@@ -3067,7 +3066,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			cmnd++;
 		if (*cmnd == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d no commands after IF/OR", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d no commands after IF/OR", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return null;
 		}
 		morebuf = one_argument(cmnd, buf);
@@ -3138,7 +3137,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 						cmnd++;
 					if (*cmnd == '\0')
 					{
-						logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif after else",
+						logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif after else",
 							 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 						return null;
 					}
@@ -3206,7 +3205,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				cmnd++;
 			if (*cmnd == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing else or endif", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing else or endif", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return null;
 			}
 			morebuf = one_argument(cmnd, buf);
@@ -3234,7 +3233,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				cmnd++;
 			if (*cmnd == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing an else or endif",
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing an else or endif",
 					 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return null;
 			}
@@ -3250,7 +3249,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			cmnd++;
 		if (*cmnd == '\0')
 		{
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 			return null;
 		}
 		morebuf = one_argument(cmnd, buf);
@@ -3274,7 +3273,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			}
 			if (!str_cmp(buf, "else"))
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d found else in an else section",
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d found else in an else section",
 					 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return null;
 			}
@@ -3295,7 +3294,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				cmnd++;
 			if (*cmnd == '\0')
 			{
-				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif in else section",
+				logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif in else section",
 					 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 				return null;
 			}
@@ -3371,7 +3370,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 				*t = UPPER(*t);
 		}
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		break;
 
 	case 'N':
@@ -3388,7 +3387,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 			else
 				strcpy(t, "someone");
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		break;
 
 	case 't':
@@ -3400,7 +3399,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 				*t = UPPER(*t);
 		}
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		break;
 
 	case 'T':
@@ -3417,7 +3416,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 			else
 				strcpy(t, "someone");
 		else
-			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		break;
 
 	case 'f':
@@ -3634,7 +3633,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		break;
 
 	default:
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad $$var : %c", DC::getInstance()->mob_index[mob->mobdata->nr].virt, ch);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad $$var : %c", DC::getInstance()->mob_index[mob->mobdata->nr].virt, ch);
 		break;
 	}
 
@@ -3847,7 +3846,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
 	*point = '\0';
 
 	//  if(strlen(buf) > MAX_INPUT_LENGTH-1)
-	//    logf(IMMORTAL, LogChannels::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
+	//    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
 
 	return mob->command_interpreter(buf, true);
 }
@@ -3890,7 +3889,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor,
 	activeProgs++;
 	if (activeProgs > 20)
 	{
-		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		activeProgs--;
 		return;
 	}
@@ -4547,7 +4546,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 			{
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
-					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
+					logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
 						 DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 					return eFAILURE;
 				}
@@ -4728,7 +4727,7 @@ Character *initiate_oproc(Character *ch, Object *obj)
 		}
 	temp->setName(buf);
 
-	SET_BIT(temp->misc, MISC_IS_OBJ);
+	temp->setType(Character::Type::ObjectProgram);
 	temp->objdata = obj;
 
 	return temp;
@@ -4739,12 +4738,12 @@ void end_oproc(Character *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, DC::LogChannel::LOG_BUG);
 
 		if (core_counter++ < 10)
 		{
 			produce_coredump();
-			logf(IMMORTAL, LogChannels::LOG_BUG, "Corefile produced.");
+			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Corefile produced.");
 		}
 	}
 	else
@@ -4844,7 +4843,7 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 			{
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
-					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
+					logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
 						 DC::getInstance()->obj_index[obj->item_number].virt);
 					return eFAILURE;
 				}

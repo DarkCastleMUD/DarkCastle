@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/player.h"
@@ -14,7 +15,6 @@
 #include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
@@ -224,7 +224,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
     failchance -= 5;
 
   int to_dam = GET_DAMROLL(ch);
-  if (IS_MOB(victim))
+  if (IS_NPC(victim))
     to_dam = (int)((float)to_dam * .8);
 
   dam = dice(ch->equipment[WIELD]->obj_flags.value[1],
@@ -476,19 +476,19 @@ int do_bash(Character *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     ch->sendln("You cannot bash something that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to bash!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     ch->sendln("You cannot target something that tiny!");
     return eFAILURE;
@@ -1071,7 +1071,7 @@ int do_guard(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
 
-  if (!IS_MOB(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
+  if (!IS_NPC(ch) && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
     ch->sendln("You have no idea how to be a full time bodyguard.");
     return eFAILURE;
@@ -1199,7 +1199,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to set up a safe camp.");
     return eFAILURE;
@@ -1219,7 +1219,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   {
     next_i = i->next_in_room;
 
-    if ((IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
+    if ((IS_NPC(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
     {
       ch->sendln("This area does not yet feel secure enough to rest.");
       return eFAILURE;
@@ -1360,7 +1360,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_BATTLESENSE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to heighten your battle awareness.");
     return eFAILURE;
@@ -1402,7 +1402,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_SMITE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to smite your enemies effectively.");
     return eFAILURE;
@@ -1486,7 +1486,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_LEADERSHIP);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know that ability.");
     return eFAILURE;
@@ -1545,7 +1545,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("Your lack of fortitude is stunning.");
     return eFAILURE;
@@ -1586,7 +1586,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
-  if (!IS_MOB(ch) && ch->getLevel() <= ARCHANGEL && !learned)
+  if (!IS_NPC(ch) && ch->getLevel() <= ARCHANGEL && !learned)
   {
     ch->sendln("You do not know how to use this to your advantage.");
     return eFAILURE;

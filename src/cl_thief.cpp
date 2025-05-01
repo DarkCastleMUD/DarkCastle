@@ -4,11 +4,11 @@
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
 */
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/structs.h"
 #include "DC/utility.h"
 #include "DC/spells.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/room.h"
@@ -122,7 +122,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   QString name = arguments.value(0);
 
-  if (!has_skill(SKILL_BACKSTAB) && !IS_MOB(this))
+  if (!has_skill(SKILL_BACKSTAB) && !IS_NPC(this))
   {
     this->sendln("You don't know how to backstab people!");
     return eFAILURE;
@@ -140,19 +140,19 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     this->sendln("You cannot backstab someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     this->sendln("You cannot target just one to backstab!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     this->sendln("You cannot target someone that tiny to backstab!");
     return eFAILURE;
@@ -362,21 +362,21 @@ int do_circle(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot circle behind someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot pick just one to circle behind!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
     ch->sendln("You cannot target something that tiny to circle behind!");
@@ -844,7 +844,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
     return eFAILURE;
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
@@ -1008,9 +1008,9 @@ int do_steal(Character *ch, char *argument, int cmd)
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
                     DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
-            logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+            logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
                    DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -1179,8 +1179,8 @@ int do_steal(Character *ch, char *argument, int cmd)
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, victim->getNameC());
-        logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
-        if (!IS_MOB(victim))
+        logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
+        if (!IS_NPC(victim))
         {
           victim->save(666);
           ch->save(666);
@@ -1423,7 +1423,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      logf(0, LogChannels::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
+      logf(0, DC::LogChannel::LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, victim->getNameC(), GET_ROOM_VNUM(victim->in_room));
     }
     else
     {
@@ -1599,7 +1599,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   extern int weight_in(Object *);
 
-  if (!IS_MOB(ch) && ch->isPlayerObjectThief())
+  if (!IS_NPC(ch) && ch->isPlayerObjectThief())
   {
     ch->sendln("Your criminal acts prohibit this action.");
     return eFAILURE;
@@ -1613,7 +1613,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit this action.");
       return eFAILURE;
@@ -1704,7 +1704,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
-      logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+      logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (ch->getLevel() < DEITY))
         ch->removeGold(amount);
@@ -1890,7 +1890,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
     sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
             GET_NAME(vict));
-    logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
@@ -2090,19 +2090,19 @@ int do_jab(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
+  if (IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
     ch->sendln("You cannot jab someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
     ch->sendln("You cannot target just one to jab!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
     ch->sendln("You cannot target someone that tiny to jab!");
     return eFAILURE;
@@ -2360,19 +2360,19 @@ int do_cripple(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
+  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
   {
     ch->sendln("You cannot cripple someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
+  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
   {
     ch->sendln("You cannot pick just one to cripple!");
     return eFAILURE;
   }
 
-  if (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
+  if (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
   {
     ch->sendln("You cannot target someone that tiny to cripple!");
     return eFAILURE;

@@ -11,7 +11,7 @@
 #include "DC/wizard.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
-#include "DC/levels.h"
+
 #include "DC/interp.h"
 #include "DC/room.h"
 #include "DC/DC.h"
@@ -23,7 +23,6 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/const.h"
-#include "DC/Command.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;
@@ -303,7 +302,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   send("\r\n");
 
-  if (!IS_MOB(this))
+  if (!IS_NPC(this))
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -325,7 +324,7 @@ command_return_t Character::do_goto(QStringList arguments, int cmd)
 
   move_char(this, location);
 
-  if (!IS_MOB(this))
+  if (!IS_NPC(this))
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))

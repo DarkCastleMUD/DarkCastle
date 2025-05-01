@@ -12,12 +12,12 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstdio>
-// DarkCastle header files
+
+#include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/character.h" // Character
 #include "DC/DC.h"        // Object
-#include "DC/levels.h"    // MIN_GOD
 #include "DC/utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "DC/terminal.h"  // colors
 #include "DC/act.h"       // act flags
@@ -183,22 +183,22 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
         if (current->IsCode())
           // std::cerr << "Code token" << std::endl;
           if (current->IsText())
-          // std::cerr << "Text token" << std::endl;
+    // std::cerr << "Text token" << std::endl;
 #endif
 
             if (current->IsText())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's a text token" << std::endl;
+      // std::cerr << "It's a text token" << std::endl;
 #endif
               interp += current->GetBuf();
             }
             else if (current->IsAnsi() || current->IsVt100())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's ansi or vt100 code" << std::endl;
+      // std::cerr << "It's ansi or vt100 code" << std::endl;
 #endif
-              if (IS_MOB(send_to) ||
+              if (IS_NPC(send_to) ||
                   (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
                   (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
               {
@@ -254,7 +254,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             else if (current->IsCode())
             {
 #ifdef DEBUG_TOKEN
-              // std::cerr << "It's a special code" << std::endl;
+      // std::cerr << "It's a special code" << std::endl;
 #endif
               switch ((current->GetBuf())[1])
               {
@@ -507,10 +507,10 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             } /* if it's a code */
             else // It's unrecognized.  Shouldn't happen.
             {
-              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, DC::LogChannel::LOG_BUG);
             }
 #ifdef DEBUG_TOKEN
-            // std::cerr << "Output after this loop: " << interp << std::endl;
+    // std::cerr << "Output after this loop: " << interp << std::endl;
 #endif
   } /* for loop */
 

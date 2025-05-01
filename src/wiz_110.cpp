@@ -19,7 +19,7 @@
 
 #include "DC/wizard.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
+
 #include "DC/player.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
@@ -34,7 +34,6 @@
 #include "DC/guild.h"
 #include "DC/const.h"
 #include "DC/vault.h"
-#include "DC/Command.h"
 #include "DC/meta.h"
 
 int get_max_stat_bonus(Character *ch, int attrs)
@@ -199,7 +198,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), LogChannels::LOG_GOD);
+  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), DC::LogChannel::LOG_GOD);
   this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
   this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
   return eSUCCESS;
@@ -241,7 +240,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
     ch->send(buf);
     sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
             GET_NAME(ch));
-    logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
     vict->send(buf);
     return eSUCCESS;
@@ -271,7 +270,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
   ch->send(buf);
   snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict),
            DC::bestowable_god_commands[i].name.toStdString().c_str(), GET_NAME(ch));
-  logentry(buf, ch->getLevel(), LogChannels::LOG_GOD);
+  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch),
            DC::bestowable_god_commands[i].name.toStdString().c_str());
   vict->send(buf);
@@ -288,14 +287,14 @@ int do_wizlock(Character *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
-    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
-    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
   return eSUCCESS;
@@ -374,7 +373,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
     }
   }
 
-  send_to_gods(command, lev_nr, LogChannels::LOG_BUG);
+  send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
   return eSUCCESS;
 }
 
@@ -432,7 +431,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
       GET_PLATINUM(victim) -= 500;
       send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, LogChannels::LOG_GOD);
+      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
@@ -561,7 +560,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   }
 
   buffer = QStringLiteral("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
-  logentry(buffer, level_, LogChannels::LOG_GOD);
+  logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
   DC::getInstance()->TheAuctionHouse.HandleRename(this, victim->getNameC(), newname);
@@ -1003,10 +1002,10 @@ int do_export(Character *ch, char *args, int cmdnum)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
+    logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
   }
 
-  logf(110, LogChannels::LOG_GOD, "Exported objects as %s.", filename);
+  logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
   return eSUCCESS;
 }

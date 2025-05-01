@@ -31,7 +31,6 @@
 #include <sstream>
 
 #include "DC/fight.h"
-#include "DC/levels.h"
 #include "DC/race.h"
 #include "DC/player.h" // log
 #include "DC/character.h"
@@ -58,6 +57,7 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/stat.h"
+#include "DC/obj.h"
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 
@@ -99,7 +99,7 @@ void do_champ_flag_death(Character *victim)
   }
   else
   {
-    logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -228,14 +228,14 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Error in perform_violence()!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
 
     // DEBUG CODE
     int last_virt = -1;
     int last_class = GET_CLASS(ch);
-    if (IS_MOB(ch))
+    if (IS_NPC(ch))
       last_virt = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
     // DEBUG CODE
     if (!ch->fighting)
@@ -277,7 +277,7 @@ void perform_violence(void)
 
     if (can_attack(ch))
     {
-      is_mob = IS_MOB(ch);
+      is_mob = IS_NPC(ch);
       if (is_mob)
       {
         if ((DC::getInstance()->mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
@@ -295,7 +295,7 @@ void perform_violence(void)
           {
             // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
             // MOB_WAIT_STATE(ch) -= DC::PULSE_VIOLENCE; // MIKE
-            // logentry(debug, OVERSEER, LogChannels::LOG_BUG);
+            // logentry(debug, OVERSEER, DC::LogChannel::LOG_BUG);
           }
           else
           {
@@ -309,7 +309,7 @@ void perform_violence(void)
       {
         // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
         // now invalid memory.  report what class we were and return
-        logf(IMPLEMENTER, LogChannels::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
+        logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
         break;
       }
       // DEBUG CODE
@@ -351,7 +351,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Error in perform_violence(), part2!  Null ch->fighting!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     bool over = false;
@@ -489,7 +489,7 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
   };
   if (!threat)
   { // Nothing set. Bugger.
-    logf(110, LogChannels::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
+    logf(110, DC::LogChannel::LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill).toStdString().c_str(), skill);
     return;
   }
   threat = (int)(threat * v); // vary depending on skill
@@ -538,7 +538,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr Victim or Ch sent to attack!  This crashes us!"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
 
     return eINTERNAL_ERROR;
@@ -546,7 +546,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   if (GET_POS(ch) == position_t::DEAD)
   {
-    logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
 
@@ -917,7 +917,7 @@ bool do_frostshield(Character *ch, Character *vict)
 {
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to do_frostshield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -944,7 +944,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to do_lightning_shield"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -1026,7 +1026,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_vampiric_aura!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1059,7 +1059,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_fireshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1148,7 +1148,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_acidshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1233,7 +1233,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict, or ch==vict sent to do_boneshield!"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     abort();
   }
 
@@ -1390,7 +1390,7 @@ int get_weapon_damage_type(class Object *wielded)
   default:
     sprintf(log_buf, "WORLD: Unknown w_type for object #%d name: %s, fourth value flag is: %d.",
             wielded->item_number, wielded->name, wielded->obj_flags.value[3]);
-    logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
+    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     break;
   }
   return TYPE_HIT; // should never get here
@@ -1453,7 +1453,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (!vict || !ch)
   {
-    logentry(QStringLiteral("Null victim or char in one_hit!  This Crashes us!"), -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim or char in one_hit!  This Crashes us!"), -1, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -1699,7 +1699,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
       return debug_retval(ch, vict, retval) | eSUCCESS;
   }
 
-  if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
+  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
   {
     if (number(1, 100) <= 10)
     {
@@ -1837,7 +1837,7 @@ void eq_damage(Character *ch, Character *victim,
       act("$p worn by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
     }
   } // number(0, 3) == 0
-  else if (victim->carrying && (number(0, 7) == 0))
+  else if (victim->carrying && (number(0, 19) == 0))
   {
     // let's scrap something in the inventory
     for (count = 0, obj = victim->carrying; obj; obj = obj->next_content)
@@ -1925,7 +1925,7 @@ void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
       }
       break;
     } // of switch
-    logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+    logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
     victim->player->statmetas -= 1; // we lost a stat, so don't charge extra meta
   } // of pir's extra stat loss
 }
@@ -2895,7 +2895,7 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
     if (room_death_msg)
       act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
     if (death_log_msg)
-      logentry(death_log_msg, IMMORTAL, LogChannels::LOG_MORTAL);
+      logentry(death_log_msg, IMMORTAL, DC::LogChannel::LOG_MORTAL);
     if (type == KILL_BATTER)
       kill_type = TYPE_PKILL;
     fight_kill(nullptr, ch, kill_type, type);
@@ -3197,7 +3197,7 @@ void fight_kill(Character *ch, Character *vict, int type, int spec_type)
 {
   if (!vict)
   {
-    logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null vict sent to fight_kill()!"), -1, DC::LogChannel::LOG_BUG);
     return;
   }
   bool vict_is_attacker = false;
@@ -3258,7 +3258,7 @@ void debug_isHit(const Character *ch, const Character *victim, const int &attack
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("isHit: %1 vs %2 attacktype=%3 type=%4 reduce=%5 tohit=%6 %7").arg(translate_name(ch)).arg(translate_name(victim)).arg(attacktype).arg(type).arg(reduce).arg(tohit).arg(message), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3266,7 +3266,7 @@ void debug_isHit_toHit(const Character *ch, const Character *victim, const int &
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("isHit: toHit=%1").arg(toHit), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3274,7 +3274,7 @@ void debug_isHit_generic(const Character *ch, const Character *victim, const aut
 {
   if (ch->getDebug() || victim->getDebug())
   {
-    logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, LOG_BUG);
+    logentry(QStringLiteral("parry=%1 dodge=%2 block=%3 martial=%4 tumbling=%5").arg(parry).arg(dodge).arg(block).arg(martial).arg(tumbling), DIVINITY, DC::LogChannel::LOG_BUG);
   }
 }
 
@@ -3558,7 +3558,7 @@ int checkCounterStrike(Character *ch, Character *victim)
     act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -3602,7 +3602,7 @@ int doTumblingCounterStrike(Character *ch, Character *victim)
     act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious screw-up in counter strike!"), ANGEL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -4056,7 +4056,7 @@ void load_messages(char *file, int base)
     //	 produce_coredump();
     if (i >= MAX_MESSAGES)
     {
-      logentry(QStringLiteral("Too many combat messages."), ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Too many combat messages."), ANGEL, DC::LogChannel::LOG_BUG);
       exit(0);
     }
 
@@ -4160,12 +4160,7 @@ void set_fighting(Character *ch, Character *vict)
       if (level_difference > 0 || ch->getLevel() == 60)
       {
         vict->add_memory(GET_NAME(ch), 't');
-        struct timer_data *timer;
-#ifdef LEAK_CHECK
-        timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-        timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+        struct timer_data *timer = new timer_data;
         timer->var_arg1 = vict->hunting;
         timer->arg2 = (void *)vict;
         timer->function = clear_hunt;
@@ -4180,14 +4175,7 @@ void set_fighting(Character *ch, Character *vict)
           if (level_difference > 0 || vict->getLevel() == 60)
           {
             ch->add_memory(vict->getName(), 't');
-            struct timer_data *timer;
-#ifdef LEAK_CHECK
-            timer = (struct timer_data *)calloc(1, sizeof(struct
-                                                          timer_data));
-#else
-            timer = (struct timer_data *)dc_alloc(1, sizeof(struct
-                                                            timer_data));
-#endif
+            struct timer_data *timer = new timer_data;
             timer->var_arg1 = ch->hunting;
             timer->arg2 = (void *)ch;
             timer->function = clear_hunt;
@@ -4236,7 +4224,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   if (!ch)
   {
-    logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch in stop_fighting.  This would have crashed us."), IMPLEMENTER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -4343,7 +4331,7 @@ void stop_fighting(Character *ch, int clearlag)
       ;
     if (!tmp)
     {
-      logentry(QStringLiteral("Stop_fighting: char not found"), ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Stop_fighting: char not found"), ANGEL, DC::LogChannel::LOG_BUG);
       // abort();
       return;
     }
@@ -4547,7 +4535,7 @@ void make_corpse(Character *ch)
   }
 
   // level 1-19 PC's can keep their eq
-  if (IS_MOB(ch) || ch->getLevel() > 19)
+  if (IS_NPC(ch) || ch->getLevel() > 19)
   {
     for (i = 0; i < MAX_WEAR; i++)
       if (ch->equipment[i])
@@ -4560,7 +4548,7 @@ void make_corpse(Character *ch)
       obj_to_obj(money, corpse);
     }
 
-    if (IS_MOB(ch) && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
+    if (IS_NPC(ch) && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
       class Object *recipeitem = nullptr;
       int rarity = number(1, 100);
@@ -4633,7 +4621,7 @@ void make_corpse(Character *ch)
       {
         char bugmsg[MAX_STRING_LENGTH];
         sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", GET_NAME(ch));
-        logentry(bugmsg, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(bugmsg, IMMORTAL, DC::LogChannel::LOG_BUG);
       }
     }
 
@@ -5362,21 +5350,21 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   }
   if (type == TYPE_BLUDGEON || type == TYPE_CRUSH)
   {
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)))
     {
       act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)))
     {
       act("$N swarms around your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N swarms around $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You swarm around $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
       return;
     }
-    if (vict->getLevel() >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
+    if (vict->getLevel() >= 90 || (IS_NPC(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)))
     {
       act("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, TO_CHAR, 0);
       act("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -5424,7 +5412,7 @@ void raw_kill(Character *ch, Character *victim)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error in raw_kill()!  Null victim!"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -5483,11 +5471,11 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch == nullptr)
       {
-        logf(0, LogChannels::LOG_BUG, "selfpurge on nullptr to nullptr");
+        logf(0, DC::LogChannel::LOG_BUG, "selfpurge on nullptr to nullptr");
       }
       else
       {
-        // logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
+        // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
@@ -5510,7 +5498,7 @@ void raw_kill(Character *ch, Character *victim)
     { /* rk */
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s's golem lost a level!", victim->getNameC());
-      logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
+      logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
       shatter_message(victim->player->golem);
       extract_char(victim->player->golem, true);
     }
@@ -5605,7 +5593,7 @@ void raw_kill(Character *ch, Character *victim)
     clan_death(victim, ch);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s at %d", buf, DC::getInstance()->world[death_room].number);
-    logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
     // update stats
     GET_RDEATHS(victim) += 1;
@@ -5640,7 +5628,7 @@ void raw_kill(Character *ch, Character *victim)
             if (IS_PC(victim))
             {
               sprintf(log_buf, "%s lost a con. ouch.", victim->getNameC());
-              logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+              logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
           }
@@ -5652,7 +5640,7 @@ void raw_kill(Character *ch, Character *victim)
             if (IS_PC(victim))
             {
               sprintf(log_buf, "%s lost a dex. ouch.", victim->getNameC());
-              logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+              logentry(log_buf, SERAPH, DC::LogChannel::LOG_MORTAL);
               victim->player->statmetas--;
             }
           }
@@ -5688,7 +5676,7 @@ void raw_kill(Character *ch, Character *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s permanently dies.", name);
-        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_INT(victim) <= 4)
@@ -5735,7 +5723,7 @@ void raw_kill(Character *ch, Character *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s sees tits.", name);
-        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_WIS(victim) <= 4)
@@ -5762,7 +5750,7 @@ void raw_kill(Character *ch, Character *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s gets batted to death.", name);
-        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_STR(victim) <= 4)
@@ -5795,7 +5783,7 @@ void raw_kill(Character *ch, Character *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s goes to moose heaven.", name);
-        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
       else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
@@ -5839,7 +5827,7 @@ void raw_kill(Character *ch, Character *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s permanently dies the horrible dex-death.", name);
-        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, DC::LogChannel::LOG_MORTAL);
         return;
       }
     }
@@ -5955,7 +5943,7 @@ Character *get_highest_level_killer(Character *leader, Character *killer)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&     // if grouped
         f->follower->in_room == killer->in_room && // and in the room
-        !IS_MOB(f->follower))
+        !IS_NPC(f->follower))
     {
       if (f->follower->getLevel() > highest->getLevel())
         highest = f->follower;
@@ -5985,7 +5973,7 @@ int32_t count_xp_eligibles(Character *leader, Character *killer,
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&     // if grouped
         f->follower->in_room == killer->in_room && // and in the room
-        !IS_MOB(f->follower) &&
+        !IS_NPC(f->follower) &&
         (highest_level - f->follower->getLevel()) < 25)
     {
       num_eligibles += 1;
@@ -6187,7 +6175,7 @@ void dam_message(int dam, Character *ch, Character *victim,
     w_type -= TYPE_HIT;
     if (((unsigned)w_type) >= sizeof(attack_table))
     {
-      logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
       w_type = 0;
     }
   }
@@ -6476,7 +6464,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to do_pkill."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -6660,7 +6648,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
-    if (!IS_MOB(ch)
+    if (!IS_NPC(ch)
         // && victim->getLevel() > PKILL_COUNT_LIMIT
         && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
@@ -6800,7 +6788,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
     Object *obj = nullptr;
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
-      logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
     if (IS_NPC(ch) && ch->master)
@@ -6841,7 +6829,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (!victim)
   {
-    logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to arena_kill."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -6886,7 +6874,7 @@ void arena_kill(Character *ch, Character *victim, int type)
               victim->getNameC(), get_clan_name(victim_clan));
     }
 
-    logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] killed %s [%s]",
+    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
          ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
          victim->getNameC(), get_clan_name(victim_clan));
   }
@@ -6923,7 +6911,7 @@ void arena_kill(Character *ch, Character *victim, int type)
 
   if (ch && victim && (arena.isPrize() || arena.isChaos()))
   {
-    logf(IMMORTAL, LogChannels::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
+    logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s killed %s", GET_NAME(ch), victim->getNameC());
   }
 
   // if it's a chaos, see if the clan was eliminated
@@ -6941,7 +6929,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     {
       sprintf(killer_message, "## [%s] was just eliminated from the chaos!\n\r", get_clan_name(victim_clan));
       send_info(killer_message);
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
     }
   }
 
@@ -7025,14 +7013,14 @@ int can_be_attacked(Character *ch, Character *vict)
     if (ch->fighting && ch->fighting != vict)
     {
       ch->sendln("You are already fighting someone.");
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
            GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
            GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
       return false;
     }
@@ -7044,14 +7032,14 @@ int can_be_attacked(Character *ch, Character *vict)
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
       ch->sendln("You are already fighting someone from another clan.");
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       ch->sendln("They are already fighting someone.");
-      logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
       return false;
     }
@@ -7162,7 +7150,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
 
   if (!ch || !vict)
   {
-    logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null ch or vict sent to weapon spells!"), -1, DC::LogChannel::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
   if (!weapon)
@@ -7324,7 +7312,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
       retval = eSUCCESS;
       // Don't want to log this since a non-spell affect is going to happen all
       // the time (like SAVE_VS_FIRE or HIT-N-DAM for example) -pir
-      // logf(IMMORTAL, LogChannels::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
+      // logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal affect %d in weapons spells item '%d'.",
       //     current_affect, DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].virt);
       break;
     } /* switch statement */
@@ -7723,7 +7711,7 @@ void remove_nosave(Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to remove_nosave!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -7758,7 +7746,7 @@ void remove_active_potato(Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to remove_active_potato!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return;
   }
 

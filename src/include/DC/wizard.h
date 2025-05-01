@@ -15,8 +15,6 @@
 
 #include "DC/character.h"
 #include "DC/act.h"
-
-#include "DC/levels.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
@@ -26,7 +24,6 @@
 #include "DC/terminal.h"
 #include "DC/player.h"
 #include "DC/connect.h"
-#include "ctime"
 #include "DC/db.h"
 
 /* Function headers */

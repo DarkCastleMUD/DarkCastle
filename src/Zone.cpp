@@ -1,4 +1,5 @@
 #include "DC/DC.h"
+#include "DC/utility.h"
 
 Zone::Zone(zone_t zone_key)
     : id_(zone_key)

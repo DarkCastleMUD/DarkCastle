@@ -7,6 +7,8 @@
 
 #include <cctype>
 #include <cstring>
+
+#include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
@@ -15,7 +17,6 @@
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/affect.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/character.h"
 #include "DC/act.h"
@@ -84,26 +85,26 @@ int eq_max_damage(Object *obj)
   switch (GET_ITEM_TYPE(obj))
   {
   case ITEM_WEAPON:
-    amount = 5;
+    amount = 7;
     break;
   case ITEM_ARMOR:
-    amount = 3;
+    amount = 5;
     amount += ((obj->obj_flags.value[0]) / 2); // + 1 hit per 2ac
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
   case ITEM_INSTRUMENT:
   case ITEM_LIGHT:
-    amount = 3;
+    amount = 5;
     break;
   case ITEM_FIREWEAPON:
   case ITEM_CONTAINER:
   case ITEM_KEYRING:
   case ITEM_KEY:
-    amount = 2;
+    amount = 4;
     break;
   default:
-    amount = 1;
+    amount = 3;
     break;
   }
 
@@ -257,7 +258,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
   int i /*,j*/;
   bool equipped;
   int retval = eSUCCESS;
-  int is_mob = IS_MOB(ch);
+  int is_mob = IS_NPC(ch);
   int lvl;
 
   equipped = false;
@@ -354,7 +355,7 @@ int do_recite(Character *ch, char *argument, int cmd)
   int i, bits;
   bool equipped;
   int retval = eSUCCESS;
-  int is_mob = IS_MOB(ch);
+  int is_mob = IS_NPC(ch);
   int lvl;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
@@ -441,7 +442,7 @@ int do_recite(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
         {
-          logf(100, LogChannels::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
           continue;
         }
         else
@@ -806,7 +807,7 @@ int do_name(Character *ch, char *arg, int cmd)
   int ctr;
   int nope = 0;
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NONAME))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NONAME))
   {
     ch->sendln("You can't do that.  You must have been naughty.");
     return eFAILURE;
@@ -1492,7 +1493,7 @@ int size_restricted(Character *ch, class Object *obj)
   if (GET_RACE(ch) == RACE_HUMAN) // human can wear all sizes
     return false;
 
-  if (IS_MOB(ch)) // mobs (ie charmies) can wear all sizes
+  if (IS_NPC(ch)) // mobs (ie charmies) can wear all sizes
     return false;
 
   if (GET_HEIGHT(ch) < 42)
@@ -1553,19 +1554,19 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // temporarily affect the person's height
   if (add)
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
   else
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
 
   if (add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
     ch->sendln("After modifying your height that item would not fit!");
     return true;
@@ -1587,12 +1588,12 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   // fix height back to normal
   if (add)
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
   }
   else
   {
-    //	  logf(ANGEL, LogChannels::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+    //	  logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
     GET_HEIGHT(ch) += mod;
   }
 
@@ -2175,7 +2176,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   break;
   default:
   {
-    logentry(QStringLiteral("Unknown type called in wear."), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unknown type called in wear."), ANGEL, DC::LogChannel::LOG_BUG);
   }
   break;
   }
@@ -2630,7 +2631,7 @@ bool fullSave(Object *obj)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->name);
-    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 

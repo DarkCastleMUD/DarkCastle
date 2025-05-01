@@ -26,7 +26,6 @@
 #include "DC/mobile.h"
 #include "DC/isr.h"
 #include "DC/spells.h" // TYPE
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
@@ -520,7 +519,7 @@ void advance_level(Character *ch, int is_conversion)
 		break;
 
 	default:
-		logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Unknown class in advance level?"), OVERSEER, DC::LogChannel::LOG_BUG);
 		return;
 	}
 
@@ -559,12 +558,12 @@ void advance_level(Character *ch, int is_conversion)
 	ch->raw_ki += add_ki;
 	ch->max_ki += add_ki;
 	redo_ki(ch); // Ki gets level bonuses now
-	if (!IS_MOB(ch) && !is_conversion)
+	if (!IS_NPC(ch) && !is_conversion)
 		ch->player->practices += add_practices;
 
 	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
 			GET_MAX_MOVE(ch),
-			IS_MOB(ch) ? 0 : add_practices, IS_MOB(ch) ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
+			IS_NPC(ch) ? 0 : add_practices, IS_NPC(ch) ? 0 : ch->player->practices, add_ki, GET_MAX_KI(ch));
 	if (!is_conversion)
 		ch->send(buf);
 
@@ -744,9 +743,9 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_MOB(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -760,9 +759,9 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_MOB(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
 			{
-				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
 					do_drink(i, "fountain", CMD_DEFAULT);
@@ -826,7 +825,7 @@ void point_update(void)
 			i->setMove(MIN(GET_MOVE(i) + i->move_gain_lookup(), i->move_limit()));
 			GET_KI(i) = MIN(GET_KI(i) + i->ki_gain_lookup(), ki_limit(i));
 		}
-		else if (!IS_MOB(i) && i->getLevel() < 1 && !i->desc)
+		else if (!IS_NPC(i) && i->getLevel() < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", 666);
@@ -853,17 +852,29 @@ void update_corpses_and_portals(void)
 		 |  Type 4 is a no look permanent game portal
 		 */
 
-		if ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp()))
+		if ((j->isTotem() && isSet(j->obj_flags.more_flags, ITEM_POOF_AFTER_24H)) || ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp())))
 		{
 			if (j->obj_flags.timer > 0)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if ((j->in_room != DC::NOWHERE) && (DC::getInstance()->world[j->in_room].people))
+				if (j->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_room].people)
 				{
 					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
-					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
 				}
+				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_obj->in_room].people)
+				{
+					act("$p shimmers brightly for a moment.", DC::getInstance()->world[j->in_obj->in_room].people, j->in_obj, 0, TO_ROOM, INVIS_NULL);
+				}
+				else if (j->in_obj && j->in_obj->carried_by)
+				{
+					act("$p shimmers brightly for a moment.", j->in_obj->carried_by, j->in_obj, 0, TO_CHAR, INVIS_NULL);
+				}
+				else if (j->carried_by)
+				{
+					act("$p shimmers brightly and then fades away.", j->carried_by, j, 0, TO_CHAR, INVIS_NULL);
+				}
+
 				extract_obj(j);
 				continue;
 			}
@@ -938,7 +949,7 @@ void update_corpses_and_portals(void)
 					}
 					else
 					{
-						logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, LogChannels::LOG_BUG);
+						logentry(QStringLiteral("BIIIG problem in limits.c!"), OVERSEER, DC::LogChannel::LOG_BUG);
 						return;
 					}
 				}
@@ -957,7 +968,7 @@ void update_corpses_and_portals(void)
 		save_corpses();
 	}
 	// sprintf(buf, "DEBUG: Processed Objects: %d", proc);
-	// logentry(buf, 108, LogChannels::LOG_BUG);
+	// logentry(buf, 108, DC::LogChannel::LOG_BUG);
 	/* Now process the portals */
 	// process_portals();
 }

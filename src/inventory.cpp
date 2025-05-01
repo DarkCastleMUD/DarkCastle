@@ -11,6 +11,7 @@
 
 #include <fmt/format.h>
 
+#include "DC/obj.h"
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/DC.h"
@@ -19,7 +20,6 @@
 #include "DC/structs.h"
 #include "DC/utility.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -92,7 +92,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].virt, sub_object->name);
-        logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
@@ -127,7 +127,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
-        logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         if (ch->isPlayerGoldThief())
         {
@@ -148,9 +148,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
               DC::getInstance()->obj_index[obj_object->item_number].virt,
               sub_object->name,
               DC::getInstance()->obj_index[sub_object->item_number].virt);
-      logentry(log_buf, 110, LogChannels::LOG_OBJECTS);
+      logentry(log_buf, 110, DC::LogChannel::LOG_OBJECTS);
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
              obj_object->short_description,
              DC::getInstance()->obj_index[obj_object->item_number].virt,
              loop_obj->short_description,
@@ -179,9 +179,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
               ch->in_room);
-      logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+      logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
              obj_object->short_description,
              loop_obj->short_description,
              DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -205,7 +205,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     buffer = fmt::format("There was {} coins.",
                          obj_object->obj_flags.value[0]);
-    if (IS_MOB(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (IS_NPC(ch) || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
       ch->sendln("");
@@ -218,7 +218,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
       DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
-      if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
@@ -240,7 +240,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       obj_object->obj_flags.value[0] -= cgold;
       ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
-      if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+      if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
@@ -270,7 +270,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
       buffer = fmt::format("{}\r\n", buffer);
     }
 
-    if (!IS_MOB(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
+    if (!IS_NPC(ch) && isSet(ch->player->toggles, Player::PLR_BRIEF))
       ch->send(buffer);
     extract_obj(obj_object);
   }
@@ -895,7 +895,7 @@ int do_get(Character *ch, char *argument, int cmd)
                           DC::getInstance()->obj_index[obj_object->item_number].virt,
                           sub_object->name,
                           DC::getInstance()->obj_index[sub_object->item_number].virt);
-                  logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+                  logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
                   fail = true;
@@ -1113,7 +1113,7 @@ int do_drop(Character *ch, char *argument, int cmd)
 
   if (is_number(arg))
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1167,7 +1167,7 @@ int do_drop(Character *ch, char *argument, int cmd)
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
           continue;
 
-        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1197,9 +1197,9 @@ int do_drop(Character *ch, char *argument, int cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -1233,7 +1233,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       if (tmp_object)
       {
 
-        if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+        if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
         {
           ch->sendln("Your criminal acts prohibit it.");
           return eFAILURE;
@@ -1265,9 +1265,9 @@ int do_drop(Character *ch, char *argument, int cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+            logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    DC::getInstance()->obj_index[loop_obj->item_number].virt);
@@ -1492,7 +1492,7 @@ int do_put(Character *ch, char *argument, int cmd)
                 {
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                        ch->getNameC(),
                        obj_object->short_description,
                        DC::getInstance()->obj_index[obj_object->item_number].virt,
@@ -1503,7 +1503,7 @@ int do_put(Character *ch, char *argument, int cmd)
                 {
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
                        ch->getNameC(),
                        obj_object->short_description,
                        DC::getInstance()->obj_index[obj_object->item_number].virt,
@@ -1607,7 +1607,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
   if (is_number(obj_name))
   {
-    if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+    if (!IS_NPC(ch) && ch->isPlayerGoldThief())
     {
       ch->sendln("Your criminal acts prohibit it.");
       return eFAILURE;
@@ -1663,7 +1663,7 @@ int do_give(Character *ch, char *argument, int cmd)
 
     sprintf(buf, "%s gives %ld coin%s to %s", GET_NAME(ch), amount,
             pluralize(amount), GET_NAME(vict));
-    logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
     sprintf(buf, "%s gives you %ld $B$5gold$R coin%s.", PERS(ch, vict), amount,
             amount == 1 ? "" : "s");
@@ -1770,7 +1770,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!IS_NPC(ch) && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return eFAILURE;
@@ -1832,7 +1832,7 @@ int do_give(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) && ch->isPlayerObjectThief() && !vict->desc)
+  if (!IS_NPC(ch) && ch->isPlayerObjectThief() && !vict->desc)
   {
     ch->sendln("Now WHY would a thief give something to a linkdead char..?");
     return eFAILURE;
@@ -1909,9 +1909,9 @@ int do_give(Character *ch, char *argument, int cmd)
 
   sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
           GET_NAME(vict));
-  logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+  logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
          DC::getInstance()->obj_index[obj->item_number].virt,
          loop_obj->short_description,
@@ -2706,18 +2706,18 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   { // Logging gold gets from corpses would just be too much.
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
             sub_object->name);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, DC::getInstance()->obj_index[obj_object->item_number].virt,
             ch->in_room);
-    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            DC::getInstance()->obj_index[loop_obj->item_number].virt);
   }
 

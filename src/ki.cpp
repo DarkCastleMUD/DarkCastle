@@ -14,7 +14,6 @@
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/levels.h"
 #include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/interp.h"
@@ -269,7 +268,7 @@ int do_ki(Character *ch, char *argument, int cmd)
       if (!tar_char)
       {
         logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
-                 LogChannels::LOG_BUG);
+                 DC::LogChannel::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
             "game.  Tell a god what you did immediately.\r\n",
@@ -414,7 +413,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -492,7 +491,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logf(ANGEL, LogChannels::LOG_BUG, "Serious problem in ki punch!", ANGEL, LogChannels::LOG_BUG);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -609,7 +608,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -640,7 +639,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
   if (!arg)
@@ -703,7 +702,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   if (!victim)
   {
-    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -760,7 +759,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
@@ -1136,7 +1135,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   int learned, chance, percent;
   struct affected_type af;
 
-  if (IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
+  if (IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {

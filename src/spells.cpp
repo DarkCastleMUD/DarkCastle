@@ -27,9 +27,9 @@
 #include <cassert>
 #include <cstdlib>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/race.h"
-#include "DC/levels.h"
 #include "DC/spells.h"
 #include "DC/magic.h"
 #include "DC/player.h"
@@ -1041,13 +1041,13 @@ void isr_set(Character *ch)
 
   if (!ch)
   {
-    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
      sprintf(buf, "isr_set ch %s", GET_NAME(ch));
-     logentry(buf, 0, LogChannels::LOG_BUG);
+     logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1074,7 +1074,7 @@ void extractFamiliar(Character *ch)
 {
   Character *victim = nullptr;
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -1129,7 +1129,7 @@ void stop_follower(Character *ch, int cmd)
 
   if (ch->master == nullptr)
   {
-    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -1955,7 +1955,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     }
     else
     {
-      if (!IS_MOB(ch))
+      if (!IS_NPC(ch))
       {
         if (!(learned = ch->has_skill(spl)))
         {
@@ -2346,7 +2346,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (ch->getLevel() < ARCHANGEL && !IS_MOB(ch))
+      if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch))
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -2400,7 +2400,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       {
         int chance = 50;
 
-        if (IS_MOB(ch))
+        if (IS_NPC(ch))
         {
           learned = ch->getLevel();
         }
@@ -2497,7 +2497,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
-            logentry(log_buf, 110, LogChannels::LOG_PLAYER, ch);
+            logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast
@@ -2508,7 +2508,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
                    GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
               return eFAILURE;
             }
@@ -2516,14 +2516,14 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (ch->fighting && ch->fighting != tar_char)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
                    GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
               return eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
                    get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
               return eFAILURE;
             }
@@ -2536,7 +2536,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
@@ -2544,7 +2544,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
                    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
                    get_skill_name(spl).toStdString().c_str(),
@@ -2554,7 +2554,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
                    get_skill_name(spl).toStdString().c_str(),
                    GET_NAME(tar_char), get_clan_name(tar_char),

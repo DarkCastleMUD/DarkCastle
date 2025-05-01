@@ -6,7 +6,6 @@
 #include "DC/character.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
-#include "DC/levels.h"
 
 #ifdef __CYGWIN__
 #include <crypt.h>

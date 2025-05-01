@@ -20,6 +20,7 @@
 #include "DC/returnvals.h"
 #include <cerrno>
 
+#include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
@@ -28,7 +29,6 @@
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/affect.h"
-#include "DC/levels.h"
 #include "DC/interp.h"
 #include "DC/character.h"
 #include "DC/act.h"
@@ -278,7 +278,7 @@ void DC::load_corpses(void)
 		get_line_new(fp, line);
 	}
 	else
-		logentry(QStringLiteral("No corpses in file to load"), 0, LogChannels::LOG_MISC);
+		logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
 
 	while (!feof(fp) && !end)
 	{
@@ -295,7 +295,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -Loading Object: %d", nr);
-				logentry(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 			}
 			/* we have the number, check it, load obj. */
 			if (nr == -1)
@@ -325,7 +325,7 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logentry(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 			}
 			sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
 			GET_OBJ_VAL(temp, 0) = t[1];
@@ -340,13 +340,13 @@ void DC::load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				logentry(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 			}
 			/* read line check for xap. */
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					logentry(QStringLiteral("XAP Found"), 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("XAP Found"), 0, DC::LogChannel::LOG_MISC);
 				if ((temp->name = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->name = "undefined";
@@ -356,7 +356,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -NAME: %s\n", temp->name);
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}
 
@@ -369,7 +369,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}
 
@@ -382,7 +382,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -DESC: %s\n", temp->description);
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}
 
@@ -396,20 +396,20 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						snprintf(buf3, sizeof(buf3) - 1, "   -ACT_DESC: %s\n", temp->ActionDescription().toStdString().c_str());
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}
 				if (!get_line_new(fp, line) ||
 					(sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
 				{
-					logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("load_corpses: Format error in first numeric line (expecting 5 args)"), 0, DC::LogChannel::LOG_MISC);
 				}
 				else
 				{
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -FLAGS: %s", line);
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 				}
 				temp->obj_flags.type_flag = t[0];
@@ -474,7 +474,7 @@ void DC::load_corpses(void)
 				} /* exit our for loop */
 				if (alloc_num_affects != temp->num_affects)
 				{
-					logf(0, LogChannels::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
+					logf(0, DC::LogChannel::LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
 						 alloc_num_affects, temp->num_affects);
 				}
 			}
@@ -489,7 +489,7 @@ void DC::load_corpses(void)
 					continue;
 				}
 				if (debug == 1)
-					logentry(QStringLiteral("XAP NOT Found"), 0, LogChannels::LOG_MISC);
+					logentry(QStringLiteral("XAP NOT Found"), 0, DC::LogChannel::LOG_MISC);
 			}
 			if (temp != nullptr)
 			{
@@ -506,7 +506,7 @@ void DC::load_corpses(void)
 							if (debug == 1)
 							{
 								sprintf(buf3, "  -Moving [%s] to [%s]", obj->name, temp->name);
-								logentry(buf3, 0, LogChannels::LOG_MISC);
+								logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 							}
 							obj_from_room(obj);	   /* get those objs from that room */
 							obj_to_obj(obj, temp); /* and put them in the corpse */
@@ -518,7 +518,7 @@ void DC::load_corpses(void)
 						if (debug == 1)
 						{
 							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->name, GET_OBJ_VROOM(temp));
-							logentry(buf3, 0, LogChannels::LOG_MISC);
+							logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
 					}
@@ -529,7 +529,7 @@ void DC::load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "  -Moving corpse [%s] to holding room.", temp->name);
-						logentry(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 					}
 					obj_to_room(temp, real_room(frozen_start_room));
 				}

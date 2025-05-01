@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 
+#include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/affect.h"
 #include "DC/mobile.h"
@@ -21,7 +22,6 @@
 #include "DC/room.h"
 #include "DC/terminal.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/fight.h"
 #include "DC/interp.h"
@@ -87,7 +87,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
   arg = one_argument(arg, buf);
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
+    if (IS_NPC(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
     {
       victim = k->follower;
       break;
@@ -180,7 +180,7 @@ int do_tame(Character *ch, char *arg, int cmd)
     return eFAILURE;
     /*   Character * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
-         if(IS_MOB(k->follower) &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
+         if(IS_NPC(k->follower) &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
             vict = k->follower;
             break;
@@ -305,7 +305,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_MOB(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
+  if (IS_NPC(this) && ISSET(this->mobdata->actflags, ACT_STUPID))
   {
     this->sendln("Being stupid, you cannot find any..");
     return eFAILURE;
@@ -1738,7 +1738,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
   /*
     TODO - make this into a skill and put it in
 
-    if(IS_MOB(ch) || ch->getLevel() >= ARCHANGEL)
+    if(IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
        ch->sendln("You try to think like a chipmunk and go nuts.");
@@ -1757,7 +1757,7 @@ int do_mind_delve(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(target))
+  if (!IS_NPC(target))
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
     ch->send(buf);

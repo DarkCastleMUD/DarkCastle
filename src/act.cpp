@@ -12,7 +12,6 @@
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/utility.h"
@@ -64,7 +63,7 @@ act_return act(
   // This shouldn't happen
   if (ch == 0)
   {
-    logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
     delete tokens;
     ar.retval = eFAILURE;
     return ar;
@@ -129,7 +128,7 @@ act_return act(
   {
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
-      logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
       delete tokens;
       ar.retval = eFAILURE;
       return ar;

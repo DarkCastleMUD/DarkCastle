@@ -11,7 +11,7 @@
 #include "DC/connect.h"
 #include "DC/mobile.h"
 #include "DC/player.h"
-#include "DC/levels.h"
+
 #include "DC/DC.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -96,7 +96,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 
 int do_incognito(Character *ch, char *argument, int cmd)
 {
-	if (IS_MOB(ch))
+	if (IS_NPC(ch))
 		return eFAILURE;
 
 	if (ch->player->incognito == true)
@@ -225,7 +225,7 @@ int do_load(Character *ch, char *arg, int cmd)
 	{
 	default:
 		ch->sendln("Problem...fuck up in do_load.");
-		logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
 		if ((number = number_or_name(&c, &num)) == 0)

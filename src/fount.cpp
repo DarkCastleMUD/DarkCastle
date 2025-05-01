@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cctype>
 
+#include "DC/obj.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/character.h"

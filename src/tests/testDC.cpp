@@ -12,6 +12,7 @@
 #include "DC/spells.h"
 #include "DC/vault.h"
 #include "DC/terminal.h"
+#include "DC/connect.h"
 
 using namespace std::literals;
 
@@ -105,6 +106,7 @@ private slots:
         std::unique_ptr<Character> ch = std::make_unique<Character>();
         std::unique_ptr<Player> player = std::make_unique<Player>();
         ch->player = player.get();
+        ch->setType(Character::Type::Player);
         ch->do_toggle({"ansi"});
         QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
         QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
@@ -205,6 +207,7 @@ private slots:
         ch.weight = 150;
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         conn.descriptor = 1;
         conn.character = &ch;
@@ -336,6 +339,7 @@ private slots:
         ch.setClass(CLASS_WARRIOR);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         conn.descriptor = 1;
         conn.character = &ch;
@@ -787,6 +791,7 @@ private slots:
         ch.setClass(CLASS_WARRIOR);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -812,6 +817,7 @@ private slots:
         ch2.setClass(CLASS_WARRIOR);
         Player player2;
         ch2.player = &player2;
+        ch2.setType(Character::Type::Player);
         Connection conn2;
         dc.descriptor_list->next = &conn2;
         conn2.descriptor = 1;
@@ -956,6 +962,7 @@ private slots:
         ch.setName(QStringLiteral("Test"));
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -1010,6 +1017,7 @@ private slots:
         ch.setPosition(position_t::STANDING);
         Player player;
         ch.player = &player;
+        ch.setType(Character::Type::Player);
         Connection conn;
         dc.descriptor_list = &conn;
         conn.descriptor = 1;
@@ -1071,6 +1079,272 @@ private slots:
         QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
         QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
         QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+    }
+    void test_blackjack()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character ch;
+        ch.setName(QStringLiteral("Test"));
+        ch.setPosition(position_t::STANDING);
+        Player player;
+        ch.player = &player;
+        ch.setType(Character::Type::Player);
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = move_char(&ch, 21905);
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "");
+        QCOMPARE(ch.in_room, 21905);
+        ch.setPosition(position_t::STANDING);
+
+        rc = do_look(&ch, str_hsh(""));
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The Platinum Club blackjack tables\r\n"
+                              "   People scurry about the blackjack area, searching for perhaps a lively\r\n"
+                              "table, the bar, or possibly the ATM machine.  A cocktail waitress in a short\r\n"
+                              "skirt rushes by, a tray of drinks on one hand.\r\n"
+                              "A table covered in deep purple felt stands here.\n\r"
+                              "A blackjack dealer stands here, smiling and waiting for the patrons.\r\n"
+                              "-the blackjack dealer has: aura! \r\n"
+                              "Exits: south \r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("list");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Sorry, but you cannot do that here!\r\n"
+                              "\x1B[1m\x1B[0m\x1B[37m");
+        conn.output = {};
+
+        rc = ch.command_interpreter("look table");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "@---------------------------------@\r\n"
+                              "|    Platinum Towers Blackjack    |\r\n"
+                              "|                                 |\r\n"
+                              "|      Min Bet: 5 platinum        |\r\n"
+                              "|     Max Bet: 250 platinum       |\r\n"
+                              "|                                 |\r\n"
+                              "@---------------------------------@\r\n"
+                              "Enter \"help CASINO\" for more information\r\nor BET <amount> to place a bet.\r\n"
+                              "\x1B[1m\x1B[0m\x1B[37m");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet abc");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer shuffles the deck.\r\n"
+                              "Bet how much?\r\n"
+                              "Syntax: bet <amount>\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 0");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet -1");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 100000");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Minimum bet: 5\r\n"
+                              "Maximum bet: 250\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("bet 250");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You cannot afford that.\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        ch.do_toggle({"ansi"});
+        QVERIFY(isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(conn.output, "ANSI COLOR on.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
+                              "\r\n"
+                              "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m5h\x1B[0m\x1B[37m \x1B[1m\x1B[30m3s\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m6h\x1B[0m\x1B[37m \x1B[1mDC\x1B[0m\x1B[37m\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, true);
+        QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
+                              "\r\n"
+                              "      \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m               \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m\r\n"
+                              "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m5\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30m3\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m6\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| D |\x1B[0m\x1B[37m\r\n"
+                              "      \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30ms\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m               \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| C |\x1B[0m\x1B[37m\r\n      \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m               \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m\r\n");
+        conn.output = {};
+
+        ch.do_toggle({"ansi"});
+        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(conn.output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "Test:  5h 3s = 8   Dealer:  6h DC\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, true);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "      ,---,,---,               ,---,,---,\r\n"
+                              "Test: | 5 || 3 | = 8   Dealer: | 6 || D |\r\n"
+                              "      | h || s |               | h || C |\r\n"
+                              "      '---''---'               '---''---'\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("hit");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You hit and receive a Qc.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY \r\n"
+                              "\r\n"
+                              "Test:  5h 3s Qc = 18   Dealer:  6h DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("hit");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You hit and receive a 5d.\r\n"
+                              "You BUSTED!\r\n"
+                              "The dealer takes your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+        check_timer();
+        QCOMPARE(conn.output, "It is now the dealer's turn.\r\n"
+                              "The dealer flips over his card revealing a \x1B[1m\x1B[31mAd\x1B[0m\x1B[37m.\r\n"
+                              "The dealer has 17!\r\n");
+        conn.output = {};
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'Place your bets!'\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
+                              "\r\n"
+                              "Test:  7d Jh = 17   Dealer:  Qs DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("stay");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Test stays.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "It is now the dealer's turn.\r\n"
+                              "The dealer flips over his card revealing a \x1B[1m\x1B[30m8s\x1B[0m\x1B[37m.\r\n"
+                              "The dealer has 18!\r\n"
+                              "You LOSE your bet!\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'Place your bets!'\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("bet 5");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "The dealer accepts your bet.\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "The dealer says 'No more bets!'\r\n"
+                              "\r\n"
+                              "The dealer passes out cards to everyone at the table.\r\n"
+                              "The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "You can: INSURANCE \r\n"
+                              "\r\n"
+                              "Test:  Qd 4s = 14   Dealer:  As DC\r\n");
+        conn.output = {};
+
+        rc = ch.command_interpreter("insurance");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You cannot afford an insurance bet right now.\r\n");
+        conn.output = {};
+
+        ch.plat = 5;
+        rc = ch.command_interpreter("insurance");
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "You make an insurance bet.\r\n");
+        conn.output = {};
+
+        blackjack_prompt(&ch, conn.output, false);
+        QCOMPARE(conn.output, "\r\nTest:  Qd 4s = 14   Dealer:  As DC\r\n");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
+
+        check_timer();
+        QCOMPARE(conn.output, "");
+        conn.output = {};
     }
 };
 

@@ -18,7 +18,6 @@
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
 #include "DC/handler.h"
@@ -27,19 +26,20 @@
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
+#include "DC/obj.h"
 
 class channel_msg
 {
 public:
-  channel_msg(const Character *sender, const int32_t type, const char *msg)
-      : type(type), msg(std::string(msg))
+  channel_msg(const Character *sender, const DC::LogChannel type, const char *msg)
+      : type_(type), msg(std::string(msg))
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const Character *sender, const int32_t type, const std::string &msg)
-      : type(type), msg(msg)
+  channel_msg(const Character *sender, const DC::LogChannel type, const std::string &msg)
+      : type_(type), msg(msg)
   {
     set_wizinvis(sender);
     set_name(sender);
@@ -59,9 +59,9 @@ public:
       sender = name;
     }
 
-    switch (type)
+    switch (type_)
     {
-    case LogChannels::CHANNEL_GOSSIP:
+    case DC::LogChannel::CHANNEL_GOSSIP:
       output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
       break;
     }
@@ -90,14 +90,14 @@ public:
     else
     {
       name = std::string("Unknown");
-      logf(IMMORTAL, LogChannels::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type, msg.c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type_, msg.c_str());
     }
   }
 
 private:
   std::string name;
   int32_t wizinvis;
-  int32_t type;
+  DC::LogChannel type_;
   std::string msg;
 };
 
@@ -113,7 +113,7 @@ command_return_t do_say(Character *ch, std::string argument, int cmd)
   int retval;
   extern bool MOBtrigger;
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_STUPID))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("You try to speak but just look like an idiot!");
     return eSUCCESS;
@@ -271,13 +271,13 @@ int do_pray(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_STUPID))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_STUPID))
   {
     ch->sendln("Duh...I'm too stupid!");
     return eSUCCESS;
   }
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOPRAY))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOPRAY))
   {
     ch->sendln("The gods are deaf to your prayers.");
     return eSUCCESS;
@@ -289,7 +289,7 @@ int do_pray(Character *ch, char *arg, int cmd)
   {
     if ((i->character == nullptr) || (i->character->getLevel() <= MORTAL))
       continue;
-    if (!(isSet(i->character->misc, LogChannels::LOG_PRAYER)))
+    if (!(isSet(i->character->misc, DC::LogChannel::LOG_PRAYER)))
       continue;
     if (is_busy(i->character) || is_ignoring(i->character, ch))
       continue;
@@ -335,14 +335,14 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (IS_PC(ch))
   {
-    if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
+    if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    ch);
       return eSUCCESS;
     }
-    if (!(isSet(ch->misc, LogChannels::CHANNEL_GOSSIP)))
+    if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_GOSSIP)))
     {
       ch->sendln("You told yourself not to GOSSIP!!");
       return eSUCCESS;
@@ -371,7 +371,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
   {
     ch->decrementMove(5);
 
-    channel_msg msg(ch, LogChannels::CHANNEL_GOSSIP, argument);
+    channel_msg msg(ch, DC::LogChannel::CHANNEL_GOSSIP, argument);
 
     sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
@@ -384,7 +384,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (i->character != ch && !i->connected && (isSet(i->character->misc, LogChannels::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
+      if (i->character != ch && !i->connected && (isSet(i->character->misc, DC::LogChannel::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
       {
         for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         {
@@ -432,14 +432,14 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
 
   if (IS_PC(this))
   {
-    if (!IS_MOB(this) && isSet(this->player->punish, PUNISH_SILENCED))
+    if (!IS_NPC(this) && isSet(this->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
                    "you find yourself unable to!\n\r",
                    this);
       return eSUCCESS;
     }
-    if (!(isSet(this->misc, LogChannels::CHANNEL_AUCTION)))
+    if (!(isSet(this->misc, DC::LogChannel::CHANNEL_AUCTION)))
     {
       this->sendln("You told yourself not to AUCTION!!");
       return eSUCCESS;
@@ -484,7 +484,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != this && !i->connected &&
-          (isSet(i->character->misc, LogChannels::CHANNEL_AUCTION)) &&
+          (isSet(i->character->misc, DC::LogChannel::CHANNEL_AUCTION)) &&
           !is_ignoring(i->character, this))
       {
         for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -533,7 +533,7 @@ int do_shout(Character *ch, char *argument, int cmd)
                  ch);
     return eSUCCESS;
   }
-  if (IS_PC(ch) && !(isSet(ch->misc, LogChannels::CHANNEL_SHOUT)))
+  if (IS_PC(ch) && !(isSet(ch->misc, DC::LogChannel::CHANNEL_SHOUT)))
   {
     ch->sendln("You told yourself not to SHOUT!!");
     return eSUCCESS;
@@ -561,7 +561,7 @@ int do_shout(Character *ch, char *argument, int cmd)
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
           (DC::getInstance()->world[i->character->in_room].zone == DC::getInstance()->world[ch->in_room].zone) &&
-          (IS_NPC(i->character) || isSet(i->character->misc, LogChannels::CHANNEL_SHOUT)) &&
+          (IS_NPC(i->character) || isSet(i->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
           !is_ignoring(i->character, ch))
       {
         for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -612,7 +612,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
                    ch);
       return eSUCCESS;
     }
-    if (!(isSet(ch->misc, LogChannels::CHANNEL_TRIVIA)))
+    if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_TRIVIA)))
     {
       ch->sendln("You told yourself not to listen to Trivia!!");
       return eSUCCESS;
@@ -663,7 +663,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     if (i->character != ch && !i->connected &&
-        (isSet(i->character->misc, LogChannels::CHANNEL_TRIVIA)) &&
+        (isSet(i->character->misc, DC::LogChannel::CHANNEL_TRIVIA)) &&
         !is_ignoring(i->character, ch))
     {
       for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
@@ -705,7 +705,7 @@ int do_dream(Character *ch, char *argument, int cmd)
                    ch);
       return eSUCCESS;
     }
-  if (!(isSet(ch->misc, LogChannels::CHANNEL_DREAM)))
+  if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_DREAM)))
   {
     ch->sendln("You told yourself not to dream!!");
     return eSUCCESS;
@@ -744,7 +744,7 @@ int do_dream(Character *ch, char *argument, int cmd)
       if ((i->character != ch) &&
           (!i->connected) &&
           !is_ignoring(i->character, ch) &&
-          (isSet(i->character->misc, LogChannels::CHANNEL_DREAM)) &&
+          (isSet(i->character->misc, DC::LogChannel::CHANNEL_DREAM)) &&
           ((GET_POS(i->character) == position_t::SLEEPING) ||
            (i->character->getLevel() >= MIN_GOD)))
         send_to_char(buf1, i->character);
@@ -795,7 +795,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   QString name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
-  if (!IS_MOB(this) && isSet(this->player->punish, PUNISH_NOTELL))
+  if (!IS_NPC(this) && isSet(this->player->punish, PUNISH_NOTELL))
   {
     this->sendln("Your message didn't get through!!");
     return eSUCCESS;
@@ -808,7 +808,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       return eFAILURE;
     }
 
-  if (!IS_MOB(this) && !isSet(this->misc, LogChannels::CHANNEL_TELL))
+  if (!IS_NPC(this) && !isSet(this->misc, DC::LogChannel::CHANNEL_TELL))
   {
     this->sendln("You have tell channeled off!!");
     return eSUCCESS;
@@ -875,12 +875,12 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (IS_PC(vict) && !isSet(vict->misc, LogChannels::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
+  if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
   {
     this->sendln("The person is ignoring all tells right now.");
     return eSUCCESS;
   }
-  else if (IS_PC(vict) && !isSet(vict->misc, LogChannels::CHANNEL_TELL))
+  else if (IS_PC(vict) && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
     this->sendln("That player has tell channeled off btw...");
@@ -904,7 +904,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     }
     if (is_busy(vict) && level_ >= OVERSEER)
     {
-      if (IS_MOB(vict))
+      if (IS_NPC(vict))
       {
         buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
       }
@@ -932,7 +932,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     }
     else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
     {
-      if (IS_MOB(vict))
+      if (IS_NPC(vict))
       {
         buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
       }
@@ -952,16 +952,16 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       this->tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
-      if (!IS_MOB(vict) && isSet(vict->player->punish, PUNISH_LOG))
+      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
              level_ >= SERAPH)
     {
       vict->sendln("A heavenly power intrudes on your subconcious dreaming...");
-      if (IS_MOB(vict))
+      if (IS_NPC(vict))
       {
         buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
       }
@@ -986,9 +986,9 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
 
       this->sendln("They were sleeping btw...");
       // Log what I told a logged player under their name
-      if (!IS_MOB(vict) && isSet(vict->player->punish, PUNISH_LOG))
+      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG))
       {
-        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, LogChannels::LOG_PLAYER, vict);
+        logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
     else
@@ -1005,7 +1005,7 @@ command_return_t do_reply(Character *ch, std::string argument, int cmd)
   std::string buf = {};
   Character *vict = nullptr;
 
-  if (IS_MOB(ch) || ch->player->last_tell.isEmpty())
+  if (IS_NPC(ch) || ch->player->last_tell.isEmpty())
   {
     ch->sendln("You have noone to reply to.");
     return eSUCCESS;
@@ -1171,7 +1171,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   for (; isspace(*argument); argument++)
     ;
 
-  if (!IS_MOB(ch) && isSet(ch->player->punish, PUNISH_NOTELL))
+  if (!IS_NPC(ch) && isSet(ch->player->punish, PUNISH_NOTELL))
   {
     ch->sendln("Your message didn't get through!!");
     return eSUCCESS;
@@ -1262,7 +1262,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
                    ch);
       return eSUCCESS;
     }
-    if (!(isSet(ch->misc, LogChannels::CHANNEL_NEWBIE)))
+    if (!(isSet(ch->misc, DC::LogChannel::CHANNEL_NEWBIE)))
     {
       ch->sendln("You told yourself not to use the newbie channel!!");
       return eSUCCESS;
@@ -1299,7 +1299,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected &&
           !is_ignoring(i->character, ch) &&
-          (isSet(i->character->misc, LogChannels::CHANNEL_NEWBIE)))
+          (isSet(i->character->misc, DC::LogChannel::CHANNEL_NEWBIE)))
       {
         for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
           if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)

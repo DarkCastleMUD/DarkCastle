@@ -54,11 +54,11 @@ char *index(char *buf, char op);
 
 #define MOB_WAIT_STATE(ch) ((ch)->deaths)
 
-#define GET_WAIT(ch) (IS_MOB((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
+#define GET_WAIT(ch) (IS_NPC((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
 
-#define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
+#define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
 
-#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
+#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_NPC((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
                                                                                                                                                        : 0)
 
 // Defines for gradual skill increase code
@@ -172,10 +172,9 @@ bool IS_DARK(int room);
 // #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
 // #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
-#define IS_PC(ch) (!IS_NPC(ch) && ch->player != nullptr)
-#define IS_NPC(ch) (isSet((ch)->misc, MISC_IS_MOB))
-#define IS_MOB(ch) (IS_NPC(ch))
-#define IS_OBJ(ch) (isSet((ch)->misc, MISC_IS_OBJ))
+#define IS_PC(ch) (ch->getType() == Character::Type::Player && ch->player != nullptr)
+#define IS_NPC(ch) (ch->getType() == Character::Type::NPC || ch->getType() == Character::Type::ObjectProgram)
+#define IS_OBJ(ch) (ch->getType() == Character::Type::ObjectProgram)
 #define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define IS_MINLEVEL_PC(ch, level) (ch->getLevel() >= level && IS_PC(ch))
@@ -311,11 +310,11 @@ auto getBitvector(auto value)
 
 #define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_NPC(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(Character *ch)
 {
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
      // this should really never be called on mobs
      return 1;
   else if (ch->getLevel() >= 101)
@@ -487,9 +486,6 @@ char *str_dup0(const char *str);
 void logbug(QString message);
 void logsocket(QString message);
 void logmisc(QString message);
-void logf(int level, LogChannels type, const char *arg, ...);
-void logf(int level, LogChannels type, QString arg);
-int send_to_gods(QString message, uint64_t god_level, LogChannels type);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);

@@ -32,7 +32,6 @@
 #include "DC/fight.h"
 #include "DC/db.h" // index_data
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
@@ -80,7 +79,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (!IS_MOB(ch))
+    if (!IS_NPC(ch))
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
@@ -158,7 +157,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, LogChannels::LOG_BUG);
+      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -243,7 +242,7 @@ void mobile_activity(void)
         int room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
-          logf(IMMORTAL, LogChannels::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
+          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];
@@ -277,7 +276,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_MOB(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
+        if (!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
@@ -350,7 +349,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, LogChannels::LOG_BUG);
+              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -363,7 +362,7 @@ void mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_MOB(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+            if ((!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
                                                                                               isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
@@ -937,7 +936,7 @@ void scavenge(Character *ch)
             break;
 
           default:
-            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, LogChannels::LOG_BUG);
+            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
             break;
 
           } /* end switch */

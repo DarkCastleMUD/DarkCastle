@@ -13,7 +13,6 @@
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/levels.h"
 #include "DC/race.h"
 #include "DC/utility.h"
 #include "DC/player.h"
@@ -401,7 +400,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			if (ch->getLevel() < ARCHANGEL && spl != 0 && spl != SPELL_TYPE_WAND)
 				if (!(learned = ch->has_skill(song_info[spl].skill_num)))
 				{
-					if (IS_MOB(ch) && !ch->master)
+					if (IS_NPC(ch) && !ch->master)
 						learned = 50;
 					else
 					{
@@ -544,7 +543,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		if (!isSet(song_info[spl].targets, TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
-				logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, LogChannels::LOG_BUG);
+				logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
 				send_to_char("If you triggered this message, you almost crashed the\n\r"
 							 "game.  Tell a god what you did immediately.\r\n",
 							 ch);
@@ -557,7 +556,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-		if (ch->getLevel() < ARCHANGEL && !IS_MOB(ch) &&
+		if (ch->getLevel() < ARCHANGEL && !IS_NPC(ch) &&
 			GET_KI(ch) < use_song(ch, spl))
 		{
 			ch->sendln("You do not have enough ki!");
@@ -886,7 +885,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
 
 	if (!victim || !ch)
 	{
-		logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Serious problem in song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 	act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
@@ -912,7 +911,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	if (!ch || ch->songs.empty())
 	{
-		logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Serious problem in execute_song_hypnotic_harmony!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -982,7 +981,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 {
 	if (!victim || !ch)
 	{
-		logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("Serious problem in song_disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1035,7 +1034,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
 
 	if (!victim)
 	{
-		logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, LogChannels::LOG_BUG);
+		logentry(QStringLiteral("No vict send to song whistle sharp!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1690,7 +1689,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 
 	if (!victim || !target)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "do_astral_chanty_movement: nullptr pointer passed.");
 		produce_coredump();
 		return;
 	}
@@ -2269,7 +2268,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
 	if (ch->followers)
 		for (fvictim = ch->followers; fvictim; fvictim = fvictim->next)
 		{
-			if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) && ch->in_room != fvictim->follower->in_room)
+			if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_NPC(fvictim->follower) && ch->in_room != fvictim->follower->in_room)
 			{
 				summoned = true;
 				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", CMD_DEFAULT);

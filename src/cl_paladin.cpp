@@ -5,6 +5,7 @@
 |
 | File create with do_layhands -Pirahna 7/6/1999
 */
+#include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/player.h"
@@ -12,7 +13,6 @@
 #include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/handler.h"
-#include "DC/levels.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
 #include "DC/room.h"

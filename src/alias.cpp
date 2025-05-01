@@ -7,7 +7,6 @@
 
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/levels.h"
 #include "DC/player.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"

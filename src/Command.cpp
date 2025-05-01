@@ -1,6 +1,5 @@
 #include "DC/Command.h"
 #include "DC/character.h"
-#include "DC/levels.h"
 #include "DC/common.h"
 
 QMap<QString, Command> Commands::map_ = {};

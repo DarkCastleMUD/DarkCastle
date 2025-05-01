@@ -1,0 +1,460 @@
+#21900
+The Platinum Towers Hotel and Casino~
+   Twin moose statues flank the tinted sliding glass doors that open up to the
+town's only casino.  A rather large man, with the seedy look of a used car
+salesman about him, eagerly rubs one of the moose heads, ostensibly for luck.
+Inside, people stand about waiting to check into the hotel.
+$B$1A small, engraved sign is here with important information.  $R
+~
+130 1174940910 0
+D0
+~
+~
+0 -1 21901
+D2
+~
+~
+0 -1 23000
+E
+sign~
+Welcome to the Platinum Towers Casino.
+Founded April 2006 by Urizen, Wendy, and Apocalypse.
+At this time only blackjack is available for players but several
+other games including: roulette, texas hold'em poker, and slots
+are soon to follow.
+Enjoy yourself and remember to know your limit and stay within it!
+~
+S
+#21901
+The lobby~
+   The gaudy flashing lights and throngs of people overwhelm the senses.  Off
+in the distance, a loud siren and flashing red lights indicate that someone has
+won a major jackpot.  Rows upon rows of different table games can be seen;
+straight ahead are the blackjack tables.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21902
+D1
+~
+~
+0 -1 21921
+D2
+~
+~
+0 -1 21900
+D3
+~
+~
+0 -1 21910
+D4
+~
+~
+0 -1 21907
+S
+#21902
+The blackjack tables~
+   People scurry about the blackjack area, searching for perhaps a lively
+table, the bar, or possibly the ATM machine.  A cocktail waitress in a short
+skirt rushes by, a tray of drinks on one hand.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21903
+D2
+~
+~
+0 -1 21901
+S
+#21903
+The blackjack tables~
+   People scurry about the blackjack area, searching for perhaps a lively
+table, the bar, or possibly the ATM machine.  A cocktail waitress in a short
+skirt rushes by, a tray of drinks on one hand.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21904
+D2
+~
+~
+0 -1 21902
+S
+#21904
+The blackjack tables~
+   People scurry about the blackjack area, searching for perhaps a lively
+table, the bar, or possibly the ATM machine.  A cocktail waitress in a short
+skirt rushes by, a tray of drinks on one hand.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21906
+D2
+~
+~
+0 -1 21903
+S
+#21905
+The Platinum Club blackjack tables~
+   People scurry about the blackjack area, searching for perhaps a lively
+table, the bar, or possibly the ATM machine.  A cocktail waitress in a short
+skirt rushes by, a tray of drinks on one hand.
+~
+130 1107832042 0
+D2
+~
+~
+0 -1 21906
+S
+#21906
+An opulent lounge~
+   This is a luxurious waiting area for the casino's high rollers.  Several
+wealthy individuals relax and sip drinks as they take a break from their
+betting.  To the north is the "$BPlatinum Club"$R player's blackjack room.  A
+large security guard is here to ensure the entrance fee is paid before
+proceeding onward.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21905
+D2
+~
+~
+0 -1 21904
+S
+#21907
+The upper lobby~
+   The flashing lights and loud sounds of the casino floor recede some on this
+level.  The soft sounds of ambient music filter quietly through the upper lobby
+and several hotel and casino patrons wander about enjoying their vacations.
+To the east the entrance to the Platinum Thermal Spas can be seen.  To the
+north a large sign declares the Platinum Towers Hotel is currently under
+construction.
+~
+130 1107832042 0
+D1
+~
+~
+0 -1 21908
+D5
+~
+~
+0 -1 21901
+S
+#21908
+The Platinum Spa~
+   Graceful palm trees and delicate ferns dominate the decor in the Platinum
+Spa.  Several spa attendants move about at a measured pace as they take care of
+guests.  Patrons appear to be in a very relaxed state and enjoying both the
+scents and sounds within the spa.  To the west is the upper lobby and to the
+east the main thermal spa room is visible.
+~
+130 1107832042 0
+D1
+~
+~
+0 -1 21909
+D3
+~
+~
+0 -1 21907
+S
+#21909
+A relaxing thermal spa~
+   The Platinum Towers Thermal Spa is legendary throughout the realms.  A thick
+and delicately scented steam rises from hot rocks that have been carefully
+placed within small pools of water about the room.  Magically formed rock
+creates natural pools and eddies in which patrons can relax and recover from a
+hard day of work, gambling, or adventuring.  Spa attendants move quietly about
+serving the guests while careful not to disturb their rest.  The security here
+is very tight and some patrons appear comfortable to the point of having made a
+home here.
+~
+130 1107832042 0
+D3
+~
+~
+0 -1 21908
+S
+#21910
+The lobby~
+   The gaudy flashing lights and throngs of people overwhelm the senses.  Off
+in the distance, a loud siren and flashing red lights indicate that someone has
+won a major jackpot.  Rows upon rows of different table games can be seen;
+straight ahead are the slot machines.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21911
+D1
+~
+~
+0 -1 21901
+D3
+~
+~
+0 -1 21916
+S
+#21911
+Rows of slots~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21912
+D2
+~
+~
+0 -1 21910
+D3
+~
+~
+0 -1 21917
+S
+#21912
+Rows of slots~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21913
+D2
+~
+~
+0 -1 21911
+D3
+~
+~
+0 -1 21918
+S
+#21913
+Rows of slots~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21914
+D2
+~
+~
+0 -1 21912
+D3
+~
+~
+0 -1 21919
+S
+#21914
+An opulent lounge~
+   This is a luxurious waiting area for the casino's high rollers.  Several
+wealthy individuals relax and sip drinks as they take a break from their
+betting.  To the north is the "Platinum Club" slots room.  A large security
+guard is here to ensure the entrance fee is paid before proceeding onward.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21915
+D2
+~
+~
+0 -1 21913
+S
+#21915
+The Platinum Club slots~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around,
+~
+130 1107832042 0
+D2
+~
+~
+0 -1 21914
+D3
+~
+~
+0 -1 21920
+S
+#21916
+The lobby~
+   The gaudy flashing lights and throngs of people overwhelm the senses.  Off
+in the distance, a loud siren and flashing red lights indicate that someone has
+won a major jackpot.  Rows upon rows of different table games can be seen.
+Straight ahead are the slot machines.
+~
+130 34090218 0
+D0
+~
+~
+0 -1 21917
+D1
+~
+~
+0 -1 21910
+D3
+~
+~
+0 -1 21923
+S
+#21917
+Slots of fun!~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21918
+D1
+~
+~
+0 -1 21911
+D2
+~
+~
+0 -1 21916
+S
+#21918
+Slots of fun!~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21919
+D1
+~
+~
+0 -1 21912
+D2
+~
+~
+0 -1 21917
+S
+#21919
+Slots of fun!~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around, and to the north are the high rollers slots.
+~
+130 1107832042 0
+D1
+~
+~
+0 -1 21913
+D2
+~
+~
+0 -1 21918
+S
+#21920
+The Platinum Club slots~
+   Rows upon rows of slots of all different types fill up the western wing of
+the casino.  Several old ladies sit in one row of slots, glaring at anyone who
+might dare to take their spots at these particular slots and win their jackpot,
+should any of the old ladies get up.  Moving along, there are plenty more slot
+machines to go around,
+~
+130 1107832042 0
+D1
+~
+~
+0 -1 21915
+S
+#21921
+The lobby~
+   The gaudy flashing lights and throngs of people overwhelm the senses.  Off
+in the distance, a loud siren and flashing red lights indicate that someone has
+won a major jackpot.  Rows upon rows of different table games can be seen;
+straight ahead is a roulette table.
+~
+130 1107832042 0
+D0
+~
+~
+0 -1 21922
+D3
+~
+~
+0 -1 21901
+S
+#21922
+Before a roulette table~
+   People mill about the roulette table, placing bets and waiting for the
+croupier to set the ball and wheel in motion.  Off in the distance, a woman
+squeals as she has just won big at her roulette table.
+~
+130 1107832042 0
+D2
+~
+~
+0 -1 21921
+S
+#21923
+The Platinum Towers Hotel and Casino~
+   Twin moose statues flank the tinted sliding glass doors that open up to the
+town's only casino.  A rather large man, with the seedy look of a used car
+salesman about him, eagerly rubs one of the moose heads, ostensibly for luck.
+Inside, people stand about waiting to check into the hotel.
+~
+130 1174940910 0
+D1
+~
+~
+0 -1 21916
+D3
+~
+~
+0 -1 17881
+S
+#21999
+Blank Room~
+Empty description
+~
+130 0 0
+S
+$~

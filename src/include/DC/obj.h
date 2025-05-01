@@ -21,10 +21,10 @@
 
 #include "DC/common.h"
 #include "DC/structs.h" // uint8_t
-#include "DC/character.h"
-#include "DC/DC.h"
 #include "DC/casino.h"
 #include "DC/room.h"
+
+class Character;
 
 /* The following defs are for Object  */
 
@@ -145,6 +145,8 @@
 #define ITEM_TOGGLE 1U << 13 // Toggles for certain items.
 #define ITEM_NO_CUSTOM 1U << 14
 #define ITEM_24H_NO_SELL 1U << 15 // Item can't be sold for 24 RL hours
+#define ITEM_POOF_AFTER_24H 1U << 16
+#define ITEM_POOF_NEVER 1U << 17
 
 /* Bitvector for 'size' */
 #define SIZE_ANY 1U
@@ -282,6 +284,10 @@ public:
     bool isPortal(void)
     {
         return obj_flags.type_flag == ITEM_PORTAL;
+    }
+    bool isTotem(void)
+    {
+        return obj_flags.type_flag == ITEM_TOTEM;
     }
     room_t getPortalDestinationRoom(void)
     {

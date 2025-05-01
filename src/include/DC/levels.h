@@ -3,9 +3,6 @@
 #ifndef LEVELS_H_
 #define LEVELS_H_
 
-#include "DC/structs.h"
-#include <QString>
-
 #define MORTAL 60
 /* #define GLADIATOR */
 

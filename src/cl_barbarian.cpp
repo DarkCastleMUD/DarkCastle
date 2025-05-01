@@ -5,7 +5,6 @@
  *************************************************************************/
 #include "DC/structs.h"
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/character.h"
 #include "DC/spells.h"
 #include "DC/utility.h"
@@ -24,6 +23,7 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/move.h"
+#include "DC/obj.h"
 
 extern int rev_dir[];
 
@@ -651,25 +651,25 @@ int do_headbutt(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
     ch->sendln("You are too puny to headbutt someone that HUGE!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to headbutt!");
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
   {
     ch->sendln("That would be like smashing your head into a wall!");
     return eFAILURE;
@@ -698,7 +698,7 @@ int do_headbutt(Character *ch, char *argument, int cmd)
   }
 
   int mod = 0;
-  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
@@ -938,12 +938,7 @@ int do_bullrush(Character *ch, char *argument, int cmd)
   extern void addtimer(struct timer_data * add);
 
   // Reset bullrush AFF in 5 seconds
-  struct timer_data *timer;
-#ifdef LEAK_CHECK
-  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-#else
-  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-#endif
+  struct timer_data *timer = new timer_data;
   timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;
@@ -1126,19 +1121,19 @@ int do_knockback(Character *ch, char *argument, int cmd)
   }
   else
   {
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
     {
       ch->sendln("You are too tiny to knock someone that HUGE anywhere!");
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
     {
       ch->sendln("You cannot pick just one to knockback!");
       return eFAILURE;
     }
 
-    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
     {
       act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;
@@ -1363,7 +1358,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    logf(OVERSEER, LogChannels::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
+    logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
   }
 
   // rest already set

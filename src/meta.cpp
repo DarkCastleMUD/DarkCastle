@@ -24,7 +24,6 @@
 #include "DC/room.h"
 #include "DC/handler.h"
 #include "DC/magic.h"
-#include "DC/levels.h"
 #include "DC/fight.h"
 #include "DC/DC.h"
 #include "DC/player.h"
@@ -683,7 +682,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	move_cost = ch->meta_get_moves_plat_cost(1);
 	mana_cost = ch->meta_get_mana_plat_cost(1);
 
-	if (!IS_MOB(ch))
+	if (!IS_NPC(ch))
 	{
 		ki_exp = ch->meta_get_ki_exp_cost();
 		ki_cost = ch->meta_get_ki_plat_cost();
@@ -789,11 +788,11 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 		ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
 
-		if (!IS_MOB(ch) && ki_cost && ki_exp)
+		if (!IS_NPC(ch) && ki_cost && ki_exp)
 		{ // mobs can't meta ki
 			csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
 		}
-		else if (!IS_MOB(ch))
+		else if (!IS_NPC(ch))
 			ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
 
 		ch->sendln("$BMonetary Exchange:$R");
@@ -808,7 +807,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			"$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
 			"$B$320)$R Buy a practice session for 25 plats.\r\n",
 			ch);
-		if (!IS_MOB(ch))
+		if (!IS_NPC(ch))
 		{
 			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
@@ -1073,7 +1072,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		}
 		if (choice == 12 && ki_exp && ki_cost)
 		{
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("Mobs cannot meta ki.");
 				return eSUCCESS;
@@ -1138,7 +1137,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		}
 		if (choice == 15)
 		{
-			if (!IS_MOB(ch) && ch->isPlayerGoldThief())
+			if (!IS_NPC(ch) && ch->isPlayerGoldThief())
 			{
 				ch->sendln("Your criminal acts prohibit it.");
 				return eSUCCESS;
@@ -1186,7 +1185,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("What would you have to spend $B$5gold$R on chode?");
 				return eSUCCESS;
@@ -1232,7 +1231,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 25 plats...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy practices chode...");
 				return eSUCCESS;
@@ -1250,7 +1249,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 10 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy AC, chode...");
 				return eSUCCESS;
@@ -1266,7 +1265,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			GET_AC(ch) -= 2;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
+			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1278,7 +1277,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 				ch->sendln("Costs 1 qpoint...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy experience, chode...");
 				return eSUCCESS;
@@ -1288,7 +1287,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			GET_EXP(ch) += 2000000;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
+			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1498,8 +1497,8 @@ void Character::set_heightweight(void)
 		this->weight = number(240, 280);
 		break;
 	}
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
-	logf(ANGEL, LogChannels::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
+	logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(this), GET_HEIGHT(this));
+	logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(this), GET_WEIGHT(this));
 }
 
 int changecost(int oldrace, int newrace)
@@ -1803,22 +1802,22 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			if (choice == 3)
 			{
 				ch->height++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 4)
 			{
 				ch->height--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+				logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
 			}
 			if (choice == 5)
 			{
 				ch->weight++;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			if (choice == 6)
 			{
 				ch->weight--;
-				logf(ANGEL, LogChannels::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+				logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
 			}
 			return eSUCCESS;
 		}
@@ -1829,7 +1828,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;
@@ -1844,7 +1843,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			GET_AGE_METAS(ch) += 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
+			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;
@@ -1856,7 +1855,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 				ch->sendln("Costs 5 qpoints...which you don't have.");
 				return eSUCCESS;
 			}
-			if (IS_MOB(ch))
+			if (IS_NPC(ch))
 			{
 				ch->sendln("You can't buy age, chode...");
 				return eSUCCESS;
@@ -1871,7 +1870,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			GET_AGE_METAS(ch) -= 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-			logf(110, LogChannels::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
+			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
 			ch->save(10);
 
 			return eSUCCESS;

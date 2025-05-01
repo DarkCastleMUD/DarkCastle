@@ -31,7 +31,6 @@
 #include "DC/spells.h"
 #include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/player.h"
-#include "DC/levels.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/handler.h"
@@ -602,7 +601,7 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
 
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 {
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     ch->player = nullptr;
 #ifdef LEAK_CHECK
@@ -616,6 +615,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   {
     ch->mobdata = nullptr;
     ch->player = new Player;
+    ch->setType(Character::Type::Player);
     if (!ch->player->read(fpsave, ch, filename))
     {
       return false;
@@ -710,19 +710,19 @@ void read_skill(Character *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -866,7 +866,7 @@ void save_char_obj_db(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -917,7 +917,7 @@ void save_char_obj(Character *ch)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -962,7 +962,7 @@ void save_char_obj(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -976,7 +976,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(log_buf.toStdString().c_str());
-  logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
+  logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
@@ -1048,7 +1048,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
   }
 
   // stored names only matter for mobs
-  if (!IS_MOB(ch))
+  if (!IS_NPC(ch))
   {
     ch->setName(name);
   }
@@ -1739,7 +1739,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_MOB(ch))
+  if (IS_NPC(ch))
   {
     st->armor = ch->armor;
     st->hitroll = ch->hitroll;

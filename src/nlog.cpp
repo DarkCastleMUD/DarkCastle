@@ -102,13 +102,13 @@ char *str_hsh(const char *arg)
   return (current->name);
 }
 
-void logf(int level, LogChannels type, QString arg)
+void logf(int level, DC::LogChannel type, QString arg)
 {
   logentry(arg, level, type);
 }
 
-/* logf(ch->getLevel(), LogChannels::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void logf(int level, LogChannels type, const char *arg, ...)
+/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
+void logf(int level, DC::LogChannel type, const char *arg, ...)
 {
   va_list args;
   char s[MAX_STRING_LENGTH];
@@ -174,7 +174,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_MOB(ch) || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {
