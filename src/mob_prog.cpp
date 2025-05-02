@@ -4204,8 +4204,8 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
 int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 {
 
-	QSharedPointer<class MobProgram> mprg = 0;
-	QSharedPointer<class MobProgram> next = 0;
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	Object *obj = 0;
 	bool done = false;
 
@@ -4248,8 +4248,8 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 int mprog_damage_trigger(Character *mob, Character *ch, int amount)
 {
 
-	QSharedPointer<class MobProgram> mprg = 0;
-	QSharedPointer<class MobProgram> next = 0;
+	QSharedPointer<class MobProgram> mprg{};
+	QSharedPointer<class MobProgram> next{};
 	Object *obj = 0;
 	bool done = false;
 	if (IS_NPC(mob) && (DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
