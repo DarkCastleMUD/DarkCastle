@@ -1346,6 +1346,48 @@ private slots:
         QCOMPARE(conn.output, "");
         conn.output = {};
     }
+
+    void test_movement()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+
+        Character ch;
+        ch.setName(QStringLiteral("Testmob"));
+        ch.in_room = 3;
+        ch.height = 72;
+        ch.weight = 150;
+        ch.setClass(CLASS_WARRIOR);
+        ch.setPosition(position_t::STANDING);
+        Player player;
+        ch.player = &player;
+        ch.setType(Character::Type::Player);
+        Connection conn;
+        dc.descriptor_list = &conn;
+        conn.descriptor = 1;
+        conn.character = &ch;
+        ch.desc = &conn;
+        dc.character_list.insert(&ch);
+        conn.output = {};
+
+        auto rc = do_move(&ch, str_hsh(""), CMD_NORTH);
+        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(conn.output, "Alas, you can't go that way.\r\n");
+        conn.output = {};
+
+        rc = do_move(&ch, str_hsh(""), CMD_UP);
+        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(conn.output, "You are too exhausted.\r\n");
+        conn.output = {};
+
+        ch.setMove(100);
+        rc = do_move(&ch, str_hsh(""), CMD_UP);
+        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(conn.output, "Seasick Wench Inn\r\n   You are inside the Seasick Wench Inn, where only the foolish and very brave\r\nventure.  The unsavory clientele sit at their round oak tables, glancing at you\r\nover their shoulders.  A few pigeons coo from the rafters of the mouldering\r\nroof, and a rat runs across a roof beam in search of food scraps.  The smell of\r\nunwashed people and ancient beer hits you in the face in a dizzying wave of\r\nstench.\r\nAn oozing green blob is here, sucking in bits of debris.\r\nA beggar is here, asking for a few coins.\r\nQuark is standing here, eager to serve you a special drink.\r\n-Quark has: aura! \r\nExits: west \r\n");
+        conn.output = {};
+    }
 };
 
 QTEST_MAIN(TestDC)
