@@ -151,8 +151,8 @@ public:
   int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
   void *item{};                                                                          /* the mobile/object itself                 */
 
-  QSharedPointer<class MobProgram> mobprogs;
-  QSharedPointer<class MobProgram> mobspec;
+  QSharedPointer<class MobProgram> mobprogs{};
+  QSharedPointer<class MobProgram> mobspec{};
   int progtypes{};
 };
 
