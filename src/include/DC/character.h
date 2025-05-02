@@ -134,7 +134,7 @@ struct mob_prog_act_list
 class MobProgram
 {
 public:
-    QSharedPointer<class MobProgram> next;
+    QSharedPointer<class MobProgram> next{};
     int type{};
     char *arglist{};
     char *comlist{};
