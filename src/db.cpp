@@ -61,6 +61,7 @@ int load_debug = 0;
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/wizard.h"
+#include "DC/Arena.h"
 
 Room &World::operator[](room_t room_key)
 {
@@ -157,7 +158,7 @@ void Room::FreeTracks()
 	nTracks = 0;
 }
 
-auto Room::arena() -> class Arena &
+Arena &Room::arena(void)
 {
 	static Arena generic_arena;
 	if (isArena())

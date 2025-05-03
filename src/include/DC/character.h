@@ -36,8 +36,7 @@ class Character;
 #include "DC/utility.h"
 #include "DC/Zone.h"
 #include "DC/room.h"
-
-typedef uint64_t gold_t;
+#include "DC/types.h"
 
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);

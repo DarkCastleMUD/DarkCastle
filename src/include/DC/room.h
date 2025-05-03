@@ -13,6 +13,7 @@
 #include "DC/class.h"
 #include "DC/Zone.h"
 #include "DC/common.h"
+#include "DC/Arena.h"
 
 /* Bitvector For 'room_flags' */
 
@@ -192,7 +193,7 @@ public:
     constexpr auto isNoWhere() const -> bool { return isSet(room_flags, NO_WHERE); }
     constexpr auto isLightRoom() const -> bool { return isSet(room_flags, LIGHT_ROOM); }
 
-    auto arena() -> class Arena &;
+    Arena &arena(void);
 
     uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light = {};            // Light factor of room
