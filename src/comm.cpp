@@ -150,8 +150,6 @@ void flush_queues(class Connection *d);
 int perform_subst(class Connection *t, char *orig, char *subst);
 
 void check_idle_passwords(void);
-void init_heartbeat();
-void heartbeat();
 void report_debug_logging();
 
 /* extern fcnts */
@@ -1053,7 +1051,7 @@ void game_test_init(void)
 }
 
 extern void pulse_hunts();
-void init_heartbeat()
+void DC::init_heartbeat(void)
 {
   pulse_mobile = DC::PULSE_MOBILE;
   pulse_timer = DC::PULSE_TIMER;
@@ -1066,9 +1064,8 @@ void init_heartbeat()
   pulse_short = DC::PULSE_SHORT;
 }
 
-void heartbeat()
+void DC::heartbeat(void)
 {
-  DC *dc = DC::getInstance();
   if (--pulse_mobile < 1)
   {
     pulse_mobile = DC::PULSE_MOBILE;
@@ -1144,7 +1141,7 @@ void heartbeat()
     PerfTimers["weather"].stop();
 
     PerfTimers["auctionexp"].start();
-    dc->TheAuctionHouse.CheckExpire();
+    TheAuctionHouse.CheckExpire();
     PerfTimers["auctionexp"].stop();
   }
 
@@ -1159,7 +1156,7 @@ void heartbeat()
     checkConsecrate(DC::PULSE_REGEN);
     if (!number(0, 2))
     {
-      dc->send_hint();
+      send_hint();
     }
     PerfTimers["pulse_regen"].stop();
   }

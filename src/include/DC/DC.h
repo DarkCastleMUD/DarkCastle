@@ -577,6 +577,8 @@ private:
   QString current_filename_;
 
   void game_loop_init(void);
+  void init_heartbeat(void);
+  void heartbeat(void);
   void game_loop(void);
   int init_socket(in_port_t port);
   int exceeded_connection_limit(Connection *new_conn);
