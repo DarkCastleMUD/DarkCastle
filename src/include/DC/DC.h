@@ -99,6 +99,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include "DC/DC_global.h"
 #include "DC/types.h"
+#include "DC/timeinfo.h"
 typedef uint64_t vnum_t;
 typedef uint64_t rnum_t;
 typedef int32_t legacy_rnum_t;
@@ -413,6 +414,7 @@ public:
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
   QList<struct wizlist_info> wizlist;
+  struct time_info_data time_info; /* the infomation about the time   */
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -583,6 +585,9 @@ private:
   int init_socket(in_port_t port);
   int exceeded_connection_limit(Connection *new_conn);
   void nanny(class Connection *d, std::string arg = "");
+  void time_update(void);
+  void another_hour(int mode);
+  void reset_time(void);
 };
 void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);

@@ -2280,22 +2280,21 @@ int do_time(Character *ch, char *argument, int cmd)
    time_t timep;
    int32_t h, m;
    // int32_t s;
-   extern struct time_info_data time_info;
    extern char *weekdays[];
    extern char *month_name[];
    struct tm *pTime = nullptr;
 
    /* 35 days in a month */
-   weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
+   weekday = ((35 * DC::getInstance()->time_info.month) + DC::getInstance()->time_info.day + 1) % 7;
 
    sprintf(buf, "It is %d o'clock %s, on %s.\r\n",
-           ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)),
-           ((time_info.hours >= 12) ? "pm" : "am"),
+           ((DC::getInstance()->time_info.hours % 12 == 0) ? 12 : ((DC::getInstance()->time_info.hours) % 12)),
+           ((DC::getInstance()->time_info.hours >= 12) ? "pm" : "am"),
            weekdays[weekday]);
 
    ch->send(buf);
 
-   day = time_info.day + 1; /* day in [1..35] */
+   day = DC::getInstance()->time_info.day + 1; /* day in [1..35] */
 
    if (day == 1)
       suf = "st";
@@ -2317,8 +2316,8 @@ int do_time(Character *ch, char *argument, int cmd)
    sprintf(buf, "The %d%s Day of the %s, Year %d.  (game time)\n\r",
            day,
            suf,
-           month_name[time_info.month],
-           time_info.year);
+           month_name[DC::getInstance()->time_info.month],
+           DC::getInstance()->time_info.year);
 
    ch->send(buf);
 

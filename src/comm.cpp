@@ -162,7 +162,6 @@ void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
-void time_update();
 void weather_update();
 void send_hint();
 extern void pulse_command_lag();

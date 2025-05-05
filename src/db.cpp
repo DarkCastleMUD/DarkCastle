@@ -105,7 +105,6 @@ struct help_index_element_new *new_help_table = 0;
 int top_of_mobt = 0; /* top of mobile index table       */
 int top_of_objt = 0; /* top of object index table       */
 
-struct time_info_data time_info;  /* the infomation about the time   */
 struct weather_data weather_info; /* the infomation about the weather */
 
 struct vault_data *vault_table = 0;
@@ -126,7 +125,6 @@ index_data *generate_obj_indices(int *top, index_data *index);
 
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
-void reset_time(void);
 void clear_char(Character *ch);
 
 // MOBprogram locals
@@ -905,7 +903,7 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 }
 
 /* reset the time in the game from file */
-void reset_time(void)
+void DC::reset_time(void)
 {
 	int32_t beginning_of_time = 650336715;
 

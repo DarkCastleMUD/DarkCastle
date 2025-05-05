@@ -40,8 +40,6 @@
 
 struct player_shop *g_playershops;
 
-extern struct time_info_data time_info;
-
 int max_shop;
 
 // extern function
@@ -79,22 +77,22 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   /*
    * Shop hours.
    */
-  if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open1)
+  if (DC::getInstance()->time_info.hours < DC::getInstance()->shop_index[shop_nr].open1)
   {
     do_say(keeper, "Come back later!", 0);
     return false;
   }
 
-  else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close1)
+  else if (DC::getInstance()->time_info.hours <= DC::getInstance()->shop_index[shop_nr].close1)
   {
     return true;
   }
-  else if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open2)
+  else if (DC::getInstance()->time_info.hours < DC::getInstance()->shop_index[shop_nr].open2)
   {
     do_say(keeper, "Come back later!", 0);
     return false;
   }
-  else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close2)
+  else if (DC::getInstance()->time_info.hours <= DC::getInstance()->shop_index[shop_nr].close2)
   {
     return true;
   }
