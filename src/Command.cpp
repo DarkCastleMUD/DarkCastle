@@ -96,7 +96,7 @@ const QList<Command> Commands::commands_ =
         {"say", do_say, position_t::RESTING, 0, CMD_SAY, true, 0, CommandType::all},
         {"psay", do_psay, position_t::RESTING, 0, CMD_SAY, true, 0, CommandType::all},
         {"'", do_say, position_t::RESTING, 0, CMD_SAY, true, 0, CommandType::all},
-        {"shout", do_shout, position_t::RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"shout", &Character::do_shout, position_t::RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"whisper", do_whisper, position_t::RESTING, 0, CMD_WHISPER, 0, 0, CommandType::all},
 
         // Object manipulation

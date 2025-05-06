@@ -883,6 +883,7 @@ public:
     command_return_t do_linkload(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_rename_char(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_auction(QStringList arguments = {}, int cmd = CMD_DEFAULT);
+    command_return_t do_shout(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_test(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_tell(QStringList arguments = {}, int cmd = CMD_DEFAULT);
     command_return_t do_wake(QStringList arguments = {}, int cmd = CMD_DEFAULT);

@@ -939,7 +939,7 @@ int mob_arrow_response(Character *ch, Character *victim,
   if (ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if (!number(0, 20))
-      do_shout(victim, "Duh George, someone keeps shooting me!", CMD_DEFAULT);
+      victim->do_shout({QStringLiteral("Duh George, someone keeps shooting me!")});
     return eSUCCESS;
   }
 
@@ -1006,11 +1006,11 @@ int mob_arrow_response(Character *ch, Character *victim,
     {
       if (number(0, 1))
       {
-        do_shout(victim, "Where the fuck are these arrows coming from?!", CMD_DEFAULT);
+        victim->do_shout({QStringLiteral("Where the fuck are these arrows coming from?!")});
       }
       else
       {
-        do_shout(victim, "Quit shooting me dammit!", CMD_DEFAULT);
+        victim->do_shout({QStringLiteral("Quit shooting me dammit!")});
       }
     }
   }

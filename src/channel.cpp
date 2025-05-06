@@ -500,79 +500,78 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_shout(Character *ch, char *argument, int cmd)
+command_return_t Character::do_shout(QStringList arguments, int cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
-  class Connection *i;
-  Object *tmp_obj;
-  bool silence = false;
-
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return eSUCCESS;
   }
 
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (Object *tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  {
     if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
-      ch->sendln("The magical silence prevents you from speaking!");
+      sendln("The magical silence prevents you from speaking!");
       return eFAILURE;
     }
-
-  if (IS_NPC(ch) && ch->master)
-  {
-    return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
   }
 
-  if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
+  if (isNPC() && master)
   {
-    send_to_char("You must have somehow offended the gods, for you "
-                 "find yourself unable to!\n\r",
-                 ch);
-    return eSUCCESS;
+    return do_say(this, "Shouting makes my throat hoarse.", CMD_DEFAULT);
   }
-  if (IS_PC(ch) && !(isSet(ch->misc, DC::LogChannel::CHANNEL_SHOUT)))
+
+  if (isPlayer() && isSet(player->punish, PUNISH_SILENCED))
   {
-    ch->sendln("You told yourself not to SHOUT!!");
-    return eSUCCESS;
-  }
-  if (IS_PC(ch) && ch->getLevel() < 3)
-  {
-    send_to_char("Due to misuse, you must be of at least 3rd level "
-                 "to shout.\r\n",
-                 ch);
+    sendln("You must have somehow offended the gods, for you find yourself unable to!");
     return eSUCCESS;
   }
 
-  for (; *argument == ' '; argument++)
-    ;
+  if (isPlayer() && !(isSet(misc, DC::LogChannel::CHANNEL_SHOUT)))
+  {
+    sendln("You told yourself not to SHOUT!!");
+    return eSUCCESS;
+  }
 
-  if (!(*argument))
-    ch->sendln("What do you want to shout, dork?");
+  if (isPlayer() && getLevel() < 3)
+  {
+    sendln("Due to misuse, you must be of at least level 3 to shout.");
+    return eSUCCESS;
+  }
 
+  QString arg1 = arguments.value(0).trimmed();
+  if (arg1.isEmpty())
+  {
+    sendln("What do you want to shout, dork?");
+  }
   else
   {
-    sprintf(buf1, "$B$n shouts '%s'$R", argument);
-    sprintf(buf2, "$BYou shout '%s'$R", argument);
-    act(buf2, ch, 0, 0, TO_CHAR, 0);
+    act(QStringLiteral("$BYou shout '%1'$R").arg(arguments.join(' ').trimmed()), this, 0, 0, TO_CHAR, 0);
 
-    for (i = DC::getInstance()->descriptor_list; i; i = i->next)
-      if (i->character != ch && !i->connected &&
-          (DC::getInstance()->world[i->character->in_room].zone == DC::getInstance()->world[ch->in_room].zone) &&
+    for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
+    {
+      if (i->character != this &&
+          !i->connected &&
+          DC::getInstance()->world[i->character->in_room].zone == DC::getInstance()->world[in_room].zone &&
           (IS_NPC(i->character) || isSet(i->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
-          !is_ignoring(i->character, ch))
+          !is_ignoring(i->character, this))
       {
-        for (tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        bool silence = false;
+        for (Object *tmp_obj = DC::getInstance()->world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        {
           if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
           }
+        }
         if (!silence)
-          act(buf1, ch, 0, i->character, TO_VICT, 0);
+        {
+          act(QStringLiteral("$B$n shouts '%1'$R").arg(arguments.join(' ').trimmed()), this, 0, i->character, TO_VICT, 0);
+        }
       }
+    }
   }
   return eSUCCESS;
 }

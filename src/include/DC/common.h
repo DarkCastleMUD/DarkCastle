@@ -469,7 +469,6 @@ command_return_t do_sector(Character *ch, char *argument, int cmd = CMD_DEFAULT)
 command_return_t do_sedit(Character *ch, char *argument, int cmd = CMD_DEFAULT);
 command_return_t do_send(Character *ch, char *argument, int cmd = CMD_DEFAULT);
 command_return_t do_set(Character *ch, char *argument, int cmd = CMD_DEFAULT);
-command_return_t do_shout(Character *ch, char *argument, int cmd = CMD_DEFAULT);
 command_return_t do_showhunt(Character *ch, char *argument, int cmd = CMD_DEFAULT);
 command_return_t do_skills(Character *ch, char *argument, int cmd = CMD_DEFAULT);
 command_return_t do_social(Character *ch, char *argument, int cmd = CMD_DEFAULT);

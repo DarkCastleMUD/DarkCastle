@@ -1251,8 +1251,7 @@ int do_steal(Character *ch, char *argument, int cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
-      do_shout(victim, buf, 0);
+      victim->do_shout({QStringLiteral("%1 is a bloody thief.").arg(GET_SHORT(ch))});
     }
     else
     {
@@ -1435,8 +1434,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
   {
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
-      sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
-      do_shout(victim, buf, 0);
+      victim->do_shout({QStringLiteral("%1 is a bloody thief.").arg(GET_SHORT(ch))});
     }
     else
     {

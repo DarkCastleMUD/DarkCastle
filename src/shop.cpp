@@ -60,8 +60,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
     do_say(keeper, "Go away before I call the guards!!", 0);
-    sprintf(buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch));
-    do_shout(keeper, buf, 0);
+    keeper->do_shout({QStringLiteral("%1 the KILLER is over here!\n\r").arg(GET_SHORT(ch))});
     return false;
   }
 

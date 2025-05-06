@@ -456,7 +456,7 @@ int active_grandmaster(Character *ch, class Object *obj, int command, const char
       ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-static char *frostyYellText[] = {
+static const char *frostyYellText[] = {
     "I >WAS< female but my breasts slid down in the heat.",
     "WOW, it sure is hot, who wants a frosty? *winkwink*",
     "Hey, who made me out of yellow snow?",
@@ -495,7 +495,7 @@ int frosty(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if ((unsigned)x < FROSTY_YELL_TEXT_SIZE)
   {
-    do_shout(ch, frostyYellText[x], CMD_DEFAULT);
+    ch->do_shout({frostyYellText[x]});
     return eSUCCESS;
   }
   return eFAILURE;
