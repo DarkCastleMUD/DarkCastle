@@ -123,7 +123,6 @@ QString read_next_worldfile_name(FILE *flWorldIndex);
 index_data *generate_mob_indices(int *top, index_data *index);
 index_data *generate_obj_indices(int *top, index_data *index);
 
-void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void clear_char(Character *ch);
 
@@ -3594,11 +3593,11 @@ int create_blank_mobile(int nr)
 	 */
 
 	//   int i;
-	for (i = 0; i < MAX_SHOP; i++)
+	for (auto &shop : DC::getInstance()->shop_index)
 	{
-		if (DC::getInstance()->shop_index[i].keeper >= cur_index)
-			DC::getInstance()->shop_index[i].keeper++;
+		shop.setKeeperRNUM(real_mobile(shop.keeper_vnum()));
 	}
+
 	return cur_index;
 }
 
@@ -3669,11 +3668,9 @@ void delete_mob_from_index(int nr)
 	/*
 	 Shop fixes follow.
 	 */
-	int z;
-	for (z = 0; z < MAX_SHOP; z++)
+	for (auto &shop : DC::getInstance()->shop_index)
 	{
-		if (DC::getInstance()->shop_index[z].keeper >= nr)
-			DC::getInstance()->shop_index[z].keeper--;
+		shop.setKeeperRNUM(real_mobile(shop.keeper_vnum()));
 	}
 }
 

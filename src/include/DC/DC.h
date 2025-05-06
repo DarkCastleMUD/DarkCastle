@@ -588,6 +588,11 @@ private:
   void time_update(void);
   void another_hour(int mode);
   void reset_time(void);
+  void boot_the_shops(void);
+  void assign_the_shopkeepers(void);
+  void fix_shopkeepers_inventory(void);
+  void boot_player_shops(void);
+  void assign_the_player_shopkeepers(void);
 };
 void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);

@@ -21,10 +21,6 @@
 typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
 typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
 
-void boot_the_shops();
-void boot_player_shops();
-void assign_the_shopkeepers();
-void assign_the_player_shopkeepers();
 void assign_non_combat_procs();
 void assign_combat_procs();
 
