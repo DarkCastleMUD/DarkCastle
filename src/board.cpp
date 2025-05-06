@@ -63,6 +63,7 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/interp.h"
 #include <sstream>
 #include "DC/obj.h"
+#include "DC/save.h"
 
 #define MAX_MESSAGE_LENGTH 2048
 
@@ -96,7 +97,6 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
 int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int fwrite_string(char *buf, FILE *fl);
 void new_edit_board_unlock_board(Character *ch, int abort);
 
 #define ANY_BOARD 0
@@ -1123,9 +1123,4 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   board_save_board(board);
   page_string(ch->desc, board_msg.c_str(), 1);
   return eSUCCESS;
-}
-
-int fwrite_string(char *buf, FILE *fl)
-{
-  return (fprintf(fl, "%s~\n", buf));
 }

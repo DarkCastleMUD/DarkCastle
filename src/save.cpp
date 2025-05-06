@@ -38,6 +38,7 @@
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/guild.h"
+#include "DC/save.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -214,12 +215,6 @@ void Mobile::read(FILE *fpsave)
 // TODO - make sure I go back and update the time_data structs everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
-void fwrite_string_tilde(FILE *fpsave)
-{
-  char buf[40];
-  strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
-  fwrite(&buf, 37, 1, fpsave);
-}
 void Player::save(FILE *fpsave, struct time_data tmpage)
 {
   fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
@@ -1815,4 +1810,16 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
     if (char_eq[i])
       equip_char(ch, char_eq[i], i, 1);
   }
+}
+
+int fwrite_string_tilde(FILE *fpsave)
+{
+  char buf[40];
+  strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
+  return fwrite(&buf, 37, 1, fpsave);
+}
+
+int fwrite_string(char *buf, FILE *fl)
+{
+  return fprintf(fl, "%s~\n", buf);
 }
