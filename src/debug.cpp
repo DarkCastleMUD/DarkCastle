@@ -49,7 +49,7 @@ void test_handle_ansi(QString test)
   // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
   QString str1 = test;
   char *str2 = new char[1024];
-  memset(str2, 1024, 0);
+  memset(str2, 0, 1024);
   strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
@@ -294,7 +294,7 @@ int main(int argc, char **argv)
 
   update_max_who();
 
-  do_stand(ch, "", CMD_DEFAULT);
+  do_stand(ch, str_hsh(""), CMD_DEFAULT);
   process_output(d);
 
   char_to_room(ch, 3001);
@@ -454,9 +454,9 @@ int main(int argc, char **argv)
     for (const auto &c : DC::getInstance()->character_list)
     {
       c->desc = d;
-      do_score(c, "");
+      do_score(c, str_hsh(""));
       process_output(d);
-      do_vault(c, "list");
+      do_vault(c, str_hsh("list"));
       process_output(d);
 
       if (c->isImmortalPlayer())
@@ -467,9 +467,9 @@ int main(int argc, char **argv)
 
     if (argv[1] == QStringLiteral("leaderboard"))
     {
-      do_leaderboard(ch, "scan", CMD_DEFAULT);
+      do_leaderboard(ch, str_hsh("scan"), CMD_DEFAULT);
       process_output(d);
-      do_leaderboard(ch, "", CMD_DEFAULT);
+      do_leaderboard(ch, str_hsh(""), CMD_DEFAULT);
       process_output(d);
     }
     /*
