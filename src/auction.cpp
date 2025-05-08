@@ -850,7 +850,8 @@ AuctionHouse::~AuctionHouse()
 /*
 Empty constructor
 */
-AuctionHouse::AuctionHouse()
+AuctionHouse::AuctionHouse(DC *dc)
+    : dc_(dc)
 {
   /*
    In the current implementation this must NEVER be called
@@ -869,7 +870,8 @@ AuctionHouse::AuctionHouse()
 /*
 Constructor with file name
 */
-AuctionHouse::AuctionHouse(QString in_file)
+AuctionHouse::AuctionHouse(DC *dc, QString in_file)
+    : dc_(dc)
 {
   ItemsPosted = 0;
   ItemsActive = 0;

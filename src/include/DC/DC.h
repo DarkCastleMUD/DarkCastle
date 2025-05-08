@@ -227,8 +227,8 @@ class Character;
 class AuctionHouse
 {
 public:
-  AuctionHouse(QString in_file);
-  AuctionHouse();
+  AuctionHouse(DC *dc, QString in_file);
+  AuctionHouse(DC *dc);
   ~AuctionHouse();
   void CollectTickets(Character *ch, unsigned int ticket = 0);
   void CancelAll(Character *ch);
@@ -253,6 +253,7 @@ public:
   void setItemsPosted(unsigned int items_posted) { ItemsPosted = items_posted; }
 
 private:
+  DC *dc_;
   unsigned int ItemsPosted;
   unsigned int ItemsExpired;
   unsigned int ItemsSold;
