@@ -1412,7 +1412,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       if (robj < 0)
         ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(item->price));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg(DC::getInstance()->obj_index[robj].item->short_description, -40).arg(item->price));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))

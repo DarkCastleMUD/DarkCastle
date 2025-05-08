@@ -3429,7 +3429,7 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 
 	// update index of all the obj prototypes
 	for (int i = cur_index + 1; i <= top_of_objt; i++)
-		((Object *)DC::getInstance()->obj_index[i].item)->item_number++;
+		DC::getInstance()->obj_index[i].item->item_number++;
 
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
@@ -3706,7 +3706,7 @@ void delete_item_from_index(int nr)
 
 	// update index of all the obj prototypes
 	for (i = nr; i <= top_of_objt; i++)
-		((Object *)DC::getInstance()->obj_index[i].item)->item_number--;
+		DC::getInstance()->obj_index[i].item->item_number--;
 
 	// update obj file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;

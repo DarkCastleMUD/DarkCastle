@@ -2149,7 +2149,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->name = str_hsh(buf4);
+    DC::getInstance()->obj_index[rnum].item->name = str_hsh(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2163,7 +2163,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->description = str_hsh(buf4);
+    DC::getInstance()->obj_index[rnum].item->description = str_hsh(buf4);
     sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2177,7 +2177,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->short_description = str_hsh(buf4);
+    DC::getInstance()->obj_index[rnum].item->short_description = str_hsh(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2191,7 +2191,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->ActionDescription(buf4);
+    DC::getInstance()->obj_index[rnum].item->ActionDescription(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2205,7 +2205,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
                    ch);
-      snprintf(buf, sizeof(buf), "%s\n", item_types[((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
+      snprintf(buf, sizeof(buf), "%s\n", item_types[DC::getInstance()->obj_index[rnum].item->obj_flags.type_flag].toStdString().c_str());
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
 
@@ -2222,13 +2222,13 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     if (intval == 24)
     {
-      ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = -1;
+      DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = -1;
     }
     else
     {
-      ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = 0;
+      DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = 0;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.type_flag = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.type_flag = intval;
     sprintf(buf, "Item type set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2242,7 +2242,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags, Object::wear_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.wear_flags, Object::wear_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::wear_bits.size(); i++)
@@ -2251,7 +2251,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.wear_flags);
+    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.wear_flags);
   }
   break;
 
@@ -2263,7 +2263,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.size,
+      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.size,
                 size_bitfields, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
@@ -2275,7 +2275,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(size_bitfields, buf4, ch,
-                              ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.size);
+                              DC::getInstance()->obj_index[rnum].item->obj_flags.size);
   }
   break;
 
@@ -2287,7 +2287,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.extra_flags, Object::extra_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::extra_bits.size(); i++)
@@ -2296,7 +2296,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.extra_flags);
   }
   break;
 
@@ -2313,7 +2313,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.weight = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.weight = intval;
     sprintf(buf, "Item weight set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2332,7 +2332,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.cost = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.cost = intval;
     sprintf(buf, "Item value set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2346,7 +2346,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.more_flags, Object::more_obj_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::more_obj_bits.size(); i++)
@@ -2355,7 +2355,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.more_flags);
   }
   break;
 
@@ -2372,7 +2372,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.eq_level = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.eq_level = intval;
     sprintf(buf, "Item minimum level set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2391,7 +2391,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[0] = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.value[0] = intval;
     sprintf(buf, "Item value 1 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2410,7 +2410,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[1] = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.value[1] = intval;
     sprintf(buf, "Item value 2 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2429,7 +2429,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[2] = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = intval;
     sprintf(buf, "Item value 3 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2448,7 +2448,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.value[3] = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.value[3] = intval;
     sprintf(buf, "Item value 4 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2593,23 +2593,23 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    ((Object *)DC::getInstance()->obj_index[rnum].item)->obj_flags.timer = intval;
+    DC::getInstance()->obj_index[rnum].item->obj_flags.timer = intval;
     sprintf(buf, "Item timer to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
   case 22:
     extra_descr_data *curr;
-    for (curr = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, ((Object *)DC::getInstance()->obj_index[rnum].item)->name))
+    for (curr = DC::getInstance()->obj_index[rnum].item->ex_description; curr; curr = curr->next)
+      if (!str_cmp(curr->keyword, DC::getInstance()->obj_index[rnum].item->name))
         break;
     if (!curr)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(((Object *)DC::getInstance()->obj_index[rnum].item)->name);
+      curr->keyword = str_dup(DC::getInstance()->obj_index[rnum].item->name);
       curr->description = str_dup("");
-      curr->next = ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description;
-      ((Object *)DC::getInstance()->obj_index[rnum].item)->ex_description = curr;
+      curr->next = DC::getInstance()->obj_index[rnum].item->ex_description;
+      DC::getInstance()->obj_index[rnum].item->ex_description = curr;
     }
     ch->sendln("Write your object's description. End with /s.");
     ch->desc->connected = Connection::states::EDITING;

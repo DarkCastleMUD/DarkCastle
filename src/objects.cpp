@@ -170,7 +170,7 @@ void object_activity(uint64_t pulse_type)
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((Object *)DC::getInstance()->obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = DC::getInstance()->obj_index[item_number].item->obj_flags.value[1];
       send_to_room(obj->ex_description->description, obj->in_room, true);
     }
     else
