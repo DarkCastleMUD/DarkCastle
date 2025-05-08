@@ -1205,7 +1205,7 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
   {
     Object *reference_obj = Item_it->obj;
 
-    obj = clone_object(rnum);
+    obj = DC::getInstance()->clone_object(rnum);
     copySaveData(obj, reference_obj);
 
     if (verify_item(&obj))
@@ -1215,7 +1215,7 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
   }
   else
   {
-    obj = clone_object(rnum);
+    obj = DC::getInstance()->clone_object(rnum);
   }
 
   return obj;

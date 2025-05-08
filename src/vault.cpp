@@ -1578,10 +1578,10 @@ void DC::vault_get(Character *ch, QString object, QString owner)
     item_remove(obj, vault);
 
     if (!fullSave(obj))
-      tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = DC::getInstance()->clone_object(real_object(GET_OBJ_VNUM(obj)));
     else
     {
-      tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = DC::getInstance()->clone_object(real_object(GET_OBJ_VNUM(obj)));
       copySaveData(tmp_obj, obj);
 
       if (verify_item(&tmp_obj))

@@ -350,9 +350,9 @@ private slots:
         auto new_rnum = create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
         int rnum = real_object(1);
-        Object *o1 = clone_object(rnum);
-        Object *o2 = clone_object(rnum);
-        Object *o3 = clone_object(rnum);
+        Object *o1 = DC::getInstance()->clone_object(rnum);
+        Object *o2 = DC::getInstance()->clone_object(rnum);
+        Object *o3 = DC::getInstance()->clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
         QVERIFY(o3);
@@ -857,8 +857,8 @@ private slots:
         auto new_rnum = create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
         int rnum = real_object(1);
-        Object *o1 = clone_object(rnum);
-        Object *o2 = clone_object(rnum);
+        Object *o1 = DC::getInstance()->clone_object(rnum);
+        Object *o2 = DC::getInstance()->clone_object(rnum);
         QVERIFY(o1);
         QVERIFY(o2);
         GET_OBJ_NAME(o1) = str_hsh("sword");

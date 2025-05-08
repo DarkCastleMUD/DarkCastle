@@ -187,7 +187,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
     return (eFAILURE | eINTERNAL_ERROR);
   }
 
-  Object *reward = clone_object(rewardnum);
+  Object *reward = DC::getInstance()->clone_object(rewardnum);
   obj_to_char(reward, ch);
   ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);

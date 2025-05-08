@@ -772,7 +772,7 @@ int do_forage(Character *ch, char *arg, int cmd)
         return eFAILURE;
       }
 
-      new_obj = clone_object(real_object(ovnum));
+      new_obj = DC::getInstance()->clone_object(real_object(ovnum));
       break;
     }
     last = last + forage_lookup_table[cur_sector][i].rate[lgroup];

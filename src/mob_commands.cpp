@@ -576,7 +576,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
     prog_error(ch, "Mpoload - Bad vnum arg.");
     return eFAILURE | eINTERNAL_ERROR;
   }
-  obj = clone_object(realnum);
+  obj = DC::getInstance()->clone_object(realnum);
 
   if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {

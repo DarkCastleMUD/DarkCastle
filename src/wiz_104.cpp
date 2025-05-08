@@ -2413,7 +2413,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 	}
-	obj = clone_object(r1);
+	obj = DC::getInstance()->clone_object(r1);
 	if (!obj)
 	{
 		ch->sendln("Failure. Unable to clone item.");

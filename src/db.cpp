@@ -4439,7 +4439,7 @@ bool has_random(Object *obj)
 }
 
 /* clone an object from DC::getInstance()->obj_index */
-class Object *clone_object(int nr)
+class Object *DC::clone_object(int nr)
 {
 	class Object *obj, *old;
 	struct extra_descr_data *new_new_descr, *descr;
@@ -4819,7 +4819,7 @@ void Zone::reset(ResetType reset_type)
 						if (!get_obj_in_list_num(cmd[cmd_no]->arg1,
 												 DC::getInstance()->world[cmd[cmd_no]->arg3].contents) &&
 							(obj =
-								 clone_object(cmd[cmd_no]->arg1)))
+								 DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 						{
 							obj_to_room(obj, cmd[cmd_no]->arg3);
 							last_cmd = 1;
@@ -4860,7 +4860,7 @@ void Zone::reset(ResetType reset_type)
 					obj_to = 0;
 					obj = 0;
 					if ((obj_to = get_obj_num(cmd[cmd_no]->arg3)) && (obj =
-																		  clone_object(cmd[cmd_no]->arg1)))
+																		  DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 						obj_to_obj(obj, obj_to);
 					else
 						logf(
@@ -4897,7 +4897,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4952,7 +4952,7 @@ void Zone::reset(ResetType reset_type)
 					last_obj = 0;
 					break;
 				}
-				if ((obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 				{
 					randomize_object(obj);
 
@@ -6917,7 +6917,7 @@ bool verify_item(class Object **obj)
 	if (newitem == -1)
 		return false;
 
-	*obj = clone_object(newitem); // Fixed!
+	*obj = DC::getInstance()->clone_object(newitem); // Fixed!
 	return true;
 }
 

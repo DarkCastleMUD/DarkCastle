@@ -586,7 +586,7 @@ int start_quest(Character *ch, struct quest_info *quest)
       return eFAILURE;
    }
 
-   obj = clone_object(real_object(quest->objnum));
+   obj = DC::getInstance()->clone_object(real_object(quest->objnum));
    obj->short_description = str_hsh(quest->objshort);
    obj->description = str_hsh(quest->objlong);
 
@@ -790,7 +790,7 @@ void quest_update()
             {
                if ((mob = get_mob_vnum(quest->mobnum)))
                {
-                  obj = clone_object(quest->objnum);
+                  obj = DC::getInstance()->clone_object(quest->objnum);
                   obj->short_description = str_hsh(quest->objshort);
                   obj->description = str_hsh(quest->objlong);
                   sprintf(buf, "%s q%d", quest->objkey, quest->number);
@@ -1605,7 +1605,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
       }
 
       class Object *obj;
-      obj = clone_object(rnum);
+      obj = DC::getInstance()->clone_object(rnum);
 
       /*      if (class_restricted(ch, obj)) {
            sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));

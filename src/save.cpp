@@ -1083,9 +1083,9 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // if it's not, then we need to remove it from the pfile so clone obj 1
 
   if ((nr = real_object(object.item_number)) > -1)
-    obj = clone_object(nr);
+    obj = DC::getInstance()->clone_object(nr);
   else
-    obj = clone_object(1);
+    obj = DC::getInstance()->clone_object(1);
 
   obj->obj_flags.timer = object.timer;
   wear_pos = object.wear_pos;

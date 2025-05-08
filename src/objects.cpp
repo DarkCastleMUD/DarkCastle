@@ -481,7 +481,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
-  trap_obj = clone_object(GOD_TRAP_ITEM);
+  trap_obj = DC::getInstance()->clone_object(GOD_TRAP_ITEM);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -502,7 +502,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
   // make a new item
-  trap_obj = clone_object(GOD_TRAP_ITEM);
+  trap_obj = DC::getInstance()->clone_object(GOD_TRAP_ITEM);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -561,7 +561,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   }
 
   // make a new item
-  trap_obj = clone_object(real_object(MORTAR_ROUND_OBJECT_ID));
+  trap_obj = DC::getInstance()->clone_object(real_object(MORTAR_ROUND_OBJECT_ID));
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)

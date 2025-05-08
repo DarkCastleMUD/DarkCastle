@@ -4558,10 +4558,10 @@ void make_corpse(Character *ch)
         switch (itemtype)
         {
         case 0: // bottle
-          recipeitem = clone_object(real_object(6324));
+          recipeitem = DC::getInstance()->clone_object(real_object(6324));
           break;
         case 1:
-          recipeitem = clone_object(real_object(6338));
+          recipeitem = DC::getInstance()->clone_object(real_object(6338));
           break;
         }
       }
@@ -4570,10 +4570,10 @@ void make_corpse(Character *ch)
         switch (itemtype)
         {
         case 0: // bottle
-          recipeitem = clone_object(real_object(6323));
+          recipeitem = DC::getInstance()->clone_object(real_object(6323));
           break;
         case 1:
-          recipeitem = clone_object(real_object(6339));
+          recipeitem = DC::getInstance()->clone_object(real_object(6339));
           break;
         }
       }
@@ -4582,10 +4582,10 @@ void make_corpse(Character *ch)
         switch (itemtype)
         {
         case 0: // bottle
-          recipeitem = clone_object(real_object(6322));
+          recipeitem = DC::getInstance()->clone_object(real_object(6322));
           break;
         case 1:
-          recipeitem = clone_object(real_object(6340));
+          recipeitem = DC::getInstance()->clone_object(real_object(6340));
           break;
         }
       }
@@ -4594,10 +4594,10 @@ void make_corpse(Character *ch)
         switch (itemtype)
         {
         case 0: // bottle
-          recipeitem = clone_object(real_object(6321));
+          recipeitem = DC::getInstance()->clone_object(real_object(6321));
           break;
         case 1:
-          recipeitem = clone_object(real_object(6341));
+          recipeitem = DC::getInstance()->clone_object(real_object(6341));
           break;
         }
       }
@@ -4606,10 +4606,10 @@ void make_corpse(Character *ch)
         switch (itemtype)
         {
         case 0: // bottle
-          recipeitem = clone_object(real_object(6320));
+          recipeitem = DC::getInstance()->clone_object(real_object(6320));
           break;
         case 1:
-          recipeitem = clone_object(real_object(6342));
+          recipeitem = DC::getInstance()->clone_object(real_object(6342));
           break;
         }
       }

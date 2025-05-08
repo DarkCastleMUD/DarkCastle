@@ -369,7 +369,6 @@ extern index_data mob_index_array[MAX_INDEX];
 class Object *read_object(int nr, FILE *fl, bool zz);
 class Object *read_object(int nr, QTextStream &fl, bool zz);
 Character *read_mobile(int nr, FILE *fl);
-class Object *clone_object(int nr);
 Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
 void string_to_file(FILE *fl, QString str);

@@ -134,7 +134,7 @@ void Shop::restock_keeper(Character *shopkeeper_ch)
 
   for (Object *obj = inventory; obj; obj = obj->next_content)
   {
-    Object *obj2 = clone_object(obj->item_number);
+    Object *obj2 = DC::getInstance()->clone_object(obj->item_number);
     obj_to_char(obj2, shopkeeper_ch);
   }
 }
@@ -229,13 +229,13 @@ void Shop::shopping_buy(const char *arg, Character *ch, Character *keeper)
   // Wormhole to map_eq_level
   /*
   if( obj->obj_flags.eq_level == 1000 )
-       obj = clone_object(obj->item_number);
+       obj = DC::getInstance()->clone_object(obj->item_number);
   else
       obj_from_char( obj );
   */
 
   if (unlimited_supply(obj))
-    obj = clone_object(obj->item_number);
+    obj = DC::getInstance()->clone_object(obj->item_number);
   else
     obj_from_char(obj);
 
@@ -877,11 +877,11 @@ void DC::fix_shopkeepers_inventory(void)
       {
         if (keeper->carrying)
         {
-          Object *last_obj = clone_object(keeper->carrying->item_number);
+          Object *last_obj = DC::getInstance()->clone_object(keeper->carrying->item_number);
           shop.inventory = last_obj;
           for (Object *obj = keeper->carrying->next_content; obj; obj = obj->next_content)
           {
-            Object *cloned = clone_object(obj->item_number);
+            Object *cloned = DC::getInstance()->clone_object(obj->item_number);
             last_obj->next_content = cloned;
             last_obj = cloned;
           }
@@ -1195,7 +1195,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   }
 
   // give it to them, thank them, take the money
-  Object *obj = clone_object(robj);
+  Object *obj = DC::getInstance()->clone_object(robj);
   obj_to_char(obj, ch);
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
@@ -1822,7 +1822,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
     for (int i = 0; i < eddie[choice - 1].item_qty; i++)
     {
-      Object *item = clone_object(real_object(eddie[choice - 1].item_vnum));
+      Object *item = DC::getInstance()->clone_object(real_object(eddie[choice - 1].item_vnum));
       if (item != 0)
       {
         obj_to_char(item, ch);

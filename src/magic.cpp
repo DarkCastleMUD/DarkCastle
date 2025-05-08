@@ -2011,9 +2011,9 @@ int spell_create_food(uint8_t level, Character *ch, Character *victim, class Obj
   class Object *tmp_obj;
 
   if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN)
-    tmp_obj = clone_object(real_object(8));
+    tmp_obj = DC::getInstance()->clone_object(real_object(8));
   else
-    tmp_obj = clone_object(real_object(7));
+    tmp_obj = DC::getInstance()->clone_object(real_object(7));
 
   tmp_obj->obj_flags.value[0] += skill / 2;
 
@@ -5223,7 +5223,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
     return eSUCCESS;
   }
 
-  tmp_obj = clone_object(real_object(6));
+  tmp_obj = DC::getInstance()->clone_object(real_object(6));
 
   obj_to_char(tmp_obj, ch);
 
@@ -12585,7 +12585,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
   ch->sendln("You set a magical beacon in the air.");
   if (!ch->beacon)
   {
-    if (!(new_obj = clone_object(real_object(BEACON_OBJ_NUMBER))))
+    if (!(new_obj = DC::getInstance()->clone_object(real_object(BEACON_OBJ_NUMBER))))
     {
       ch->sendln("Error setting beacon.  Contact a god.");
       return eFAILURE;
@@ -13305,7 +13305,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, cla
     dur = 2;
     mod = 15;
   }
-  globe = clone_object(real_object(GLOBE_OF_DARKNESS_OBJECT));
+  globe = DC::getInstance()->clone_object(real_object(GLOBE_OF_DARKNESS_OBJECT));
 
   if (!globe)
   {
@@ -14750,7 +14750,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
   ch->sendln("Your chants fade softy to an eerie quiet as the silence takes hold...");
   act("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, TO_ROOM, 0);
 
-  if (!(silence_obj = clone_object(real_object(SILENCE_OBJ_NUMBER))))
+  if (!(silence_obj = DC::getInstance()->clone_object(real_object(SILENCE_OBJ_NUMBER))))
   {
     ch->sendln("Error setting silence object.  Tell an immortal.");
     return eFAILURE;
@@ -15368,7 +15368,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
     return eFAILURE;
   }
 
-  if (!(ssobj = clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
+  if (!(ssobj = DC::getInstance()->clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
   {
     ch->sendln("Error setting spirit shield object.  Tell an immortal.");
     return eFAILURE;
@@ -15627,7 +15627,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  cItem = DC::getInstance()->clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (cItem == nullptr)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
@@ -15785,7 +15785,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  cItem = DC::getInstance()->clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (!cItem)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");

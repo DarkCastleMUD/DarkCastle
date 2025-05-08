@@ -1156,7 +1156,7 @@ bool assemble_item_index(Character *ch, int item_index)
   }
 
   // make the new item
-  Object *reward_item = clone_object(item_real);
+  Object *reward_item = DC::getInstance()->clone_object(item_real);
   if (reward_item == 0)
   {
     logf(ANGEL, DC::LogChannel::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
@@ -2417,7 +2417,7 @@ int pull_proc(Character *ch, class Object *obj, int cmd, const char *arg, Charac
       break;
     }
     send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258, true);
-    obj_to_room(clone_object(real_object(29202)), 29258);
+    obj_to_room(DC::getInstance()->clone_object(real_object(29202)), 29258);
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
@@ -3012,7 +3012,7 @@ int hornoplenty(Character *ch, class Object *obj, int cmd, const char *arg, Char
     return eFAILURE;
   }
 
-  newobj = clone_object(objnum);
+  newobj = DC::getInstance()->clone_object(objnum);
 
   obj_to_obj(newobj, obj);
   return eSUCCESS;
@@ -4251,7 +4251,7 @@ int godload_quiver(Character *ch, class Object *obj, int cmd, const char *arg,
   {
     if ((obj->obj_flags.weight + 1) < obj->obj_flags.value[0])
     {
-      obj2 = clone_object(real_object(597));
+      obj2 = DC::getInstance()->clone_object(real_object(597));
       if (!obj_to_obj(obj2, obj))
       {
         ch->sendln("Some arrows appear in your quiver.");

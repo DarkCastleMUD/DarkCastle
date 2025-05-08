@@ -3379,7 +3379,7 @@ void check_champion_and_website_who_list()
 
    if (!(obj = get_obj_num(real_object(CHAMPION_ITEM))))
    {
-      if ((obj = clone_object(real_object(CHAMPION_ITEM))))
+      if ((obj = DC::getInstance()->clone_object(real_object(CHAMPION_ITEM))))
       {
          obj_to_room(obj, CFLAG_HOME);
       }

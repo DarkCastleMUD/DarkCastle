@@ -722,7 +722,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 			return eSUCCESS;
 		}
 		class Object *obj;
-		obj = clone_object(real_object(platsmith_list[o].sales[k]));
+		obj = DC::getInstance()->clone_object(real_object(platsmith_list[o].sales[k]));
 
 		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
 		{

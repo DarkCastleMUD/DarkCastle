@@ -221,7 +221,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   }
   else /* Duplicate the object # duplicate */
   {
-    from_portal = clone_object(real_object(duplicate));
+    from_portal = DC::getInstance()->clone_object(real_object(duplicate));
 
     if (!from_portal->isPortal())
     {

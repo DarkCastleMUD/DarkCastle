@@ -314,7 +314,7 @@ void DC::load_corpses(void)
 
 				if ((number = real_object(nr)) < 0)
 					continue;
-				temp = clone_object(number);
+				temp = DC::getInstance()->clone_object(number);
 				if (!temp)
 				{
 					continue;

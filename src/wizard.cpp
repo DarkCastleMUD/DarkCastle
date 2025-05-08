@@ -162,7 +162,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
   act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
   for (auto i = 1; i <= cnt; i++)
   {
-    obj = clone_object(rnum);
+    obj = DC::getInstance()->clone_object(rnum);
     act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
     if (random == true)
     {
@@ -209,7 +209,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
   act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
   for (i = 1; i <= cnt; i++)
   {
-    obj = clone_object(rnum);
+    obj = DC::getInstance()->clone_object(rnum);
     act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
     if (random == true)
     {
@@ -1935,7 +1935,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
       break;
     }
-    class Object *obj = clone_object(rnum);
+    class Object *obj = DC::getInstance()->clone_object(rnum);
     obj_to_char(obj, vict);
     struct hunt_items *ni;
 #ifdef LEAK_CHECK
@@ -1980,7 +1980,7 @@ void pick_up_item(Character *ch, class Object *obj)
         r1 = real_object(get_rand_obj(h));
         if (r1 > 0)
         {
-          oitem = clone_object(r1);
+          oitem = DC::getInstance()->clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
                   obj->short_description, oitem->short_description);
           ch->send(buf);
