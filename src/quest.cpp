@@ -1655,7 +1655,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          return eSUCCESS;
       }
 
-      if (!isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) &&
+      if (!isexact("quest", ((DC::getInstance()->obj_index[obj->item_number].item))->name) &&
           DC::getInstance()->obj_index[obj->item_number].virt != 3124 &&
           DC::getInstance()->obj_index[obj->item_number].virt != 3125 &&
           DC::getInstance()->obj_index[obj->item_number].virt != 3126 &&

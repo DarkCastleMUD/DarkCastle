@@ -281,7 +281,7 @@ int do_load(Character *ch, char *arg, int cmd)
 
 			if (random[0] == 'r')
 			{
-				Object *obj = (Object *)(DC::getInstance()->obj_index[number].item);
+				Object *obj = (DC::getInstance()->obj_index[number].item);
 				if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 				{
 					ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
