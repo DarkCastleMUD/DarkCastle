@@ -236,19 +236,19 @@ int main(int argc, char **argv)
   }
 
   logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
-  DC::getInstance()->boot_zones();
+  debug.boot_zones();
 
   logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
 
-  DC::getInstance()->top_of_world_alloc = 2000;
+  debug.top_of_world_alloc = 2000;
 
-  DC::getInstance()->boot_world();
+  debug.boot_world();
 
   logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
   logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
-  generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
+  generate_obj_indices(&top_of_objt, debug.obj_index);
 
   logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
   generate_mob_indices(&top_of_mobt, DC::getInstance()->mob_index);
