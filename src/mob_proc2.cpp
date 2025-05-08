@@ -686,7 +686,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
-			char *tmp = gl_item((Object *)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+			char *tmp = gl_item(DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
 			ch->send(tmp);
 			dc_free(tmp);
 		}

@@ -1061,7 +1061,7 @@ bool identify(Character *ch, Object *obj)
          const int rn_of_vnum = real_object(vnum);
          if (rn_of_vnum >= 0)
          {
-            vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
+            vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
          }
       }
    }
@@ -1262,7 +1262,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
          send("Invalid VNUM.\r\n");
          return eFAILURE;
       }
-      obj = (Object *)DC::getInstance()->obj_index[rnum].item;
+      obj = DC::getInstance()->obj_index[rnum].item;
 
       if (obj->isDark() && !isImmortalPlayer())
       {
@@ -4580,7 +4580,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
             const int rn_of_vnum = real_object(vnum);
             if (rn_of_vnum >= 0)
             {
-               vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
+               vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
             }
          }
       }

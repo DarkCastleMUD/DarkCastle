@@ -801,7 +801,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   {
     if (real_object(i) < 0)
       continue;
-    obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
+    obj = DC::getInstance()->obj_index[real_object(i)].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, ITEM_TAKE) &&
@@ -854,7 +854,7 @@ int do_eqmax(Character *ch, char *argument, int cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, (DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -975,7 +975,7 @@ int do_listproc(Character *ch, char *argument, int a)
     }
     else
     {
-      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, ((Object *)DC::getInstance()->obj_index[real_object(i)].item)->name);
+      sprintf(buf, "%s[%-3d] [%-3d] %s\r\n", buf, tot, i, (DC::getInstance()->obj_index[real_object(i)].item)->name);
     }
   }
   ch->send(buf);

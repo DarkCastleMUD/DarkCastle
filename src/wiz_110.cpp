@@ -874,7 +874,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
   char buf[MAX_STRING_LENGTH];
   for (r = 0; r < top_of_objt; r++)
   {
-    obj = (Object *)DC::getInstance()->obj_index[r].item;
+    obj = DC::getInstance()->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -991,7 +991,7 @@ int do_export(Character *ch, char *args, int cmdnum)
     {
       for (int x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv((Object *)DC::getInstance()->obj_index[x].item, fout);
+        write_object_csv(DC::getInstance()->obj_index[x].item, fout);
       }
       curr = curr->next;
     }

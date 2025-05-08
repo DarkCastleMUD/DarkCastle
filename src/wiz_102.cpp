@@ -1591,7 +1591,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   // select = # of affect
   // value = value to change aff to
 
-  obj = (Object *)DC::getInstance()->obj_index[item_num].item;
+  obj = DC::getInstance()->obj_index[item_num].item;
 
   if (!*buf)
   {
@@ -1801,7 +1801,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
       break;
   }
 
-  obj = (Object *)DC::getInstance()->obj_index[item_num].item;
+  obj = DC::getInstance()->obj_index[item_num].item;
 
   switch (x)
   {
@@ -2114,7 +2114,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
   if (!*buf3) // no field.  Stat the item.
   {
-    obj_stat(ch, (Object *)DC::getInstance()->obj_index[rnum].item);
+    obj_stat(ch, DC::getInstance()->obj_index[rnum].item);
     return eSUCCESS;
   }
 
@@ -2577,7 +2577,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   // stat
   case 20:
   {
-    obj_stat(ch, (Object *)DC::getInstance()->obj_index[rnum].item);
+    obj_stat(ch, DC::getInstance()->obj_index[rnum].item);
     return eSUCCESS;
     break;
   }
@@ -5083,7 +5083,7 @@ int do_osave(Character *ch, char *arg, int cmd)
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)
     {
-      write_object(lf, (Object *)DC::getInstance()->obj_index[x].item);
+      write_object(lf, DC::getInstance()->obj_index[x].item);
     }
     fprintf(lf.file_handle_, "$~\n");
   }

@@ -1115,7 +1115,7 @@ bool assemble_item_index(Character *ch, int item_index)
   // If we get to this point then all components for item_index were found
   int item_vnum = assemble_items[item_index].item;
   int item_real = real_object(item_vnum);
-  Object *item = (Object *)DC::getInstance()->obj_index[item_real].item;
+  Object *item = DC::getInstance()->obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
   if (isSet(item->obj_flags.more_flags, ITEM_UNIQUE))

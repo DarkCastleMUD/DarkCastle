@@ -1703,9 +1703,9 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     else
@@ -1716,7 +1716,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
       }
     }
     send_info(buf);
@@ -2098,11 +2098,11 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((Object *)DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     int itemsleft = 0;

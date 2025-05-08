@@ -1655,7 +1655,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+        strncpy(item_buf, (DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
       }
       else
       {
@@ -1664,7 +1664,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+        strncpy(cost_buf, (DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {

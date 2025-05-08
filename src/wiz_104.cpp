@@ -2045,7 +2045,7 @@ void opstat(Character *ch, int vnum)
 		ch->sendln("Error, non-existant object.");
 		return;
 	}
-	obj = (Object *)DC::getInstance()->obj_index[num].item;
+	obj = DC::getInstance()->obj_index[num].item;
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
 			obj->name, vnum);
 	ch->send(buf);
@@ -2429,11 +2429,11 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	*/
 
 	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\r\n",
-		   v1, ((Object *)DC::getInstance()->obj_index[real_object(v1)].item)->short_description,
-		   v2, ((Object *)DC::getInstance()->obj_index[real_object(v2)].item)->short_description);
+		   v1, (DC::getInstance()->obj_index[real_object(v1)].item)->short_description,
+		   v2, (DC::getInstance()->obj_index[real_object(v2)].item)->short_description);
 
 	DC::getInstance()->object_list = DC::getInstance()->object_list->next;
-	otmp = (Object *)DC::getInstance()->obj_index[r2].item;
+	otmp = DC::getInstance()->obj_index[r2].item;
 	obj->item_number = r2;
 	DC::getInstance()->obj_index[r2].item = obj;
 	DC::getInstance()->obj_index[r2].non_combat_func = 0;

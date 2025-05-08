@@ -1502,7 +1502,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1512,7 +1512,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1522,7 +1522,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
@@ -1532,7 +1532,7 @@ int quest_vendor(Character *ch, Object *obj, int cmd, const char *arg, Character
          rnum = real_object(qvnum);
          if (rnum >= 0)
          {
-            char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+            char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
             ch->send(buffer);
             dc_free(buffer);
          }
