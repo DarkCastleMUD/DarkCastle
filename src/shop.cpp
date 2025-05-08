@@ -741,7 +741,7 @@ void DC::boot_the_shops(void)
   {
     for (;;)
     {
-      Shop shop{};
+      Shop shop(this);
       char *buf = fread_string(fp.data(), 0);
 
       // We've reached the end of the list of shops
@@ -827,7 +827,7 @@ void DC::boot_the_shops(void)
       }
       else
       {
-        shop_index[shop.shop_nr()] = shop;
+        shop_index.insert(shop.shop_nr(), shop);
       }
     }
   }
@@ -850,7 +850,7 @@ void DC::boot_the_shops(void)
       shop.setShopNR(0);
     }
 
-    shop_index[shop.shop_nr()] = shop;
+    shop_index.insert(shop.shop_nr(), shop);
   }
 }
 
@@ -1569,20 +1569,22 @@ void redo_shop_profit()
   case 0:
     break;
   case 1:
-    for (int i = 0; i < 58; i++)
+    for (auto &shop : DC::getInstance()->shop_index)
     {
-      DC::getInstance()->shop_index[i].profit_buy = DC::getInstance()->shop_index[i].profit_buy_base;
+      shop.profit_buy = shop.profit_buy_base;
     }
     break;
   case 2:
-    for (int i = 0; i < 58; i++)
-      DC::getInstance()->shop_index[i].profit_buy *= 1.0 + number(10, 50) / 100.0;
+    for (auto &shop : DC::getInstance()->shop_index)
+    {
+      shop.profit_buy *= 1.0 + number(10, 50) / 100.0;
+    }
     break;
   case 3:
-    for (int i = 0; i < 58; i++)
+    for (auto &shop : DC::getInstance()->shop_index)
     {
-      DC::getInstance()->shop_index[i].profit_buy *= 1.0 - number(10, 50) / 100.0;
-      DC::getInstance()->shop_index[i].profit_buy = MAX(DC::getInstance()->shop_index[i].profit_buy, DC::getInstance()->shop_index[i].profit_sell + 0.1);
+      shop.profit_buy *= 1.0 - number(10, 50) / 100.0;
+      shop.profit_buy = MAX(shop.profit_buy, shop.profit_sell + 0.1);
     }
     break;
   default:
@@ -2106,4 +2108,9 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
   }
 
   return eSUCCESS;
+}
+
+Shop::Shop(DC *dc)
+    : dc_(dc)
+{
 }

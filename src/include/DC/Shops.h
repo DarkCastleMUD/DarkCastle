@@ -29,6 +29,7 @@ public:
         Ok
     };
     Q_ENUM(Status)
+    explicit Shop(DC *dc);
     void setStatus(Status status);
     auto status() -> Status;
     void validate(void);
@@ -65,6 +66,7 @@ public:
     void shopping_list(const char *arg, Character *ch, Character *keeper);
 
 private:
+    DC *dc_{};
     Status status_{};
     uint64_t shop_nr_{};
     vnum_t keeper_vnum_{}; /* The mob who owns the shop (virt)     */
