@@ -358,7 +358,7 @@ int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
-index_data *generate_obj_indices(int *top, index_data *index);
+obj_index_data *generate_obj_indices(int *top, obj_index_data *index);
 index_data *generate_mob_indices(int *top, index_data *index);
 
 extern struct skill_quest *skill_list;

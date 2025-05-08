@@ -542,7 +542,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return isSet(((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(DC::getInstance()->obj_index[nr].item->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -563,7 +563,7 @@ bool AuctionHouse::IsLevel(unsigned int to, unsigned int from, int vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = DC::getInstance()->obj_index[nr].item->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -1063,7 +1063,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", DC::getInstance()->obj_index[nr].item->short_description);
       return;
     }
     else
@@ -1279,7 +1279,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
       return;
     }
 
-    if (isSet(((class Object *)(DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(DC::getInstance()->obj_index[rnum].item->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1479,7 +1479,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     if (nr >= 0)
     {
       sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
-              ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+              DC::getInstance()->obj_index[nr].item->short_description);
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";

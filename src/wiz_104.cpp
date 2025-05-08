@@ -165,10 +165,10 @@ int do_load(Character *ch, char *arg, int cmd)
 			if ((num = real_object(x)) < 0)
 				continue;
 
-			if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
+			if (isexact("prize", DC::getInstance()->obj_index[num].item->name))
 			{
 				cnt++;
-				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
+				sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, DC::getInstance()->obj_index[num].item->short_description);
 				ch->send(buf);
 			}
 
@@ -263,12 +263,12 @@ int do_load(Character *ch, char *arg, int cmd)
 				return eFAILURE;
 			}
 			if ((ch->getLevel() < 108) &&
-				isSet(((class Object *)(DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+				isSet(DC::getInstance()->obj_index[number].item->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
 				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
 			}
-			else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->name))
+			else if (cmd == CMD_PRIZE && !isexact("prize", DC::getInstance()->obj_index[number].item->name))
 			{
 				ch->sendln("This command can only load prize items.");
 				return eFAILURE;
@@ -308,13 +308,13 @@ int do_load(Character *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 		if ((ch->getLevel() < IMPLEMENTER) &&
-			isSet(((class Object *)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
+			isSet(DC::getInstance()->obj_index[num].item->obj_flags.extra_flags,
 				  ITEM_SPECIAL))
 		{
 			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
 		}
-		else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
+		else if (cmd == CMD_PRIZE && !isexact("prize", DC::getInstance()->obj_index[num].item->name))
 		{
 			ch->sendln("This command can only load prize items.");
 			return eFAILURE;
@@ -979,8 +979,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				if ((nr = real_object(begin)) >= 0)
 				{
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+							DC::getInstance()->obj_index[nr].item->obj_flags.eq_level,
+							DC::getInstance()->obj_index[nr].item->short_description);
 					ch->send(buf);
 				}
 			}
@@ -994,8 +994,8 @@ int do_show(Character *ch, char *argument, int cmd)
 
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+							DC::getInstance()->obj_index[nr].item->obj_flags.eq_level,
+							DC::getInstance()->obj_index[nr].item->short_description);
 					ch->send(buf);
 
 					if (count > 200)
@@ -1017,12 +1017,12 @@ int do_show(Character *ch, char *argument, int cmd)
 					continue;
 
 				if (isexact(name,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->name))
+							DC::getInstance()->obj_index[nr].item->name))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-							((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+							DC::getInstance()->obj_index[nr].item->obj_flags.eq_level,
+							DC::getInstance()->obj_index[nr].item->short_description);
 					ch->send(buf);
 				}
 
@@ -1636,37 +1636,37 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 20; i++)
 					if (isSet(wear, 1 << i))
 						if (!isSet(
-								((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.wear_flags,
+								DC::getInstance()->obj_index[nr].item->obj_flags.wear_flags,
 								1 << i))
 							goto endLoop;
 			if (type)
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != type)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.type_flag != type)
 					continue;
 			if (lweight != -555)
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight < lweight)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.weight < lweight)
 					continue;
 			if (hweight != -555)
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight > hweight)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.weight > hweight)
 					continue;
 
 			if (levhigh != -555)
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level > levhigh)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.eq_level > levhigh)
 					continue;
 			if (levlow != -555)
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level < levlow)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.eq_level < levlow)
 					continue;
 			if (size)
 				for (i = 0; i < 10; i++)
 					if (isSet(size, 1 << i))
 						if (!isSet(
-								((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.size,
+								DC::getInstance()->obj_index[nr].item->obj_flags.size,
 								1 << i))
 							goto endLoop;
-			if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
+			if (DC::getInstance()->obj_index[nr].item->obj_flags.type_flag == ITEM_WEAPON)
 			{
 				int get_weapon_damage_type(class Object * wielded);
 				its = get_weapon_damage_type(
-					((class Object *)(DC::getInstance()->obj_index[nr].item)));
+					DC::getInstance()->obj_index[nr].item);
 			}
 			if (dam && dam != (its - 1000))
 				continue;
@@ -1674,10 +1674,10 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 30; i++)
 					if (isSet(extra, 1 << i))
 						if (!isSet(
-								((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+								DC::getInstance()->obj_index[nr].item->obj_flags.extra_flags,
 								1 << i) &&
 							!(any && isSet(
-										 ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+										 DC::getInstance()->obj_index[nr].item->obj_flags.extra_flags,
 										 1 << any)))
 							goto endLoop;
 
@@ -1685,16 +1685,16 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (i = 0; i < 10; i++)
 					if (isSet(more, 1 << i))
 						if (!isSet(
-								((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags,
+								DC::getInstance()->obj_index[nr].item->obj_flags.more_flags,
 								1 << i))
 							goto endLoop;
 			//      int aff,total = 0;
 			//    bool found = false;
 			if (!item_type)
 				for (aff = 0;
-					 aff < ((class Object *)(DC::getInstance()->obj_index[nr].item))->num_affects;
+					 aff < DC::getInstance()->obj_index[nr].item->num_affects;
 					 aff++)
-					if (affect == ((class Object *)(DC::getInstance()->obj_index[nr].item))->affected[aff].location)
+					if (affect == DC::getInstance()->obj_index[nr].item->affected[aff].location)
 						found = true;
 			if (affect && !item_type)
 				if (!found)
@@ -1703,14 +1703,14 @@ int do_show(Character *ch, char *argument, int cmd)
 			if (item_type)
 			{
 				bool spell_found = false;
-				if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != item_type)
+				if (DC::getInstance()->obj_index[nr].item->obj_flags.type_flag != item_type)
 					continue;
 				if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
 					for (i = 1; i < 4; i++)
-						if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[i] == spellnum)
+						if (DC::getInstance()->obj_index[nr].item->obj_flags.value[i] == spellnum)
 							spell_found = true;
 				if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-					if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[3] == spellnum)
+					if (DC::getInstance()->obj_index[nr].item->obj_flags.value[3] == spellnum)
 						spell_found = true;
 
 				if (!spell_found)
@@ -1724,8 +1724,8 @@ int do_show(Character *ch, char *argument, int cmd)
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
-					((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-					((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+					DC::getInstance()->obj_index[nr].item->obj_flags.eq_level,
+					DC::getInstance()->obj_index[nr].item->short_description);
 			ch->send(buf);
 		endLoop:
 			continue;
@@ -2435,7 +2435,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	DC::getInstance()->object_list = DC::getInstance()->object_list->next;
 	otmp = (Object *)DC::getInstance()->obj_index[r2].item;
 	obj->item_number = r2;
-	DC::getInstance()->obj_index[r2].item = (void *)obj;
+	DC::getInstance()->obj_index[r2].item = obj;
 	DC::getInstance()->obj_index[r2].non_combat_func = 0;
 	DC::getInstance()->obj_index[r2].number = 0;
 	DC::getInstance()->obj_index[r2].virt = v2;

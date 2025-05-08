@@ -121,7 +121,7 @@ world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
 index_data *generate_mob_indices(int *top, index_data *index);
-index_data *generate_obj_indices(int *top, index_data *index);
+obj_index_data *generate_obj_indices(int *top, obj_index_data *index);
 
 int file_to_string(const char *name, char *buf);
 void clear_char(Character *ch);
@@ -1291,8 +1291,7 @@ void DC::remove_all_objs_from_world()
 }
 
 /* generate index table for object file */
-index_data *generate_obj_indices(int *top,
-								 index_data *index)
+obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
 {
 	int i = 0;
 	char buf[82];
@@ -6376,9 +6375,9 @@ int obj_in_index(char *name, int index)
 	int i, j;
 
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
-					   ((class Object *)(DC::getInstance()->obj_index[i].item));
+					   DC::getInstance()->obj_index[i].item;
 		 i++)
-		if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[i].item))->name))
+		if (isexact(name, DC::getInstance()->obj_index[i].item->name))
 		{
 			if (j == index)
 				return i;
@@ -6884,7 +6883,7 @@ bool verify_item(class Object **obj)
 
 		if ((*obj)->item_number - i >= 0)
 		{
-			index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
+			obj_index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
 			if (obj_index_entry)
 			{
 				Object *obj_index_item = (class Object *)obj_index_entry->item;

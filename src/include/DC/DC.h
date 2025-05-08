@@ -157,6 +157,20 @@ public:
   int progtypes{};
 };
 
+class obj_index_data
+{
+public:
+  vnum_t virt{};                                                                         /* virt number of ths mob/obj           */
+  vnum_t number{};                                                                       /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
+  int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
+  Object *item{};                                                                        /* the mobile/object itself                 */
+
+  QSharedPointer<class MobProgram> mobprogs{};
+  QSharedPointer<class MobProgram> mobspec{};
+  int progtypes{};
+};
+
 class World
 {
 public:
@@ -398,8 +412,8 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  class index_data obj_index_array[MAX_INDEX] = {};
-  class index_data *obj_index = obj_index_array;
+  class obj_index_data obj_index_array[MAX_INDEX] = {};
+  class obj_index_data *obj_index = obj_index_array;
 
   class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
