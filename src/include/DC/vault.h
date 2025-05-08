@@ -17,7 +17,6 @@ void vault_access(Character *ch, const char *who);
 void my_vault_access(Character *ch);
 void add_vault_access(Character *ch, QString name, struct vault_data *vault);
 void remove_vault_access(Character *ch, QString name, struct vault_data *vault);
-void vault_get(Character *ch, QString object, QString owner);
 void vault_put(Character *ch, QString object, QString owner);
 void vault_list(Character *ch, QString owner);
 void add_new_vault(const char *name, int indexonly);

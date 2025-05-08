@@ -531,7 +531,7 @@ public:
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
-
+  void vault_get(Character *ch, QString object, QString owner);
   ~DC(void)
   {
     /* TODO enable and fix all memory leaks

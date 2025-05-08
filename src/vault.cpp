@@ -437,7 +437,7 @@ int do_vault(Character *ch, char *argument, int cmd)
     }
     else if (!*arg2)
       sprintf(arg2, "%s", GET_NAME(ch));
-    vault_get(ch, argument, arg2);
+    DC::getInstance()->vault_get(ch, argument, arg2);
   }
   else
   {
@@ -1421,7 +1421,7 @@ class Object *exists_in_vault(struct vault_data *vault, Object *obj)
   return 0;
 }
 
-void vault_get(Character *ch, QString object, QString owner)
+void DC::vault_get(Character *ch, QString object, QString owner)
 {
   QString sbuf;
   char obj_list[50][100];
