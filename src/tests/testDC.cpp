@@ -1071,14 +1071,14 @@ private slots:
         DC::getInstance()->getObjectVNUM(obj, &ok);
         QCOMPARE(ok, true);
         ok = false;
-        DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].virt;
+        DC::getInstance()->getObjectVNUM(obj->item_number, &ok);
         QCOMPARE(ok, true);
-        DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, &ok), DC::INVALID_VNUM;
+        DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_VNUM, &ok);
         QCOMPARE(ok, false);
 
         QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].virt);
         QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].virt);
-        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+        QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_VNUM, nullptr), DC::INVALID_VNUM);
     }
     void test_blackjack()
     {
