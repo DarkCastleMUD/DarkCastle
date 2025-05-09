@@ -909,8 +909,8 @@ char *show_hand(int hand_data[21], int hide, bool ascii, bool showColor)
    static char buf[MAX_STRING_LENGTH];
    int i = 0;
    buf[0] = '\0';
-   sprintf(lineTwo, "%s%*s", lineTwo, strlen(tempBuf) + padnext, " ");
-   sprintf(lineTop, "%s%*s", lineTop, strlen(tempBuf) + padnext, " ");
+   sprintf(lineTwo, "%s%*s", lineTwo, (int)strlen(tempBuf) + padnext, " ");
+   sprintf(lineTop, "%s%*s", lineTop, (int)strlen(tempBuf) + padnext, " ");
    if (padnext)
       padnext = 0;
    while (hand_data[i] > 0)
@@ -979,7 +979,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)
          return;
-   auto obj = DC::getInstance()->world[ch->in_room].contents;
+   Object *obj = DC::getInstance()->world[ch->in_room].contents;
    for (; obj; obj = obj->next_content)
    {
       if (obj->table)

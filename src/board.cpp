@@ -890,7 +890,7 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
     return;
   }
 
-  fprintf(the_file, " %d ", board->second.msgs.size());
+  fprintf(the_file, " %lu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);

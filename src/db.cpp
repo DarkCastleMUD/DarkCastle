@@ -204,14 +204,14 @@ bool operator==(const struct deny_data &dd1, const struct deny_data &dd2)
 	do
 	{
 		denies1.push_back(curr1->vnum);
-	} while (curr1 = curr1->next);
+	} while ((curr1 = curr1->next));
 
 	QList<decltype(dd2.vnum)> denies2;
 	const struct deny_data *curr2 = &dd2;
 	do
 	{
 		denies2.push_back(curr2->vnum);
-	} while (curr2 = curr2->next);
+	} while ((curr2 = curr2->next));
 
 	return denies1 == denies2;
 }
@@ -223,14 +223,14 @@ bool operator==(struct extra_descr_data &edd1, struct extra_descr_data &edd2)
 	do
 	{
 		extra_descriptions1.insert(curr1->keyword, curr1->description);
-	} while (curr1 = curr1->next);
+	} while ((curr1 = curr1->next));
 
 	QMap<QString, QString> extra_descriptions2;
 	struct extra_descr_data *curr2 = &edd2;
 	do
 	{
 		extra_descriptions2.insert(curr2->keyword, curr2->description);
-	} while (curr2 = curr2->next);
+	} while ((curr2 = curr2->next));
 
 	return extra_descriptions1 == extra_descriptions2;
 }
@@ -661,7 +661,7 @@ void DC::boot_db(void)
 	{
 		if (cf.verbose_mode)
 		{
-			qInfo(qUtf8Printable(QStringLiteral("[%1 %2]\t%3.").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.Name())));
+			qInfo("%s", qUtf8Printable(QStringLiteral("[%1 %2]\t%3.").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.Name())));
 		}
 
 		zone.reset(Zone::ResetType::full);
@@ -882,10 +882,10 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 				continue;
 
 			if (z++ % 5)
-				sprintf(lines + strlen(lines), "%s, ", DC::getInstance()->wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s, ", qUtf8Printable(DC::getInstance()->wizlist[x].name));
 			else
 			{
-				sprintf(lines + strlen(lines), "%s\n\r", DC::getInstance()->wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s\n\r", qUtf8Printable(DC::getInstance()->wizlist[x].name));
 				line_length = strlen(lines) - 2;
 				sp = 79 - line_length;
 				sp /= 2;
@@ -1047,7 +1047,7 @@ index_data *generate_mob_indices(int *top, index_data *index)
 						perror("Too many mob indexes");
 						abort();
 					}
-					sscanf(buf, "#%d", &index[i].virt);
+					sscanf(buf, "#%lu", &index[i].virt);
 					index[i].number = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
@@ -1058,8 +1058,7 @@ index_data *generate_mob_indices(int *top, index_data *index)
 					if (!(index[i].item = (Character *)read_mobile(i, fl)))
 					{
 
-						sprintf(log_buf, "Unable to load mobile %d!\n\r",
-								index[i].virt);
+						sprintf(log_buf, "Unable to load mobile %lu!\n\r", index[i].virt);
 						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
 					}
 					i++;
@@ -1350,15 +1349,14 @@ obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
 						perror("Too many obj indexes");
 						abort();
 					}
-					sscanf(buf, "#%d", &index[i].virt);
+					sscanf(buf, "#%lu", &index[i].virt);
 					index[i].number = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].progtypes = 0;
 					if (!(index[i].item = (class Object *)read_object(i, fl, false)))
 					{
-						sprintf(log_buf, "Unable to load object %d!\n\r",
-								index[i].virt);
+						sprintf(log_buf, "Unable to load object %lu!\n\r", index[i].virt);
 						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
 					}
 					i++;
@@ -1396,7 +1394,7 @@ void write_one_room(LegacyFile &lf, int a)
 
 	if (DC::getInstance()->world[a].iFlags)
 		REMOVE_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
-	fprintf(f, "%d %d %d\n",
+	fprintf(f, "%lu %d %d\n",
 			DC::getInstance()->world[a].zone,
 			DC::getInstance()->world[a].room_flags,
 			DC::getInstance()->world[a].sector_type);
@@ -1580,7 +1578,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 			if (load_debug)
 			{
-				printf("Flags are %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
+				printf("Flags are %lu %u %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags,
 					   DC::getInstance()->world[room_nr].sector_type);
 				fflush(stdout);
 			}
@@ -1773,7 +1771,7 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_l
 	for (quint8 i = 1; i < 4; ++i)
 	{
 		vnum_t generation = pow(10, i);
-		qDebug("searching for vnum %lu. %lu %lu %lu", vnum, i, generation, vnum - (vnum % generation));
+		qDebug("searching for vnum %lu. %u %lu %lu", vnum, i, generation, vnum - (vnum % generation));
 	}
 
 	return std::unexpected(search_error::not_found);
@@ -2304,9 +2302,9 @@ void DC::free_zones_from_memory()
 void Zone::write(FILE *fl)
 {
 	fprintf(fl, "V2\n");
-	fprintf(fl, "#%d\n", (id_ ? (bottom / 100) : 0));
+	fprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
 	fprintf(fl, "%s~\n", NameC());
-	fprintf(fl, "%d %d %d %ld %d\n", top,
+	fprintf(fl, "%lu %lu %d %ld %d\n", top,
 			lifespan,
 			reset_mode,
 			zone_flags,
@@ -2860,7 +2858,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 	FILE *fl = lf.file_handle_;
 	int i = 0;
 
-	fprintf(fl, "#%d\n", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+	fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 	string_to_file(fl, mob->getName());
 	string_to_file(fl, mob->short_desc);
 	string_to_file(fl, mob->long_desc);
@@ -3314,7 +3312,7 @@ Character *clone_mobile(int nr)
 
 	mob->mobdata = new Mobile;
 
-	memcpy(mob->mobdata, old->mobdata, sizeof(Mobile));
+	mob->mobdata = old->mobdata;
 
 	for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
 		mob->equipment[i] = 0;
@@ -3756,7 +3754,7 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 
 	if (!message.isEmpty())
 	{
-		qDebug(qPrintable(QStringLiteral("%1: [%2]").arg(message).arg(current_line)));
+		qDebug("%s", qPrintable(QStringLiteral("%1: [%2]").arg(message).arg(current_line)));
 	}
 	auto ok = stream.seek(current_pos);
 	assert(stream.pos() == current_pos);
@@ -3789,7 +3787,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 
 	obj->name = fread_string(fl, 1);
 
-	qDebug(QStringLiteral("Object name: %1").arg(obj->name).toStdString().c_str());
+	qDebug("%s", QStringLiteral("Object name: %1").arg(obj->name).toStdString().c_str());
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
@@ -4456,7 +4454,7 @@ class Object *DC::clone_object(int nr)
 	}
 	else
 	{
-		qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
+		qWarning("%s", qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
 		dc_free(obj);
 		return nullptr;
 	}
