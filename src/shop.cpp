@@ -755,7 +755,7 @@ void DC::boot_the_shops(void)
       if (*buf != '#')
       {
         dc_free(buf);
-        qWarning(qUtf8Printable(QStringLiteral("Unrecognized string '%1' found in SHOP_FILE '%2'").arg(buf).arg(SHOP_FILE)));
+        qWarning("%s", qUtf8Printable(QStringLiteral("Unrecognized string '%1' found in SHOP_FILE '%2'").arg(buf).arg(SHOP_FILE)));
         continue;
       }
 
@@ -767,7 +767,7 @@ void DC::boot_the_shops(void)
         shop.setShopNR(shop_nr_buffer.toULongLong(&ok));
         if (!ok)
         {
-          qWarning(qUtf8Printable(QStringLiteral("Shop file '%1' contains invalid shop number '%2'.").arg(SHOP_FILE).arg(shop_nr_buffer)));
+          qWarning("%s", qUtf8Printable(QStringLiteral("Shop file '%1' contains invalid shop number '%2'.").arg(SHOP_FILE).arg(shop_nr_buffer)));
           shop.setShopNR(0);
         }
       }
@@ -860,7 +860,7 @@ void DC::assign_the_shopkeepers(void)
   {
     if (shop.status() == Shop::Status::Ok)
     {
-      qDebug(qUtf8Printable(QStringLiteral("vnum:%1 rnum:%2 non_combat_func:shop_keeper").arg(shop.keeper_vnum()).arg(shop.keeper_rnum())));
+      qDebug("%s", qUtf8Printable(QStringLiteral("vnum:%1 rnum:%2 non_combat_func:shop_keeper").arg(shop.keeper_vnum()).arg(shop.keeper_rnum())));
       mob_index[shop.keeper_rnum()].non_combat_func = shop_keeper;
     }
   }

@@ -3154,17 +3154,17 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				{
 					qDebug("debug: ");
 					if (cmnd)
-						qDebug(qUtf8Printable(QStringLiteral("cmd: %1 ").arg(cmnd));
+						qDebug("%s",qUtf8Printable(QStringLiteral("cmd: %1 ").arg(cmnd));
 					else
 						qDebug("cmd: (null) ");
 
 					if (mob && mob->name)
-						qDebug(qUtf8Printable(QStringLiteral("mob: %1 ").arg(mob->name)));
+						qDebug("%s",qUtf8Printable(QStringLiteral("mob: %1 ").arg(mob->name)));
 					else
 						qDebug("mob: (null) ");
 
 					if (actor && actor->name)
-						qDebug(qUtf8Printable(QStringLiteral("actor: %1 = ").arg(actor->name)));
+						qDebug("%s",qUtf8Printable(QStringLiteral("actor: %1 = ").arg(actor->name)));
 					else
 						qDebug("actor: (null) = ");
 				}

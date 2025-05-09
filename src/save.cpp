@@ -364,13 +364,13 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
   {
     if (feof(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
     if (ferror(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
@@ -379,7 +379,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
     long after_fread_offset = ftell(fpsave);
     if (read_count != 1)
     {
-      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
     }
 
     buffer += a;
@@ -391,7 +391,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 
   if (characters_read >= 160)
   {
-    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
+    qDebug("%s", QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
   }
 
   return characters_read;

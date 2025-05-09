@@ -461,7 +461,7 @@ int main(int argc, char **argv)
 
       if (c->isImmortalPlayer())
       {
-        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
+        qWarning("%s", QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
       }
     }
 

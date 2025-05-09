@@ -50,14 +50,14 @@ void Shop::validate(void)
     auto rnum = real_mobile(keeper_vnum_);
     if (rnum == -1)
     {
-        qWarning(qUtf8Printable(QStringLiteral("Shop %1 has shopkeeper mob VNUM set to %2 which does not exist.").arg(shop_nr_).arg(keeper_vnum_)));
+        qWarning("%s", qUtf8Printable(QStringLiteral("Shop %1 has shopkeeper mob VNUM set to %2 which does not exist.").arg(shop_nr_).arg(keeper_vnum_)));
         status_ = Status::Broken;
     }
     keeper_rnum_ = rnum;
 
     if (real_room(in_room) == DC::NOWHERE)
     {
-        qWarning(qUtf8Printable(QStringLiteral("Shop %1 has in_room set to %2 which does not exist.").arg(shop_nr_).arg(in_room)));
+        qWarning("%s", qUtf8Printable(QStringLiteral("Shop %1 has in_room set to %2 which does not exist.").arg(shop_nr_).arg(in_room)));
         status_ = Status::Broken;
     }
 
