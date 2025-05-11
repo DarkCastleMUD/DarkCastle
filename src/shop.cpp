@@ -1151,7 +1151,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   write_one_player_shop(shop);
 }
 
-void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
+void DC::player_shopping_buy(const char *arg, Character *ch, Character *keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1444,7 +1444,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
     player_shopping_stock(arg, ch, keeper);
     break;
   case 56:
-    player_shopping_buy(arg, ch, keeper);
+    DC::getInstance()->player_shopping_buy(arg, ch, keeper);
     break;
   case 57:
     player_shopping_sell(arg, ch, keeper);
@@ -1562,26 +1562,26 @@ void DC::assign_the_player_shopkeepers(void)
   mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
 }
 
-void redo_shop_profit()
+void DC::redo_shop_profit(void)
 {
   switch (number(0, 3))
   {
   case 0:
     break;
   case 1:
-    for (auto &shop : DC::getInstance()->shop_index)
+    for (auto &shop : shop_index)
     {
       shop.profit_buy = shop.profit_buy_base;
     }
     break;
   case 2:
-    for (auto &shop : DC::getInstance()->shop_index)
+    for (auto &shop : shop_index)
     {
       shop.profit_buy *= 1.0 + number(10, 50) / 100.0;
     }
     break;
   case 3:
-    for (auto &shop : DC::getInstance()->shop_index)
+    for (auto &shop : shop_index)
     {
       shop.profit_buy *= 1.0 - number(10, 50) / 100.0;
       shop.profit_buy = MAX(shop.profit_buy, shop.profit_sell + 0.1);

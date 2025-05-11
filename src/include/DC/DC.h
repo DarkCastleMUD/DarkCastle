@@ -547,6 +547,7 @@ public:
   vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
   void vault_get(Character *ch, QString object, QString owner);
+  void player_shopping_buy(const char *arg, Character *ch, Character *keeper);
   Object *clone_object(int nr);
   ~DC(void)
   {
@@ -609,6 +610,7 @@ private:
   void fix_shopkeepers_inventory(void);
   void boot_player_shops(void);
   void assign_the_player_shopkeepers(void);
+  void redo_shop_profit(void);
 };
 void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);
