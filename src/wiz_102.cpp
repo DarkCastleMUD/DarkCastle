@@ -2090,12 +2090,15 @@ int do_oedit(Character *ch, char *argument, int cmd)
   }
   else
   {
-    vnum = ch->player->last_obj_vnum;
-    rnum = real_object(vnum);
-    if (rnum < 0 || vnum < 1)
+    if (argument && !QString(argument).trimmed().startsWith("new"))
     {
-      ch->sendln("Invalid item number.");
-      return eSUCCESS;
+      vnum = ch->player->last_obj_vnum;
+      rnum = real_object(vnum);
+      if (rnum < 0 || vnum < 1)
+      {
+        ch->sendln("Invalid item number.");
+        return eSUCCESS;
+      }
     }
 
     // put the buffs where they should be
@@ -2510,6 +2513,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
+    ch->player->last_obj_vnum = intval;
     break;
   }
 
