@@ -96,7 +96,7 @@ message("Patch: ${VERSION_PATCH}")
 message("SHA1: ${VERSION_SHA1}")
 
 project(DC VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
-configure_file(buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/DC/buildinfo.h)
+configure_file(src/buildinfo.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/include/DC/buildinfo.h)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
 
@@ -104,196 +104,196 @@ find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
 set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++23" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
 
 add_library(DC SHARED
-    act_comm.cpp
-    act.cpp
-    act_info.cpp
-    alias.cpp
-    arena.cpp
-    assign_proc.cpp
-    auction.cpp
-    ban.cpp
-    board.cpp
-    casino.cpp
-    channel.cpp
-    character.cpp
-    clan.cpp
-    class.cpp
-    cl_barbarian.cpp
-    cl_mage.cpp
-    cl_monk.cpp
-    cl_paladin.cpp
-    cl_ranger.cpp
-    cl_thief.cpp
-    cl_warrior.cpp
-    combinables.cpp
-    CommandStack.cpp
-    Command.cpp
-    comm.cpp
-    const.cpp
-    corpse.cpp
-    Database.cpp
-    db.cpp
-    DC.cpp
-    fight.cpp
-    fount.cpp
-    game_portal.cpp
-    golem.cpp
-    group.cpp
-    guild.cpp
-    handler.cpp
-    help.cpp
-    info.cpp
-    innate.cpp
-    interp.cpp
-    inventory.cpp
-    ki.cpp
-    Leaderboard.cpp
-    limits.cpp
-    magic.cpp
-    memory.cpp
-    meta.cpp
-    mob_act.cpp
-    MobActivity.cpp
-    mob_commands.cpp
-    mob_proc2.cpp
-    mob_proc.cpp
-    mob_prog.cpp
-    modify.cpp
-    move.cpp
-    nanny.cpp
-    new_edit.cpp
-    news.cpp
-    nlog.cpp
-    non_off.cpp
-    objects.cpp
-    obj_proc.cpp
-    offense.cpp
-    quest.cpp
-    save.cpp
-    SSH.cpp
-    shop.cpp
-    Shops.cpp
-    sing.cpp
-    social.cpp
-    spec.cpp
-    spells.cpp
-    stat.cpp
-    Timer.cpp
-    token.cpp
-    Trace.cpp
-    utility.cpp
-    vault.cpp
-    Version.cpp
-    weather.cpp
-    who.cpp
-    wiz_101.cpp
-    wiz_102.cpp
-    wiz_103.cpp
-    wiz_104.cpp
-    wiz_105.cpp
-    wiz_106.cpp
-    wiz_107.cpp
-    wiz_108.cpp
-    wiz_109.cpp
-    wiz_110.cpp
-    wizard.cpp
-    Zone.cpp
-    include/DC/act.h
-    include/DC/affect.h
-    include/DC/alias.h
-    include/DC/bandwidth.h
-    include/DC/buildinfo.h
-    include/DC/character.h
-    include/DC/clan.h
-    include/DC/class.h
-    include/DC/combinables.h
-    include/DC/CommandStack.h
-    include/DC/comm.h
-    include/DC/Command.h
-    include/DC/common.h
-    include/DC/connect.h
-    include/DC/const.h
-    include/DC/corpse.h
-    include/DC/Database.h
-    include/DC/db.h
-    include/DC/DC.h
-    include/DC/DC_global.h
-    include/DC/dc_xmlrpc.h
-    include/DC/event.h
-    include/DC/fight.h
-    include/DC/fileinfo.h
-    include/DC/game_portal.h
-    include/DC/guild.h
-    include/DC/handler.h
-    include/DC/help.h
-    include/DC/innate.h
-    include/DC/interp.h
-    include/DC/inventory.h
-    include/DC/isr.h
-    include/DC/ki.h
-    include/DC/language.h
-    include/DC/Leaderboard.h
-    include/DC/levels.h
-    include/DC/magic.h
-    include/DC/memory.h
-    include/DC/MobActivity.h
-    include/DC/mobile.h
-    include/DC/move.h
-    include/DC/newedit.h
-    include/DC/news.h
-    include/DC/obj.h
-    include/DC/player.h
-    include/DC/punish.h
-    include/DC/quest.h
-    include/DC/race.h
-    include/DC/returnvals.h
-    include/DC/room.h
-    include/DC/set.h
-    include/DC/shop.h
-    include/DC/Shops.h
-    include/DC/sing.h
-    include/DC/social.h
-    include/DC/spells.h
-    include/DC/SSH.h
-    include/DC/stat.h
-    include/DC/structs.h
-    include/DC/terminal.h
-    include/DC/timeinfo.h
-    include/DC/Timer.h
-    include/DC/token.h
-    include/DC/Trace.h
-    include/DC/utility.h
-    include/DC/vault.h
-    include/DC/Version.h
-    include/DC/weather.h
-    include/DC/wizard.h
-    include/DC/Zone.h
+    src/act_comm.cpp
+    src/act.cpp
+    src/act_info.cpp
+    src/alias.cpp
+    src/arena.cpp
+    src/assign_proc.cpp
+    src/auction.cpp
+    src/ban.cpp
+    src/board.cpp
+    src/casino.cpp
+    src/channel.cpp
+    src/character.cpp
+    src/clan.cpp
+    src/class.cpp
+    src/cl_barbarian.cpp
+    src/cl_mage.cpp
+    src/cl_monk.cpp
+    src/cl_paladin.cpp
+    src/cl_ranger.cpp
+    src/cl_thief.cpp
+    src/cl_warrior.cpp
+    src/combinables.cpp
+    src/CommandStack.cpp
+    src/Command.cpp
+    src/comm.cpp
+    src/const.cpp
+    src/corpse.cpp
+    src/Database.cpp
+    src/db.cpp
+    src/DC.cpp
+    src/fight.cpp
+    src/fount.cpp
+    src/game_portal.cpp
+    src/golem.cpp
+    src/group.cpp
+    src/guild.cpp
+    src/handler.cpp
+    src/help.cpp
+    src/info.cpp
+    src/innate.cpp
+    src/interp.cpp
+    src/inventory.cpp
+    src/ki.cpp
+    src/Leaderboard.cpp
+    src/limits.cpp
+    src/magic.cpp
+    src/memory.cpp
+    src/meta.cpp
+    src/mob_act.cpp
+    src/MobActivity.cpp
+    src/mob_commands.cpp
+    src/mob_proc2.cpp
+    src/mob_proc.cpp
+    src/mob_prog.cpp
+    src/modify.cpp
+    src/move.cpp
+    src/nanny.cpp
+    src/new_edit.cpp
+    src/news.cpp
+    src/nlog.cpp
+    src/non_off.cpp
+    src/objects.cpp
+    src/obj_proc.cpp
+    src/offense.cpp
+    src/quest.cpp
+    src/save.cpp
+    src/SSH.cpp
+    src/shop.cpp
+    src/Shops.cpp
+    src/sing.cpp
+    src/social.cpp
+    src/spec.cpp
+    src/spells.cpp
+    src/stat.cpp
+    src/Timer.cpp
+    src/token.cpp
+    src/Trace.cpp
+    src/utility.cpp
+    src/vault.cpp
+    src/Version.cpp
+    src/weather.cpp
+    src/who.cpp
+    src/wiz_101.cpp
+    src/wiz_102.cpp
+    src/wiz_103.cpp
+    src/wiz_104.cpp
+    src/wiz_105.cpp
+    src/wiz_106.cpp
+    src/wiz_107.cpp
+    src/wiz_108.cpp
+    src/wiz_109.cpp
+    src/wiz_110.cpp
+    src/wizard.cpp
+    src/Zone.cpp
+    src/include/DC/act.h
+    src/include/DC/affect.h
+    src/include/DC/alias.h
+    src/include/DC/bandwidth.h
+    src/include/DC/buildinfo.h
+    src/include/DC/character.h
+    src/include/DC/clan.h
+    src/include/DC/class.h
+    src/include/DC/combinables.h
+    src/include/DC/CommandStack.h
+    src/include/DC/comm.h
+    src/include/DC/Command.h
+    src/include/DC/common.h
+    src/include/DC/connect.h
+    src/include/DC/const.h
+    src/include/DC/corpse.h
+    src/include/DC/Database.h
+    src/include/DC/db.h
+    src/include/DC/DC.h
+    src/include/DC/DC_global.h
+    src/include/DC/dc_xmlrpc.h
+    src/include/DC/event.h
+    src/include/DC/fight.h
+    src/include/DC/fileinfo.h
+    src/include/DC/game_portal.h
+    src/include/DC/guild.h
+    src/include/DC/handler.h
+    src/include/DC/help.h
+    src/include/DC/innate.h
+    src/include/DC/interp.h
+    src/include/DC/inventory.h
+    src/include/DC/isr.h
+    src/include/DC/ki.h
+    src/include/DC/language.h
+    src/include/DC/Leaderboard.h
+    src/include/DC/levels.h
+    src/include/DC/magic.h
+    src/include/DC/memory.h
+    src/include/DC/MobActivity.h
+    src/include/DC/mobile.h
+    src/include/DC/move.h
+    src/include/DC/newedit.h
+    src/include/DC/news.h
+    src/include/DC/obj.h
+    src/include/DC/player.h
+    src/include/DC/punish.h
+    src/include/DC/quest.h
+    src/include/DC/race.h
+    src/include/DC/returnvals.h
+    src/include/DC/room.h
+    src/include/DC/set.h
+    src/include/DC/shop.h
+    src/include/DC/Shops.h
+    src/include/DC/sing.h
+    src/include/DC/social.h
+    src/include/DC/spells.h
+    src/include/DC/SSH.h
+    src/include/DC/stat.h
+    src/include/DC/structs.h
+    src/include/DC/terminal.h
+    src/include/DC/timeinfo.h
+    src/include/DC/Timer.h
+    src/include/DC/token.h
+    src/include/DC/Trace.h
+    src/include/DC/utility.h
+    src/include/DC/vault.h
+    src/include/DC/Version.h
+    src/include/DC/weather.h
+    src/include/DC/wizard.h
+    src/include/DC/Zone.h
 )
 #set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 
 target_compile_definitions(DC PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
-target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 
-qt_add_executable(dcastle dcastle.cpp)
+qt_add_executable(dcastle src/dcastle.cpp)
 target_compile_definitions(dcastle PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
-target_include_directories(dcastle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(dcastle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 target_link_libraries(dcastle PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
 
-qt_add_executable(debug debug.cpp)
+qt_add_executable(debug src/debug.cpp)
 target_compile_definitions(debug PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
-target_include_directories(debug PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(debug PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 target_link_libraries(debug PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
 
-qt_add_executable(benchmarkDC benchmarks/benchmarkDC.cpp)
-target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+qt_add_executable(benchmarkDC src/benchmarks/benchmarkDC.cpp)
+target_include_directories(benchmarkDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 target_link_libraries(benchmarkDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(benchmarkDC PRIVATE Qt::Test)
 
 enable_testing(true)
-qt_add_executable(testDC tests/testDC.cpp)
+qt_add_executable(testDC src/tests/testDC.cpp)
 add_test(NAME testDC COMMAND testDC)
-target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(testDC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 target_link_libraries(testDC PRIVATE DC Qt${QT_VERSION_MAJOR}::Core pq fmt crypt ssh Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::HttpServer Qt${QT_VERSION_MAJOR}::Concurrent)
 target_link_libraries(testDC PRIVATE Qt::Test)
 
@@ -302,6 +302,17 @@ install (TARGETS dcastle debug testDC benchmarkDC
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+install (DIRECTORY archive DESTINATION /var/lib/dcastle)
+install (DIRECTORY blog DESTINATION /var/lib/dcastle)
+install (DIRECTORY bsave DESTINATION /var/lib/dcastle)
+install (DIRECTORY docs DESTINATION /var/lib/dcastle)
+install (DIRECTORY familiar DESTINATION /var/lib/dcastle)
+install (DIRECTORY follower DESTINATION /var/lib/dcastle)
+install (DIRECTORY lib DESTINATION /var/lib/dcastle)
+install (DIRECTORY log DESTINATION /var/lib/dcastle)
+install (DIRECTORY save DESTINATION /var/lib/dcastle)
+install (DIRECTORY scripts DESTINATION /var/lib/dcastle)
+install (DIRECTORY vaults DESTINATION /var/lib/dcastle)
 qt_generate_deploy_app_script(
     TARGET dcastle
     OUTPUT_SCRIPT deploy_script
