@@ -19,11 +19,11 @@ RUN cmake -B build -GNinja \
     -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
 RUN ninja -C build package
 RUN zypper -n in --allow-unsigned-rpm build/dc*rpm
+WORKDIR /srv/dcastle/git/DarkCastle/lib
 RUN /usr/bin/testDC
 COPY lib /hostdir/lib
 RUN cp -av build/dc*rpm /hostdir
 
-WORKDIR /srv/dcastle/git/DarkCastle/lib
 CMD ["/usr/bin/dcastle", "-P"]
 
 LABEL Name=darkcastle Version=0.0.5
