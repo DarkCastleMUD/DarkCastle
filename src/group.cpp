@@ -22,8 +22,7 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/terminal.h"
-
-char *calc_color(int hit, int max_hit);
+#include "DC/comm.h"
 
 int do_abandon(Character *ch, char *argument, int cmd)
 {
