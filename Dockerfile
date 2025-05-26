@@ -3,7 +3,7 @@ FROM opensuse/tumbleweed
 
 RUN zypper -n dup --no-recommends --auto-agree-with-licenses
 RUN zypper -n in --no-recommends glibc-locale glibc-locale-base \
-    gcc14-c++ clang18 libpq5 fmt-devel libfmt9 zlib-devel cmake postgresql-devel qt6-sql-devel \
+    gcc15-c++ clang18 libpq5 fmt-devel libfmt9 zlib-devel cmake postgresql-devel qt6-sql-devel \
     qt6-httpserver-devel qt6-concurrent-devel libssh-devel git libQt6Test6 qt6-test-devel mold
 
 RUN mkdir -p /srv/dcastle/git
