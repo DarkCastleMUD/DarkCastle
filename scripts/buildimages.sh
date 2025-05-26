@@ -1,7 +1,7 @@
 #!/bin/bash
-export DCTMPDIR=$(mktemp -d)
-echo $DCTMPDIR
-podman build --file Dockerfile --tag darkcastle-devel --volume "${DCTMPDIR}:/hostdir"
-podman build -f Dockerfile.prod --tag darkcastle-prod --volume ${DCTMPDIR}:/hostdir
-podman image save localhost/darkcastle-prod -o build/darkcastle-prod.image
-xz --compress build/darkcastle-prod.image > build/darkcastle-prod.image.xz
+rm -rf /tmp/dcastle
+mkdir -p /tmp/dcastle
+podman build --file Dockerfile.devel --tag darkcastle.devel --volume "/tmp/dcastle:/srv/dcastle"
+podman build --file Dockerfile.prod --tag darkcastle.prod --volume "/tmp/dcastle:/srv/dcastle"
+podman image save localhost/darkcastle.prod -o build/darkcastle.prod.img
+xz --compress build/darkcastle.prod.img > build/darkcastle-prod.img.xz
