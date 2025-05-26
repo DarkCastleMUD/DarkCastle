@@ -2,8 +2,8 @@
 FROM opensuse/tumbleweed
 
 RUN zypper -n dup --no-recommends --auto-agree-with-licenses
-RUN zypper -n in --no-recommends --allow-unsigned-rpm /hostdir/dc*rpm xz
-WORKDIR /var/lib/dcastle/lib
+RUN zypper -n in --no-recommends --allow-unsigned-rpm /srv/dcastle/dc*rpm
+WORKDIR /srv/dcastle/lib
 RUN /usr/bin/testDC
 CMD ["/usr/bin/dcastle", "-P"]
 
