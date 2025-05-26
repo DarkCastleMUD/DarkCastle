@@ -4,4 +4,4 @@ echo $DCTMPDIR
 podman build --file Dockerfile --tag darkcastle-devel --volume "${DCTMPDIR}:/hostdir"
 podman build -f Dockerfile.prod --tag darkcastle-prod --volume ${DCTMPDIR}:/hostdir
 podman image save localhost/darkcastle-prod -o build/darkcastle-prod.image
-xzip --compress build/darkcastle-prod.image > build/darkcastle-prod.image.xz
+xz --compress build/darkcastle-prod.image > build/darkcastle-prod.image.xz
