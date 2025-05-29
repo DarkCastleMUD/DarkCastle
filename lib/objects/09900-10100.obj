@@ -1645,4 +1645,13 @@ A broken ladder leans against the wall here.~
 0 0 0 0 0
 0 0 0
 S
+#14905
+light stone~
+a small glowing stone~
+Just enough light and heat to keep a small lichen happy.~
+~
+1 16 81921 1
+0 0 -1 0 5
+1 100 0
+S
 $~
