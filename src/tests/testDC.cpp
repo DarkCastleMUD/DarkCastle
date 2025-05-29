@@ -1,5 +1,6 @@
 #include <cstring>
 #include <memory>
+#include <iostream>
 
 #include <QTest>
 #include <QtLogging>
@@ -28,6 +29,20 @@ using namespace std::literals;
 #define STRING_LITERAL4 "$"
 #define STRING_LITERAL5 "test"
 #define STRING_LITERAL6 "$z$>$;"
+
+QString get_parsed_legacy_prompt_variable(Character *ch, QString var)
+{
+    std::string generate_prompt(Character *);
+    if (!ch)
+        return {};
+    char *saved_prompt = GET_PROMPT(ch);
+
+    GET_PROMPT(ch) = strdup(qPrintable(var));
+    QString str = generate_prompt(ch).c_str();
+    free(GET_PROMPT(ch));
+    GET_PROMPT(ch) = saved_prompt;
+    return str;
+}
 
 class TestDC : public QObject
 {
@@ -1345,6 +1360,272 @@ private slots:
         check_timer();
         QCOMPARE(conn.output, "");
         conn.output = {};
+    }
+
+    void test_legacy_prompts()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character p1, g1, g2, g3, g4;
+
+        auto count = 0;
+        QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};
+        for (Character *ch : {&p1, &g1, &g2, &g3, &g4})
+        {
+            ch->setName(names.value(count++));
+            ch->plat = 1111;
+            ch->setGold(40000);
+            ch->player = new Player;
+            ch->setType(Character::Type::Player);
+            ch->setPosition(position_t::STANDING);
+            GET_TITLE(ch) = str_hsh("the great");
+            ch->alignment = 123;
+            // divide by zero error if max values are 0
+            ch->ki = 1230;
+            ch->max_ki = 1234;
+            ch->hit = 2340;
+            ch->max_hit = 2345;
+            ch->mana = 3450;
+            ch->max_mana = 3456;
+            ch->setMove(4560);
+            ch->max_move = 4567;
+            ch->player->last_obj_vnum = 2222;
+            ch->player->last_mob_edit = 4444;
+
+            ch->desc = new Connection;
+            ch->desc->descriptor = 1;
+            ch->desc->character = ch;
+            ch->desc->output = {};
+
+            if (dc.descriptor_list)
+                ch->desc->next = dc.descriptor_list;
+            dc.descriptor_list = ch->desc;
+            dc.character_list.insert(ch);
+
+            QCOMPARE(move_char(ch, 3014), eSUCCESS);
+            QCOMPARE(ch->desc->output, "");
+        }
+
+        QCOMPARE(do_found(&p1, "."), eSUCCESS);
+        QCOMPARE(p1.desc->output, "You found: .\n\r");
+        p1.desc->output = {};
+
+        QCOMPARE(do_look(&p1, ""), eSUCCESS);
+        p1.desc->output = {};
+
+        for (Character *ch : {&g1, &g2, &g3, &g4})
+        {
+            ch->desc->output = {};
+            p1.desc->output = {};
+            QCOMPARE(do_follow(ch, str_hsh(qUtf8Printable(names[0]))), eSUCCESS);
+            QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
+            QCOMPARE(p1.desc->output, QStringLiteral("%1 starts following you.\r\n").arg(ch->getName().replace(0, 1, ch->getName()[0].toUpper())));
+            ch->desc->output = {};
+            p1.desc->output = {};
+            QCOMPARE(do_group(&p1, str_hsh(qUtf8Printable(ch->getName()))), eSUCCESS);
+            QCOMPARE(p1.desc->output, QStringLiteral("%1 is now a group member.\r\n").arg(ch->getName().replace(0, 1, ch->getName()[0].toUpper())));
+            p1.desc->output = {};
+        }
+
+        QList<QChar> prompt_variables;
+        for (char c = ' '; c <= '~'; ++c)
+            prompt_variables.append(c);
+
+        QMap<QString, QString> parsed_prompt_variables;
+        if (GET_PROMPT(&p1))
+            dc_free(GET_PROMPT(&p1));
+        weather_info.sky = SKY_CLOUDLESS;
+        weather_info.sunlight = 0;
+        for (const auto &c : prompt_variables)
+        {
+            QString var = QStringLiteral("%%1").arg(c);
+            parsed_prompt_variables[var] = get_parsed_legacy_prompt_variable(&p1, var);
+            // std::cout << "QCOMPARE(parsed_prompt_variables[\"" << prompt << "\"],\"" << parsed_prompt_variables[prompt] << "\"); // " << prompt << "\n";
+        }
+        QCOMPARE(parsed_prompt_variables["% "], "2There is a fucked up code in your prompt> ");  // %
+        QCOMPARE(parsed_prompt_variables["%!"], "2There is a fucked up code in your prompt> ");  // %!
+        QCOMPARE(parsed_prompt_variables["%\""], "2There is a fucked up code in your prompt> "); // %"
+        QCOMPARE(parsed_prompt_variables["%#"], "2There is a fucked up code in your prompt> ");  // %#
+        QCOMPARE(parsed_prompt_variables["%$"], "1111 ");                                        // %$
+        QCOMPARE(parsed_prompt_variables["%%"], "% ");                                           // %%
+        QCOMPARE(parsed_prompt_variables["%&"], "2There is a fucked up code in your prompt> ");  // %&
+        QCOMPARE(parsed_prompt_variables["%'"], "2There is a fucked up code in your prompt> ");  // %'
+        QCOMPARE(parsed_prompt_variables["%("], "2There is a fucked up code in your prompt> ");  // %(
+        QCOMPARE(parsed_prompt_variables["%)"], "2There is a fucked up code in your prompt> ");  // %)
+        QCOMPARE(parsed_prompt_variables["%*"], "2There is a fucked up code in your prompt> ");  // %*
+        QCOMPARE(parsed_prompt_variables["%+"], "2There is a fucked up code in your prompt> ");  // %+
+        QCOMPARE(parsed_prompt_variables["%,"], "2There is a fucked up code in your prompt> ");  // %,
+        QCOMPARE(parsed_prompt_variables["%-"], "2There is a fucked up code in your prompt> ");  // %-
+        QCOMPARE(parsed_prompt_variables["%."], "2There is a fucked up code in your prompt> ");  // %.
+        QCOMPARE(parsed_prompt_variables["%/"], "2There is a fucked up code in your prompt> ");  // %/
+        QCOMPARE(parsed_prompt_variables["%0"], "\u001B[0m\u001B[37m ");                         // %0
+        QCOMPARE(parsed_prompt_variables["%1"], "\u001B[31m ");                                  // %1
+        QCOMPARE(parsed_prompt_variables["%2"], "\u001B[32m ");                                  // %2
+        QCOMPARE(parsed_prompt_variables["%3"], "\u001B[33m ");                                  // %3
+        QCOMPARE(parsed_prompt_variables["%4"], "\u001B[34m ");                                  // %4
+        QCOMPARE(parsed_prompt_variables["%5"], "\u001B[35m ");                                  // %5
+        QCOMPARE(parsed_prompt_variables["%6"], "\u001B[36m ");                                  // %6
+        QCOMPARE(parsed_prompt_variables["%7"], "\u001B[37m ");                                  // %7
+        QCOMPARE(parsed_prompt_variables["%8"], "\u001B[1m ");                                   // %8
+
+        QCOMPARE(parsed_prompt_variables["%9"], "2There is a fucked up code in your prompt> "); // %9
+        QCOMPARE(parsed_prompt_variables["%:"], "2There is a fucked up code in your prompt> "); // %:
+        QCOMPARE(parsed_prompt_variables["%;"], "2There is a fucked up code in your prompt> "); // %;
+        QCOMPARE(parsed_prompt_variables["%<"], "2There is a fucked up code in your prompt> "); // %<
+        QCOMPARE(parsed_prompt_variables["%="], "2There is a fucked up code in your prompt> "); // %=
+        QCOMPARE(parsed_prompt_variables["%>"], "2There is a fucked up code in your prompt> "); // %>
+        QCOMPARE(parsed_prompt_variables["%?"], "2There is a fucked up code in your prompt> "); // %?
+        QCOMPARE(parsed_prompt_variables["%@"], "2There is a fucked up code in your prompt> "); // %@
+        QCOMPARE(parsed_prompt_variables["%A"], "\u001B[1m\u001B[37m123\u001B[0m\u001B[37m ");  // %A
+        QCOMPARE(parsed_prompt_variables["%B"], "\u001B[32m2340\u001B[0m\u001B[37m ");          // %B
+        QCOMPARE(parsed_prompt_variables["%C"], "  ");                                          // %C
+        QCOMPARE(parsed_prompt_variables["%P"], "  ");                                          // %P
+        QCOMPARE(parsed_prompt_variables["%Q"], "  ");                                          // %Q
+
+        g1.desc->output = {};
+        QCOMPARE(do_abandon(&g1, str_hsh(qPrintable(names[0]))), eSUCCESS);
+        QCOMPARE(g1.desc->output, "You abandon: .\n\rYou stop following agis.\r\n");
+        g1.desc->output = {};
+        QCOMPARE(p1.desc->output, "Thalanil abandons: .\r\nThalanil stops following you.\r\n");
+        p1.desc->output = {};
+
+        QCOMPARE(p1.do_hit({g1.getName()}), eFAILURE);
+        QCOMPARE(p1.desc->output, "You are too new in this realm to make enemies!\r\n");
+        p1.desc->output = {};
+        p1.setLevel(10);
+        g1.setLevel(10);
+        g2.setLevel(10);
+        g1.setHP(1000);
+        g2.setHP(1000);
+        // 14905, 2256, 3181
+        QVERIFY(real_object(14905) != -1);
+        QVERIFY(real_object(2256) != -1);
+        QVERIFY(real_object(3181) != -1);
+        QVERIFY(real_object(107) != -1);
+        QVERIFY(real_object(108) != -1);
+        QVERIFY(real_object(7004) != -1);
+        QVERIFY(obj_to_char(clone_object(real_object(14905)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(2256)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(3181)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(107)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(108)), &p1));
+        QVERIFY(obj_to_char(clone_object(real_object(7004)), &p1));
+
+        p1.setClass(CLASS_MAGE);
+        auto spell = find_skills_by_name("create_golem");
+        QVERIFY(!spell.empty());
+
+        p1.learn_skill(spell.begin()->second, 100, 100);
+        QCOMPARE(p1.desc->output, "");
+
+        p1.desc->output = {};
+        p1.setLevel(OVERSEER);
+        QCOMPARE(do_cast(&p1, str_hsh("'create golem' iron")), eSUCCESS);
+        p1.setLevel(10);
+        QCOMPARE(p1.desc->output, "Ok.\r\nAdding in the final ingredient, your golem increases in strength!\r\nAn enchanted iron golem starts following you.\r\nThere is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n");
+        p1.desc->output = {};
+
+        QCOMPARE(p1.do_hit({g1.getName()}), eSUCCESS);
+        QCOMPARE(p1.desc->output, "Your hit misses thalanil.\r\n");
+        QCOMPARE(p1.fighting->fighting, &p1);
+        g2.desc->output = {};
+        QCOMPARE(g2.do_join({names[0]}), eSUCCESS);
+        QCOMPARE(g2.desc->output, "ARGGGGG!!!! *** K I L L ***!!!!.\r\nYour hit tickles thalanil.\r\n");
+        g2.desc->output = {};
+
+        QCOMPARE(parsed_prompt_variables["%Y"], "  "); // %Y
+        parsed_prompt_variables["%Y"] = get_parsed_legacy_prompt_variable(&p1, "%Y");
+        QCOMPARE(parsed_prompt_variables["%Y"], "\u001B[32m100\u001B[0m\u001B[37m "); // %Y
+        parsed_prompt_variables["%C"] = get_parsed_legacy_prompt_variable(&p1, "%C");
+        parsed_prompt_variables["%P"] = get_parsed_legacy_prompt_variable(&p1, "%P");
+        parsed_prompt_variables["%Q"] = get_parsed_legacy_prompt_variable(&p1, "%Q");
+        QCOMPARE(parsed_prompt_variables["%C"], "<\u001B[32ma few scratches\u001B[0m\u001B[37m> "); // %C
+
+        QCOMPARE(parsed_prompt_variables["%D"], "cloudless ");                         // %D
+        QCOMPARE(parsed_prompt_variables["%E"], "\u001B[32m2340\u001B[0m\u001B[37m "); // %E
+        QCOMPARE(parsed_prompt_variables["%F"], "  ");                                 // %F
+        parsed_prompt_variables["%F"] = get_parsed_legacy_prompt_variable(&p1, "%F");
+        QCOMPARE(parsed_prompt_variables["%F"], "(\u001B[31mbleeding freely\u001B[0m\u001B[37m) "); // %F
+
+        QCOMPARE(parsed_prompt_variables["%G"], "2 ");                                     // %G
+        QCOMPARE(parsed_prompt_variables["%H"], "2348 ");                                  // %H
+        QCOMPARE(parsed_prompt_variables["%I"], "99 ");                                    // %I
+        QCOMPARE(parsed_prompt_variables["%J"], "\u001B[32m2340\u001B[0m\u001B[37m ");     // %J
+        QCOMPARE(parsed_prompt_variables["%K"], "1234 ");                                  // %K
+        QCOMPARE(parsed_prompt_variables["%L"], "99 ");                                    // %L
+        QCOMPARE(parsed_prompt_variables["%M"], "3456 ");                                  // %M
+        QCOMPARE(parsed_prompt_variables["%N"], "99 ");                                    // %N
+        QCOMPARE(parsed_prompt_variables["%O"], "2222 ");                                  // %O
+        QCOMPARE(parsed_prompt_variables["%P"], "\u001B[32magis\u001B[0m\u001B[37m ");     // %P
+        QCOMPARE(parsed_prompt_variables["%Q"], "\u001B[31mthalanil\u001B[0m\u001B[37m "); // %Q
+        QCOMPARE(parsed_prompt_variables["%R"], "\u001B[32m3014\u001B[0m\u001B[37m ");     // %R
+        QCOMPARE(parsed_prompt_variables["%S"], "4444 ");                                  // %S
+        QCOMPARE(parsed_prompt_variables["%T"], "  ");                                     // %T
+        p1.desc->output = {};
+        QCOMPARE(do_promote(&p1, str_hsh(qUtf8Printable(names[2]))), eSUCCESS);
+        QCOMPARE(p1.desc->output, "You step down, appointing elluin as the new leader.\r\nElluin stops following you.\r\nReptar stops following you.\r\nDakath stops following you.\r\n");
+        p1.desc->output = {};
+        parsed_prompt_variables["%T"] = get_parsed_legacy_prompt_variable(&p1, "%T");
+        QCOMPARE(parsed_prompt_variables["%T"], "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
+        QCOMPARE(parsed_prompt_variables["%U"], "\u001B[32m2340\u001B[0m\u001B[37m ");              // %U
+        QCOMPARE(parsed_prompt_variables["%V"], "4587 ");                                           // %V
+        QCOMPARE(parsed_prompt_variables["%W"], "99 ");                                             // %W
+        QCOMPARE(parsed_prompt_variables["%X"], "1 ");                                              // %X
+
+        QCOMPARE(parsed_prompt_variables["%Z"], "\u001B[31m4\u001B[0m\u001B[37m ");              // %Z
+        QCOMPARE(parsed_prompt_variables["%["], "2There is a fucked up code in your prompt> ");  // %[
+        QCOMPARE(parsed_prompt_variables["%\\"], "2There is a fucked up code in your prompt> "); // %
+        QCOMPARE(parsed_prompt_variables["%]"], "2There is a fucked up code in your prompt> ");  // %]
+        QCOMPARE(parsed_prompt_variables["%^"], "2There is a fucked up code in your prompt> ");  // %^
+        QCOMPARE(parsed_prompt_variables["%_"], "2There is a fucked up code in your prompt> ");  // %_
+        QCOMPARE(parsed_prompt_variables["%`"], "2There is a fucked up code in your prompt> ");  // %`
+        QCOMPARE(parsed_prompt_variables["%a"], "123 ");                                         // %a
+        QCOMPARE(parsed_prompt_variables["%b"], "agis ");                                        // %b
+        QCOMPARE(parsed_prompt_variables["%c"], "  ");                                           // %c
+        parsed_prompt_variables["%c"] = get_parsed_legacy_prompt_variable(&p1, "%c");
+        QCOMPARE(parsed_prompt_variables["%c"], "<a few scratches> "); // %c
+        QCOMPARE(parsed_prompt_variables["%d"], "night time ");        // %d
+        QCOMPARE(parsed_prompt_variables["%e"], "reptar ");            // %e
+        QCOMPARE(parsed_prompt_variables["%f"], "  ");                 // %f
+        parsed_prompt_variables["%f"] = get_parsed_legacy_prompt_variable(&p1, "%f");
+        QCOMPARE(parsed_prompt_variables["%f"], "(bleeding freely) ");                          // %f
+        QCOMPARE(parsed_prompt_variables["%g"], "40000 ");                                      // %g
+        QCOMPARE(parsed_prompt_variables["%h"], "2340 ");                                       // %h
+        QCOMPARE(parsed_prompt_variables["%i"], "\u001B[32m2340\u001B[0m\u001B[37m ");          // %i
+        QCOMPARE(parsed_prompt_variables["%j"], "dakath ");                                     // %j
+        QCOMPARE(parsed_prompt_variables["%k"], "1230 ");                                       // %k
+        QCOMPARE(parsed_prompt_variables["%l"], "\u001B[32m1230\u001B[0m\u001B[37m ");          // %l
+        QCOMPARE(parsed_prompt_variables["%m"], "3450 ");                                       // %m
+        QCOMPARE(parsed_prompt_variables["%n"], "\u001B[32m3450\u001B[0m\u001B[37m ");          // %n
+        QCOMPARE(parsed_prompt_variables["%o"], "2There is a fucked up code in your prompt> "); // %o
+        QCOMPARE(parsed_prompt_variables["%p"], "  ");                                          // %p
+        QCOMPARE(parsed_prompt_variables["%q"], "  ");                                          // %q
+        parsed_prompt_variables["%p"] = get_parsed_legacy_prompt_variable(&p1, "%p");
+        parsed_prompt_variables["%q"] = get_parsed_legacy_prompt_variable(&p1, "%q");
+        QCOMPARE(parsed_prompt_variables["%p"], "agis\u001B[0m\u001B[37m ");     // %p
+        QCOMPARE(parsed_prompt_variables["%q"], "thalanil\u001B[0m\u001B[37m "); // %q
+        QCOMPARE(parsed_prompt_variables["%r"], "\n\r ");                        // %r
+        QCOMPARE(parsed_prompt_variables["%s"], "city ");                        // %s
+        QCOMPARE(parsed_prompt_variables["%t"], "  ");                           // %t
+        parsed_prompt_variables["%t"] = get_parsed_legacy_prompt_variable(&p1, "%t");
+        QCOMPARE(parsed_prompt_variables["%t"], "[a few scratches] ");                 // %t
+        QCOMPARE(parsed_prompt_variables["%u"], "elluin ");                            // %u
+        QCOMPARE(parsed_prompt_variables["%v"], "4560 ");                              // %v
+        QCOMPARE(parsed_prompt_variables["%w"], "\u001B[32m4560\u001B[0m\u001B[37m "); // %w
+        QCOMPARE(parsed_prompt_variables["%x"], "0 ");                                 // %x
+        QCOMPARE(parsed_prompt_variables["%y"], "  ");                                 // %y
+        parsed_prompt_variables["%y"] = get_parsed_legacy_prompt_variable(&p1, "%y");
+        QCOMPARE(parsed_prompt_variables["%y"], "100 ");                                        // %y
+        QCOMPARE(parsed_prompt_variables["%z"], " ");                                           // %z
+        QCOMPARE(parsed_prompt_variables["%{"], "2There is a fucked up code in your prompt> "); // %{
+        QCOMPARE(parsed_prompt_variables["%|"], "2There is a fucked up code in your prompt> "); // %|
+        QCOMPARE(parsed_prompt_variables["%}"], "2There is a fucked up code in your prompt> "); // %}
+        QCOMPARE(parsed_prompt_variables["%~"], "2There is a fucked up code in your prompt> "); // %~
     }
 };
 
