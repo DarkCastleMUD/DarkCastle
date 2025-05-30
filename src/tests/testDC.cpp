@@ -1493,9 +1493,9 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%7"), "\u001B[37m ");                                // %7
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%8"), "\u001B[1m ");                                 // %8
 
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), "\u001B[32m<a few scratches>\u001B[0m\u001B[37m "); // %C
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%P"), " ");                                               // %P
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), " ");                                               // %Q
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), " "); // %C
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%P"), " "); // %P
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), " "); // %Q
 
         g1.desc->output = {};
         QCOMPARE(do_abandon(&g1, str_hsh(qPrintable(names[0]))), eSUCCESS);
@@ -1539,7 +1539,7 @@ private slots:
         p1.setLevel(10);
         QCOMPARE(p1.desc->output, "Ok.\r\nAdding in the final ingredient, your golem increases in strength!\r\nAn enchanted iron golem starts following you.\r\nThere is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n");
         p1.desc->output = {};
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Y"), "\u001B[32m<excellent condition>\u001B[0m\u001B[37m "); // %Y
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Y"), " "); // %Y
 
         QCOMPARE(p1.do_hit({g1.getName()}), eSUCCESS);
         QCOMPARE(p1.desc->output, "Your hit misses thalanil.\r\n");
@@ -1612,7 +1612,7 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%v"), "4560 ");                              // %v
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%w"), "\u001B[32m4560\u001B[0m\u001B[37m "); // %w
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%x"), "0 ");                                 // %x
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), "<excellent condition> ");             // %y
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");                                  // %y
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%z"), " ");                                  // %z
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%{"), "%{ ");                                // %{
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%|"), "%| ");                                // %|

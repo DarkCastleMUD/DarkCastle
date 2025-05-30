@@ -717,6 +717,15 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     bool supports_color = isPlayer() && (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100));
     bool use_color = false;
     auto target = this;
+    enum class targets
+    {
+        Self,
+        Tank,
+        Fighting,
+        Charmie,
+        GrouptMember
+    } target_is = targets::Self;
+
     QString color{}, value{};
 
     const static QMap<QString, QString> legacy_to_modern{
@@ -793,12 +802,12 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
 
     QStringList arguments = variable.split('.');
     variable = arguments.value(0);
-    bool target_is_tank = false;
     if (variable == "charmie")
     {
         target = get_charmie(this);
         if (!target)
             return {};
+        target_is = targets::Charmie;
         arguments.pop_front();
         variable = arguments.value(0);
     }
@@ -807,18 +816,19 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         if (fighting && fighting->fighting)
         {
             target = fighting->fighting;
-            target_is_tank = true;
+            target_is = targets::Tank;
         }
         else
             return {};
         arguments.pop_front();
         variable = arguments.value(0);
     }
-    else if (variable == "target")
+    else if (variable == "target" || variable == "fighting" || variable == "opponent")
     {
         if (!fighting)
             return {};
         target = fighting;
+        target_is = targets::Fighting;
         arguments.pop_front();
         variable = arguments.value(0);
     }
@@ -835,6 +845,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
             target = getFollowers().at(gmember_no - 1);
             if (!target)
                 return {};
+            target_is = targets::GrouptMember;
 
             arguments.pop_front();
             variable = arguments.value(0);
@@ -936,12 +947,22 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         value = QString::number(getGold() / 20000);
     else if (variable == "cond" || variable == "condition")
     {
-        if (target == fighting)
-            value = QStringLiteral("(%1)").arg(calc_condition(target));
-        else if (target_is_tank)
-            value = QStringLiteral("[%1]").arg(calc_condition(target));
+        if (target && target->fighting)
+        {
+            if (target_is == targets::Self)
+                value = QStringLiteral("<%1>").arg(calc_condition(target));
+            else if (target_is == targets::Fighting)
+                value = QStringLiteral("(%1)").arg(calc_condition(target));
+            else if (target_is == targets::Tank)
+                value = QStringLiteral("[%1]").arg(calc_condition(target));
+            else if (target_is == targets::Charmie || target_is == targets::GrouptMember)
+                value = QStringLiteral("%1").arg(calc_condition(target));
+            else
+                return {};
+        }
         else
-            value = QStringLiteral("<%1>").arg(calc_condition(target));
+            return {};
+
         if (use_color)
             color = calc_color(target->getHP(), GET_MAX_HIT(target));
     }
