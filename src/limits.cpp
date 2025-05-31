@@ -896,7 +896,6 @@ void update_corpses_and_portals(void)
 			if (j->obj_flags.timer > 0)
 			{
 				j->obj_flags.timer--;
-				save_corpses();
 			}
 
 			if (!j->obj_flags.timer)
@@ -908,7 +907,7 @@ void update_corpses_and_portals(void)
 					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, 0);
 				}
-
+				bool corpse_contained = j->contains != nullptr;
 				for (jj = j->contains; jj; jj = next_thing2)
 				{
 					next_thing2 = jj->next_content; /* Next in inventory */
@@ -964,8 +963,9 @@ void update_corpses_and_portals(void)
 					next_thing = next_thing->next;
 				// Is THIS what caused the crasher then?
 				// Wtf: damnit.
+				if (IS_OBJ_STAT(j, ITEM_PC_CORPSE) && corpse_contained)
+					corpses_need_saving = true;
 				extract_obj(j);
-				corpses_need_saving = true;
 			}
 		}
 	}
