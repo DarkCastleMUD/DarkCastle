@@ -1438,6 +1438,7 @@ private slots:
             dc_free(GET_PROMPT(&p1));
         weather_info.sky = SKY_CLOUDLESS;
         weather_info.sunlight = 0;
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("% "), "% ");    // %
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%!"), "%! ");   // %!
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%\""), "%\" "); // %"
@@ -1549,17 +1550,16 @@ private slots:
         QCOMPARE(g2.desc->output, "ARGGGGG!!!! *** K I L L ***!!!!.\r\nYour hit tickles thalanil.\r\n");
         g2.desc->output = {};
 
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), "\u001B[32m<a few scratches>\u001B[0m\u001B[37m "); // %C
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), "<\u001B[32ma few scratches\u001B[0m\u001B[37m> "); // %C
 
         // QCOMPARE(p1.get_parsed_legacy_prompt_variable("%D"), "cloudless ");                         // %D
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%E"), "\u001B[32m2340\u001B[0m\u001B[37m ");                       // %E
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%F"), "\u001B[1m\u001B[33m(bleeding freely)\u001B[0m\u001B[37m "); // %F
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%E"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %E
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%F"), "(\u001B[31mbleeding freely\u001B[0m\u001B[37m) "); // %F
 
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%G"), "2 ");    // %G
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%H"), "2348 "); // %H
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%I"), "99 ");   // %I
         QVERIFY(isSet(p1.player->toggles, Player::PLR_ANSI));
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%J"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %J
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%J"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %J
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%K"), "1234 ");                                           // %K
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%L"), "99 ");                                             // %L
@@ -1570,12 +1570,12 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), "\u001B[1m\u001B[33mthalanil\u001B[0m\u001B[37m "); // %Q
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%R"), "\u001B[32m3014\u001B[0m\u001B[37m ");              // %R
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%S"), "4444 ");                                           // %S
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "\u001B[32m[a few scratches]\u001B[0m\u001B[37m "); // %T
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
         p1.desc->output = {};
         QCOMPARE(do_promote(&p1, str_hsh(qUtf8Printable(names[2]))), eSUCCESS);
         QCOMPARE(p1.desc->output, "You step down, appointing elluin as the new leader.\r\nElluin stops following you.\r\nReptar stops following you.\r\nDakath stops following you.\r\n");
         p1.desc->output = {};
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "\u001B[32m[a few scratches]\u001B[0m\u001B[37m "); // %T
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%U"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %U
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%V"), "4587 ");                                           // %V
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%W"), "99 ");                                             // %W
@@ -1612,7 +1612,7 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%v"), "4560 ");                              // %v
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%w"), "\u001B[32m4560\u001B[0m\u001B[37m "); // %w
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%x"), "0 ");                                 // %x
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");                                  // %y
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), "excellent condition ");               // %y
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%z"), " ");                                  // %z
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%{"), "%{ ");                                // %{
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%|"), "%| ");                                // %|
