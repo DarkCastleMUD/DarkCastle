@@ -1910,18 +1910,18 @@ private slots:
         g1.setHP(1000);
         g2.setHP(1000);
         // 14905, 2256, 3181
-        QVERIFY(real_object(14905) != -1);
-        QVERIFY(real_object(2256) != -1);
-        QVERIFY(real_object(3181) != -1);
-        QVERIFY(real_object(107) != -1);
-        QVERIFY(real_object(108) != -1);
-        QVERIFY(real_object(7004) != -1);
-        QVERIFY(obj_to_char(dc.clone_object(real_object(14905)), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(real_object(2256)), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(real_object(3181)), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(real_object(107)), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(real_object(108)), &p1));
-        QVERIFY(obj_to_char(dc.clone_object(real_object(7004)), &p1));
+        QVERIFY(dc.obj_index.contains(14905));
+        QVERIFY(dc.obj_index.contains(2256));
+        QVERIFY(dc.obj_index.contains(3181));
+        QVERIFY(dc.obj_index.contains(107));
+        QVERIFY(dc.obj_index.contains(108));
+        QVERIFY(dc.obj_index.contains(7004));
+        QVERIFY(obj_to_char(dc.clone_object(14905), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(2256), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(3181), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(107), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(108), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(7004), &p1));
 
         p1.setClass(CLASS_MAGE);
         auto spell = find_skills_by_name("create_golem");
