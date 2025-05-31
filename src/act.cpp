@@ -96,7 +96,7 @@ act_return act(
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
     Character *tmp_char, *next_tmp_char;
-    if (ch->in_room >= 0)
+    if (ch->in_room >= 1)
     {
       for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
       {
