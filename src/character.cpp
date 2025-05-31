@@ -823,7 +823,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         arguments.pop_front();
         variable = arguments.value(0);
     }
-    else if (variable == "target" || variable == "fighting" || variable == "opponent")
+    else if (variable == "fighting" || variable == "target" || variable == "opponent")
     {
         if (!fighting)
             return {};
@@ -947,24 +947,21 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         value = QString::number(getGold() / 20000);
     else if (variable == "cond" || variable == "condition")
     {
-        if (target && target->fighting)
+        if (target && fighting)
         {
             if (target_is == targets::Self)
-                value = QStringLiteral("<%1>").arg(calc_condition(target));
+                return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
             else if (target_is == targets::Fighting)
-                value = QStringLiteral("(%1)").arg(calc_condition(target));
+                return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
             else if (target_is == targets::Tank)
-                value = QStringLiteral("[%1]").arg(calc_condition(target));
+                return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
             else if (target_is == targets::Charmie || target_is == targets::GrouptMember)
-                value = QStringLiteral("%1").arg(calc_condition(target));
+                return QStringLiteral("%1").arg(calc_condition(target, use_color));
             else
                 return {};
         }
         else
             return {};
-
-        if (use_color)
-            color = calc_color(target->getHP(), GET_MAX_HIT(target));
     }
     else if (variable == "normal" && supports_color)
         value = NTEXT;
@@ -1028,7 +1025,8 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     }
     else if (variable == "cr")
         value = QStringLiteral("\r\n");
-    else
+
+    if (value.isEmpty())
         return {};
 
     if (color.isEmpty())
