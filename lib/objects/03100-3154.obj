@@ -465,4 +465,13 @@ Fixed.~
 0 0 0 0 0
 0 0 0
 S
+#3181
+grub~
+a $2green$R grub~
+A odd grub wiggles around here.~
+~
+10 0 1 0
+15 16 16 16 0
+1 0 0
+S
 $~

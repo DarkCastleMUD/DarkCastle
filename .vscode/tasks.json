@@ -63,7 +63,7 @@
         {
             "label": "rebuild",
             "type": "shell",
-            "command": "test \"$(ninja -n -C build|tail -1)\" != \"ninja: no work to do.\" && { ninja -C build && pidof dcastle && rebootdc.sh; } || true",
+            "command": "scripts/rebuild.sh",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [

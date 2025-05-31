@@ -1311,4 +1311,16 @@ Fixed.~
 A
 13 -100
 S
+#2256
+herbs druid~
+some druidic herbs~
+Some druidic herbs are on the ground here.~
+~
+12 16 16385 1
+5 0 0 0 0
+1 100 0
+E
+herbs druidic~
+The herbs are dark green with small shoots growing off them.~
+S
 $~

@@ -68,5 +68,8 @@ void telnet_echo_off(class Connection *d);
 void telnet_echo_on(class Connection *d);
 void update_bard_singing(void);
 void affect_update(int32_t duration_type); /* In spells.c */
-
+char *calc_color(int hit, int max_hit);
+char *calc_color_align(int align);
+char *calc_condition(Character *ch, bool colour = false);
+Character *get_charmie(Character *ch);
 #endif

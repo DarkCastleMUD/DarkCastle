@@ -858,13 +858,17 @@ void update_corpses_and_portals(void)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if (j->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_room].people)
+				if (j->in_room != DC::NOWHERE)
 				{
-					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
+					auto str = QStringLiteral("%1 shimmers brightly and then fades away.\r\n").arg(GET_OBJ_SHORT(j));
+					str[0] = str[0].toUpper();
+					send_to_room(str, j->in_room);
 				}
-				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_obj->in_room].people)
+				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE)
 				{
-					act("$p shimmers brightly for a moment.", DC::getInstance()->world[j->in_obj->in_room].people, j->in_obj, 0, TO_ROOM, INVIS_NULL);
+					auto str = QStringLiteral("%1 shimmers brightly for a moment.\r\n").arg(GET_OBJ_SHORT(j->in_obj));
+					str[0] = str[0].toUpper();
+					send_to_room(str, j->in_obj->in_room);
 				}
 				else if (j->in_obj && j->in_obj->carried_by)
 				{
@@ -874,6 +878,9 @@ void update_corpses_and_portals(void)
 				{
 					act("$p shimmers brightly and then fades away.", j->carried_by, j, 0, TO_CHAR, INVIS_NULL);
 				}
+
+				if (j->isTotem() && j->in_obj && j->in_obj->obj_flags.type_flag == ITEM_ALTAR)
+					remove_totem(j->in_obj, j);
 
 				extract_obj(j);
 				continue;
@@ -889,7 +896,6 @@ void update_corpses_and_portals(void)
 			if (j->obj_flags.timer > 0)
 			{
 				j->obj_flags.timer--;
-				save_corpses();
 			}
 
 			if (!j->obj_flags.timer)
@@ -901,7 +907,7 @@ void update_corpses_and_portals(void)
 					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("A quivering horde of maggots consumes $p.", DC::getInstance()->world[j->in_room].people, j, 0, TO_CHAR, 0);
 				}
-
+				bool corpse_contained = j->contains != nullptr;
 				for (jj = j->contains; jj; jj = next_thing2)
 				{
 					next_thing2 = jj->next_content; /* Next in inventory */
@@ -957,8 +963,9 @@ void update_corpses_and_portals(void)
 					next_thing = next_thing->next;
 				// Is THIS what caused the crasher then?
 				// Wtf: damnit.
+				if (IS_OBJ_STAT(j, ITEM_PC_CORPSE) && corpse_contained)
+					corpses_need_saving = true;
 				extract_obj(j);
-				corpses_need_saving = true;
 			}
 		}
 	}

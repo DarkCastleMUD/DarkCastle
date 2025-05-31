@@ -462,6 +462,11 @@ public:
         MALE = 1,
         FEMALE = 2
     };
+    enum class PromptVariableType
+    {
+        Legacy,
+        Advanced
+    };
     static constexpr qsizetype MIN_NAME_SIZE = 3;
     static constexpr qsizetype MAX_NAME_SIZE = 12;
     static const QList<int> wear_to_item_wear;
@@ -1051,6 +1056,9 @@ public:
     bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
     bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
     bool allowColor(void);
+    QString generate_prompt(void);
+    QString parse_prompt_variable(QString variable, PromptVariableType type = PromptVariableType::Advanced);
+    QString get_parsed_legacy_prompt_variable(QString var);
 
 private:
     Type type_ = Type::Undefined;

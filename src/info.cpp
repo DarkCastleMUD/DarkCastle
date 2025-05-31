@@ -370,6 +370,16 @@ void Character::show_obj_to_char(class Object *object, int mode)
          }
       }
 
+      if (isSet(object->obj_flags.more_flags, ITEM_POOF_AFTER_24H))
+      {
+         if (object->obj_flags.timer)
+         {
+            char timebuffer[101] = {};
+            snprintf(timebuffer, 100, " $R($B$0%lu ticks left$R)", object->obj_flags.timer);
+            strcat(buffer, timebuffer);
+         }
+      }
+
       if (mode == 0)             // 'look'
          strcat(buffer, "$B$1"); // setup color background
    }

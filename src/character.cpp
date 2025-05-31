@@ -5,6 +5,8 @@
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/obj.h"
+#include "DC/terminal.h"
+#include "DC/const.h"
 
 void set_golem(Character *golem, int golemtype);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
@@ -255,7 +257,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     {
         restored = ".restored";
     }
-    QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(0).arg(restored);
+    QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(QString::number(0)).arg(restored);
 
     QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
     QString fullpath = path + filename;
@@ -646,7 +648,7 @@ level_t Character::getLevel(void) const
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QStringLiteral("Warning: getLevel returned %1.").arg(level_));
+        logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
     }
 
     return level_;
@@ -659,7 +661,7 @@ void Character::setLevel(level_t level)
     if (level_ > 110)
     {
         produce_coredump();
-        logentry(QStringLiteral("Warning: setLevel(%1).").arg(level_));
+        logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
     }
 }
 
@@ -708,4 +710,363 @@ move_t Character::move_limit(void)
     /* Skill/Spell calculations */
 
     return max;
+}
+
+QString Character::parse_prompt_variable(QString variable, PromptVariableType type)
+{
+    bool supports_color = isPlayer() && (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100));
+    bool use_color = false;
+    auto target = this;
+    enum class targets
+    {
+        Self,
+        Tank,
+        Fighting,
+        Charmie,
+        GrouptMember
+    } target_is = targets::Self;
+
+    QString color{}, value{};
+
+    const static QMap<QString, QString> legacy_to_modern{
+        {"h", "hp"},
+        {"H", "maxhp"},
+        {"i", "colorhp"},
+        {"m", "mana"},
+        {"M", "maxmana"},
+        {"n", "colormana"},
+        {"v", "move"},
+        {"V", "maxmove"},
+        {"w", "colormove"},
+        {"k", "ki"},
+        {"K", "maxki"},
+        {"l", "colorki"},
+        {"a", "align"},
+        {"A", "coloralign"},
+        {"I", "hp%"},
+        {"N", "mana%"},
+        {"L", "ki%"},
+        {"W", "move%"},
+        {"x", "xp"},
+        {"X", "xptnl"},
+        {"g", "gold"},
+        {"G", "platsofgold"},
+        {"s", "sector"},
+        {"d", "timeofday"},
+        {"D", "weather"},
+        {"R", "room"},
+        {"O", "lastobj"},
+        {"$", "platinum"},
+        {"%", "%"},
+        {"Z", "zone"},
+        {"S", "lastmob"},
+        {"z", "wizinvis"},
+        {"c", "condition"},
+        {"f", "target.condition"},
+        {"t", "tank.condition"},
+        {"y", "charmie.condition"},
+        {"p", "tank.name"},
+        {"q", "target.name"},
+        {"C", "colorcondition"},
+        {"F", "target.colorcondition"},
+        {"T", "tank.colorcondition"},
+        {"Y", "charmie.colorcondition"},
+        {"P", "tank.colorname"},
+        {"Q", "target.colorname"},
+        {"b", "gmember1.name"},
+        {"e", "gmember2.name"},
+        {"j", "gmember3.name"},
+        {"u", "gmember4.name"},
+        {"B", "gmember1.colorhp"},
+        {"E", "gmember2.colorhp"},
+        {"J", "gmember3.colorhp"},
+        {"U", "gmember4.colorhp"},
+        {"0", "normal"},
+        {"1", "red"},
+        {"2", "green"},
+        {"3", "yellow"},
+        {"4", "blue"},
+        {"5", "purple"},
+        {"6", "cyan"},
+        {"7", "grey"},
+        {"8", "bold"},
+        {"r", "cr"}};
+
+    if (type == PromptVariableType::Legacy)
+    {
+        if (legacy_to_modern.contains(variable))
+        {
+            variable = legacy_to_modern.value(variable);
+        }
+    }
+
+    QStringList arguments = variable.split('.');
+    variable = arguments.value(0);
+    if (variable == "charmie")
+    {
+        target = get_charmie(this);
+        if (!target)
+            return {};
+        target_is = targets::Charmie;
+        arguments.pop_front();
+        variable = arguments.value(0);
+    }
+    else if (variable == "tank")
+    {
+        if (fighting && fighting->fighting)
+        {
+            target = fighting->fighting;
+            target_is = targets::Tank;
+        }
+        else
+            return {};
+        arguments.pop_front();
+        variable = arguments.value(0);
+    }
+    else if (variable == "fighting" || variable == "target" || variable == "opponent")
+    {
+        if (!fighting)
+            return {};
+        target = fighting;
+        target_is = targets::Fighting;
+        arguments.pop_front();
+        variable = arguments.value(0);
+    }
+    else
+    {
+        QStringList gmembers = variable.split(QRegularExpression("(gmember|groupmember)"));
+        if (gmembers.size() > 1)
+        {
+            bool ok = false;
+            auto gmember_no = gmembers.last().toUInt(&ok);
+            if (!ok || !gmember_no || gmember_no > getFollowers().size())
+                return {};
+
+            target = getFollowers().at(gmember_no - 1);
+            if (!target)
+                return {};
+            target_is = targets::GrouptMember;
+
+            arguments.pop_front();
+            variable = arguments.value(0);
+        }
+    }
+
+    if (variable.startsWith("color"))
+    {
+        arguments[0] = arguments[0].remove(QRegularExpression{"^color"});
+        variable = arguments.value(0);
+        use_color = supports_color;
+    }
+
+    // %h or %{hp} - Current hitpoints
+    // %i          - Current hitpoints with color
+    if (variable == "hp")
+    {
+        value = QString::number(target->getHP());
+        if (use_color)
+            color = calc_color(target->getHP(), GET_MAX_HIT(target));
+    }
+    // %H or %{maxhp} - Maximum hitpoints
+    else if (variable == "maxhp")
+    {
+        value = QString::number(GET_MAX_HIT(target));
+    }
+    // %I or %{hp%} - Current hitpoints as a percent
+    else if (variable == "hp%")
+    {
+        value = QString::number((target->getHP() * 100) / GET_MAX_HIT(target));
+        if (use_color)
+            color = calc_color(target->getHP(), GET_MAX_HIT(target));
+    }
+    // %m or %{mana} - Current mana
+    // %n            - Current mana with color
+    else if (variable == "mana")
+    {
+        value = QString::number(GET_MANA(target));
+        if (use_color)
+            color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
+    }
+    else if (variable == "maxmana")
+    {
+        value = QString::number(GET_MAX_MANA(target));
+    }
+    else if (variable == "mana%")
+    {
+        value = QString::number((GET_MANA(target) * 100) / GET_MAX_MANA(target));
+        if (use_color)
+            color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
+    }
+    else if (variable == "move")
+    {
+        value = QString::number(GET_MOVE(target));
+        if (use_color)
+            color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
+    }
+    else if (variable == "maxmove")
+    {
+        value = QString::number(GET_MAX_MOVE(target));
+    }
+    else if (variable == "move%")
+    {
+        value = QString::number((GET_MOVE(target) * 100) / GET_MAX_MOVE(target));
+        if (use_color)
+            color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
+    }
+    else if (variable == "ki")
+    {
+        value = QString::number(GET_KI(target));
+        if (use_color)
+            color = calc_color(GET_KI(target), GET_MAX_KI(target));
+    }
+    else if (variable == "maxki")
+    {
+        value = QString::number(GET_MAX_KI(target));
+    }
+    else if (variable == "ki%")
+    {
+        value = QString::number((GET_KI(target) * 100) / GET_MAX_KI(target));
+        if (use_color)
+            color = calc_color(GET_KI(target), GET_MAX_KI(target));
+    }
+    else if (variable == "xp")
+        value = QString::number(GET_EXP(target));
+    else if (variable == "xptnl")
+        value = QString::number(exp_table[getLevel() + 1] - GET_EXP(this));
+    else if (variable == "align" || variable == "alignment")
+    {
+        value = QString::number(GET_ALIGNMENT(this));
+        if (use_color)
+            color = calc_color_align(GET_ALIGNMENT(this));
+    }
+    else if (variable == "gold")
+        value = QString::number(getGold());
+    else if (variable == "platinum" || variable == "plats")
+        value = QString::number(GET_PLATINUM(this));
+    else if (variable == "platsofgold")
+        value = QString::number(getGold() / 20000);
+    else if (variable == "cond" || variable == "condition")
+    {
+        if (target && fighting)
+        {
+            if (target_is == targets::Self)
+                return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
+            else if (target_is == targets::Fighting)
+                return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
+            else if (target_is == targets::Tank)
+                return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
+            else if (target_is == targets::Charmie || target_is == targets::GrouptMember)
+                return QStringLiteral("%1").arg(calc_condition(target, use_color));
+            else
+                return {};
+        }
+        else
+            return {};
+    }
+    else if (variable == "normal" && supports_color)
+        value = NTEXT;
+    else if (variable == "red" && supports_color)
+        value = RED;
+    else if (variable == "green" && supports_color)
+        value = GREEN;
+    else if (variable == "yellow" && supports_color)
+        value = YELLOW;
+    else if (variable == "blue" && supports_color)
+        value = BLUE;
+    else if (variable == "purple" && supports_color)
+        value = PURPLE;
+    else if (variable == "cyan" && supports_color)
+        value = CYAN;
+    else if (variable == "grey" && supports_color)
+        value = GREY;
+    else if (variable == "bold" && supports_color)
+        value = BOLD;
+    else if (variable == "%")
+        value = "%";
+    else if (variable == "lastobj")
+    {
+        if (isPlayer())
+            value = QString::number(player->last_obj_vnum);
+    }
+    else if (variable == "lastmob")
+    {
+        if (isPlayer())
+            value = QString::number(player->last_mob_edit);
+    }
+    else if (variable == "weather")
+        value = time_look[weather_info.sunlight];
+    else if (variable == "name")
+    {
+        value = target->getName();
+        if (use_color)
+            color = calc_color(target->getHP(), GET_MAX_HIT(target));
+    }
+    else if (variable == "room")
+    {
+        value = QString::number(in_room);
+        if (supports_color)
+            color = GREEN;
+    }
+    else if (variable == "zone")
+    {
+        const auto rm = DC::getInstance()->world[in_room];
+        value = QString::number(rm.zone);
+        if (supports_color)
+            color = RED;
+    }
+    else if (variable == "sector")
+    {
+        if (DC::getInstance()->rooms.contains(in_room))
+            value = sector_types[DC::getInstance()->world[in_room].sector_type];
+    }
+    else if (variable == "timeofday")
+    {
+        value = time_look[weather_info.sunlight];
+    }
+    else if (variable == "cr")
+        value = QStringLiteral("\r\n");
+
+    if (value.isEmpty())
+        return {};
+
+    if (color.isEmpty())
+        return value;
+
+    return QStringLiteral("%1%2%3").arg(color).arg(value).arg(NTEXT);
+}
+
+QString Character::generate_prompt(void)
+{
+    QString source{};
+    if (IS_NPC(this))
+    {
+        source = QStringLiteral("HP: %i/%H %f >");
+    }
+    else
+    {
+        source = GET_PROMPT(this);
+    }
+
+    // Searching for %{variable} like %{hp}
+    // or %{variable1.variable2} like %{gmember1.hp}
+    QRegularExpression re{"%{([a-zA-Z0-9.%]+)}"};
+    auto match = re.match(source);
+    while (match.hasMatch())
+    {
+        source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1)));
+        match = re.match(source);
+    }
+
+    re = QRegularExpression{"%([a-np-zA-Z0-8%$])"};
+    match = re.match(source);
+    while (match.hasMatch())
+    {
+        source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1), PromptVariableType::Legacy));
+        match = re.match(source);
+    }
+
+    if (!source.endsWith(' ') && !source.endsWith('\n') && !source.endsWith('\r'))
+        source.append(" ");
+
+    return source;
 }

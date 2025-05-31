@@ -13,8 +13,8 @@ jobs:
         
       - name: install dependencies
         run: |
-          zypper -n dup --auto-agree-with-licenses
-          zypper -n in --no-recommends glibc-locale glibc-locale-base gcc14-c++ clang18 libpq5 fmt-devel libfmt9 zlib-devel cmake postgresql-devel qt6-sql-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git libQt6Test6 qt6-test-devel mold
+          zypper -n dup --no-recommends --auto-agree-with-licenses
+          zypper -n in --no-recommends glibc-locale glibc-locale-base gcc15-c++ clang18 libpq5 fmt-devel libfmt9 zlib-devel cmake postgresql-devel qt6-sql-devel qt6-httpserver-devel qt6-concurrent-devel libssh-devel git libQt6Test6 qt6-test-devel mold
           
       - name: get code
         uses: actions/checkout@v4
@@ -25,8 +25,9 @@ jobs:
       - name: make
         run: |
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
-          cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -GNinja -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
-          ninja -C build
+          cmake -S src -B build -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo  -DCMAKE_CXX_COMPILER="/usr/bin/g++-15" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
+          ninja -C build package
+          zypper -n in --allow-unsigned-rpm build/dc*rpm
 
       - name: test
         run: |

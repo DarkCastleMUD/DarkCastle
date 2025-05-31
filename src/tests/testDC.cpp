@@ -1,5 +1,6 @@
 #include <cstring>
 #include <memory>
+#include <iostream>
 
 #include <QTest>
 #include <QtLogging>
@@ -28,6 +29,17 @@ using namespace std::literals;
 #define STRING_LITERAL4 "$"
 #define STRING_LITERAL5 "test"
 #define STRING_LITERAL6 "$z$>$;"
+
+QString Character::get_parsed_legacy_prompt_variable(QString var)
+{
+    char *saved_prompt = GET_PROMPT(this);
+
+    GET_PROMPT(this) = strdup(qPrintable(var));
+    QString str = generate_prompt();
+    free(GET_PROMPT(this));
+    GET_PROMPT(this) = saved_prompt;
+    return str;
+}
 
 class TestDC : public QObject
 {
@@ -1750,6 +1762,268 @@ private slots:
         // taste
         // sip
         // loot
+    }
+
+    void test_legacy_prompts()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+
+        dc.random_ = QRandomGenerator(0);
+        auto base_character_count = dc.character_list.size();
+
+        Character p1, g1, g2, g3, g4;
+
+        auto count = 0;
+        QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};
+        for (Character *ch : {&p1, &g1, &g2, &g3, &g4})
+        {
+            ch->setName(names.value(count++));
+            ch->plat = 1111;
+            ch->setGold(40000);
+            ch->player = new Player;
+            ch->setType(Character::Type::Player);
+            ch->setPosition(position_t::STANDING);
+            GET_TITLE(ch) = str_hsh("the great");
+            ch->alignment = 123;
+            // divide by zero error if max values are 0
+            ch->ki = 1230;
+            ch->max_ki = 1234;
+            ch->hit = 2340;
+            ch->max_hit = 2345;
+            ch->mana = 3450;
+            ch->max_mana = 3456;
+            ch->setMove(4560);
+            ch->max_move = 4567;
+            ch->player->last_obj_vnum = 2222;
+            ch->player->last_mob_edit = 4444;
+
+            ch->desc = new Connection;
+            ch->desc->descriptor = 1;
+            ch->desc->character = ch;
+            ch->desc->output = {};
+
+            if (dc.descriptor_list)
+                ch->desc->next = dc.descriptor_list;
+            dc.descriptor_list = ch->desc;
+            dc.character_list.insert(ch);
+
+            QCOMPARE(move_char(ch, 3014), eSUCCESS);
+            QCOMPARE(ch->desc->output, "");
+        }
+
+        QCOMPARE(do_found(&p1, "."), eSUCCESS);
+        QCOMPARE(p1.desc->output, "You found: .\n\r");
+        p1.desc->output = {};
+
+        QCOMPARE(do_look(&p1, ""), eSUCCESS);
+        p1.desc->output = {};
+
+        for (Character *ch : {&g1, &g2, &g3, &g4})
+        {
+            ch->desc->output = {};
+            p1.desc->output = {};
+            QCOMPARE(do_follow(ch, str_hsh(qUtf8Printable(names[0]))), eSUCCESS);
+            QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
+            QCOMPARE(p1.desc->output, QStringLiteral("%1 starts following you.\r\n").arg(ch->getName().replace(0, 1, ch->getName()[0].toUpper())));
+            ch->desc->output = {};
+            p1.desc->output = {};
+            QCOMPARE(do_group(&p1, str_hsh(qUtf8Printable(ch->getName()))), eSUCCESS);
+            QCOMPARE(p1.desc->output, QStringLiteral("%1 is now a group member.\r\n").arg(ch->getName().replace(0, 1, ch->getName()[0].toUpper())));
+            p1.desc->output = {};
+        }
+
+        QList<QChar> prompt_variables;
+        for (char c = ' '; c <= '~'; ++c)
+            prompt_variables.append(c);
+
+        QMap<QString, QString> parsed_prompt_variables;
+        if (GET_PROMPT(&p1))
+            dc_free(GET_PROMPT(&p1));
+        weather_info.sky = SKY_CLOUDLESS;
+        weather_info.sunlight = 0;
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("% "), "% ");    // %
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%!"), "%! ");   // %!
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%\""), "%\" "); // %"
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%#"), "%# ");   // %#
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%$"), "1111 "); // %$
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%%"), "% ");    // %%
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%&"), "%& ");   // %&
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%'"), "%' ");   // %'
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%("), "%( ");   // %(
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%)"), "%) ");   // %)
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%*"), "%* ");   // %*
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%+"), "%+ ");   // %+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%,"), "%, ");   // %,
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%-"), "%- ");   // %-
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%."), "%. ");   // %.
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%/"), "%/ ");   // %/
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%0"), " ");   // %0
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%1"), " ");   // %1
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%2"), " ");   // %2
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%3"), " ");   // %3
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%4"), " ");   // %4
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%5"), " ");   // %5
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%6"), " ");   // %6
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%7"), " ");   // %7
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%8"), " ");   // %8
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%9"), "%9 "); // %9
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%:"), "%: "); // %:
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%;"), "%; "); // %;
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%<"), "%< "); // %<
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%="), "%= "); // %=
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%>"), "%> "); // %>
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%?"), "%? "); // %?
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%@"), "%@ "); // %@
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%A"), "123 ");  // %A
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%B"), "2340 "); // %B
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%F"), " ");     // %F
+
+        QCOMPARE(p1.do_toggle({"ansi"}), eSUCCESS);
+        p1.desc->output = {};
+        QVERIFY(isSet(p1.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%E"), "\u001B[32m2340\u001B[0m\u001B[37m ");         // %E
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%A"), "\u001B[1m\u001B[37m123\u001B[0m\u001B[37m "); // %A
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%B"), "\u001B[32m2340\u001B[0m\u001B[37m ");         // %B
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%0"), "\u001B[0m\u001B[37m ");                       // %0
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%1"), "\u001B[31m ");                                // %1
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%2"), "\u001B[32m ");                                // %2
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%3"), "\u001B[33m ");                                // %3
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%4"), "\u001B[34m ");                                // %4
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%5"), "\u001B[35m ");                                // %5
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%6"), "\u001B[36m ");                                // %6
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%7"), "\u001B[37m ");                                // %7
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%8"), "\u001B[1m ");                                 // %8
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), " "); // %C
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%P"), " "); // %P
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), " "); // %Q
+
+        g1.desc->output = {};
+        QCOMPARE(do_abandon(&g1, str_hsh(qPrintable(names[0]))), eSUCCESS);
+        QCOMPARE(g1.desc->output, "You abandon: .\n\rYou stop following agis.\r\n");
+        g1.desc->output = {};
+        QCOMPARE(p1.desc->output, "Thalanil abandons: .\r\nThalanil stops following you.\r\n");
+        p1.desc->output = {};
+
+        QCOMPARE(p1.do_hit({g1.getName()}), eFAILURE);
+        QCOMPARE(p1.desc->output, "You are too new in this realm to make enemies!\r\n");
+        p1.desc->output = {};
+        p1.setLevel(10);
+        g1.setLevel(10);
+        g2.setLevel(10);
+        g1.setHP(1000);
+        g2.setHP(1000);
+        // 14905, 2256, 3181
+        QVERIFY(real_object(14905) != -1);
+        QVERIFY(real_object(2256) != -1);
+        QVERIFY(real_object(3181) != -1);
+        QVERIFY(real_object(107) != -1);
+        QVERIFY(real_object(108) != -1);
+        QVERIFY(real_object(7004) != -1);
+        QVERIFY(obj_to_char(dc.clone_object(real_object(14905)), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(real_object(2256)), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(real_object(3181)), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(real_object(107)), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(real_object(108)), &p1));
+        QVERIFY(obj_to_char(dc.clone_object(real_object(7004)), &p1));
+
+        p1.setClass(CLASS_MAGE);
+        auto spell = find_skills_by_name("create_golem");
+        QVERIFY(!spell.empty());
+
+        p1.learn_skill(spell.begin()->second, 100, 100);
+        QCOMPARE(p1.desc->output, "");
+
+        p1.desc->output = {};
+        p1.setLevel(OVERSEER);
+        QCOMPARE(do_cast(&p1, str_hsh("'create golem' iron")), eSUCCESS);
+        p1.setLevel(10);
+        QCOMPARE(p1.desc->output, "Ok.\r\nAdding in the final ingredient, your golem increases in strength!\r\nAn enchanted iron golem starts following you.\r\nThere is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n");
+        p1.desc->output = {};
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Y"), " "); // %Y
+
+        QCOMPARE(p1.do_hit({g1.getName()}), eSUCCESS);
+        QCOMPARE(p1.desc->output, "Your hit misses thalanil.\r\n");
+        QCOMPARE(p1.fighting->fighting, &p1);
+        g2.desc->output = {};
+        QCOMPARE(g2.do_join({names[0]}), eSUCCESS);
+        QCOMPARE(g2.desc->output, "ARGGGGG!!!! *** K I L L ***!!!!.\r\nYour hit tickles thalanil.\r\n");
+        g2.desc->output = {};
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%C"), "<\u001B[32ma few scratches\u001B[0m\u001B[37m> "); // %C
+
+        // QCOMPARE(p1.get_parsed_legacy_prompt_variable("%D"), "cloudless ");                         // %D
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%E"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %E
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%F"), "(\u001B[31mbleeding freely\u001B[0m\u001B[37m) "); // %F
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%G"), "2 ");    // %G
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%H"), "2348 "); // %H
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%I"), "99 ");   // %I
+        QVERIFY(isSet(p1.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%J"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %J
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%K"), "1234 ");                                           // %K
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%L"), "99 ");                                             // %L
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%M"), "3456 ");                                           // %M
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%N"), "92 ");                                             // %N
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%O"), "2222 ");                                           // %O
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%P"), "\u001B[32magis\u001B[0m\u001B[37m ");              // %P
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), "\u001B[1m\u001B[33mthalanil\u001B[0m\u001B[37m "); // %Q
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%R"), "\u001B[32m3014\u001B[0m\u001B[37m ");              // %R
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%S"), "4444 ");                                           // %S
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
+        p1.desc->output = {};
+        QCOMPARE(do_promote(&p1, str_hsh(qUtf8Printable(names[2]))), eSUCCESS);
+        QCOMPARE(p1.desc->output, "You step down, appointing elluin as the new leader.\r\nElluin stops following you.\r\nReptar stops following you.\r\nDakath stops following you.\r\n");
+        p1.desc->output = {};
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%U"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %U
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%V"), "4587 ");                                           // %V
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%W"), "99 ");                                             // %W
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%X"), "200000 ");                                         // %X
+
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Z"), "\u001B[31m4\u001B[0m\u001B[37m ");    // %Z
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%["), "%[ ");                                // %[
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%\\"), "%\\ ");                              // %
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%]"), "%] ");                                // %]
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%^"), "%^ ");                                // %^
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%_"), "%_ ");                                // %_
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%`"), "%` ");                                // %`
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%a"), "123 ");                               // %a
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%b"), "elluin ");                            // %b
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%c"), "<a few scratches> ");                 // %c
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%d"), "night time ");                        // %d
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%e"), "agis ");                              // %e
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%f"), "(bleeding freely) ");                 // %f
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%g"), "40000 ");                             // %g
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%h"), "2340 ");                              // %h
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%i"), "\u001B[32m2340\u001B[0m\u001B[37m "); // %i
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%j"), "dakath ");                            // %j
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%k"), "1230 ");                              // %k
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%l"), "\u001B[32m1230\u001B[0m\u001B[37m "); // %l
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%m"), "3200 ");                              // %m
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%n"), "\u001B[32m3200\u001B[0m\u001B[37m "); // %n
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%o"), "%o ");                                // %o
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%p"), "agis ");                              // %p
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%q"), "thalanil ");                          // %q
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%r"), "\r\n");                               // %r
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%s"), "city ");                              // %s
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%t"), "[a few scratches] ");                 // %t
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%u"), "reptar ");                            // %u
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%v"), "4560 ");                              // %v
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%w"), "\u001B[32m4560\u001B[0m\u001B[37m "); // %w
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%x"), "0 ");                                 // %x
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), "excellent condition ");               // %y
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%z"), " ");                                  // %z
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%{"), "%{ ");                                // %{
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%|"), "%| ");                                // %|
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%}"), "%} ");                                // %}
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%~"), "%~ ");                                // %~
     }
 
     void init()

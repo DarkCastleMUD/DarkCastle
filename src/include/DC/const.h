@@ -77,4 +77,5 @@ extern const char *ki[];
 extern const char *innate_skills[];
 extern const char *reserved[];
 extern room_t IMM_PIRAHNA_ROOM;
+extern char *time_look[];
 #endif

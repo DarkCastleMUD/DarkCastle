@@ -229,7 +229,7 @@ void save_corpses(void)
 		next = i->next;
 
 		/* Check if its a players corpse */
-		if (IS_OBJ_STAT(i, ITEM_PC_CORPSE))
+		if (IS_OBJ_STAT(i, ITEM_PC_CORPSE) && i->contains)
 		{
 			/* It is, so save it to a file */
 			if (!corpse_save(i, fp, location, false))
