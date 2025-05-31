@@ -858,13 +858,17 @@ void update_corpses_and_portals(void)
 				(j->obj_flags.timer)--;
 			if (!(j->obj_flags.timer))
 			{
-				if (j->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_room].people)
+				if (j->in_room != DC::NOWHERE)
 				{
-					act("$p shimmers brightly and then fades away.", DC::getInstance()->world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
+					auto str = QStringLiteral("%1 shimmers brightly and then fades away.\r\n").arg(GET_OBJ_SHORT(j));
+					str[0] = str[0].toUpper();
+					send_to_room(str, j->in_room);
 				}
-				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE && DC::getInstance()->world[j->in_obj->in_room].people)
+				else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE)
 				{
-					act("$p shimmers brightly for a moment.", DC::getInstance()->world[j->in_obj->in_room].people, j->in_obj, 0, TO_ROOM, INVIS_NULL);
+					auto str = QStringLiteral("%1 shimmers brightly for a moment.\r\n").arg(GET_OBJ_SHORT(j->in_obj));
+					str[0] = str[0].toUpper();
+					send_to_room(str, j->in_obj->in_room);
 				}
 				else if (j->in_obj && j->in_obj->carried_by)
 				{
@@ -874,6 +878,9 @@ void update_corpses_and_portals(void)
 				{
 					act("$p shimmers brightly and then fades away.", j->carried_by, j, 0, TO_CHAR, INVIS_NULL);
 				}
+
+				if (j->isTotem() && j->in_obj && j->in_obj->obj_flags.type_flag == ITEM_ALTAR)
+					remove_totem(j->in_obj, j);
 
 				extract_obj(j);
 				continue;
