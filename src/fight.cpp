@@ -4657,8 +4657,8 @@ void make_corpse(Character *ch)
   object_list_new_new_owner(corpse, 0);
   obj_to_room(corpse, ch->in_room);
 
-  save_corpses();
-  return;
+  if (corpse->contains)
+    save_corpses();
 }
 
 void make_dust(Character *ch)
