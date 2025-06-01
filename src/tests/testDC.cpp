@@ -1067,8 +1067,7 @@ private slots:
                               "Exits: south \r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("list");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("list"), eSUCCESS);
         QCOMPARE(conn.output, "[Amt] [ Price ] [ VNUM ] Item\r\n"
                               "[  1] [     55] [  3011] a delicious DONUT.\r\n"
                               "[  1] [    165] [  3010] a chewy salted fish.\r\n"
@@ -1135,8 +1134,7 @@ private slots:
                               "Exits: south \r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("list");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("list"), eSUCCESS);
         QCOMPARE(conn.output, "Sorry, but you cannot do that here!\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
@@ -1241,8 +1239,7 @@ private slots:
                               "      '---''---'               '---''---'\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("hit");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("hit"), eSUCCESS);
         QCOMPARE(conn.output, "You hit and receive a Qc.\r\n"
                               "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
         conn.output = {};
@@ -1253,8 +1250,7 @@ private slots:
                               "Test:  5h 3s Qc = 18   Dealer:  6h DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("hit");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("hit"), eSUCCESS);
         QCOMPARE(conn.output, "You hit and receive a 5d.\r\n"
                               "You BUSTED!\r\n"
                               "The dealer takes your bet.\r\n");
@@ -1295,8 +1291,7 @@ private slots:
                               "Test:  7d Jh = 17   Dealer:  Qs DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("stay");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("stay"), eSUCCESS);
         QCOMPARE(conn.output, "Test stays.\r\n");
         conn.output = {};
 
@@ -1338,14 +1333,12 @@ private slots:
                               "Test:  Qd 4s = 14   Dealer:  As DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("insurance");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("insurance"), eSUCCESS);
         QCOMPARE(conn.output, "You cannot afford an insurance bet right now.\r\n");
         conn.output = {};
 
         ch.plat = 5;
-        rc = ch.command_interpreter("insurance");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("insurance"), eSUCCESS);
         QCOMPARE(conn.output, "You make an insurance bet.\r\n");
         conn.output = {};
 
@@ -1411,6 +1404,8 @@ private slots:
         cf.sql = false;
         DC dc(cf);
         dc.boot_db();
+        QVERIFY(QFile(QStringLiteral("objects/00000-96.obj")).exists());
+        QFile(QStringLiteral("objects/00000-96.obj.testDCbackup")).remove();
         QVERIFY(QFile(QStringLiteral("objects/00000-96.obj")).copy("objects/00000-96.obj.testDCbackup"));
 
         Character ch, ch2, ch3;
@@ -1464,8 +1459,7 @@ private slots:
 
         command_return_t rc{};
         // oedit
-        rc = ch.command_interpreter("oedit");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("oedit"), eFAILURE);
         QCOMPARE(conn.output, "Syntax:  oedit new [obj vnum]           -- Create new object\n\r"
                               "         oedit [obj vnum]               -- Stat object\n\r"
                               "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
@@ -1516,20 +1510,20 @@ private slots:
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
 
+        QCOMPARE(ch.player->last_obj_vnum, 0);
         rc = ch.command_interpreter("oedit new 100");
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "Item '100' created successfully.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
+        QCOMPARE(ch.player->last_obj_vnum, 100);
 
         // osave
-        rc = ch.command_interpreter("osave");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
         QCOMPARE(conn.output, "Saved.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("osave");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
         QCOMPARE(conn.output, "This range has not been modified.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
@@ -1539,8 +1533,7 @@ private slots:
         conn2.output = {};
 
         // show
-        rc = ch.command_interpreter("show");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("show"), eFAILURE);
         QCOMPARE(conn.output, "Format: show <type> <name>.\r\n"
                               "Types:\r\n"
                               "  keydoorcombo\r\n"
@@ -1573,8 +1566,7 @@ private slots:
         conn.output = {};
 
         // show ofiles
-        rc = ch.command_interpreter("oedit");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("oedit"), eFAILURE);
         QCOMPARE(conn.output, "Syntax:  oedit new [obj vnum]           -- Create new object\n\r"
                               "         oedit [obj vnum]               -- Stat object\n\r"
                               "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
@@ -1615,8 +1607,7 @@ private slots:
         conn2.output = {};
 
         // stat
-        rc = ch.command_interpreter("stat");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("stat"), eFAILURE);
         QCOMPARE(conn.output, "Huh?\r\n");
         conn.output = {};
         rc = ch.command_interpreter("bestow TestImmortal1 stat");
@@ -1625,8 +1616,7 @@ private slots:
                               "TestImmortal1 has bestowed stat upon you.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("stat");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("stat"), eFAILURE);
         QCOMPARE(conn.output, "Usage:  stat <mob|obj|char> <name>\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
@@ -1648,8 +1638,7 @@ private slots:
         conn2.output = {};
 
         // purloin
-        rc = ch.command_interpreter("purloin");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("purloin"), eFAILURE);
         QCOMPARE(conn.output, "Huh?\r\n");
         conn.output = {};
         rc = ch.command_interpreter("bestow TestImmortal1 purloin");
@@ -1658,8 +1647,7 @@ private slots:
                               "TestImmortal1 has bestowed purloin upon you.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("purloin");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("purloin"), eFAILURE);
         QCOMPARE(conn.output, "Retrieves any item in the game and puts it in your inventory.\r\n"
                               "Works well in combination with the 'find obj' command.\r\n"
                               "Usage: purloin [number.]name\n\r"
@@ -1672,8 +1660,7 @@ private slots:
         conn2.output = {};
 
         // load
-        rc = ch.command_interpreter("load");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("load"), eFAILURE);
         QCOMPARE(conn.output, "Huh?\r\n");
         conn.output = {};
         rc = ch.command_interpreter("bestow TestImmortal1 load");
@@ -1682,8 +1669,7 @@ private slots:
                               "TestImmortal1 has bestowed load upon you.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("load");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("load"), eFAILURE);
         QCOMPARE(conn.output, "Usage:  load <mob> <name|vnum> [qty]\r\n"
                               "        load <obj> <name|vnum> [qty] [random]\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
@@ -1695,8 +1681,7 @@ private slots:
         conn2.output = {};
 
         // string
-        rc = ch.command_interpreter("string");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("string"), eSUCCESS);
         QCOMPARE(conn.output, "Huh?\r\n");
         conn.output = {};
         rc = ch.command_interpreter("bestow TestImmortal1 string");
@@ -1705,8 +1690,7 @@ private slots:
                               "TestImmortal1 has bestowed string upon you.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("string");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("string"), eSUCCESS);
         QCOMPARE(conn.output, "Huh?\r\n");
         conn.output = {};
 
@@ -1720,8 +1704,7 @@ private slots:
         QCOMPARE(conn.output, "Item deleted.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
-        rc = ch.command_interpreter("osave");
-        QCOMPARE(rc, eFAILURE);
+        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
         QCOMPARE(conn.output, "That range doesn't seem to exist...tell an imp.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
@@ -2019,14 +2002,24 @@ private slots:
     void init()
     {
         QString original_filename{QStringLiteral("objects/00000-96.obj")};
+        QString original2_filename{QStringLiteral("objects/00101-0199.obj")};
         QString backup_filename{QStringLiteral("objects/00000-96.obj.testDCbackup")};
+        QString backup2_filename{QStringLiteral("objects/00101-0199.obj.testDCbackup")};
         QFile backup_file{QFile(backup_filename)};
+        QFile backup2_file{QFile(backup2_filename)};
 
         if (backup_file.exists())
         {
             if (std::rename(qUtf8Printable(backup_filename), qUtf8Printable(original_filename)))
             {
                 qWarning("Unable to rename '%s' to '%s' using std::rename.", qUtf8Printable(backup_filename), qUtf8Printable(original_filename));
+            }
+        }
+        if (backup2_file.exists())
+        {
+            if (std::rename(qUtf8Printable(backup2_filename), qUtf8Printable(original2_filename)))
+            {
+                qWarning("Unable to rename '%s' to '%s' using std::rename.", qUtf8Printable(backup2_filename), qUtf8Printable(original2_filename));
             }
         }
     }
