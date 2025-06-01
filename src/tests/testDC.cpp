@@ -115,17 +115,27 @@ private slots:
 
     void test_handle_ansi()
     {
-        std::unique_ptr<Character> ch = std::make_unique<Character>();
-        std::unique_ptr<Player> player = std::make_unique<Player>();
-        ch->player = player.get();
-        ch->setType(Character::Type::Player);
-        ch->do_toggle({"ansi"});
-        QVERIFY(isSet(ch->player->toggles, Player::PLR_ANSI));
-        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_COLOR));
+        Connection conn{};
+        Character ch{};
+        ch.setType(Character::Type::Player);
+        ch.desc = &conn;
+        conn.character = &ch;
+        conn.descriptor = 1;
+        Player player{};
+        ch.player = &player;
 
-        ch->do_toggle({"ansi"});
-        QVERIFY(!isSet(ch->player->toggles, Player::PLR_ANSI));
-        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
+        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(ch.desc->output, "");
+        QCOMPARE(ch.do_toggle({"ansi"}), eSUCCESS);
+        QCOMPARE(ch.desc->output, "ANSI COLOR on.\r\n");
+        ch.desc->output = {};
+        QVERIFY(isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), &ch), QStringLiteral(STRING_LITERAL1_COLOR));
+
+        QCOMPARE(ch.do_toggle({"ansi"}), eSUCCESS);
+        QVERIFY(!isSet(ch.player->toggles, Player::PLR_ANSI));
+        QCOMPARE(ch.desc->output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
+        QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), &ch), QStringLiteral(STRING_LITERAL1_NOCOLOR));
     }
 
     void test_str_dup0()
@@ -865,7 +875,7 @@ private slots:
         auto new_mob_rnum = real_mobile(5258);
         QVERIFY(new_mob_rnum != -1);
 
-        auto new_rnum = create_blank_item(1);
+        auto new_rnum = create_blank_item(1UL);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
         Object *o1 = dc.clone_object(1);
         Object *o2 = dc.clone_object(1);
