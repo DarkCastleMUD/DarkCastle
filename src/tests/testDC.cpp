@@ -1956,7 +1956,7 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%N"), "92 ");                                             // %N
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%O"), "2222 ");                                           // %O
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%P"), "\u001B[32magis\u001B[0m\u001B[37m ");              // %P
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), "\u001B[1m\u001B[33mthalanil\u001B[0m\u001B[37m "); // %Q
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Q"), "\u001B[31mthalanil\u001B[0m\u001B[37m ");          // %Q
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%R"), "\u001B[32m3014\u001B[0m\u001B[37m ");              // %R
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%S"), "4444 ");                                           // %S
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
