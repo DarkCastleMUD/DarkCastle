@@ -1393,54 +1393,6 @@ char *cond_txtc[] = {
     BOLD GREY "near death" NTEXT,
     "dead as a doornail"};
 
-char *cond_colorcodes[] = {
-    BOLD GREEN,
-    GREEN,
-    BOLD YELLOW,
-    YELLOW,
-    RED,
-    BOLD RED,
-    BOLD GREY,
-};
-
-std::string calc_name(Character *ch, bool colour = false)
-{
-  int percent;
-  std::string name;
-
-  if (ch->getHP() == 0 || GET_MAX_HIT(ch) == 0)
-    percent = 0;
-  else
-    percent = ch->getHP() * 100 / GET_MAX_HIT(ch);
-
-  if (colour == true)
-  {
-    if (percent >= 100)
-      name = cond_colorcodes[0];
-    else if (percent >= 90)
-      name = cond_colorcodes[1];
-    else if (percent >= 75)
-      name = cond_colorcodes[2];
-    else if (percent >= 50)
-      name = cond_colorcodes[3];
-    else if (percent >= 30)
-      name = cond_colorcodes[4];
-    else if (percent >= 15)
-      name = cond_colorcodes[5];
-    else if (percent >= 0)
-      name = cond_colorcodes[6];
-  }
-
-  if (IS_PC(ch))
-    name += ch->getNameC();
-  else
-    name += ch->short_desc;
-
-  name += NTEXT;
-
-  return name;
-}
-
 char *calc_condition(Character *ch, bool colour)
 {
   int percent;

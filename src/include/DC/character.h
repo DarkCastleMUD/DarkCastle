@@ -1058,6 +1058,7 @@ public:
     QString generate_prompt(void);
     QString parse_prompt_variable(QString variable, PromptVariableType type = PromptVariableType::Advanced);
     QString get_parsed_legacy_prompt_variable(QString var);
+    QString calc_name(bool use_color = false);
 
 private:
     Type type_ = Type::Undefined;

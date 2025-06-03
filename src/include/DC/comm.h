@@ -5,6 +5,8 @@
 #define __COMM_H__
 
 #include <string>
+#include <QStringList>
+#include "DC/terminal.h"
 
 typedef int socket_t;
 
@@ -41,6 +43,15 @@ struct pulse_info
 	uint64_t duration;
 	char name[];
 };
+
+const QStringList cond_colorcodes = {
+	QStringLiteral(BOLD GREEN),
+	QStringLiteral(GREEN),
+	QStringLiteral(BOLD YELLOW),
+	QStringLiteral(YELLOW),
+	QStringLiteral(RED),
+	QStringLiteral(BOLD RED),
+	QStringLiteral(BOLD GREY)};
 
 #define BAN_NOT 0
 #define BAN_NEW 1

@@ -997,9 +997,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         value = time_look[weather_info.sunlight];
     else if (variable == "name")
     {
-        value = target->getName();
-        if (use_color)
-            color = calc_color(target->getHP(), GET_MAX_HIT(target));
+        return target->calc_name(use_color);
     }
     else if (variable == "room")
     {
@@ -1069,4 +1067,45 @@ QString Character::generate_prompt(void)
         source.append(" ");
 
     return source;
+}
+
+QString Character::calc_name(bool use_color)
+{
+    uint_fast8_t percent{};
+    QString name;
+
+    if (getHP() == 0 || GET_MAX_HIT(this) == 0)
+        percent = 0;
+    else
+        percent = getHP() * 100 / GET_MAX_HIT(this);
+
+    if (use_color)
+    {
+        if (percent >= 100)
+            name = cond_colorcodes.value(0);
+        else if (percent >= 90)
+            name = cond_colorcodes.value(1);
+        else if (percent >= 75)
+            name = cond_colorcodes.value(2);
+        else if (percent >= 50)
+            name = cond_colorcodes.value(3);
+        else if (percent >= 30)
+            name = cond_colorcodes.value(4);
+        else if (percent >= 15)
+            name = cond_colorcodes.value(5);
+        else if (percent >= 0)
+            name = cond_colorcodes.value(6);
+    }
+
+    if (isPlayer())
+        name += getName();
+    else if (short_desc)
+        name += short_desc;
+    else
+        name += QStringLiteral("unknown");
+
+    if (use_color)
+        name += NTEXT;
+
+    return name;
 }
