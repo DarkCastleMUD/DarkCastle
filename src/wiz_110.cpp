@@ -869,12 +869,12 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
     return eFAILURE;
   }
   i = 1 << i;
-  int r, o = 1;
+  int o = 1;
   Object *obj;
   char buf[MAX_STRING_LENGTH];
-  for (r = 0; r < top_of_objt; r++)
+  for (const auto &obj_index_entry : DC::getInstance()->obj_index)
   {
-    obj = DC::getInstance()->obj_index[r].item;
+    obj = obj_index_entry.item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -884,7 +884,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].virt, ac);
+            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, obj_index_entry.vnum, ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -959,8 +959,6 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 int do_export(Character *ch, char *args, int cmdnum)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
-  world_file_list_item *curr = DC::getInstance()->obj_file_list;
-
   args = one_argument(args, export_type);
   one_argument(args, filename);
 
@@ -987,13 +985,13 @@ int do_export(Character *ch, char *args, int cmdnum)
 
     fout << "affects" << std::endl;
 
-    while (curr)
+    for (const auto &entry : DC::getInstance()->objects.objects_files)
     {
-      for (int x = curr->firstnum; x <= curr->lastnum; x++)
+      for (int x = entry.firstnum; x <= entry.lastnum; x++)
       {
-        write_object_csv(DC::getInstance()->obj_index[x].item, fout);
+        if (DC::getInstance()->obj_index.contains(x))
+          write_object_csv(DC::getInstance()->obj_index[x].item, fout);
       }
-      curr = curr->next;
     }
 
     fout.close();

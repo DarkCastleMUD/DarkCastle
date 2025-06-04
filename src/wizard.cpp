@@ -982,9 +982,9 @@ void obj_stat(Character *ch, class Object *j)
     }
 */
 
-  virt = (j->item_number >= 0) ? DC::getInstance()->obj_index[j->item_number].virt : 0;
+  virt = (j->vnum >= 0) ? j->vnum : 0;
   sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-          j->name, j->item_number, virt);
+          j->name, j->vnum, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
@@ -1304,14 +1304,14 @@ void obj_stat(Character *ch, class Object *j)
   ch->send(buf);
 
   strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
-  if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].non_combat_func ? "exists\n\r" : "none\n\r"));
+  if (j->vnum >= 0)
+    strcat(buf, (DC::getInstance()->obj_index[j->vnum].non_combat_func ? "exists\n\r" : "none\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
   strcpy(buf, "$3Combat Special procedure$R : ");
-  if (j->item_number >= 0)
-    strcat(buf, (DC::getInstance()->obj_index[j->item_number].combat_func ? "exists\n\r" : "none\n\r"));
+  if (j->vnum >= 0)
+    strcat(buf, (DC::getInstance()->obj_index[j->vnum].combat_func ? "exists\n\r" : "none\n\r"));
   else
     strcat(buf, "No\n\r");
   ch->send(buf);
@@ -1703,9 +1703,9 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
       }
     }
     else
@@ -1716,7 +1716,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
       }
     }
     send_info(buf);
@@ -1848,7 +1848,7 @@ char *last_hunt_time(char *last_hunt)
   return time_of_last_hunt;
 }
 
-void begin_hunt(int item, int duration, int amount, char *huntname)
+void begin_hunt(vnum_t item, int duration, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
   char *tmp;
@@ -1893,9 +1893,9 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
   if (item == 76)
     init_random_hunt_items(n);
-  int rnum = real_object(item);
+
   extern int top_of_mobt;
-  if (rnum < 0)
+  if (!DC::getInstance()->obj_index.contains(item))
     return;
 
   for (int i = 0; i < amount; i++)
@@ -1935,7 +1935,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
       break;
     }
-    class Object *obj = DC::getInstance()->clone_object(rnum);
+    class Object *obj = DC::getInstance()->clone_object(item);
     obj_to_char(obj, vict);
     struct hunt_items *ni;
 #ifdef LEAK_CHECK
@@ -1965,7 +1965,7 @@ void pick_up_item(Character *ch, class Object *obj)
         p->next = in;
       else
         hunt_items_list = in;
-      int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+      vnum_t vnum = obj->vnum;
       sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
               obj->short_description, i->mobname, ch->getNameC());
       send_info(buf);
@@ -1977,8 +1977,8 @@ void pick_up_item(Character *ch, class Object *obj)
       case 76:
         obj_from_char(obj);
         obj_to_room(obj, 6345);
-        r1 = real_object(get_rand_obj(h));
-        if (r1 > 0)
+        r1 = get_rand_obj(h);
+        if (DC::getInstance()->obj_index.contains(r1))
         {
           oitem = DC::getInstance()->clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
@@ -1989,13 +1989,13 @@ void pick_up_item(Character *ch, class Object *obj)
           send_info(buf);
           if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (search_char_for_item(ch, oitem->item_number, false))
+            if (search_char_for_item(ch, oitem->vnum, false))
             {
               if (isSet(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
               {
                 ch->sendln("You already have this item - Timer has been reset!");
                 extract_obj(oitem);
-                citem = search_char_for_item(ch, oitem->item_number, false);
+                citem = search_char_for_item(ch, oitem->vnum, false);
                 citem->save_expiration = time(nullptr) + (60 * 60 * 24);
                 break; // Used to crash it.
               }
@@ -2017,7 +2017,7 @@ void pick_up_item(Character *ch, class Object *obj)
           ch->sendln("Brick turned into a non-existent item. Tell an imm.");
           break;
         }
-        if (DC::getInstance()->obj_index[oitem->item_number].virt < 27915 || DC::getInstance()->obj_index[oitem->item_number].virt > 27918)
+        if (oitem->vnum < 27915 || oitem->vnum > 27918)
           break;
         else
           obj = oitem; // Gold! Continue on to the next cases.
@@ -2098,11 +2098,11 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[h->itemnum].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description, h->time));
     }
 
     int itemsleft = 0;
@@ -2128,41 +2128,6 @@ int do_showhunt(Character *ch, char *arg, int cmd)
 int do_huntstart(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-#ifdef TWITTER
-  twitCurl twitterObj;
-  std::string authUrl, replyMsg;
-  std::string myOAuthAccessTokenKey("");
-  std::string myOAuthAccessTokenSecret("");
-  std::string userName("");
-  std::string passWord("");
-  std::string message("");
-
-  userName = "username";
-  passWord = "password";
-
-  twitterObj.setTwitterUsername(userName);
-  twitterObj.setTwitterPassword(passWord);
-
-  twitterObj.getOAuth().setConsumerKey(std::string("xyz"));
-  twitterObj.getOAuth().setConsumerSecret(std::string("xyz"));
-
-  twitterObj.getOAuth().setOAuthTokenKey(std::string("xyz-xyz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(std::string("xyz"));
-
-  if (twitterObj.accountVerifyCredGet())
-  {
-    //    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-  else
-  {
-    twitterObj.getLastCurlError(replyMsg);
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-#endif
-
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg2);
   argument = one_argument(argument, arg3);
@@ -2172,12 +2137,14 @@ int do_huntstart(Character *ch, char *argument, int cmd)
     ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
     return eSUCCESS;
   }
-  int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
-  if (vnum <= 0 || real_object(vnum) < 0)
+  bool ok = false;
+  vnum_t vnum = QString(arg).toULongLong(&ok);
+  if (!ok || !vnum || !DC::getInstance()->obj_index.contains(vnum))
   {
-    ch->sendln("Non-existent item.");
+    ch->sendln(QStringLiteral("VNUM #%1 (%2) does not exist.").arg(arg).arg(vnum));
     return eSUCCESS;
   }
+  int num = atoi(arg2), time = atoi(arg3);
   if (num <= 0 || num > 50)
   {
     ch->sendln("Invalid number of items. Maximum of 50 allowed.");
