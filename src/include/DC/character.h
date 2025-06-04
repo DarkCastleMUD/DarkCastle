@@ -138,7 +138,42 @@ public:
     char *arglist{};
     char *comlist{};
 };
+char *mprog_type_to_name(int type);
+void write_mprog_recur(auto &fl, QSharedPointer<MobProgram> mprg, bool mob)
+{
+    if (mprg->next)
+    {
+        write_mprog_recur(fl, mprg->next, mob);
+    }
 
+    if (mob)
+    {
+        fl << ">" << mprog_type_to_name(mprg->type) << " ";
+    }
+    else
+    {
+        fl << "\\" << mprog_type_to_name(mprg->type) << " ";
+    }
+
+    if (mprg->arglist)
+    {
+        string_to_file(fl, QString(mprg->arglist));
+    }
+    else
+    {
+        string_to_file(fl, QStringLiteral("Saved During Edit"));
+    }
+
+    if (mprg->comlist)
+    {
+        string_to_file(fl, QString(mprg->comlist));
+    }
+    else
+    {
+        string_to_file(fl, QStringLiteral("Saved During Edit"));
+    }
+}
+void write_mprog_recur(FILE *fl, QSharedPointer<class MobProgram> mprg, bool mob);
 #define ERROR_PROG -1
 #define IN_FILE_PROG 0
 #define ACT_PROG 1
