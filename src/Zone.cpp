@@ -10,7 +10,7 @@ QStringList Zone::zone_bits =
     {
         "NO_TELEPORT",
         "IS_TOWN(keep out STAY_NO_TOWN mobs)",
-        "MODIFIED",
+        "NEEDS_SAVING",
         "UNUSED",
         "BPORT",
         "NOCLAIM",
@@ -41,20 +41,20 @@ void Zone::setDiedThisTick(uint64_t died)
     died_this_tick = died;
 }
 
-bool Zone::isModified(void)
+bool Zone::isNeedsSaving(void)
 {
-    return isSet(zone_flags, MODIFIED);
+    return isSet(zone_flags, NEEDS_SAVING);
 }
 
-void Zone::setModified(bool flag)
+void Zone::setNeedsSaving(bool flag)
 {
     if (flag)
     {
-        SET_BIT(zone_flags, MODIFIED);
+        SET_BIT(zone_flags, NEEDS_SAVING);
     }
     else
     {
-        REMOVE_BIT(zone_flags, MODIFIED);
+        REMOVE_BIT(zone_flags, NEEDS_SAVING);
     }
 }
 
