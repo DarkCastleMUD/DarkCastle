@@ -38,8 +38,7 @@
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 {
-
-  if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
+  if (GET_OBJ_VNUM(obj) == 0)
     return;
 
   if (!decay)
@@ -116,7 +115,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
+  if (obj->vnum == CHAMPION_ITEM)
   {
     ch->sendln("In soviet russia, champion flag sacrifice YOU!");
     return eFAILURE;
@@ -309,12 +308,12 @@ int do_donate(Character *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, DC::getInstance()->obj_index[obj->item_number].virt);
+    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj->vnum);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].virt);
+           loop_obj->vnum);
   }
 
   location = real_room(room);

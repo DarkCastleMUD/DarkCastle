@@ -1723,7 +1723,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 	Character *tmpch;
 
 	for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
+		if (search_char_for_item(tmpch, 76, false) || search_char_for_item(tmpch, 51, false))
 		{
 			victim->sendln("Your astral travels fail to find your destination.");
 			return;
@@ -1780,7 +1780,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
 		Character *tmpch;
 
 		for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-			if (search_char_for_item(tmpch, real_object(51), false))
+			if (search_char_for_item(tmpch, 51, false))
 			{
 				ch->sendln("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R");
 				status = eFAILURE;

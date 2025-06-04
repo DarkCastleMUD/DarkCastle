@@ -365,56 +365,20 @@ int DC::load_hotboot_descs(void)
 
 vnum_t DC::getObjectVNUM(Object *obj, bool *ok)
 {
-  if (obj && obj_index)
+  if (obj && !obj_index.isEmpty())
   {
     if (ok)
     {
       *ok = true;
     }
-    return obj_index[obj->item_number].virt;
+    return obj->vnum;
   }
 
   if (ok)
   {
     *ok = false;
   }
-  return INVALID_VNUM;
-}
-
-vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
-{
-  if (nr >= 0 && nr <= top_of_objt && obj_index)
-  {
-    if (ok)
-    {
-      *ok = true;
-    }
-    return obj_index[nr].virt;
-  }
-
-  if (ok)
-  {
-    *ok = false;
-  }
-  return INVALID_VNUM;
-}
-
-vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
-{
-  if (nr != DC::INVALID_RNUM && nr <= top_of_objt && obj_index)
-  {
-    if (ok)
-    {
-      *ok = true;
-    }
-    return obj_index[nr].virt;
-  }
-
-  if (ok)
-  {
-    *ok = false;
-  }
-  return INVALID_VNUM;
+  return INVALID_OBJ_VNUM;
 }
 
 void finish_hotboot()

@@ -116,6 +116,7 @@ typedef QList<QString> hints_t;
 #include "DC/Database.h"
 #include "DC/Command.h"
 #include "DC/Arena.h"
+#include "DC/db.h"
 
 class Connection;
 class index_data;
@@ -156,12 +157,14 @@ public:
   QSharedPointer<class MobProgram> mobspec{};
   int progtypes{};
 };
+extern index_data mob_index_array[MAX_INDEX];
+index_data *generate_mob_indices(int *top, index_data *index);
 
-class obj_index_data
+class obj_index_t
 {
 public:
-  vnum_t virt{};                                                                         /* virt number of ths mob/obj           */
-  vnum_t number{};                                                                       /* number of existing units of ths mob/obj */
+  vnum_t vnum{};                                                                         /* virt number of ths mob/obj           */
+  quint64 qty{};                                                                         /* quantity of existing units of ths obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
   Object *item{};                                                                        /* the mobile/object itself                 */
@@ -199,7 +202,6 @@ public:
 #define AUC_MAX_PRICE 2000000000
 
 struct AuctionTicket;
-Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
 enum ListOptions
 {
@@ -278,15 +280,15 @@ private:
   void ParseStats();
   bool CanSellMore(Character *ch);
   bool IsOkToSell(Object *obj);
-  bool IsWearable(Character *ch, int vnum);
-  bool IsNoTrade(int vnum);
+  bool IsWearable(Character *ch, vnum_t vnum);
+  bool IsNoTrade(vnum_t vnum);
   bool IsSeller(QString in_name, QString seller);
-  bool IsExist(QString name, int vnum);
-  bool IsClass(int vnum, QString isclass);
-  bool IsRace(int vnum, QString israce);
-  bool IsName(QString name, int vnum);
-  bool IsSlot(QString slot, int vnum);
-  bool IsLevel(unsigned int to, unsigned int from, int vnum);
+  bool IsExist(QString name, vnum_t vnum);
+  bool IsClass(vnum_t vnum, QString isclass);
+  bool IsRace(vnum_t vnum, QString israce);
+  bool IsName(QString name, vnum_t vnum);
+  bool IsSlot(QString slot, vnum_t vnum);
+  bool IsLevel(level_t to, level_t from, vnum_t vnum);
   QMap<int, int> auction_rooms;
   unsigned int cur_index;
   QString file_name;
@@ -300,12 +302,29 @@ struct wizlist_info
 };
 struct world_file_list_item
 {
+  explicit operator bool(void) const;
   QString filename;
   vnum_t firstnum;
   vnum_t lastnum;
   int32_t flags;
   world_file_list_item *next;
+  bool isNeedsSaving(void);
+  bool isRemoved(void);
+  void setNeedsSaving(bool modified = true);
+  void setRemoved(bool removed = true);
+  bool operator==(const world_file_list_item wfli);
 };
+
+typedef QMap<QString, world_file_list_item> world_file_list_t;
+struct Objects
+{
+  world_file_list_t objects_files{};
+  world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum);
+  world_file_list_item &findRange(QString filename);
+  world_file_list_item &newRange(QString filename, vnum_t lowvnum = {}, vnum_t highvnum = {});
+  bool saveRangeIndex(void);
+};
+
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -369,7 +388,8 @@ public:
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0ULL;
-  static constexpr vnum_t INVALID_VNUM = -1ULL;
+  static constexpr vnum_t INVALID_OBJ_VNUM = 0UL;
+  static constexpr vnum_t INVALID_MOB_VNUM = -1ULL;
   static constexpr vnum_t INVALID_RNUM = -1ULL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
@@ -399,8 +419,6 @@ public:
   std::unordered_set<Character *> shooting_list;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
-  special_function_list_t obj_non_combat_functions;
-  special_function_list_t obj_combat_functions;
   free_list_t free_list;
   SSH::SSH ssh;
   fd_set input_set = {};
@@ -412,19 +430,19 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  class obj_index_data obj_index_array[MAX_INDEX] = {};
-  class obj_index_data *obj_index = obj_index_array;
+  QMap<vnum_t, obj_index_t> obj_index{};
 
   class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
   struct world_file_list_item *world_file_list = 0; // List of the world files
   struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  struct world_file_list_item *obj_file_list = 0;   // List of the obj files
-  class Object *object_list = 0;                    // the global linked list of obj's
-  struct pulse_data *bard_list = 0;                 // global l-list of bards
-  int top_of_helpt = 0;                             // top of help index table
-  int new_top_of_helpt = 0;                         // top of help index table
-  room_t top_of_world_alloc = 0;                    // index of last alloc'd memory in world
+  // struct world_file_list_item *obj_file_list = 0;   // List of the obj files
+  Objects objects{};
+  class Object *object_list = 0;    // the global linked list of obj's
+  struct pulse_data *bard_list = 0; // global l-list of bards
+  int top_of_helpt = 0;             // top of help index table
+  int new_top_of_helpt = 0;         // top of help index table
+  room_t top_of_world_alloc = 0;    // index of last alloc'd memory in world
   room_t top_of_world = 0;
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
@@ -465,6 +483,8 @@ public:
   void init_game(void);
   void boot_db(void);
   void boot_zones(void);
+  bool verify_item(Object **obj);
+  world_file_list_item *new_obj_file_item(QString filename);
   void boot_world(void);
   void write_one_zone(FILE *fl, zone_t zone_key);
   zone_t read_one_zone(FILE *fl);
@@ -514,19 +534,20 @@ public:
   void clean_socials_from_memory(void);
   void remove_all_mobs_from_world(void);
   void remove_all_objs_from_world(void);
+  void load_objects(void);
+  void renum_zone_table(void);
   void free_zones_from_memory(void);
   void free_clans_from_memory(void);
   void set_zone_saved_zone(int32_t room);
   void set_zone_modified_zone(int32_t room);
-  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>;
   void set_zone_modified(int32_t modnum, world_file_list_item *list);
   void set_zone_modified_world(int32_t room);
   void set_zone_modified_mob(int32_t mob);
-  void set_zone_modified_obj(int32_t obj);
+  void set_zone_modified_obj(vnum_t vnum);
   void set_zone_saved(int32_t modnum, world_file_list_item *list);
   void set_zone_saved_world(int32_t room);
   void set_zone_saved_mob(int32_t mob);
-  void set_zone_saved_obj(int32_t obj);
+  void set_zone_saved_obj(vnum_t obj);
   void free_world_from_memory(void);
   void free_mobs_from_memory(void);
   void free_objs_from_memory(void);
@@ -544,11 +565,10 @@ public:
   int write_hotboot_file(void);
   int load_hotboot_descs(void);
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
-  vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
-  vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
+  Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
   void vault_get(Character *ch, QString object, QString owner);
   void player_shopping_buy(const char *arg, Character *ch, Character *keeper);
-  Object *clone_object(int nr);
+  Object *clone_object(vnum_t nr);
   ~DC(void)
   {
     /* TODO enable and fix all memory leaks
@@ -611,12 +631,30 @@ private:
   void boot_player_shops(void);
   void assign_the_player_shopkeepers(void);
   void redo_shop_profit(void);
+  void assign_objects(void);
+  void assign_one_obj_non(vnum_t vnum, special_function func);
+  void assign_one_obj_com(vnum_t vnum, special_function func);
 };
+void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type = DC::PULSE_TIME);
 void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);
 void logf(int level, DC::LogChannel type, QString arg);
 int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
 void produce_coredump(void *ptr = 0);
+
+void write_object(Object *obj, auto &out)
+{
+  out << QStringLiteral("#%1\n").arg(obj->vnum);
+  string_to_file(out, obj->name);
+  string_to_file(out, obj->short_description);
+  string_to_file(out, obj->description);
+  string_to_file(out, obj->ActionDescription());
+  out << obj->obj_flags;
+  out << obj->ex_description;
+  affects_to_file(out, obj);
+  out << DC::getInstance()->obj_index[obj->vnum].mobprogs;
+  out << "S\n";
+}
 
 template <typename T>
 T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
@@ -648,7 +686,6 @@ extern std::vector<std::string> continent_names;
 
 extern struct spell_info_type spell_info[];
 void renum_world(void);
-void renum_zone_table(void);
 
 union varg_t
 {
@@ -677,7 +714,10 @@ void clear_hunt(varg_t arg1, void *arg2, void *arg3);
 void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
-#define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
+void REMOVE_BIT(auto &var, const auto bit)
+{
+  var = var & ~bit;
+}
 
 auto &operator>>(auto &in, Room &room)
 {
@@ -879,6 +919,77 @@ T check_returns(T in_str)
   }
 
   return new_string;
+}
+
+auto &operator<<(auto &out, Room &room)
+{
+  auto temp_room_flags = room.room_flags;
+  if (room.iFlags)
+  {
+    REMOVE_BIT(temp_room_flags, room.iFlags);
+  }
+
+  struct extra_descr_data *extra;
+  if (!DC::getInstance()->rooms.contains(room.number))
+    return out;
+
+  out << "#" << room.number << "\n";
+  string_to_file(out, room.name);
+  string_to_file(out, room.description);
+
+  out << room.zone << " " << room.room_flags << " " << room.sector_type << "\n";
+
+  /* exits */
+  for (int b = 0; b <= 5; b++)
+  {
+    if (!(room.dir_option[b]))
+      continue;
+    out << "D" << b << "\n";
+    if (room.dir_option[b]->general_description)
+      string_to_file(out, room.dir_option[b]->general_description);
+    else
+      out << "~\n"; // print blank
+    if (room.dir_option[b]->keyword)
+      string_to_file(out, room.dir_option[b]->keyword);
+    else
+      out << "~\n"; // print blank
+    out << room.dir_option[b]->exit_info << " " << room.dir_option[b]->key << " " << room.dir_option[b]->to_room << "\n";
+  } /* exits */
+
+  /* extra descriptions */
+  for (extra = room.ex_description; extra; extra = extra->next)
+  {
+    if (!extra)
+      break;
+    out << "E\n";
+    if (extra->keyword)
+      string_to_file(out, extra->keyword);
+    else
+      out << "~\n"; // print blank
+    if (extra->description)
+      string_to_file(out, extra->description);
+    else
+      out << "~\n"; // print blank
+  } /* extra descriptions */
+
+  struct deny_data *deni;
+  for (deni = room.denied; deni; deni = deni->next)
+  {
+    out << "B\n"
+        << deni->vnum << "\n";
+  }
+
+  // Write out allowed classes if any
+  for (int i = 0; i < CLASS_MAX; i++)
+  {
+    if (room.allow_class[i] == true)
+    {
+      out << "C" << i << "\n";
+    }
+  }
+
+  out << "S\n";
+  return out;
 }
 
 #endif

@@ -103,7 +103,6 @@ struct help_index_element *help_index = 0;
 struct help_index_element_new *new_help_table = 0;
 
 int top_of_mobt = 0; /* top of mobile index table       */
-int top_of_objt = 0; /* top of object index table       */
 
 struct weather_data weather_info; /* the infomation about the weather */
 
@@ -116,13 +115,10 @@ void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
 world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
-world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
 index_data *generate_mob_indices(int *top, index_data *index);
-obj_index_data *generate_obj_indices(int *top, obj_index_data *index);
-
 int file_to_string(const char *name, char *buf);
 void clear_char(Character *ch);
 
@@ -286,12 +282,10 @@ bool operator==(const Room &r1, const Room &r2)
 
 room_track_data *Room::TrackItem(int nIndex)
 {
-	int nr;
 	room_track_data *pScent;
-
-	for (pScent = tracks, nr = 1; pScent;
-		 pScent = pScent->next, nr++)
-		if (nr == nIndex)
+	quint64 indexCount = 1;
+	for (pScent = tracks; pScent; pScent = pScent->next, indexCount++)
+		if (indexCount == nIndex)
 			return pScent;
 
 	return 0;
@@ -610,7 +604,7 @@ void DC::boot_db(void)
 	generate_mob_indices(&top_of_mobt, mob_index);
 
 	logverbose(QStringLiteral("Generating object indices/loading all objects"));
-	generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
+	load_objects();
 
 	funny_boot_message();
 
@@ -619,9 +613,6 @@ void DC::boot_db(void)
 
 	logverbose(QStringLiteral("Looking for unordered mobiles..."));
 	find_unordered_mobiles();
-
-	logverbose(QStringLiteral("Looking for unordered objects..."));
-	find_unordered_objects();
 
 	if (cf.bport == false)
 	{
@@ -1290,9 +1281,8 @@ void DC::remove_all_objs_from_world()
 }
 
 /* generate index table for object file */
-obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
+void DC::load_objects(void)
 {
-	int i = 0;
 	char buf[82];
 	char log_buf[256];
 	FILE *fl;
@@ -1311,7 +1301,7 @@ obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
 	/*
 	 } else {
 	 if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-	 logentry(QStringLiteral("Cannot open object file index.(tiny)."),0,DC::LogChannel::LOG_MISC);
+	 logentry(QStringLiteral("Cannot open object file obj_index.(tiny)."),0,DC::LogChannel::LOG_MISC);
 	 abort();
 	 }
 	 }
@@ -1331,35 +1321,35 @@ obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
 
 		if (!(fl = fopen(endfile, "r")))
 		{
-			logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, DC::LogChannel::LOG_BUG);
+			logentry(QStringLiteral("load_objects: could not open obj file."), 0, DC::LogChannel::LOG_BUG);
 			logentry(temp, 0, DC::LogChannel::LOG_BUG);
 			abort();
 		}
 
-		pItem = new_obj_file_item(temp, i);
-
+		pItem = new_obj_file_item(temp);
+		vnum_t vnum{}, lowest_vnum = UINT64_MAX, highest_vnum{};
 		for (;;)
 		{
 			if (fgets(buf, 81, fl))
 			{
 				if (*buf == '#') /* allocate new_new cell */
 				{
-					if (i >= MAX_INDEX)
+					sscanf(buf, "#%lu", &vnum);
+					if (vnum < lowest_vnum)
+						lowest_vnum = vnum;
+					if (vnum > highest_vnum)
+						highest_vnum = vnum;
+
+					obj_index[vnum].vnum = vnum;
+					obj_index[vnum].qty = 0;
+					obj_index[vnum].non_combat_func = 0;
+					obj_index[vnum].combat_func = 0;
+					obj_index[vnum].progtypes = 0;
+					if (!(obj_index[vnum].item = read_object(vnum, fl, false)))
 					{
-						perror("Too many obj indexes");
-						abort();
-					}
-					sscanf(buf, "#%lu", &index[i].virt);
-					index[i].number = 0;
-					index[i].non_combat_func = 0;
-					index[i].combat_func = 0;
-					index[i].progtypes = 0;
-					if (!(index[i].item = (class Object *)read_object(i, fl, false)))
-					{
-						sprintf(log_buf, "Unable to load object %lu!\n\r", index[i].virt);
+						sprintf(log_buf, "Unable to load object %lu!\n\r", obj_index.value(vnum).vnum);
 						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
 					}
-					i++;
 				}
 				else if (*buf == '$') /* EOF */
 					break;
@@ -1370,14 +1360,13 @@ obj_index_data *generate_obj_indices(int *top, obj_index_data *index)
 			}
 		} // for ;;
 
-		pItem->lastnum = (i - 1);
+		pItem->firstnum = lowest_vnum;
+		pItem->lastnum = highest_vnum;
 
 		fclose(fl);
 	} // for next_in_file
 
-	*top = i - 1;
 	fclose(flObjIndex);
-	return (index);
 }
 
 void write_one_room(LegacyFile &lf, int a)
@@ -1749,7 +1738,7 @@ bool can_modify_this_object(Character *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_object(Character *ch, int32_t obj)
+bool can_modify_object(Character *ch, vnum_t obj)
 {
 	return can_modify_this_object(ch, obj);
 }
@@ -1764,19 +1753,6 @@ void DC::set_zone_modified_zone(int32_t room)
 	setZoneModified(world[room].zone);
 }
 
-auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>
-{
-	struct world_file_list_item *world_entry = {};
-
-	for (quint8 i = 1; i < 4; ++i)
-	{
-		vnum_t generation = pow(10, i);
-		qDebug("searching for vnum %lu. %u %lu %lu", vnum, i, generation, vnum - (vnum % generation));
-	}
-
-	return std::unexpected(search_error::not_found);
-}
-
 void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 {
 	world_file_list_item *curr = list;
@@ -1789,7 +1765,6 @@ void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		auto world_file = findWorldFileWithVNUM(modnum);
 		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(modnum));
 		return;
 	}
@@ -1799,22 +1774,21 @@ void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 void DC::set_zone_modified_world(int32_t room)
 {
-
 	set_zone_modified(room, world_file_list);
 }
 
 // rnum of mob
 void DC::set_zone_modified_mob(int32_t mob)
 {
-
 	set_zone_modified(mob, DC::getInstance()->mob_file_list);
 }
 
-// rnum of mob
-void DC::set_zone_modified_obj(int32_t obj)
+// vnum of obj
+void DC::set_zone_modified_obj(vnum_t vnum)
 {
-
-	set_zone_modified(obj, DC::getInstance()->obj_file_list);
+	auto range = objects.findRange(vnum, vnum);
+	if (!range.filename.isEmpty())
+		REMOVE_BIT(range.flags, WORLD_FILE_MODIFIED);
 }
 
 void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
@@ -1832,8 +1806,6 @@ void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
 		logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, DC::LogChannel::LOG_BUG);
 		return;
 	}
-
-	REMOVE_BIT(curr->flags, WORLD_FILE_MODIFIED);
 }
 
 void DC::set_zone_saved_world(int32_t room)
@@ -1848,10 +1820,13 @@ void DC::set_zone_saved_mob(int32_t mob)
 	set_zone_saved(mob, DC::getInstance()->mob_file_list);
 }
 
-void DC::set_zone_saved_obj(int32_t obj)
+void DC::set_zone_saved_obj(vnum_t obj)
 {
-
-	set_zone_saved(obj, DC::getInstance()->obj_file_list);
+	auto range = objects.findRange(obj, obj);
+	if (range)
+	{
+		range.setNeedsSaving(false);
+	}
 }
 
 /* destruct the world */
@@ -1921,15 +1896,14 @@ void DC::free_mobs_from_memory(void)
 
 void DC::free_objs_from_memory(void)
 {
-	class Object *curr = nullptr;
-	// struct extra_descr_data * curr_extra = nullptr;
-
-	for (int i = 0; i <= top_of_objt; i++)
-		if ((curr = (class Object *)obj_index[i].item))
+	for (auto &obj_index_entry : obj_index)
+	{
+		if (obj_index_entry.item)
 		{
-			free_obj(curr);
-			obj_index[i].item = nullptr;
+			free_obj(obj_index_entry.item);
+			obj_index_entry.item = nullptr;
 		}
+	}
 }
 
 world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
@@ -1977,9 +1951,9 @@ world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr)
 	return new_w_file_item(filename, room_nr, DC::getInstance()->mob_file_list);
 }
 
-world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr)
+world_file_list_item *DC::new_obj_file_item(QString filename)
 {
-	return new_w_file_item(filename, room_nr, DC::getInstance()->obj_file_list);
+	return &objects.newRange(filename);
 }
 
 /* load the rooms */
@@ -2187,11 +2161,10 @@ void renum_world(void)
 							real_room(DC::getInstance()->world[room].dir_option[door]->to_room);
 }
 
-void renum_zone_table(void)
+void DC::renum_zone_table(void)
 {
 	int zone, comm;
 
-	auto &zones = DC::getInstance()->zones;
 	for (auto [zone_key, zone] : zones.asKeyValueRange())
 	{
 		assert(zone_key != 0);
@@ -2209,8 +2182,7 @@ void renum_zone_table(void)
 				 zone.cmd[comm]->command = 'J';
 				 }*/
 				if (real_mobile(zone.cmd[comm]->arg1) >= 0 && real_room(zone.cmd[comm]->arg3) >= 0)
-					zone.cmd[comm]->arg1 =
-						real_mobile(zone.cmd[comm]->arg1);
+					zone.cmd[comm]->arg1 = real_mobile(zone.cmd[comm]->arg1);
 				else
 				{
 					zone.cmd[comm]->active = 0;
@@ -2220,55 +2192,22 @@ void renum_zone_table(void)
 
 				break;
 			case 'O':
-				if (real_object(zone.cmd[comm]->arg1) >= 0 && real_room(zone.cmd[comm]->arg3) >= 0)
-					zone.cmd[comm]->arg1 = real_object(zone.cmd[comm]->arg1);
-				else
-					zone.cmd[comm]->active = 0;
-
-				//            if (zone.cmd[comm]->arg3 != DC::NOWHERE)
-				//          zone.cmd[comm]->arg3 =
-				//        real_room(zone.cmd[comm]->arg3);
+				zone.cmd[comm]->active = obj_index.contains(zone.cmd[comm]->arg1) && real_room(zone.cmd[comm]->arg3) != DC::NOWHERE;
 				break;
 			case 'G':
-				if (real_object(zone.cmd[comm]->arg1) >= 0)
-					zone.cmd[comm]->arg1 =
-						real_object(zone.cmd[comm]->arg1);
-				else
-					zone.cmd[comm]->active = 0;
-
-				break;
 			case 'E':
-				if (real_object(zone.cmd[comm]->arg1) >= 0)
-					zone.cmd[comm]->arg1 =
-						real_object(zone.cmd[comm]->arg1);
-				else
-					zone.cmd[comm]->active = 0;
-
+				zone.cmd[comm]->active = obj_index.contains(zone.cmd[comm]->arg1);
 				break;
 			case 'P':
-				if (real_object(zone.cmd[comm]->arg1) >= 0 && real_object(zone.cmd[comm]->arg3) >= 0)
-				{
-					zone.cmd[comm]->arg1 =
-						real_object(zone.cmd[comm]->arg1);
-					zone.cmd[comm]->arg3 =
-						real_object(zone.cmd[comm]->arg3);
-				}
-				else
-					zone.cmd[comm]->active = 0;
+				zone.cmd[comm]->active = obj_index.contains(zone.cmd[comm]->arg1) && obj_index.contains(zone.cmd[comm]->arg3);
 				break;
 			case 'D':
-				if (real_room(zone.cmd[comm]->arg1) < 0)
-					zone.cmd[comm]->active = 0;
-				else
+				zone.cmd[comm]->active = real_room(zone.cmd[comm]->arg1) != DC::NOWHERE;
+				if (!zone.cmd[comm]->active)
 				{
-					zone.cmd[comm]->arg1 =
-						real_room(zone.cmd[comm]->arg1);
-					if (zone.cmd[comm]->arg1 == -1)
-					{
-						qWarning("Problem in zonefile: no room number for door"
-								 " - setting to J command\n");
-						zone.cmd[comm]->command = 'J';
-					}
+					qWarning("Problem in zonefile: no room number for door"
+							 " - setting to J command\n");
+					zone.cmd[comm]->command = 'J';
 				}
 				break;
 			case '%':
@@ -2342,8 +2281,8 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'P')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
-			int virt2 = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg3].virt : cmd[i]->arg3;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum : cmd[i]->arg1;
+			int virt2 = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg3].vnum : cmd[i]->arg3;
 			fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2352,7 +2291,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'G')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum : cmd[i]->arg1;
 
 			fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
@@ -2362,7 +2301,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'O')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum : cmd[i]->arg1;
 			fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2371,7 +2310,7 @@ void Zone::write(FILE *fl)
 		}
 		else if (cmd[i]->command == 'E')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->obj_index[cmd[i]->arg1].vnum : cmd[i]->arg1;
 			fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2448,7 +2387,7 @@ zone_t DC::read_one_zone(FILE *fl)
 	// this zone will be saved with new format soon
 	if (modified == true)
 	{
-		zone.setModified();
+		zone.setNeedsSaving();
 	}
 
 	if (version > 1)
@@ -3363,34 +3302,18 @@ Character *clone_mobile(int nr)
 // other items in the game after the one being inserted.  Pain in the
 // ass but oh well.  it shouldn't hopefully happen that often.
 //
-// Args:  int nr = virtual number of object (what gods know it as)
-//
 // return index of item on success, -1 on failure
 //
-auto create_blank_item(int nr) -> std::expected<int, create_error>
+auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>
 {
 	class Object *obj;
 	class Object *curr;
 	int cur_index = 0;
 
-	// check if room available in index
-	if ((top_of_objt + 1) >= MAX_INDEX)
-		return std::unexpected(create_error::index_full);
-
-	// find how where our index will be
-	// yes, i could check if the last item is smaller and then do a binary
-	// search to do this faster but if everything in life was optimized I wouldn't
-	// be playing solitaire at work on a windows machine. -pir
-	while (DC::getInstance()->obj_index[cur_index].virt < nr && cur_index < top_of_objt + 1)
-		cur_index++;
-
-	if (DC::getInstance()->obj_index[cur_index].virt == nr) // item already exists
+	if (DC::getInstance()->obj_index.contains(vnum))
+	{ // item already exists
 		return std::unexpected(create_error::entry_exists);
-
-	// theoretically if top_of_objt+1 wasn't initialized properly it could
-	// be junk data, which could be == nr, returning -1, but i'm not gonna worry about it
-
-	// create
+	}
 
 	obj = new Object;
 	clear_object(obj);
@@ -3406,46 +3329,17 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 	obj->equipped_by = 0;
 	obj->in_obj = 0;
 	obj->contains = 0;
-	obj->item_number = cur_index;
+	obj->vnum = vnum;
 	obj->ex_description = 0;
-	// shift > items right
-	memmove(&DC::getInstance()->obj_index[cur_index + 1], &DC::getInstance()->obj_index[cur_index],
-			((top_of_objt - cur_index + 1) * sizeof(index_data)));
-	top_of_objt++;
 
 	// insert
-	DC::getInstance()->obj_index[cur_index].virt = nr;
-	DC::getInstance()->obj_index[cur_index].number = 0;
-	DC::getInstance()->obj_index[cur_index].non_combat_func = 0;
-	DC::getInstance()->obj_index[cur_index].combat_func = 0;
-	DC::getInstance()->obj_index[cur_index].item = obj;
-
-	// update index of all items in game
-	for (curr = DC::getInstance()->object_list; curr; curr = curr->next)
-		if (curr->item_number >= cur_index)
-			curr->item_number++;
-
-	// update index of all the obj prototypes
-	for (int i = cur_index + 1; i <= top_of_objt; i++)
-		DC::getInstance()->obj_index[i].item->item_number++;
-
-	// update obj file indices
-	world_file_list_item *wcurr = nullptr;
-
-	wcurr = DC::getInstance()->obj_file_list;
-	while (wcurr)
-	{
-		if (wcurr->firstnum >= cur_index)
-			wcurr->firstnum++;
-
-		if (wcurr->lastnum >= cur_index - 1)
-			wcurr->lastnum++;
-
-		wcurr = wcurr->next;
-	}
-
-	rebuild_rnum_references(cur_index, 2);
-	return cur_index;
+	DC::getInstance()->obj_index[vnum].vnum = vnum;
+	DC::getInstance()->obj_index[vnum].qty = 0;
+	DC::getInstance()->obj_index[vnum].non_combat_func = 0;
+	DC::getInstance()->obj_index[vnum].combat_func = 0;
+	DC::getInstance()->obj_index[vnum].item = obj;
+	DC::getInstance()->set_zone_modified_obj(vnum);
+	return vnum;
 }
 
 // add a new mobile to the index.  To do this, we need to update ALL the
@@ -3475,7 +3369,7 @@ int create_blank_mobile(int nr)
 	if (DC::getInstance()->mob_index[cur_index].virt == nr) // item already exists
 		return -1;
 
-	// theoretically if top_of_objt+1 wasn't initialized properly it could
+	// theoretically if top_of_mobt+1 wasn't initialized properly it could
 	// be junk data, which could be == nr, returning -1, but i'm not gonna worry
 
 	// create
@@ -3583,7 +3477,7 @@ int create_blank_mobile(int nr)
 		wcurr = wcurr->next;
 	}
 
-	rebuild_rnum_references(cur_index, 1);
+	rebuild_mob_rnum_references(cur_index);
 
 	/*
 	 Shop fixes follow.
@@ -3678,71 +3572,17 @@ void delete_mob_from_index(int nr)
 // before calling this function.  Otherwise these old items will think
 // they are the restrung version of the item that now holds that index.
 //
-// Args:  int nr = real number of object (index in array)
-//
 // return index of item on success, -1 on failure
 //
-void delete_item_from_index(int nr)
+void delete_item_from_index(vnum_t vnum)
 {
-	int i = 0, j = 0;
-	class Object *curr;
-
-	if (nr < 0 || nr > top_of_objt) // doesn't exist!
+	if (!DC::getInstance()->obj_index.contains(vnum))
+	{
 		return;
-
-	dc_free(DC::getInstance()->obj_index[nr].item);
-
-	// shift > items left
-	memmove(&DC::getInstance()->obj_index[nr], &DC::getInstance()->obj_index[nr + 1],
-			((top_of_objt - nr) * sizeof(index_data)));
-	top_of_objt--;
-
-	// update index of all items in game - these store rnums
-	for (curr = DC::getInstance()->object_list; curr; curr = curr->next)
-		if (curr->item_number >= nr)
-			curr->item_number--;
-
-	// update index of all the obj prototypes
-	for (i = nr; i <= top_of_objt; i++)
-		DC::getInstance()->obj_index[i].item->item_number--;
-
-	// update obj file indices - these store rnums
-	world_file_list_item *wcurr = nullptr;
-
-	wcurr = DC::getInstance()->obj_file_list;
-
-	while (wcurr)
-	{
-		if (wcurr->firstnum > nr)
-			wcurr->firstnum--;
-
-		if (wcurr->lastnum >= nr)
-			wcurr->lastnum--;
-		wcurr = wcurr->next;
 	}
 
-	// update zonefile commands - these store rnums
-	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-	{
-		for (j = 0; j < zone.cmd.size(); j++)
-		{
-			switch (zone.cmd[j]->command)
-			{
-			case 'P': // 1 and 3
-				if (zone.cmd[j]->arg3 >= nr)
-					zone.cmd[j]->arg3--;
-				// no break here on purpose so it falls through and does the '1'
-			case 'O':
-			case 'G':
-			case 'E': // 1 only
-				if (zone.cmd[j]->arg1 >= nr)
-					zone.cmd[j]->arg1--;
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	delete DC::getInstance()->obj_index[vnum].item;
+	DC::getInstance()->obj_index.remove(vnum);
 }
 
 QString qDebugQTextStreamLine(QTextStream &stream, QString message)
@@ -3767,15 +3607,15 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 }
 
 /* read an object from OBJ_FILE */
-class Object *read_object(int nr, QTextStream &fl, bool ignore)
+class Object *read_object(vnum_t vnum, QTextStream &fl, bool ignore)
 {
 	int loc{}, mod{};
 
 	QString chk;
 
-	if (nr < 0)
+	if (!vnum)
 	{
-		return 0;
+		return {};
 	}
 
 	class Object *obj = new Object;
@@ -3791,7 +3631,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->short_description = fread_string(fl, 1);
 	if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %lu short_description too long.", vnum);
 	}
 
 	obj->description = fread_string(fl, 1);
@@ -3800,11 +3640,11 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	fl.skipWhiteSpace();
 	if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
 	{
-		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(DC::getInstance()->obj_index[nr].virt).arg(obj->ActionDescription()));
+		logentry(QStringLiteral("read_object: vnum %1 action description [%2] removed.").arg(vnum).arg(obj->ActionDescription()));
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
-	DC::getInstance()->currentVNUM(nr);
+	DC::getInstance()->currentVNUM(vnum);
 	DC::getInstance()->currentName(obj->name);
 	DC::getInstance()->currentType("Object");
 	obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
@@ -3829,7 +3669,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->num_affects = 0;
 	/* *** other flags *** */
 
-	if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
+	if (vnum == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
 	{
 		qDebug("Debug point");
 	}
@@ -3872,7 +3712,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 
 			qDebugQTextStreamLine(fl, "after seek: ");
 
-			mprog_read_programs(fl, nr, ignore);
+			mprog_read_programs(fl, vnum, ignore);
 
 			qDebugQTextStreamLine(fl, "after mprog_read_programs seek: ");
 			break;
@@ -3902,7 +3742,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 	obj->equipped_by = 0;
 	obj->in_obj = 0;
 	obj->contains = 0;
-	obj->item_number = nr;
+	obj->vnum = vnum;
 
 	// Keys will now save for up to 24 hours. If there are any with
 	// ITEM_NOSAVE that flag will be removed.
@@ -3916,16 +3756,16 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 }
 
 /* read an object from OBJ_FILE */
-class Object *read_object(int nr, FILE *fl, bool ignore)
+class Object *read_object(vnum_t vnum, FILE *fl, bool ignore)
 {
 	int loc, mod;
 
 	char chk;
 	struct extra_descr_data *new_new_descr;
 
-	if (nr < 0)
+	if (!vnum)
 	{
-		return 0;
+		return {};
 	}
 
 	Object *obj = new Object;
@@ -3948,7 +3788,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 		obj->short_description = str_dup(tmpptr);
 		free(tmpptr);
 
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[vnum].vnum);
 	}
 	else
 	{
@@ -3959,11 +3799,11 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	obj->ActionDescription(fread_string(fl, 1));
 	if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[nr].virt, obj->ActionDescription().toStdString().c_str());
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", DC::getInstance()->obj_index[vnum].vnum, obj->ActionDescription().toStdString().c_str());
 		obj->ActionDescription(QString());
 	}
 	obj->table = 0;
-	DC::getInstance()->currentVNUM(nr);
+	DC::getInstance()->currentVNUM(vnum);
 	DC::getInstance()->currentName(obj->name);
 	DC::getInstance()->currentType("Object");
 
@@ -4015,7 +3855,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 
 		case '\\':
 			ungetc('\\', fl);
-			mprog_read_programs(fl, nr, ignore);
+			mprog_read_programs(fl, vnum, ignore);
 			break;
 
 		case 'A':
@@ -4052,7 +3892,7 @@ class Object *read_object(int nr, FILE *fl, bool ignore)
 	obj->equipped_by = 0;
 	obj->in_obj = 0;
 	obj->contains = 0;
-	obj->item_number = nr;
+	obj->vnum = vnum;
 
 	// Keys will now save for up to 24 hours. If there are any with
 	// ITEM_NOSAVE that flag will be removed.
@@ -4186,7 +4026,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 	obj->equipped_by = 0;
 	obj->in_obj = 0;
 	obj->contains = 0;
-	obj->item_number = 0;
+	obj->vnum = 0;
 
 	return in;
 }
@@ -4196,10 +4036,12 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 //
 void write_object(LegacyFile &lf, Object *obj)
 {
+	if (!obj)
+		return;
 	FILE *fl = lf.file_handle_;
 	struct extra_descr_data *currdesc;
 
-	fprintf(fl, "#%d\n", DC::getInstance()->obj_index[obj->item_number].virt);
+	fprintf(fl, "#%d\n", obj->vnum);
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->description);
@@ -4238,9 +4080,9 @@ void write_object(LegacyFile &lf, Object *obj)
 				obj->affected[i].location,
 				obj->affected[i].modifier);
 
-	if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
+	if (DC::getInstance()->obj_index[obj->vnum].mobprogs)
 	{
-		write_mprog_recur(fl, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
+		write_mprog_recur(fl, DC::getInstance()->obj_index[obj->vnum].mobprogs, false);
 		fprintf(fl, "|\n");
 	}
 
@@ -4249,7 +4091,7 @@ void write_object(LegacyFile &lf, Object *obj)
 
 std::ofstream &operator<<(std::ofstream &out, Object *obj)
 {
-	out << "#" << DC::getInstance()->obj_index[obj->item_number].virt << "\n";
+	out << "#" << obj->vnum << "\n";
 	string_to_file(out, obj->name);
 	string_to_file(out, obj->short_description);
 	string_to_file(out, obj->description);
@@ -4286,9 +4128,9 @@ std::ofstream &operator<<(std::ofstream &out, Object *obj)
 			<< obj->affected[i].modifier << "\n";
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].mobprogs)
+	if (DC::getInstance()->obj_index[obj->vnum].mobprogs)
 	{
-		write_mprog_recur(out, DC::getInstance()->obj_index[obj->item_number].mobprogs, false);
+		write_mprog_recur(out, DC::getInstance()->obj_index[obj->vnum].mobprogs, false);
 		out << "|\n";
 	}
 
@@ -4381,7 +4223,7 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 {
 	try
 	{
-		fout << DC::getInstance()->obj_index[obj->item_number].virt << ",";
+		fout << obj->vnum << ",";
 		fout << "\"" << obj->name << "\",";
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
 		fout << "\"" << quotequotes(obj->description) << "\",";
@@ -4432,21 +4274,21 @@ void write_object_csv(Object *obj, std::ofstream &fout)
 bool has_random(Object *obj)
 {
 
-	return ((DC::getInstance()->obj_index[obj->item_number].progtypes & RAND_PROG) || (DC::getInstance()->obj_index[obj->item_number].progtypes & ARAND_PROG));
+	return ((DC::getInstance()->obj_index[obj->vnum].progtypes & RAND_PROG) || (DC::getInstance()->obj_index[obj->vnum].progtypes & ARAND_PROG));
 }
 
 /* clone an object from DC::getInstance()->obj_index */
-class Object *DC::clone_object(int nr)
+Object *DC::clone_object(vnum_t vnum)
 {
 	class Object *obj, *old;
 	struct extra_descr_data *new_new_descr, *descr;
 
-	if (nr < 0)
-		return 0;
+	if (!obj_index.contains(vnum))
+		return {};
 
 	obj = new Object;
 	clear_object(obj);
-	old = ((class Object *)DC::getInstance()->obj_index[nr].item); /* cast the void pointer */
+	old = obj_index[vnum].item;
 
 	if (old != 0)
 	{
@@ -4454,7 +4296,7 @@ class Object *DC::clone_object(int nr)
 	}
 	else
 	{
-		qWarning("%s", qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
+		qWarning("%s", qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in obj_index.\n").arg(vnum)));
 		dc_free(obj);
 		return nullptr;
 	}
@@ -4485,17 +4327,17 @@ class Object *DC::clone_object(int nr)
 	obj->table = 0;
 	obj->next_skill = 0;
 	obj->next_content = 0;
-	obj->next = DC::getInstance()->object_list;
-	DC::getInstance()->object_list = obj;
-	DC::getInstance()->obj_index[nr].number++;
+	obj->next = object_list;
+	object_list = obj;
+	obj_index[vnum].qty++;
 	obj->save_expiration = 0;
 	obj->no_sell_expiration = 0;
 
-	if (DC::getInstance()->obj_index[obj->item_number].non_combat_func ||
+	if (obj_index[obj->vnum].non_combat_func ||
 		obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 		has_random(obj))
 	{
-		DC::getInstance()->active_obj_list.insert(obj);
+		active_obj_list.insert(obj);
 	}
 	return obj;
 }
@@ -4727,7 +4569,8 @@ void Zone::reset(ResetType reset_type)
 	{
 		last_full_reset = QDateTime::currentDateTimeUtc();
 	}
-
+	rnum_t rnum{};
+	vnum_t vnum{};
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	Character *mob = nullptr;
 	class Object *obj, *obj_to;
@@ -4809,14 +4652,12 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'O': /* Load object on the ground */
-				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
+				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].qty < cmd[cmd_no]->arg2)
 				{
 					if (cmd[cmd_no]->arg3 >= 0)
 					{
-						if (!get_obj_in_list_num(cmd[cmd_no]->arg1,
-												 DC::getInstance()->world[cmd[cmd_no]->arg3].contents) &&
-							(obj =
-								 DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
+						if (!get_obj_in_list_num(cmd[cmd_no]->arg1, DC::getInstance()->world[cmd[cmd_no]->arg3].contents) &&
+							(obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 						{
 							obj_to_room(obj, cmd[cmd_no]->arg3);
 							last_cmd = 1;
@@ -4836,7 +4677,7 @@ void Zone::reset(ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-									DC::getInstance()->obj_index[cmd[cmd_no]->arg1].virt, id_, cmd_no);
+									DC::getInstance()->obj_index[cmd[cmd_no]->arg1].vnum, id_, cmd_no);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
 						last_cmd = 0;
@@ -4852,12 +4693,11 @@ void Zone::reset(ResetType reset_type)
 
 			case 'P': /* object to object */
 
-				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
+				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].qty < cmd[cmd_no]->arg2)
 				{
 					obj_to = 0;
 					obj = 0;
-					if ((obj_to = get_obj_num(cmd[cmd_no]->arg3)) && (obj =
-																		  DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
+					if ((obj_to = get_obj_num(cmd[cmd_no]->arg3)) && (obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 						obj_to_obj(obj, obj_to);
 					else
 						logf(
@@ -4888,13 +4728,13 @@ void Zone::reset(ResetType reset_type)
 				// Never load the same totem as long as it exists in the world
 				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
 					cmd[cmd_no]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].qty >= cmd[cmd_no]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].qty < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = DC::getInstance()->clone_object(cmd[cmd_no]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4941,9 +4781,11 @@ void Zone::reset(ResetType reset_type)
 					break;
 				}
 				// Never load the same totem as long as it exists in the world
-				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
+				vnum = cmd[cmd_no]->arg1;
+				if (DC::getInstance()->obj_index.contains(vnum) &&
+					DC::getInstance()->obj_index[vnum].item->isTotem() &&
 					cmd[cmd_no]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+					DC::getInstance()->obj_index[vnum].qty >= cmd[cmd_no]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
@@ -5951,6 +5793,7 @@ void free_char(Character *ch, Trace trace)
 			ch->mobdata->mpact = currmprog;
 		}
 		delete ch->mobdata;
+		ch->mobdata = {};
 	}
 	else
 	{
@@ -6149,7 +5992,7 @@ void clear_object(class Object *obj)
 	}
 
 	*obj = {};
-	obj->item_number = -1;
+	obj->vnum = -1;
 	obj->in_room = DC::NOWHERE;
 	obj->vroom = 0;
 	obj->obj_flags = obj_flag_data();
@@ -6319,32 +6162,6 @@ int real_mobile(int virt)
 		if (bot >= top)
 			return (-1);
 		if ((DC::getInstance()->mob_index + mid)->virt > virt)
-			top = mid - 1;
-		else
-			bot = mid + 1;
-	}
-
-	return -1;
-}
-
-/* returns the real number of the object with given virt number */
-int real_object(int virt)
-{
-	int bot, top, mid;
-
-	bot = 0;
-	top = top_of_objt;
-
-	/* perform binary search on obj-table */
-	for (;;)
-	{
-		mid = (bot + top) / 2;
-
-		if ((DC::getInstance()->obj_index + mid)->virt == virt)
-			return (mid);
-		if (bot >= top)
-			return (-1);
-		if ((DC::getInstance()->obj_index + mid)->virt > virt)
 			top = mid - 1;
 		else
 			bot = mid + 1;
@@ -6646,21 +6463,6 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 
 // * --- End MOBProgs stuff --- *
 
-void find_unordered_objects(void)
-{
-	int cur_vnum, last_vnum = 0;
-
-	for (int rnum = 0; rnum <= top_of_objt; rnum++, last_vnum = cur_vnum)
-	{
-		cur_vnum = DC::getInstance()->obj_index[rnum].virt;
-
-		if (cur_vnum < last_vnum)
-		{
-			logf(0, DC::LogChannel::LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
-		}
-	}
-}
-
 void find_unordered_mobiles(void)
 {
 	int cur_vnum, last_vnum = 0;
@@ -6865,56 +6667,33 @@ bool fullItemMatch(Object *obj, Object *obj2)
 }
 
 // Function to ensure an item is not bugged. If it is, replace it with the original.
-bool verify_item(class Object **obj)
+// TODO check for more than short_description differences
+bool DC::verify_item(class Object **obj_ptr)
 {
-	extern int top_of_objt;
-
-	if (!str_cmp((*obj)->short_description, ((class Object *)DC::getInstance()->obj_index[(*obj)->item_number].item)->short_description))
-		return false;
-
-	int newitem = -1;
-	for (int i = 1;; i++)
+	Object *obj = *obj_ptr;
+	if (!obj || !obj->short_description)
 	{
-
-		if ((*obj)->item_number - i < 0 && (*obj)->item_number + i > top_of_objt)
-			break; // No item at all found, it's a restring or deleted.
-
-		if ((*obj)->item_number - i >= 0)
-		{
-			obj_index_data *obj_index_entry = &DC::getInstance()->obj_index[(*obj)->item_number - i];
-			if (obj_index_entry)
-			{
-				Object *obj_index_item = (class Object *)obj_index_entry->item;
-				if (obj_index_item)
-				{
-					if (!str_cmp((*obj)->short_description, obj_index_item->short_description))
-					{
-						newitem = (*obj)->item_number - i;
-						break;
-					}
-				}
-				else
-				{
-					qWarning("obj_index_item is null");
-				}
-			}
-			else
-			{
-				qWarning("obj_index_entry is null");
-			}
-		}
-
-		if ((*obj)->item_number + i <= top_of_objt)
-			if (!str_cmp((*obj)->short_description, ((class Object *)DC::getInstance()->obj_index[(*obj)->item_number + i].item)->short_description))
-			{
-				newitem = (*obj)->item_number + i;
-				break;
-			}
-	}
-	if (newitem == -1)
 		return false;
+	}
 
-	*obj = DC::getInstance()->clone_object(newitem); // Fixed!
+	vnum_t vnum = obj->vnum;
+	if (!obj_index.contains(vnum))
+	{
+		return false;
+	}
+
+	Object *reference_obj = obj_index[vnum].item;
+	if (!reference_obj || !reference_obj->short_description)
+	{
+		return false;
+	}
+
+	if (!str_cmp(obj->short_description, reference_obj->short_description))
+	{
+		return false;
+	}
+
+	*obj_ptr = DC::getInstance()->clone_object(vnum); // Fixed!
 	return true;
 }
 

@@ -1088,20 +1088,20 @@ command_return_t Character::special(QString arguments, int cmd)
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
+    if (equipment[j] && this->equipment[j]->vnum >= 0)
+      if (DC::getInstance()->obj_index[this->equipment[j]->vnum].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->vnum].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
 
   /* special in inventory? */
   for (i = carrying; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+    if (i->vnum >= 0)
+      if (DC::getInstance()->obj_index[i->vnum].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->vnum].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }
@@ -1129,10 +1129,10 @@ command_return_t Character::special(QString arguments, int cmd)
 
   /* special in object present? */
   for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+    if (i->vnum >= 0)
+      if (DC::getInstance()->obj_index[i->vnum].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->vnum].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, eCH_DIED) || isSet(retval, eSUCCESS))
           return retval;
       }

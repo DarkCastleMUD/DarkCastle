@@ -910,7 +910,7 @@ int do_steal(Character *ch, char *argument, int cmd)
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return eFAILURE;
     }
-    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (obj->vnum == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
       return eFAILURE;
@@ -1007,18 +1007,18 @@ int do_steal(Character *ch, char *argument, int cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
-                    DC::getInstance()->obj_index[obj->item_number].virt, victim->getNameC());
+                    obj->vnum, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].virt);
+                   loop_obj->vnum);
           }
-          if (DC::getInstance()->obj_index[obj->item_number].virt != 76)
+          if (obj->vnum != 76)
           {
             obj_from_char(obj);
-            has_item = search_char_for_item(ch, obj->item_number, false);
+            has_item = search_char_for_item(ch, obj->vnum, false);
             obj_to_char(obj, ch);
           }
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1214,7 +1214,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           }
         } // !is_npc
         obj_from_char(obj);
-        has_item = search_char_for_item(ch, obj->item_number, false);
+        has_item = search_char_for_item(ch, obj->vnum, false);
         obj_to_char(obj, ch);
 
         if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1468,7 +1468,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   //      has_lockpicks = true;
 
   for (j = 0; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->item_number].virt == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || ch->equipment[j]->vnum == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1783,7 +1783,7 @@ int do_slip(Character *ch, char *argument, int cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (DC::getInstance()->obj_index[container->item_number].virt != 536 ||
+        (container->vnum != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
@@ -1798,7 +1798,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (DC::getInstance()->obj_index[container->item_number].virt != 536)
+    if (container->vnum != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
@@ -1844,7 +1844,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(vict, obj->item_number, false))
+    if (search_char_for_item(vict, obj->vnum, false))
     {
       ch->sendln("The item's uniqueness prevents it!");
       return eFAILURE;
@@ -1855,7 +1855,7 @@ int do_slip(Character *ch, char *argument, int cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (DC::getInstance()->obj_index[obj->item_number].virt == 393)
+    if (obj->vnum == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
       return eFAILURE;

@@ -108,7 +108,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      int vnum = DC::getInstance()->obj_index[curr->item_number].virt;
+      int vnum = curr->vnum;
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -126,7 +126,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].virt)
+      if (golem_list[golemtype].components[i] == curr->vnum)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {

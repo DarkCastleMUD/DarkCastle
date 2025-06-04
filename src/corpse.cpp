@@ -258,7 +258,8 @@ void DC::load_corpses(void)
 	FILE *fp;
 	char line[256] = {0};
 	int t[15], zwei = 0;
-	int nr, num_objs = 0;
+	int num_objs = 0;
+	vnum_t vnum{};
 	class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
 	struct extra_descr_data *new_descr;
 	char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
@@ -288,33 +289,28 @@ void DC::load_corpses(void)
 			break;
 		else if (*line == '#')
 		{
-			if (sscanf(line, "#%d", &nr) != 1)
+			if (sscanf(line, "#%lu", &vnum) != 1)
 			{
 				continue;
 			}
 			if (debug == 1)
 			{
-				sprintf(buf3, " -Loading Object: %d", nr);
+				sprintf(buf3, " -Loading Object: %lu", vnum);
 				logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 			}
 			/* we have the number, check it, load obj. */
-			if (nr == -1)
+			if (vnum == 0)
 			{ /* then it is unique */
 				temp = create_obj_new();
-				temp->item_number = nr;
+				temp->vnum = 0;
 			}
-			else if (nr < 0)
+			else if (!obj_index.contains(vnum))
 			{
 				continue;
 			}
 			else
 			{
-				if (nr >= 999999)
-					continue;
-
-				if ((number = real_object(nr)) < 0)
-					continue;
-				temp = DC::getInstance()->clone_object(number);
+				temp = clone_object(vnum);
 				if (!temp)
 				{
 					continue;
@@ -480,7 +476,7 @@ void DC::load_corpses(void)
 			}
 			else
 			{ /* exit our xap loop */
-				if (nr == -1)
+				if (vnum == 0)
 				{
 					if (debug == 1)
 						sprintf(buf3, "GOLD FOUND: %d total", t[1]);

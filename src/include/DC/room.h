@@ -206,7 +206,7 @@ public:
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents
     room_track_data *last_track = {}; // last in the scent list
-    int iFlags = {};                  // Internal flags. These do NOT save.
+    quint64 iFlags = {};                  // Internal flags. These do NOT save.
     struct path_data *paths = {};
     bool allow_class[CLASS_MAX] = {};
 

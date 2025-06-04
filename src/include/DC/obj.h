@@ -202,7 +202,7 @@ class active_object
 #define OBJ_NOTIMER -7000000
 
 typedef uint16_t object_type_t;
-typedef int32_t object_value_t;
+typedef vnum_t object_value_t;
 
 struct obj_flag_data
 {
@@ -252,7 +252,7 @@ public:
     static const QStringList extra_bits;
     static const QStringList apply_types;
 
-    int32_t item_number = {};     /* Where in data-base               */
+    vnum_t vnum = {};             /* Where in data-base               */
     int vroom = {};               /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};
@@ -415,7 +415,7 @@ private:
 struct obj_file_elem
 {
     int16_t version = {};
-    int32_t item_number = {};
+    vnum_t vnum = {};
     int16_t timer = {};
     int16_t wear_pos = {};
     int16_t container_depth = {};

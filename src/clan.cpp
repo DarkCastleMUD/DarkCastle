@@ -29,10 +29,10 @@ uint64_t i = UINT64_MAX;
 #include "DC/player.h"
 #include "DC/utility.h"
 #include "DC/character.h"
-#include "DC/connect.h" // Connection
-#include "DC/mobile.h"  // utility.h stuff
-#include "DC/clan.h"    // duh
-#include "DC/interp.h"  // do_outcast, etc..
+#include "DC/connect.h"  // Connection
+#include "DC/mobile.h"   // utility.h stuff
+#include "DC/clan.h"     // duh
+#include "DC/interp.h"   // do_outcast, etc..
 #include "DC/handler.h"  // get_char_room_vis
 #include "DC/terminal.h" // get_char_room_vis
 #include "DC/room.h"     // CLAN_ROOM flag
@@ -1514,7 +1514,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (tmp_obj->vnum == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from speaking!");
       return eFAILURE;
@@ -1572,7 +1572,7 @@ int do_ctell(Character *ch, char *arg, int cmd)
       continue;
 
     for (tmp_obj = DC::getInstance()->world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if (tmp_obj->vnum == SILENCE_OBJ_NUMBER)
       {
         yes = true;
         break;

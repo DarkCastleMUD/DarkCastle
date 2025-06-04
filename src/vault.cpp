@@ -53,7 +53,7 @@ int total_vaults = 0;
 int get_line(FILE *fl, char *buf);
 
 void item_remove(Object *obj, struct vault_data *vault);
-void item_add(int vnum, struct vault_data *vault);
+void item_add(vnum_t vnum, struct vault_data *vault);
 
 Character *find_owner(QString name);
 void vault_log(Character *ch, char *owner);
@@ -829,12 +829,12 @@ void DC::testing_load_vaults(void)
         {
           // We discard the line #VNUM
           vault_file_stream.readLine();
-          if (real_object(vnum) == 3846 && vault->owner == "Gipsy")
+          if (vnum == 3846 && vault->owner == "Gipsy")
           {
             qDebug("3846");
           }
           qDebug(vault->owner.toStdString().c_str());
-          obj = read_object(real_object(vnum), vault_file_stream, true);
+          obj = read_object(vnum, vault_file_stream, true);
           items->obj = obj;
         }
 
@@ -1088,7 +1088,7 @@ void DC::load_vaults(void)
         {
           char tmp[MAX_INPUT_LENGTH];
           get_line(fl, tmp);
-          obj = read_object(real_object(vnum), fl, true);
+          obj = read_object(vnum, fl, true);
           items->obj = obj;
         }
 
@@ -1543,7 +1543,7 @@ void DC::vault_get(Character *ch, QString object, QString owner)
       return;
     }
 
-    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->vnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1578,10 +1578,10 @@ void DC::vault_get(Character *ch, QString object, QString owner)
     item_remove(obj, vault);
 
     if (!fullSave(obj))
-      tmp_obj = DC::getInstance()->clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = DC::getInstance()->clone_object(GET_OBJ_VNUM(obj));
     else
     {
-      tmp_obj = DC::getInstance()->clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = DC::getInstance()->clone_object(GET_OBJ_VNUM(obj));
       copySaveData(tmp_obj, obj);
 
       if (verify_item(&tmp_obj))
@@ -1601,9 +1601,9 @@ void DC::vault_get(Character *ch, QString object, QString owner)
   save_char_obj(ch);
 }
 
-void item_add(int vnum, struct vault_data *vault)
+void item_add(vnum_t vnum, struct vault_data *vault)
 {
-  if (vnum == -1)
+  if (vnum == 0)
   {
     produce_coredump();
     return;
@@ -2158,9 +2158,9 @@ void vault_list(Character *ch, QString owner)
       ch->send(QStringLiteral("%1 $3Lvl: %2$R").arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
     }
 
-    if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
+    if (ch->getLevel() > IMMORTAL && obj->vnum > 0)
     {
-      ch->send(QStringLiteral(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].virt));
+      ch->send(QStringLiteral(" [%1]").arg(obj->vnum));
     }
     ch->send("\r\n");
   }
@@ -2731,9 +2731,9 @@ int vault_search(Character *ch, const char *args)
           ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
         }
 
-        if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
+        if (ch->getLevel() > IMMORTAL && obj->vnum > 0)
         {
-          ch->send(fmt::format(" [{}]", DC::getInstance()->obj_index[obj->item_number].virt));
+          ch->send(fmt::format(" [{}]", obj->vnum));
         }
         ch->send("\r\n");
       } // for loop of objects

@@ -26,7 +26,6 @@
 /* handling the affected-structures */
 void affect_total(Character *ch);
 void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
-void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type = DC::PULSE_TIME);
 void affect_from_char(Character *ch, int skill, int flags = 0);
 void affect_remove(Character *ch, struct affected_type *af, int flags);
 void affect_join(Character *ch, struct affected_type *af,
@@ -66,10 +65,10 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag = 0);
 class Object *unequip_char(Character *ch, int pos, int flag = 0);
 
 class Object *get_obj_in_list(char *name, class Object *list);
-class Object *get_obj_in_list_num(int num, class Object *list);
+class Object *get_obj_in_list_num(vnum_t num, class Object *list);
 class Object *get_obj(char *name);
-class Object *get_obj(int vnum);
-class Object *get_obj_num(int nr);
+class Object *get_obj(vnum_t vnum);
+class Object *get_obj_num(vnum_t nr);
 
 void object_list_new_new_owner(class Object *list, Character *ch);
 

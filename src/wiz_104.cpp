@@ -2051,27 +2051,26 @@ char *oprog_type_to_name(int type)
 
 void opstat(Character *ch, int vnum)
 {
-	Object *obj;
-	char buf[MAX_STRING_LENGTH];
-	if (num < 0)
+	if (!DC::getInstance()->obj_index.contains(vnum))
 	{
 		ch->sendln("Error, non-existant object.");
 		return;
 	}
-	obj = DC::getInstance()->obj_index[num].item;
+	auto obj_index_entry = DC::getInstance()->obj_index[vnum];
+	auto obj = obj_index_entry.item;
+	char buf[MAX_STRING_LENGTH]{};
 	sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
 			obj->name, vnum);
 	ch->send(buf);
-	if (DC::getInstance()->obj_index[num].progtypes == 0)
+	if (!obj_index_entry.progtypes)
 	{
 		ch->sendln("This object has no special procedures.");
 		return;
 	}
 	ch->sendln("");
-	QSharedPointer<class MobProgram> mprg{};
-	int i{};
+	int i = 1;
 	char buf2[MAX_STRING_LENGTH]{};
-	for (mprg = DC::getInstance()->obj_index[num].mobprogs, i = 1; mprg != nullptr;
+	for (auto mprg = obj_index_entry.mobprogs; mprg;
 		 i++, mprg = mprg->next)
 	{
 		sprintf(buf, "$3%d$R>$3$B", i);

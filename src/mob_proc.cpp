@@ -1960,7 +1960,7 @@ int janitor(Character *ch, class Object *obj, int cmd, const char *arg,
     if (isSet(i->obj_flags.wear_flags, ITEM_TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        DC::getInstance()->obj_index[i->item_number].virt != CHAMPION_ITEM)
+        i->vnum != CHAMPION_ITEM)
     {
       act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
       move_obj(i, ch);

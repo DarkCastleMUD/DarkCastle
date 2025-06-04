@@ -1755,7 +1755,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		break;
 
 	case eAMTITEMS:
-		return mprog_veval(DC::getInstance()->obj_index[real_object(atoi(arg))].number, opr, atoi(val));
+		return mprog_veval(DC::getInstance()->obj_index[atoi(arg)].qty, opr, atoi(val));
 		break;
 
 	case eNUMPCS:
@@ -1799,7 +1799,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		Object *p;
 		for (p = DC::getInstance()->object_list; p; p = p->next)
 		{
-			if (DC::getInstance()->obj_index[p->item_number].virt == target)
+			if (p->vnum == target)
 			{
 				count++;
 			}
@@ -2564,7 +2564,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 		if (fvict)
 		{
-			obj = search_char_for_item(fvict, real_object(atoi(valu)), true);
+			obj = search_char_for_item(fvict, atoi(valu), true);
 			take = fvict;
 		}
 		else
@@ -2576,28 +2576,28 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			case 'z':
 				if (!mob->beacon)
 					return -1;
-				obj = search_char_for_item(((Character *)mob->beacon), real_object(atoi(valu)), true);
+				obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), true);
 				take = ((Character *)mob->beacon);
 			case 'i': // mob
-				obj = search_char_for_item(mob, real_object(atoi(valu)), true);
+				obj = search_char_for_item(mob, atoi(valu), true);
 				take = mob;
 				break;
 			case 'n': // actor
 				if (!actor)
 					return -1;
-				obj = search_char_for_item(actor, real_object(atoi(valu)), true);
+				obj = search_char_for_item(actor, atoi(valu), true);
 				take = actor;
 				break;
 			case 't': // vict
 				if (!vict)
 					return -1;
-				obj = search_char_for_item(vict, real_object(atoi(valu)), true);
+				obj = search_char_for_item(vict, atoi(valu), true);
 				take = vict;
 				break;
 			case 'r': // rndm
 				if (!rndm)
 					return -1;
-				obj = search_char_for_item(rndm, real_object(atoi(valu)), true);
+				obj = search_char_for_item(rndm, atoi(valu), true);
 				take = rndm;
 				break;
 			default:
@@ -2634,7 +2634,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		char *valu = one_argument(val, bufeh);
 		if (fvict)
 		{
-			obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
+			obj = search_char_for_item(fvict, atoi(valu), false);
 			take = fvict;
 		}
 		else
@@ -2646,28 +2646,28 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			case 'z':
 				if (!mob->beacon)
 					return -1;
-				obj = search_char_for_item(((Character *)mob->beacon), real_object(atoi(valu)), false);
+				obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), false);
 				take = ((Character *)mob->beacon);
 			case 'i': // mob
-				obj = search_char_for_item(mob, real_object(atoi(valu)), false);
+				obj = search_char_for_item(mob, atoi(valu), false);
 				take = mob;
 				break;
 			case 'n': // actor
 				if (!actor)
 					return -1;
-				obj = search_char_for_item(actor, real_object(atoi(valu)), false);
+				obj = search_char_for_item(actor, atoi(valu), false);
 				take = actor;
 				break;
 			case 't': // vict
 				if (!vict)
 					return -1;
-				obj = search_char_for_item(vict, real_object(atoi(valu)), false);
+				obj = search_char_for_item(vict, atoi(valu), false);
 				take = vict;
 				break;
 			case 'r': // rndm
 				if (!rndm)
 					return -1;
-				obj = search_char_for_item(rndm, real_object(atoi(valu)), false);
+				obj = search_char_for_item(rndm, atoi(valu), false);
 				take = rndm;
 				break;
 			default:
@@ -2770,7 +2770,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'o':
 			if (obj)
 			{
-				lhsvl = DC::getInstance()->obj_index[obj->item_number].virt;
+				lhsvl = obj->vnum;
 				rhsvl = atoi(val);
 				return mprog_veval(lhsvl, opr, rhsvl);
 			}
@@ -2779,7 +2779,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		case 'p':
 			if (v_obj)
 			{
-				lhsvl = DC::getInstance()->obj_index[v_obj->item_number].virt;
+				lhsvl = v_obj->vnum;
 				rhsvl = atoi(val);
 				return mprog_veval(lhsvl, opr, rhsvl);
 			}
@@ -2882,7 +2882,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			 obj;
 			 obj = obj->next_content)
 		{
-			if (DC::getInstance()->obj_index[obj->item_number].virt == target)
+			if (obj->vnum == target)
 				return 1;
 		}
 		return 0;
@@ -4703,8 +4703,8 @@ Character *initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
 	Character *temp;
 	temp = clone_mobile(real_mobile(12));
-	DC::getInstance()->mob_index[real_mobile(12)].mobprogs = DC::getInstance()->obj_index[obj->item_number].mobprogs;
-	DC::getInstance()->mob_index[real_mobile(12)].progtypes = DC::getInstance()->obj_index[obj->item_number].progtypes;
+	DC::getInstance()->mob_index[real_mobile(12)].mobprogs = DC::getInstance()->obj_index[obj->vnum].mobprogs;
+	DC::getInstance()->mob_index[real_mobile(12)].progtypes = DC::getInstance()->obj_index[obj->vnum].progtypes;
 
 	if (ch)
 		char_to_room(temp, ch->in_room);
@@ -4765,7 +4765,7 @@ int oprog_can_see_trigger(Character *ch, Object *item)
 	Character *vmob;
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & CAN_SEE_PROG)
+	if (DC::getInstance()->obj_index[item->vnum].progtypes & CAN_SEE_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, CAN_SEE_PROG);
@@ -4788,7 +4788,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 	mprog_cur_result = eSUCCESS;
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & SPEECH_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4799,7 +4799,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 			end_oproc(vmob, Trace("oprog_speech_trigger2"));
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & SPEECH_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4812,7 +4812,7 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
+			if (DC::getInstance()->obj_index[ch->equipment[i]->vnum].progtypes & SPEECH_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
 				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
@@ -4831,9 +4831,9 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 	mprog_cur_result = eFAILURE;
 	Character *vmob;
 
-	if (DC::getInstance()->obj_index[obj->item_number].progtypes & CATCH_PROG)
+	if (DC::getInstance()->obj_index[obj->vnum].progtypes & CATCH_PROG)
 	{
-		mprg = DC::getInstance()->obj_index[obj->item_number].mobprogs;
+		mprg = DC::getInstance()->obj_index[obj->vnum].mobprogs;
 		mprog_command_num = 0;
 		for (; mprg != nullptr; mprg = mprg->next)
 		{
@@ -4844,7 +4844,7 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
 					logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
-						 DC::getInstance()->obj_index[obj->item_number].virt);
+						 obj->vnum);
 					return eFAILURE;
 				}
 				if (curr_catch == catch_num)
@@ -4897,7 +4897,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
 																		  item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ACT_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4908,7 +4908,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 			end_oproc(vmob, Trace("oprog_act_trigger2"));
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ACT_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4921,7 +4921,7 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
+			if (DC::getInstance()->obj_index[ch->equipment[i]->vnum].progtypes & ACT_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
 				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
@@ -4948,7 +4948,7 @@ int oprog_greet_trigger(Character *ch)
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
 																		  item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ALL_GREET_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & ALL_GREET_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, ALL_GREET_PROG);
@@ -4968,7 +4968,7 @@ int oprog_rand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & RAND_PROG)
+	if (DC::getInstance()->obj_index[item->vnum].progtypes & RAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, RAND_PROG);
@@ -4988,7 +4988,7 @@ int oprog_arand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & ARAND_PROG)
+	if (DC::getInstance()->obj_index[item->vnum].progtypes & ARAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, ARAND_PROG);
@@ -5007,7 +5007,7 @@ int oprog_load_trigger(Character *ch)
 	mprog_cur_result = eSUCCESS;
 
 	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & LOAD_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -5015,7 +5015,7 @@ int oprog_load_trigger(Character *ch)
 			return mprog_cur_result;
 		}
 	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & LOAD_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
 			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -5025,7 +5025,7 @@ int oprog_load_trigger(Character *ch)
 
 	for (int i = 0; i < MAX_WEAR; i++)
 		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
+			if (DC::getInstance()->obj_index[ch->equipment[i]->vnum].progtypes & LOAD_PROG)
 			{
 				vmob = initiate_oproc(ch, item);
 				mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
@@ -5046,7 +5046,7 @@ int oprog_weapon_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & WEAPON_PROG)
+	if (DC::getInstance()->obj_index[item->vnum].progtypes & WEAPON_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, WEAPON_PROG);
@@ -5068,7 +5068,7 @@ int oprog_armour_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & ARMOUR_PROG)
+	if (DC::getInstance()->obj_index[item->vnum].progtypes & ARMOUR_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, ARMOUR_PROG);
@@ -5094,7 +5094,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 	{
 		for (item = DC::getInstance()->world[in_room].contents; item; item = item->next_content)
 		{
-			if (DC::getInstance()->obj_index[item->item_number].progtypes & COMMAND_PROG)
+			if (DC::getInstance()->obj_index[item->vnum].progtypes & COMMAND_PROG)
 			{
 				if (!arguments.isEmpty())
 				{
@@ -5114,7 +5114,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 
 	for (item = carrying; item; item = item->next_content)
 	{
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & COMMAND_PROG)
+		if (DC::getInstance()->obj_index[item->vnum].progtypes & COMMAND_PROG)
 		{
 			if (!arguments.isEmpty())
 			{
@@ -5134,7 +5134,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 	{
 		if (equipment[i])
 		{
-			if (DC::getInstance()->obj_index[equipment[i]->item_number].progtypes & COMMAND_PROG)
+			if (DC::getInstance()->obj_index[equipment[i]->vnum].progtypes & COMMAND_PROG)
 			{
 				if (!arguments.isEmpty())
 				{

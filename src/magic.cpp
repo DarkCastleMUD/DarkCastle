@@ -2011,9 +2011,9 @@ int spell_create_food(uint8_t level, Character *ch, Character *victim, class Obj
   class Object *tmp_obj;
 
   if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN)
-    tmp_obj = DC::getInstance()->clone_object(real_object(8));
+    tmp_obj = DC::getInstance()->clone_object(8);
   else
-    tmp_obj = DC::getInstance()->clone_object(real_object(7));
+    tmp_obj = DC::getInstance()->clone_object(7);
 
   tmp_obj->obj_flags.value[0] += skill / 2;
 
@@ -3026,7 +3026,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
   {
     // TODO
     // Removed for now because it's keep locate spell from seeing portals or corpses
-    //	  if (i->item_number == -1) {
+    //	  if (i->vnum == -1) {
     //		  continue;
     //	  }
     //
@@ -3301,7 +3301,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     {
       act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
       REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      if (DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (obj->vnum == 514)
       {
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
@@ -3345,7 +3345,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
   {
     if ((obj = victim->equipment[j]) && isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (skill > 70 && obj->vnum == 514)
       {
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
@@ -3369,7 +3369,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     {
       act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
       act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-      if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (skill > 70 && obj->vnum == 514)
       {
         int i = 0;
         for (i = 0; i < obj->num_affects; i++)
@@ -5223,7 +5223,7 @@ int spell_cont_light(uint8_t level, Character *ch, Character *victim, class Obje
     return eSUCCESS;
   }
 
-  tmp_obj = DC::getInstance()->clone_object(real_object(6));
+  tmp_obj = DC::getInstance()->clone_object(6);
 
   obj_to_char(tmp_obj, ch);
 
@@ -6536,8 +6536,8 @@ void make_portal(Character *ch, Character *vict)
   clear_object(ch_portal);
   clear_object(vict_portal);
 
-  ch_portal->item_number = -1;
-  vict_portal->item_number = -1;
+  ch_portal->vnum = -1;
+  vict_portal->vnum = -1;
   ch_portal->in_room = DC::NOWHERE;
   vict_portal->in_room = DC::NOWHERE;
 
@@ -6695,7 +6695,7 @@ int spell_portal(uint8_t level, Character *ch, Character *victim, class Object *
   bool found_hunt_or_quest_item = false;
   for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
   {
-    if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
+    if (search_char_for_item(tmpch, 76, false) || search_char_for_item(tmpch, 51, false))
     {
       found_hunt_or_quest_item = true;
     }
@@ -11528,7 +11528,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       ch->sendln("You don't seem to be carrying any such root.");
       return eFAILURE;
     }
-    int virt = DC::getInstance()->obj_index[obj->item_number].virt;
+    int virt = obj->vnum;
     int aff = 0, spl = 0;
     switch (virt)
     {
@@ -12160,13 +12160,13 @@ int check_components(Character *ch, int destroy, int item_one = 0,
   if (!ch->carrying)
     return false;
 
-  ptr_one = get_obj_in_list_num(real_object(item_one), ch->carrying);
+  ptr_one = get_obj_in_list_num(item_one, ch->carrying);
   if (item_two)
-    ptr_two = get_obj_in_list_num(real_object(item_two), ch->carrying);
+    ptr_two = get_obj_in_list_num(item_two, ch->carrying);
   if (item_three)
-    ptr_three = get_obj_in_list_num(real_object(item_three), ch->carrying);
+    ptr_three = get_obj_in_list_num(item_three, ch->carrying);
   if (item_four)
-    ptr_four = get_obj_in_list_num(real_object(item_four), ch->carrying);
+    ptr_four = get_obj_in_list_num(item_four, ch->carrying);
 
   // Destroy the components if needed
 
@@ -12585,7 +12585,7 @@ int do_beacon(Character *ch, char *argument, int cmd)
   ch->sendln("You set a magical beacon in the air.");
   if (!ch->beacon)
   {
-    if (!(new_obj = DC::getInstance()->clone_object(real_object(BEACON_OBJ_NUMBER))))
+    if (!(new_obj = DC::getInstance()->clone_object(BEACON_OBJ_NUMBER)))
     {
       ch->sendln("Error setting beacon.  Contact a god.");
       return eFAILURE;
@@ -13305,7 +13305,7 @@ int spell_globe_of_darkness(uint8_t level, Character *ch, Character *victim, cla
     dur = 2;
     mod = 15;
   }
-  globe = DC::getInstance()->clone_object(real_object(GLOBE_OF_DARKNESS_OBJECT));
+  globe = DC::getInstance()->clone_object(GLOBE_OF_DARKNESS_OBJECT);
 
   if (!globe)
   {
@@ -14750,7 +14750,7 @@ int spell_silence(uint8_t level, Character *ch, Character *victim, Object *obj, 
   ch->sendln("Your chants fade softy to an eerie quiet as the silence takes hold...");
   act("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, TO_ROOM, 0);
 
-  if (!(silence_obj = DC::getInstance()->clone_object(real_object(SILENCE_OBJ_NUMBER))))
+  if (!(silence_obj = DC::getInstance()->clone_object(SILENCE_OBJ_NUMBER)))
   {
     ch->sendln("Error setting silence object.  Tell an immortal.");
     return eFAILURE;
@@ -15368,7 +15368,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
     return eFAILURE;
   }
 
-  if (!(ssobj = DC::getInstance()->clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
+  if (!(ssobj = DC::getInstance()->clone_object(SPIRIT_SHIELD_OBJ_NUMBER)))
   {
     ch->sendln("Error setting spirit shield object.  Tell an immortal.");
     return eFAILURE;
@@ -15531,10 +15531,10 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[HOLD];
-      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+      if ((component == 0) || (compNum != component->vnum))
       {
         component = ch->equipment[HOLD2];
-        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+        if ((component == 0) || (compNum != component->vnum))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;
@@ -15627,7 +15627,7 @@ int spell_consecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = DC::getInstance()->clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  cItem = DC::getInstance()->clone_object(CONSECRATE_OBJ_NUMBER);
   if (cItem == nullptr)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
@@ -15688,10 +15688,10 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[HOLD];
-      if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+      if ((component == 0) || (compNum != component->vnum))
       {
         component = ch->equipment[HOLD2];
-        if ((component == 0) || (compNum != DC::getInstance()->obj_index[component->item_number].virt))
+        if ((component == 0) || (compNum != component->vnum))
         {
           ch->sendln("You do not have the required components.");
           return eFAILURE;
@@ -15785,7 +15785,7 @@ int spell_desecrate(uint8_t level, Character *ch, Character *victim,
 
   ch->cRooms++;
 
-  cItem = DC::getInstance()->clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  cItem = DC::getInstance()->clone_object(CONSECRATE_OBJ_NUMBER);
   if (!cItem)
   {
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");

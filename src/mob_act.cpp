@@ -679,7 +679,7 @@ void scavenge(Character *ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (obj->vnum == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

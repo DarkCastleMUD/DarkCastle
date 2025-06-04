@@ -686,7 +686,7 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
 		{
-			char *tmp = gl_item(DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+			char *tmp = gl_item(DC::getInstance()->obj_index[platsmith_list[o].sales[z]].item, z, ch);
 			ch->send(tmp);
 			dc_free(tmp);
 		}
@@ -722,9 +722,9 @@ int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Ch
 			return eSUCCESS;
 		}
 		class Object *obj;
-		obj = DC::getInstance()->clone_object(real_object(platsmith_list[o].sales[k]));
+		obj = DC::getInstance()->clone_object(platsmith_list[o].sales[k]);
 
-		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
+		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->vnum, false))
 		{
 			owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
 			extract_obj(obj);

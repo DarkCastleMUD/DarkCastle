@@ -1082,8 +1082,8 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // if it's a current object, clone it and continue
   // if it's not, then we need to remove it from the pfile so clone obj 1
 
-  if ((nr = real_object(object.item_number)) > -1)
-    obj = DC::getInstance()->clone_object(nr);
+  if (DC::getInstance()->obj_index.contains(object.vnum))
+    obj = DC::getInstance()->clone_object(object.vnum);
   else
     obj = DC::getInstance()->clone_object(1);
 
@@ -1272,7 +1272,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && DC::getInstance()->obj_index[last_cont->item_number].virt != 536)
+      if (!last_cont->equipped_by && last_cont->vnum != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1350,12 +1350,12 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     }
   }
 
-  if (obj->item_number < 0)
+  if (obj->vnum < 1)
     return true;
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = DC::getInstance()->obj_index[obj->item_number].virt;
+  object.vnum = obj->vnum;
   object.timer = obj->obj_flags.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1368,7 +1368,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = ((class Object *)DC::getInstance()->obj_index[obj->item_number].item);
+  standard_obj = DC::getInstance()->obj_index[obj->vnum].item;
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1452,7 +1452,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
 
     tmp_weight = obj->obj_flags.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && DC::getInstance()->obj_index[obj->item->number].virt != 536)
+    && DC::getInstance()->obj_index[obj->item->number].vnum != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->obj_flags.weight)
@@ -1570,7 +1570,7 @@ void restore_weight(class Object *obj)
 
   if (obj == nullptr)
     return;
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 536)
+  if (obj->vnum == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);

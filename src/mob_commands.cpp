@@ -571,14 +571,14 @@ int do_mpoload(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((realnum = real_object(atoi(arg1))) < 0)
+  if ((realnum = atoi(arg1)) < 0)
   {
     prog_error(ch, "Mpoload - Bad vnum arg.");
     return eFAILURE | eINTERNAL_ERROR;
   }
   obj = DC::getInstance()->clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (obj->vnum == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return eFAILURE;
   }
@@ -1597,7 +1597,7 @@ int do_mpothrow(Character *ch, char *argument, int cmd)
   if (isdigit(*first))
   {
     if (!check_valid_and_convert(mob_num, first) ||
-        (real_object(mob_num) < 0))
+        (mob_num < 0))
     {
       prog_error(ch, "Mpothrow - Invalid objnum.");
       return eFAILURE;
@@ -2278,7 +2278,7 @@ void prog_error(Character *ch, char *format, ...)
   if (ch && IS_OBJ(ch))
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Obj %d, com %d, line %d: %s",
-         DC::getInstance()->obj_index[ch->objdata->item_number].virt, mprog_command_num,
+         ch->objdata->vnum, mprog_command_num,
          mprog_line_num, buffer);
   }
   else if (ch && IS_NPC(ch))

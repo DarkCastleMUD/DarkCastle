@@ -135,7 +135,7 @@ void eq_remove_damage(Object *obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(Object *obj)
 {
-  if (DC::getInstance()->obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (obj->vnum == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -162,7 +162,7 @@ void object_activity(uint64_t pulse_type)
 {
   for (const auto &obj : DC::getInstance()->active_obj_list)
   {
-    int32_t item_number = obj->item_number;
+    int32_t item_number = obj->vnum;
 
     if (DC::getInstance()->obj_index[item_number].non_combat_func)
     {
@@ -442,7 +442,7 @@ int do_recite(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", scroll->vnum, i, i);
           continue;
         }
         else
@@ -561,7 +561,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   }
 
   // make a new item
-  trap_obj = DC::getInstance()->clone_object(real_object(MORTAR_ROUND_OBJECT_ID));
+  trap_obj = DC::getInstance()->clone_object(MORTAR_ROUND_OBJECT_ID);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -2499,13 +2499,13 @@ int do_remove(Character *ch, char *argument, int cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+            if (obj_object->vnum == 30010 && obj_object->obj_flags.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
-            if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (obj_object->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2542,7 +2542,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             send_to_char(arg1, ch);
             return eFAILURE;
           }
-          if (DC::getInstance()->obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+          if (obj_object->vnum == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return eFAILURE;
@@ -2559,7 +2559,7 @@ int do_remove(Character *ch, char *argument, int cmd)
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
-          else if (DC::getInstance()->obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (obj_object->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);

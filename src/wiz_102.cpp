@@ -52,7 +52,7 @@ command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zo
 // This should obviously not be called at any other time than additions to the previously mentioned
 // arrays, as it'd screw things up.
 // Saving zones after this SHOULD not be required, as the old savefiles contain vnums, which should remain correct.
-void rebuild_rnum_references(int startAt, int type)
+void rebuild_mob_rnum_references(int startAt)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
@@ -61,27 +61,12 @@ void rebuild_rnum_references(int startAt, int type)
       switch (zone.cmd[comm]->command)
       {
       case 'M':
-        if (type == 1 && zone.cmd[comm]->arg1 >= startAt)
-          zone.cmd[comm]->arg1++;
-        break;
-      case 'O':
-        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
+        if (zone.cmd[comm]->arg1 >= startAt)
           zone.cmd[comm]->arg1++;
         break;
       case 'G':
-        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
-          zone.cmd[comm]->arg1++;
-        break;
       case 'E':
-        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
-          zone.cmd[comm]->arg1++;
-        break;
       case 'P':
-        if (type == 2 && zone.cmd[comm]->arg1 >= startAt)
-          zone.cmd[comm]->arg1++;
-        if (type == 2 && zone.cmd[comm]->arg3 >= startAt)
-          zone.cmd[comm]->arg3++;
-        break;
       case '%':
       case 'K':
       case 'D':
@@ -90,7 +75,7 @@ void rebuild_rnum_references(int startAt, int type)
       case 'J':
         break;
       default:
-        logentry(QStringLiteral("Illegal char hit in rebuild_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
+        logentry(QStringLiteral("Illegal char hit in rebuild_mob_rnum_references"), 0, DC::LogChannel::LOG_WORLD);
         break;
       }
     }
@@ -717,8 +702,8 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         case 'G':
         case 'O':
         case 'E':
-          j = real_object(i);
-          original_value = DC::getInstance()->obj_index[zone.cmd[cmd]->arg1].virt;
+          j = i;
+          original_value = DC::getInstance()->obj_index[zone.cmd[cmd]->arg1].vnum;
           break;
         case 'X':
         case 'K':
@@ -783,7 +768,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         case 'P': // Put object in object
           change_type = "object VNUM";
           vnum = i;
-          i = real_object(i);
+          i = i;
           break;
         case 'G': // Give object to mobile (in inventory)
         case 'E': // Equib item on a mobile
@@ -1134,7 +1119,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
 
     ch->sendln("Matches:");
 
-    robj = real_object(j);
+    robj = j;
     rmob = real_mobile(j);
 
     // If that obj/mob doesn't exist, put a junk value that should never (hopefully) match
@@ -1832,7 +1817,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].virt);
+      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -1893,7 +1878,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].virt);
+      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -1931,7 +1916,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].virt);
+              DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -1972,7 +1957,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     if (!obj->affected)
     {
       sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].virt);
+              DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -2003,7 +1988,6 @@ int do_oedit(Character *ch, char *argument, int cmd)
   char buf2[MAX_INPUT_LENGTH] = {};
   char buf3[MAX_INPUT_LENGTH] = {};
   char buf4[MAX_INPUT_LENGTH] = {};
-  int rnum = {};
   vnum_t vnum = {};
   int intval = {};
   int x = {}, i = {};
@@ -2075,10 +2059,9 @@ int do_oedit(Character *ch, char *argument, int cmd)
       vnum = 0;
     }
 
-    rnum = real_object(vnum);
-    if (rnum < 0 || vnum < 1)
+    if (!DC::getInstance()->obj_index.contains(vnum))
     {
-      ch->sendln("Invalid item number.");
+      ch->sendln(QStringLiteral("%1 is an invalid object number.").arg(vnum));
       return eSUCCESS;
     }
 
@@ -2093,8 +2076,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     if (argument && !QString(argument).trimmed().startsWith("new"))
     {
       vnum = ch->player->last_obj_vnum;
-      rnum = real_object(vnum);
-      if (rnum < 0 || vnum < 1)
+      if (!DC::getInstance()->obj_index.contains(vnum))
       {
         ch->sendln("Invalid item number.");
         return eSUCCESS;
@@ -2117,7 +2099,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
 
   if (!*buf3) // no field.  Stat the item.
   {
-    obj_stat(ch, DC::getInstance()->obj_index[rnum].item);
+    obj_stat(ch, DC::getInstance()->obj_index[vnum].item);
     return eSUCCESS;
   }
 
@@ -2152,7 +2134,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] keywords <new_keywords>");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->name = str_hsh(buf4);
+    DC::getInstance()->obj_index[vnum].item->name = str_hsh(buf4);
     sprintf(buf, "Item keywords set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2166,7 +2148,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] longdesc <new_desc>");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->description = str_hsh(buf4);
+    DC::getInstance()->obj_index[vnum].item->description = str_hsh(buf4);
     sprintf(buf, "Item longdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2180,7 +2162,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] shortdesc <new_desc>");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->short_description = str_hsh(buf4);
+    DC::getInstance()->obj_index[vnum].item->short_description = str_hsh(buf4);
     sprintf(buf, "Item shortdesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2194,7 +2176,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("$3Syntax$R: oedit [item_num] actiondesc <new_desc>");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->ActionDescription(buf4);
+    DC::getInstance()->obj_index[vnum].item->ActionDescription(buf4);
     sprintf(buf, "Item actiondesc set to '%s'.\r\n", buf4);
     ch->send(buf);
   }
@@ -2208,7 +2190,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\n\r"
                    "$3Current$R: ",
                    ch);
-      snprintf(buf, sizeof(buf), "%s\n", item_types[DC::getInstance()->obj_index[rnum].item->obj_flags.type_flag].toStdString().c_str());
+      snprintf(buf, sizeof(buf), "%s\n", item_types[DC::getInstance()->obj_index[vnum].item->obj_flags.type_flag].toStdString().c_str());
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
 
@@ -2225,13 +2207,13 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     if (intval == 24)
     {
-      DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = -1;
+      DC::getInstance()->obj_index[vnum].item->obj_flags.value[2] = -1;
     }
     else
     {
-      DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = 0;
+      DC::getInstance()->obj_index[vnum].item->obj_flags.value[2] = 0;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.type_flag = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.type_flag = intval;
     sprintf(buf, "Item type set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2245,7 +2227,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] wear <location[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.wear_flags, Object::wear_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[vnum].item->obj_flags.wear_flags, Object::wear_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::wear_bits.size(); i++)
@@ -2254,7 +2236,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.wear_flags);
+    parse_bitstrings_into_int(Object::wear_bits, QString(buf4), ch, DC::getInstance()->obj_index[vnum].item->obj_flags.wear_flags);
   }
   break;
 
@@ -2266,7 +2248,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.size,
+      sprintbit(DC::getInstance()->obj_index[vnum].item->obj_flags.size,
                 size_bitfields, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
@@ -2278,7 +2260,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     parse_bitstrings_into_int(size_bitfields, buf4, ch,
-                              DC::getInstance()->obj_index[rnum].item->obj_flags.size);
+                              DC::getInstance()->obj_index[vnum].item->obj_flags.size);
   }
   break;
 
@@ -2290,7 +2272,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.extra_flags, Object::extra_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[vnum].item->obj_flags.extra_flags, Object::extra_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::extra_bits.size(); i++)
@@ -2299,7 +2281,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), ch, DC::getInstance()->obj_index[vnum].item->obj_flags.extra_flags);
   }
   break;
 
@@ -2316,7 +2298,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.weight = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.weight = intval;
     sprintf(buf, "Item weight set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2335,7 +2317,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.cost = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.cost = intval;
     sprintf(buf, "Item value set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2349,7 +2331,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintbit(DC::getInstance()->obj_index[rnum].item->obj_flags.more_flags, Object::more_obj_bits, buf);
+      sprintbit(DC::getInstance()->obj_index[vnum].item->obj_flags.more_flags, Object::more_obj_bits, buf);
       ch->send(buf);
       ch->sendln("\r\n$3Valid types$R:");
       for (i = 0; i < Object::more_obj_bits.size(); i++)
@@ -2358,7 +2340,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       }
       return eFAILURE;
     }
-    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, DC::getInstance()->obj_index[rnum].item->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), ch, DC::getInstance()->obj_index[vnum].item->obj_flags.more_flags);
   }
   break;
 
@@ -2375,7 +2357,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Value out of valid range.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.eq_level = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.eq_level = intval;
     sprintf(buf, "Item minimum level set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2394,7 +2376,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.value[0] = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.value[0] = intval;
     sprintf(buf, "Item value 1 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2413,7 +2395,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.value[1] = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.value[1] = intval;
     sprintf(buf, "Item value 2 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2432,7 +2414,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.value[2] = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.value[2] = intval;
     sprintf(buf, "Item value 3 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2451,7 +2433,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.value[3] = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.value[3] = intval;
     sprintf(buf, "Item value 4 set to %d.\r\n", intval);
     ch->send(buf);
   }
@@ -2460,14 +2442,14 @@ int do_oedit(Character *ch, char *argument, int cmd)
   /* affects */
   case 16:
   {
-    return oedit_affects(ch, rnum, buf4);
+    return oedit_affects(ch, vnum, buf4);
     break;
   }
 
   // exdesc
   case 17:
   {
-    return oedit_exdesc(ch, rnum, buf4);
+    return oedit_exdesc(ch, vnum, buf4);
     break;
   }
 
@@ -2484,7 +2466,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    /*        if (real_object(intval) <= 0)
+    /*        if (intval <= 0)
             {
         ch->sendln("Object already exists.");
         return eFAILURE;
@@ -2507,13 +2489,17 @@ int do_oedit(Character *ch, char *argument, int cmd)
             }
     */
     auto x = create_blank_item(intval);
-    if (!x.has_value())
+    if (!x)
     {
-      ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
+      ch->send(QStringLiteral("Could not create item #%1. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
       return eFAILURE;
     }
     ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
     ch->player->last_obj_vnum = intval;
+    auto range = DC::getInstance()->objects.newRange(QStringLiteral("%1-%1.obj").arg(ch->player->last_obj_vnum), ch->player->last_obj_vnum, ch->player->last_obj_vnum);
+    if (!range)
+      ch->sendln(QStringLiteral("Error creating range."));
+    ch->sendln(QStringLiteral("Range [%1] [%2] [%3] created.").arg(range.filename).arg(range.firstnum).arg(range.lastnum));
     break;
   }
 
@@ -2546,12 +2532,12 @@ int do_oedit(Character *ch, char *argument, int cmd)
         {
           titems = items->next;
 
-          real_num = real_object(items->item_vnum);
-          obj = items->obj ? items->obj : ((class Object *)DC::getInstance()->obj_index[real_num].item);
+          real_num = items->item_vnum;
+          obj = items->obj ? items->obj : DC::getInstance()->obj_index[real_num].item;
           if (obj == nullptr)
             continue;
 
-          if (obj->item_number == rnum)
+          if (obj->vnum == vnum)
           {
 
             void item_remove(Object * obj, struct vault_data * vault);
@@ -2568,12 +2554,12 @@ int do_oedit(Character *ch, char *argument, int cmd)
     for (Object *k = DC::getInstance()->object_list; k; k = next_k)
     {
       next_k = k->next;
-      if (k->item_number == rnum)
+      if (k->vnum == vnum)
         extract_obj(k);
     }
 
     // remove the item from index
-    delete_item_from_index(rnum);
+    delete_item_from_index(vnum);
     ch->sendln("Item deleted.");
     break;
   }
@@ -2581,7 +2567,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
   // stat
   case 20:
   {
-    obj_stat(ch, DC::getInstance()->obj_index[rnum].item);
+    obj_stat(ch, DC::getInstance()->obj_index[vnum].item);
     return eSUCCESS;
     break;
   }
@@ -2597,23 +2583,23 @@ int do_oedit(Character *ch, char *argument, int cmd)
       ch->sendln("Please specifiy a valid number.");
       return eFAILURE;
     }
-    DC::getInstance()->obj_index[rnum].item->obj_flags.timer = intval;
+    DC::getInstance()->obj_index[vnum].item->obj_flags.timer = intval;
     sprintf(buf, "Item timer to %d.\r\n", intval);
     ch->send(buf);
   }
   break;
   case 22:
     extra_descr_data *curr;
-    for (curr = DC::getInstance()->obj_index[rnum].item->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, DC::getInstance()->obj_index[rnum].item->name))
+    for (curr = DC::getInstance()->obj_index[vnum].item->ex_description; curr; curr = curr->next)
+      if (!str_cmp(curr->keyword, DC::getInstance()->obj_index[vnum].item->name))
         break;
     if (!curr)
     { // None existing;
       curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(DC::getInstance()->obj_index[rnum].item->name);
+      curr->keyword = str_dup(DC::getInstance()->obj_index[vnum].item->name);
       curr->description = str_dup("");
-      curr->next = DC::getInstance()->obj_index[rnum].item->ex_description;
-      DC::getInstance()->obj_index[rnum].item->ex_description = curr;
+      curr->next = DC::getInstance()->obj_index[vnum].item->ex_description;
+      DC::getInstance()->obj_index[vnum].item->ex_description = curr;
     }
     ch->sendln("Write your object's description. End with /s.");
     ch->desc->connected = Connection::states::EDITING;
@@ -2625,7 +2611,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     break;
   }
 
-  DC::getInstance()->set_zone_modified_obj(rnum);
+  DC::getInstance()->set_zone_modified_obj(vnum);
   return eSUCCESS;
 }
 
@@ -3115,7 +3101,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
     mobvnum = mob_num;
     mob_num = real_mobile(mobvnum);
-    if (mobvnum == DC::INVALID_VNUM || mob_num == DC::INVALID_VNUM)
+    if (mobvnum == DC::INVALID_MOB_VNUM || mob_num == DC::INVALID_MOB_VNUM)
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", buf));
       return eFAILURE;
@@ -4923,7 +4909,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (!zone.isModified())
+  if (!zone.isNeedsSaving())
   {
     sendln(QStringLiteral("Zone %1 has not been modified. Saving anyway.").arg(zone_key));
   }
@@ -4943,7 +4929,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
 
   fclose(f);
   sendln(QStringLiteral("Saved zone %1.").arg(zone_key));
-  zone.setModified(false);
+  zone.setNeedsSaving(false);
   return eSUCCESS;
 }
 
@@ -5047,11 +5033,10 @@ int do_msave(Character *ch, char *arg, int cmd)
 
 int do_osave(Character *ch, char *arg, int cmd)
 {
-  world_file_list_item *curr;
   char buf[180];
   char buf2[180];
 
-  if (ch->player->last_obj_vnum < 1)
+  if (!ch->player->last_obj_vnum)
   {
     ch->sendln("You have not recently edited an item.");
     return eFAILURE;
@@ -5059,41 +5044,34 @@ int do_osave(Character *ch, char *arg, int cmd)
   vnum_t v = ch->player->last_obj_vnum;
   if (!can_modify_object(ch, v))
   {
-    ch->sendln("You may only msave inside of the room range you are assigned to.");
+    ch->sendln("You may only osave inside of the room range you are assigned to.");
     return eFAILURE;
   }
-  int r = real_object(v);
-  curr = DC::getInstance()->obj_file_list;
-  while (curr)
-    if (curr->firstnum <= r && curr->lastnum >= r)
-      break;
-    else
-      curr = curr->next;
-
-  if (!curr)
+  auto &range = DC::getInstance()->objects.findRange(v, v);
+  if (!range)
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
     return eFAILURE;
   }
-
-  if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
+  if (!range.isNeedsSaving())
   {
     ch->sendln("This range has not been modified.");
     return eFAILURE;
   }
 
-  LegacyFile lf("objects", curr->filename, "Couldn't open legacy obj save file %1.");
+  LegacyFile lf("objects", range.filename, "Couldn't open legacy obj save file %1.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (vnum_t vnum = range.firstnum; vnum <= range.lastnum; vnum++)
     {
-      write_object(lf, DC::getInstance()->obj_index[x].item);
+      if (DC::getInstance()->obj_index.contains(vnum))
+        write_object(lf, DC::getInstance()->obj_index[vnum].item);
     }
     fprintf(lf.file_handle_, "$~\n");
   }
 
-  ch->sendln("Saved.");
-  DC::getInstance()->set_zone_saved_obj(curr->firstnum);
+  ch->sendln(QStringLiteral("Saved object range ['%1' %2-%3] for vnum %4.").arg(range.filename).arg(range.firstnum).arg(range.lastnum).arg(v));
+  range.setNeedsSaving(false);
   return eSUCCESS;
 }
 
@@ -5216,14 +5194,14 @@ int do_instazone(Character *ch, char *arg, int cmd)
         for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
                                                                       obj_list->next)
         {
-          if (obj_list->item_number == obj->item_number)
+          if (obj_list->vnum == obj->vnum)
             count++;
         }
 
         if (!obj->in_obj)
         {
           fprintf(fl, "O 0 %d %d %d",
-                  DC::getInstance()->obj_index[obj->item_number].virt, count,
+                  obj->vnum, count,
                   DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
@@ -5238,13 +5216,13 @@ int do_instazone(Character *ch, char *arg, int cmd)
               for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
                                                                             obj_list->next)
               {
-                if (obj_list->item_number == tmp_obj->item_number)
+                if (obj_list->vnum == tmp_obj->vnum)
                   count++;
               }
 
               fprintf(fl, "P 1 %d %d %d",
-                      DC::getInstance()->obj_index[tmp_obj->item_number].virt, count,
-                      DC::getInstance()->obj_index[obj->item_number].virt);
+                      tmp_obj->vnum, count,
+                      obj->vnum);
               sprintf(buf, "     %s placed inside %s\n",
                       tmp_obj->short_description,
                       obj->short_description);
@@ -5301,14 +5279,14 @@ int do_instazone(Character *ch, char *arg, int cmd)
             for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
                                                                           obj_list->next)
             {
-              if (obj_list->item_number == obj->item_number)
+              if (obj_list->vnum == obj->vnum)
                 count++;
             }
 
             if (!obj->in_obj)
             {
               fprintf(fl, "E 1 %d %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].virt, count,
+                      obj->vnum, count,
                       pos);
               sprintf(buf, "      Equip %s with %s\n",
                       mob->short_desc, obj->short_description);
@@ -5324,14 +5302,14 @@ int do_instazone(Character *ch, char *arg, int cmd)
                   for (obj_list = DC::getInstance()->object_list; obj_list;
                        obj_list = obj_list->next)
                   {
-                    if (obj_list->item_number == tmp_obj->item_number)
+                    if (obj_list->vnum == tmp_obj->vnum)
                       count++;
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].virt,
+                          tmp_obj->vnum,
                           count,
-                          DC::getInstance()->obj_index[obj->item_number].virt);
+                          obj->vnum);
                   sprintf(buf, "     %s placed inside %s\n",
                           tmp_obj->short_description,
                           obj->short_description);
@@ -5352,14 +5330,14 @@ int do_instazone(Character *ch, char *arg, int cmd)
             for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
                                                                           obj_list->next)
             {
-              if (obj_list->item_number == obj->item_number)
+              if (obj_list->vnum == obj->vnum)
                 count++;
             }
 
             if (!obj->in_obj)
             {
               fprintf(fl, "G 1 %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].virt, count);
+                      obj->vnum, count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc,
                       obj->short_description);
               string_to_file(fl, buf);
@@ -5374,14 +5352,14 @@ int do_instazone(Character *ch, char *arg, int cmd)
                   for (obj_list = DC::getInstance()->object_list; obj_list;
                        obj_list = obj_list->next)
                   {
-                    if (obj_list->item_number == tmp_obj->item_number)
+                    if (obj_list->vnum == tmp_obj->vnum)
                       count++;
                   }
 
                   fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].virt,
+                          tmp_obj->vnum,
                           count,
-                          DC::getInstance()->obj_index[obj->item_number].virt);
+                          obj->vnum);
                   sprintf(buf, "     %s placed inside %s\n",
                           tmp_obj->short_description,
                           obj->short_description);

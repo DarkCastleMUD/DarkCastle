@@ -8,6 +8,8 @@
 
 #include <cctype>
 #include <cstring>
+#include <expected>
+
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
@@ -105,7 +107,7 @@ void free_player(player_data *plr)
    }
    if (!tbl->plr)
       reset_table(tbl);
-   dc_free(plr);
+   delete plr;
 }
 
 void nextturn(table_data *tbl)
@@ -968,6 +970,7 @@ int hand_number(player_data *plr)
    }
    return i;
 }
+
 void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
 {
    bool showColor = false;
@@ -979,7 +982,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)
          return;
-   Object *obj = DC::getInstance()->world[ch->in_room].contents;
+   auto obj = DC::getInstance()->world[ch->in_room].contents;
    for (; obj; obj = obj->next_content)
    {
       if (obj->table)
@@ -1997,26 +2000,25 @@ void save_slot_machines()
       return;
    }
 
-   world_file_list_item *curr;
-   char buf[180];
-   char buf2[180];
-
-   curr = DC::getInstance()->obj_file_list;
-   while (curr && curr->filename != "21900-21999.obj")
-      curr = curr->next;
-
-   if (!curr)
+   auto range = DC::getInstance()->objects.findRange(21900, 21999);
+   if (!range)
    {
-      logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
-      return;
+      logentry(QStringLiteral("Object range 21900-21999 via file '21900-21999.obj' is missing. Recreating."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      range = DC::getInstance()->objects.newRange("21900-21999.obj", 21900, 21999);
+      if (!range)
+      {
+         logentry(QStringLiteral("Error recreating object range 21900-21999 via file '21900-21999.obj'."), IMMORTAL, DC::LogChannel::LOG_BUG);
+         return;
+      }
    }
 
-   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+   LegacyFile lf("objects", range.filename, "Couldn't open obj save file %1 for save_slot_machines.");
    if (lf.isOpen())
    {
-      for (int x = curr->firstnum; x <= curr->lastnum; x++)
+      for (vnum_t vnum = range.firstnum; vnum <= range.lastnum; vnum++)
       {
-         write_object(lf, DC::getInstance()->obj_index[x].item);
+         if (DC::getInstance()->obj_index.contains(vnum))
+            write_object(lf, DC::getInstance()->obj_index[vnum].item);
       }
       fprintf(lf.file_handle_, "$~\n");
    }
@@ -2066,9 +2068,9 @@ void update_linked_slots(machine_data *machine)
             machine->gold ? "coins" : "plats");
 
    // Find all the slot machines
-   for (int i = 21906; i < 21918; i++)
+   for (int i = 21906; i < 21918 && DC::getInstance()->obj_index.contains(i); i++)
    {
-      Object *slot_obj = DC::getInstance()->obj_index[real_object(i)].item;
+      Object *slot_obj = DC::getInstance()->obj_index[i].item;
 
       // Find all the slot machines linked to the same slot machine as us
       // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2085,7 +2087,7 @@ void update_linked_slots(machine_data *machine)
          // Update instances of the original slot obj
          for (Object *j = DC::getInstance()->object_list; j; j = j->next)
          {
-            if (j->item_number == real_object(i))
+            if (j->vnum == i)
             {
                // if(!ishashed(j->description)) dc_free(j->description);
                j->description = str_dup(ldesc);
@@ -2168,13 +2170,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            (DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            DC::getInstance()->obj_index[machine->obj->vnum].item->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            if (!ishashed((DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
-               dc_free((DC::getInstance()->obj_index[machine->obj->item_number].item)->description);
-            (DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            if (!ishashed(DC::getInstance()->obj_index[machine->obj->vnum].item->description))
+               dc_free(DC::getInstance()->obj_index[machine->obj->vnum].item->description);
+            DC::getInstance()->obj_index[machine->obj->vnum].item->description = str_dup(buf);
          }
       }
 
@@ -2198,13 +2200,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
          }
          else
          {
-            (DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            DC::getInstance()->obj_index[machine->obj->vnum].item->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
             // if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            // if(!ishashed((DC::getInstance()->obj_index[machine->obj->item_number].item)->description))
-            //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->description);
-            (DC::getInstance()->obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            // if(!ishashed(DC::getInstance()->obj_index[machine->obj->vnum].item->description))
+            //    dc_free(((Object*)obj_index[machine->obj->vnum].item)->description);
+            DC::getInstance()->obj_index[machine->obj->vnum].item->description = str_dup(buf);
          }
       }
       else if (payout)

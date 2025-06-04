@@ -213,7 +213,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
                                        "shimmers in the air before you.");
 
     from_portal->obj_flags.type_flag = ITEM_PORTAL;
-    from_portal->item_number = (-1);
+    from_portal->vnum = 0;
 
     /* Only need to do this if I didn't clone it */
     from_portal->next = DC::getInstance()->object_list;
@@ -221,7 +221,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   }
   else /* Duplicate the object # duplicate */
   {
-    from_portal = DC::getInstance()->clone_object(real_object(duplicate));
+    from_portal = DC::getInstance()->clone_object(duplicate);
 
     if (!from_portal->isPortal())
     {

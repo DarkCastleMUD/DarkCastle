@@ -74,33 +74,19 @@ void assign_one_mob_com(int vnum, special_function func)
   }
 }
 
-void assign_one_obj_non(int vnum, special_function func)
+void DC::assign_one_obj_non(vnum_t vnum, special_function func)
 {
-  if (vnum >= 0)
+  if (obj_index.contains(vnum))
   {
-    DC::getInstance()->obj_non_combat_functions[vnum] = func;
-  }
-
-  int rnum = real_object(vnum);
-
-  if (rnum >= 0)
-  {
-    DC::getInstance()->obj_index[rnum].non_combat_func = func;
+    obj_index[vnum].non_combat_func = func;
   }
 }
 
-void assign_one_obj_com(int vnum, special_function func)
+void DC::assign_one_obj_com(vnum_t vnum, special_function func)
 {
-  if (vnum >= 0)
+  if (obj_index.contains(vnum))
   {
-    DC::getInstance()->obj_combat_functions[vnum] = func;
-  }
-
-  int rnum = real_object(vnum);
-
-  if (rnum >= 0)
-  {
-    DC::getInstance()->obj_index[rnum].combat_func = func;
+    obj_index[vnum].combat_func = func;
   }
 }
 
@@ -408,7 +394,7 @@ void assign_combat_procs()
 }
 
 /* assign special procedures to objects */
-void assign_objects(void)
+void DC::assign_objects(void)
 {
   SPEC_FUN board;
   SPEC_FUN bank;

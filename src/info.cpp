@@ -399,7 +399,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
    for (i = list; i; i = i->next_content)
    {
       if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-          i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+          i->next_content->vnum == i->vnum && i->vnum != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
       {
          number++;
          continue;
@@ -1063,12 +1063,12 @@ bool identify(Character *ch, Object *obj)
    ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
    const Object *vobj = nullptr;
-   if (obj->item_number >= 0)
+   if (obj->vnum >= 0)
    {
-      const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+      const int vnum = obj->vnum;
       if (vnum >= 0)
       {
-         const int rn_of_vnum = real_object(vnum);
+         const rnum_t rn_of_vnum = vnum;
          if (rn_of_vnum >= 0)
          {
             vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
@@ -1266,7 +1266,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
       QString buffer = match.captured("vnum");
 
       vnum_t vnum = buffer.toULongLong();
-      vnum_t rnum = real_object(vnum);
+      vnum_t rnum = vnum;
       if (rnum == -1)
       {
          send("Invalid VNUM.\r\n");
@@ -1431,7 +1431,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      {
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                             tmp_object->vnum,
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
                         tmp_object->obj_flags.value[1] =
@@ -1467,7 +1467,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      {
 
                         int weight_in(class Object * obj);
-                        if (DC::getInstance()->obj_index[tmp_object->item_number].virt == 536)
+                        if (tmp_object->vnum == 536)
                            temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                         else
                            temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1486,7 +1486,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                         temp = 3;
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                              "Bug in object %d. Weight: %d v1: %d",
-                             DC::getInstance()->obj_index[tmp_object->item_number].virt,
+                             tmp_object->vnum,
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
                      }
@@ -2589,7 +2589,7 @@ int do_olocate(Character *ch, char *name, int cmd)
    if (isdigit(*name))
    {
       vnum = atoi(name);
-      searchnum = real_object(vnum);
+      searchnum = vnum;
    }
 
    ch->sendln("-#-- Short Description ------- Room Number\n");
@@ -2600,7 +2600,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       // allow search by vnum
       if (vnum)
       {
-         if (k->item_number != searchnum)
+         if (k->vnum != searchnum)
             continue;
       }
       else if (!(isexact(name, k->name)))
@@ -3372,13 +3372,13 @@ void check_champion_and_website_who_list()
          buf << GET_SHORT(ch) << std::endl;
       }
 
-      if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+      if ((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
       {
          obj_from_char(obj);
          obj_to_room(obj, CFLAG_HOME);
       }
 
-      if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+      if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
       {
          REMBIT(ch->affected_by, AFF_CHAMPION);
       }
@@ -3387,9 +3387,9 @@ void check_champion_and_website_who_list()
    buf << "endminutenobodywillhavethisnameever" << std::endl;
    addminute++;
 
-   if (!(obj = get_obj_num(real_object(CHAMPION_ITEM))))
+   if (!(obj = get_obj_num(CHAMPION_ITEM)))
    {
-      if ((obj = DC::getInstance()->clone_object(real_object(CHAMPION_ITEM))))
+      if ((obj = DC::getInstance()->clone_object(CHAMPION_ITEM)))
       {
          obj_to_room(obj, CFLAG_HOME);
       }
@@ -4378,16 +4378,10 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    }
    else
    {
-      for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].virt; ++vnum)
+      for (const auto &obj_index_entry : DC::getInstance()->obj_index)
       {
-         int rnum = 0;
-         // real_object returns -1 for missing VNUMs
-         if ((rnum = real_object(vnum)) < 0)
-         {
-            continue;
-         }
-         Object *obj = static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
-         if (obj == nullptr)
+         Object *obj = obj_index_entry.item;
+         if (!obj)
          {
             continue;
          }
@@ -4425,7 +4419,7 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
       }
       if (obj_results.empty())
       {
-         send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
+         send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(DC::getInstance()->obj_index.size()));
          return eFAILURE;
       }
 
@@ -4468,11 +4462,11 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
    {
       if (limit_output)
       {
-         send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+         send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(DC::getInstance()->obj_index.size()).arg(obj_results.size()).arg(limit_output));
       }
       else
       {
-         send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+         send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(DC::getInstance()->obj_index.size()).arg(obj_results.size()));
       }
    }
 
@@ -4582,12 +4576,12 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
 
       // Needed to show details or affects below
       const Object *vobj = nullptr;
-      if (obj->item_number >= 0)
+      if (obj->vnum >= 0)
       {
-         const int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+         const int vnum = obj->vnum;
          if (vnum >= 0)
          {
-            const int rn_of_vnum = real_object(vnum);
+            const rnum_t rn_of_vnum = vnum;
             if (rn_of_vnum >= 0)
             {
                vobj = DC::getInstance()->obj_index[rn_of_vnum].item;

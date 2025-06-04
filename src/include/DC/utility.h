@@ -215,7 +215,6 @@ bool IS_DARK(int room);
 #define GET_OBJ_SHORT(obj) ((obj)->short_description)
 #define GET_OBJ_NAME(obj) ((obj)->name)
 
-#define GET_OBJ_RNUM(obj) ((obj)->item_number)
 #define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_VROOM(obj) ((obj)->vroom)
 #define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
@@ -224,7 +223,7 @@ bool IS_DARK(int room);
 #define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
 #define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
 #define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
-#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? DC::getInstance()->obj_index[GET_OBJ_RNUM(obj)].virt : -1)
+#define GET_OBJ_VNUM(obj) ((obj)->vnum)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
 #define GET_ROOM_VNUM(rnum) \
    ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
@@ -579,7 +578,6 @@ void redo_hitpoints(Character *ch); /* Rua's put in  */
 void redo_mana(Character *ch);      /* Rua's put in  */
 void redo_ki(Character *ch);        /* And Urizen*/
 void assign_rooms(void);
-void assign_objects(void);
 void free_obj(class Object *obj);
 
 int char_from_room(Character *ch, bool stop_fighting);

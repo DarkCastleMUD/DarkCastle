@@ -699,11 +699,11 @@ int do_simple_move(Character *ch, int cmd, int following)
 
 	Object *tmp_obj;
 	for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (tmp_obj->vnum == SILENCE_OBJ_NUMBER)
 			ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
 
 	for (tmp_obj = DC::getInstance()->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-		if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+		if (tmp_obj->vnum == SILENCE_OBJ_NUMBER)
 			ch->sendln("The noise around you returns as you leave the silenced area!");
 
 	if (!isSet(retval, eSUCCESS))
@@ -1091,7 +1091,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
 	{
-		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
+		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->vnum);
 		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		ch->sendln("You can't enter that.");
 		return eFAILURE;
@@ -1174,7 +1174,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		ch->sendln("You cannot enter that.");
 		return eFAILURE;
 	default:
-		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
+		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->vnum);
 		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		return eFAILURE;
 	}
@@ -1279,7 +1279,7 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	if (real_room(dest) < 0)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", DC::getInstance()->obj_index[obj->item_number].virt);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj->vnum);
 		ch->sendln("You can't climb that.");
 		return eFAILURE | eINTERNAL_ERROR;
 	}

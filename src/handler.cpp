@@ -529,7 +529,7 @@ const struct set_data set_list[] = {
 void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 {
 	// obj has just been worn
-	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+	int obj_vnum = obj->vnum;
 	int i;
 	int z = 0, y;
 	// Quadruple nested for. Annoying, but it's gotta be done.
@@ -549,7 +549,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && ch->equipment[i]->vnum == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -800,7 +800,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
 void remove_set_stats(Character *ch, Object *obj, int flag)
 {
 	// obj has just been removed
-	int obj_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+	int obj_vnum = obj->vnum;
 	int i;
 	int z = 0, y;
 	// Quadruply nested for. Annoying, but it's gotta be done.
@@ -818,7 +818,7 @@ void remove_set_stats(Character *ch, Object *obj, int flag)
 					bool found = false, doublea = false;
 					for (i = 0; i < MAX_WEAR; i++)
 					{
-						if (ch->equipment[i] && DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+						if (ch->equipment[i] && ch->equipment[i]->vnum == set_list[z].vnum[y])
 						{
 							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
 							{
@@ -2520,24 +2520,24 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		}
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
 		act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
@@ -2600,17 +2600,17 @@ class Object *unequip_char(Character *ch, int pos, int flag)
 
 	obj = ch->equipment[pos];
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", ch, obj, 0, TO_CHAR, 0);
 		GET_MANA(ch) = GET_MANA(ch) / 2;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
 		ch->setHP(ch->getHP() / 2);
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (obj->vnum == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 		act("The spring in your step has subsided.", ch, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
@@ -2784,12 +2784,12 @@ class Object *get_obj_in_list(char *name, class Object *list)
 }
 
 /* Search a given list for an object number, and return a ptr to that obj */
-class Object *get_obj_in_list_num(int num, class Object *list)
+class Object *get_obj_in_list_num(vnum_t num, class Object *list)
 {
 	class Object *i;
 
 	for (i = list; i; i = i->next_content)
-		if (i->item_number == num)
+		if (i->vnum == num)
 			return (i);
 
 	return (0);
@@ -2819,20 +2819,19 @@ class Object *get_obj(char *name)
 	return (0);
 }
 
-class Object *get_obj(int vnum)
+class Object *get_obj(vnum_t vnum)
 {
-	int num = real_object(vnum);
 
-	return ((class Object *)DC::getInstance()->obj_index[num].item);
+	return DC::getInstance()->obj_index[vnum].item;
 }
 
 /*search the entire world for an object number, and return a pointer  */
-class Object *get_obj_num(int nr)
+class Object *get_obj_num(vnum_t nr)
 {
 	class Object *i;
 
 	for (i = DC::getInstance()->object_list; i; i = i->next)
-		if (i->item_number == nr)
+		if (i->vnum == nr)
 			return (i);
 
 	return (0);
@@ -3261,7 +3260,7 @@ int obj_to_char(class Object *object, Character *ch)
 	// class Object *obj;
 	/*
 	 if(!(obj = ch->carrying) ||
-	 (!obj->next_content && obj->item_number > object->item_number))
+	 (!obj->next_content && obj->vnum > object->vnum))
 	 {
 	 */
 	object->next_content = ch->carrying;
@@ -3287,7 +3286,7 @@ int obj_to_char(class Object *object, Character *ch)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->item_number < object->item_number)
+	 obj->next_content->vnum < object->vnum)
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3379,7 +3378,7 @@ int obj_to_room(class Object *object, int room)
 	// search through for the last object, or another object just like this one
 	for (obj = DC::getInstance()->world[room].contents; obj && obj->next_content; obj = obj->next_content)
 	{
-		if (obj->item_number == object->item_number)
+		if (obj->vnum == object->vnum)
 			break;
 	}
 
@@ -3401,7 +3400,7 @@ int obj_to_room(class Object *object, int room)
 
 	/*
 	 if(!(obj = DC::getInstance()->world[room].contents) ||
-	 (!obj->next_content && obj->item_number > object->item_number))
+	 (!obj->next_content && obj->vnum > object->vnum))
 	 {
 	 object->next_content = DC::getInstance()->world[room].contents;
 	 DC::getInstance()->world[room].contents = object;
@@ -3414,7 +3413,7 @@ int obj_to_room(class Object *object, int room)
 	 }
 
 	 while(obj->next_content &&
-	 obj->next_content->item_number < object->item_number)
+	 obj->next_content->vnum < object->vnum)
 	 obj = obj->next_content;
 
 	 object->next_content = obj->next_content;
@@ -3478,7 +3477,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 	// search through for the last object, or another object just like this one
 	for (tobj = obj_to->contains; tobj && tobj->next_content; tobj = tobj->next_content)
 	{
-		if (tobj->item_number == obj->item_number)
+		if (tobj->vnum == obj->vnum)
 			break;
 	}
 
@@ -3496,7 +3495,7 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 
 	// recursively upwards add the weight.  Since we only have 1 layer of containers,
 	// this loop only happens once, but it's good to leave later in case we change our mind
-	if (DC::getInstance()->obj_index[obj_to->item_number].virt != 536)
+	if (obj_to->vnum != 536)
 	{
 		for (tobj = obj->in_obj; tobj;
 			 GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3540,7 +3539,7 @@ int obj_from_obj(class Object *obj)
 
 	// Subtract weight from containers container
 
-	if (!obj_from || DC::getInstance()->obj_index[obj_from->item_number].virt != 536)
+	if (!obj_from || obj_from->vnum != 536)
 	{
 		for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
 			GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3637,9 +3636,9 @@ void extract_obj(class Object *obj)
 			temp1->next = obj->next;
 	}
 
-	if (obj->item_number >= 0)
+	if (obj->vnum >= 0)
 	{
-		(DC::getInstance()->obj_index[obj->item_number].number)--;
+		(DC::getInstance()->obj_index[obj->vnum].qty)--;
 	}
 
 	for (auto &r : reroll_sessions)
@@ -3663,7 +3662,7 @@ void extract_obj(class Object *obj)
 
 void update_object(class Object *obj, int use)
 {
-	if (obj->obj_flags.timer > 0 && (DC::getInstance()->obj_index[obj->item_number].virt != 30010 && DC::getInstance()->obj_index[obj->item_number].virt != 30036 && DC::getInstance()->obj_index[obj->item_number].virt != 30033 && DC::getInstance()->obj_index[obj->item_number].virt != 30097 && DC::getInstance()->obj_index[obj->item_number].virt != 30019))
+	if (obj->obj_flags.timer > 0 && (obj->vnum != 30010 && obj->vnum != 30036 && obj->vnum != 30033 && obj->vnum != 30097 && obj->vnum != 30019))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);
@@ -3693,7 +3692,7 @@ void update_char_objects(Character *ch)
 	{
 		if (ch->equipment[i])
 		{
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+			if (ch->equipment[i]->vnum == SPIRIT_SHIELD_OBJ_NUMBER)
 			{
 				update_object(ch->equipment[i], 1);
 
@@ -4222,9 +4221,9 @@ Character *get_mob_vis(Character *ch, char *name)
 Object *get_obj_vnum(int vnum)
 {
 	Object *i;
-	int num = real_object(vnum);
+	rnum_t num = vnum;
 	for (i = DC::getInstance()->object_list; i; i = i->next)
-		if (i->item_number == num)
+		if (i->vnum == num)
 			return i;
 	return nullptr;
 }
@@ -4562,14 +4561,14 @@ Character *Character::get_active_pc_vis(QString name)
 class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool blindfighting)
 {
 	class Object *i;
-	int number = real_object(item_num);
+	rnum_t number = item_num;
 
 	// never match invalid items
 	if (number == -1)
 		return nullptr;
 
 	for (i = list; i; i = i->next_content)
-		if (i->item_number == number && CAN_SEE_OBJ(ch, i, blindfighting))
+		if (i->vnum == number && CAN_SEE_OBJ(ch, i, blindfighting))
 			return i;
 
 	return nullptr;
@@ -4629,7 +4628,7 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 	{
 		// TODO
 		// For now they want me to remove this becuase portals and corpses are item_number -1
-		// if (i->item_number == -1) continue;
+		// if (i->vnum == -1) continue;
 		//
 		if (loc && isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 			ch->getLevel() < 101)
@@ -4687,7 +4686,7 @@ class Object *create_money(int amount)
 	obj->obj_flags.wear_flags = ITEM_TAKE;
 	obj->obj_flags.value[0] = amount;
 	obj->obj_flags.cost = amount;
-	obj->item_number = -1;
+	obj->vnum = -1;
 
 	obj->next = DC::getInstance()->object_list;
 	DC::getInstance()->object_list = obj;
@@ -4987,7 +4986,7 @@ void remove_memory(Character *ch, char type)
 	if (type == 't')
 		ch->hunting = 0;
 
-	if (!IS_NPC(ch))
+	if (!IS_NPC(ch) || !ch->mobdata)
 		return;
 
 	if (type == 'h' && !ch->mobdata->hated.isEmpty())
