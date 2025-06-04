@@ -599,11 +599,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   if (IS_NPC(ch))
   {
     ch->player = nullptr;
-#ifdef LEAK_CHECK
-    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+    ch->mobdata = mobdata_t::create();
     ch->mobdata->read(fpsave);
   }
   else

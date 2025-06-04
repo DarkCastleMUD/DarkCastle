@@ -471,7 +471,7 @@ private:
 
 typedef uint_fast8_t class_t;
 typedef int32_t move_t;
-
+typedef QSharedPointer<Mobile> mobdata_t;
 // Character, Character
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
@@ -507,7 +507,7 @@ public:
     static const QList<int> wear_to_item_wear;
     static bool validateName(QString name);
 
-    class Mobile *mobdata = nullptr;
+    mobdata_t mobdata = {};
     class Player *player = nullptr;
     class Object *objdata = nullptr;
 

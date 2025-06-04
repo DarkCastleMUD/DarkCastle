@@ -2586,7 +2586,7 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->description = fread_string(fl, 1);
 	mob->title = 0;
 
-	mob->mobdata = new Mobile;
+	mob->mobdata = mobdata_t::create();
 	mob->mobdata->reset = {};
 	/* *** Numeric data *** */
 	j = 0;
@@ -3249,7 +3249,7 @@ Character *clone_mobile(int nr)
 
 	*mob = *old;
 
-	mob->mobdata = new Mobile;
+	mob->mobdata = mobdata_t::create();
 
 	mob->mobdata = old->mobdata;
 
@@ -3398,11 +3398,7 @@ int create_blank_mobile(int nr)
 	GET_RAW_CON(mob) = 11;
 	mob->height = 198;
 	mob->weight = 200;
-#ifdef LEAK_CHECK
-	mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-	mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+	mob->mobdata = mobdata_t::create();
 	int i;
 	for (i = 0; i < ACT_MAX / ASIZE + 1; i++)
 		mob->mobdata->actflags[i] = 0;
@@ -5792,7 +5788,6 @@ void free_char(Character *ch, Trace trace)
 			dc_free(ch->mobdata->mpact);
 			ch->mobdata->mpact = currmprog;
 		}
-		delete ch->mobdata;
 		ch->mobdata = {};
 	}
 	else

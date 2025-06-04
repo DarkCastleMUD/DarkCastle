@@ -3150,7 +3150,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 			{
 
 #ifdef DEBUG_MPROG
-				if (mob && mob->mobdata != (Mobile *)0x95959595 && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
+				if (mob && mob->mobdata && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
 				{
 					qDebug("debug: ");
 					if (cmnd)
@@ -3172,7 +3172,7 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
 
 #ifdef DEBUG_MPROG
-				if (mob && mob->mobdata != (Mobile *)0x95959595 && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
+				if (mob && mob->mobdata && DC::getInstance()->mob_index[mob->mobdata->nr].virt == 4821)
 				{
 					if (isSet(mprog_cur_result, eFAILURE))
 						qDebug("eFAILURE ");
@@ -5166,7 +5166,7 @@ bool isPaused(Character *mob)
 		return false;
 	}
 
-	if (mob->mobdata == nullptr || mob->mobdata == (Mobile *)0x95959595)
+	if (!mob->mobdata)
 	{
 		return false;
 	}
