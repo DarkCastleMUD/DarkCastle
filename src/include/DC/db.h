@@ -137,12 +137,11 @@ public:
 bool can_modify_this_room(Character *ch, int32_t room);
 bool can_modify_room(Character *ch, int32_t room);
 bool can_modify_mobile(Character *ch, int32_t room);
-bool can_modify_object(Character *ch, int32_t room);
+bool can_modify_object(Character *ch, vnum_t vnum);
 
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, Character *mob);
 void write_object(LegacyFile &lf, Object *obj);
-void write_mprog_recur(FILE *fl, QSharedPointer<class MobProgram> mprg, bool mob);
 int load_new_help(FILE *fl, int reload = 0, Character *ch = nullptr);
 int count_hash_records(FILE *fl);
 void load_hints();
@@ -152,45 +151,10 @@ void write_wizlist(std::stringstream &filename);
 void write_wizlist(std::string filename);
 void write_wizlist(const char filename[]);
 void string_to_file(QTextStream &fl, QString str);
-
+void string_to_file(FILE *fl, QString str);
 void string_to_file(auto &fl, QString str)
 {
   fl << str.remove('\r').toStdString() << "~\n";
-}
-
-void write_mprog_recur(auto &fl, QSharedPointer<class MobProgram> mprg, bool mob)
-{
-  if (mprg->next)
-  {
-    write_mprog_recur(fl, mprg->next, mob);
-  }
-
-  if (mob)
-  {
-    fl << ">" << mprog_type_to_name(mprg->type) << " ";
-  }
-  else
-  {
-    fl << "\\" << mprog_type_to_name(mprg->type) << " ";
-  }
-
-  if (mprg->arglist)
-  {
-    string_to_file(fl, mprg->arglist);
-  }
-  else
-  {
-    string_to_file(fl, "Saved During Edit");
-  }
-
-  if (mprg->comlist)
-  {
-    string_to_file(fl, mprg->comlist);
-  }
-  else
-  {
-    string_to_file(fl, "Saved During Edit");
-  }
 }
 
 auto &operator<<(auto &out, const obj_flag_data &of)
@@ -232,91 +196,6 @@ auto &operator<<(auto &out, QSharedPointer<class MobProgram> mobprogs)
   return out;
 }
 
-void write_object(Object *obj, auto &out)
-{
-  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
-  string_to_file(out, obj->name);
-  string_to_file(out, obj->short_description);
-  string_to_file(out, obj->description);
-  string_to_file(out, obj->ActionDescription());
-  out << obj->obj_flags;
-  out << obj->ex_description;
-  affects_to_file(out, obj);
-  out << DC::getInstance()->obj_index[obj->item_number].mobprogs;
-  out << "S\n";
-}
-
-auto &operator<<(auto &out, const Room &room)
-{
-  auto temp_room_flags = room.room_flags;
-  if (room.iFlags)
-  {
-    REMOVE_BIT(temp_room_flags, room.iFlags);
-  }
-
-  struct extra_descr_data *extra;
-  if (!DC::getInstance()->rooms.contains(room.number))
-    return out;
-
-  out << "#" << room.number << "\n";
-  string_to_file(out, room.name);
-  string_to_file(out, room.description);
-
-  out << room.zone << " " << room.room_flags << " " << room.sector_type << "\n";
-
-  /* exits */
-  for (int b = 0; b <= 5; b++)
-  {
-    if (!(room.dir_option[b]))
-      continue;
-    out << "D" << b << "\n";
-    if (room.dir_option[b]->general_description)
-      string_to_file(out, room.dir_option[b]->general_description);
-    else
-      out << "~\n"; // print blank
-    if (room.dir_option[b]->keyword)
-      string_to_file(out, room.dir_option[b]->keyword);
-    else
-      out << "~\n"; // print blank
-    out << room.dir_option[b]->exit_info << " " << room.dir_option[b]->key << " " << room.dir_option[b]->to_room << "\n";
-  } /* exits */
-
-  /* extra descriptions */
-  for (extra = room.ex_description; extra; extra = extra->next)
-  {
-    if (!extra)
-      break;
-    out << "E\n";
-    if (extra->keyword)
-      string_to_file(out, extra->keyword);
-    else
-      out << "~\n"; // print blank
-    if (extra->description)
-      string_to_file(out, extra->description);
-    else
-      out << "~\n"; // print blank
-  } /* extra descriptions */
-
-  struct deny_data *deni;
-  for (deni = room.denied; deni; deni = deni->next)
-  {
-    out << "B\n"
-        << deni->vnum << "\n";
-  }
-
-  // Write out allowed classes if any
-  for (int i = 0; i < CLASS_MAX; i++)
-  {
-    if (room.allow_class[i] == true)
-    {
-      out << "C" << i << "\n";
-    }
-  }
-
-  out << "S\n";
-  return out;
-}
-
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
@@ -333,16 +212,10 @@ char *fread_string(FILE *fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
 char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
-enum class create_error
-{
-  index_full,
-  entry_exists
-};
-auto create_blank_item(int nr) -> std::expected<int, create_error>;
+auto create_blank_item(vnum_t nr) -> std::expected<vnum_t, create_error>;
 int create_blank_mobile(int nr);
-void delete_item_from_index(int nr);
+void delete_item_from_index(vnum_t vnum);
 void delete_mob_from_index(int nr);
-int real_object(int virt);
 int real_mobile(int virt);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
@@ -358,27 +231,21 @@ int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
-obj_index_data *generate_obj_indices(int *top, obj_index_data *index);
-index_data *generate_mob_indices(int *top, index_data *index);
 
 extern struct skill_quest *skill_list;
-extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
 
-class Object *read_object(int nr, FILE *fl, bool zz);
-class Object *read_object(int nr, QTextStream &fl, bool zz);
+class Object *read_object(vnum_t vnum, FILE *fl, bool zz);
+class Object *read_object(vnum_t vnum, QTextStream &fl, bool zz);
 Character *read_mobile(int nr, FILE *fl);
 Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
-void string_to_file(FILE *fl, QString str);
-void string_to_file(QTextStream &fl, QString str);
 std::ofstream &operator<<(std::ofstream &out, Object *obj);
 std::ifstream &operator>>(std::ifstream &in, Object *obj);
 std::string lf_to_crlf(std::string &s1);
 QString lf_to_crlf(QString s1);
 void copySaveData(Object *new_obj, Object *obj);
-bool verify_item(class Object **obj);
 bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
@@ -386,9 +253,7 @@ void load_messages(char *file, int base = 0);
 void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
-void find_unordered_objects(void);
 
-extern int top_of_objt;
 extern time_t start_time; /* mud start time */
 
 struct pulse_data
@@ -405,9 +270,10 @@ struct help_index_element
 
 extern int exp_table[61 + 1];
 
-#define WORLD_FILE_MODIFIED 1
-#define WORLD_FILE_IN_PROGRESS 1 << 1
-#define WORLD_FILE_READY 1 << 2
-#define WORLD_FILE_APPROVED 1 << 3
+#define WORLD_FILE_MODIFIED 1U
+#define WORLD_FILE_IN_PROGRESS 1U << 1U
+#define WORLD_FILE_READY 1U << 2U
+#define WORLD_FILE_APPROVED 1U << 3U
+#define WORLD_FILE_REMOVED 1U << 4U
 
 #endif
