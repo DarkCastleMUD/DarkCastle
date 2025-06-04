@@ -1415,9 +1415,6 @@ private slots:
         DC dc(cf);
         dc.boot_db();
         QVERIFY(QFile(QStringLiteral("objects/00000-96.obj")).exists());
-        QFile(QStringLiteral("objects/00000-96.obj.testDCbackup")).remove();
-        QVERIFY(QFile(QStringLiteral("objects/00000-96.obj")).copy("objects/00000-96.obj.testDCbackup"));
-
         Character ch, ch2, ch3;
         ch.setName(QStringLiteral("TestImmortal1"));
         ch2.setName(QStringLiteral("Testplayer1"));
@@ -1524,13 +1521,14 @@ private slots:
         rc = ch.command_interpreter("oedit new 100");
         QCOMPARE(rc, eSUCCESS);
         QCOMPARE(conn.output, "Item '100' created successfully.\r\n"
+                              "Range [100-100.obj] [100] [100] created.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
         QCOMPARE(ch.player->last_obj_vnum, 100);
 
         // osave
-        QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
-        QCOMPARE(conn.output, "Saved.\r\n"
+        QCOMPARE(ch.command_interpreter("osave"), eSUCCESS);
+        QCOMPARE(conn.output, "Saved object range ['100-100.obj' 100-100] for vnum 100.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
         QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
@@ -1715,7 +1713,7 @@ private slots:
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
         QCOMPARE(ch.command_interpreter("osave"), eFAILURE);
-        QCOMPARE(conn.output, "That range doesn't seem to exist...tell an imp.\r\n"
+        QCOMPARE(conn.output, "This range has not been modified.\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
     }
@@ -2009,28 +2007,55 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%~"), "%~ ");                                // %~
     }
 
-    void init()
+    void initTestCase()
     {
-        QString original_filename{QStringLiteral("objects/00000-96.obj")};
-        QString original2_filename{QStringLiteral("objects/00101-0199.obj")};
-        QString backup_filename{QStringLiteral("objects/00000-96.obj.testDCbackup")};
-        QString backup2_filename{QStringLiteral("objects/00101-0199.obj.testDCbackup")};
-        QFile backup_file{QFile(backup_filename)};
-        QFile backup2_file{QFile(backup2_filename)};
-
-        if (backup_file.exists())
+        for (QString file : {"lib/objectindex", "lib/objects/00000-96.obj", "lib/objects/00101-0199.obj"})
         {
-            if (std::rename(qUtf8Printable(backup_filename), qUtf8Printable(original_filename)))
+            QFile backup{file + ".testDCbackup"};
+            if (backup.exists())
+                if (!backup.remove())
+                    qDebug("Failed to remove %s", qUtf8Printable(file + ".testDCbackup"));
+
+            QFile original{file};
+            if (original.exists())
+                if (!backup.exists())
+                {
+                    if (!original.copy(backup.fileName()))
+                        qDebug("Failed to copy %s to %s", qUtf8Printable(original.fileName()), qUtf8Printable(backup.fileName()));
+                }
+                else
+                {
+                    qFatal("%s exists but should have been removed earlier", qUtf8Printable(backup.fileName()));
+                }
+            else
+                qDebug("%s does not exist surprisingly.", qUtf8Printable(original.fileName()));
+        }
+    }
+
+    void cleanup()
+    {
+        for (QString file : {"objectindex", "objects/00000-96.obj", "objects/00101-0199.obj"})
+        {
+            QFile backup{file + ".testDCbackup"};
+            if (backup.exists())
             {
-                qWarning("Unable to rename '%s' to '%s' using std::rename.", qUtf8Printable(backup_filename), qUtf8Printable(original_filename));
+                if (!QFile(file).remove())
+                    qDebug("Failed to remove %s", qUtf8Printable(file));
+                if (!backup.copy(file))
+                    qDebug("Failed to copy %s to %s", qUtf8Printable(backup.fileName()), qUtf8Printable(file));
             }
         }
-        if (backup2_file.exists())
+    }
+
+    void cleanupTestCase()
+    {
+        for (QString file : {"objectindex", "objects/00000-96.obj", "objects/00101-0199.obj"})
         {
-            if (std::rename(qUtf8Printable(backup2_filename), qUtf8Printable(original2_filename)))
-            {
-                qWarning("Unable to rename '%s' to '%s' using std::rename.", qUtf8Printable(backup2_filename), qUtf8Printable(original2_filename));
-            }
+            QFile(file + ".testDCbackup").remove();
+        }
+        for (QString file : {"objects/100-100.obj"})
+        {
+            QFile(file).remove();
         }
     }
 };
