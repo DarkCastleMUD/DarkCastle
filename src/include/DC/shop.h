@@ -29,8 +29,6 @@ struct player_shop
   player_shop *next;
 };
 
-void redo_shop_profit(void);
-
 struct reroll_t
 {
   class Object *choice1_obj = nullptr;
