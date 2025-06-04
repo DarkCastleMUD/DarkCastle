@@ -62,7 +62,8 @@
         "cwchar": "cpp",
         "queue": "cpp",
         "system_error": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "ratio": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
