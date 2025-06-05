@@ -1042,7 +1042,7 @@ QString Character::generate_prompt(void)
     }
     else
     {
-        source = GET_PROMPT(this);
+        source = getPrompt();
     }
 
     // Searching for %{variable} like %{hp}
@@ -1108,4 +1108,44 @@ QString Character::calc_name(bool use_color)
         name += NTEXT;
 
     return name;
+}
+
+QString Player::getPrompt(void)
+{
+    return prompt_;
+}
+void Player::setPrompt(QString prompt)
+{
+    prompt_ = prompt;
+}
+QString Player::getLastPrompt(void)
+{
+    return last_prompt_;
+}
+void Player::setLastPrompt(QString prompt)
+{
+    last_prompt_ = prompt;
+}
+
+QString Character::getPrompt(void)
+{
+    if (player)
+        return player->getPrompt();
+    return {};
+}
+void Character::setPrompt(QString prompt)
+{
+    if (player)
+        player->setPrompt(prompt);
+}
+QString Character::getLastPrompt(void)
+{
+    if (player)
+        return player->getLastPrompt();
+    return {};
+}
+void Character::setLastPrompt(QString prompt)
+{
+    if (player)
+        player->setLastPrompt(prompt);
 }

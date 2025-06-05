@@ -228,8 +228,6 @@ bool IS_DARK(int room);
 #define GET_ROOM_VNUM(rnum) \
    ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
 
-#define GET_PROMPT(ch) ((ch)->player->prompt)
-#define GET_LAST_PROMPT(ch) ((ch)->player->last_prompt)
 #define GET_TOGGLES(ch) ((ch)->player->toggles)
 
 #define GET_CLASS(ch) ((ch)->c_class)

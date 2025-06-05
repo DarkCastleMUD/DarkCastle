@@ -32,12 +32,11 @@ using namespace std::literals;
 
 QString Character::get_parsed_legacy_prompt_variable(QString var)
 {
-    char *saved_prompt = GET_PROMPT(this);
+    auto saved_prompt = getPrompt();
 
-    GET_PROMPT(this) = strdup(qPrintable(var));
+    setPrompt(var);
     QString str = generate_prompt();
-    free(GET_PROMPT(this));
-    GET_PROMPT(this) = saved_prompt;
+    setPrompt(saved_prompt);
     return str;
 }
 
@@ -1821,8 +1820,6 @@ private slots:
             prompt_variables.append(c);
 
         QMap<QString, QString> parsed_prompt_variables;
-        if (GET_PROMPT(&p1))
-            dc_free(GET_PROMPT(&p1));
         weather_info.sky = SKY_CLOUDLESS;
         weather_info.sunlight = 0;
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");

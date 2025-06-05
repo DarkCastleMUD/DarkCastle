@@ -5753,10 +5753,6 @@ void free_char(Character *ch, Trace trace)
 			ch->player->skillchange = 0;
 			if (!ch->player->ignoring.empty())
 				ch->player->ignoring.clear();
-			if (ch->player->prompt)
-				dc_free(ch->player->prompt);
-			if (ch->player->last_prompt)
-				dc_free(ch->player->last_prompt);
 			if (ch->player->golem)
 				logentry(QStringLiteral("Error, golem not released properly"), ANGEL, DC::LogChannel::LOG_BUG);
 			/* Free aliases... (I was to lazy to do before. ;) */
@@ -6093,8 +6089,8 @@ void init_char(Character *ch)
 
 	ch->altar = nullptr;
 	ch->spec = 0;
-	GET_PROMPT(ch) = 0;
-	GET_LAST_PROMPT(ch) = 0;
+	ch->setPrompt({});
+	ch->setLastPrompt({});
 	ch->player->skillchange = 0;
 	ch->player->joining = {};
 	ch->player->practices = 0;

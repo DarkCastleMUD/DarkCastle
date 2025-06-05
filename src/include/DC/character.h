@@ -267,7 +267,6 @@ public:
     QString last_site;        /* Last login from.. */
     QString poofin;           /* poofin message */
     QString poofout;          /* poofout message */
-    char *prompt = {};        /* Sadus' disguise.. unused */
     Object *skillchange = {}; /* Skill changing equipment. */
     Character *golem = {};    // CURRENT golem.
 
@@ -402,7 +401,6 @@ public:
     uint32_t quest_current_ticksleft[QUEST_MAX] = {};
     int16_t quest_cancel[QUEST_CANCEL] = {};
     uint32_t quest_complete[QUEST_TOTAL / ASIZE + 1] = {};
-    char *last_prompt = {};
     std::multimap<int, std::pair<timeval, timeval>> *lastseen = {};
     uint8_t profession = {};
     bool multi = {};
@@ -415,8 +413,15 @@ public:
     QString perform_alias(QString orig);
     void save(FILE *fpsave, time_data tmpage);
     bool read(FILE *fpsave, Character *ch, QString filename);
-
     aliases_t aliases_; /* Aliases */
+    QString getPrompt(void);
+    QString getLastPrompt(void);
+    void setPrompt(QString prompt);
+    void setLastPrompt(QString prompt);
+
+private:
+    QString prompt_;
+    QString last_prompt_;
 };
 
 enum mob_type_t
@@ -1095,6 +1100,11 @@ public:
     QString parse_prompt_variable(QString variable, PromptVariableType type = PromptVariableType::Advanced);
     QString get_parsed_legacy_prompt_variable(QString var);
     QString calc_name(bool use_color = false);
+
+    QString getPrompt(void);
+    void setPrompt(QString prompt);
+    QString getLastPrompt(void);
+    void setLastPrompt(QString prompt);
 
 private:
     Type type_ = Type::Undefined;

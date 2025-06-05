@@ -1236,10 +1236,10 @@ void telnet_ga(Connection *d)
 
 int do_lastprompt(Character *ch, char *arg, int cmd)
 {
-  if (GET_LAST_PROMPT(ch))
-    csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
-  else
+  if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
+  else
+    ch->sendln(QStringLiteral("Last prompt: %1").arg(ch->getLastPrompt()));
 
   return eSUCCESS;
 }
@@ -1258,15 +1258,15 @@ int do_prompt(Character *ch, char *arg, int cmd)
   if (!*arg)
   {
     ch->sendln("Set your prompt to what? Try 'help prompt'.");
-    if (GET_PROMPT(ch))
+    if (!ch->getPrompt().isEmpty())
     {
       ch->send("Current prompt:  ");
-      send_to_char(GET_PROMPT(ch), ch);
+      send_to_char(ch->getPrompt(), ch);
       ch->sendln("");
       ch->send("Last prompt: ");
-      if (GET_LAST_PROMPT(ch))
+      if (!ch->getLastPrompt().isEmpty())
       {
-        send_to_char(GET_LAST_PROMPT(ch), ch);
+        send_to_char(ch->getLastPrompt(), ch);
       }
       else
       {
@@ -1277,16 +1277,8 @@ int do_prompt(Character *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_LAST_PROMPT(ch))
-    dc_free(GET_LAST_PROMPT(ch));
-
-  if (GET_PROMPT(ch))
-  {
-    GET_LAST_PROMPT(ch) = str_dup(GET_PROMPT(ch));
-    dc_free(GET_PROMPT(ch));
-  }
-
-  GET_PROMPT(ch) = str_dup(arg);
+  ch->setLastPrompt(ch->getPrompt());
+  ch->setPrompt(arg);
   ch->sendln("Ok.");
   return eSUCCESS;
 }
@@ -1426,7 +1418,7 @@ void make_prompt(class Connection *d, std::string &prompt)
   {
     if (!isSet(GET_TOGGLES(d->character), Player::PLR_COMPACT))
       prompt += "\n\r";
-    if (!GET_PROMPT(d->character))
+    if (d->character->getPrompt().isEmpty())
       prompt += "type 'help prompt'> ";
     else
       prompt += d->character->generate_prompt().toStdString();
