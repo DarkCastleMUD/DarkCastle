@@ -626,7 +626,7 @@ void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, int room, bool awakeonly = false, Character *nta = nullptr);
 void record_track_data(Character *ch, int cmd);
-int write_to_descriptor(int desc, std::string txt);
+int write_to_descriptor(int desc, QByteArray txt);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const std::string txt, std::queue<std::string> &queue);
 int use_mana(Character *ch, int sn);

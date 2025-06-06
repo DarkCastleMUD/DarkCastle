@@ -1477,7 +1477,7 @@ void flush_queues(class Connection *d)
     ;
   if (!d->output.empty())
   {
-    write_to_descriptor(d->descriptor, d->output);
+    write_to_descriptor(d->descriptor, d->output.c_str());
   }
 }
 
@@ -1654,12 +1654,12 @@ int process_output(class Connection *t)
    */
   if (!t->prompt_mode)
   { /* && !t->connected) */
-    result = write_to_descriptor(t->descriptor, i);
+    result = write_to_descriptor(t->descriptor, i.c_str());
     t->prompt_mode = 0;
   }
   else
   {
-    result = write_to_descriptor(t->descriptor, i.substr(2));
+    result = write_to_descriptor(t->descriptor, i.substr(2).c_str());
     t->prompt_mode = 0;
   }
   /* handle snooping: prepend "% " and send to snooper */
@@ -1675,29 +1675,25 @@ int process_output(class Connection *t)
   return result;
 }
 
-int write_to_descriptor(int desc, std::string txt)
+int write_to_descriptor(int desc, QByteArray txt)
 {
-  int total, bytes_written;
+  if (txt.isEmpty())
+    return 0;
 
-  total = txt.size();
-
+  auto txtPtr = txt.constData();
+  auto total = txt.size();
   do
   {
-#ifndef WIN32
-    if ((bytes_written = write(desc, txt.c_str(), total)) < 0)
+    auto bytes_written = write(desc, txtPtr, total);
+    if (bytes_written < 0)
     {
-#else
-    if ((bytes_written = send(desc, txt, total, 0)) < 0)
-    {
-#endif
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
         errno = EAGAIN;
 #endif /* EWOULDBLOCK */
       if (errno == EAGAIN)
       {
-        // logentry(QStringLiteral("process_output: socket write would block"),
-        //     0, DC::LogChannel::LOG_MISC);
+        logmisc(QStringLiteral("process_output: socket write would block"));
       }
       else
       {
@@ -1708,7 +1704,7 @@ int write_to_descriptor(int desc, std::string txt)
     }
     else
     {
-      txt += bytes_written;
+      txtPtr += bytes_written;
       total -= bytes_written;
     }
   } while (total > 0);
@@ -1940,7 +1936,7 @@ int process_input(class Connection *t)
         {
           new_buffer += "\r\n";
         }
-        write_to_descriptor(t->descriptor, new_buffer);
+        write_to_descriptor(t->descriptor, new_buffer.c_str());
       }
     }
     // Keep looping until client sends us a \n or \r
