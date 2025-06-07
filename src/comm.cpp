@@ -1645,7 +1645,7 @@ int Connection::process_output(void)
   }
   else
   {
-    result = write_to_descriptor(descriptor, i.mid(2));
+    result = write_to_descriptor(descriptor, i);
     prompt_mode = 0;
   }
   /* handle snooping: prepend "% " and send to snooper */
