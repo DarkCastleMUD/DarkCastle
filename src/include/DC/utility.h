@@ -593,7 +593,6 @@ void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
-int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
 load_status_t load_char_obj(class Connection *d, QString name);
 void save_char_obj(Character *ch);
@@ -737,7 +736,6 @@ int get_stat(Character *ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(const QStringView str);
-void make_prompt(class Connection *d, std::string &prompt);
 
 qsizetype find(QString haystack, auto needle, qsizetype pos)
 {
@@ -914,7 +912,6 @@ QByteArray handle_ansi(QByteArray, Character *ch);
 QString handle_ansi(QString, Character *ch);
 std::string handle_ansi(std::string s, Character *ch);
 char *handle_ansi_(char *s, Character *ch);
-void blackjack_prompt(Character *ch, std::string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
 void special_log(QString message);
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);

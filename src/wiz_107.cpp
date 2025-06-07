@@ -63,7 +63,7 @@ int do_pview(Character *ch, char *argument, int cmd)
 {
   char name[200];
   Character *victim;
-  std::string tprompt;
+  QString tprompt;
 
   argument = one_argument(argument, name);
 
@@ -79,7 +79,7 @@ int do_pview(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  make_prompt(victim->desc, tprompt);
+  tprompt = victim->desc->createPrompt();
   ch->sendln("Target's prompt is:");
   ch->send(tprompt);
   ch->sendln("\r\n");

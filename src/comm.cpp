@@ -141,7 +141,6 @@ char *calc_color(int hit, int max_hit);
 std::string get_from_q(std::queue<std::string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
-int process_output(class Connection *t);
 int process_input(class Connection *t);
 void flush_queues(class Connection *d);
 int perform_subst(class Connection *t, char *orig, char *subst);
@@ -269,91 +268,66 @@ int DC::write_hotboot_file(void)
 // links to the mud.
 int DC::load_hotboot_descs(void)
 {
-  if (!QFile("hotboot").exists())
+  QFile hotboot_file{QStringLiteral("hotboot")};
+  if (!hotboot_file.exists())
   {
-    return 0;
+    return {};
   }
 
-  std::string chr = {};
-  char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
-  int desc = {};
-  class Connection *d = nullptr;
-  std::ifstream ifs;
-
-  ifs.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
-
-  try
+  if (hotboot_file.open(QFile::ReadOnly))
   {
-    ifs.open("hotboot");
     unlink("hotboot");
     logverbose(QStringLiteral("Hotboot, reloading characters."), 0, DC::LogChannel::LOG_MISC);
 
-    for_each(cf.ports.begin(), cf.ports.end(), [this, &ifs](in_port_t &port)
+    QTextStream out(&hotboot_file);
+    for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
              {
              int fd;
-            ifs >> fd;
+            out >> fd;
             qDebug("Read %d for port %d", fd, port);
-            this->server_descriptor_list.insert(fd); });
+            server_descriptor_list.insert(fd); });
 
-    while (ifs.good())
+    while (!out.atEnd())
     {
-      desc = 0;
-      chr.clear();
-      *host = '\0';
-      try
-      {
-        ifs >> desc;
-        ifs >> chr;
-        ifs >> host;
-      }
-      catch (std::ifstream::failure::runtime_error)
-      {
-        break;
-      }
+      int descriptor;
+      out >> descriptor;
 
-      // fscanf(fp, "%d\n%s\n%s\n", &desc, chr.data(), host);
-      d = new Connection;
+      QString character_name;
+      out >> character_name;
 
+      QString address;
+      out >> address;
+
+      auto d = new Connection;
       d->idle_time = 0;
       d->idle_tics = 0;
       d->wait = 1;
       d->prompt_mode = 1;
       d->output = {};
       d->input = std::queue<std::string>();
-      d->output = chr; // store it for later
+      d->output = qPrintable(character_name); // store it for later
       d->login_time = time(0);
+      d->setPeerAddress(QHostAddress(address));
+      d->descriptor = descriptor;
 
-      if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
+      for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"})
       {
-        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
-        CLOSE_SOCKET(desc);
-        delete d;
-        d = nullptr;
-        continue;
+        if (write_to_descriptor(descriptor, str) == -1)
+        {
+          logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
+          CLOSE_SOCKET(descriptor);
+          delete d;
+          d = {};
+          break;
+        }
       }
-
-      d->setPeerAddress(QHostAddress(host));
-      d->descriptor = desc;
-
-      // we need a second to be sure
-      if (write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n") == -1)
-      {
-        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
-        CLOSE_SOCKET(desc);
-        delete d;
-        d = nullptr;
+      if (!d)
         continue;
-      }
 
       d->next = DC::getInstance()->descriptor_list;
       DC::getInstance()->descriptor_list = d;
     }
-    ifs.close();
-  }
-  catch (...)
-  {
-    logverbose(QStringLiteral("Hotboot file missing/unopenable."));
-    return false;
+    hotboot_file.close();
   }
 
   unlink("hotboot"); // if the above unlink failed somehow(?),
@@ -390,10 +364,9 @@ void finish_hotboot()
   {
     write_to_descriptor(d->descriptor, "Reconnecting your link to your character...\r\n");
 
-    if (!load_char_obj(d, d->output.c_str()))
+    if (!load_char_obj(d, d->output))
     {
-      sprintf(buf, "Could not load char '%s' in hotboot.", d->output.c_str());
-      logentry(buf, 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -800,8 +773,8 @@ void DC::game_loop(void)
   for (d = DC::getInstance()->descriptor_list; d; d = next_d)
   {
     next_d = d->next;
-    if ((FD_ISSET(d->descriptor, &output_set) && !d->output.empty()) || d->prompt_mode)
-      if (process_output(d) < 0)
+    if ((FD_ISSET(d->descriptor, &output_set) && !d->output.isEmpty()) || d->prompt_mode)
+      if (d->process_output() < 0)
         close_socket(d);
     // else
     // d->prompt_mode = 1;
@@ -979,31 +952,31 @@ void game_test_init(void)
   do_restore(ch, "debugimp", CMD_DEFAULT);
 
   do_stand(ch, "", CMD_DEFAULT);
-  process_output(d);
+  d->process_output();
 
   char_to_room(ch, 3001);
-  process_output(d);
+  d->process_output();
   ch->do_toggle({"pager"}, CMD_DEFAULT);
   ch->do_toggle({"ansi"}, CMD_DEFAULT);
   ch->do_toggle({}, CMD_DEFAULT);
   ch->do_goto({"23"});
   do_score(ch, "", CMD_DEFAULT);
-  process_output(d);
+  d->process_output();
 
   do_load(ch, "m 23", CMD_DEFAULT);
-  process_output(d);
+  d->process_output();
 
   do_look(ch, "debugimp", CMD_LOOK);
-  process_output(d);
+  d->process_output();
 
   ch->do_bestow({"debugimp", "load"});
-  process_output(d);
+  d->process_output();
 
   do_load(ch, "m 23", CMD_DEFAULT);
-  process_output(d);
+  d->process_output();
 
   ch->do_test({"all"});
-  process_output(d);
+  d->process_output();
 
   std::cout << std::endl;
   std::cerr << std::endl;
@@ -1378,58 +1351,50 @@ char *calc_condition(Character *ch, bool colour)
     return cond_txt[7];
 }
 
-void make_prompt(class Connection *d, std::string &prompt)
+QString Connection::createPrompt(void)
 {
-  std::string buf = {};
-  if (!d->character || !d->character->player)
+  QString prompt, buf;
+  if (!character || !character->player)
   {
-    return;
+    return {};
   }
-  if (d->showstr_count)
+  if (showstr_count)
   {
-    buf = fmt::format("\r\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number ({} {}) ]",
-                      d->showstr_page, d->showstr_count);
-    prompt += buf;
+    return QStringLiteral("\r\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%1 %2) ]").arg(showstr_page).arg(showstr_count);
   }
-  else if (d->strnew)
+  else if (strnew)
   {
-    if (IS_PC(d->character) && isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB))
+    if (IS_PC(character) && isSet(character->player->toggles, Player::PLR_EDITOR_WEB))
     {
-      prompt += "Web Editor] ";
+      return "Web Editor] ";
     }
     else
     {
-      prompt += "*] ";
+      return "*] ";
     }
   }
-  else if (d->hashstr)
+  else if (hashstr)
   {
-    prompt += "] ";
+    return "] ";
   }
-  else if (STATE(d) != Connection::states::PLAYING)
+  else if (STATE(this) != Connection::states::PLAYING)
   {
-    return;
+    return {};
   }
-  else if (IS_NPC(d->character))
+  else if (IS_NPC(character))
   {
-    prompt += d->character->generate_prompt().toStdString();
+    return character->createPrompt();
   }
   else
   {
-    if (!isSet(GET_TOGGLES(d->character), Player::PLR_COMPACT))
+    if (!isSet(GET_TOGGLES(character), Player::PLR_COMPACT))
       prompt += "\n\r";
-    if (d->character->getPrompt().isEmpty())
+    if (character->getPrompt().isEmpty())
       prompt += "type 'help prompt'> ";
     else
-      prompt += d->character->generate_prompt().toStdString();
+      prompt += character->createPrompt();
   }
-
-  // As long as we're not in telnet character mode then send IAC GA
-  if (d->character->getSetting("mode").startsWith("char") == false)
-  {
-    char go_ahead[] = {(char)IAC, (char)GA, (char)0};
-    prompt += go_ahead;
-  }
+  return prompt;
 }
 
 Character *get_charmie(Character *ch)
@@ -1470,14 +1435,11 @@ std::string get_from_q(std::queue<std::string> &input_queue)
 /* Empty the queues before closing connection */
 void flush_queues(class Connection *d)
 {
-  int dummy;
-  std::string buf2 = {};
-
   while (!get_from_q(d->input).empty())
     ;
-  if (!d->output.empty())
+  if (!d->output.isEmpty())
   {
-    write_to_descriptor(d->descriptor, d->output.c_str());
+    write_to_descriptor(d->descriptor, qPrintable(d->output));
   }
 }
 
@@ -1633,44 +1595,68 @@ int new_descriptor(int s)
   return 0;
 }
 
-int process_output(class Connection *t)
+QString Connection::createBlackjackPrompt(void)
 {
-  std::string i = {};
-  static int result;
+  if (character)
+    return character->createBlackjackPrompt();
+  return {};
+}
 
-  /* we may need this \r\n for later -- see below */
-  i = "\r\n";
+void Connection::setOutput(QString output_buffer)
+{
+  output = qUtf8Printable(output_buffer);
+}
+
+void Connection::appendOutput(QString output_buffer)
+{
+  output += qUtf8Printable(output_buffer);
+}
+
+QByteArray Connection::getOutput(void) const
+{
+  return output;
+}
+
+int Connection::process_output(void)
+{
+  QByteArray i;
 
   /* now, append the 'real' output */
-  i += t->output;
+  i += qUtf8Printable(output);
+  i += qUtf8Printable(createBlackjackPrompt());
+  i += qUtf8Printable(createPrompt());
 
-  if (t && t->character && t->character->player && t->connected == Connection::states::PLAYING)
-    blackjack_prompt(t->character, i, t->character->player && !isSet(t->character->player->toggles, Player::PLR_ASCII));
-  make_prompt(t, i);
+  // As long as we're not in telnet character mode then send IAC GA
+  if (character && character->getSetting("mode").startsWith("char") == false)
+  {
+    char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+    i += go_ahead;
+  }
 
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
    */
-  if (!t->prompt_mode)
+  int result{};
+  if (!prompt_mode)
   { /* && !t->connected) */
-    result = write_to_descriptor(t->descriptor, i.c_str());
-    t->prompt_mode = 0;
+    result = write_to_descriptor(descriptor, "\r\n" + i);
+    prompt_mode = 0;
   }
   else
   {
-    result = write_to_descriptor(t->descriptor, i.substr(2).c_str());
-    t->prompt_mode = 0;
+    result = write_to_descriptor(descriptor, i.mid(2));
+    prompt_mode = 0;
   }
   /* handle snooping: prepend "% " and send to snooper */
-  if (t->snoop_by)
+  if (snoop_by)
   {
-    SEND_TO_Q("% ", t->snoop_by);
-    SEND_TO_Q(t->output, t->snoop_by);
-    SEND_TO_Q("%%", t->snoop_by);
+    SEND_TO_Q("% ", snoop_by);
+    SEND_TO_Q(output, snoop_by);
+    SEND_TO_Q("%%", snoop_by);
   }
 
-  t->output = {};
+  output = {};
 
   return result;
 }

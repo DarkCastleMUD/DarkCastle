@@ -692,7 +692,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
 
 void check_blackjacks(table_data *tbl)
 {
-   std::string buf;
+   QString buf;
    player_data *plr, *next;
    if (hand_strength(tbl) == 21)
    {
@@ -702,9 +702,8 @@ void check_blackjacks(table_data *tbl)
          next = plr->next;
          if (!verify(plr))
             continue;
-         buf[0] = '\0';
-         blackjack_prompt(plr->ch, buf, !isSet(plr->ch->player->toggles, Player::PLR_ASCII));
-         plr->ch->send(buf);
+
+         plr->ch->sendBlackjackPrompt();
       }
       check_winner(tbl);
       return;
@@ -717,15 +716,12 @@ void check_blackjacks(table_data *tbl)
       if (hand_strength(plr) == 21 &&
           hand_strength(tbl) != 21)
       {
-         buf = fmt::format("{} blackjacks!\r\n", GET_NAME(plr->ch));
-         send_to_table(buf.c_str(), tbl, plr);
+         buf = QStringLiteral("%1 blackjacks!\r\n").arg(GET_NAME(plr->ch));
+         send_to_table(buf, tbl, plr);
          plr->ch->sendln("$BYou BLACKJACK!$R");
-         buf = fmt::format("The dealer gives you {} {} coins.\r\n", (int)(plr->bet * 2.5), plr->table->gold ? "gold" : "platinum");
-
+         buf = QStringLiteral("The dealer gives you %1 %2 coins.\r\n").arg((int)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
          plr->ch->send(buf);
-         buf[0] = '\0';
-         blackjack_prompt(plr->ch, buf, !isSet(plr->ch->player->toggles, Player::PLR_ASCII));
-         plr->ch->send(buf);
+         plr->ch->sendBlackjackPrompt();
 
          if (plr->table->gold)
             plr->ch->addGold((uint32_t)(plr->bet * 2.5));
@@ -971,18 +967,23 @@ int hand_number(player_data *plr)
    return i;
 }
 
-void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
+QString Character::createBlackjackPrompt(void)
 {
+   if (!isPlayer())
+      return {};
+
+   bool ascii = isSet(player->toggles, Player::PLR_ASCII);
+   QString prompt;
    bool showColor = false;
-   if (ch && ch->isPlayer() && (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100)))
+   if (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100))
    {
       showColor = true;
    }
 
-   if (ch->in_room < 21902 || ch->in_room > 21905)
-      if (ch->in_room != 44)
-         return;
-   auto obj = DC::getInstance()->world[ch->in_room].contents;
+   if (in_room < 21902 || in_room > 21905)
+      if (in_room != 44)
+         return {};
+   auto obj = DC::getInstance()->world[in_room].contents;
    for (; obj; obj = obj->next_content)
    {
       if (obj->table)
@@ -990,7 +991,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    }
 
    if (!obj || !obj->table->plr)
-      return;
+      return {};
    // Prompt-time
    int plrsdone = 0;
    char buf[MAX_STRING_LENGTH];
@@ -1005,7 +1006,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
          continue;
       if (!plr->hand_data[0])
          continue;
-      if (plr->ch == ch)
+      if (plr->ch == this)
       {
          char buf2[MAX_STRING_LENGTH];
          buf2[0] = '\0';
@@ -1122,6 +1123,12 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
          prompt += "\r\n";
       }
    }
+   return prompt;
+}
+
+void Character::sendBlackjackPrompt(void)
+{
+   send(createBlackjackPrompt());
 }
 
 int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,

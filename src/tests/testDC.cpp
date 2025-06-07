@@ -35,7 +35,7 @@ QString Character::get_parsed_legacy_prompt_variable(QString var)
     auto saved_prompt = getPrompt();
 
     setPrompt(var);
-    QString str = generate_prompt();
+    QString str = createPrompt();
     setPrompt(saved_prompt);
     return str;
 }
@@ -1213,13 +1213,15 @@ private slots:
         QCOMPARE(conn.output, "ANSI COLOR on.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
                               "\r\n"
                               "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m5h\x1B[0m\x1B[37m \x1B[1m\x1B[30m3s\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m6h\x1B[0m\x1B[37m \x1B[1mDC\x1B[0m\x1B[37m\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, true);
+        SET_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
                               "\r\n"
                               "      \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m               \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m\r\n"
@@ -1233,13 +1235,15 @@ private slots:
         QCOMPARE(conn.output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "Test:  5h 3s = 8   Dealer:  6h DC\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, true);
+        SET_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "      ,---,,---,               ,---,,---,\r\n"
@@ -1252,8 +1256,8 @@ private slots:
         QCOMPARE(conn.output, "You hit and receive a Qc.\r\n"
                               "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
         conn.output = {};
-
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY \r\n"
                               "\r\n"
                               "Test:  5h 3s Qc = 18   Dealer:  6h DC\r\n");
@@ -1294,7 +1298,8 @@ private slots:
                               "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "Test:  7d Jh = 17   Dealer:  Qs DC\r\n");
@@ -1336,7 +1341,8 @@ private slots:
                               "The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: INSURANCE \r\n"
                               "\r\n"
                               "Test:  Qd 4s = 14   Dealer:  As DC\r\n");
@@ -1351,7 +1357,8 @@ private slots:
         QCOMPARE(conn.output, "You make an insurance bet.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "\r\nTest:  Qd 4s = 14   Dealer:  As DC\r\n");
         conn.output = {};
 

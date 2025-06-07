@@ -131,7 +131,7 @@ public:
   int max_str = {};
   std::string buf = {};        /* buffer for raw input	*/
   std::string last_input = {}; /* the last input	*/
-  std::string output = {};     /* queue of strings to send	*/
+  QByteArray output = {};      /* output buffer for writing to connection	*/
   std::string inbuf = {};
   std::queue<std::string> input = {}; /* queue of unprocessed input	*/
   Character *character = {};          /* linked to char		*/
@@ -207,6 +207,12 @@ public:
   {
     return connected == Connection::states::PLAYING;
   }
+  int process_output(void);
+  QString createBlackjackPrompt(void);
+  QString createPrompt(void);
+  void setOutput(QString output_buffer);
+  void appendOutput(QString output_buffer);
+  QByteArray getOutput(void) const;
 
 private:
   QHostAddress peer_address_ = {};
