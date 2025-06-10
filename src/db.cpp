@@ -25,8 +25,8 @@ int load_debug = 0;
 #include "DC/game_portal.h" // load_game_portals()
 #include "DC/spells.h"		// command_range
 #include "DC/help.h"
-#include "DC/const.h"
-#include "DC/connect.h"
+#include "DC/const.h" // mob_race_mod, races, item_types, apply_types
+#include "DC/connect.h" // Connection
 
 Room &World::operator[](room_t room_key)
 {
