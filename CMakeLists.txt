@@ -129,6 +129,7 @@ add_library(DC SHARED
     src/CommandStack.cpp
     src/Command.cpp
     src/comm.cpp
+    src/Connection.cpp
     src/const.cpp
     src/corpse.cpp
     src/Database.cpp
