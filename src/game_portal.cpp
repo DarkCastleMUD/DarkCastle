@@ -18,8 +18,23 @@
 #include "DC/handler.h"
 
 #include <cstring>
+#include <cstdint>
+
+#define MAX_GAME_PORTALS 9
+#define FOREVER -5
+
+typedef uint64_t room_t;
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
+struct game_portal
+{
+  room_t to_room;  /* Room to make the portal to */
+  int *from_rooms; /* Rooms to make the portal from */
+  int num_rooms;   /* Number of rooms in from_rooms */
+  int obj_num;     /* Object to duplicate for portal */
+  int max_timer;   /* What does the timer reset to? -- game days */
+  int cur_timer;   /* What is the timer at now? -- game days */
+};
 
 struct game_portal game_portals[MAX_GAME_PORTALS];
 
