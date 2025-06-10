@@ -59,11 +59,9 @@ public:
       sender = name;
     }
 
-    switch (type_)
+    if (type_ == DC::LogChannel::CHANNEL_GOSSIP)
     {
-    case DC::LogChannel::CHANNEL_GOSSIP:
       output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
-      break;
     }
 
     return output.str();
