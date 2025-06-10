@@ -1272,7 +1272,7 @@ int do_show(Character *ch, char *argument, int cmd)
 					SETBIT(affect, i);
 					goto thisLoop;
 				}
-			for (i = 0; i <= MAX_RACE; i++)
+			for (i = 0; i <= DC::MAX_RACE; i++)
 				if (!str_nosp_cmp(races[i].singular_name, arg1))
 				{
 					race = i;
@@ -1340,7 +1340,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				else
 					ch->send(" ");
 			}
-			for (i = 0; i <= MAX_RACE; i++)
+			for (i = 0; i <= DC::MAX_RACE; i++)
 			{
 				o++;
 				send_to_char_nosp(races[i].singular_name, ch);

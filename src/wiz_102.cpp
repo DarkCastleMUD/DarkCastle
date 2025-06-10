@@ -3295,13 +3295,13 @@ int do_medit(Character *ch, char *argument, int cmd)
                    "Available types:\r\n",
               races[((Character *)DC::getInstance()->mob_index[mob_num].item)->race].singular_name);
       ch->send(buf);
-      for (i = 0; i <= MAX_RACE; i++)
+      for (i = 0; i <= DC::MAX_RACE; i++)
         csendf(ch, "  %s\r\n", races[i].singular_name);
       ch->sendln("");
       return eFAILURE;
     }
     int race_set = 0;
-    for (i = 0; i <= MAX_RACE; i++)
+    for (i = 0; i <= DC::MAX_RACE; i++)
     {
       if (is_abbrev(buf4, races[i].singular_name))
       {

@@ -316,7 +316,7 @@ int do_matrixinfo(Character *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int i = 0;
   buf[0] = '\0';
-  for (; i < MAX_RACE; i++)
+  for (; i < DC::MAX_RACE; i++)
   {
     char immbuf[MAX_STRING_LENGTH], resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
     immbuf[0] = resbuf[0] = susbuf[0] = '\0';
