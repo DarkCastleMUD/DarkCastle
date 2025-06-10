@@ -5,10 +5,14 @@
 | connect.h
 | Description: State of connectedness information.
 */
-#include "DC/character.h"
-#include "DC/structs.h" // MAX_INPUT_LENGTH
-#include "DC/comm.h"
+// #include "DC/character.h"
+// #include "DC/structs.h" // MAX_INPUT_LENGTH
+// #include "DC/comm.h"
+
 #include "DC/common.h"
+#include <QHostAddress>
+#include <queue>
+#include <QMap>
 
 int isbanned(QHostAddress address);
 
