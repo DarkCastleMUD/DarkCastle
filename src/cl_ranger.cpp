@@ -406,7 +406,7 @@ command_return_t Character::do_track(QStringList arguments, int cmd)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (this && this->fighting) || !!hunting.isEmpty())
+            if (SOMEONE_DIED(retval) || (this->fighting) || !!hunting.isEmpty())
               return retval;
             else
               return do_hit(hunting.split(' '));
