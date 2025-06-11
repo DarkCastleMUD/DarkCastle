@@ -25,7 +25,7 @@ jobs:
       - name: make
         run: |
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
-          cmake -S src -B build -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo  -DCMAKE_CXX_COMPILER="/usr/bin/g++-15" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
+          cmake -B build -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo  -DCMAKE_CXX_COMPILER="/usr/bin/g++-15" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold"
           ninja -C build package
           zypper -n in --allow-unsigned-rpm build/dc*rpm
 
