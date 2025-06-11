@@ -659,9 +659,7 @@ void DC::game_loop(void)
       {
         if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
         {
-          sprintf(buf, "Connection attempt bailed from %s", d->getPeerOriginalAddress().toString().toStdString().c_str());
-          printf(buf);
-          logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
+          logsocket(QStringLiteral("Connection attempt bailed from %1").arg(d->getPeerOriginalAddress().toString()));
         }
         close_socket(d);
       }
@@ -2066,26 +2064,25 @@ int process_input(class Connection *t)
       if (!failed_subst)
         write_to_q(tmp, t->input, 0);
 
-      /* find the end of this line */
-  /*
-    while (ISNEWL(*nl_pos) || (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG && *nl_pos == '|'))
-      nl_pos++;
-*/
-  /* see if there's another newline in the input buffer */
-  /*
+
+  //  while (ISNEWL(*nl_pos) || (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG && *nl_pos == '|'))
+  //    nl_pos++;
+
+  // see if there's another newline in the input buffer
+
     read_point = ptr = nl_pos;
     for (nl_pos = nullptr; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr) || (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
 
   }
-*/
-  /* now move the rest of the buffer up to the beginning for the next pass */
-  /*
-      write_point = t->inbuf.data();
-    while (*read_point)
-      *(write_point++) = *(read_point++);
-    *write_point = '\0';
+  //
+  // now move the rest of the buffer up to the beginning for the next pass
+  //
+  write_point = t->inbuf.data();
+  while (*read_point)
+    *(write_point++) = *(read_point++);
+  *write_point = '\0';
   */
 
   return 1;
@@ -2931,9 +2928,4 @@ Proxy::Proxy(QString h)
 
     active = true;
   }
-}
-
-const char *Connection::getPeerOriginalAddressC(void)
-{
-  return getPeerOriginalAddress().toString().toStdString().c_str();
 }
