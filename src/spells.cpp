@@ -1762,14 +1762,14 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 
   if (i > number(1, 100) || getLevel() >= IMMORTAL)
   {
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (this->getPosition() == position_t::RESTING || this->getPosition() == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a + 500);
     return true; // Success
   }
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (this->getPosition() == position_t::RESTING || this->getPosition() == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
@@ -1932,9 +1932,9 @@ int do_cast(Character *ch, char *argument, int cmd)
 
   if (spell_info[spl].spell_pointer)
   {
-    if (GET_POS(ch) < spell_info[spl].minimum_position)
+    if (ch->getPosition() < spell_info[spl].minimum_position)
     {
-      switch (GET_POS(ch))
+      switch (ch->getPosition())
       {
       case position_t::SLEEPING:
         ch->sendln("You dream about great magical powers.");

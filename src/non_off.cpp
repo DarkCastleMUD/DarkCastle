@@ -953,7 +953,7 @@ command_return_t Character::do_beep_set(QStringList arguments, int cmd)
 
 int do_stand(Character *ch, char *argument, int cmd)
 {
-  switch (GET_POS(ch))
+  switch (ch->getPosition())
   {
   case position_t::STANDING:
   {
@@ -1012,7 +1012,7 @@ int do_sit(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  switch (GET_POS(ch))
+  switch (ch->getPosition())
   {
   case position_t::STANDING:
   {
@@ -1066,7 +1066,7 @@ int do_rest(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  switch (GET_POS(ch))
+  switch (ch->getPosition())
   {
   case position_t::STANDING:
   {
@@ -1129,10 +1129,10 @@ int do_sleep(Character *ch, char *argument, int cmd)
     }
 
   if ((paf = ch->affected_by_spell(SPELL_SLEEP)) &&
-      paf->modifier == 1 && GET_POS(ch) != position_t::SLEEPING)
+      paf->modifier == 1 && ch->getPosition() != position_t::SLEEPING)
     paf->modifier = 0;
 
-  switch (GET_POS(ch))
+  switch (ch->getPosition())
   {
   case position_t::STANDING:
     ch->sendln("You lie down and go to sleep.");
@@ -1226,7 +1226,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     }
   }
 
-  if (GET_POS(tmp_char) != position_t::SLEEPING)
+  if (tmp_char->getPosition() != position_t::SLEEPING)
   {
     if (tmp_char == this)
     {
@@ -1253,7 +1253,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(this) == position_t::FIGHTING)
+  if (this->getPosition() == position_t::FIGHTING)
   {
     if (number(1, 100) > GET_DEX(this) && tmp_char != this)
     {

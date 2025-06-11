@@ -958,7 +958,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 		for (k = ch->followers; k; k = next_dude)
 		{ // no following a fleer
 			next_dude = k->next;
-			if ((was_in == k->follower->in_room) && ((is_retreat && GET_POS(k->follower) > position_t::RESTING) || (GET_POS(k->follower) >= position_t::STANDING)))
+			if ((was_in == k->follower->in_room) && ((is_retreat && k->follower->getPosition() > position_t::RESTING) || (k->follower->getPosition() >= position_t::STANDING)))
 			{
 				if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
 				{
@@ -993,7 +993,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 				/*
 				 sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
 				 GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room,
-				 GET_POS(k->follower), is_retreat);
+				 k->follower->getPosition(), is_retreat);
 				 logentry(tmp, OVERSEER, DC::LogChannel::LOG_BUG);
 				 */
 			}
@@ -1312,8 +1312,8 @@ int ambush(Character *ch)
 		if (i == ch || i->ambush.isEmpty() || !CAN_SEE(i, ch) || i->fighting)
 			continue;
 
-		if (GET_POS(i) <= position_t::RESTING ||
-			GET_POS(i) == position_t::FIGHTING ||
+		if (i->getPosition() <= position_t::RESTING ||
+			i->getPosition() == position_t::FIGHTING ||
 			IS_AFFECTED(i, AFF_PARALYSIS) ||
 			(isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) &&
 			 !IS_AFFECTED(ch, AFF_CANTQUIT)))

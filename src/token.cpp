@@ -168,7 +168,7 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
     return "";
   if ((send_to->getLevel() < MIN_GOD) && (flags & GODS))
     return "";
-  if ((GET_POS(send_to) <= position_t::SLEEPING) && !(flags & ASLEEP))
+  if ((send_to->getPosition() <= position_t::SLEEPING) && !(flags & ASLEEP))
     return "";
 
   // Ok, now bother

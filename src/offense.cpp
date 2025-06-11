@@ -53,7 +53,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
     ch->sendln("Something blocks your attempted suicide, be happy!  You have a new lease on life!");
     return eFAILURE;
   }
-  if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
+  if (ch->getPosition() == position_t::FIGHTING || ch->fighting)
   {
     ch->sendln("You are too busy trying to kill somebody else!");
     return eFAILURE;
@@ -107,7 +107,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
           return eFAILURE;
         }
 
-        if ((GET_POS(this) == position_t::STANDING) &&
+        if ((this->getPosition() == position_t::STANDING) &&
             (victim != this->fighting))
         {
 
@@ -170,7 +170,7 @@ int do_murder(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if ((GET_POS(ch) == position_t::STANDING) &&
+        if ((ch->getPosition() == position_t::STANDING) &&
             (victim != ch->fighting))
         {
           WAIT_STATE(ch, DC::PULSE_VIOLENCE + 2); /* HVORFOR DET?? */

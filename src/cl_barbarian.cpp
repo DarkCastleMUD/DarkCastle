@@ -1319,7 +1319,7 @@ int do_primalfury(Character *ch, char *argument, int cmd)
     ch->sendln("You must wait before using this ability again.");
     return eSUCCESS;
   }
-  if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
+  if (!ch->fighting || ch->getPosition() != position_t::FIGHTING)
   {
     ch->sendln("You must be in combat in order to use this ability.");
     return eSUCCESS;

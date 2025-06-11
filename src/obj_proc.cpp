@@ -1543,7 +1543,7 @@ int dancevest(Character *ch, class Object *obj, int cmd, const char *arg,
   ch->sendln("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!");
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
   {
-    if (GET_POS(v) != position_t::STANDING)
+    if (v->getPosition() != position_t::STANDING)
     {
       continue;
     }
@@ -1657,13 +1657,13 @@ int eliara_non_combat(Character *ch, class Object *obj, int cmd, const char *arg
   if (!ch)
     return eFAILURE;
 
-  if (cmd == CMD_REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->vnum == 30627)
+  if (cmd == CMD_REMOVE && ch->getPosition() == position_t::FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->vnum == 30627)
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
 
   remove_eliara(ch);
@@ -2471,7 +2471,7 @@ int szrildor_pass(Character *ch, class Object *obj, int cmd, const char *arg, Ch
           produce_coredump(tmp_victim);
           continue;
         }
-        if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+        if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
         {
           continue;
         }
@@ -3619,7 +3619,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     std::vector<std::string> tmp;
     std::string buf;
 
-    if (GET_POS(vict) == position_t::FIGHTING)
+    if (vict->getPosition() == position_t::FIGHTING)
     {
       tmp = sword_combat;
       if (IS_NPC(vict->fighting) && vict->fighting->getLevel() > 99)
@@ -3684,7 +3684,7 @@ int talkingsword(Character *ch, class Object *obj, int cmd, const char *arg,
     else
     {
       tmp = sword_non_combat;
-      if (GET_POS(vict) == position_t::SLEEPING)
+      if (vict->getPosition() == position_t::SLEEPING)
       {
         buf = "Hey... someone steal me already... this guy sucks...";
         tmp.push_back(buf);
@@ -4683,7 +4683,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, int cmd, const char *arg
 
   update_pos(victim);
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
@@ -4736,7 +4736,7 @@ int godload_foecrusher(Character *ch, class Object *obj, int cmd, const char *ar
 
   update_pos(victim);
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);

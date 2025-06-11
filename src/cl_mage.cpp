@@ -326,8 +326,8 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       break;
 
     // If for some reason the caster is busy, the spell fails.
-    if (GET_POS(i) <= position_t::RESTING ||
-        GET_POS(i) == position_t::FIGHTING || i->fighting ||
+    if (i->getPosition() <= position_t::RESTING ||
+        i->getPosition() == position_t::FIGHTING || i->fighting ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
@@ -363,7 +363,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
 
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
-      if (ally == ch || ally == i || ally->fighting || GET_POS(ally) != position_t::STANDING ||
+      if (ally == ch || ally == i || ally->fighting || ally->getPosition() != position_t::STANDING ||
           (IS_PC(ally) && !ally->desc) // linkdead groupies won't help
       )
         continue;

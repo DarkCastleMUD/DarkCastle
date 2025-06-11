@@ -1140,7 +1140,7 @@ int do_fire(Character *ch, char *arg, int cmd)
     return eFAILURE;
   }
   /*
-   if(GET_POS(ch) == position_t::FIGHTING)
+   if(ch->getPosition() == position_t::FIGHTING)
    {
    ch->sendln("Aren't you a bit busy with hand to hand combat?");
    return eFAILURE;

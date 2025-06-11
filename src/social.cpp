@@ -45,7 +45,7 @@ command_return_t Character::check_social(QString pcomm)
     return SOCIAL_true;
   }
 
-  switch (GET_POS(this))
+  switch (this->getPosition())
   {
   case position_t::DEAD:
     this->sendln("Lie still; you are DEAD.");
@@ -104,7 +104,7 @@ command_return_t Character::check_social(QString pcomm)
       act(action->others_auto, this, 0, 0, TO_ROOM,
           (action->hide) ? INVIS_NULL : 0);
   }
-  else if (GET_POS(vict) < action->min_victim_position)
+  else if (vict->getPosition() < action->min_victim_position)
   {
     act("$N is not in a proper position for that.",
         this, 0, vict, TO_CHAR, 0);

@@ -302,7 +302,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
 
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) < position_t::FIGHTING)
+  if (ch->getPosition() < position_t::FIGHTING)
     return eFAILURE;
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return eFAILURE;
@@ -317,7 +317,7 @@ int fighter(Character *ch, class Object *obj, int cmd, const char *arg,
     return eFAILURE;
 
   // Deathstroke my opponent whenever possible
-  if (ch->getLevel() > 39 && GET_POS(vict) < position_t::FIGHTING)
+  if (ch->getLevel() > 39 && vict->getPosition() < position_t::FIGHTING)
   {
     MOB_WAIT_STATE(ch) = 2;
     return do_deathstroke(ch, "", CMD_DEFAULT);
@@ -356,7 +356,7 @@ int active_tarrasque(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   Character *vict;
 
-  if ((GET_POS(ch) != position_t::FIGHTING) || (!ch->fighting))
+  if ((ch->getPosition() != position_t::FIGHTING) || (!ch->fighting))
   {
     return eFAILURE;
   }
@@ -404,7 +404,7 @@ int active_grandmaster(Character *ch, class Object *obj, int command, const char
 {
   Character *vict;
   /* Find a dude to do evil things upon ! */
-  if ((GET_POS(ch) != position_t::FIGHTING))
+  if ((ch->getPosition() != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -701,7 +701,7 @@ int white_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -724,7 +724,7 @@ int black_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -746,7 +746,7 @@ int red_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -766,7 +766,7 @@ int green_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -795,7 +795,7 @@ int brass_dragon(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -1981,7 +1981,7 @@ int mother_moat_and_moad(Character *ch, class Object *obj, int cmd, const char *
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) == position_t::FIGHTING)
+  if (ch->getPosition() == position_t::FIGHTING)
     return eFAILURE;
 
   if (ch->mobdata->hated.isEmpty())
@@ -2135,7 +2135,7 @@ int bee(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (ch->fighting &&
@@ -2328,7 +2328,7 @@ int hellstreamer(Character *ch, class Object *obj, int cmd, const char *arg,
   // int percent;
   /* Find a dude to do evil things upon ! */
 
-  if ((GET_POS(ch) != position_t::FIGHTING))
+  if ((ch->getPosition() != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2491,9 +2491,9 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
 
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) < position_t::FIGHTING)
+  if (ch->getPosition() < position_t::FIGHTING)
     return eFAILURE;
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
   if (!ch->fighting)
     return eFAILURE;
@@ -2505,7 +2505,7 @@ int clutchdrone_combat(Character *ch, class Object *obj, int cmd, const char *ar
   if (!vict)
     return eFAILURE;
 
-  if (ch->getLevel() > 3 && number(0, 3) == 0 && GET_POS(vict) > position_t::SITTING)
+  if (ch->getLevel() > 3 && number(0, 3) == 0 && vict->getPosition() > position_t::SITTING)
   {
     retval = damage(ch, vict, 1, TYPE_HIT, SKILL_BASH, 0);
     if (isSet(retval, eCH_DIED))
@@ -2574,7 +2574,7 @@ int blindingparrot(Character *ch, class Object *obj, int cmd, const char *arg,
 {
   if (cmd)
     return eFAILURE;
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (ch->fighting &&
@@ -2675,7 +2675,7 @@ int bounder(Character *ch, class Object *obj, int cmd, const char *arg,
 
   /* Find a dude to do evil things upon ! */
 
-  if ((GET_POS(ch) != position_t::FIGHTING))
+  if ((ch->getPosition() != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2705,7 +2705,7 @@ int dispelguy(Character *ch, class Object *obj, int cmd, const char *arg,
   Character *vict;
   // int percent;
 
-  if ((GET_POS(ch) != position_t::FIGHTING))
+  if ((ch->getPosition() != position_t::FIGHTING))
   {
     return eFAILURE;
   }
@@ -2749,9 +2749,9 @@ int marauder(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) < position_t::FIGHTING)
+  if (ch->getPosition() < position_t::FIGHTING)
     return eFAILURE;
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
   if (!ch->fighting)
     return eFAILURE;
@@ -2797,7 +2797,7 @@ int foggy_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (GET_POS(ch) != position_t::FIGHTING)
+  if (ch->getPosition() != position_t::FIGHTING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -3281,7 +3281,7 @@ int druid_elemental(Character *ch, class Object *obj,
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
   if (!ch->fighting)
   {
@@ -3311,7 +3311,7 @@ int mage_golem(Character *ch, class Object *obj, int cmd,
 
 int gremlinthing(Character *ch)
 {
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
 
   if (ch->master && IS_PC(ch->master) && ch->master->player->golem &&
@@ -3347,7 +3347,7 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
     extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
   if (!ch->fighting)
   {
@@ -3404,7 +3404,7 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, int cmd, const char 
   }
 
   // do nothing unless doing nothing :)
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
 
   if (!ch->fighting)
@@ -3492,7 +3492,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, int cmd, const char
     }
 
     // do nothing unless doing nothing :)
-    if (GET_POS(ch) < position_t::STANDING)
+    if (ch->getPosition() < position_t::STANDING)
       return eFAILURE;
 
     if (!ch->fighting)
@@ -3538,7 +3538,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, int cmd, const
   }
 
   // do nothing unless doing nothing :)
-  if (GET_POS(ch) < position_t::STANDING)
+  if (ch->getPosition() < position_t::STANDING)
     return eFAILURE;
 
   if (!ch->fighting)

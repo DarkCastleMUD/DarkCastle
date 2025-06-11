@@ -1673,13 +1673,13 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_POS(ch) == position_t::FIGHTING && cmd != 666)
+    if (ch->getPosition() == position_t::FIGHTING && cmd != 666)
     {
       ch->sendln("No way! You are fighting.");
       return eFAILURE;
     }
 
-    if (GET_POS(ch) < position_t::STUNNED)
+    if (ch->getPosition() < position_t::STUNNED)
     {
       ch->sendln("You're not DEAD yet.");
       return eFAILURE;

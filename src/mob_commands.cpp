@@ -277,7 +277,7 @@ int do_mphit(Character *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     prog_error(ch, "MpHit - Victim already dead.");
     return eFAILURE | eINTERNAL_ERROR;

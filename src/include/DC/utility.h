@@ -202,8 +202,6 @@ bool IS_DARK(int room);
 #define GET_AC_METAS(ch) ((ch)->acmetas)
 #define GET_AGE_METAS(ch) ((ch)->agemetas)
 #define GET_KI_METAS(ch) ((ch)->player->kimetas)
-
-#define GET_POS(ch) ((ch)->getPosition())
 #define GET_COND(ch, i) ((ch)->conditions[(i)])
 #define GET_NAME(ch) ((ch)->getNameC())
 #define GET_SHORT(ch) ((ch)->short_desc ? (ch)->short_desc : (ch)->getNameC())
@@ -305,7 +303,7 @@ auto getBitvector(auto value)
 }
 #define IS_UNDEAD(ch) ((GET_RACE(ch) == RACE_UNDEAD) || (GET_RACE(ch) == RACE_GHOST))
 
-#define AWAKE(ch) (GET_POS(ch) != position_t::SLEEPING)
+#define AWAKE(ch) (ch->getPosition() != position_t::SLEEPING)
 
 #define IS_ANONYMOUS(ch) (IS_NPC(ch) ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*

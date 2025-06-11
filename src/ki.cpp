@@ -159,9 +159,9 @@ int do_ki(Character *ch, char *argument, int cmd)
 
   if (ki_info[spl].ki_pointer)
   {
-    if (GET_POS(ch) < ki_info[spl].minimum_position || (spl == KI_MEDITATION && (GET_POS(ch) == position_t::FIGHTING || GET_POS(ch) <= position_t::SLEEPING)))
+    if (ch->getPosition() < ki_info[spl].minimum_position || (spl == KI_MEDITATION && (ch->getPosition() == position_t::FIGHTING || ch->getPosition() <= position_t::SLEEPING)))
     {
-      switch (GET_POS(ch))
+      switch (ch->getPosition())
       {
       case position_t::SLEEPING:
         ch->sendln("You dream of wonderful ki powers.");
@@ -383,7 +383,7 @@ int Character::ki_gain_lookup(void)
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
-  switch (GET_POS(this))
+  switch (this->getPosition())
   {
   case position_t::SLEEPING:
     multiplyer = 3;
@@ -839,7 +839,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
         0);
 
     if (IS_NPC(victim) && (!victim->fighting) &&
-        GET_POS(ch) > position_t::SLEEPING)
+        ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);

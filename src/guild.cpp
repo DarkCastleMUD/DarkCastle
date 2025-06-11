@@ -668,7 +668,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     return eSUCCESS;
   }
 
-  if (GET_POS(this) == position_t::SLEEPING)
+  if (this->getPosition() == position_t::SLEEPING)
   {
     sendln("You cannot practice in your sleep.");
     return eSUCCESS;

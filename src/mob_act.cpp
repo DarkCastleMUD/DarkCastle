@@ -234,7 +234,7 @@ void mobile_activity(void)
     PerfTimers["scavenge"].stop();
 
     /* Wander */
-    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && GET_POS(ch) == position_t::STANDING)
+    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && ch->getPosition() == position_t::STANDING)
     {
       door = number(0, 30);
       if (door <= 5 && CAN_GO(ch, door))
@@ -309,7 +309,7 @@ void mobile_activity(void)
 
       if (!ISSET(ch->mobdata->actflags, ACT_STUPID))
       {
-        if (GET_POS(ch) > position_t::SITTING)
+        if (ch->getPosition() > position_t::SITTING)
         {
           if (!IS_AFFECTED(ch, AFF_BLIND) && !ch->hunting.isEmpty())
           {
@@ -318,7 +318,7 @@ void mobile_activity(void)
               continue;
           }
         }
-        else if (GET_POS(ch) < position_t::FIGHTING)
+        else if (ch->getPosition() < position_t::FIGHTING)
         {
           do_stand(ch, "", CMD_DEFAULT);
           continue;

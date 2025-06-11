@@ -2177,7 +2177,7 @@ bool is_bracing(Character *bracee, struct room_direction_data *exit)
     return false;
 
   // has to be standing
-  if (GET_POS(bracee) < position_t::STANDING)
+  if (bracee->getPosition() < position_t::STANDING)
     return false;
 
   // if neither the spot bracee is at, nor remote spot, is equal to teh exit

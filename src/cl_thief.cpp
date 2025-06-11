@@ -299,7 +299,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   }
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != DC::NOWHERE)
+  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && victim->getPosition() != position_t::DEAD && victim->in_room != DC::NOWHERE)
   {
     if (was_in == this->in_room)
     {
@@ -599,7 +599,7 @@ int do_trip(Character *ch, char *argument, int cmd)
       act("$n trips you and you go down!", ch, nullptr, victim, TO_VICT, 0);
       act("You trip $N and $N goes down!", ch, nullptr, victim, TO_CHAR, 0);
       act("$n trips $N and $N goes down!", ch, nullptr, victim, TO_ROOM, NOTVICT);
-      if (GET_POS(victim) > position_t::SITTING)
+      if (victim->getPosition() > position_t::SITTING)
         victim->setSitting();
       SET_BIT(victim->combat, COMBAT_BASH2);
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 1);
@@ -838,7 +838,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people!");
     return eFAILURE;
@@ -893,8 +893,8 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
-  //  if(GET_POS(victim) <= position_t::SLEEPING &&
-  //   GET_POS(victim) != position_t::STUNNED)
+  //  if(victim->getPosition() <= position_t::SLEEPING &&
+  //   victim->getPosition() != position_t::STUNNED)
   // percent = -1; /* ALWAYS SUCCESS */
 
   if ((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying)))
@@ -957,7 +957,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           else
             _exp = (GET_OBJ_WEIGHT(obj) * 1000);
 
-          if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
+          if (victim->getPosition() <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
             _exp = 0;
 
           ch->sendln("Got it!");
@@ -1128,8 +1128,8 @@ int do_steal(Character *ch, char *argument, int cmd)
       }
       int mod = ch->has_skill(SKILL_STEAL) - chance;
 
-      if (GET_POS(victim) > position_t::SLEEPING ||
-          GET_POS(victim) == position_t::STUNNED)
+      if (victim->getPosition() > position_t::SLEEPING ||
+          victim->getPosition() == position_t::STUNNED)
       {
         ch->sendln("Steal the equipment now? Impossible!");
         return eFAILURE;
@@ -1172,7 +1172,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * victim->getLevel());
-        if (GET_POS(victim) <= position_t::SLEEPING)
+        if (victim->getPosition() <= position_t::SLEEPING)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
         sprintf(buf, "You receive %d exps.\r\n", _exp);
@@ -1294,7 +1294,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     ch->sendln("Don't steal from dead people.");
     return eFAILURE;
@@ -1394,7 +1394,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
         _exp = 0;
       if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
         _exp = 1;
-      if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
+      if (victim->getPosition() <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);

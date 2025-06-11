@@ -108,7 +108,7 @@ int do_innate(Character *ch, char *arg, int cmd)
           ch->sendln("You cannot use that yet.");
           return eFAILURE;
         }
-        if (GET_POS(ch) == position_t::SLEEPING &&
+        if (ch->getPosition() == position_t::SLEEPING &&
             i != 1)
         {
           ch->sendln("In your dreams, or what?");

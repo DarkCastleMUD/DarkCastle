@@ -138,7 +138,7 @@ int check_autojoiners(Character *ch, int skill = 0)
       continue;
     if (!tmp->desc)
       continue;
-    if (GET_POS(tmp) != position_t::STANDING)
+    if (tmp->getPosition() != position_t::STANDING)
       continue;
     if (tmp->player == nullptr || tmp->player->joining.empty())
       continue;
@@ -173,7 +173,7 @@ int check_joincharmie(Character *ch, int skill = 0)
     return eFAILURE;
   if (tmp->fighting)
     return eFAILURE;
-  if (GET_POS(tmp) != position_t::STANDING)
+  if (tmp->getPosition() != position_t::STANDING)
     return eFAILURE;
   if (!tmp->player || tmp->player->joining.empty())
     return eFAILURE;
@@ -544,7 +544,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
     return eINTERNAL_ERROR;
   }
 
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     logentry(QStringLiteral("Dead ch sent to attack. Wtf ;)"), -1, DC::LogChannel::LOG_BUG);
     produce_coredump();
@@ -555,7 +555,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
   // victim could be dead if a skill like do_ki causes folowers to autojoin and kill
   // before attack gets called
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
   {
     stop_fighting(ch);
     return eFAILURE;
@@ -711,7 +711,7 @@ int attack(Character *ch, Character *vict, int type, int weapon)
 
     // This is here so we only show this after the PC's first
     // attack rather than after every hit.
-    if (GET_POS(vict) == position_t::STUNNED)
+    if (vict->getPosition() == position_t::STUNNED)
       act("$n is $B$0stunned$R, but will probably recover.", vict, 0, 0, TO_ROOM, INVIS_NULL);
 
     if (second_attack(ch))
@@ -895,7 +895,7 @@ void update_stuns(Character *ch)
   {
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
     if (ch->getHP() > 0)
-      if (GET_POS(ch) != position_t::FIGHTING)
+      if (ch->getPosition() != position_t::FIGHTING)
       {
         act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
@@ -948,7 +948,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return eFAILURE;
   if (ch->isImmortalPlayer())
     return eFAILURE;
@@ -1007,7 +1007,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
   do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
   update_pos(ch);
 
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
@@ -1030,7 +1030,7 @@ int do_vampiric_aura(Character *ch, Character *vict)
     abort();
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return eFAILURE;
 
   struct affected_type *af;
@@ -1063,7 +1063,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
     abort();
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return eFAILURE;
   if (ch->isImmortalPlayer())
     return eFAILURE;
@@ -1124,7 +1124,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
   do_dam_msgs(vict, ch, dam, SPELL_FIRESHIELD, WIELD);
   update_pos(ch);
 
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
@@ -1152,7 +1152,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
     abort();
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return eFAILURE;
   if (ch->isImmortalPlayer())
     return eFAILURE;
@@ -1210,7 +1210,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
   do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
   update_pos(ch);
 
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
@@ -1237,7 +1237,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
     abort();
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return eFAILURE;
   if (ch->isImmortalPlayer())
     return eFAILURE;
@@ -1270,7 +1270,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
   do_dam_msgs(vict, ch, dam, SPELL_BONESHIELD, WIELD);
   update_pos(ch);
 
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
@@ -1464,7 +1464,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     return eFAILURE;
   }
 
-  if (GET_POS(vict) == position_t::DEAD)
+  if (vict->getPosition() == position_t::DEAD)
     return (eSUCCESS | eVICT_DIED);
 
   // TODO - I'd like to remove these 3 cause they are checked in attack()
@@ -2074,7 +2074,7 @@ int damage(Character *ch, Character *victim,
   if (attacktype == SKILL_FLAMESLASH)
     weapon_bit = TYPE_FIRE;
 
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
     return (eSUCCESS | eVICT_DIED);
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
                                           attacktype == SKILL_ARCHERY || attacktype == SPELL_LIGHTNING_BOLT ||
@@ -2320,7 +2320,7 @@ int damage(Character *ch, Character *victim,
   }
 
   /* An eye for an eye, a tooth for a tooth, a life for a life. */
-  if (GET_POS(victim) > position_t::STUNNED && ch != victim)
+  if (victim->getPosition() > position_t::STUNNED && ch != victim)
   {
     if (!victim->fighting && ch->in_room == victim->in_room)
       set_fighting(victim, ch);
@@ -2330,9 +2330,9 @@ int damage(Character *ch, Character *victim,
         (!isSet(victim->combat, COMBAT_BASH1)) &&
         (!isSet(victim->combat, COMBAT_BASH2)))
     {
-      if (GET_POS(victim) > position_t::STUNNED)
+      if (victim->getPosition() > position_t::STUNNED)
       {
-        if (GET_POS(victim) < position_t::FIGHTING)
+        if (victim->getPosition() < position_t::FIGHTING)
         {
           act("$n scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
           act("You scramble to your feet!", victim, 0, 0, TO_CHAR, 0);
@@ -2341,7 +2341,7 @@ int damage(Character *ch, Character *victim,
       }
     }
   }
-  else if (GET_POS(victim) == position_t::SLEEPING)
+  else if (victim->getPosition() == position_t::SLEEPING)
   {
     affect_from_char(victim, INTERNAL_SLEEPING);
     act("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
@@ -2349,13 +2349,13 @@ int damage(Character *ch, Character *victim,
     victim->setPOSFighting();
   }
 
-  if (GET_POS(ch) == position_t::FIGHTING &&
+  if (ch->getPosition() == position_t::FIGHTING &&
       !ch->fighting)
   { // fix for fighting thin air thing related to poison
     ch->setStanding();
     ;
   }
-  if (GET_POS(ch) > position_t::STUNNED && ch != victim)
+  if (ch->getPosition() > position_t::STUNNED && ch != victim)
   {
     if (!ch->fighting && ch->in_room == victim->in_room)
       set_fighting(ch, victim);
@@ -2755,7 +2755,7 @@ int damage(Character *ch, Character *victim,
 
   inform_victim(ch, victim, dam);
 
-  if (GET_POS(victim) != position_t::DEAD && ch->in_room != victim->in_room &&
+  if (victim->getPosition() != position_t::DEAD && ch->in_room != victim->in_room &&
       !(attacktype == SPELL_SOLAR_GATE || attacktype == SKILL_ARCHERY ||
         attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
         attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
@@ -2813,7 +2813,7 @@ int damage(Character *ch, Character *victim,
     }
 
   // Payoff for killing things.
-  if (GET_POS(victim) == position_t::DEAD)
+  if (victim->getPosition() == position_t::DEAD)
   {
     if (attacktype == SKILL_EAGLE_CLAW)
       make_heart(ch, victim);
@@ -2885,7 +2885,7 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
 
   ch->removeHP(dam);
   update_pos(ch);
-  if (GET_POS(ch) == position_t::DEAD)
+  if (ch->getPosition() == position_t::DEAD)
   {
     if (char_death_msg)
     {
@@ -3097,7 +3097,7 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
       act(replaceString(messages->miss_msg.room_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
     }
-    else if (GET_POS(victim) == position_t::DEAD)
+    else if (victim->getPosition() == position_t::DEAD)
     {
       QString victim_msg1 = replaceString(messages->die_msg.victim_msg, find, replace);
       QString victim_msg2 = replaceString(messages2->die_msg.victim_msg, find, replace);
@@ -4121,7 +4121,7 @@ void update_pos(Character *victim)
   if (victim->getHP() > 0)
   {
     if ((!isSet(victim->combat, COMBAT_STUNNED)) && (!isSet(victim->combat, COMBAT_STUNNED2)))
-      if (GET_POS(victim) <= position_t::STUNNED)
+      if (victim->getPosition() <= position_t::STUNNED)
         victim->setStanding();
     return;
   }
@@ -5125,7 +5125,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
     update_pos(vict);
     inform_victim(ch, vict, damadd);
 
-    if (GET_POS(vict) != position_t::DEAD && number(0, 4999) == 1)
+    if (vict->getPosition() != position_t::DEAD && number(0, 4999) == 1)
     { /* tiny chance of instakill */
       vict->setHP(-1, ch);
       ch->sendln("You impale your weapon through your opponent's chest!");
@@ -5356,7 +5356,7 @@ void do_combatmastery(Character *ch, Character *vict, int weapon)
   }
   if (type == TYPE_WHIP && !ch->affected_by_spell(SKILL_CM_TIMER))
   {
-    if (GET_POS(vict) > position_t::SITTING && !vict->affected_by_spell(SPELL_IRON_ROOTS))
+    if (vict->getPosition() > position_t::SITTING && !vict->affected_by_spell(SPELL_IRON_ROOTS))
     {
       vict->setSitting();
       SET_BIT(vict->combat, COMBAT_BASH2);
@@ -7133,7 +7133,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
     return eFAILURE;
 
-  if ((ch->in_room != vict->in_room && weapon != ITEM_MISSILE) || GET_POS(vict) == position_t::DEAD)
+  if ((ch->in_room != vict->in_room && weapon != ITEM_MISSILE) || vict->getPosition() == position_t::DEAD)
     return eFAILURE;
 
   if (!ch->equipment[weapon] && weapon != ITEM_MISSILE)
@@ -7154,7 +7154,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
     /* It's possible the victim has fled or died */
     if (ch->in_room != vict->in_room)
       return eFAILURE;
-    if (GET_POS(vict) == position_t::DEAD)
+    if (vict->getPosition() == position_t::DEAD)
       return eSUCCESS | eVICT_DIED;
     chance = number(0, 101);
     percent = weap->affected[i].modifier;
@@ -7364,7 +7364,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
 {
   int max_hit;
 
-  switch (GET_POS(victim))
+  switch (victim->getPosition())
   {
   case position_t::STUNNED:
     // This was moved into "attack" so that the message only goes off

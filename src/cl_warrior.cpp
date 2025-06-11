@@ -195,7 +195,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_POS(victim) > position_t::SITTING)
+  if (victim->getPosition() > position_t::SITTING)
   {
     ch->sendln("Your opponent isn't in a vulnerable enough position!");
     return eFAILURE;
@@ -248,7 +248,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
       dam /= 2;
     ch->removeHP(dam);
     update_pos(ch);
-    if (GET_POS(ch) == position_t::DEAD)
+    if (ch->getPosition() == position_t::DEAD)
     {
       fight_kill(ch, ch, TYPE_CHOOSE, 0);
       return eSUCCESS | eCH_DIED;

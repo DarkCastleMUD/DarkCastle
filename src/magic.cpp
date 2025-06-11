@@ -959,7 +959,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
       break;
     }
 
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1285,7 +1285,7 @@ int spell_group_recall(uint8_t level, Character *ch, Character *victim, class Ob
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1319,7 +1319,7 @@ int spell_group_fly(uint8_t level, Character *ch, Character *victim, class Objec
   for (const auto &tmp_victim : character_list)
   {
 
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1353,7 +1353,7 @@ int spell_heroes_feast(uint8_t level, Character *ch, Character *victim, class Ob
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1380,7 +1380,7 @@ int spell_group_sanc(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1406,7 +1406,7 @@ int spell_heal_spray(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1470,7 +1470,7 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -1765,7 +1765,7 @@ int spell_bless(uint8_t level, Character *ch, Character *victim, class Object *o
   if (obj)
   {
     if ((5 * level > GET_OBJ_WEIGHT(obj)) &&
-        (GET_POS(ch) != position_t::FIGHTING))
+        (ch->getPosition() != position_t::FIGHTING))
     {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_BLESS);
       act("$p briefly glows.", ch, obj, 0, TO_CHAR, 0);
@@ -1820,7 +1820,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       if (number(0, 1))
       {
         ch->sendln("The combined magics fizzle!");
-        if (GET_POS(victim) == position_t::SLEEPING)
+        if (victim->getPosition() == position_t::SLEEPING)
         {
           victim->sendln("You are awakened by a burst of $6energy$R!");
           act("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, TO_ROOM, 0);
@@ -1857,7 +1857,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     act("$N resists your attempt to paralyze $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to paralyze $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
-    if ((!victim->fighting) && GET_POS(victim) > position_t::SLEEPING && victim != ch)
+    if ((!victim->fighting) && victim->getPosition() > position_t::SLEEPING && victim != ch)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1886,7 +1886,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
     {
       act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && victim->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1958,7 +1958,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     act("$N resists your attempt to blind $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to blind $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to blind you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -1979,7 +1979,7 @@ int spell_blindness(uint8_t level, Character *ch, Character *victim, class Objec
     {
       act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && victim->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -3192,7 +3192,7 @@ int spell_poison(uint8_t level, Character *ch, Character *victim, class Object *
       victim->sendln("You feel very sick.");
       act("$N looks very sick.", ch, 0, victim, TO_CHAR, 0);
     }
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -4014,7 +4014,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
     act("$N resists your attempt to sleep $M!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to sleep you!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -4047,7 +4047,7 @@ int spell_sleep(uint8_t level, Character *ch, Character *victim, class Object *o
       af.bitvector = AFF_SLEEP;
       affect_join(victim, &af, false, false);
 
-      if (GET_POS(victim) > position_t::SLEEPING)
+      if (victim->getPosition() > position_t::SLEEPING)
       {
         act("You feel very sleepy ..... zzzzzz", victim, 0, 0, TO_CHAR, 0);
         act("$n goes to sleep.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -4936,7 +4936,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -4977,7 +4977,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -5038,7 +5038,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
     return eFAILURE;
   }
 
-  if (GET_POS(victim) == position_t::SLEEPING)
+  if (victim->getPosition() == position_t::SLEEPING)
   {
     ch->sendln("How do you expect a sleeping person to be scared?");
     return eFAILURE;
@@ -5090,7 +5090,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
         0);
     if (IS_NPC(
             victim) &&
-        (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+        (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5504,7 +5504,7 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel minor!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel minor!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -5775,7 +5775,7 @@ int spell_dispel_magic(uint8_t level, Character *ch, Character *victim, class Ob
     act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
     act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("You resist $n's attempt to dispel magic!", ch, nullptr, victim, TO_VICT, 0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
+    if (IS_NPC(victim) && (!victim->fighting) && ch->getPosition() > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
       retval = SWAP_CH_VICT(retval);
@@ -7717,7 +7717,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
             }
-            else if (GET_POS(tar_ch) == position_t::FIGHTING)
+            else if (tar_ch->getPosition() == position_t::FIGHTING)
               ch->sendln("Nothing seems to happen.");
             else
               retval &= spell_bless(level, ch, tar_ch, 0, skill);
@@ -7731,7 +7731,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
           }
-          else if (GET_POS(leader) == position_t::FIGHTING)
+          else if (leader->getPosition() == position_t::FIGHTING)
             ch->sendln("Nothing seems to happen.");
           else
             retval &= spell_bless(level, ch, leader, 0, skill);
@@ -7739,7 +7739,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
 
         return retval;
       }
-      if (GET_POS(tar_ch) == position_t::FIGHTING)
+      if (tar_ch->getPosition() == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -7748,7 +7748,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
     }
     break;
   case SPELL_TYPE_POTION:
-    if (GET_POS(ch) == position_t::FIGHTING)
+    if (ch->getPosition() == position_t::FIGHTING)
     {
       ch->sendln("Nothing seems to happen.");
       return eFAILURE;
@@ -7771,7 +7771,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
       if (!tar_ch)
         tar_ch = ch;
 
-      if (GET_POS(tar_ch) == position_t::FIGHTING)
+      if (tar_ch->getPosition() == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -7792,7 +7792,7 @@ int cast_bless(uint8_t level, Character *ch, char *arg, int type,
     else
     { /* Then it is a PC | NPC */
 
-      if (GET_POS(tar_ch) == position_t::FIGHTING)
+      if (tar_ch->getPosition() == position_t::FIGHTING)
       {
         ch->sendln("Nothing seems to happen.");
         return eFAILURE;
@@ -11266,7 +11266,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -11787,7 +11787,7 @@ int spell_entangle(uint8_t level, Character *ch, Character *victim, class Object
     if (!number(0, skill))
       spell_blindness(level, ch, victim, 0, 0); /* The plants blind the victim . . */
   }
-  if (GET_POS(victim) > position_t::SITTING)
+  if (victim->getPosition() > position_t::SITTING)
   {
     victim->setSitting(); /* And pull the victim down to the ground */
     if (victim->fighting)
@@ -13412,7 +13412,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }
@@ -15885,7 +15885,7 @@ int spell_ethereal_focus(uint8_t level, Character *ch, Character *victim, class 
   {
     next_ally = ally->next_in_room;
 
-    if (IS_PC(ally) && GET_POS(ally) > position_t::SLEEPING &&
+    if (IS_PC(ally) && ally->getPosition() > position_t::SLEEPING &&
         (ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master)))
     {
       ally->sendln("Your mind's eye focuses, you still your body, and poise yourself to react to anything!");

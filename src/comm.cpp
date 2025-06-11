@@ -2718,7 +2718,7 @@ void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
   if (!messg.isEmpty())
     for (i = DC::getInstance()->world[room].people; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
-        if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
+        if (!awakeonly || i->getPosition() > position_t::SLEEPING)
           SEND_TO_Q(messg, i->desc);
 }
 

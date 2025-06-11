@@ -358,7 +358,7 @@ int do_stun(Character *ch, char *argument, int cmd)
     }
     return eSUCCESS;
   }
-  if ((!skill_success(ch, victim, SKILL_STUN) && GET_POS(victim) != position_t::SLEEPING) || do_frostshield(ch, victim))
+  if ((!skill_success(ch, victim, SKILL_STUN) && victim->getPosition() != position_t::SLEEPING) || do_frostshield(ch, victim))
   {
     act_return ar = act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, nullptr, victim, TO_VICT, 0);
     retval = ar.retval;
@@ -484,7 +484,7 @@ int do_stun(Character *ch, char *argument, int cmd)
       }
 
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
-      if (GET_POS(victim) > position_t::STUNNED)
+      if (victim->getPosition() > position_t::STUNNED)
         victim->setStunned();
       ;
       SET_BIT(victim->combat, COMBAT_STUNNED);

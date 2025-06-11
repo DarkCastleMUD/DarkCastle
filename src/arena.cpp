@@ -104,7 +104,7 @@ auto do_joinarena(Character *ch, char *arg, int cmd) -> int
     return eFAILURE;
   }
 
-  if (GET_POS(ch) == position_t::SLEEPING)
+  if (ch->getPosition() == position_t::SLEEPING)
   {
     affect_from_char(ch, INTERNAL_SLEEPING);
     ch->wake();

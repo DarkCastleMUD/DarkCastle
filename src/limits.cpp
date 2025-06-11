@@ -119,7 +119,7 @@ int Character::mana_gain_lookup(void)
 		//    gain = graf(age().year, 2,3,4,6,7,8,9);
 
 		gain = (int)(this->max_mana * (float)mana_regens[GET_CLASS(this)] / 100);
-		switch (GET_POS(this))
+		switch (this->getPosition())
 		{
 		case position_t::SLEEPING:
 			divisor = 1;
@@ -743,7 +743,7 @@ void food_update(void)
 		gain_condition(i, FULL, amt);
 		if (!GET_COND(i, FULL) && i->getLevel() < 60)
 		{ // i'm hungry
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (i->getPosition() > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
@@ -759,7 +759,7 @@ void food_update(void)
 		gain_condition(i, THIRST, amt);
 		if (!GET_COND(i, THIRST) && i->getLevel() < 60)
 		{ // i'm thirsty
-			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
+			if (!IS_NPC(i) && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (i->getPosition() > position_t::SLEEPING))
 			{
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
@@ -816,7 +816,7 @@ void point_update(void)
 		}
 
 		// only heal linkalive's and mobs
-		if (GET_POS(i) > position_t::DEAD && (IS_NPC(i) || i->desc))
+		if (i->getPosition() > position_t::DEAD && (IS_NPC(i) || i->desc))
 		{
 			i->setHP(MIN(i->getHP() + i->hit_gain(), hit_limit(i)));
 

@@ -391,7 +391,7 @@ void boro_mob_stat(Character *ch, Character *k)
   /* end of fourth sprintf */
   ch->send(buf);
 
-  sprinttype(GET_POS(k), Character::position_types, buf2);
+  sprinttype(k->getPosition(), Character::position_types, buf2);
 
   if (IS_NPC(k))
     sprinttype((k->mobdata->default_pos), Character::position_types, buf3);
@@ -1458,7 +1458,7 @@ int do_clear(Character *ch, char *argument, int cmd)
       produce_coredump(tmp_victim);
       continue;
     }
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (tmp_victim->getPosition() == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
     {
       continue;
     }

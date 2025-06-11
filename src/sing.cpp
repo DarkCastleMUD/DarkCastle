@@ -373,9 +373,9 @@ int do_sing(Character *ch, char *arg, int cmd)
 
 	if (song_info[spl].song_pointer)
 	{
-		if (GET_POS(ch) < song_info[spl].minimum_position && IS_PC(ch) && spl != SPELL_TYPE_WAND)
+		if (ch->getPosition() < song_info[spl].minimum_position && IS_PC(ch) && spl != SPELL_TYPE_WAND)
 		{
-			switch (GET_POS(ch))
+			switch (ch->getPosition())
 			{
 			case position_t::SLEEPING:
 				ch->sendln("You dream of beautiful music.");
@@ -754,7 +754,7 @@ void update_character_singing(Character *ch)
 				--j;
 				continue;
 			}
-			else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position) && IS_PC(ch)) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
+			else if ((((ch->getPosition() < song_info[(*j).song_number].minimum_position) && IS_PC(ch)) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
 			{
 				ch->sendln("You can't keep singing in this position!");
 				(*j).song_timer = 0;
@@ -2178,7 +2178,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
 
 	snprintf(buf, 200, "Your song finds %s ", GET_SHORT(target));
 
-	switch (GET_POS(target))
+	switch (target->getPosition())
 	{
 	case position_t::STUNNED:
 		sprintf(buf, "%s%s at ", buf, "on the ground, stunned");

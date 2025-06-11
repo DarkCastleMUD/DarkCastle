@@ -325,7 +325,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_POS(ch) == position_t::SLEEPING)
+  if (ch->getPosition() == position_t::SLEEPING)
   {
     ch->sendln("You're asleep.  Dream or something....");
     return eSUCCESS;
@@ -683,7 +683,7 @@ int do_dream(Character *ch, char *argument, int cmd)
   class Connection *i = nullptr;
   int ctr = 0;
 
-  if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
+  if ((ch->getPosition() != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
   {
     ch->sendln("How are you going to dream if you're awake?");
     return eSUCCESS;
@@ -742,7 +742,7 @@ int do_dream(Character *ch, char *argument, int cmd)
           (!i->connected) &&
           !is_ignoring(i->character, ch) &&
           (isSet(i->character->misc, DC::LogChannel::CHANNEL_DREAM)) &&
-          ((GET_POS(i->character) == position_t::SLEEPING) ||
+          ((i->character->getPosition() == position_t::SLEEPING) ||
            (i->character->getLevel() >= MIN_GOD)))
         send_to_char(buf1, i->character);
     }
@@ -884,7 +884,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   }
   if (this == vict)
     this->sendln("You try to tell yourself something.");
-  else if ((GET_POS(vict) == position_t::SLEEPING || isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
+  else if ((vict->getPosition() == position_t::SLEEPING || isSet(DC::getInstance()->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
     act("Sorry, $E cannot hear you.", this, 0, vict, TO_CHAR, STAYHIDE);
   else
   {
@@ -927,7 +927,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
       this->send(buf);
     }
-    else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
+    else if (!is_busy(vict) && vict->getPosition() > position_t::SLEEPING)
     {
       if (IS_NPC(vict))
       {
@@ -954,7 +954,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
         logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
     }
-    else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
+    else if (!is_busy(vict) && vict->getPosition() == position_t::SLEEPING &&
              level_ >= SERAPH)
     {
       vict->sendln("A heavenly power intrudes on your subconcious dreaming...");

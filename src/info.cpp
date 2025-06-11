@@ -512,7 +512,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       }
       ch->send("$B$3");
 
-      if (!(i->long_desc) || (IS_NPC(i) && (GET_POS(i) != i->mobdata->default_pos)))
+      if (!(i->long_desc) || (IS_NPC(i) && (i->getPosition() != i->mobdata->default_pos)))
       {
          /* A char without long descr, or not in default pos. */
          if (IS_PC(i))
@@ -561,7 +561,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
             buffer[0] = toupper(buffer[0]);
          }
 
-         switch (GET_POS(i))
+         switch (i->getPosition())
          {
          case position_t::STUNNED:
             buffer.append(" is on the ground, stunned.");
@@ -1322,9 +1322,9 @@ int do_look(Character *ch, const char *argument, int cmd)
    int weight_in(class Object * obj);
    if (!ch->desc)
       return 1;
-   if (GET_POS(ch) < position_t::SLEEPING)
+   if (ch->getPosition() < position_t::SLEEPING)
       ch->sendln("You can't see anything but stars!");
-   else if (GET_POS(ch) == position_t::SLEEPING)
+   else if (ch->getPosition() == position_t::SLEEPING)
       ch->sendln("You can't see anything, you're sleeping!");
    else if (check_blind(ch))
    {
@@ -2379,7 +2379,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    extern struct weather_data weather_info;
    char buf[256];
 
-   if (GET_POS(ch) <= position_t::SLEEPING)
+   if (ch->getPosition() <= position_t::SLEEPING)
    {
       ch->sendln("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.");
       return eSUCCESS;
@@ -3059,7 +3059,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 
          percent -= mod;
 
-         if (GET_POS(victim) <= position_t::SLEEPING)
+         if (victim->getPosition() <= position_t::SLEEPING)
             percent = 100;
          if (victim->getLevel() > IMMORTAL)
             percent = 0;

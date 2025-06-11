@@ -205,13 +205,13 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         return eSUCCESS;
       }
       // Character not in position for command?
-      if (GET_POS(this) == position_t::FIGHTING && !this->fighting)
+      if (this->getPosition() == position_t::FIGHTING && !this->fighting)
         this->setStanding();
       ;
       // fix for thin air thing
-      if (GET_POS(this) < found->getMinimumPosition())
+      if (this->getPosition() < found->getMinimumPosition())
       {
-        switch (GET_POS(this))
+        switch (this->getPosition())
         {
         case position_t::DEAD:
           this->sendln("Lie still; you are DEAD.");
