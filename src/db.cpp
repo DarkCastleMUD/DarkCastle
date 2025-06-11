@@ -25,7 +25,7 @@ int load_debug = 0;
 #include "DC/game_portal.h" // load_game_portals()
 #include "DC/spells.h"		// command_range
 #include "DC/help.h"
-#include "DC/const.h" // mob_race_mod, races, item_types, apply_types
+#include "DC/const.h"	// mob_race_mod, races, item_types, apply_types
 #include "DC/connect.h" // Connection
 
 Room &World::operator[](room_t room_key)
@@ -4002,14 +4002,14 @@ void write_object(LegacyFile &lf, Object *obj)
 	FILE *fl = lf.file_handle_;
 	struct extra_descr_data *currdesc;
 
-	fprintf(fl, "#%d\n", obj->vnum);
+	fprintf(fl, "#%lu\n", obj->vnum);
 	string_to_file(fl, obj->name);
 	string_to_file(fl, obj->short_description);
 	string_to_file(fl, obj->description);
 	string_to_file(fl, obj->ActionDescription());
 
 	fprintf(fl, "%d %d %d %d\n"
-				"%d %d %d %d %llu\n"
+				"%lu %lu %lu %lu %llu\n"
 				"%d %d %d\n",
 			obj->obj_flags.type_flag,
 			obj->obj_flags.extra_flags,
@@ -4559,7 +4559,7 @@ void Zone::reset(ResetType reset_type)
 		if (cmd_no < 0 || cmd_no > cmd.size())
 		{
 			sprintf(buf,
-					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
+					"Trapped zone error, Command is null, zone: %lu cmd_no: %d",
 					id_, cmd_no);
 			logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 			break;
@@ -4637,7 +4637,7 @@ void Zone::reset(ResetType reset_type)
 						if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 						{
 							sprintf(buf,
-									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
+									"Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d",
 									DC::getInstance()->obj_index[cmd[cmd_no]->arg1].vnum, id_, cmd_no);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
@@ -4680,7 +4680,7 @@ void Zone::reset(ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, cmd_no + 1);
+					sprintf(buf, "Null mob in G, reseting zone %lu cmd %d", id_, cmd_no + 1);
 					logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
@@ -4735,7 +4735,7 @@ void Zone::reset(ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, cmd_no + 1);
+					sprintf(buf, "Null mob in E reseting zone %lu cmd %d", id_, cmd_no + 1);
 					logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
@@ -4772,7 +4772,7 @@ void Zone::reset(ResetType reset_type)
 					{
 						if (!equip_char(mob, obj, cmd[cmd_no]->arg3))
 						{
-							sprintf(buf, "Bad equip_char zone %d cmd %d", id_, cmd_no + 1);
+							sprintf(buf, "Bad equip_char zone %lu cmd %d", id_, cmd_no + 1);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
 					}
@@ -4800,19 +4800,19 @@ void Zone::reset(ResetType reset_type)
 			case 'D': /* set state of door */
 				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > DC::getInstance()->top_of_world)
 				{
-					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_, cmd_no + 1);
+					sprintf(log_buf, "Illegal room number Z: %lu cmd %d", id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
 				if (cmd[cmd_no]->arg2 < 0 || cmd[cmd_no]->arg2 >= 6)
 				{
-					sprintf(log_buf, "Illegal direction %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
+					sprintf(log_buf, "Illegal direction %d doesn't exist Z: %lu cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
 				if (!DC::getInstance()->rooms.contains(cmd[cmd_no]->arg1))
 				{
-					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg1, id_, cmd_no + 1);
+					sprintf(log_buf, "Room %d doesn't exist Z: %lu cmd %d", cmd[cmd_no]->arg1, id_, cmd_no + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
@@ -4821,7 +4821,7 @@ void Zone::reset(ResetType reset_type)
 				{
 					sprintf(
 						log_buf,
-						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
+						"Attempt to reset direction %d on room %d that doesn't exist Z: %lu cmd %d",
 						cmd[cmd_no]->arg2, DC::getInstance()->world[cmd[cmd_no]->arg1].number, id_, cmd_no);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
@@ -4902,7 +4902,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			default:
-				sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .", id_, cmd_no + 1, cmd[cmd_no]->command);
+				sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %lu cmd %d: '%c' Skipping .", id_, cmd_no + 1, cmd[cmd_no]->command);
 				logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 				age = 0;
 				return;

@@ -1005,7 +1005,7 @@ int do_steal(Character *ch, char *argument, int cmd)
           if (IS_PC(victim))
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%d] from %s",
+            sprintf(log_buf, "%s stole %s[%lu] from %s",
                     GET_NAME(ch), obj->short_description,
                     obj->vnum, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);

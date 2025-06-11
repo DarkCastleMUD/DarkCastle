@@ -3004,7 +3004,7 @@ int move_obj(Object *obj, int dest)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3052,17 +3052,17 @@ int move_obj(Object *obj, int dest)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (1): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (2) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in NOWHERE (3) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", obj->name, DC::getInstance()->world[dest].number);
@@ -3089,7 +3089,7 @@ int move_obj(Object *obj, Object *dest_obj)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3133,17 +3133,17 @@ int move_obj(Object *obj, Object *dest_obj)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (4): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (5) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (6) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", obj->name, dest_obj->name);
@@ -3172,7 +3172,7 @@ int move_obj(Object *obj, Character *ch)
 
 	if (obj->equipped_by && GET_ITEM_TYPE(obj) != ITEM_BEACON)
 	{
-		qFatal(qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
+		qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object move_obj() while equipped: %1.\n").arg(obj->name)));
 	}
 
 	if ((obj_in_room = obj->in_room) != DC::NOWHERE)
@@ -3232,17 +3232,17 @@ int move_obj(Object *obj, Character *ch)
 		if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (7): %1.\n").arg(obj->name)));
 		}
 		else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (8) : %1.\n").arg(obj->name)));
 		}
 		else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
 		{
 			// Now we have real problems
-			qFatal(qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
+			qFatal("%s", qUtf8Printable(QStringLiteral("FATAL: Object stuck in DC::NOWHERE (9) : %1.\n").arg(obj->name)));
 		}
 
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", obj->name, GET_NAME(ch));
@@ -3350,7 +3350,7 @@ int obj_to_room(class Object *object, int room)
 	if (!object)
 		return 0;
 
-	if (&DC::getInstance()->world[room] == nullptr)
+	if (!DC::getInstance()->rooms.contains(room))
 	{
 		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
 		produce_coredump();

@@ -1240,7 +1240,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
 		// Now we have real problems
 		if (char_to_room(ch, origination) == 0)
 		{
-			qFatal(qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(GET_NAME(ch))));
+			qFatal("%s", qUtf8Printable(QStringLiteral("Error in move_char(), character stuck in DC::NOWHERE: %1.\n").arg(GET_NAME(ch))));
 		}
 		logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), DC::getInstance()->world[dest].number);
 		return eINTERNAL_ERROR;

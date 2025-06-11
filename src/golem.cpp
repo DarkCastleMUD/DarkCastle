@@ -396,7 +396,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6d     $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\n\r"
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
@@ -424,7 +424,7 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
+          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   master->send(buf);
 
@@ -541,7 +541,8 @@ int do_golem_score(Character *ch, char *argument, int cmd)
         sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
                 scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                apply_types[(int)aff->location], aff->caster.c_str());
+                scratch);
+        // apply_types[(int)aff->location], aff->caster.c_str(),
       }
       else
       {

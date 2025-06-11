@@ -272,19 +272,19 @@ void setup_group_buf(char *report, Character *j, Character *i)
     if (IS_PC(i) && isSet(i->player->toggles, Player::PLR_ANSI))
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_KI(j), GET_MAX_KI(j)), GET_KI(j), NTEXT, GET_MAX_KI(j),
                 calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
                 j->getLevel(),
                 calc_color(j->getHP(), GET_MAX_HIT(j)), j->getHP(), NTEXT, GET_MAX_HIT(j),
                 calc_color(GET_MANA(j), GET_MAX_MANA(j)), GET_MANA(j), NTEXT, GET_MAX_MANA(j),
@@ -293,16 +293,16 @@ void setup_group_buf(char *report, Character *j, Character *i)
     else
     {
       if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-        sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_KI(j),
                 GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
       else if (GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                GET_CLASS(j) == CLASS_BARBARIAN)
-        sprintf(report, "[Lv %3d| %6d/%-6dhp    -====-    %5d/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %6d/%-6dhp    -====-    %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j),
                 GET_MOVE(j), GET_MAX_MOVE(j));
       else
-        sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
+        sprintf(report, "[Lv %3llu| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
                 j->getLevel(), j->getHP(), GET_MAX_HIT(j), GET_MANA(j),
                 GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
     }

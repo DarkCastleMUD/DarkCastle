@@ -106,7 +106,7 @@ void boot_clans(void)
     new_new_clan->founder = fread_word(fl, 1);
     new_new_clan->name = fread_word(fl, 1);
     new_new_clan->number = fread_int(fl, 0, 2147483467);
-    if (new_new_clan->number < 1 || new_new_clan->number >= 2147483467)
+    if (new_new_clan->number < 1 || new_new_clan->number >= UINT16_MAX)
     {
       logf(0, DC::LogChannel::LOG_BUG, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
@@ -171,14 +171,14 @@ void boot_clans(void)
         }
         catch (error_negative_int &e)
         {
-          qCritical(qUtf8Printable(QStringLiteral("negative clan balance read for clan %1.\n").arg(new_new_clan->number)));
-          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("negative clan balance read for clan %1.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         catch (...)
         {
-          qCritical(qUtf8Printable(QStringLiteral("unknown error reading clan balance for clan %1.\n").arg(new_new_clan->number)));
-          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("unknown error reading clan balance for clan %1.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         break;
@@ -354,7 +354,7 @@ void save_clans(void)
     for (pmember = pclan->members; pmember; pmember = pmember->next)
     {
       fprintf(fl, "M\n%s~\n", pmember->NameC());
-      fprintf(fl, "%d %d %d %d %d %d\n", pmember->Rights(),
+      fprintf(fl, "%d %d %lld %lld %lld %d\n", pmember->Rights(),
               pmember->Rank(), pmember->Unused1(), pmember->Unused2(),
               pmember->Unused3(), pmember->TimeJoined());
       fprintf(fl, "%s~\n", pmember->Unused4C());

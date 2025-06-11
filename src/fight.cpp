@@ -1388,7 +1388,7 @@ int get_weapon_damage_type(class Object *wielded)
     return TYPE_PIERCE;
     break;
   default:
-    sprintf(log_buf, "WORLD: Unknown w_type for object #%d name: %s, fourth value flag is: %d.",
+    sprintf(log_buf, "WORLD: Unknown w_type for object #%lu name: %s, fourth value flag is: %lu.",
             wielded->vnum, wielded->name, wielded->obj_flags.value[3]);
     logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     break;
@@ -4555,65 +4555,40 @@ void make_corpse(Character *ch)
       bool itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
-          recipeitem = DC::getInstance()->clone_object(6324);
-          break;
-        case 1:
+        if (itemtype)
           recipeitem = DC::getInstance()->clone_object(6338);
-          break;
-        }
+        else
+          recipeitem = DC::getInstance()->clone_object(6324);
       }
       else if (rarity > 85) // 85-95 10%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
-          recipeitem = DC::getInstance()->clone_object(6323);
-          break;
-        case 1:
+        if (itemtype)
           recipeitem = DC::getInstance()->clone_object(6339);
-          break;
-        }
+        else
+          recipeitem = DC::getInstance()->clone_object(6323);
       }
       else if (rarity > 65) // 65-85 20%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
-          recipeitem = DC::getInstance()->clone_object(6322);
-          break;
-        case 1:
+        if (itemtype)
           recipeitem = DC::getInstance()->clone_object(6340);
-          break;
-        }
+        else
+          recipeitem = DC::getInstance()->clone_object(6322);
       }
       else if (rarity > 40) // 41-65 25%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
-          recipeitem = DC::getInstance()->clone_object(6321);
-          break;
-        case 1:
+        if (itemtype)
           recipeitem = DC::getInstance()->clone_object(6341);
-          break;
-        }
+        else
+          recipeitem = DC::getInstance()->clone_object(6321);
       }
       else // 1-40 40%
       {
-        switch (itemtype)
-        {
-        case 0: // bottle
-          recipeitem = DC::getInstance()->clone_object(6320);
-          break;
-        case 1:
+        if (itemtype)
           recipeitem = DC::getInstance()->clone_object(6342);
-          break;
-        }
+        else
+          recipeitem = DC::getInstance()->clone_object(6320);
       }
-      if (recipeitem > (Object *)0)
+      if (recipeitem)
       {
         obj_to_obj(recipeitem, corpse);
       }
@@ -5576,8 +5551,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].virt,
-                GET_NAME(ch));
+        sprintf(buf, "%s killed by %lu (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].virt, GET_NAME(ch));
       }
       else
       {

@@ -520,7 +520,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       self_learn_max = getLevel() * 2;
     }
 
-    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
+    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3llu/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
             per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
     send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
@@ -1135,7 +1135,7 @@ int skill_master(Character *ch, class Object *obj, int cmd, const char *arg, Cha
       int known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
-      sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
+      sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
       ch->send(buf);
     }
@@ -1206,6 +1206,9 @@ int Character::get_stat(attribute_t stat)
     break;
   case attribute_t::CONSTITUTION:
     return GET_RAW_CON(this);
+    break;
+  case attribute_t::UNDEFINED:
+    return 0;
     break;
   };
   return 0;
