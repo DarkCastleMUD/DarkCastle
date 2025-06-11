@@ -6475,7 +6475,7 @@ int spell_mass_invis(uint8_t level, Character *ch, Character *victim, class Obje
   for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
-    if ((ch->in_room == tmp_victim->in_room))
+    if (ch->in_room == tmp_victim->in_room)
       if (!tmp_victim->affected_by_spell(SPELL_INVISIBLE))
       {
 
