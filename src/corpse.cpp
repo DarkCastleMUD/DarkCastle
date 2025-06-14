@@ -138,7 +138,7 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
 		*buf1 = 0;
 	fprintf(fp,
 			"#%lu\n"
-			"%d %lu %lu %lu %lu %u %d %d\n",
+			"%d %lu %lu %lu %lu %u %lu %d\n",
 			GET_OBJ_VNUM(obj),
 			locate,
 			GET_OBJ_VAL(obj, 0),
@@ -513,7 +513,7 @@ void DC::load_corpses(void)
 						/* put the corpse in the right room */
 						if (debug == 1)
 						{
-							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->name, GET_OBJ_VROOM(temp));
+							sprintf(buf3, "  -Moving corpse [%s] to [%lu]", temp->name, GET_OBJ_VROOM(temp));
 							logentry(buf3, 0, DC::LogChannel::LOG_MISC);
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));

@@ -58,6 +58,11 @@ command_return_t Character::check_social(QString pcomm)
   case position_t::SLEEPING:
     this->sendln("In your dreams, or what?");
     return SOCIAL_true;
+  case position_t::RESTING:
+  case position_t::SITTING:
+  case position_t::FIGHTING:
+  case position_t::STANDING:
+    break;
   }
 
   if (isSet(DC::getInstance()->world[this->in_room].room_flags, QUIET))

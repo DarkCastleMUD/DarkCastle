@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group));
+        csendf(this, "\n\r$B%s Profession Skills:$R\n\r", find_profession(c_class, skilllist[i].group).toStdString().c_str());
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -729,7 +729,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && IS_PC(this) && skilllist[skillnumber].group != player->profession)
     {
-      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
+      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group).toStdString().c_str());
       return eSUCCESS;
     }
   }

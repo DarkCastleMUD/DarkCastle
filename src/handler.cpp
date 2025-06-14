@@ -3352,7 +3352,7 @@ int obj_to_room(class Object *object, int room)
 
 	if (!DC::getInstance()->rooms.contains(room))
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%d] == nullptr", room);
+		logf(IMMORTAL, DC::LogChannel::LOG_BUG, "obj_to_room: DC::getInstance()->world[%lu] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}

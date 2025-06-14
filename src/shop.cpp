@@ -407,9 +407,9 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf, CMD_DEFAULT);
-        sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+        sprintf(buf, "The damage dice are '%luD%lu'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf, CMD_DEFAULT);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -456,7 +456,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf, CMD_DEFAULT);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -492,7 +492,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
     {
       if (obj->obj_flags.value[0] < 20)
       {
-        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
+        sprintf(buf, "Excellent, %s has been imbued with energies of the %luth level.", obj->short_description, obj->obj_flags.value[0]);
         do_say(keeper, buf, CMD_DEFAULT);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
@@ -548,7 +548,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf, CMD_DEFAULT);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf, CMD_DEFAULT);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -1199,7 +1199,7 @@ void DC::player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
 
-  if (!shop->sell_message || !*shop->sell_message)
+  if (shop->sell_message[0] == '\0')
   {
     keeper->do_tell(QStringLiteral("%1 Thank you, come again!").arg(GET_NAME(ch)).split(' '));
   }
@@ -1689,21 +1689,21 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\r\n",
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%lus|%%2d x %%-%lus|\r\n",
                  30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
                  35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
       }
       else if (cost_plats > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| $B%%-%ds$R    |\r\n",
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%lus| $B%%-%lus$R    |\r\n",
                  30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
                  35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
       else
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| %%-%ds    |\r\n",
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%lus| %%-%lus    |\r\n",
                  30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
                  35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);

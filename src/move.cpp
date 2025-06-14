@@ -1091,7 +1091,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 
 	if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
 	{
-		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->vnum);
+		sprintf(buf, "Error in do_enter(), value 0 on object %lu < 0", portal->vnum);
 		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		ch->sendln("You can't enter that.");
 		return eFAILURE;
@@ -1174,7 +1174,7 @@ int do_enter(Character *ch, char *argument, int cmd)
 		ch->sendln("You cannot enter that.");
 		return eFAILURE;
 	default:
-		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->vnum);
+		sprintf(buf, "Error in do_enter(), value 1 on object %lu returned default case", portal->vnum);
 		logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
 		return eFAILURE;
 	}
@@ -1279,7 +1279,7 @@ int do_climb(Character *ch, char *argument, int cmd)
 
 	if (real_room(dest) < 0)
 	{
-		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj->vnum);
+		logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in Object %lu.", obj->vnum);
 		ch->sendln("You can't climb that.");
 		return eFAILURE | eINTERNAL_ERROR;
 	}

@@ -91,7 +91,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, obj_object->vnum, sub_object->name);
+        sprintf(log_buf, "%s looted %s[%lu] from %s", GET_NAME(ch), obj_object->short_description, obj_object->vnum, sub_object->name);
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
@@ -126,7 +126,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
+        sprintf(log_buf, "%s looted %lu coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         if (ch->isPlayerGoldThief())
@@ -142,7 +142,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
       char log_buf[MAX_STRING_LENGTH] = {};
-      sprintf(log_buf, "%s gets %s[%d] from %s[%d]",
+      sprintf(log_buf, "%s gets %s[%lu] from %s[%lu]",
               GET_NAME(ch),
               obj_object->name,
               obj_object->vnum,
@@ -150,7 +150,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
               sub_object->vnum);
       logentry(log_buf, 110, DC::LogChannel::LOG_OBJECTS);
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%lu] contained %s[%lu]",
              obj_object->short_description,
              obj_object->vnum,
              loop_obj->short_description,
@@ -177,11 +177,11 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
       char log_buf[MAX_STRING_LENGTH] = {};
-      sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_object->vnum,
+      sprintf(log_buf, "%s gets %s[%lu] from room %lu", GET_NAME(ch), obj_object->name, obj_object->vnum,
               ch->in_room);
       logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+        logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]",
              obj_object->short_description,
              loop_obj->short_description,
              loop_obj->vnum);
@@ -889,7 +889,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
                   char log_buf[MAX_STRING_LENGTH] = {};
-                  sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
+                  sprintf(log_buf, "%s poofed %s[%lu] from %s[%lu]",
                           GET_NAME(ch),
                           obj_object->short_description,
                           obj_object->vnum,
@@ -1196,10 +1196,10 @@ int do_drop(Character *ch, char *argument, int cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, tmp_object->vnum, ch->in_room);
+            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->name, tmp_object->vnum, ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    loop_obj->vnum);
@@ -1264,10 +1264,10 @@ int do_drop(Character *ch, char *argument, int cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, tmp_object->vnum, ch->in_room);
+            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->name, tmp_object->vnum, ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    loop_obj->vnum);
@@ -1492,7 +1492,7 @@ int do_put(Character *ch, char *argument, int cmd)
                 {
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%lu] to %s[%lu]",
                        ch->getNameC(),
                        obj_object->short_description,
                        obj_object->vnum,
@@ -1503,7 +1503,7 @@ int do_put(Character *ch, char *argument, int cmd)
                 {
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                  logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%lu] in %s[%lu]",
                        ch->getNameC(),
                        obj_object->short_description,
                        obj_object->vnum,
@@ -1911,7 +1911,7 @@ int do_give(Character *ch, char *argument, int cmd)
           GET_NAME(vict));
   logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%lu] contained %s[%lu]",
          obj->short_description,
          obj->vnum,
          loop_obj->short_description,
@@ -2704,20 +2704,20 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   char log_buf[MAX_STRING_LENGTH] = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
-    sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_object->vnum,
+    sprintf(log_buf, "%s palms %s[%lu] from %s", GET_NAME(ch), obj_object->name, obj_object->vnum,
             sub_object->name);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]", obj_object->short_description, loop_obj->short_description,
            loop_obj->vnum);
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_object->vnum,
+    sprintf(log_buf, "%s palms %s[%lu] from room %lu", GET_NAME(ch), obj_object->name, obj_object->vnum,
             ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]", obj_object->short_description, loop_obj->short_description,
            loop_obj->vnum);
   }
 
@@ -2741,7 +2741,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       (obj_object->obj_flags.value[0] >= 1))
   {
     obj_from_char(obj_object);
-    sprintf(buffer, "There was %d coins.\r\n",
+    sprintf(buffer, "There was %lu coins.\r\n",
             obj_object->obj_flags.value[0]);
     ch->send(buffer);
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=

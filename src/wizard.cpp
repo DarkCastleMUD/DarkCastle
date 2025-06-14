@@ -486,21 +486,21 @@ void boro_mob_stat(Character *ch, Character *k)
             (int32_t)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
+    sprintf(buf, "$3Age$R:[%lu] Years [%lu] Months [%lu] Days [%lu] Hours\n\r",
             k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\n\r", k->getGold(),
+    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%lu]\n\r", k->getGold(),
             k->player->bank);
     ch->send(buf);
   }
 
   if (IS_PC(k))
   {
-    sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
+    sprintf(buf, "$3SaveMod$R: FIRE[%lu] COLD[%lu] ENERGY[%lu] ACID[%lu] MAGIC[%lu] POISON[%lu]\n\r",
             k->player->saves_mods[SAVE_TYPE_FIRE],
             k->player->saves_mods[SAVE_TYPE_COLD],
             k->player->saves_mods[SAVE_TYPE_ENERGY],
@@ -631,11 +631,11 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   strcat(buf, buf2);
 
-  sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->getLevel(),
+  sprintf(buf2, "   $3Level$R:[%lu] $3Alignment$R:[%lu] ", k->getLevel(),
           k->alignment);
   strcat(buf, buf2);
   ch->send(buf);
-  sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
+  sprintf(buf, "$3Spelldamage$R:[%lu] ", getRealSpellDamage(k));
   ch->send(buf);
   sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   ch->send(buf);
@@ -648,7 +648,7 @@ command_return_t mob_stat(Character *ch, Character *k)
             (int32_t)(k->player->time.played));
     ch->send(buf);
 
-    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
+    sprintf(buf, "$3Age$R:[%lu] Years [%lu] Months [%lu] Days [%lu] Hours\n\r",
             k->age().year, k->age().month, k->age().day, k->age().hours);
     ch->send(buf);
   }
@@ -667,7 +667,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
     ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
   }
-  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
+  sprintf(buf, "$3Height$R:[%lu]  $3Weight$R:[%lu]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
 
   switch (k->sex)
@@ -688,7 +688,7 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (IS_PC(ch))
   {
-    sprintf(buf, "$3Hometown$R:[%d]\n\r", k->hometown);
+    sprintf(buf, "$3Hometown$R:[%lu]\n\r", k->hometown);
     ch->send(buf);
   }
   else
@@ -710,13 +710,13 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k));
   ch->send(buf);
 
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\n\r",
+  sprintf(buf, "$3AC$R:[%lu]  $3Exp$R:[%ld]  $3Hitroll$R:[%lu]  $3Damroll$R:[%lu]  $3Gold$R: [$B$5%ld$R]\n\r",
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
   if (!IS_NPC(k))
   {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
+    sprintf(buf, "$3Plats$R:[%lu]  $3Bank$R:[%lu]  $3Clan$R:[%lu]  $3Quest Points$R:[%lu]\n\r",
             GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
     ch->send(buf);
   }
@@ -739,7 +739,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     ch->send(buf);
   }
 
-  sprintf(buf, "  $3Timer$R:[%d] \n\r", k->timer);
+  sprintf(buf, "  $3Timer$R:[%lu] \n\r", k->timer);
   ch->send(buf);
 
   if (IS_NPC(k))
@@ -749,7 +749,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   }
   else
   {
-    sprintf(buf, "$3PC flags$R: [%d]", k->player->toggles);
+    sprintf(buf, "$3PC flags$R: [%lu]", k->player->toggles);
     sprintbit(k->player->toggles, player_bits, buf2);
   }
   strcat(buf, buf2);
@@ -817,7 +817,7 @@ command_return_t mob_stat(Character *ch, Character *k)
           k->conditions[FULL],
           k->conditions[DRUNK]);
   ch->send(buf);
-  sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n",
+  sprintf(buf, "$3Melee$R: [%lu] $3Spell$R: [%lu] $3Song$R: [%lu] $3Reflect$R: [%lu]\r\n",
           k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
   ch->send(buf);
 
@@ -853,13 +853,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   csendf(ch, "$3Affected by$R: [%d %d] %s\r\n", k->affected_by[0], k->affected_by[1], buf);
 
   sprintbit(k->immune, isr_bits, buf);
-  csendf(ch, "$3Immune$R: [%d] %s\n\r", k->immune, buf);
+  csendf(ch, "$3Immune$R: [%lu] %s\n\r", k->immune, buf);
 
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptible$R: [%d] %s\n\r", k->suscept, buf);
+  csendf(ch, "$3Susceptible$R: [%lu] %s\n\r", k->suscept, buf);
 
   sprintbit(k->resist, isr_bits, buf);
-  csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
+  csendf(ch, "$3Resistant$R: [%lu] %s\n\r", k->resist, buf);
 
   if (!IS_NPC(k))
   {
@@ -932,19 +932,19 @@ command_return_t mob_stat(Character *ch, Character *k)
     case mob_type_t::MOB_NORMAL:
       break;
     case mob_type_t::MOB_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-                   " $3Direction (v2)$R: [%d]\n\r"
-                   "    $3Unused (v3)$R: [%d]\n\r"
-                   "    $3Unused (v4)$R: [%d]\n\r",
+      sprintf(buf, "$3Guard room (v1)$R: [%lu]\n\r"
+                   " $3Direction (v2)$R: [%lu]\n\r"
+                   "    $3Unused (v3)$R: [%lu]\n\r"
+                   "    $3Unused (v4)$R: [%lu]\n\r",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
       break;
     case mob_type_t::MOB_CLAN_GUARD:
-      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-                   " $3Direction (v2)$R: [%d]\n\r"
-                   "  $3Clan num (v3)$R: [%d]\n\r"
-                   "    $3Unused (v4)$R: [%d]\n\r",
+      sprintf(buf, "$3Guard room (v1)$R: [%lu]\n\r"
+                   " $3Direction (v2)$R: [%lu]\n\r"
+                   "  $3Clan num (v3)$R: [%lu]\n\r"
+                   "    $3Unused (v4)$R: [%lu]\n\r",
               k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
               k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
       ch->send(buf);
@@ -983,7 +983,7 @@ void obj_stat(Character *ch, class Object *j)
 */
 
   virt = (j->vnum >= 0) ? j->vnum : 0;
-  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
+  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%lu]  $3V-number$R:[%lu]  $3Item type$R: ",
           j->name, j->vnum, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
@@ -1119,10 +1119,10 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[2]);
     break;
   case ITEM_ARMOR:
-    sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
-                 "$3Unused  (v2)$R: [%d] (make 0)\n\r"
-                 "$3Unused  (v3)$R: [%d] (make 0)\n\r"
-                 "$3Unused  (v4)$R: [%d] (make 0)",
+    sprintf(buf, "$3AC-apply(v1)$R: [%lu]\n\r"
+                 "$3Unused  (v2)$R: [%lu] (make 0)\n\r"
+                 "$3Unused  (v3)$R: [%lu] (make 0)\n\r"
+                 "$3Unused  (v4)$R: [%lu] (make 0)",
             j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
     break;
   case ITEM_POTION:
@@ -1235,7 +1235,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[3]);
     break;
   case ITEM_INSTRUMENT:
-    sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
+    sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%lu] $3Combat(v2)$R[%lu]",
             j->obj_flags.value[0],
             j->obj_flags.value[1]);
     break;
@@ -1274,7 +1274,7 @@ void obj_stat(Character *ch, class Object *j)
     strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
     break;
   default:
-    sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
+    sprintf(buf, "Values 0-3 : [%lu] [%lu] [%lu] [%lu]",
             j->obj_flags.value[0],
             j->obj_flags.value[1],
             j->obj_flags.value[2],

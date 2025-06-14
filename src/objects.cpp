@@ -442,7 +442,7 @@ int do_recite(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
         if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", scroll->vnum, i, i);
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%lu].spell_pointer == nullptr", scroll->vnum, i, i);
           continue;
         }
         else
@@ -1640,7 +1640,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   {
     if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
-      sprintf(buffer, "You must be level %d to use $p.",
+      sprintf(buffer, "You must be level %llu to use $p.",
               obj_object->obj_flags.eq_level);
       act(buffer, ch, obj_object, 0, TO_CHAR, 0);
       return;
@@ -1651,7 +1651,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (DC::getInstance()->mob_index[ch->mobdata->nr].virt != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
-        sprintf(buffer, "You must be level %d to use $p.",
+        sprintf(buffer, "You must be level %llu to use $p.",
                 obj_object->obj_flags.eq_level);
         act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
@@ -2599,7 +2599,7 @@ int Character::recheck_height_wears(void)
 {
   int j;
   class Object *obj = nullptr;
-  if (!this || IS_NPC(this))
+  if (IS_NPC(this))
     return eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)

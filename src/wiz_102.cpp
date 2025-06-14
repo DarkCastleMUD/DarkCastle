@@ -141,7 +141,7 @@ int do_check(Character *ch, char *arg, int cmd)
 
   sprintf(buf, "$3Short Desc$R: %s\n\r", GET_SHORT(vict));
   ch->send(buf);
-  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
+  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8lld $3In Room$R: %d\n\r",
           races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
@@ -171,7 +171,7 @@ int do_check(Character *ch, char *arg, int cmd)
 
     /* ctime adds a \n to the std::string it returns! */
     const time_t tBuffer = vict->player->time.logon;
-    +sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
+    sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
     ch->send(buf);
   }
 
@@ -1817,7 +1817,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum);
+      sprintf(buf, "Object %lu has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -1878,7 +1878,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum);
+      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
     }
@@ -1915,7 +1915,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
+      sprintf(buf, "Object %lu has no affects to modify.\r\n",
               DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
@@ -1956,7 +1956,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
+      sprintf(buf, "Object %lu has no affects to modify.\r\n",
               DC::getInstance()->obj_index[item_num].vnum);
       ch->send(buf);
       return eFAILURE;
@@ -2665,7 +2665,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
                  "  The field must be one of the following:\n\r",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->player->last_mob_edit);
+    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %lu\n\r", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
   }
@@ -3348,7 +3348,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\n\r"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
+      sprintf(buf, "%llu\n",
               ((Character *)DC::getInstance()->mob_index[mob_num].item)->getLevel());
       ch->send(buf);
       return eFAILURE;
@@ -5136,7 +5136,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
     break;
   }
 
-  fprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
+  fprintf(fl, "#%lu\n", DC::getInstance()->world[room].zone);
   sprintf(buf, "%s's Area.", ch->getNameC());
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
@@ -5200,7 +5200,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
         if (!obj->in_obj)
         {
-          fprintf(fl, "O 0 %d %d %d",
+          fprintf(fl, "O 0 %lu %d %d",
                   obj->vnum, count,
                   DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
@@ -5220,7 +5220,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
                   count++;
               }
 
-              fprintf(fl, "P 1 %d %d %d",
+              fprintf(fl, "P 1 %lu %d %lu",
                       tmp_obj->vnum, count,
                       obj->vnum);
               sprintf(buf, "     %s placed inside %s\n",
@@ -5263,7 +5263,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %d %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].virt,
+        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].virt,
                 count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
@@ -5285,7 +5285,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "E 1 %d %d %d",
+              fprintf(fl, "E 1 %lu %d %d",
                       obj->vnum, count,
                       pos);
               sprintf(buf, "      Equip %s with %s\n",
@@ -5306,7 +5306,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %d %d %d",
+                  fprintf(fl, "P 1 %lu %d %lu",
                           tmp_obj->vnum,
                           count,
                           obj->vnum);
@@ -5336,7 +5336,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "G 1 %d %d",
+              fprintf(fl, "G 1 %lu %d",
                       obj->vnum, count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc,
                       obj->short_description);
@@ -5356,7 +5356,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %d %d %d",
+                  fprintf(fl, "P 1 %lu %d %lu",
                           tmp_obj->vnum,
                           count,
                           obj->vnum);
@@ -5419,7 +5419,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
   sprintf(buf,
-          "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\n\r",
+          "Room name: %s, Of zone : %lu. V-Number : %d, R-number : %lu\n\r",
           rm->name, rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 

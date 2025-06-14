@@ -218,7 +218,7 @@ void list_quests(Character *ch, int lownum, int highnum)
       {
          // Create a format std::string based on a space offset that takes color codes into account
          snprintf(buffer, MAX_STRING_LENGTH,
-                  "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
+                  "%%3d. $B$2Name:$7 %%-%lus$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
                   35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
          csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
@@ -420,7 +420,7 @@ int show_one_available_quest(Character *ch, struct quest_info *quest, int count)
    char buffer[MAX_STRING_LENGTH];
    // Create a format std::string based on a space offset that takes color codes into account
    snprintf(buffer, MAX_STRING_LENGTH,
-            "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
+            "$B$7%3d. $2Name:$7 %%-%lus$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
             quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
    csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);

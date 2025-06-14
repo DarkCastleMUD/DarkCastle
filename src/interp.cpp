@@ -231,6 +231,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         case position_t::FIGHTING:
           this->sendln("No way!  You are still fighting!");
           break;
+        case position_t::STANDING:
+          break;
         }
         return eSUCCESS;
       }
@@ -294,21 +296,18 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       switch (found->getType())
       {
       case CommandType::all:
-        if (this == nullptr)
-        {
-          return eFAILURE;
-        }
+
         break;
 
       case CommandType::players_only:
-        if (this == nullptr || this->player == nullptr)
+        if (player == nullptr)
         {
           return eFAILURE;
         }
         break;
 
       case CommandType::non_players_only:
-        if (this == nullptr || this->mobdata == nullptr)
+        if (mobdata == nullptr)
         {
           return eFAILURE;
         }
@@ -323,17 +322,14 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         break;
 
       case CommandType::implementors_only:
-        if (this == nullptr || this->player == nullptr || this->getLevel() < IMP_ONLY)
+        if (player == nullptr || this->getLevel() < IMP_ONLY)
         {
           return eFAILURE;
         }
         break;
 
       default:
-        if (this == nullptr)
-        {
-          return eFAILURE;
-        }
+
         break;
       }
 
@@ -850,7 +846,7 @@ void automail(char *name)
   char buf[100];
 
   blah = fopen("../lib/whassup.txt", "w");
-  fprintf(blah, name);
+  fprintf(blah, "%s", name);
   fclose(blah);
   sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);

@@ -43,16 +43,16 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%lu] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%lu] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
@@ -308,10 +308,10 @@ int do_donate(Character *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj->vnum);
+    sprintf(log_buf, "%s donates %s[%lu]", GET_NAME(ch), obj->name, obj->vnum);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%lu]", obj->short_description,
            loop_obj->short_description,
            loop_obj->vnum);
   }
@@ -1505,7 +1505,7 @@ void CVoteData::OutToFile()
 
   fprintf(the_file, "%s\n", vote_question.c_str());
 
-  fprintf(the_file, "%d\n", answers.size());
+  fprintf(the_file, "%lu\n", answers.size());
 
   std::vector<SVoteData>::iterator answer_it;
 
@@ -1517,13 +1517,13 @@ void CVoteData::OutToFile()
 
   std::map<std::string, bool>::iterator ip_it;
 
-  fprintf(the_file, "%d\n", ip_voted.size());
+  fprintf(the_file, "%lu\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fprintf(the_file, "%d\n", char_voted.size());
+  fprintf(the_file, "%lu\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());

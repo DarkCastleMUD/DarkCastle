@@ -1323,7 +1323,7 @@ int do_idea(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%u]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.  Thanks.");
@@ -1358,7 +1358,7 @@ int do_typo(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n",
+  sprintf(str, "**%s[%u]: %s\n",
           GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
@@ -1394,7 +1394,7 @@ int do_bug(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
+  sprintf(str, "**%s[%u]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
   fputs(str, fl);
   fclose(fl);
   ch->sendln("Ok.");
@@ -2384,11 +2384,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2406,11 +2406,11 @@ void remove_character(QString name, BACKUP_TYPE backup)
 
   if (DC::getInstance()->cf.bport)
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
   else
   {
-    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name.toStdString().c_str());
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0].toLatin1(), name.toStdString().c_str());
   }
 
   if (0 == stat(src_filename, &statbuf))
@@ -2821,7 +2821,7 @@ splitstring("std::string  with 2 spaces", " ", true)
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty)
 {
   std::vector<std::string> result;
-  unsigned int splitter;
+  std::size_t splitter;
   while ((splitter = splitme.find_first_of(delims)) != splitme.npos)
   {
     if (ignore_empty && splitter > 0)
@@ -2894,7 +2894,7 @@ bool class_can_go(int ch_class, int room)
   return true;
 }
 
-const char *find_profession(int c_class, uint8_t profession)
+QString find_profession(int c_class, uint8_t profession)
 {
   // TODO Fix
   return "Unknown";

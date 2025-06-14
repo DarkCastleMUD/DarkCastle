@@ -697,7 +697,7 @@ void AuctionHouse::Load()
   for (i = 0; i < num_items; i++)
   {
     fscanf(the_file, "%u\n", &ticket);
-    fscanf(the_file, "%d\n", &InTicket.vitem);
+    fscanf(the_file, "%lu\n", &InTicket.vitem);
     fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
     if (nl)
@@ -773,7 +773,7 @@ void AuctionHouse::Save()
   for (Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
     fprintf(the_file, "%u\n", Item_it.key());
-    fprintf(the_file, "%d\n", Item_it->vitem);
+    fprintf(the_file, "%lu\n", Item_it->vitem);
     fprintf(the_file, "%s\n", (char *)Item_it->item_name.toStdString().c_str());
     fprintf(the_file, "%s\n", (char *)Item_it->seller.toStdString().c_str());
     fprintf(the_file, "%s\n", (char *)Item_it->buyer.toStdString().c_str());
@@ -1017,7 +1017,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   if (!dc_->obj_index.contains(Item_it->vitem))
   {
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!",
+    sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %lu] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
@@ -1028,7 +1028,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   if (!obj)
   {
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!",
+    sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %lu] belonging to %s could not be created!",
             Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
@@ -1093,7 +1093,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   Save();
   char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
+  sprintf(log_buf, "VEND: %s bought %s's %s[%lu] for %u coins.\r\n",
           GET_NAME(ch), Item_it->seller.toStdString().c_str(), Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->price);
   logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   obj_to_char(obj, ch);
@@ -1257,7 +1257,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     if (!dc_->obj_index.contains(Item_it->vitem))
     {
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!",
+      sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %lu] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
@@ -1273,7 +1273,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     if (!obj)
     {
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
+      sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %lu] belonging to %s could not be created!",
               Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->seller.toStdString().c_str());
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;

@@ -375,7 +375,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
          if (object->obj_flags.timer)
          {
             char timebuffer[101] = {};
-            snprintf(timebuffer, 100, " $R($B$0%lu ticks left$R)", object->obj_flags.timer);
+            snprintf(timebuffer, 100, " $R($B$0%u ticks left$R)", object->obj_flags.timer);
             strcat(buffer, timebuffer);
          }
       }
@@ -392,7 +392,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
 {
    class Object *i;
    bool found = false;
-   int number = 1;
+   uint64_t number = 1;
    int can_see;
    char buf[50];
 
@@ -408,7 +408,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
       {
          if (number > 1)
          {
-            sprintf(buf, "[%d] ", number);
+            sprintf(buf, "[%lu] ", number);
             this->send(buf);
          }
          show_obj_to_char(i, mode);
@@ -1113,12 +1113,12 @@ bool identify(Character *ch, Object *obj)
 
    case ITEM_WAND:
    case ITEM_STAFF:
-      sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\n\r",
+      sprintf(buf, "$3Has $R%lu$3 charges, with $R%lu$3 charges left.$R\n\r",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "$3Level $R%d$3 spell of:$R\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "$3Level $R%lu$3 spell of:$R\n\r", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
@@ -1151,14 +1151,14 @@ bool identify(Character *ch, Object *obj)
       break;
 
    case ITEM_INSTRUMENT:
-      sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
+      sprintf(buf, "$3Affects non-combat singing by '$R%lu$3'$R\r\n$3Affects combat singing by '$R%lu$3'$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
       break;
 
    case ITEM_MISSILE:
-      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+      sprintf(buf, "$3Damage Dice are '$R%luD%lu$3'$R\n\rIt is +%lu to arrow hit and +%lu to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -1167,7 +1167,7 @@ bool identify(Character *ch, Object *obj)
       break;
 
    case ITEM_FIREWEAPON:
-      sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
+      sprintf(buf, "$3Bow is +$R%lu$3 to arrow hit and +$R%lu$3 to arrow damage.$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
@@ -1430,7 +1430,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      if (temp > 3)
                      {
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in object %d. v2: %d > v1: %d. Resetting.",
+                             "Bug in Object %lu. v2: %d > v1: %d. Resetting.",
                              tmp_object->vnum,
                              tmp_object->obj_flags.value[1],
                              tmp_object->obj_flags.value[0]);
@@ -1485,7 +1485,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                      {
                         temp = 3;
                         logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
-                             "Bug in object %d. Weight: %d v1: %d",
+                             "Bug in Object %lu. Weight: %d v1: %d",
                              tmp_object->vnum,
                              tmp_object->obj_flags.weight,
                              tmp_object->obj_flags.value[0]);
@@ -1748,7 +1748,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                        sector_buf);
             sprintbit((int32_t)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
                       rflag_buf);
-            csendf(ch, "\r\nLight[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
+            csendf(ch, "\r\nLight[%lu] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
             if (DC::getInstance()->world[ch->in_room].temp_room_flags)
             {
                sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
@@ -1894,7 +1894,7 @@ int do_exits(Character *ch, char *argument, int cmd)
          continue;
 
       if (!IS_NPC(ch) && ch->player->holyLite)
-         sprintf(buf + strlen(buf), "%s - %s [%d]\n\r", exits[door],
+         sprintf(buf + strlen(buf), "%s - %s [%u]\n\r", exits[door],
                  DC::getInstance()->world[EXIT(ch, door)->to_room].name,
                  DC::getInstance()->world[EXIT(ch, door)->to_room].number);
       else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1964,7 +1964,7 @@ int do_score(Character *ch, char *argument, int cmd)
    sprintf(buf,
            "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
            "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3d        $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+           "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3llu        $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
            "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
            "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\n\r"
            "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
@@ -2369,7 +2369,7 @@ int do_time(Character *ch, char *argument, int cmd)
    // 	s = timep % 60;
    // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \n\r",
    // 			h,m,s);
-   sprintf(buf, "The mud has been running for: %02li:%02li \n\r", h, m);
+   sprintf(buf, "The mud has been running for: %02d:%02d \n\r", h, m);
    ch->send(buf);
    return eSUCCESS;
 }
@@ -3757,6 +3757,9 @@ bool Search::operator==(const Object *obj)
       break;
 
    case O_AFFECTED:
+   case O_CARRIED_BY:
+   case O_EQUIPPED_BY:
+   case LIMIT:
       break;
    }
    return false;
@@ -4561,6 +4564,9 @@ command_return_t Character::do_search(QStringList arguments, int cmd)
          case Search::locations::in_vault:
          case Search::locations::in_clan_vault:
             custom_columns += QStringLiteral(" [%1 vault]").arg(result.getName(), 13);
+            break;
+         case Search::locations::in_object_database:
+            custom_columns += QStringLiteral(" [%1]").arg("in Object DB", 19);
             break;
          }
       }

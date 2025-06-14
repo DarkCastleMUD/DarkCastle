@@ -230,7 +230,7 @@ TICKET STRUCT
 */
 struct AuctionTicket
 {
-  int vitem;
+  vnum_t vitem;
   QString item_name;
   unsigned int price;
   QString seller;

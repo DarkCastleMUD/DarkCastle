@@ -625,7 +625,7 @@ int do_wizinvis(Character *ch, char *argument, int cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->player->wizinvis);
+  sprintf(buf, "WizInvis Set to: %d \n\r", ch->player->wizinvis);
   ch->send(buf);
   return eSUCCESS;
 }

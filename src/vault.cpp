@@ -364,7 +364,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     half_chop(arg1, argument, arg2);
 
-    if (arg2)
+    if (arg2[0] != '\0')
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
@@ -388,7 +388,7 @@ int do_vault(Character *ch, char *argument, int cmd)
   {
     half_chop(arg1, argument, arg2);
 
-    if (arg2)
+    if (arg2[0] != '\0')
     {
       if (!str_cmp(arg2, "clan") && ch->clan)
       {
@@ -629,7 +629,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     break;
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name.at(0), name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name.at(0).toLatin1(), name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -644,7 +644,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0], name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0].toLatin1(), name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -659,7 +659,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
     }
   }
 
-  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0], name.toStdString().c_str());
+  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0].toLatin1(), name.toStdString().c_str());
 
   if (0 == stat(src_filename, &statbuf))
   {
@@ -833,7 +833,7 @@ void DC::testing_load_vaults(void)
           {
             qDebug("3846");
           }
-          qDebug(vault->owner.toStdString().c_str());
+          qDebug("%s", qUtf8Printable(vault->owner));
           obj = read_object(vnum, vault_file_stream, true);
           items->obj = obj;
         }
@@ -2217,7 +2217,7 @@ void add_new_vault(const char *name, int indexonly)
   }
 
   if (ch)
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
+    fprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
   else
     fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
@@ -2321,8 +2321,8 @@ void logvault(QString message, QString name)
 
   logentry(message, IMMORTAL, DC::LogChannel::LOG_VAULT);
 
-  sprintf(fname, "../vaults/%c/%s.vault.log", name[0], name.toStdString().c_str());
-  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0], name.toStdString().c_str());
+  sprintf(fname, "../vaults/%c/%s.vault.log", name[0].toLatin1(), name.toStdString().c_str());
+  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0].toLatin1(), name.toStdString().c_str());
 
   if (!(ofile = fopen(fname, "r")))
   {

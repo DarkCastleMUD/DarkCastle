@@ -253,7 +253,7 @@ public:
     static const QStringList apply_types;
 
     vnum_t vnum = {};             /* Where in data-base               */
-    int vroom = {};               /* for corpse saving */
+    room_t vroom = {};            /* for corpse saving */
     obj_flag_data obj_flags = {}; /* Object information               */
     int16_t num_affects = {};
     obj_affected_type *affected = {}; /* Which abilities in PC to change  */

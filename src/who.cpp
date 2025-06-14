@@ -129,7 +129,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
       if ((!IS_NPC(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
-                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
+                "   $B%-18s %-10s %-14s   Level %2lld      $1($7Leader$1)$R \n\r",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
                 pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
       }
@@ -152,7 +152,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
+              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2lld\n\r",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
                       pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
             else
@@ -226,7 +226,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
-                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
+                  "   %-15s %-9s %-13s %2lld     %-4d%-7d%d\n\r",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),
@@ -638,12 +638,12 @@ int do_where(Character *ch, char *argument, int cmd)
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+          csendf(ch, "%-20s - %s$R [%lu] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                  DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%d]\n\r",
+          csendf(ch, "%-20s - %s$R [%lu]\n\r",
                  d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
         }
       }
@@ -660,7 +660,7 @@ int do_where(Character *ch, char *argument, int cmd)
         { // If switched
           if (is_abbrev(buf, d->original->getName()))
           {
-            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+            csendf(ch, "%-20s - %s$R [%lu] In body of %s\n\r", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
                    DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
           }
         }
@@ -668,7 +668,7 @@ int do_where(Character *ch, char *argument, int cmd)
         {
           if (is_abbrev(buf, d->character->getNameC()))
           {
-            csendf(ch, "%-20s - %s$R [%d]\n\r",
+            csendf(ch, "%-20s - %s$R [%lu]\n\r",
                    d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
           }
         }

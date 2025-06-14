@@ -3539,7 +3539,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 		break;
 	case 'q':
 		char buf[15];
-		sprintf(buf, "%d", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+		sprintf(buf, "%lu", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
 		strcpy(t, buf);
 		break;
 	case 'j':

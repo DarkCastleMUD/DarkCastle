@@ -1098,7 +1098,7 @@ bool assemble_item_index(Character *ch, int item_index)
     rnum_t component_real = component_virt;
     if (component_real < 0)
     {
-      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+      logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%lu], component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
       ch->sendln("There was an internal malfunction assembling your item. Contact an Immortal.");
@@ -1452,7 +1452,7 @@ int devilsword(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd != CMD_SAY)
     return eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WIELD])
+  if (!ch || !ch->equipment[0] || !ch->equipment[WIELD])
     return eFAILURE;
 
   if (185 != ch->equipment[WIELD]->vnum)
@@ -1626,7 +1626,7 @@ int eliara_combat(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  if (!ch || !ch->equipment || !ch->equipment[WIELD])
+  if (!ch || !ch->equipment[0] || !ch->equipment[WIELD])
     return eFAILURE;
 
   if (30627 != ch->equipment[WIELD]->vnum)
@@ -1657,7 +1657,7 @@ int eliara_non_combat(Character *ch, class Object *obj, int cmd, const char *arg
   if (!ch)
     return eFAILURE;
 
-  if (cmd == CMD_REMOVE && ch->getPosition() == position_t::FIGHTING && ch->equipment && ch->equipment[WIELD] && ch->equipment[WIELD]->vnum == 30627)
+  if (cmd == CMD_REMOVE && ch->getPosition() == position_t::FIGHTING && ch->equipment[0] && ch->equipment[WIELD] && ch->equipment[WIELD]->vnum == 30627)
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
     return eSUCCESS;
@@ -1713,7 +1713,7 @@ int arenaporter(Character *ch, class Object *obj, int cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (move_char(ch, real_room(number(17800, 17949))) != ReturnValue::eSUCCESS)
     return eFAILURE;
 
   if (ch->fighting)
@@ -1755,7 +1755,7 @@ int movingarenaporter(Character *ch, class Object *obj, int cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (move_char(ch, real_room(number(17800, 17949))) != ReturnValue::eSUCCESS)
     return eFAILURE;
 
   ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");

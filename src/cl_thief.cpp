@@ -1010,7 +1010,7 @@ int do_steal(Character *ch, char *argument, int cmd)
                     obj->vnum, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%lu]",
                    obj->short_description,
                    loop_obj->short_description,
                    loop_obj->vnum);

@@ -891,7 +891,7 @@ char *numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
 
-const char *find_profession(int c_class, uint8_t profession);
+QString find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32_t, int8_t);
 

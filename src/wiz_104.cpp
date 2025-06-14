@@ -78,7 +78,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 				if (IS_PC(ch) && ch->player->wizinvis && i->character->getLevel() < ch->player->wizinvis)
 					sprintf(buf3, "Someone");
 				else
-					sprintf(buf3, GET_SHORT(ch));
+					sprintf(buf3, "%s", GET_SHORT(ch));
 
 				if (cmd == CMD_DEFAULT)
 				{
@@ -466,7 +466,7 @@ int Zone::show_info(Character *ch)
 	ch->send(buf);
 	sprintf(buf, "\r\n"
 				 "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-				 "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
+				 "$3DiedThisTick$R: %3lu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
 			num_mob_on_repop,
 			death_counter,
 			counter_mod,
@@ -586,7 +586,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			else
 				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
 			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
-			sprintf(buf, "%s ([%d] [%d] [%s])", buf,
+			sprintf(buf, "%s ([%lu] [%lu] [%s])", buf,
 					zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
 					charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
 			sprintf(buf, "%s\r\n", buf);
@@ -629,9 +629,9 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
 			if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
 				zone.cmd[j]->arg3 < 0)
-				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
+				sprintf(buf, "%s[%lu](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
 			else
-				sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
+				sprintf(buf, "%s[%lu](%s).$R\r\n", buf, zone.cmd[j]->arg3,
 						equipment_types[zone.cmd[j]->arg3]);
 			break;
 		case 'D':
@@ -672,7 +672,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 					zone.cmd[j]->comment.toStdString().c_str() ? zone.cmd[j]->comment.toStdString().c_str() : "Empty Comment");
 			break;
 		case 'K':
-			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
+			sprintf(buf, "%s Skip next [%lu] commands.\r\n", buf,
 					zone.cmd[j]->arg1);
 			break;
 		case 'X':
@@ -703,7 +703,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				break;
 			}
 
-			sprintf(buf, "%s [%d] %s\r\n", buf,
+			sprintf(buf, "%s [%lu] %s\r\n", buf,
 					zone.cmd[j]->arg1, xresultstr);
 		}
 		break;
@@ -911,7 +911,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			{
 				if ((nr = real_mobile(begin)) >= 0)
 				{
-					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+					sprintf(buf, "[  1] [%5d] [%2llu] %s\n\r", begin,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -926,7 +926,7 @@ int do_show(Character *ch, char *argument, int cmd)
 						continue;
 
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2llu] %s\n\r", count, i,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -952,7 +952,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].item))->getNameC()))
 				{
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2llu] %s\n\r", count, i,
 							((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 							((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 					ch->send(buf);
@@ -1015,7 +1015,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			{
 				if (DC::getInstance()->obj_index.contains(begin))
 				{
-					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+					sprintf(buf, "[  1] [%5d] [%2llu] %s\n\r", begin,
 							DC::getInstance()->obj_index[begin].item->obj_flags.eq_level,
 							DC::getInstance()->obj_index[begin].item->short_description);
 					ch->send(buf);
@@ -1026,7 +1026,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				for (auto obj_index_it = DC::getInstance()->obj_index.find(begin); obj_index_it != DC::getInstance()->obj_index.find(end) && obj_index_it != DC::getInstance()->obj_index.end(); obj_index_it++)
 				{
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, obj_index_it->vnum,
+					sprintf(buf, "[%3d] [%5lu] [%2llu] %s\n\r", count, obj_index_it->vnum,
 							obj_index_it->item->obj_flags.eq_level,
 							obj_index_it->item->short_description);
 					ch->send(buf);
@@ -1049,7 +1049,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				if (isexact(name, obj_index_entry.item->name))
 				{
 					count++;
-					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+					sprintf(buf, "[%3d] [%5d] [%2llu] %s\n\r", count, i,
 							obj_index_entry.item->obj_flags.eq_level,
 							obj_index_entry.item->short_description);
 					ch->send(buf);
@@ -1428,7 +1428,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				ch->sendln("Limit reached.");
 				break;
 			}
-			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+			sprintf(buf, "[%3d] [%5d] [%2llu] %s\n\r", count, c,
 					((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
 					((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
 			ch->send(buf);
@@ -1737,7 +1737,7 @@ int do_show(Character *ch, char *argument, int cmd)
 				ch->sendln("Limit reached.");
 				break;
 			}
-			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+			sprintf(buf, "[%3d] [%5d] [%2llu] %s\n\r", count, c,
 					obj_index_entry.item->obj_flags.eq_level,
 					obj_index_entry.item->short_description);
 			ch->send(buf);
@@ -2412,7 +2412,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	if (!DC::getInstance()->obj_index.contains(v2))
 	{
 		char buf[30];
-		sprintf(buf, "new %lu", v2);
+		sprintf(buf, "new %d", v2);
 		command_return_t retval = do_oedit(ch, buf);
 		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
