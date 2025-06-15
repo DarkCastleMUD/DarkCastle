@@ -947,21 +947,21 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         value = QString::number(getGold() / 20000);
     else if (variable == "cond" || variable == "condition")
     {
-        if (target && fighting)
+        if (target)
         {
-            if (target_is == targets::Self)
-                return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
-            else if (target_is == targets::Fighting)
-                return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
-            else if (target_is == targets::Tank)
-                return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
-            else if (target_is == targets::Charmie || target_is == targets::GrouptMember)
+            if (target_is == targets::Charmie || target_is == targets::GrouptMember)
                 return QStringLiteral("%1").arg(calc_condition(target, use_color));
-            else
-                return {};
+
+            if (fighting)
+            {
+                if (target_is == targets::Self)
+                    return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
+                else if (target_is == targets::Fighting)
+                    return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
+                else if (target_is == targets::Tank)
+                    return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
+            }
         }
-        else
-            return {};
     }
     else if (variable == "normal" && supports_color)
         value = NTEXT;
