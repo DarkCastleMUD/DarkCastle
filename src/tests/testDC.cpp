@@ -746,7 +746,7 @@ private slots:
             fstream_world_file << "$~\n";
         }
 
-        qInfo("Wrote %d rooms to '%s'.", rooms_written, qPrintable(filename));
+        qInfo("Wrote %lu rooms to '%s'.", rooms_written, qPrintable(filename));
 
         auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
         auto legacyfile_checksum = checksumFile(legacyfile_filename);
