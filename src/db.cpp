@@ -3453,7 +3453,7 @@ int create_blank_mobile(int nr)
 	return cur_index;
 }
 
-// Hack of delete_item_from_index
+// Hack of delete_obj_from_index
 // Note:  ALL copies of this mobile must have been removed from the game
 // before calling this function.  Otherwise these old mobiles will think
 // they are the restrung version of the mobile that now holds that index.
@@ -3535,9 +3535,20 @@ void delete_mob_from_index(int nr)
 //
 // return index of item on success, -1 on failure
 //
-void delete_item_from_index(vnum_t vnum)
+void delete_obj_from_index(vnum_t vnum)
 {
 	if (!DC::getInstance()->obj_index.contains(vnum))
+	{
+		return;
+	}
+
+	delete DC::getInstance()->obj_index[vnum].item;
+	DC::getInstance()->obj_index.remove(vnum);
+}
+
+void delete_mob_from_index(vnum_t vnum)
+{
+	if (!DC::getInstance()->mob_index.contains(vnum))
 	{
 		return;
 	}

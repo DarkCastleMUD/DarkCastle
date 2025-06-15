@@ -214,7 +214,7 @@ char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
 auto create_blank_item(vnum_t nr) -> std::expected<vnum_t, create_error>;
 int create_blank_mobile(int nr);
-void delete_item_from_index(vnum_t vnum);
+void delete_obj_from_index(vnum_t vnum);
 void delete_mob_from_index(int nr);
 int real_mobile(int virt);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
