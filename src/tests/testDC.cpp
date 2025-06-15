@@ -1931,7 +1931,7 @@ private slots:
         p1.setLevel(10);
         QCOMPARE(p1.desc->output, "Ok.\r\nAdding in the final ingredient, your golem increases in strength!\r\nAn enchanted iron golem starts following you.\r\nThere is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n");
         p1.desc->output = {};
-        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Y"), " "); // %Y
+        QCOMPARE(p1.get_parsed_legacy_prompt_variable("%Y"), "\u001B[32m100\u001B[0m\u001B[37m "); // %Y
 
         QCOMPARE(p1.do_hit({g1.getName()}), eSUCCESS);
         QCOMPARE(p1.desc->output, "Your hit misses thalanil.\r\n");
