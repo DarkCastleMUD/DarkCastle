@@ -994,7 +994,13 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
             value = QString::number(player->last_mob_edit);
     }
     else if (variable == "weather")
-        value = time_look[weather_info.sunlight];
+    {
+        extern char *sky_look[];
+        if (OUTSIDE(this))
+            value = sky_look[weather_info.sky];
+        else
+            value = "indoors";
+    }
     else if (variable == "name")
     {
         return target->calc_name(use_color);
