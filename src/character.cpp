@@ -770,7 +770,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
         {"C", "colorcondition"},
         {"F", "target.colorcondition"},
         {"T", "tank.colorcondition"},
-        {"Y", "charmie.colorcondition"},
+        {"Y", "charmie.colorhp%"},
         {"P", "tank.colorname"},
         {"Q", "target.colorname"},
         {"b", "gmember1.name"},
