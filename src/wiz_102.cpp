@@ -2559,7 +2559,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
 
     // remove the item from index
-    delete_obj_from_index(vnum);
+    delete_item_from_index(DC::getInstance()->obj_index, vnum);
     ch->sendln("Item deleted.");
     break;
   }
