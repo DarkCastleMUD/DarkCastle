@@ -981,7 +981,7 @@ int guild_guard(Character *ch, class Object *obj, int cmd, const char *arg,
 int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
                Character *owner)
 {
-  int in_room = ch->in_room;
+  auto in_room = ch->in_room;
   int guard_clan = 0;
   int guard_room = 0;
   int guard_direction = 0;

@@ -2581,7 +2581,8 @@ int do_olocate(Character *ch, char *name, int cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    class Object *k;
-   int in_room = 0, count = 0;
+   room_t in_room = 0;
+   int count = 0;
    int vnum = 0;
    int searchnum = 0;
 
@@ -2648,7 +2649,7 @@ int do_olocate(Character *ch, char *name, int cmd)
       count++;
 
       if (in_room != DC::NOWHERE)
-         sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
+         sprintf(buf, "[%2d] %-26s %lu", count, k->short_description, in_room);
       else
          sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
                  "(Item at DC::NOWHERE.)");

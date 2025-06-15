@@ -118,7 +118,7 @@ struct room_direction_data
     int16_t exit_info;         /* Exit info                       */
     Character *bracee;         /* This is who is bracing the door */
     int16_t key;               /* Key's number (-1 for no key)    */
-    int16_t to_room;           /* Where direction leeds (NOWHERE) */
+    room_t to_room;            /* Where direction leeds (NOWHERE) */
 };
 
 struct room_track_data
@@ -206,7 +206,7 @@ public:
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents
     room_track_data *last_track = {}; // last in the scent list
-    quint64 iFlags = {};                  // Internal flags. These do NOT save.
+    quint64 iFlags = {};              // Internal flags. These do NOT save.
     struct path_data *paths = {};
     bool allow_class[CLASS_MAX] = {};
 

@@ -1369,7 +1369,7 @@ void write_one_room(LegacyFile &lf, int a)
 			string_to_file(f, DC::getInstance()->world[a].dir_option[b]->keyword);
 		else
 			fprintf(f, "~\n"); // print blank
-		fprintf(f, "%d %d %d\n",
+		fprintf(f, "%d %d %lu\n",
 				DC::getInstance()->world[a].dir_option[b]->exit_info,
 				DC::getInstance()->world[a].dir_option[b]->key,
 				DC::getInstance()->world[a].dir_option[b]->to_room);

@@ -5510,7 +5510,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
       ch->send(buf);
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
       sprintf(buf,
-              "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\n\r",
+              "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %lu\n\r",
               buf2, rm->dir_option[i]->key,
               rm->dir_option[i]->to_room);
       ch->send(buf);
