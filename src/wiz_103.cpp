@@ -170,7 +170,7 @@ int do_disconnect(Character *ch, char *argument, int cmd)
 
   one_argument(argument, arg);
   sdesc = atoi(arg);
-  if (arg == 0)
+  if (arg[0] == '\0')
   {
     ch->sendln("Illegal descriptor number.");
     ch->sendln("Usage: release <#>");
