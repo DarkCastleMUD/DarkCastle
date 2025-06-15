@@ -202,7 +202,7 @@ class active_object
 #define OBJ_NOTIMER -7000000
 
 typedef uint16_t object_type_t;
-typedef vnum_t object_value_t;
+typedef int32_t object_value_t;
 
 struct obj_flag_data
 {
