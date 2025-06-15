@@ -126,7 +126,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %lu coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
+        sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         if (ch->isPlayerGoldThief())
@@ -2741,8 +2741,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       (obj_object->obj_flags.value[0] >= 1))
   {
     obj_from_char(obj_object);
-    sprintf(buffer, "There was %lu coins.\r\n",
-            obj_object->obj_flags.value[0]);
+    sprintf(buffer, "There was %d coins.\r\n", obj_object->obj_flags.value[0]);
     ch->send(buffer);
     if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                                                         DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)

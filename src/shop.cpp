@@ -409,7 +409,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
         do_say(keeper, buf, CMD_DEFAULT);
         sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf, CMD_DEFAULT);
-        sprintf(buf, "The damage dice are '%luD%lu'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+        sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf, CMD_DEFAULT);
         for (int i = 0; i < obj->num_affects; i++)
         {
@@ -492,7 +492,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
     {
       if (obj->obj_flags.value[0] < 20)
       {
-        sprintf(buf, "Excellent, %s has been imbued with energies of the %luth level.", obj->short_description, obj->obj_flags.value[0]);
+        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
         do_say(keeper, buf, CMD_DEFAULT);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {

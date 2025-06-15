@@ -1388,7 +1388,7 @@ int get_weapon_damage_type(class Object *wielded)
     return TYPE_PIERCE;
     break;
   default:
-    sprintf(log_buf, "WORLD: Unknown w_type for object #%lu name: %s, fourth value flag is: %lu.",
+    sprintf(log_buf, "WORLD: Unknown w_type for object #%lu name: %s, fourth value flag is: %d.",
             wielded->vnum, wielded->name, wielded->obj_flags.value[3]);
     logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     break;

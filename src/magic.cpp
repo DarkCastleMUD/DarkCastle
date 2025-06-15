@@ -4671,7 +4671,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     case ITEM_SCROLL:
     case ITEM_POTION:
-      sprintf(buf, "Level %lu spells of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "Level %d spells of:\n\r", obj->obj_flags.value[0]);
       ch->send(buf);
       if (obj->obj_flags.value[1] >= 1)
       {
@@ -4695,12 +4695,12 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
 
     case ITEM_WAND:
     case ITEM_STAFF:
-      sprintf(buf, "Has %lu charges, with %lu charges left.\r\n",
+      sprintf(buf, "Has %d charges, with %d charges left.\r\n",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "Level %lu spell of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "Level %d spell of:\n\r", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
@@ -4712,21 +4712,21 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       break;
 
     case ITEM_WEAPON:
-      sprintf(buf, "Damage Dice are '%luD%lu'\n\r",
+      sprintf(buf, "Damage Dice are '%dD%d'\n\r",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
       break;
 
     case ITEM_INSTRUMENT:
-      sprintf(buf, "Affects non-combat singing by '%lu'\r\nAffects combat singing by '%lu'\r\n",
+      sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
       break;
 
     case ITEM_MISSILE:
-      sprintf(buf, "Damage Dice are '%luD%lu'\n\rIt is +%lu to arrow hit and +%lu to arrow damage\r\n",
+      sprintf(buf, "Damage Dice are '%dD%d'\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -4735,7 +4735,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
       break;
 
     case ITEM_FIREWEAPON:
-      sprintf(buf, "Bow is +%lu to arrow hit and +%lu to arrow damage.\r\n",
+      sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
@@ -4752,7 +4752,7 @@ int spell_identify(uint8_t level, Character *ch, Character *victim, class Object
         value = obj->obj_flags.value[0];
       }
 
-      sprintf(buf, "AC-apply is %d     Resistance to damage is %lu\n\r",
+      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
               value, obj->obj_flags.value[2]);
       ch->send(buf);
       break;

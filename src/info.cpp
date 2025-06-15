@@ -993,7 +993,7 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
       // if negative show "- difference"
       if (swapcolors)
       {
-         buf2 = QStringLiteral("%s%d$R").arg(color_good).arg(random - base);
+         buf2 = QStringLiteral("%1%2$R").arg(color_good).arg(random - base);
       }
       else
       {
@@ -1113,12 +1113,12 @@ bool identify(Character *ch, Object *obj)
 
    case ITEM_WAND:
    case ITEM_STAFF:
-      sprintf(buf, "$3Has $R%lu$3 charges, with $R%lu$3 charges left.$R\n\r",
+      sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\n\r",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       ch->send(buf);
 
-      sprintf(buf, "$3Level $R%lu$3 spell of:$R\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "$3Level $R%d$3 spell of:$R\n\r", obj->obj_flags.value[0]);
       ch->send(buf);
 
       if (obj->obj_flags.value[3] >= 1)
@@ -1151,14 +1151,14 @@ bool identify(Character *ch, Object *obj)
       break;
 
    case ITEM_INSTRUMENT:
-      sprintf(buf, "$3Affects non-combat singing by '$R%lu$3'$R\r\n$3Affects combat singing by '$R%lu$3'$R\r\n",
+      sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
       break;
 
    case ITEM_MISSILE:
-      sprintf(buf, "$3Damage Dice are '$R%luD%lu$3'$R\n\rIt is +%lu to arrow hit and +%lu to arrow damage\r\n",
+      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1],
               obj->obj_flags.value[2],
@@ -1167,7 +1167,7 @@ bool identify(Character *ch, Object *obj)
       break;
 
    case ITEM_FIREWEAPON:
-      sprintf(buf, "$3Bow is +$R%lu$3 to arrow hit and +$R%lu$3 to arrow damage.$R\r\n",
+      sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
               obj->obj_flags.value[0],
               obj->obj_flags.value[1]);
       ch->send(buf);
