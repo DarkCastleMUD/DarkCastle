@@ -4009,7 +4009,7 @@ void write_object(LegacyFile &lf, Object *obj)
 	string_to_file(fl, obj->ActionDescription());
 
 	fprintf(fl, "%d %d %d %d\n"
-				"%lu %lu %lu %lu %llu\n"
+				"%d %d %d %d %llu\n"
 				"%d %d %d\n",
 			obj->obj_flags.type_flag,
 			obj->obj_flags.extra_flags,
