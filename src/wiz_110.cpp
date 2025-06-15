@@ -842,7 +842,7 @@ int do_metastat(Character *ch, char *argument, int cmd)
   {
     if ((l++ % 10) == 0)
       sprintf(buf, "%s\r\n", buf);
-    sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
+    sprintf(buf, "%s%llu ", buf, Commands::commands_[i].getNumber());
   }
   ch->send(buf);
   return eSUCCESS;
@@ -883,7 +883,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
     for (int z = 0; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
-    sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
+    sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
             o % 2 == 0 ? "$2" : "$3", o, obj->short_description, obj_index_entry.vnum, ac);
     ch->send(buf);
     o++;
