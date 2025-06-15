@@ -57,7 +57,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 	if (IS_PC(ch) && ch->player->wizinvis)
 		sprintf(buf3, "someone");
 	else
-		sprintf(buf3, GET_SHORT(ch));
+		sprintf(buf3, "%s", GET_SHORT(ch));
 
 	for (; *argument == ' '; argument++)
 		;
@@ -586,8 +586,9 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 			else
 				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
 			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j]->arg3);
-			sprintf(buf, "%s ([%lu] [%lu] [%s])", buf,
-					zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
+			sprintf(buf, "%s ([%s] [%s] [%s])", buf,
+					zone.cmd[j]->lastPop ? "true" : "false",
+					charExists(zone.cmd[j]->lastPop) ? "ch exists" : "ch no exist",
 					charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
 			sprintf(buf, "%s\r\n", buf);
 			break;
@@ -629,9 +630,9 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
 			if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
 				zone.cmd[j]->arg3 < 0)
-				sprintf(buf, "%s[%lu](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
+				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
 			else
-				sprintf(buf, "%s[%lu](%s).$R\r\n", buf, zone.cmd[j]->arg3,
+				sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
 						equipment_types[zone.cmd[j]->arg3]);
 			break;
 		case 'D':
@@ -672,7 +673,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 					zone.cmd[j]->comment.toStdString().c_str() ? zone.cmd[j]->comment.toStdString().c_str() : "Empty Comment");
 			break;
 		case 'K':
-			sprintf(buf, "%s Skip next [%lu] commands.\r\n", buf,
+			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
 					zone.cmd[j]->arg1);
 			break;
 		case 'X':
@@ -703,7 +704,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 				break;
 			}
 
-			sprintf(buf, "%s [%lu] %s\r\n", buf,
+			sprintf(buf, "%s [%d] %s\r\n", buf,
 					zone.cmd[j]->arg1, xresultstr);
 		}
 		break;
