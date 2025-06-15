@@ -72,7 +72,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobdata->vnum)
     {
       if (!can_be_attacked(ally, ch->fighting))
         continue;
@@ -119,7 +119,7 @@ int protect(Character *ch, int iFriendId)
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobdata->vnum)
     {
       // obscure whitney houston joke
       do_say(ch, "and IiiiIIiiii will always, looove yooooou!", CMD_DEFAULT);
@@ -229,7 +229,7 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
   {
     if (!IS_NPC(victim))
       continue;
-    if (real_mobile(iFriendId) == victim->mobdata->nr)
+    if (real_mobile(iFriendId) == victim->mobdata->vnum)
     {
       move_char(victim, ch->in_room);
     }
@@ -252,7 +252,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
   {
     if (!IS_NPC(ally))
       continue;
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (real_mobile(iFriendId) == ally->mobdata->vnum)
       return ally;
   }
   return nullptr;
@@ -1031,7 +1031,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   int clan_num = ch->clan;
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
   {
-    int b = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+    int b = DC::getInstance()->mob_index[ch->mobdata->vnum].virt;
     switch (b)
     {
     case 8:     // golem
@@ -2244,7 +2244,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
      * Should be some code here to defend against weird monsters
      * getting loaded into the pet shop back room.  -- Furey
      */
-    pet = clone_mobile(pet->mobdata->nr);
+    pet = clone_mobile(pet->mobdata->vnum);
     GET_EXP(pet) = 0;
     SETBIT(pet->affected_by, AFF_CHARM);
 
@@ -3584,7 +3584,7 @@ int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  switch (DC::getInstance()->mob_index[ch->mobdata->nr].virt)
+  switch (DC::getInstance()->mob_index[ch->mobdata->vnum].virt)
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

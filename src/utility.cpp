@@ -1737,7 +1737,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   {
     fol_next = fol->next;
     if (IS_NPC(fol->follower) &&
-        DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
+        DC::getInstance()->mob_index[fol->follower->mobdata->vnum].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false, QStringLiteral("do_quit/followers"));

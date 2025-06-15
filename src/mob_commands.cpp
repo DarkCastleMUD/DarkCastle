@@ -138,7 +138,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
-          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
+          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->vnum].virt);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -146,13 +146,13 @@ void mpstat(Character *ch, Character *victim)
           victim->long_desc ? victim->long_desc : "(nullptr)");
   ch->send(buf);
 
-  if (!(DC::getInstance()->mob_index[victim->mobdata->nr].progtypes))
+  if (!(DC::getInstance()->mob_index[victim->mobdata->vnum].progtypes))
   {
     ch->sendln("That mob has no programs set.");
     return;
   }
 
-  for (mprg = DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
+  for (mprg = DC::getInstance()->mob_index[victim->mobdata->vnum].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
@@ -1235,7 +1235,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   {
     if (IS_NPC(this))
     {
-      int num = DC::getInstance()->mob_index[this->mobdata->nr].virt;
+      int num = DC::getInstance()->mob_index[this->mobdata->vnum].virt;
 
       logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
@@ -1798,7 +1798,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->vnum].virt;
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -2284,7 +2284,7 @@ void prog_error(Character *ch, char *format, ...)
   else if (ch && IS_NPC(ch))
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d, com %d, line %d: %s",
-         DC::getInstance()->mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
+         DC::getInstance()->mob_index[ch->mobdata->vnum].virt, mprog_command_num, mprog_line_num,
          buffer);
   }
   else

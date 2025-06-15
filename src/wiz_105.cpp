@@ -339,7 +339,7 @@ int do_debug(Character *ch, char *args, int cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == vnum)
+          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].virt == vnum)
           {
             if (!first_npc_found)
             {
@@ -347,7 +347,7 @@ int do_debug(Character *ch, char *args, int cmd)
               first_npc_debug_state = c->getDebug();
             }
             c->setDebug(!first_npc_debug_state);
-            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->nr).arg(c->getDebug() ? "on" : "off"));
+            ch->sendln(QStringLiteral("Vnum %1 Rnum %2 debug turned %3.").arg(vnum).arg(c->mobdata->vnum).arg(c->getDebug() ? "on" : "off"));
             change_count++;
           }
         }

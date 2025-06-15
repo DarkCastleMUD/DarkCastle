@@ -2727,7 +2727,7 @@ Character *read_mobile(int nr, FILE *fl)
 	if (isSet(mob->suscept, ISR_MAGIC))
 		mob->saves[SAVE_TYPE_MAGIC] -= 50;
 
-	mob->mobdata->nr = nr;
+	mob->mobdata->vnum = nr;
 	mob->desc = 0;
 
 	return (mob);
@@ -2762,7 +2762,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 	FILE *fl = lf.file_handle_;
 	int i = 0;
 
-	fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].virt);
+	fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->vnum].virt);
 	string_to_file(fl, mob->getName());
 	string_to_file(fl, mob->short_desc);
 	string_to_file(fl, mob->long_desc);
@@ -2824,9 +2824,9 @@ void write_mobile(LegacyFile &lf, Character *mob)
 		fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
 	}
 
-	if (DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs)
+	if (DC::getInstance()->mob_index[mob->mobdata->vnum].mobprogs)
 	{
-		write_mprog_recur(fl, DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs, true);
+		write_mprog_recur(fl, DC::getInstance()->mob_index[mob->mobdata->vnum].mobprogs, true);
 		fprintf(fl, "|\n");
 	}
 
@@ -3221,7 +3221,7 @@ Character *clone_mobile(int nr)
 	for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
 		mob->equipment[i] = 0;
 
-	mob->mobdata->nr = nr;
+	mob->mobdata->vnum = nr;
 	mob->desc = 0;
 	mob->mobdata->reset = {};
 
@@ -3374,7 +3374,7 @@ int create_blank_mobile(int nr)
 	mob->mobdata->damsizedice = 1;
 	mob->mobdata->default_pos = position_t::STANDING;
 	mob->mobdata->last_room = 0;
-	mob->mobdata->nr = cur_index;
+	mob->mobdata->vnum = cur_index;
 	mob->setType(Character::Type::NPC);
 	mob->misc = 0;
 
@@ -3415,13 +3415,13 @@ int create_blank_mobile(int nr)
 			 [&cur_index](Character *const &curr)
 			 {
 				 if (IS_NPC(curr))
-					 if (curr->mobdata->nr >= cur_index)
-						 curr->mobdata->nr++;
+					 if (curr->mobdata->vnum >= cur_index)
+						 curr->mobdata->vnum++;
 			 });
 
 	// update index of all the mob prototypes
 	for (i = cur_index + 1; i <= top_of_mobt; i++)
-		((Character *)DC::getInstance()->mob_index[i].item)->mobdata->nr++;
+		((Character *)DC::getInstance()->mob_index[i].item)->mobdata->vnum++;
 
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
@@ -3479,13 +3479,13 @@ void delete_mob_from_index(int nr)
 	for_each(character_list.begin(), character_list.end(),
 			 [&nr](Character *const &curr)
 			 {
-				 if (IS_NPC(curr) && curr->mobdata->nr >= nr)
-					 curr->mobdata->nr--;
+				 if (IS_NPC(curr) && curr->mobdata->vnum >= nr)
+					 curr->mobdata->vnum--;
 			 });
 
 	// update index of all the mob prototypes
 	for (i = nr; i <= top_of_mobt; i++)
-		((Character *)DC::getInstance()->mob_index[i].item)->mobdata->nr--;
+		((Character *)DC::getInstance()->mob_index[i].item)->mobdata->vnum--;
 
 	// update mob file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;
@@ -3548,10 +3548,10 @@ void delete_obj_from_index(vnum_t vnum)
 
 void delete_mob_from_index(vnum_t vnum)
 {
-	if (!DC::getInstance()->mob_index.contains(vnum))
-	{
-		return;
-	}
+	// if (!DC::getInstance()->mob_index.contains(vnum))
+	//{
+	//	return;
+	// }
 
 	delete DC::getInstance()->obj_index[vnum].item;
 	DC::getInstance()->obj_index.remove(vnum);
@@ -4513,7 +4513,7 @@ uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
 	uint64_t count = {};
 	for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].virt == vnum)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].virt == vnum)
 		{
 			count++;
 		}
@@ -4526,7 +4526,7 @@ uint64_t countMobsInWorld(uint64_t vnum)
 	uint64_t count = {};
 	for (const auto ch : DC::getInstance()->character_list)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].virt == vnum && ch->in_room != DC::NOWHERE)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].virt == vnum && ch->in_room != DC::NOWHERE)
 		{
 			count++;
 		}

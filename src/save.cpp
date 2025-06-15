@@ -178,7 +178,7 @@ char *fread_var_string(FILE *fpsave)
 
 void Mobile::save(FILE *fpsave)
 {
-  fwrite(&(nr), sizeof(nr), 1, fpsave);
+  fwrite(&(vnum), sizeof(vnum), 1, fpsave);
   fwrite(&(default_pos), sizeof(default_pos), 1, fpsave);
   fwrite(&(attack_type), sizeof(attack_type), 1, fpsave);
   fwrite(&(actflags), sizeof(actflags), 1, fpsave);
@@ -193,7 +193,7 @@ void Mobile::save(FILE *fpsave)
 
 void Mobile::read(FILE *fpsave)
 {
-  fread(&(nr), sizeof(nr), 1, fpsave);
+  fread(&(vnum), sizeof(vnum), 1, fpsave);
   fread(&(default_pos), sizeof(default_pos), 1, fpsave);
   fread(&(attack_type), sizeof(attack_type), 1, fpsave);
   fread(&(actflags), sizeof(actflags), 1, fpsave);

@@ -895,7 +895,7 @@ void Character::list_char_to_char(Character *list, int mode)
             }
 
             gettimeofday(&tv, nullptr);
-            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
+            this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->vnum, std::pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(this->in_room))
@@ -2725,7 +2725,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
       // allow find by vnum
       if (vnum)
       {
-         if (searchnum != i->mobdata->nr)
+         if (searchnum != i->mobdata->vnum)
             continue;
       }
       else if (!(isexact(name, i->getName())))

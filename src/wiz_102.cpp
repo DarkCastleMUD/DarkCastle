@@ -430,7 +430,7 @@ int do_mpstat(Character *ch, char *arg, int cmd)
       ch->sendln("No such mobile.");
       return eFAILURE;
     }
-    x = vict->mobdata->nr;
+    x = vict->mobdata->vnum;
   }
   /*
     if(!has_range)
@@ -3515,7 +3515,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       uint64_t NPCs_changed = 0;
       for (auto const &c : DC::getInstance()->character_list)
       {
-        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->nr].virt == mobvnum)
+        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].virt == mobvnum)
         {
           c->mobdata->actflags[0] = new_actflags[0];
           c->mobdata->actflags[1] = new_actflags[1];
@@ -3999,7 +3999,7 @@ int do_medit(Character *ch, char *argument, int cmd)
     const auto &character_list = DC::getInstance()->character_list;
     for (const auto &v : character_list)
     {
-      if (IS_NPC(v) && v->mobdata->nr == mob_num)
+      if (IS_NPC(v) && v->mobdata->vnum == mob_num)
         extract_char(v, true);
     }
     delete_mob_from_index(mob_num);
@@ -5259,11 +5259,11 @@ int do_instazone(Character *ch, char *arg, int cmd)
         for (mob_list = character_list; mob_list;
              mob_list = mob_list->next)
         {
-          if (IS_NPC(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
+          if (IS_NPC(mob_list) && mob_list->mobdata->vnum == mob->mobdata->vnum)
             count++;
         }
 
-        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].virt,
+        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->vnum].virt,
                 count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
@@ -5613,8 +5613,8 @@ int do_return(Character *ch, char *argument, int cmd)
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;
-    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt > 90 &&
-        DC::getInstance()->mob_index[ch->mobdata->nr].virt < 100 &&
+    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].virt > 90 &&
+        DC::getInstance()->mob_index[ch->mobdata->vnum].virt < 100 &&
         cmd != 12)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);

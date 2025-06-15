@@ -443,7 +443,7 @@ struct mob_flag_data
 class Mobile
 {
 public:
-    int32_t nr = {};
+    int32_t vnum = {};
     position_t default_pos = {};                 // Default position for NPC
     int8_t last_direction = {};                  // Last direction the mobile went in
     uint32_t attack_type = {};                   // Bitvector of damage type for bare-handed combat

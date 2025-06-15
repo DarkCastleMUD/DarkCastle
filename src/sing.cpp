@@ -2798,11 +2798,11 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 		return eFAILURE;
 	}
 	int type = 0;
-	if (DC::getInstance()->mob_index[target->mobdata->nr].virt == 8)
+	if (DC::getInstance()->mob_index[target->mobdata->vnum].virt == 8)
 		type = 4;
 	else if (IS_AFFECTED(target, AFF_FAMILIAR))
 		type = 3;
-	else if (DC::getInstance()->mob_index[target->mobdata->nr].virt >= 22394 && DC::getInstance()->mob_index[target->mobdata->nr].virt <= 22398)
+	else if (DC::getInstance()->mob_index[target->mobdata->vnum].virt >= 22394 && DC::getInstance()->mob_index[target->mobdata->vnum].virt <= 22398)
 		type = 2;
 	else
 		type = 1;
