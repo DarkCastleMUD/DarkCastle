@@ -138,7 +138,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
-          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->vnum].virt);
+          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->vnum].vnum);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
@@ -1235,7 +1235,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   {
     if (IS_NPC(this))
     {
-      int num = DC::getInstance()->mob_index[this->mobdata->vnum].virt;
+      int num = DC::getInstance()->mob_index[this->mobdata->vnum].vnum;
 
       logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
@@ -1798,7 +1798,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->vnum].virt;
+    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->vnum].vnum;
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -2241,19 +2241,19 @@ int do_mpsetmath(Character *ch, char *arg, int cmd)
   {
     *lvali = i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
-    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  	r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2284,7 +2284,7 @@ void prog_error(Character *ch, char *format, ...)
   else if (ch && IS_NPC(ch))
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d, com %d, line %d: %s",
-         DC::getInstance()->mob_index[ch->mobdata->vnum].virt, mprog_command_num, mprog_line_num,
+         DC::getInstance()->mob_index[ch->mobdata->vnum].vnum, mprog_command_num, mprog_line_num,
          buffer);
   }
   else

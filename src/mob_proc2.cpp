@@ -662,7 +662,7 @@ const struct platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538
 int godload_sales(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
 {
 
-	int mobvnum = DC::getInstance()->mob_index[owner->mobdata->vnum].virt;
+	int mobvnum = DC::getInstance()->mob_index[owner->mobdata->vnum].vnum;
 	int o;
 	char buf[MAX_STRING_LENGTH];
 	//  return eFAILURE; //disabled for now

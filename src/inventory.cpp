@@ -1821,7 +1821,7 @@ int do_give(Character *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->vnum].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->vnum].virt == QUEST_MASTER))
+  if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->vnum].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->vnum].vnum == QUEST_MASTER))
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return eFAILURE;

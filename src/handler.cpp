@@ -2858,7 +2858,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
 			continue;
 		if (number == 1 || number == 0)
 		{
-			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->vnum].virt == 12))
+			if (isexact(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && DC::getInstance()->mob_index[i->mobdata->vnum].vnum == 12))
 				return (i);
 			else if (isprefix(tmp, GET_NAME(i)))
 			{
@@ -3755,7 +3755,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 			extract_char(ch->player->golem, false);
 		}
 	}
-	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].virt == 8)
+	if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == 8)
 	{
 		isGolem = true;
 		if (pull)
@@ -3911,7 +3911,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		do_return(ch, "", 12);
 
 	if (IS_NPC(ch) && ch->mobdata->vnum > -1)
-		DC::getInstance()->mob_index[ch->mobdata->vnum].number--;
+		DC::getInstance()->mob_index[ch->mobdata->vnum].vnum--;
 
 	if (pull || isGolem)
 	{
@@ -4231,7 +4231,7 @@ Object *get_obj_vnum(int vnum)
 Character *get_random_mob_vnum(int vnum)
 {
 	int num = real_mobile(vnum);
-	int total = DC::getInstance()->mob_index[num].number;
+	int total = DC::getInstance()->mob_index[num].qty;
 	int which = number(1, total);
 
 	const auto &character_list = DC::getInstance()->character_list;

@@ -566,7 +566,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->vnum].virt == 8)
+    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->vnum].vnum == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

@@ -1031,7 +1031,7 @@ int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg,
   int clan_num = ch->clan;
   if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
   {
-    int b = DC::getInstance()->mob_index[ch->mobdata->vnum].virt;
+    int b = DC::getInstance()->mob_index[ch->mobdata->vnum].vnum;
     switch (b)
     {
     case 8:     // golem
@@ -3584,7 +3584,7 @@ int bodyguard(Character *ch, class Object *obj, int cmd, const char *arg,
   if (cmd)
     return eFAILURE;
 
-  switch (DC::getInstance()->mob_index[ch->mobdata->vnum].virt)
+  switch (DC::getInstance()->mob_index[ch->mobdata->vnum].vnum)
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

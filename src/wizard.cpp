@@ -118,7 +118,7 @@ void do_mload(Character *ch, int rnum, int cnt)
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
-               DC::getInstance()->mob_index[rnum].virt,
+               DC::getInstance()->mob_index[rnum].vnum,
                mob->short_desc,
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
@@ -128,7 +128,7 @@ void do_mload(Character *ch, int rnum, int cnt)
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
-               DC::getInstance()->mob_index[rnum].virt,
+               DC::getInstance()->mob_index[rnum].vnum,
                mob->short_desc,
                DC::getInstance()->world[ch->in_room].number,
                DC::getInstance()->world[ch->in_room].name);
@@ -140,7 +140,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
              GET_NAME(ch),
              cnt,
-             DC::getInstance()->mob_index[rnum].virt,
+             DC::getInstance()->mob_index[rnum].vnum,
              DC::getInstance()->world[ch->in_room].number,
              DC::getInstance()->world[ch->in_room].name);
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
@@ -285,7 +285,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (IS_PC(k) ? "PC" : "MOB"),
           GET_NAME(k),
-          (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->vnum].virt : 0),
+          (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->vnum].vnum : 0),
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
@@ -589,7 +589,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
             (IS_PC(k) ? "PC" : "MOB"), GET_NAME(k),
-            (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->vnum].virt : 0),
+            (IS_NPC(k) ? DC::getInstance()->mob_index[k->mobdata->vnum].vnum : 0),
             (IS_NPC(k) ? k->mobdata->vnum : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
@@ -1905,15 +1905,15 @@ void begin_hunt(vnum_t item, int duration, int amount, char *huntname)
     while (1)
     {
       mob = number(1, top_of_mobt);
-      int vnum = DC::getInstance()->mob_index[mob].virt; // debug
-      if (!(DC::getInstance()->mob_index[mob].virt > 300 &&
-            (DC::getInstance()->mob_index[mob].virt < 2300 || DC::getInstance()->mob_index[mob].virt > 2499) &&
-            (DC::getInstance()->mob_index[mob].virt < 29200 || DC::getInstance()->mob_index[mob].virt > 29299) &&
-            (DC::getInstance()->mob_index[mob].virt < 5600 || DC::getInstance()->mob_index[mob].virt > 5699) &&
-            (DC::getInstance()->mob_index[mob].virt < 16200 || DC::getInstance()->mob_index[mob].virt > 16399) &&
-            (DC::getInstance()->mob_index[mob].virt < 1900 || DC::getInstance()->mob_index[mob].virt > 1999) &&
-            (DC::getInstance()->mob_index[mob].virt < 10500 || DC::getInstance()->mob_index[mob].virt > 10622) &&
-            (DC::getInstance()->mob_index[mob].virt < 8500 || DC::getInstance()->mob_index[mob].virt > 8699)))
+      int vnum = DC::getInstance()->mob_index[mob].vnum; // debug
+      if (!(DC::getInstance()->mob_index[mob].vnum > 300 &&
+            (DC::getInstance()->mob_index[mob].vnum < 2300 || DC::getInstance()->mob_index[mob].vnum > 2499) &&
+            (DC::getInstance()->mob_index[mob].vnum < 29200 || DC::getInstance()->mob_index[mob].vnum > 29299) &&
+            (DC::getInstance()->mob_index[mob].vnum < 5600 || DC::getInstance()->mob_index[mob].vnum > 5699) &&
+            (DC::getInstance()->mob_index[mob].vnum < 16200 || DC::getInstance()->mob_index[mob].vnum > 16399) &&
+            (DC::getInstance()->mob_index[mob].vnum < 1900 || DC::getInstance()->mob_index[mob].vnum > 1999) &&
+            (DC::getInstance()->mob_index[mob].vnum < 10500 || DC::getInstance()->mob_index[mob].vnum > 10622) &&
+            (DC::getInstance()->mob_index[mob].vnum < 8500 || DC::getInstance()->mob_index[mob].vnum > 8699)))
         continue;
 
       // Skip mobs marked NO_HUNT
@@ -1923,7 +1923,7 @@ void begin_hunt(vnum_t item, int duration, int amount, char *huntname)
         continue;
       }
 
-      if (DC::getInstance()->mob_index[mob].number <= 0)
+      if (DC::getInstance()->mob_index[mob].qty <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;

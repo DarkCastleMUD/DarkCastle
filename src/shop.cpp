@@ -309,7 +309,7 @@ void Shop::shopping_sell(const char *arg, Character *ch, Character *keeper)
 
   int virt = obj->vnum;
   if (virt >= 13400 && virt <= 13707 &&
-      DC::getInstance()->mob_index[keeper->mobdata->vnum].virt != 13416)
+      DC::getInstance()->mob_index[keeper->mobdata->vnum].vnum != 13416)
   {
     keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
@@ -382,7 +382,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
     }
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].virt == 3003)
+  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].vnum == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -431,7 +431,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
     else
       do_say(keeper, "I'm a weapons expert, that is all.", CMD_DEFAULT);
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].virt == 3004)
+  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].vnum == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -475,7 +475,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
     else
       do_say(keeper, "I deal with armor exclusively.", CMD_DEFAULT);
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].virt == 3000)
+  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].vnum == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -532,7 +532,7 @@ void Shop::shopping_value(const char *arg, Character *ch, Character *keeper)
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", CMD_DEFAULT);
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].virt == 3010 && keeperhas)
+  if (DC::getInstance()->mob_index[keeper->mobdata->vnum].vnum == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);

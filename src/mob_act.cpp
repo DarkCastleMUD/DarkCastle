@@ -55,7 +55,7 @@ bool is_r_denied(Character *ch, int room)
   if (IS_PC(ch))
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (DC::getInstance()->mob_index[ch->mobdata->vnum].virt == d->vnum)
+    if (DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == d->vnum)
       return true;
   return false;
 }

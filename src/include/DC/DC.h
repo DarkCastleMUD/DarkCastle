@@ -117,6 +117,7 @@ typedef QList<QString> hints_t;
 #include "DC/Command.h"
 #include "DC/Arena.h"
 #include "DC/db.h"
+#include "DC/mobile.h"
 
 class Connection;
 class index_data;
@@ -143,31 +144,15 @@ typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
 
-/* element in monster and object index-tables   */
-class index_data
-{
-public:
-  vnum_t virt{};                                                                         /* virt number of ths mob/obj           */
-  vnum_t number{};                                                                       /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
-  int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
-  void *item{};                                                                          /* the mobile/object itself                 */
-
-  QSharedPointer<class MobProgram> mobprogs{};
-  QSharedPointer<class MobProgram> mobspec{};
-  int progtypes{};
-};
-extern index_data mob_index_array[MAX_INDEX];
-index_data *generate_mob_indices(int *top, index_data *index);
-
-class obj_index_t
+template <typename T>
+class index_t
 {
 public:
   vnum_t vnum{};                                                                         /* virt number of ths mob/obj           */
   quint64 qty{};                                                                         /* quantity of existing units of ths obj */
   int (*non_combat_func)(Character *, class Object *, int, const char *, Character *){}; // non Combat special proc
   int (*combat_func)(Character *, class Object *, int, const char *, Character *){};     // combat special proc
-  Object *item{};                                                                        /* the mobile/object itself                 */
+  T *item{};                                                                             /* the mobile/object itself                 */
 
   QSharedPointer<class MobProgram> mobprogs{};
   QSharedPointer<class MobProgram> mobspec{};
@@ -316,9 +301,9 @@ struct world_file_list_item
 };
 
 typedef QMap<QString, world_file_list_item> world_file_list_t;
-struct Objects
+struct FileIndexes
 {
-  world_file_list_t objects_files{};
+  world_file_list_t files{};
   world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum);
   world_file_list_item &findRange(QString filename);
   world_file_list_item &newRange(QString filename, vnum_t lowvnum = {}, vnum_t highvnum = {});
@@ -431,14 +416,12 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  QMap<vnum_t, obj_index_t> obj_index{};
-
-  class index_data mob_index_array[MAX_INDEX] = {};
-  class index_data *mob_index = mob_index_array;
+  QMap<vnum_t, index_t<Object>> obj_index{};
+  QMap<vnum_t, index_t<Character>> mob_index{};
   struct world_file_list_item *world_file_list = 0; // List of the world files
   struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  // struct world_file_list_item *obj_file_list = 0;   // List of the obj files
-  Objects objects{};
+  FileIndexes objects{};
+  FileIndexes mobiles{};
   class Object *object_list = 0;    // the global linked list of obj's
   struct pulse_data *bard_list = 0; // global l-list of bards
   int top_of_helpt = 0;             // top of help index table
@@ -536,6 +519,7 @@ public:
   void remove_all_mobs_from_world(void);
   void remove_all_objs_from_world(void);
   void load_objects(void);
+  void load_mobiles(void);
   void renum_zone_table(void);
   void free_zones_from_memory(void);
   void free_clans_from_memory(void);
@@ -570,6 +554,8 @@ public:
   void vault_get(Character *ch, QString object, QString owner);
   void player_shopping_buy(const char *arg, Character *ch, Character *keeper);
   Object *clone_object(vnum_t nr);
+  void add_mobspec(vnum_t vnum);
+
   ~DC(void)
   {
     /* TODO enable and fix all memory leaks

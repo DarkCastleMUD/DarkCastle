@@ -214,7 +214,6 @@ char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
 auto create_blank_item(vnum_t nr) -> std::expected<vnum_t, create_error>;
 int create_blank_mobile(int nr);
-void delete_mob_from_index(int nr);
 int real_mobile(int virt);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
@@ -227,8 +226,6 @@ char fread_char(FILE *fl);
 char fread_char(QTextStream &fl);
 int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
 int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
-
-void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
 
 extern struct skill_quest *skill_list;

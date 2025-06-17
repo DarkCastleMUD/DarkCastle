@@ -435,7 +435,7 @@ int do_mpstat(Character *ch, char *arg, int cmd)
   /*
     if(!has_range)
     {
-      if(!can_modify_mobile(ch, DC::getInstance()->mob_index[x].virt)) {
+      if(!can_modify_mobile(ch, DC::getInstance()->mob_index[x].vnum)) {
         ch->sendln("You are unable to work creation outside of your range.");
         return eFAILURE;
       }
@@ -696,7 +696,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         {
         case 'M':
           j = real_mobile(i);
-          original_value = DC::getInstance()->mob_index[zone.cmd[cmd]->arg1].virt;
+          original_value = DC::getInstance()->mob_index[zone.cmd[cmd]->arg1].vnum;
           break;
         case 'P':
         case 'G':
@@ -2700,7 +2700,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
 
   // a this point, mob_num is the index
   if (mobvnum == -1)
-    mobvnum = DC::getInstance()->mob_index[mob_num].virt;
+    mobvnum = DC::getInstance()->mob_index[mob_num].vnum;
 
   if (!can_modify_mobile(ch, mobvnum))
   {
@@ -3132,7 +3132,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   }
 
   if (mobvnum == -1)
-    mobvnum = DC::getInstance()->mob_index[mob_num].virt;
+    mobvnum = DC::getInstance()->mob_index[mob_num].vnum;
   // MOVED
   for (x = 0;; x++)
   {
@@ -3515,7 +3515,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       uint64_t NPCs_changed = 0;
       for (auto const &c : DC::getInstance()->character_list)
       {
-        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].virt == mobvnum)
+        if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].vnum == mobvnum)
         {
           c->mobdata->actflags[0] = new_actflags[0];
           c->mobdata->actflags[1] = new_actflags[1];
@@ -4002,7 +4002,7 @@ int do_medit(Character *ch, char *argument, int cmd)
       if (IS_NPC(v) && v->mobdata->vnum == mob_num)
         extract_char(v, true);
     }
-    delete_mob_from_index(mob_num);
+    delete_item_from_index(DC::getInstance()->mob_index, mob_num);
     ch->sendln("Mobile deleted.");
   }
   break;
@@ -5263,7 +5263,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->vnum].virt,
+        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->vnum].vnum,
                 count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
@@ -5613,8 +5613,8 @@ int do_return(Character *ch, char *argument, int cmd)
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;
-    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].virt > 90 &&
-        DC::getInstance()->mob_index[ch->mobdata->vnum].virt < 100 &&
+    if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum > 90 &&
+        DC::getInstance()->mob_index[ch->mobdata->vnum].vnum < 100 &&
         cmd != 12)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);

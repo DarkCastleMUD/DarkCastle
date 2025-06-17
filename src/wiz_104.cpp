@@ -579,7 +579,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 		switch (zone.cmd[j]->command)
 		{
 		case 'M':
-			virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].virt : ZCMD->arg1;
+			virt = ZCMD->active ? DC::getInstance()->mob_index[ZCMD->arg1].vnum : ZCMD->arg1;
 			sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
 			if (zone.cmd[j]->arg2 == -1)
 				strcat(buf, "(  always ) in room ");
@@ -920,7 +920,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			}
 			else
 			{
-				for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].virt && i <= end;
+				for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].vnum && i <= end;
 					 i++)
 				{
 					if ((nr = real_mobile(i)) < 0)
@@ -945,7 +945,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			*buf = '\0';
 			ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
-			for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].virt); i++)
+			for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].vnum); i++)
 			{
 				if ((nr = real_mobile(i)) < 0)
 					continue;
@@ -1380,7 +1380,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			ch->sendln("No valid search supplied.");
 			return eFAILURE;
 		}
-		for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].virt; c++)
+		for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].vnum; c++)
 		{
 			if ((nr = real_mobile(c)) < 0)
 				continue;
@@ -1756,7 +1756,7 @@ int do_show(Character *ch, char *argument, int cmd)
 	}
 	else if (is_abbrev(type, "ofiles") && has_range)
 	{
-		show_legacy_files(ch, DC::getInstance()->objects.objects_files);
+		show_legacy_files(ch, DC::getInstance()->objects.files);
 	}
 	else if (is_abbrev(type, "keydoorcombo"))
 	{
@@ -2509,7 +2509,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 
 	// clone_mobile assigns the start of character_list to be mob
 	// This undos the change
-	DC::getInstance()->mob_index[src].number--;
+	DC::getInstance()->mob_index[src].qty--;
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.erase(mob);
@@ -2534,16 +2534,16 @@ int do_mclone(Character *ch, char *argument, int cmd)
 		   vdst, ((Character *)DC::getInstance()->mob_index[dst].item)->short_desc);
 
 	// Overwrite old mob with new mob
-	DC::getInstance()->mob_index[dst].item = (void *)mob;
-	DC::getInstance()->mob_index[dst].number = 0;
+	DC::getInstance()->mob_index[dst].item = mob;
+	DC::getInstance()->mob_index[dst].qty = 0;
 	DC::getInstance()->mob_index[dst].non_combat_func = 0;
 	DC::getInstance()->mob_index[dst].combat_func = 0;
 	DC::getInstance()->mob_index[dst].mobprogs = nullptr;
 	DC::getInstance()->mob_index[dst].mobspec = 0;
 	DC::getInstance()->mob_index[dst].progtypes = 0;
-	DC::getInstance()->mob_index[dst].virt = vdst;
+	DC::getInstance()->mob_index[dst].vnum = vdst;
 
-	add_mobspec(dst);
+	DC::getInstance()->add_mobspec(dst);
 
 	if (DC::getInstance()->mob_index[src].non_combat_func)
 	{

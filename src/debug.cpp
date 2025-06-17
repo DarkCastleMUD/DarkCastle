@@ -251,7 +251,7 @@ int main(int argc, char **argv)
   debug.load_objects();
 
   logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
-  generate_mob_indices(&top_of_mobt, DC::getInstance()->mob_index);
+  debug.load_mobiles();
 
   logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
   debug.renum_zone_table();

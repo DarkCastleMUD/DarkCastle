@@ -20,6 +20,7 @@
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 int load_debug = 0;
+#include <QString>
 
 #include "DC/DC.h"			// extra_descr_data
 #include "DC/game_portal.h" // load_game_portals()
@@ -79,11 +80,7 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
-world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
-
 QString read_next_worldfile_name(FILE *flWorldIndex);
-
-index_data *generate_mob_indices(int *top, index_data *index);
 int file_to_string(const char *name, char *buf);
 void clear_char(Character *ch);
 
@@ -566,7 +563,7 @@ void DC::boot_db(void)
 	funny_boot_message();
 
 	logverbose(QStringLiteral("Generating mob indices/loading all mobiles"));
-	generate_mob_indices(&top_of_mobt, mob_index);
+	load_mobiles();
 
 	logverbose(QStringLiteral("Generating object indices/loading all objects"));
 	load_objects();
@@ -934,108 +931,70 @@ void DC::reset_time(void)
 		weather_info.sky = SKY_CLOUDLESS;
 }
 
-/* generate index table for monster file */
-index_data *generate_mob_indices(int *top, index_data *index)
+void DC::load_mobiles(void)
 {
-	int i = 0;
-	char buf[82];
-	char log_buf[256];
-	FILE *flMobIndex;
-	FILE *fl;
-	QString temp;
-	char endfile[180];
-	struct world_file_list_item *pItem = nullptr;
-	//  extern short code_testing_mode;
-
-	DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
-	if (DC::getInstance()->cf.test_mobs)
+	logverbose(QStringLiteral("Opening mobile file index."));
+	auto flMobIndex = fopen(MOB_INDEX_FILE, "r");
+	if (!flMobIndex)
 	{
-		if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
-		{
-			logentry(QStringLiteral("Could not open index file."));
-			abort();
-		}
-	}
-	else
-	{
-		if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
-		{
-			logentry(QStringLiteral("Could not open index file."));
-			abort();
-		}
+		logentry(QStringLiteral("Could not open index file."));
+		abort();
 	}
 
-	DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
-
-	// note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
-	for (temp = read_next_worldfile_name(flMobIndex);
+	for (auto temp = read_next_worldfile_name(flMobIndex);
 		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flMobIndex))
 	{
-		strcpy(endfile, "mobs/");
-		strcat(endfile, temp.toStdString().c_str());
+		QString endfile = QStringLiteral("mobs/%1").arg(temp);
+		DC::getInstance()->logverbose(endfile);
 
-		DC::config &cf = DC::getInstance()->cf;
-
-		if (cf.verbose_mode)
+		auto fl = fopen(qUtf8Printable(endfile), "r");
+		if (!fl)
 		{
-			logentry(temp, 0, DC::LogChannel::LOG_MISC);
-		}
-
-		if (!(fl = fopen(endfile, "r")))
-		{
-			perror(endfile);
-			logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
+			perror(qUtf8Printable(endfile));
+			logbug(QStringLiteral("load_objects: could not open mob file '%1'.").arg(endfile));
 			abort();
 		}
 
-		pItem = new_mob_file_item(temp, i);
-
+		auto pItem = mobiles.newRange(temp);
+		vnum_t vnum{}, lowest_vnum = UINT64_MAX, highest_vnum{};
 		for (;;)
 		{
+			char buf[160]{};
 			if (fgets(buf, 81, fl))
 			{
-
 				if (*buf == '#')
-				{ /* allocate new_new cell */
-					if (i >= MAX_INDEX)
-					{
-						perror("Too many mob indexes");
-						abort();
-					}
-					sscanf(buf, "#%lu", &index[i].virt);
-					index[i].number = 0;
-					index[i].non_combat_func = 0;
-					index[i].combat_func = 0;
-					index[i].mobprogs = {};
-					index[i].mobspec = {};
-					index[i].progtypes = 0;
-					DC::getInstance()->currentVNUM(index[i].virt);
-					if (!(index[i].item = (Character *)read_mobile(i, fl)))
-					{
+				{
+					sscanf(buf, "#%lu", &vnum);
+					if (vnum < lowest_vnum)
+						lowest_vnum = vnum;
+					if (vnum > highest_vnum)
+						highest_vnum = vnum;
 
-						sprintf(log_buf, "Unable to load mobile %lu!\n\r", index[i].virt);
-						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+					mob_index[vnum].vnum = vnum;
+					if (!(mob_index[vnum].item = read_mobile(vnum, fl)))
+					{
+						logbug(QStringLiteral("Unable to load mobile %lu!").arg(vnum));
 					}
-					i++;
 				}
 				else if (*buf == '$') /* EOF */
 					break;
 			}
 			else
 			{
-				sprintf(endfile, "Bad char (%s)", buf);
-				logentry(endfile, 0, DC::LogChannel::LOG_MISC);
+				logmisc(QStringLiteral("Bad char (%1)").arg(buf));
 				abort();
 			}
 		}
 
-		pItem->lastnum = (i - 1);
+		pItem.firstnum = lowest_vnum;
+		pItem.lastnum = highest_vnum;
 
 		fclose(fl);
 	}
-	*top = i - 1;
+
 	fclose(flMobIndex);
+
 	/*
 	 Here the index gets processed, and mob classes gets
 	 assigned. (Not done in read_mobile 'cause of
@@ -1043,19 +1002,18 @@ index_data *generate_mob_indices(int *top, index_data *index)
 	 and an attempt to assign non-existant mob
 	 procs would be bad).
 	 */
-	for (i = 0; i <= top_of_mobt; i++)
+	for (const auto &k : mob_index.keys())
 	{
-		add_mobspec(i);
+		add_mobspec(k);
 	}
-	return (index);
 }
 
-void add_mobspec(int i)
+void DC::add_mobspec(vnum_t vnum)
 {
-	if (i < 0)
+	if (!mob_index.contains(vnum))
 		return;
 
-	Character *a = (Character *)DC::getInstance()->mob_index[i].item;
+	Character *a = mob_index[vnum].item;
 	if (!a)
 		return;
 	if (!a->c_class)
@@ -1188,13 +1146,13 @@ void add_mobspec(int i)
 		break;
 	case CLASS_PSIONIC:
 		if (a->getLevel() < 21)
-			DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(149)].mobprogs;
+			mob_index[vnum].mobspec = DC::getInstance()->mob_index[real_mobile(149)].mobprogs;
 		else if (a->getLevel() < 35)
-			DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(150)].mobprogs;
+			mob_index[vnum].mobspec = DC::getInstance()->mob_index[real_mobile(150)].mobprogs;
 		else if (a->getLevel() < 51)
-			DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(151)].mobprogs;
+			mob_index[vnum].mobspec = DC::getInstance()->mob_index[real_mobile(151)].mobprogs;
 		else
-			DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(152)].mobprogs;
+			mob_index[vnum].mobspec = DC::getInstance()->mob_index[real_mobile(152)].mobprogs;
 		break;
 	default:
 		break;
@@ -1202,24 +1160,24 @@ void add_mobspec(int i)
 
 	if (mob)
 	{
-		DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(mob)].mobprogs;
+		mob_index[vnum].mobspec = DC::getInstance()->mob_index[real_mobile(mob)].mobprogs;
 
 		for (int j = 0; j < ACT_MAX / ASIZE + 1; j++)
 		{
-			SET_BIT(((Character *)DC::getInstance()->mob_index[i].item)->mobdata->actflags[j],
+			SET_BIT(((Character *)mob_index[vnum].item)->mobdata->actflags[j],
 					((Character *)DC::getInstance()->mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
 		}
 
 		for (int j = 0; j < AFF_MAX / ASIZE + 1; j++)
 		{
-			SET_BIT(((Character *)DC::getInstance()->mob_index[i].item)->affected_by[j],
+			SET_BIT(((Character *)mob_index[vnum].item)->affected_by[j],
 					((Character *)DC::getInstance()->mob_index[real_mobile(mob)].item)->affected_by[j]);
 		}
 	}
 
-	if (DC::getInstance()->mob_index[i].mobspec)
-		for (mprg = DC::getInstance()->mob_index[i].mobspec; mprg; mprg = mprg->next)
-			SET_BIT(DC::getInstance()->mob_index[i].progtypes, mprg->type);
+	if (mob_index[vnum].mobspec)
+		for (mprg = mob_index[vnum].mobspec; mprg; mprg = mprg->next)
+			SET_BIT(mob_index[vnum].progtypes, mprg->type);
 }
 
 void DC::remove_all_mobs_from_world(void)
@@ -1245,56 +1203,36 @@ void DC::remove_all_objs_from_world()
 		extract_obj(curr);
 }
 
-/* generate index table for object file */
 void DC::load_objects(void)
 {
-	char buf[82];
-	char log_buf[256];
-	FILE *fl;
-	FILE *flObjIndex;
-	QString temp;
-	char endfile[180];
-	struct world_file_list_item *pItem = nullptr;
-
-	//  if (!bport) {
-
-	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
+	logverbose(QStringLiteral("Opening object files."));
+	auto flObjIndex = fopen(OBJECT_INDEX_FILE, "r");
+	if (!flObjIndex)
 	{
 		logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
 		abort();
 	}
-	/*
-	 } else {
-	 if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-	 logentry(QStringLiteral("Cannot open object file obj_index.(tiny)."),0,DC::LogChannel::LOG_MISC);
-	 abort();
-	 }
-	 }
-	 */
-	DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
 
-	// note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
-	for (temp = read_next_worldfile_name(flObjIndex);
+	for (auto temp = read_next_worldfile_name(flObjIndex);
 		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flObjIndex))
 	{
-		strcpy(endfile, "objects/");
-		strcat(endfile, temp.toStdString().c_str());
-
-		DC::config &cf = DC::getInstance()->cf;
+		QString endfile = QStringLiteral("objects/%1").arg(temp);
 		DC::getInstance()->logverbose(temp);
 
-		if (!(fl = fopen(endfile, "r")))
+		auto fl = fopen(qUtf8Printable(endfile), "r");
+		if (!fl)
 		{
-			logentry(QStringLiteral("load_objects: could not open obj file."), 0, DC::LogChannel::LOG_BUG);
-			logentry(temp, 0, DC::LogChannel::LOG_BUG);
+			perror(qUtf8Printable(endfile));
+			logbug(QStringLiteral("load_objects: could not open obj file '%1'.").arg(endfile));
 			abort();
 		}
 
-		pItem = new_obj_file_item(temp);
+		auto pItem = new_obj_file_item(temp);
 		vnum_t vnum{}, lowest_vnum = UINT64_MAX, highest_vnum{};
 		for (;;)
 		{
+			char buf[160]{};
 			if (fgets(buf, 81, fl))
 			{
 				if (*buf == '#') /* allocate new_new cell */
@@ -1306,14 +1244,9 @@ void DC::load_objects(void)
 						highest_vnum = vnum;
 
 					obj_index[vnum].vnum = vnum;
-					obj_index[vnum].qty = 0;
-					obj_index[vnum].non_combat_func = 0;
-					obj_index[vnum].combat_func = 0;
-					obj_index[vnum].progtypes = 0;
 					if (!(obj_index[vnum].item = read_object(vnum, fl, false)))
 					{
-						sprintf(log_buf, "Unable to load object %lu!\n\r", obj_index.value(vnum).vnum);
-						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+						logbug(QStringLiteral("Unable to load object %lu!").arg(vnum));
 					}
 				}
 				else if (*buf == '$') /* EOF */
@@ -1321,7 +1254,8 @@ void DC::load_objects(void)
 			}
 			else
 			{
-				qFatal("Error in \'%s\'.\r\n", endfile);
+				logmisc(QStringLiteral("Bad char (%1)").arg(buf));
+				abort();
 			}
 		} // for ;;
 
@@ -1911,16 +1845,6 @@ world_file_list_item *new_world_file_item(QString filename, int32_t room_nr)
 	return new_w_file_item(filename, room_nr, DC::getInstance()->world_file_list);
 }
 
-world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr)
-{
-	return new_w_file_item(filename, room_nr, DC::getInstance()->mob_file_list);
-}
-
-world_file_list_item *DC::new_obj_file_item(QString filename)
-{
-	return &objects.newRange(filename);
-}
-
 /* load the rooms */
 void DC::boot_world(void)
 {
@@ -2237,7 +2161,7 @@ void Zone::write(FILE *fl)
 					cmd[i]->comment.toStdString().c_str() ? cmd[i]->comment.toStdString().c_str() : "");
 		else if (cmd[i]->command == 'M')
 		{
-			int virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].virt : cmd[i]->arg1;
+			int virt = cmd[i]->active ? DC::getInstance()->mob_index[cmd[i]->arg1].vnum : cmd[i]->arg1;
 			fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
 					virt,
 					cmd[i]->arg2,
@@ -2762,7 +2686,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 	FILE *fl = lf.file_handle_;
 	int i = 0;
 
-	fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->vnum].virt);
+	fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->vnum].vnum);
 	string_to_file(fl, mob->getName());
 	string_to_file(fl, mob->short_desc);
 	string_to_file(fl, mob->long_desc);
@@ -3227,7 +3151,6 @@ Character *clone_mobile(int nr)
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.insert(mob);
-	DC::getInstance()->mob_index[nr].number++;
 	mob->next_in_room = 0;
 
 	handle_automatic_mob_settings(mob);
@@ -3328,10 +3251,10 @@ int create_blank_mobile(int nr)
 	// yes, i could check if the last mobile is smaller and then do a binary
 	// search to do this faster but if everything in life was optimized I wouldn't
 	// be playing solitaire at work on a windows machine. -pir
-	while (DC::getInstance()->mob_index[cur_index].virt < nr && cur_index < top_of_mobt + 1)
+	while (DC::getInstance()->mob_index[cur_index].vnum < nr && cur_index < top_of_mobt + 1)
 		cur_index++;
 
-	if (DC::getInstance()->mob_index[cur_index].virt == nr) // item already exists
+	if (DC::getInstance()->mob_index[cur_index].vnum == nr) // item already exists
 		return -1;
 
 	// theoretically if top_of_mobt+1 wasn't initialized properly it could
@@ -3379,12 +3302,12 @@ int create_blank_mobile(int nr)
 	mob->misc = 0;
 
 	// shift > items right
-	memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));
+	// memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));
 	top_of_mobt++;
 
 	// insert
-	DC::getInstance()->mob_index[cur_index].virt = nr;
-	DC::getInstance()->mob_index[cur_index].number = 0;
+	DC::getInstance()->mob_index[cur_index].vnum = nr;
+	DC::getInstance()->mob_index[cur_index].qty = 0;
 	if (DC::getInstance()->mob_non_combat_functions.contains(nr))
 	{
 		DC::getInstance()->mob_index[cur_index].non_combat_func = DC::getInstance()->mob_non_combat_functions[nr];
@@ -3451,110 +3374,6 @@ int create_blank_mobile(int nr)
 	}
 
 	return cur_index;
-}
-
-// Hack of delete_obj_from_index
-// Note:  ALL copies of this mobile must have been removed from the game
-// before calling this function.  Otherwise these old mobiles will think
-// they are the restrung version of the mobile that now holds that index.
-//
-// Args:  int nr = real number of object (index in array)
-//
-// return index of mobile on success, -1 on failure
-//
-void delete_mob_from_index(int nr)
-{
-	int i = 0, j = 0;
-
-	if (nr < 0 || nr > top_of_mobt) // doesn't exist!
-		return;
-
-	dc_free(DC::getInstance()->mob_index[nr].item);
-	// shift > items left
-	memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(index_data)));
-	top_of_mobt--;
-
-	// update index of all mobiles in game - these store rnums
-	const auto &character_list = DC::getInstance()->character_list;
-	for_each(character_list.begin(), character_list.end(),
-			 [&nr](Character *const &curr)
-			 {
-				 if (IS_NPC(curr) && curr->mobdata->vnum >= nr)
-					 curr->mobdata->vnum--;
-			 });
-
-	// update index of all the mob prototypes
-	for (i = nr; i <= top_of_mobt; i++)
-		((Character *)DC::getInstance()->mob_index[i].item)->mobdata->vnum--;
-
-	// update mob file indices - these store rnums
-	world_file_list_item *wcurr = nullptr;
-
-	wcurr = DC::getInstance()->mob_file_list;
-
-	while (wcurr)
-	{
-		if (wcurr->firstnum > nr)
-			wcurr->firstnum--;
-		if (wcurr->lastnum >= nr)
-			wcurr->lastnum--;
-		wcurr = wcurr->next;
-	}
-
-	// update zonefile commands - these store rnums
-	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
-	{
-		for (j = 0; j < zone.cmd.size(); j++)
-		{
-			switch (zone.cmd[j]->command)
-			{
-			case 'M': // just #1
-				if (zone.cmd[j]->arg1 >= nr)
-					zone.cmd[j]->arg1--;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	/*
-	 Shop fixes follow.
-	 */
-	for (auto &shop : DC::getInstance()->shop_index)
-	{
-		shop.setKeeperRNUM(real_mobile(shop.keeper_vnum()));
-	}
-}
-
-// Delete an item from the index and update everything to continue working
-// without causing mass destruction and chaos.
-//
-// Note:  ALL copies of this item must have been removed from the game
-// before calling this function.  Otherwise these old items will think
-// they are the restrung version of the item that now holds that index.
-//
-// return index of item on success, -1 on failure
-//
-void delete_obj_from_index(vnum_t vnum)
-{
-	if (!DC::getInstance()->obj_index.contains(vnum))
-	{
-		return;
-	}
-
-	delete DC::getInstance()->obj_index[vnum].item;
-	DC::getInstance()->obj_index.remove(vnum);
-}
-
-void delete_mob_from_index(vnum_t vnum)
-{
-	// if (!DC::getInstance()->mob_index.contains(vnum))
-	//{
-	//	return;
-	// }
-
-	delete DC::getInstance()->obj_index[vnum].item;
-	DC::getInstance()->obj_index.remove(vnum);
 }
 
 QString qDebugQTextStreamLine(QTextStream &stream, QString message)
@@ -4513,7 +4332,7 @@ uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
 	uint64_t count = {};
 	for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].virt == vnum)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == vnum)
 		{
 			count++;
 		}
@@ -4526,7 +4345,7 @@ uint64_t countMobsInWorld(uint64_t vnum)
 	uint64_t count = {};
 	for (const auto ch : DC::getInstance()->character_list)
 	{
-		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].virt == vnum && ch->in_room != DC::NOWHERE)
+		if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->vnum].vnum == vnum && ch->in_room != DC::NOWHERE)
 		{
 			count++;
 		}
@@ -4598,7 +4417,7 @@ void Zone::reset(ResetType reset_type)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[cmd_no]->arg1].virt) < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
+				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[cmd_no]->arg1].vnum) < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
 				{
 					char_to_room(mob, cmd[cmd_no]->arg3);
 					cmd[cmd_no]->lastPop = mob;
@@ -6114,27 +5933,10 @@ room_t real_room(room_t virt)
 /* returns the real number of the monster with given virt number */
 int real_mobile(int virt)
 {
-	int bot, top, mid;
-
-	bot = 0;
-	top = top_of_mobt;
-
-	/* perform binary search on mob-table */
-	for (;;)
-	{
-		mid = (bot + top) / 2;
-
-		if ((DC::getInstance()->mob_index + mid)->virt == virt)
-			return (mid);
-		if (bot >= top)
-			return (-1);
-		if ((DC::getInstance()->mob_index + mid)->virt > virt)
-			top = mid - 1;
-		else
-			bot = mid + 1;
-	}
-
-	return -1;
+	if (DC::getInstance()->mob_index.contains(virt))
+		return virt;
+	else
+		return -1;
 }
 
 /*  This is where all the online builder load routines are.....  */
@@ -6436,7 +6238,7 @@ void find_unordered_mobiles(void)
 
 	for (int rnum = 0; rnum <= top_of_mobt; rnum++, last_vnum = cur_vnum)
 	{
-		cur_vnum = DC::getInstance()->mob_index[rnum].virt;
+		cur_vnum = DC::getInstance()->mob_index[rnum].vnum;
 
 		if (cur_vnum < last_vnum)
 		{

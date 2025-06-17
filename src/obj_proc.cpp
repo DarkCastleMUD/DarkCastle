@@ -2701,7 +2701,7 @@ int no_magic_while_alive(Character *ch, class Object *obj, int cmd, const char *
 
   for (; vict; vict = vict->next_in_room)
   {
-    if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->vnum].virt == 9544
+    if (IS_NPC(vict) && (DC::getInstance()->mob_index[vict->mobdata->vnum].vnum == 9544
                          // to add a new mob to this list, just add || and the next check
                          ))
       break;

@@ -339,7 +339,7 @@ int do_debug(Character *ch, char *args, int cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)
         {
-          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].virt == vnum)
+          if (IS_NPC(c) && c->mobdata && DC::getInstance()->mob_index[c->mobdata->vnum].vnum == vnum)
           {
             if (!first_npc_found)
             {

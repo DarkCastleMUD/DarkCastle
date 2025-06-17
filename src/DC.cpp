@@ -451,26 +451,25 @@ auto Character::do_arena_usage(QStringList arguments) -> command_return_t
 	return command_return_t();
 }
 
-world_file_list_item &Objects::newRange(QString filename, vnum_t firstvnum, vnum_t lastvnum)
+world_file_list_item &FileIndexes::newRange(QString filename, vnum_t firstvnum, vnum_t lastvnum)
 {
-	auto &item = objects_files[filename];
+	auto &item = files[filename];
 	item.filename = filename;
 	item.firstnum = firstvnum;
 	item.lastnum = firstvnum;
 	item.flags = {};
-	item.next = {};
 
 	item.setNeedsSaving(true);
 	saveRangeIndex();
 	return item;
 }
 
-bool Objects::saveRangeIndex(void)
+bool FileIndexes::saveRangeIndex(void)
 {
 	QQueue<world_file_list_item> ranges_to_remove{};
-	for (auto &range : objects_files)
+	for (auto &range : files)
 	{
-		for (auto &larger_range : objects_files)
+		for (auto &larger_range : files)
 		{
 			if (!range.isRemoved() &&
 				!larger_range.isRemoved() &&
@@ -490,7 +489,7 @@ bool Objects::saveRangeIndex(void)
 	while (!ranges_to_remove.isEmpty())
 	{
 		auto range = ranges_to_remove.back();
-		objects_files.remove(range.filename);
+		files.remove(range.filename);
 		if (!QFile(range.filename).remove())
 			qDebug("Failed to remove range file '%s'", qUtf8Printable(range.filename));
 		else
@@ -508,7 +507,7 @@ bool Objects::saveRangeIndex(void)
 						  "* ie: <tilda><enter>filename<tilda>\n"
 						  "* DO NOT USE TILDAS IN THE COMMENTS*\n"
 						  "~\n");
-		for (const auto &range : objects_files)
+		for (const auto &range : files)
 		{
 			objectindex.write(qUtf8Printable(QStringLiteral("%1~\n").arg(range.filename)));
 		}
@@ -529,14 +528,14 @@ world_file_list_item::operator bool(void) const
 	return !filename.isEmpty();
 }
 
-world_file_list_item &Objects::findRange(QString filename)
+world_file_list_item &FileIndexes::findRange(QString filename)
 {
-	return objects_files[filename];
+	return files[filename];
 }
 
-world_file_list_item &Objects::findRange(vnum_t firstvnum, vnum_t lastvnum)
+world_file_list_item &FileIndexes::findRange(vnum_t firstvnum, vnum_t lastvnum)
 {
-	for (auto &owf : objects_files)
+	for (auto &owf : files)
 	{
 		if (firstvnum >= owf.firstnum && lastvnum <= owf.lastnum)
 		{

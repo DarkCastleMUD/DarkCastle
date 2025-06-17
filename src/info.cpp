@@ -857,7 +857,7 @@ command_return_t Character::do_botcheck(QStringList arguments, int cmd)
 
       if (nr >= 0)
       {
-         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].virt,
+         csendf(this, "[%4dms] [%5d] [%s]\n\r", ms, DC::getInstance()->mob_index[nr].vnum,
                 ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       }
    }
