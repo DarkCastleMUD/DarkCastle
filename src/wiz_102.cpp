@@ -2496,7 +2496,7 @@ int do_oedit(Character *ch, char *argument, int cmd)
     }
     ch->send(QStringLiteral("Item '%1' created successfully.\r\n").arg(intval));
     ch->player->last_obj_vnum = intval;
-    auto range = DC::getInstance()->objects.newRange(QStringLiteral("%1-%1.obj").arg(ch->player->last_obj_vnum), ch->player->last_obj_vnum, ch->player->last_obj_vnum);
+    auto range = DC::getInstance()->object_fileindex.newRange(QStringLiteral("%1-%1.obj").arg(ch->player->last_obj_vnum), ch->player->last_obj_vnum, ch->player->last_obj_vnum);
     if (!range)
       ch->sendln(QStringLiteral("Error creating range."));
     ch->sendln(QStringLiteral("Range [%1] [%2] [%3] created.").arg(range.filename).arg(range.firstnum).arg(range.lastnum));
@@ -5047,7 +5047,7 @@ int do_osave(Character *ch, char *arg, int cmd)
     ch->sendln("You may only osave inside of the room range you are assigned to.");
     return eFAILURE;
   }
-  auto &range = DC::getInstance()->objects.findRange(v, v);
+  auto &range = DC::getInstance()->object_fileindex.findRange(v, v);
   if (!range)
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");

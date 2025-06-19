@@ -1756,7 +1756,7 @@ int do_show(Character *ch, char *argument, int cmd)
 	}
 	else if (is_abbrev(type, "ofiles") && has_range)
 	{
-		show_legacy_files(ch, DC::getInstance()->objects.files);
+		show_legacy_files(ch, DC::getInstance()->object_fileindex.getFiles());
 	}
 	else if (is_abbrev(type, "keydoorcombo"))
 	{

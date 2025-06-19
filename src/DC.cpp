@@ -453,7 +453,7 @@ auto Character::do_arena_usage(QStringList arguments) -> command_return_t
 
 world_file_list_item &FileIndexes::newRange(QString filename, vnum_t firstvnum, vnum_t lastvnum)
 {
-	auto &item = files[filename];
+	auto &item = files_[filename];
 	item.filename = filename;
 	item.firstnum = firstvnum;
 	item.lastnum = firstvnum;
@@ -467,9 +467,9 @@ world_file_list_item &FileIndexes::newRange(QString filename, vnum_t firstvnum, 
 bool FileIndexes::saveRangeIndex(void)
 {
 	QQueue<world_file_list_item> ranges_to_remove{};
-	for (auto &range : files)
+	for (auto &range : files_)
 	{
-		for (auto &larger_range : files)
+		for (auto &larger_range : files_)
 		{
 			if (!range.isRemoved() &&
 				!larger_range.isRemoved() &&
@@ -489,7 +489,7 @@ bool FileIndexes::saveRangeIndex(void)
 	while (!ranges_to_remove.isEmpty())
 	{
 		auto range = ranges_to_remove.back();
-		files.remove(range.filename);
+		files_.remove(range.filename);
 		if (!QFile(range.filename).remove())
 			qDebug("Failed to remove range file '%s'", qUtf8Printable(range.filename));
 		else
@@ -507,7 +507,7 @@ bool FileIndexes::saveRangeIndex(void)
 						  "* ie: <tilda><enter>filename<tilda>\n"
 						  "* DO NOT USE TILDAS IN THE COMMENTS*\n"
 						  "~\n");
-		for (const auto &range : files)
+		for (const auto &range : files_)
 		{
 			objectindex.write(qUtf8Printable(QStringLiteral("%1~\n").arg(range.filename)));
 		}
@@ -528,14 +528,19 @@ world_file_list_item::operator bool(void) const
 	return !filename.isEmpty();
 }
 
+world_file_list_t FileIndexes::getFiles(void) const
+{
+	return files_;
+}
+
 world_file_list_item &FileIndexes::findRange(QString filename)
 {
-	return files[filename];
+	return files_[filename];
 }
 
 world_file_list_item &FileIndexes::findRange(vnum_t firstvnum, vnum_t lastvnum)
 {
-	for (auto &owf : files)
+	for (auto &owf : files_)
 	{
 		if (firstvnum >= owf.firstnum && lastvnum <= owf.lastnum)
 		{

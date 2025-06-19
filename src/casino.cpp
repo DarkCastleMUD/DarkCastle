@@ -2007,11 +2007,11 @@ void save_slot_machines()
       return;
    }
 
-   auto range = DC::getInstance()->objects.findRange(21900, 21999);
+   auto range = DC::getInstance()->object_fileindex.findRange(21900, 21999);
    if (!range)
    {
       logentry(QStringLiteral("Object range 21900-21999 via file '21900-21999.obj' is missing. Recreating."), IMMORTAL, DC::LogChannel::LOG_BUG);
-      range = DC::getInstance()->objects.newRange("21900-21999.obj", 21900, 21999);
+      range = DC::getInstance()->object_fileindex.newRange("21900-21999.obj", 21900, 21999);
       if (!range)
       {
          logentry(QStringLiteral("Error recreating object range 21900-21999 via file '21900-21999.obj'."), IMMORTAL, DC::LogChannel::LOG_BUG);

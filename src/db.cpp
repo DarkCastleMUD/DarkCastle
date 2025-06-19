@@ -956,7 +956,7 @@ void DC::load_mobiles(void)
 			abort();
 		}
 
-		auto pItem = mobiles.newRange(temp);
+		auto pItem = mobile_fileindex.newRange(temp);
 		vnum_t vnum{}, lowest_vnum = UINT64_MAX, highest_vnum{};
 		for (;;)
 		{
@@ -1685,7 +1685,7 @@ void DC::set_zone_modified_mob(int32_t mob)
 // vnum of obj
 void DC::set_zone_modified_obj(vnum_t vnum)
 {
-	auto range = objects.findRange(vnum, vnum);
+	auto range = object_fileindex.findRange(vnum, vnum);
 	if (!range.filename.isEmpty())
 		REMOVE_BIT(range.flags, WORLD_FILE_MODIFIED);
 }
@@ -1721,7 +1721,7 @@ void DC::set_zone_saved_mob(int32_t mob)
 
 void DC::set_zone_saved_obj(vnum_t obj)
 {
-	auto range = objects.findRange(obj, obj);
+	auto range = object_fileindex.findRange(obj, obj);
 	if (range)
 	{
 		range.setNeedsSaving(false);

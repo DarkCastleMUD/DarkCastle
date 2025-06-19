@@ -985,7 +985,7 @@ int do_export(Character *ch, char *args, int cmdnum)
 
     fout << "affects" << std::endl;
 
-    for (const auto &entry : DC::getInstance()->objects.files)
+    for (const auto &entry : DC::getInstance()->object_fileindex.getFiles())
     {
       for (int x = entry.firstnum; x <= entry.lastnum; x++)
       {

@@ -301,12 +301,16 @@ struct world_file_list_item
 };
 
 typedef QMap<QString, world_file_list_item> world_file_list_t;
-struct FileIndexes
+class FileIndexes
 {
-  world_file_list_t files{};
-  world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum);
-  world_file_list_item &findRange(QString filename);
-  world_file_list_item &newRange(QString filename, vnum_t lowvnum = {}, vnum_t highvnum = {});
+  QString filename_;
+  world_file_list_t files_;
+
+public:
+  [[nodiscard]] world_file_list_t getFiles(void) const;
+  [[nodiscard]] world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum);
+  [[nodiscard]] world_file_list_item &findRange(QString filename);
+  [[nodiscard]] world_file_list_item &newRange(QString filename, vnum_t lowvnum = {}, vnum_t highvnum = {});
   bool saveRangeIndex(void);
 };
 
@@ -420,8 +424,8 @@ public:
   QMap<vnum_t, index_t<Character>> mob_index{};
   struct world_file_list_item *world_file_list = 0; // List of the world files
   struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  FileIndexes objects{};
-  FileIndexes mobiles{};
+  FileIndexes object_fileindex{};
+  FileIndexes mobile_fileindex{};
   class Object *object_list = 0;    // the global linked list of obj's
   struct pulse_data *bard_list = 0; // global l-list of bards
   int top_of_helpt = 0;             // top of help index table
