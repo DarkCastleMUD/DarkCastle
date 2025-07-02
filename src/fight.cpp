@@ -4363,7 +4363,8 @@ void stop_fighting(Character *ch, int clearlag)
   }
 
   ch->damage_per_second = ch->damage_done / fight_length;
-  if (ch->getSetting("fighting.showdps", "0") == "1")
+  auto showdps = ch->getSetting("fighting.showdps", "0");
+  if (showdps == "1" || showdps.startsWith('t', Qt::CaseInsensitive))
   {
     csendf(ch, "You caused %lu damage over %lu seconds with DPS of %lu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
   }
