@@ -307,11 +307,15 @@ class FileIndexes
   world_file_list_t files_;
 
 public:
+  FileIndexes(QString filename);
   [[nodiscard]] world_file_list_t getFiles(void) const;
-  [[nodiscard]] world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum);
+  [[nodiscard]] world_file_list_item &findRange(vnum_t lowvnum, vnum_t highvnum = 0);
   [[nodiscard]] world_file_list_item &findRange(QString filename);
   [[nodiscard]] world_file_list_item &newRange(QString filename, vnum_t lowvnum = {}, vnum_t highvnum = {});
   bool saveRangeIndex(void);
+
+  void setNeedsSaving(vnum_t vnum);
+  void setSaved(vnum_t vnum);
 };
 
 class DC_EXPORT DC : public QCoreApplication
@@ -424,8 +428,8 @@ public:
   QMap<vnum_t, index_t<Character>> mob_index{};
   struct world_file_list_item *world_file_list = 0; // List of the world files
   struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  FileIndexes object_fileindex{};
-  FileIndexes mobile_fileindex{};
+  FileIndexes object_fileindex{QStringLiteral(OBJECT_INDEX_FILE)};
+  FileIndexes mobile_fileindex{QStringLiteral(MOB_INDEX_FILE)};
   class Object *object_list = 0;    // the global linked list of obj's
   struct pulse_data *bard_list = 0; // global l-list of bards
   int top_of_helpt = 0;             // top of help index table
@@ -531,11 +535,11 @@ public:
   void set_zone_modified_zone(int32_t room);
   void set_zone_modified(int32_t modnum, world_file_list_item *list);
   void set_zone_modified_world(int32_t room);
-  void set_zone_modified_mob(int32_t mob);
+  void set_zone_modified_mob(vnum_t mob);
   void set_zone_modified_obj(vnum_t vnum);
   void set_zone_saved(int32_t modnum, world_file_list_item *list);
   void set_zone_saved_world(int32_t room);
-  void set_zone_saved_mob(int32_t mob);
+  void set_zone_saved_mob(vnum_t vnum);
   void set_zone_saved_obj(vnum_t obj);
   void free_world_from_memory(void);
   void free_mobs_from_memory(void);

@@ -1618,7 +1618,7 @@ bool can_modify_this_mobile(Character *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_mobile(Character *ch, int32_t mob)
+bool can_modify_mobile(Character *ch, vnum_t mob)
 {
 	return can_modify_this_mobile(ch, mob);
 }
@@ -1677,9 +1677,9 @@ void DC::set_zone_modified_world(int32_t room)
 }
 
 // rnum of mob
-void DC::set_zone_modified_mob(int32_t mob)
+void DC::set_zone_modified_mob(vnum_t mob)
 {
-	set_zone_modified(mob, DC::getInstance()->mob_file_list);
+	mob_file_list->setNeedsSaving(mob);
 }
 
 // vnum of obj
@@ -1713,10 +1713,13 @@ void DC::set_zone_saved_world(int32_t room)
 	set_zone_saved(room, world_file_list);
 }
 
-void DC::set_zone_saved_mob(int32_t mob)
+void DC::set_zone_saved_mob(vnum_t vnum)
 {
-
-	set_zone_saved(mob, DC::getInstance()->mob_file_list);
+	auto range = mobile_fileindex.findRange(vnum);
+	if (range)
+	{
+		range.setNeedsSaving(false);
+	}
 }
 
 void DC::set_zone_saved_obj(vnum_t obj)

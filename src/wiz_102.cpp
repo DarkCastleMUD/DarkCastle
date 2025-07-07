@@ -5027,7 +5027,7 @@ int do_msave(Character *ch, char *arg, int cmd)
   }
 
   ch->sendln("Saved.");
-  DC::getInstance()->set_zone_saved_mob(curr->firstnum);
+  DC::getInstance()->mobile_fileindex.setSaved(curr->firstnum);
   return eSUCCESS;
 }
 

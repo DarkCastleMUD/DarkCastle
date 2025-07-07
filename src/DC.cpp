@@ -528,11 +528,6 @@ world_file_list_item::operator bool(void) const
 	return !filename.isEmpty();
 }
 
-world_file_list_t FileIndexes::getFiles(void) const
-{
-	return files_;
-}
-
 world_file_list_item &FileIndexes::findRange(QString filename)
 {
 	return files_[filename];
@@ -540,6 +535,8 @@ world_file_list_item &FileIndexes::findRange(QString filename)
 
 world_file_list_item &FileIndexes::findRange(vnum_t firstvnum, vnum_t lastvnum)
 {
+	if (!lastvnum)
+		lastvnum = firstvnum;
 	for (auto &owf : files_)
 	{
 		if (firstvnum >= owf.firstnum && lastvnum <= owf.lastnum)
@@ -581,4 +578,32 @@ void world_file_list_item::setRemoved(bool removed)
 bool world_file_list_item::operator==(const world_file_list_item wfli)
 {
 	return wfli.filename == filename && wfli.firstnum == firstnum && wfli.lastnum == lastnum && wfli.flags == flags;
+}
+
+FileIndexes::FileIndexes(QString filename)
+	: filename_(filename)
+{
+}
+
+world_file_list_t FileIndexes::getFiles(void) const
+{
+	return files_;
+}
+
+void FileIndexes::setNeedsSaving(vnum_t vnum)
+{
+	auto range = findRange(vnum);
+	if (range)
+		range.flags = WORLD_FILE_MODIFIED;
+	else
+		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
+}
+
+void FileIndexes::setSaved(vnum_t vnum)
+{
+	auto range = findRange(vnum);
+	if (range)
+		range.flags = {};
+	else
+		logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
 }
