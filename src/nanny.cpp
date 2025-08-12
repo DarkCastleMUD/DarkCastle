@@ -61,8 +61,7 @@ const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
                     "1) Enter the game.\r\n"
                     "2) Enter your character's description.\r\n"
                     "3) Change your password.\r\n"
-                    "4) Archive this character.\r\n"
-                    "5) Delete this character.\n\r\n\r"
+                    "4) Delete this character.\n\r\n\r"
                     "   Make your choice: ";
 
 bool wizlock = false;
@@ -1832,17 +1831,20 @@ void DC::nanny(class Connection *d, std::string arg)
          break;
 
       case '4':
-         // Archive the charater
-         SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
-         telnet_ga(d);
-         STATE(d) = Connection::states::ARCHIVE_CHAR;
-         break;
-
-      case '5':
          // delete this character
-         SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
-         telnet_ga(d);
-         STATE(d) = Connection::states::DELETE_CHAR;
+         if (d->character->getLevel() >= 20)
+         {
+            SEND_TO_Q("\r\nOnly characters under level 20 can be self-deleted.\r\n", d);
+            STATE(d) = Connection::states::SELECT_MENU;
+            SEND_TO_Q(menu, d);
+            telnet_ga(d);
+         }
+         else
+         {
+            SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
+            telnet_ga(d);
+            STATE(d) = Connection::states::DELETE_CHAR;
+         }
          break;
 
       default:
