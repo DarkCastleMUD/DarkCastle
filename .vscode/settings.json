@@ -45,7 +45,16 @@
         "ctime": "cpp",
         "__node_handle": "cpp",
         "__tree": "cpp",
-        "__verbose_abort": "cpp"
+        "__verbose_abort": "cpp",
+        "format": "cpp",
+        "system_error": "cpp",
+        "regex": "cpp",
+        "charconv": "cpp",
+        "ratio": "cpp",
+        "ranges": "cpp",
+        "__bit_reference": "cpp",
+        "bitset": "cpp",
+        "deque": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
