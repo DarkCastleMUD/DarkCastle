@@ -760,14 +760,14 @@ void DC::write_wizlist(const char filename[])
 
 	for (const auto &entry : wizlist)
 	{
-		if (entry.name.startsWith('@'))
+		if (entry.getName().startsWith('@'))
 		{
 			wizlist_file.write("@ @\n");
 			break;
 		}
-		if (entry.level >= IMMORTAL)
+		if (entry.getLevel() >= IMMORTAL)
 		{
-			wizlist_file.write(QStringLiteral("%1 %2\n").arg(entry.name).arg(entry.level).toLocal8Bit());
+			wizlist_file.write(QStringLiteral("%1 %2\n").arg(entry.getName()).arg(entry.getLevel()).toLocal8Bit());
 		}
 	}
 	wizlist_file.close();
@@ -782,21 +782,21 @@ void DC::update_wizlist(Character *ch)
 
 	for (auto &entry : wizlist)
 	{
-		if (entry.name.startsWith('@'))
+		if (entry.getName().startsWith('@'))
 		{
 			if (ch->isMortalPlayer())
 				return;
-			entry.name = ch->getName();
-			entry.level = ch->getLevel();
+			entry.setName(ch->getName());
+			entry.setLevel(ch->getLevel());
 
 			wizlist.push_back({QStringLiteral("@"), 0});
 			break;
 		}
 		else
 		{
-			if (isexact(entry.name, GET_NAME(ch)))
+			if (isexact(entry.getName(), ch->getName()))
 			{
-				entry.level = ch->getLevel();
+				entry.setLevel(ch->getLevel());
 				break;
 			}
 		}
@@ -818,7 +818,8 @@ void DC::update_wizlist(Character *ch)
 int do_wizlist(Character *ch, char *argument, int cmd)
 {
 	char buf[MAX_STRING_LENGTH], lines[500], space[80];
-	int x, current_level, z = 1;
+	int x{}, z{1};
+	level_t current_level{};
 	int gods_each_level[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int line_length, sp;
 
@@ -840,9 +841,9 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 	// count the number of gods at each level, store in array gods_each_level
 	for (x = 0;; x++)
 	{
-		if (DC::getInstance()->wizlist[x].name[0] == '@')
+		if (DC::getInstance()->wizlist[x].getName()[0] == '@')
 			break;
-		gods_each_level[DC::getInstance()->wizlist[x].level - IMMORTAL]++;
+		gods_each_level[DC::getInstance()->wizlist[x].getLevel() - IMMORTAL]++;
 	}
 
 	buf[0] = '\0';
@@ -862,7 +863,7 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 		lines[0] = '\0';
 		for (x = 0;; x++)
 		{
-			if (DC::getInstance()->wizlist[x].name[0] == '@')
+			if (DC::getInstance()->wizlist[x].getName()[0] == '@')
 			{
 				z = 1;
 				if (*lines)
@@ -880,14 +881,14 @@ int do_wizlist(Character *ch, char *argument, int cmd)
 				break;
 			}
 
-			if (DC::getInstance()->wizlist[x].level != current_level)
+			if (DC::getInstance()->wizlist[x].getLevel() != current_level)
 				continue;
 
 			if (z++ % 5)
-				sprintf(lines + strlen(lines), "%s, ", DC::getInstance()->wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s, ", qPrintable(DC::getInstance()->wizlist[x].getName()));
 			else
 			{
-				sprintf(lines + strlen(lines), "%s\n\r", DC::getInstance()->wizlist[x].name);
+				sprintf(lines + strlen(lines), "%s\n\r", qPrintable(DC::getInstance()->wizlist[x].getName()));
 				line_length = strlen(lines) - 2;
 				sp = 79 - line_length;
 				sp /= 2;
