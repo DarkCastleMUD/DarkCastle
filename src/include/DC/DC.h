@@ -280,10 +280,17 @@ private:
   QMap<unsigned int, AuctionTicket> Items_For_Sale;
 };
 
-struct wizlist_info
+class wizlist_info
 {
-  QString name;
-  level_t level = {};
+  QString name_;
+  level_t level_ = {};
+
+public:
+  wizlist_info(QString name, level_t level) : name_(name), level_(level) {}
+  QString getName(void) const { return name_; }
+  void setName(QString name) { name_ = name; }
+  level_t getLevel(void) const { return level_; }
+  void setLevel(level_t level) { level_ = level; }
 };
 struct world_file_list_item
 {
@@ -438,7 +445,7 @@ public:
   room_t top_of_world = 0;
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
-  QList<struct wizlist_info> wizlist;
+  QList<wizlist_info> wizlist;
   struct time_info_data time_info; /* the infomation about the time   */
 
   static QString getBuildVersion();

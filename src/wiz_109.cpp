@@ -493,12 +493,15 @@ command_return_t Character::do_shutdown(QStringList arguments, int cmd)
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
-          if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
+          if (IS_NPC(follower))
           {
-            if (follower->carrying != nullptr)
+            if (IS_AFFECTED(follower, AFF_CHARM))
             {
-              send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
-              return eFAILURE;
+              if (follower->carrying != nullptr || follower->equipment != nullptr)
+              {
+                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+                return eFAILURE;
+              }
             }
           }
         }
