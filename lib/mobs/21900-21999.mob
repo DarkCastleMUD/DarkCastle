@@ -253,4 +253,30 @@ endif
 endif~
 |
 S
+#23006
+redeem trader~
+a redeem trader~
+a redeem trader stands around looking bored
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+S
+#23007
+reforge blacksmith~
+a reforge trader~
+a reforge blacksmith works on equipment
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+S
 $~
