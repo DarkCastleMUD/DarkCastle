@@ -330,9 +330,25 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // We're going to execute, check for usable special proc.
       retval = special(command_arguments, found->getNumber());
-      if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+
+      QString retval_description;
+      if (isSet(retval, eSUCCESS))
       {
-        return logcmd.setReturn(retval, QStringLiteral("eSUCCESS or eCH_DIED"));
+        retval_description = QStringLiteral("eSUCCESS");
+      }
+
+      if (isSet(retval, eCH_DIED))
+      {
+        if (!retval_description.isEmpty())
+        {
+          retval_description += QStringLiteral(" ");
+        }
+        retval_description += QStringLiteral("eSUCCESS");
+      }
+
+      if (!retval_description.isEmpty())
+      {
+        return logcmd.setReturn(retval, retval_description);
       }
 
       switch (found->getType())
