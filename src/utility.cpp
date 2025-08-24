@@ -1945,7 +1945,7 @@ command_return_t Character::generic_command(QStringList argument, int cmd)
     break;
   }
 
-  return eSUCCESS;
+  return eFAILURE;
 }
 
 int do_beep(Character *ch, char *argument, int cmd)
