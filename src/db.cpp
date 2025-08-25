@@ -6768,7 +6768,7 @@ void copySaveData(Object *target, Object *source)
 		target->obj_flags.value[3] = source->obj_flags.value[3];
 	}
 
-	if (type_flag == ITEM_ARMOR || type_flag == ITEM_WEAPON || type_flag == ITEM_INSTRUMENT || type_flag == ITEM_WAND)
+	if (type_flag == ITEM_ARMOR || type_flag == ITEM_WEAPON || type_flag == ITEM_INSTRUMENT || type_flag == ITEM_WAND || type_flag == ITEM_CONTAINER)
 	{
 		if (custom)
 		{
@@ -6883,7 +6883,7 @@ bool fullItemMatch(Object *obj, Object *obj2)
 		}
 	}
 
-	return 1;
+	return true;
 }
 
 // Function to ensure an item is not bugged. If it is, replace it with the original.
