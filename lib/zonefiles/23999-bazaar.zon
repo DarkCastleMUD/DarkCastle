@@ -1,0 +1,17 @@
+V2
+#220
+ $B$7The Sorpigal Shopping District$R~
+23999 25 0 32 2
+M  0 23010   1 23001 windowshopper
+M  0 23002  -1 23002 Player shop keeper
+M  0  5258   3 23003 - broker
+O  0    70  -1 23003 - broker want ads board
+M  0 10031   1 23004 Load Eddie the Exchange Broker
+O  0 21921   1 23004 - sign: instructions for Eddie
+M  0 10031   2 17899 Load Eddie in Far Reach
+O  0 21921   2 17899 - sign: instructions for Eddie
+M  0 10032   1 23005 
+M  0 23006   1 23006 
+M  0 23007   1 23007 
+S
+$~

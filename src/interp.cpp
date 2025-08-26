@@ -109,7 +109,7 @@ public:
     {
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
-      auto timediffStr = QString::number(timediff);
+      auto timediffStr = QString::number(timediff, 'f');
       logentry(QStringLiteral("ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6").arg(ch_->getName()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
     }
   }
@@ -332,9 +332,25 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // We're going to execute, check for usable special proc.
       retval = special(command_arguments, found->getNumber());
-      if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+
+      QString retval_description;
+      if (isSet(retval, eSUCCESS))
       {
-        return logcmd.setReturn(retval, QStringLiteral("eSUCCESS or eCH_DIED"));
+        retval_description = QStringLiteral("eSUCCESS");
+      }
+
+      if (isSet(retval, eCH_DIED))
+      {
+        if (!retval_description.isEmpty())
+        {
+          retval_description += QStringLiteral(" ");
+        }
+        retval_description += QStringLiteral("eSUCCESS");
+      }
+
+      if (!retval_description.isEmpty())
+      {
+        return logcmd.setReturn(retval, retval_description);
       }
 
       switch (found->getType())

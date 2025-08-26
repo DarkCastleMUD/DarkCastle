@@ -1,0 +1,181 @@
+#10018
+gustav platsmith platinum smith master~
+Gustav, the Platsmith~
+Gustav the Platsmith stands here, ready to repair valuable platinum items.
+~
+~
+135038723 32 -1
+1126443720 0 0 -1
+0 0 105
+-80 -100 30000d1+0 1d1+100
+0 0
+8 8 0 65527 0 0
+C 7
+S
+#10019
+platsmith cirrus cloud giant~
+Cirrus, the cloud giant platsmith~
+Cirrus, the reknowned platinum forger is here selling his rare wares.
+~
+~
+135038723 32 -1
+1663312616 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 2
+S
+#10020
+platsmith huuti hu'uti~
+the Hu'uti platsmith~
+The Hu'uti platsmith is here offering you her rare and exotic goods.
+~
+~
+135038723 32 -1
+1126441672 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 2 65527 0 0
+C 4
+S
+#10021
+platsmith gronk trollish chaos~
+Gronk, the trollish platsmith~
+Gronk the grossly misshapen troll is here, working on his latest platinum armours.
+~
+~
+1208780611 32 -1
+1126507208 0 0 -1
+0 9 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 80 128
+C 7
+S
+#10022
+manx salesman platsmith krys'kath kryskath~
+Manx, the Krys'Kath platinum salesman~
+The talented Manx is here, offering his platinum wares for purchase.
+~
+~
+135038723 32 -1
+1663836904 32 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 11
+S
+#10023
+platsmith birdman bird man~
+the birdman platinum seller~
+The birdman platinum seller wanders the palace peddling his wares.
+~
+~
+135038723 32 -1
+1126507240 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 1
+S
+#10024
+rockcrusher grim merchant platsmith~
+Grim Rockcrusher, the wandering platinum merchant~
+Grim, one of the legendary Rockcrusher twins, is here looking for platinum to trade.
+~
+~
+135038723 32 -1
+1126441672 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 12
+S
+#10025
+platsmith feldspar rockcrusher blacksmith~
+Feldspar Rockcrusher, the platinum blacksmith (Jundlehem)~
+Feldspar, one of the legendary Rockcrusher twins, is here forging wondrous platinum objects.
+~
+~
+135038723 32 -1
+1126441672 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 12
+S
+#10026
+platsmith crystal platinum~
+the Crystal Platsmith~
+The Crystal Platsmith is here working on his latest creation.
+~
+~
+135038723 32 -1
+1126443752 0 0 -1
+0 0 105
+-67 -100 30000d1+0 1d1+87
+0 0
+8 8 0 65527 0 0
+C 6
+S
+#10027
+quest master phire quest-master~
+Phire, the Quest Master~
+Phire, the Quest Master stands here, copying new quests down on a stack of parchment.
+~
+~
+427859 32 -1
+1931739816 0 0 -1
+0 31 108
+-80 -3 28000d1+0 20d6+100
+25000 50000
+8 8 0 8388607 0 1048576
+C 10
+S
+#10030
+vault seller~
+the vault salesman~
+the vault salesman, stands here pawning vaults off on people.
+~
+~
+3049282 32 -1
+1896155272 0 0 -1
+0 0 108
+20 10 0d1+0 1d1+0
+0 0
+8 8 1 8388607 0 0
+S
+#10031
+eddie exchange broker~
+Eddie the Exchange Broker~
+Eddie the Exchange Broker is here, looking bored.
+~
+~
+269387586 32 -1
+1663830664 4102 0 -1
+0 1 108
+20 10 0d1+0 10d15+0
+0 0
+8 8 0 8388607 0 0
+C 3
+S
+#10032
+albert hoffman reroll~
+Albert~
+Albert is here, mixing chemicals.
+~
+~
+2 32 -1
+805571208 0 0 -1
+0 0 100
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+S
+$~

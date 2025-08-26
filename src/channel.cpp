@@ -949,7 +949,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
       this->tell_history(this, ar.str);
 
       // Log what I told a logged player under their name
-      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG))
+      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
         logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }
@@ -983,7 +983,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
 
       this->sendln("They were sleeping btw...");
       // Log what I told a logged player under their name
-      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG))
+      if (!IS_NPC(vict) && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
       {
         logentry(QStringLiteral("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(this)).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
       }

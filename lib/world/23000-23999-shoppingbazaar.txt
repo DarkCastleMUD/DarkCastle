@@ -1,0 +1,149 @@
+#23000
+The Platinum Strip~
+   A large and varied bazaar of goods unfolds to your east.  The street is full
+of people shopping at all hours of the day or night looking for that bargain
+they know is out there somewhere.  Vendors hawk their goods shouting at you
+from all directions about the quality of their shop.  To the north is the grand
+gates of the $BPlatinum Towers Casino and Hotel$R.
+~
+9 67108868 2
+D0
+~
+~
+0 -1 21900
+D1
+~
+~
+0 -1 3047
+D3
+~
+~
+0 -1 23001
+S
+#23001
+Lysergic Lane~
+   Wandering to and fro, the crowds of people that stream through this bazaar
+provide much tax revenue to the city.  A lack of authorities here is not by
+accident since many of the 'goods' here are not items neccesarily endorsed by
+the Mayor publically.  As long as the taxes keep coming in however, it is
+unlikely that they will be stopped.  A barrier to the east indicates the
+shopping district is currently closed while it undergoes restoration and
+improvements, no doubt paid for with the handsome taxes it generates.
+~
+9 67108864 0
+D0
+~
+~
+0 -1 23003
+D1
+~
+~
+0 -1 23000
+D2
+~
+~
+0 -1 23005
+D3
+~
+~
+0 -1 23004
+S
+#23002
+Pirahna's Shop~
+   Dust has formed on the counters of this long unused shop.  Empty hooks and
+shelves line the walls.  Small footprints of mice searching for anything edible
+criss-cross through the dust.
+~
+9 33563728 0
+D2
+~
+~
+0 -1 23000
+S
+#23003
+The Sorpigal Consignment Shop~
+   The shelves of this small shop are crammed with various items.  Boxes of
+unsold goods line the floor, their unmarked contents awaiting an open space for
+display.  A few of the items have accumulated a layer of dust, the owners
+having forgotten to check back with the Broker on their status.
+~
+9 1258 0
+D2
+~
+~
+0 -1 23001
+S
+#23004
+Eddie's Extravagant Exchange Emporium~
+   There isn't much to this little shop.  The back wall is lined with hooks
+holding a number of touristy looking t-shirts with cheesy slogans like "Damn
+Spoony Bards!" and "Love Monk Stun!"  A simple glass counter occupies most
+of the space.  Inside it are stacks of tokens of multiple shapes, colors, and
+sizes.
+~
+9 33563902 0
+D1
+~
+~
+0 -1 23001
+S
+#23005
+Albert's Laboratory~
+The room is large and well lit.  There are shelves along the east wall and a
+table along the west wall.  The shelves have books on them.  The tables have
+beakers filled with strange liquids simmering underneath different colored
+flames.  There is a small sign on the wall.
+~
+9 1024 0
+D0
+~
+~
+0 -1 23001
+D2
+~
+~
+0 -1 23006
+E
+sign~
+Type reroll object name to have Albert reroll that object. The cost is one $B$2cloverleaf$R token.
+~
+E
+book~
+There are books about chemistry and the Swiss Alps.
+~
+E
+books~
+There are books about chemistry and the Swiss Alps.
+~
+S
+#23006
+Redeem room~
+Empty description.
+~
+9 0 0
+D0
+~
+~
+0 -1 23005
+D2
+~
+~
+0 -1 23007
+S
+#23007
+Reforge room~
+Empty description.
+~
+9 0 0
+D0
+~
+~
+0 -1 23006
+S
+#23999
+End of the shopping district~
+   Empty description.
+~
+9 33554448 4
+S
+$~
