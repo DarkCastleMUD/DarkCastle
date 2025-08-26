@@ -287,7 +287,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/testDC",
-            "args": [],
+            "args": [
+                "test_immortal_object_commands"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],

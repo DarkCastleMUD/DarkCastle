@@ -12,3 +12,4 @@ lib/wizlist.txt
 build/
 lib/gmon.out
 vaults/vaultindex
+gcm.cache/
