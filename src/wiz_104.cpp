@@ -56,7 +56,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 	if (IS_PC(ch) && ch->player->wizinvis)
 		sprintf(buf3, "someone");
 	else
-		sprintf(buf3, GET_SHORT(ch));
+		sprintf(buf3, "%s", GET_SHORT(ch));
 
 	for (; *argument == ' '; argument++)
 		;
@@ -77,7 +77,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 				if (IS_PC(ch) && ch->player->wizinvis && i->character->getLevel() < ch->player->wizinvis)
 					sprintf(buf3, "Someone");
 				else
-					sprintf(buf3, GET_SHORT(ch));
+					sprintf(buf3, "%s", GET_SHORT(ch));
 
 				if (cmd == CMD_DEFAULT)
 				{
@@ -506,18 +506,22 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 	// show zone cmds
 	for (int j = start; (j < start + num_to_show) && j < zone.cmd.size(); j++)
 	{
-		time_t last = zone.cmd[j]->last;
-		std::string lastStr = "never";
+		auto last = zone.cmd[j]->last;
+		QDateTime last_date_time;
+		last_date_time.setSecsSinceEpoch(last);
+		QString lastStr = QStringLiteral("never");
 		if (last)
 		{
-			lastStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(last));
+			lastStr = last_date_time.toString("yyyy-MM-dd hh:mm:ss z");
 		}
 
-		time_t lastSuccess = zone.cmd[j]->lastSuccess;
-		std::string lastSuccessStr = "never";
+		auto lastSuccess = zone.cmd[j]->lastSuccess;
+		QDateTime lastSuccess_date_time;
+		lastSuccess_date_time.setSecsSinceEpoch(last);
+		QString lastSuccessStr = QStringLiteral("never");
 		if (lastSuccess)
 		{
-			lastSuccessStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(lastSuccess));
+			lastSuccessStr = lastSuccess_date_time.toString("yyyy-MM-dd hh:mm:ss z");
 		}
 
 		uint64_t attempts = zone.cmd[j]->attempts;
@@ -723,7 +727,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
 		ch->send(buf);
 		if (stats)
 		{
-			csendf(ch, "      Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
+			ch->sendln(QStringLiteral("      Last attempt: $B%1$R Last success: $B%2$R Average: $B%3$R").arg(lastStr).arg(lastSuccessStr).arg(successRate * 100.0));
 		}
 	} // for
 
