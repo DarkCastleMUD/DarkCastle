@@ -524,7 +524,7 @@ public:
 
   [[nodiscard]] inline QString current(void)
   {
-    return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(currentVNUM()).arg(currentFilename());
+    return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
   void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);

@@ -5102,7 +5102,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 				}
 
 				vmob = initiate_oproc(this, item);
-				if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
+				if (mprog_wordlist_check(command, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
 					return mprog_cur_result;
