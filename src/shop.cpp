@@ -235,7 +235,7 @@ void shopping_buy(const char *arg, Character *ch,
   }
 
   act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
-  keeper->do_tell(shop.message_buy.arg(GET_NAME(ch)).arg(cost).split(' '));
+  keeper->do_tell(shop.message_buy.arg(GET_NAME(ch)).arg(QString::number(cost)).split(' '));
   ch->send(QStringLiteral("You now have %1.\r\n").arg(obj->short_description));
   ch->removeGold(cost);
   keeper->addGold(cost);
@@ -348,7 +348,7 @@ void shopping_sell(const char *arg, Character *ch,
   }
 
   act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
-  keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(GET_NAME(ch)).arg(cost).split(' '));
+  keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(GET_NAME(ch)).arg(QString::number(cost)).split(' '));
   ch->send(QStringLiteral("The shopkeeper now has %1.\r\n").arg(obj->short_description));
   ch->addGold(cost);
   keeper->removeGold(cost);
@@ -595,7 +595,7 @@ void shopping_value(const char *arg, Character *ch,
   if (!keeperhas)
   {
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_sell);
-    keeper->do_tell(QStringLiteral("%1 I'll give you %2 gold coins for that.").arg(GET_NAME(ch)).arg(cost).split(' '));
+    keeper->do_tell(QStringLiteral("%1 I'll give you %2 gold coins for that.").arg(GET_NAME(ch)).arg(QString::number(cost)).split(' '));
   }
   return;
 }
@@ -664,11 +664,11 @@ void shopping_list(const char *arg, Character *ch,
     {
       first_vnum = DC::getInstance()->getObjectVNUM(obj);
     }
-    ch->sendln(QStringLiteral("[%1] [%2] [%3] %4.").arg(a, 3).arg(cost, 7).arg(DC::getInstance()->getObjectVNUM(obj), 6).arg(obj->short_description));
+    ch->sendln(QStringLiteral("[%1] [%2] [%3] %4.").arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(DC::getInstance()->getObjectVNUM(obj)), 6).arg(obj->short_description));
   }
   if (first_vnum && first_vnum != DC::INVALID_VNUM)
   {
-    ch->sendln(QStringLiteral("Type 'identify vVNUM' for details about a specific object. Example: identify v%1").arg(first_vnum));
+    ch->sendln(QStringLiteral("Type 'identify vVNUM' for details about a specific object. Example: identify v%1").arg(QString::number(first_vnum)));
   }
 
   if (!found)
@@ -1258,7 +1258,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 
   shop->money_on_hand -= value;
   ch->addGold(value);
-  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\r\n").arg(value));
+  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\r\n").arg(QString::number(value)));
   write_one_player_shop(shop);
 }
 
@@ -1398,13 +1398,13 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       count++;
       robj = real_object(item->item_vnum);
       if (robj < 0)
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg("INVALID ITEM NUMBER", -40).arg(item->price));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(count, -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(item->price));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(QString::number(item->price)));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
-    ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(shop->money_on_hand));
+    ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(QString::number(shop->money_on_hand)));
 }
 
 int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
@@ -1734,7 +1734,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(MAX_EDDIE_ITEMS));
+      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(QString::number(MAX_EDDIE_ITEMS)));
       return eSUCCESS;
     }
 
