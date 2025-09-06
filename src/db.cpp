@@ -4514,8 +4514,8 @@ void Zone::reset(ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in G, reseting zone %lu cmd %d", id_, cmd_no + 1);
-					logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+					// sprintf(buf, "Null mob in G, reseting zone %lu cmd %d", id_, cmd_no + 1);
+					// logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
@@ -4569,8 +4569,8 @@ void Zone::reset(ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == nullptr)
 				{
-					sprintf(buf, "Null mob in E reseting zone %lu cmd %d", id_, cmd_no + 1);
-					logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
+					// sprintf(buf, "Null mob in E reseting zone %lu cmd %d", id_, cmd_no + 1);
+					// logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
