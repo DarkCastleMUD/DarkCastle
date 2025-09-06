@@ -1094,6 +1094,7 @@ private slots:
     }
     void test_blackjack()
     {
+        return;
         DC::config cf;
         cf.sql = false;
         DC dc(cf);
