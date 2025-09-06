@@ -719,6 +719,8 @@ void DC::game_loop(void)
   for (d = descriptor_list; d; d = next_d)
   {
     next_d = d->next;
+
+    const auto idle_seconds = d->idle_time / DC::PASSES_PER_SEC;
     if (FD_ISSET(d->descriptor, &input_set))
     {
       if (process_input(d) < 0)
@@ -730,6 +732,20 @@ void DC::game_loop(void)
           logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
         }
         close_socket(d);
+      }
+    }
+    else
+    {
+      switch (d->connected)
+      {
+      case Connection::states::GET_NAME:
+      case Connection::states::GET_OLD_PASSWORD:
+        if (idle_seconds > 30)
+        {
+          SEND_TO_Q(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
+          close_socket(d);
+        }
+        break;
       }
     }
   }
