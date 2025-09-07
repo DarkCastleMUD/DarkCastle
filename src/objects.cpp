@@ -32,8 +32,6 @@ extern const char *drinks[];
 extern const char *dirs[];
 extern int drink_aff[][3];
 
-extern struct spell_info_type spell_info[MAX_SPL_LIST];
-
 void add_obj_affect(Object *obj, int loc, int mod)
 {
   obj->num_affects++;
@@ -329,10 +327,10 @@ int do_quaff(Character *ch, char *argument, int cmd)
   {
     if (temp->obj_flags.value[i] >= 1)
     {
-      if (spell_info[temp->obj_flags.value[i]].spell_pointer)
+      if (spell_info[temp->obj_flags.value[i]].spell_pointer())
       {
         lvl = (int)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer())((uint8_t)temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
       }
     }
     if (isSet(retval, eCH_DIED))
@@ -440,14 +438,14 @@ int do_recite(Character *ch, char *argument, int cmd)
       if (scroll->obj_flags.value[i] >= 1)
       {
         lvl = (int)(1.5 * scroll->obj_flags.value[0]);
-        if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
+        if (spell_info[scroll->obj_flags.value[i]].spell_pointer() == nullptr)
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer() == nullptr", DC::getInstance()->obj_index[scroll->item_number].virt, i, i);
           continue;
         }
         else
         {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)((uint8_t)scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer())((uint8_t)scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -741,8 +739,8 @@ int do_use(Character *ch, char *argument, int cmd)
       lvl = (int)(1.5 * stick->obj_flags.value[0]);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       int retval = 0;
-      if (spell_info[stick->obj_flags.value[3]].spell_pointer)
-        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
+      if (spell_info[stick->obj_flags.value[3]].spell_pointer())
+        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
       else
         retval = eFAILURE;
       return retval;
@@ -776,8 +774,8 @@ int do_use(Character *ch, char *argument, int cmd)
         lvl = (int)(1.5 * stick->obj_flags.value[0]);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         int retval;
-        if (spell_info[stick->obj_flags.value[3]].spell_pointer)
-          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+        if (spell_info[stick->obj_flags.value[3]].spell_pointer())
+          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((uint8_t)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
         else
           retval = eFAILURE;
         return retval;

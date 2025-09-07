@@ -30,13 +30,13 @@
 
 #include <fmt/format.h>
 
+#include "DC/spells.h"
 #include "DC/obj.h"
 #include "DC/room.h"
 #include "DC/connect.h"
 #include "DC/DC.h"
 #include "DC/race.h"
 #include "DC/character.h"
-#include "DC/spells.h"
 #include "DC/magic.h"
 #include "DC/player.h"
 #include "DC/fight.h"
@@ -14008,7 +14008,7 @@ int cast_holy_aura(uint8_t level, Character *ch, char *arg, int type, Character 
     else
     {
       ch->sendln("You need to specify whether you want protection against magic or physical.");
-      ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana;
+      ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana();
       return eFAILURE;
     }
 
@@ -14786,7 +14786,7 @@ int spell_immunity(uint8_t level, Character *ch, Character *victim, Object *obj,
 {
   struct affected_type af;
 
-  if ((spell_info[spl].targets & TAR_IGNORE))
+  if ((spell_info[spl].targets() & TAR_IGNORE))
   {
     ch->sendln("You find it impossible to immunize yourself against this type of spell.");
     return eSUCCESS;

@@ -61,7 +61,6 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
-extern struct song_info_type song_info[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
@@ -80,9 +79,9 @@ SPELL_FUN *spell_pointer;    /* Function to call             */
 int16_t difficulty;
 #endif
 
-struct spell_info_type spell_info[] =
+const QList<spell_info_type> spell_info =
     {
-        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, 0},
+        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, nullptr, 0},
 
         {/* 01 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_armor, SKILL_INCREASE_MEDIUM},
 
@@ -436,7 +435,7 @@ struct spell_info_type spell_info[] =
         {/* 176 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM},
         {/* 177 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY}};
 
-struct skill_stuff skill_info[] =
+const QList<skill_stuff> skill_info =
     {
         /*  1 */ {"trip", SKILL_INCREASE_MEDIUM},
         /*  2 */ {"dodge", SKILL_INCREASE_HARD},
@@ -912,7 +911,7 @@ int dam_percent(int learned, int damage)
 
 int use_mana(Character *ch, int sn)
 {
-  int base = spell_info[sn].min_usesmana;
+  int base = spell_info[sn].min_usesmana();
 
   // TODO - if we want mana to be modified by anything, we'll need to put something
   // here.  Since the "min_level_x" stuff doesn't exist anymore, and i'm too lazy
@@ -1510,7 +1509,7 @@ int do_release(Character *ch, char *argument, int cmd)
         ch->sendln("You can release the following spells:");
         printed = true;
       }
-      if (((spell_info[aff->type].targets & TAR_SELF_DEFAULT) ||
+      if (((spell_info[aff->type].targets() & TAR_SELF_DEFAULT) ||
            aff->type == SPELL_HOLY_AURA) &&
           aff->type != SPELL_IMMUNITY)
       { // Spells that default to self seems a good measure of
@@ -1542,7 +1541,7 @@ int do_release(Character *ch, char *argument, int cmd)
         continue;
       if (aff->type > MAX_SPL_LIST)
         continue;
-      if (!isSet(spell_info[aff->type].targets,
+      if (!isSet(spell_info[aff->type].targets(),
                  TAR_SELF_DEFAULT) &&
           aff->type != SPELL_HOLY_AURA)
         continue;
@@ -1601,16 +1600,13 @@ int stat_mod[] = {
 
 int get_difficulty(int skillnum)
 {
-  //  extern struct skill_stuff skill_info[];
-  extern struct ki_info_type ki_info[];
-  extern struct song_info_type song_info[];
 
   if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
-    return skill_info[skillnum - SKILL_BASE].difficulty;
+    return skill_info[skillnum - SKILL_BASE].difficulty();
   if (skillnum >= KI_OFFSET && skillnum <= KI_OFFSET + MAX_KI_LIST)
-    return ki_info[skillnum - KI_OFFSET].difficulty;
+    return ki_info[skillnum - KI_OFFSET].difficulty();
   if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
-    return song_info[skillnum - SKILL_SONG_BASE].difficulty;
+    return song_info[skillnum - SKILL_SONG_BASE].difficulty();
 
   return 0;
 }
@@ -1930,9 +1926,9 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (spell_info[spl].spell_pointer)
+  if (spell_info[spl].spell_pointer())
   {
-    if (GET_POS(ch) < spell_info[spl].minimum_position)
+    if (GET_POS(ch) < spell_info[spl].minimum_position())
     {
       switch (GET_POS(ch))
       {
@@ -2188,13 +2184,13 @@ int do_cast(Character *ch, char *argument, int cmd)
 
         } // end if filterable spell
       } // end filter
-      if (!target_ok && !isSet(spell_info[spl].targets, TAR_IGNORE))
+      if (!target_ok && !isSet(spell_info[spl].targets(), TAR_IGNORE))
       {
         argument = one_argument(argument, name);
 
         if (*name)
         {
-          if (isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
           {
             if ((tar_char = ch->get_char_room_vis(name)) != nullptr)
               target_ok = true;
@@ -2215,7 +2211,7 @@ int do_cast(Character *ch, char *argument, int cmd)
             }
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_CHAR_WORLD))
           {
             bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
@@ -2225,23 +2221,23 @@ int do_cast(Character *ch, char *argument, int cmd)
             if (!orig)
               REMBIT(ch->affected_by, AFF_true_SIGHT);
           }
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_INV))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_INV))
             if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
               target_ok = true;
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
           {
             tar_obj = get_obj_in_list_vis(ch, name, DC::getInstance()->world[ch->in_room].contents);
             if (tar_obj != nullptr)
               target_ok = true;
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
               /* && !(isSet(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
           {
             for (i = 0; i < MAX_WEAR && !target_ok; i++)
               if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
@@ -2251,7 +2247,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               }
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_SELF_ONLY))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
             if (str_cmp(GET_NAME(ch), name) == 0)
             {
               tar_char = ch;
@@ -2261,14 +2257,14 @@ int do_cast(Character *ch, char *argument, int cmd)
         else
         { // !*name No argument was typed
 
-          if (isSet(spell_info[spl].targets, TAR_FIGHT_SELF))
+          if (isSet(spell_info[spl].targets(), TAR_FIGHT_SELF))
             if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
             {
               tar_char = ch;
               target_ok = true;
             }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             if (ch->fighting && (ch->in_room == ch->fighting->in_room))
             // added the in_room checks -pir2/23/01
             {
@@ -2276,14 +2272,14 @@ int do_cast(Character *ch, char *argument, int cmd)
               target_ok = true;
             }
 
-          if (!target_ok && (isSet(spell_info[spl].targets, TAR_SELF_ONLY) ||
-                             isSet(spell_info[spl].targets, TAR_SELF_DEFAULT)))
+          if (!target_ok && (isSet(spell_info[spl].targets(), TAR_SELF_ONLY) ||
+                             isSet(spell_info[spl].targets(), TAR_SELF_DEFAULT)))
           {
             tar_char = ch;
             target_ok = true;
           }
 
-          if (!target_ok && isSet(spell_info[spl].targets, TAR_NONE_OK))
+          if (!target_ok && isSet(spell_info[spl].targets(), TAR_NONE_OK))
           {
             target_ok = true;
           }
@@ -2298,24 +2294,24 @@ int do_cast(Character *ch, char *argument, int cmd)
       {
         if (*name)
         {
-          if (isSet(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (isSet(spell_info[spl].targets(), TAR_CHAR_ROOM))
             ch->sendln("Nobody here by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_CHAR_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_CHAR_WORLD))
             ch->sendln("Nobody playing by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_INV))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_INV))
             ch->sendln("You are not carrying anything like that.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_ROOM))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
             ch->sendln("Nothing here by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             ch->sendln("Nothing at all by that name.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_EQUIP))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))
             ch->sendln("You are not wearing anything like that.");
-          else if (isSet(spell_info[spl].targets, TAR_OBJ_WORLD))
+          else if (isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             ch->sendln("Nothing at all by that name.");
         }
         else
         { /* Nothing was given as argument */
-          if (spell_info[spl].targets < TAR_OBJ_INV)
+          if (spell_info[spl].targets() < TAR_OBJ_INV)
             ch->sendln("Whom should the spell be cast upon?");
           else
             ch->sendln("What should the spell be cast upon?");
@@ -2324,7 +2320,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       }
       else
       { /* TARGET IS OK */
-        if ((tar_char == ch) && !ok_self && isSet(spell_info[spl].targets, TAR_SELF_NONO))
+        if ((tar_char == ch) && !ok_self && isSet(spell_info[spl].targets(), TAR_SELF_NONO))
         {
           if (oldroom)
           {
@@ -2334,7 +2330,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           ch->sendln("You can not cast this spell upon yourself.");
           return eFAILURE;
         }
-        else if ((tar_char != ch) && isSet(spell_info[spl].targets, TAR_SELF_ONLY))
+        else if ((tar_char != ch) && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
         {
           ch->sendln("You can only cast this spell upon yourself.");
           return eFAILURE;
@@ -2359,7 +2355,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-      if (tar_char && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+      if (tar_char && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
       {
         if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
         {
@@ -2390,11 +2386,11 @@ int do_cast(Character *ch, char *argument, int cmd)
       }
 
       if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL))
-        WAIT_STATE(ch, spell_info[spl].beats);
+        WAIT_STATE(ch, spell_info[spl].beats());
       else
-        WAIT_STATE(ch, (int)(spell_info[spl].beats / 1.5));
+        WAIT_STATE(ch, (int)(spell_info[spl].beats() / 1.5));
 
-      if ((spell_info[spl].spell_pointer == 0) && spl > 0)
+      if ((spell_info[spl].spell_pointer() == 0) && spl > 0)
         ch->sendln("Sorry, this magic has not yet been implemented :(");
       else
       {
@@ -2436,7 +2432,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1) * rel;
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
-          ch->skill_increase_check(spl, learned, spell_info[spl].difficulty);
+          ch->skill_increase_check(spl, learned, spell_info[spl].difficulty());
           if (oldroom)
           {
             char_from_room(ch);
@@ -2488,7 +2484,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           GET_MANA(ch) -= (use_mana(ch, spl) * rel);
         if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
           tar_char->sendln("Your sleep is restless.");
-        ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty);
+        ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
         if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
         {
@@ -2505,7 +2501,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           auto &arena = DC::getInstance()->arena_;
           if (ch->room().isArena() && arena.isPrize() && spl != 88)
           {
-            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
@@ -2533,7 +2529,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           // Clan Chaos
           if (ch->room().isArena() && arena.isChaos() && spl != 88)
           {
-            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
+            if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
@@ -2541,7 +2537,7 @@ int do_cast(Character *ch, char *argument, int cmd)
               return eFAILURE;
             }
 
-            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
@@ -2551,7 +2547,7 @@ int do_cast(Character *ch, char *argument, int cmd)
                    GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
             }
-            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets, TAR_FIGHT_VICT))
+            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
@@ -2651,7 +2647,7 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
         }
 
-        int retval = ((*spell_info[spl].spell_pointer)(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        int retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
         if (argument_ptr != nullptr)
         {
           free(argument_ptr);
@@ -2661,7 +2657,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);
-          WAIT_STATE(ch, (int)(spell_info[spl].beats));
+          WAIT_STATE(ch, (int)(spell_info[spl].beats()));
 
           if (spl == SPELL_LIGHTNING_BOLT)
           {
@@ -2940,7 +2936,7 @@ int do_songs(Character *ch, char *arg, int cmd)
     {
       sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
-              song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski,
+              song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
       strcat(buf, "\n\r");
     }
@@ -3044,32 +3040,32 @@ int do_spells(Character *ch, char *arg, int cmd)
     if (mage)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana);
+              UPPER(*m_skills[mage].skillname), m_skills[mage].skillname + 1, spell_info[mage].min_usesmana());
     }
     else if (cleric)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana);
+              UPPER(*c_skills[cleric].skillname), c_skills[cleric].skillname + 1, spell_info[cleric].min_usesmana());
     }
     else if (anti)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana);
+              UPPER(*a_skills[anti].skillname), a_skills[anti].skillname + 1, spell_info[anti].min_usesmana());
     }
     else if (pal)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana);
+              UPPER(*p_skills[pal].skillname), p_skills[pal].skillname + 1, spell_info[pal].min_usesmana());
     }
     else if (ranger)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana);
+              UPPER(*r_skills[ranger].skillname), r_skills[ranger].skillname + 1, spell_info[ranger].min_usesmana());
     }
     else if (druid)
     {
       sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
-              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana);
+              UPPER(*u_skills[druid].skillname), u_skills[druid].skillname + 1, spell_info[druid].min_usesmana());
     }
     else
       continue;

@@ -679,7 +679,6 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
 
 extern std::vector<std::string> continent_names;
 
-extern struct spell_info_type spell_info[];
 void renum_world(void);
 void renum_zone_table(void);
 

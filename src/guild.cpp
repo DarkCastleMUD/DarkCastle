@@ -533,13 +533,11 @@ void Character::output_praclist(class_skill_defines *skilllist)
     }
     else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
     {
-      extern struct song_info_type song_info[];
-      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski(), 3));
     }
     else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
     {
-      extern struct ki_info_type ki_info[];
-      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski, 3));
+      send(QStringLiteral("Ki:   $B%1$R ").arg(ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski(), 3));
     }
     else if (skilllist[i].skillnum == 318) // scan
     {

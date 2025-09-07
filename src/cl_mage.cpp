@@ -4,11 +4,11 @@
 */
 #include <cstring>
 
+#include "DC/spells.h"
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/character.h"
-#include "DC/spells.h"
 #include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/mobile.h"
@@ -19,8 +19,6 @@
 #include "DC/returnvals.h"
 #include "DC/room.h"
 #include "DC/db.h"
-
-extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 int spellcraft(Character *ch, int spell)
 {
@@ -202,7 +200,7 @@ int do_imbue(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana;
+  manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana();
 
   if (GET_MANA(ch) < manacost)
   {
