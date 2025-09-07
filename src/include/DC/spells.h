@@ -640,7 +640,7 @@ typedef int SPELL_FUN2(uint8_t level, Character *ch,
                        char *arg, int type,
                        Character *tar_ch,
                        class Object *tar_obj,
-                       int skill, int mana_cost);
+                       int skill, quint64 mana_cost);
 // typedef int (*spell_gen1_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill);
 // typedef command_return_t (*spell_gen2_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
 

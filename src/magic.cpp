@@ -3290,7 +3290,7 @@ int spell_protection_from_good(uint8_t level, Character *ch, Character *victim, 
 
 /* REMOVE CURSE */
 
-int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
+int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill, quint64 mana_cost)
 {
   int j;
   assert(ch && (victim || obj));
@@ -3332,64 +3332,79 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     return eSUCCESS;
   }
 
+  quint64 curses_removed = 0;
   /* Then it is a PC | NPC */
   if (victim->affected_by_spell(SPELL_CURSE))
   {
     act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
     act("You feel better.", victim, 0, 0, TO_CHAR, 0);
     affect_from_char(victim, SPELL_CURSE);
-    return eSUCCESS;
+    curses_removed++;
   }
 
   for (j = 0; j < MAX_WEAR; j++)
   {
     if ((obj = victim->equipment[j]) && isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
-        int i = 0;
-        for (i = 0; i < obj->num_affects; i++)
-          if (obj->affected[i].location == APPLY_MANA_REGEN)
-            return eSUCCESS; // only do it once
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
-        add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-        victim->mana_regen += 2;
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        if (curses_removed++)
+          GET_MANA(victim) -= mana_cost;
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        {
+          int i = 0;
+          for (i = 0; i < obj->num_affects; i++)
+            if (obj->affected[i].location == APPLY_MANA_REGEN)
+              break; // only do it once
+          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+          victim->mana_regen += 2;
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        }
+        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
+        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
       }
-      act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-      act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      return eSUCCESS;
     }
   }
 
   for (obj = victim->carrying; obj; obj = obj->next_content)
+  {
     if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
-      act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-      act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
-      if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+      if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
-        int i = 0;
-        for (i = 0; i < obj->num_affects; i++)
-          if (obj->affected[i].location == APPLY_MANA_REGEN)
-            return eSUCCESS; // only do it once
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
-        add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
-        act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        if (curses_removed++)
+          GET_MANA(victim) -= mana_cost;
+        act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+        act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
+        if (skill > 70 && DC::getInstance()->obj_index[obj->item_number].virt == 514)
+        {
+          int i = 0;
+          for (i = 0; i < obj->num_affects; i++)
+            if (obj->affected[i].location == APPLY_MANA_REGEN)
+              break; // only do it once
+          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_ROOM, 0);
+          act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
+        }
+        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
       }
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-      break;
     }
+  }
 
   if (victim->affected_by_spell(SPELL_ATTRITION))
   {
-    act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
-    act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
-    affect_from_char(victim, SPELL_ATTRITION);
-    return eSUCCESS;
+    if (!curses_removed || GET_MANA(victim) > mana_cost)
+    {
+      if (curses_removed++)
+        GET_MANA(victim) -= mana_cost;
+      act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
+      act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
+      affect_from_char(victim, SPELL_ATTRITION);
+    }
   }
 
   return eSUCCESS;
@@ -9253,13 +9268,12 @@ int cast_protection_from_good(uint8_t level, Character *ch, char *arg, int type,
   return eFAILURE;
 }
 
-int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type,
-                      Character *tar_ch, class Object *tar_obj, int skill)
+int cast_remove_curse(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    return spell_remove_curse(level, ch, tar_ch, tar_obj, skill);
+    return spell_remove_curse(level, ch, tar_ch, tar_obj, skill, mana_cost);
     break;
   case SPELL_TYPE_POTION:
     return spell_remove_curse(level, ch, ch, 0, skill);

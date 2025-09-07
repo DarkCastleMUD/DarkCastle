@@ -1926,7 +1926,7 @@ int do_cast(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (spell_info[spl].spell_pointer())
+  if (spell_info[spl].spell_pointer() || spell_info[spl].spell_pointer2())
   {
     if (GET_POS(ch) < spell_info[spl].minimum_position())
     {
@@ -2290,6 +2290,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         target_ok = true; /* No target, is a good target */
       }
 
+      quint64 mana_cost{};
       if (!target_ok)
       {
         if (*name)
@@ -2390,7 +2391,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       else
         WAIT_STATE(ch, (int)(spell_info[spl].beats() / 1.5));
 
-      if ((spell_info[spl].spell_pointer() == 0) && spl > 0)
+      if ((spell_info[spl].spell_pointer() == 0 && spell_info[spl].spell_pointer2() == 0) && spl > 0)
         ch->sendln("Sorry, this magic has not yet been implemented :(");
       else
       {
@@ -2478,10 +2479,14 @@ int do_cast(Character *ch, char *argument, int cmd)
             ch->sendln("You do not have enough mana to cast this group spell.");
             return eFAILURE;
           }
-          GET_MANA(ch) -= counter;
+          mana_cost = counter;
+          GET_MANA(ch) -= mana_cost;
         }
         else
-          GET_MANA(ch) -= (use_mana(ch, spl) * rel);
+        {
+          mana_cost = (use_mana(ch, spl) * rel);
+          GET_MANA(ch) -= mana_cost;
+        }
         if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
           tar_char->sendln("Your sleep is restless.");
         ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
@@ -2647,7 +2652,10 @@ int do_cast(Character *ch, char *argument, int cmd)
           }
         }
 
-        int retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        if (spell_info[spl].spell_pointer())
+          int retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        else if (spell_info[spl].spell_pointer2())
+          int retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
           free(argument_ptr);
