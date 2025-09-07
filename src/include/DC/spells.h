@@ -636,6 +636,11 @@ typedef int SPELL_FUN(uint8_t level, Character *ch,
                       Character *tar_ch,
                       class Object *tar_obj,
                       int skill);
+typedef int SPELL_FUN2(uint8_t level, Character *ch,
+                       char *arg, int type,
+                       Character *tar_ch,
+                       class Object *tar_obj,
+                       int skill, int mana_cost);
 // typedef int (*spell_gen1_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill);
 // typedef command_return_t (*spell_gen2_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
 
@@ -645,8 +650,16 @@ typedef int SPELL_FUN(uint8_t level, Character *ch,
 class spell_info_type
 {
 public:
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, int16_t difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(nullptr), difficulty_(difficulty)
+  {
+  }
   spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN *spell_pointer, int16_t difficulty)
       : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(spell_pointer), difficulty_(difficulty)
+  {
+  }
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN2 *spell_pointer, int16_t difficulty)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer2_(spell_pointer), difficulty_(difficulty)
   {
   }
   // spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, spell_gen2_t spell_pointer, int16_t difficulty)
@@ -659,7 +672,7 @@ public:
   int16_t targets(void) const { return targets_; }
   SPELL_FUN *spell_pointer(void) const { return spell_pointer_; }
   int16_t difficulty(void) const { return difficulty_; }
-  // spell_gen2_t spell_pointer2(void) const { return spell_pointer2_; }
+  SPELL_FUN2 *spell_pointer2(void) const { return spell_pointer2_; }
 
 private:
   uint32_t beats_;              /* Waiting time after spell	*/
@@ -668,7 +681,7 @@ private:
   int16_t targets_;             /* Legal targets		*/
   SPELL_FUN *spell_pointer_;    /* Function to call		*/
   int16_t difficulty_;          /* Spell difficulty */
-  // spell_gen2_t spell_pointer2_; /* Function to call		*/
+  SPELL_FUN2 *spell_pointer2_;  /* Function to call		*/
 };
 extern const QList<spell_info_type> spell_info;
 

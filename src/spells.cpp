@@ -81,7 +81,7 @@ int16_t difficulty;
 
 const QList<spell_info_type> spell_info =
     {
-        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, nullptr, 0},
+        {/* 00 */ /* Note: All arrays start at 0! CGT */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 01 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 8, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_armor, SKILL_INCREASE_MEDIUM},
 
@@ -95,11 +95,11 @@ const QList<spell_info_type> spell_info =
 
         {/* 06 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 15, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_iridescent_aura, SKILL_INCREASE_MEDIUM},
 
-        {/* 07 */ /* 18, position_t::STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 07 */ /* 18, position_t::STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 08 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 20, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_chill_touch, SKILL_INCREASE_HARD},
 
-        {/* 09 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 09 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 10 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 40, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD},
 
@@ -275,7 +275,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 96 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 40, TAR_IGNORE, cast_group_fly, SKILL_INCREASE_MEDIUM},
 
-        {/* 97 */ /* 24, position_t::STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 97 */ /* 24, position_t::STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 98 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_resist_fire, SKILL_INCREASE_HARD},
 
@@ -301,7 +301,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 109 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 30, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_forest_meld, SKILL_INCREASE_HARD},
 
-        {/* 110 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_companion */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 110 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 150, TAR_IGNORE, cast_companion */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 111 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 33, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_SELF_NONO, cast_drown, SKILL_INCREASE_HARD},
 
@@ -341,9 +341,9 @@ const QList<spell_info_type> spell_info =
 
         {/* 129 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 15, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD},
 
-        {/* 130 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 130 */ /* 3*DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, position_t::DEAD, 0, 0, 0},
 
-        {/* 131 */ /* 3*DC::PULSE_TIMER, position_t::STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, position_t::DEAD, 0, 0, 0, 0},
+        {/* 131 */ /* 3*DC::PULSE_TIMER, position_t::STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, position_t::DEAD, 0, 0, 0},
 
         {/* 132 */ 3 * DC::PULSE_TIMER, position_t::FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
 
@@ -375,17 +375,17 @@ const QList<spell_info_type> spell_info =
 
         {/* 146 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stability, SKILL_INCREASE_MEDIUM},
 
-        {/* 147 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 147 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 148*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 148*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
         {/* 149*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_solidity, SKILL_INCREASE_MEDIUM},
 
-        {/* 150*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 150*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 151*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 151*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
-        {/* 152*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
+        {/* 152*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, SKILL_INCREASE_MEDIUM},
 
         {/* 153*/ 3 * DC::PULSE_TIMER, position_t::STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
 
