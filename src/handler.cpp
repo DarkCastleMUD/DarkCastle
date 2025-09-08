@@ -4229,6 +4229,39 @@ Object *get_obj_vnum(int vnum)
 	return nullptr;
 }
 
+vnum_t get_vnum(QString vnum_str)
+{
+	if (vnum_str.isEmpty())
+		return {};
+	if (vnum_str.startsWith('v', Qt::CaseInsensitive))
+		vnum_str.removeFirst();
+
+	bool ok = false;
+	auto vnum = vnum_str.toULongLong(&ok);
+	if (!ok || !vnum)
+		return {};
+	return vnum;
+}
+
+Object *get_obj_vnum(QString vnum_str)
+{
+	return get_obj_vnum(get_vnum(vnum_str));
+}
+
+Object *get_objindex_vnum(vnum_t vnum)
+{
+	rnum_t rnum = real_object(vnum);
+	if (rnum == -1)
+		return nullptr;
+
+	return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+}
+
+Object *get_objindex_vnum(QString vnum_str)
+{
+	return get_objindex_vnum(get_vnum(vnum_str));
+}
+
 Character *get_random_mob_vnum(int vnum)
 {
 	int num = real_mobile(vnum);

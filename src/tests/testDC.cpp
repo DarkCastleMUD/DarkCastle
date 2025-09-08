@@ -14,6 +14,7 @@
 #include "DC/vault.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
+#include "DC/handler.h"
 
 using namespace std::literals;
 
@@ -1619,6 +1620,35 @@ private slots:
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%|"), "%| ");                                // %|
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%}"), "%} ");                                // %}
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%~"), "%~ ");                                // %~
+    }
+
+    void test_redeem_trader()
+    {
+        DC::config cf;
+        cf.sql = false;
+        DC dc(cf);
+        dc.boot_db();
+        dc.random_ = QRandomGenerator(0);
+
+        QCOMPARE(get_vnum(QStringLiteral("v0")), 0);
+        QCOMPARE(get_vnum(QStringLiteral("0")), 0);
+        QCOMPARE(get_vnum(QStringLiteral("1")), 1);
+        QCOMPARE(get_vnum(QStringLiteral("v1")), 1);
+
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v0")), nullptr);
+        QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v1")), nullptr);
+        QCOMPARE_NE(get_objindex_vnum(QStringLiteral("v99")), nullptr);
+
+        QCOMPARE(get_obj_vnum(QStringLiteral("v0")), nullptr);
+        QCOMPARE(get_obj_vnum(QStringLiteral("v1")), nullptr);
+        QCOMPARE_NE(get_obj_vnum(QStringLiteral("v99")), nullptr);
+
+        QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(get_obj_vnum(QStringLiteral("v99"))->carried_by, nullptr);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].virt, 1);
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v1"))->carried_by, nullptr);
+        QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].virt, 99);
+        QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
     }
 };
 
