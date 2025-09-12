@@ -773,7 +773,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
    }
 }
 
-command_return_t Character::do_botcheck(QStringList arguments, int cmd)
+command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 {
    QString name = arguments.value(0);
    if (name.isEmpty())
@@ -1249,7 +1249,7 @@ bool identify(Character *ch, Object *obj)
    return true;
 }
 
-command_return_t Character::do_identify(QStringList arguments, int cmd)
+command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
 {
    if (arguments.isEmpty())
    {
@@ -1301,7 +1301,7 @@ command_return_t Character::do_identify(QStringList arguments, int cmd)
    return eFAILURE;
 }
 
-int do_look(Character *ch, const char *argument, int cmd)
+int do_look(Character *ch, const char *argument, cmd_t cmd)
 {
    char buffer[MAX_STRING_LENGTH] = {0};
    char arg1[MAX_STRING_LENGTH] = {0};
@@ -1537,7 +1537,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                   try_to_peek_into_container(tmp_char, ch, arg3);
                   return eSUCCESS;
                }
-               if (cmd == 20)
+               if (cmd == cmd_t::GLANCE)
                   show_char_to_char(tmp_char, ch, 3);
                else
                   show_char_to_char(tmp_char, ch, 1);
@@ -1547,7 +1547,7 @@ int do_look(Character *ch, const char *argument, int cmd)
                   {
                      return eSUCCESS;
                   }
-                  if ((cmd == 20) && !IS_AFFECTED(ch, AFF_HIDE))
+                  if ((cmd == cmd_t::GLANCE) && !IS_AFFECTED(ch, AFF_HIDE))
                   {
                      act("$n glances at you.", ch, 0, tmp_char, TO_VICT,
                          INVIS_NULL);
@@ -1809,7 +1809,7 @@ int do_look(Character *ch, const char *argument, int cmd)
             ch->send("None.");
          ch->sendln("");
          if (IS_PC(ch) && !ch->hunting.isEmpty())
-            ch->do_track(QString(ch->hunting).split(' '), 10);
+            ch->do_track(QString(ch->hunting).split(' '), cmd_t::TRACK);
       }
          ch->in_room = original_loc;
          break;
@@ -1828,7 +1828,7 @@ int do_look(Character *ch, const char *argument, int cmd)
 
 /* end of look */
 
-int do_read(Character *ch, char *arg, int cmd)
+int do_read(Character *ch, char *arg, cmd_t cmd)
 {
    char buf[200];
 
@@ -1836,18 +1836,18 @@ int do_read(Character *ch, char *arg, int cmd)
 
    // yeah right.  -Sadus
    sprintf(buf, "at %s", arg);
-   do_look(ch, buf, 15);
+   do_look(ch, buf);
    return eSUCCESS;
 }
 
-int do_examine(Character *ch, char *argument, int cmd)
+int do_examine(Character *ch, char *argument, cmd_t cmd)
 {
    char name[200], buf[200];
    Character *tmp_char;
    class Object *tmp_object;
 
    sprintf(buf, "at %s", argument);
-   do_look(ch, buf, 15);
+   do_look(ch, buf);
 
    one_argument(argument, name);
 
@@ -1865,13 +1865,13 @@ int do_examine(Character *ch, char *argument, int cmd)
       {
          ch->sendln("When you look inside, you see:");
          sprintf(buf, "in %s", argument);
-         do_look(ch, buf, 15);
+         do_look(ch, buf);
       }
    }
    return eSUCCESS;
 }
 
-int do_exits(Character *ch, char *argument, int cmd)
+int do_exits(Character *ch, char *argument, cmd_t cmd)
 {
    int door;
    char buf[MAX_STRING_LENGTH];
@@ -1927,7 +1927,7 @@ char frills[] = {
     '~',
     '\\'};
 
-int do_score(Character *ch, char *argument, int cmd)
+int do_score(Character *ch, char *argument, cmd_t cmd)
 {
    char race[100];
    char buf[MAX_STRING_LENGTH], scratch;
@@ -2282,7 +2282,7 @@ int do_score(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_time(Character *ch, char *argument, int cmd)
+int do_time(Character *ch, char *argument, cmd_t cmd)
 {
    char buf[100];
    char const *suf;
@@ -2375,7 +2375,7 @@ int do_time(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_weather(Character *ch, char *argument, int cmd)
+int do_weather(Character *ch, char *argument, cmd_t cmd)
 {
    extern struct weather_data weather_info;
    char buf[256];
@@ -2406,7 +2406,7 @@ int do_weather(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_help(Character *ch, char *argument, int cmd)
+int do_help(Character *ch, char *argument, cmd_t cmd)
 {
    extern struct help_index_element *help_index;
    extern FILE *help_fl;
@@ -2469,7 +2469,7 @@ int do_help(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_count(Character *ch, char *arg, int cmd)
+int do_count(Character *ch, char *arg, cmd_t cmd)
 {
    class Connection *d;
    Character *i;
@@ -2509,14 +2509,14 @@ int do_count(Character *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_inventory(Character *ch, char *argument, int cmd)
+int do_inventory(Character *ch, char *argument, cmd_t cmd)
 {
    ch->sendln("You are carrying:");
    ch->list_obj_to_char(ch->carrying, 1, true);
    return eSUCCESS;
 }
 
-int do_equipment(Character *ch, char *argument, int cmd)
+int do_equipment(Character *ch, char *argument, cmd_t cmd)
 {
    int j;
    bool found;
@@ -2552,33 +2552,33 @@ int do_equipment(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_credits(Character *ch, char *argument, int cmd)
+int do_credits(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, credits, 0);
    return eSUCCESS;
 }
 
-int do_story(Character *ch, char *argument, int cmd)
+int do_story(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, story, 0);
    return eSUCCESS;
 }
 /*
-int do_news(Character *ch, char *argument, int cmd)
+int do_news(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, news, 0);
    return eSUCCESS;
 }
 
 */
-int do_info(Character *ch, char *argument, int cmd)
+int do_info(Character *ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, info, 0);
    return eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-int do_olocate(Character *ch, char *name, int cmd)
+int do_olocate(Character *ch, char *name, cmd_t cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    class Object *k;
@@ -2698,7 +2698,7 @@ int do_olocate(Character *ch, char *name, int cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-int do_mlocate(Character *ch, char *name, int cmd)
+int do_mlocate(Character *ch, char *name, cmd_t cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    int count = 0;
@@ -2719,7 +2719,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
    {
 
       if ((IS_PC(i) &&
-           (cmd != 18 || !CAN_SEE(ch, i))))
+           (cmd != cmd_t::MLOCATE_CHARACTER || !CAN_SEE(ch, i))))
          continue;
 
       // allow find by vnum
@@ -2758,7 +2758,7 @@ int do_mlocate(Character *ch, char *name, int cmd)
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-int do_consider(Character *ch, char *argument, int cmd)
+int do_consider(Character *ch, char *argument, cmd_t cmd)
 {
    Character *victim;
    char name[256];
@@ -3145,7 +3145,7 @@ int do_consider(Character *ch, char *argument, int cmd)
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-int do_scan(Character *ch, char *argument, int cmd)
+int do_scan(Character *ch, char *argument, cmd_t cmd)
 {
    int i;
    Character *vict;
@@ -3284,7 +3284,7 @@ int do_scan(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_tick(Character *ch, char *argument, int cmd)
+int do_tick(Character *ch, char *argument, cmd_t cmd)
 {
    int ntick;
    char buf[256];
@@ -3325,7 +3325,7 @@ int do_tick(Character *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-command_return_t Character::do_experience(QStringList arguments, int cmd)
+command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 {
    if (level_ >= IMMORTAL)
    {
@@ -3423,7 +3423,7 @@ void check_champion_and_website_who_list()
    flwo.close();
 }
 
-int do_sector(Character *ch, char *arg, int cmd)
+int do_sector(Character *ch, char *arg, cmd_t cmd)
 {
    std::string art = "a";
 
@@ -3446,7 +3446,7 @@ int do_sector(Character *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_version(Character *ch, char *arg, int cmd)
+int do_version(Character *ch, char *arg, cmd_t cmd)
 {
    if (ch)
    {
@@ -3787,7 +3787,7 @@ bool search_object(Object *obj, QList<Search> sl)
    return matches;
 }
 
-command_return_t Character::do_search(QStringList arguments, int cmd)
+command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 {
    if (arguments.empty())
    {

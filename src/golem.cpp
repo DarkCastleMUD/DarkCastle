@@ -78,8 +78,8 @@ void golem_gain_exp(Character *ch)
     ch->exp = 0;
     ch->incrementLevel();
     advance_golem_level(ch);
-    ch->master->save(666);
-    do_say(ch, "Errrrrhhgg...", 0);
+    ch->master->save(cmd_t::SAVE_SILENTLY);
+    do_say(ch, "Errrrrhhgg...");
   }
 }
 
@@ -348,7 +348,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
 
 extern char frills[];
 
-int do_golem_score(Character *ch, char *argument, int cmd)
+int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 { /* Pretty much a rip of score */
   char race[100];
   char buf[MAX_STRING_LENGTH], scratch;

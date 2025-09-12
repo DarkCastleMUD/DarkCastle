@@ -24,7 +24,7 @@
 #include "DC/terminal.h"
 #include "DC/comm.h"
 
-int do_abandon(Character *ch, char *argument, int cmd)
+int do_abandon(Character *ch, char *argument, cmd_t cmd)
 {
   Character *k;
   char buf[MAX_INPUT_LENGTH + 1];
@@ -74,7 +74,7 @@ int do_abandon(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_found(Character *ch, char *argument, int cmd)
+int do_found(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
 
@@ -130,7 +130,7 @@ int do_found(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_split(QStringList arguments, int cmd)
+command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
@@ -205,7 +205,7 @@ command_return_t Character::do_split(QStringList arguments, int cmd)
   share = amount / no_members;
   extra = amount % no_members;
   removeGold(amount);
-  save(666);
+  save(cmd_t::SAVE_SILENTLY);
 
   send(QStringLiteral("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
   addGold(share + extra);
@@ -309,7 +309,7 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
 }
 
-int do_group(Character *ch, char *argument, int cmd)
+int do_group(Character *ch, char *argument, cmd_t cmd)
 {
   char name[256];
   char buf[256], report[256];
@@ -425,7 +425,7 @@ int do_group(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_promote(Character *ch, char *argument, int cmd)
+int do_promote(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[250];
@@ -530,7 +530,7 @@ int do_promote(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_disband(Character *ch, char *argument, int cmd)
+int do_disband(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[200];
@@ -634,7 +634,7 @@ int do_disband(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_follow(Character *ch, char *argument, int cmd)
+int do_follow(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   Character *leader;
@@ -660,7 +660,7 @@ int do_follow(Character *ch, char *argument, int cmd)
     ch->sendln("Who do you wish to follow?");
     return eFAILURE;
   }
-  if (cmd == 9 && !CAN_SEE(ch, leader))
+  if (cmd == cmd_t::DEFAULT && !CAN_SEE(ch, leader))
   { // check it like this instead o' get_char_room_vis 'cause stalk checks.
     ch->sendln("I see no person by that name here!");
     return eFAILURE;
@@ -698,14 +698,14 @@ int do_follow(Character *ch, char *argument, int cmd)
       }
       if (ch->master)
       {
-        if (cmd == 10)
+        if (cmd == cmd_t::TRACK)
           stop_follower(ch, follower_reasons_t::END_STALK); /* stalk  */
         else
           stop_follower(ch); /* follow */
       }
 
       //	    if((abs(ch->getLevel()-leader->getLevel())<60) || ch->getLevel()>=IMMORTAL) {
-      if (cmd == 10)
+      if (cmd == cmd_t::TRACK)
         add_follower(ch, leader, follower_reasons_t::END_STALK); /* stalk  */
       else
         add_follower(ch, leader); /* follow */
@@ -721,7 +721,7 @@ int do_follow(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_autojoin(Character *ch, std::string str_arguments, int cmd)
+command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd)
 {
   if (ch->player == nullptr)
   {

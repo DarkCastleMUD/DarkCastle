@@ -1409,7 +1409,7 @@ void do_start(Character *ch)
   ch->player->time.logon = time(0);
 }
 
-command_return_t do_repop(Character *ch, std::string arguments, int cmd)
+command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1438,7 +1438,7 @@ command_return_t do_repop(Character *ch, std::string arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_clear(Character *ch, char *argument, int cmd)
+int do_clear(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int zone = DC::getInstance()->world[ch->in_room].zone;
@@ -1485,7 +1485,7 @@ int do_clear(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_linkdead(Character *ch, char *arg, int cmd)
+int do_linkdead(Character *ch, char *arg, cmd_t cmd)
 {
   int x = 0;
   char buf[100];
@@ -1512,7 +1512,7 @@ int do_linkdead(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_echo(Character *ch, char *argument, int cmd)
+int do_echo(Character *ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -1536,7 +1536,7 @@ int do_echo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_restore(Character *ch, char *argument, int cmd)
+int do_restore(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char buf[100];
@@ -1739,7 +1739,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
   }
 }
 
-int do_huntclear(Character *ch, char *arg, int cmd)
+int do_huntclear(Character *ch, char *arg, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
@@ -2077,7 +2077,7 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(Character *ch, char *arg, int cmd)
+int do_showhunt(Character *ch, char *arg, cmd_t cmd)
 {
   std::string buf;
   struct hunt_data *h;
@@ -2125,7 +2125,7 @@ int do_showhunt(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_huntstart(Character *ch, char *argument, int cmd)
+int do_huntstart(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER

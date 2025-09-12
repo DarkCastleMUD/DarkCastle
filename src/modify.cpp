@@ -161,7 +161,7 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string)
 	return;
 }
 
-int do_string(Character *ch, char *arg, int cmd)
+int do_string(Character *ch, char *arg, cmd_t cmd)
 {
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
 	char message[100];

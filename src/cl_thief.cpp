@@ -32,7 +32,7 @@ int get_weapon_damage_type(class Object *wielded);
 int check_autojoiners(Character *ch, int skill = 0);
 int check_joincharmie(Character *ch, int skill = 0);
 
-int do_eyegouge(Character *ch, char *argument, int cmd)
+int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -113,7 +113,7 @@ int do_eyegouge(Character *ch, char *argument, int cmd)
   return retval | eSUCCESS;
 }
 
-command_return_t Character::do_backstab(QStringList arguments, int cmd)
+command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
 
@@ -224,7 +224,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[SECOND_WIELD]) && ((this->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != 14))
+  if ((((IS_PC(this) && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (IS_NPC(this) && this->getLevel() > 70)) && (this->equipment[SECOND_WIELD]) && ((this->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || IS_NPC(this))
     {
@@ -334,7 +334,7 @@ command_return_t Character::do_backstab(QStringList arguments, int cmd)
   return retval;
 }
 
-int do_circle(Character *ch, char *argument, int cmd)
+int do_circle(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   int retval;
@@ -498,7 +498,7 @@ int do_circle(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_trip(Character *ch, char *argument, int cmd)
+int do_trip(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim = 0;
   char name[256];
@@ -610,7 +610,7 @@ int do_trip(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_sneak(Character *ch, char *argument, int cmd)
+int do_sneak(Character *ch, char *argument, cmd_t cmd)
 {
 
   auto &arena = DC::getInstance()->arena_;
@@ -631,7 +631,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   if (IS_AFFECTED(ch, AFF_SNEAK))
   {
     affect_from_char(ch, SKILL_SNEAK);
-    if (cmd != 10)
+    if (cmd != cmd_t::PALM)
     {
       ch->sendln("You won't be so sneaky anymore.");
       return eFAILURE;
@@ -641,7 +641,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_SNEAK))
     return eSUCCESS;
 
-  do_hide(ch, "", 12);
+  do_hide(ch, "", cmd_t::LOOK);
 
   ch->sendln("You try to move silently for a while.");
 
@@ -657,7 +657,7 @@ int do_sneak(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_stalk(Character *ch, char *argument, int cmd)
+int do_stalk(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_STRING_LENGTH];
   Character *leader;
@@ -707,22 +707,22 @@ int do_stalk(Character *ch, char *argument, int cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
   if (!skill_success(ch, leader, SKILL_STALK))
-    do_follow(ch, argument, CMD_DEFAULT);
+    do_follow(ch, argument);
 
   else
   {
-    do_follow(ch, argument, 10);
-    do_sneak(ch, argument, 10);
+    do_follow(ch, argument, cmd_t::TRACK);
+    do_sneak(ch, argument, cmd_t::TRACK);
   }
   return eSUCCESS;
 }
 
-int do_hide(Character *ch, const char *argument, int cmd)
+int do_hide(Character *ch, const char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
   {
-    if (cmd != 12)
+    if (cmd != cmd_t::LOOK)
       ch->sendln("You don't know how to hide. What do you think you are, a thief?");
     return eFAILURE;
   }
@@ -795,7 +795,7 @@ int max_level(Character *ch)
 }
 
 // steal an ITEM... not gold
-int do_steal(Character *ch, char *argument, int cmd)
+int do_steal(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   class Object *obj, *loop_obj, *next_obj;
@@ -873,7 +873,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try, silly thief.", CMD_DEFAULT);
+    return do_say(ch, "Nice try, silly thief.");
   }
 
   if (victim->fighting)
@@ -970,8 +970,8 @@ int do_steal(Character *ch, char *argument, int cmd)
 
           if (IS_PC(victim))
           {
-            victim->save(666);
-            ch->save(666);
+            victim->save(cmd_t::SAVE_SILENTLY);
+            ch->save(cmd_t::SAVE_SILENTLY);
             if (!AWAKE(victim))
             {
               //              if(number(1, 3) == 1)
@@ -1155,7 +1155,7 @@ int do_steal(Character *ch, char *argument, int cmd)
         act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), victim);
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
-        victim->save(666);
+        victim->save(cmd_t::SAVE_SILENTLY);
         set_cantquit(ch, victim);
         if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
         {
@@ -1182,8 +1182,8 @@ int do_steal(Character *ch, char *argument, int cmd)
         logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!IS_NPC(victim))
         {
-          victim->save(666);
-          ch->save(666);
+          victim->save(cmd_t::SAVE_SILENTLY);
+          ch->save(cmd_t::SAVE_SILENTLY);
           if (!AWAKE(victim))
           {
             //            if(number(1, 3) == 1)
@@ -1252,7 +1252,7 @@ int do_steal(Character *ch, char *argument, int cmd)
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
-      do_shout(victim, buf, 0);
+      do_shout(victim, buf);
     }
     else
     {
@@ -1265,7 +1265,7 @@ int do_steal(Character *ch, char *argument, int cmd)
 }
 
 // Steal gold
-int do_pocket(Character *ch, char *argument, int cmd)
+int do_pocket(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   struct affected_type pthiefaf;
@@ -1333,7 +1333,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try.", CMD_DEFAULT);
+    return do_say(ch, "Nice try.");
   }
 
   if (victim->fighting)
@@ -1409,8 +1409,8 @@ int do_pocket(Character *ch, char *argument, int cmd)
 
       if (IS_PC(victim))
       {
-        victim->save(666);
-        ch->save(666);
+        victim->save(cmd_t::SAVE_SILENTLY);
+        ch->save(cmd_t::SAVE_SILENTLY);
         if (!victim->isPlayerGoldThief())
         {
           // set_cantquit( ch, victim );
@@ -1436,7 +1436,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
     if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF))
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
-      do_shout(victim, buf, 0);
+      do_shout(victim, buf);
     }
     else
     {
@@ -1448,7 +1448,7 @@ int do_pocket(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pick(Character *ch, char *argument, int cmd)
+int do_pick(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
@@ -1589,7 +1589,7 @@ int do_pick(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_slip(Character *ch, char *argument, int cmd)
+int do_slip(Character *ch, char *argument, cmd_t cmd)
 {
   char obj_name[200], vict_name[200], buf[200];
   char arg[MAX_INPUT_LENGTH];
@@ -1902,7 +1902,7 @@ int do_slip(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_vitalstrike(Character *ch, char *argument, int cmd)
+int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -1961,7 +1961,7 @@ int do_vitalstrike(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_deceit(Character *ch, char *argument, int cmd)
+int do_deceit(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -2041,7 +2041,7 @@ int do_deceit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_jab(Character *ch, char *argument, int cmd)
+int do_jab(Character *ch, char *argument, cmd_t cmd)
 {
   int retval = eFAILURE, learned;
 
@@ -2191,7 +2191,7 @@ int do_jab(Character *ch, char *argument, int cmd)
   }
 }
 
-int do_appraise(Character *ch, char *argument, int cmd)
+int do_appraise(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim = {};
   Object *obj = {};
@@ -2334,7 +2334,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_cripple(Character *ch, char *argument, int cmd)
+int do_cripple(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char name[MAX_STRING_LENGTH];

@@ -28,7 +28,7 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-int do_harmtouch(Character *ch, char *argument, int cmd)
+int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   // Character *tmp_ch;
@@ -122,7 +122,7 @@ int do_harmtouch(Character *ch, char *argument, int cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-int do_layhands(Character *ch, char *argument, int cmd)
+int do_layhands(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   // Character *tmp_ch;
@@ -198,7 +198,7 @@ int do_layhands(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_behead(Character *ch, char *argument, int cmd)
+int do_behead(Character *ch, char *argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;

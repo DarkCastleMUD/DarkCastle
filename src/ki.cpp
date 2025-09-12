@@ -102,7 +102,7 @@ int16_t use_ki(Character *ch, int kn)
   return (ki_info[kn].min_useski());
 }
 
-int do_ki(Character *ch, char *argument, int cmd)
+int do_ki(Character *ch, char *argument, cmd_t cmd)
 {
   Character *tar_char = ch;
   char name[MAX_STRING_LENGTH];

@@ -227,7 +227,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
 		{
 			if (bardsing)
 				origsing = master;
-			do_sing(ch, "stop", CMD_DEFAULT);
+			do_sing(ch, "stop");
 			origsing = nullptr;
 		}
 		for (fvictim = master->followers; fvictim; fvictim = fvictim->next)
@@ -236,7 +236,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
 				continue;
 			else
 				origsing = fvictim->follower;
-			do_sing(ch, "stop", CMD_DEFAULT);
+			do_sing(ch, "stop");
 			origsing = nullptr;
 		}
 	}
@@ -252,12 +252,12 @@ void stop_grouped_bards(Character *ch, int bardsing)
 		{
 			// end any performances
 			if (IS_SINGING(fvictim->follower))
-				do_sing(fvictim->follower, "stop", CMD_DEFAULT);
+				do_sing(fvictim->follower, "stop");
 		}
 
 		if (IS_SINGING(master))
 		{
-			do_sing(master, "stop", CMD_DEFAULT);
+			do_sing(master, "stop");
 		}
 		origsing = nullptr;
 	}
@@ -277,7 +277,7 @@ void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
 	non_comb = ch->equipment[HOLD]->obj_flags.value[0];
 }
 
-int do_sing(Character *ch, char *arg, int cmd)
+int do_sing(Character *ch, char *arg, cmd_t cmd)
 {
 	Character *tar_char = 0;
 	Object *tar_obj = 0;
@@ -331,7 +331,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 		ch->sendln("You know not of that song.");
 		return eFAILURE;
 	}
-	if (cmd == CMD_ORCHESTRATE)
+	if (cmd == cmd_t::ORCHESTRATE)
 	{
 		if (!IS_SINGING(ch))
 		{
@@ -613,7 +613,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 					tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
 				}
 
-			if (cmd != CMD_ORCHESTRATE && IS_SINGING(ch)) // I'm singing
+			if (cmd != cmd_t::ORCHESTRATE && IS_SINGING(ch)) // I'm singing
 			{
 				if (!origsing)
 				{
@@ -663,7 +663,7 @@ int do_sing(Character *ch, char *arg, int cmd)
 				if (spl != SPELL_TYPE_WAND && !origsing) // song 'stop'
 					ch->songs.clear();
 			}
-			else if (cmd == CMD_ORCHESTRATE)
+			else if (cmd == cmd_t::ORCHESTRATE)
 			{
 				if (!skill_success(ch, nullptr, SKILL_ORCHESTRATE))
 				{
@@ -1739,7 +1739,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
 		return;
 	}
 
-	do_look(victim, "", CMD_DEFAULT);
+	do_look(victim, "");
 	WAIT_STATE(victim, DC::PULSE_VIOLENCE);
 	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
@@ -1909,7 +1909,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
 	{
 		// Die bard!
 		ch->sendln("Uh oh.");
-		do_say(victim, "Die you spoony bard!", CMD_DEFAULT);
+		do_say(victim, "Die you spoony bard!");
 		retval = attack(victim, ch, TYPE_UNDEFINED);
 		retval = SWAP_CH_VICT(retval);
 		return retval;
@@ -2271,7 +2271,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
 			if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_NPC(fvictim->follower) && ch->in_room != fvictim->follower->in_room)
 			{
 				summoned = true;
-				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", CMD_DEFAULT);
+				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n");
 				move_char(fvictim->follower, ch->in_room);
 				act("With a $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R flash of (disco?) light $n appears!", fvictim->follower, 0, 0, TO_ROOM, 0);
 			}
@@ -2851,7 +2851,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_ROOM, NOTVICT);
 	if (target->fighting)
 	{
-		do_say(target, "Hey, this sucks. I'm goin' home!", CMD_DEFAULT);
+		do_say(target, "Hey, this sucks. I'm goin' home!");
 		if (target->fighting->fighting == target)
 			stop_fighting(target->fighting);
 		stop_fighting(target);

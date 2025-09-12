@@ -43,6 +43,10 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <cstdio>  // FILE *
 #include <cstring> // memset()
 #include <cctype>  // isspace(), isdigit()
+#include <string>
+#include <map>
+#include <vector>
+#include <sstream>
 
 #include "DC/room.h"
 #include "DC/DC.h"
@@ -57,12 +61,9 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
-#include <string>
-#include <map>
-#include <vector>
 #include "DC/interp.h"
-#include <sstream>
 #include "DC/obj.h"
+#include "DC/common.h"
 
 #define MAX_MESSAGE_LENGTH 2048
 
@@ -602,13 +603,13 @@ int save_boards()
 Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
-int board(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
   static int has_loaded = 0;
 
   std::map<std::string, BOARD_INFO>::iterator board;
 
-  if (cmd != CMD_LOOK && cmd != CMD_READ && cmd != CMD_WRITE && cmd != CMD_ERASE)
+  if (cmd != cmd_t::LOOK && cmd != cmd_t::READ && cmd != cmd_t::WRITE && cmd != cmd_t::ERASE)
   {
     return eFAILURE;
   }
@@ -638,14 +639,14 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
-  if (!isexact(arg1, obj->name) && cmd == CMD_LOOK)
+  if (!isexact(arg1, obj->name) && cmd == cmd_t::LOOK)
     return eFAILURE;
 
   switch (cmd)
   {
-  case CMD_LOOK: // look
+  case cmd_t::LOOK: // look
     return (board_show_board(ch, arg, board));
-  case CMD_WRITE: // write
+  case cmd_t::WRITE: // write
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to write!");
@@ -653,7 +654,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     }
     board_write_msg(ch, arg, board);
     return eSUCCESS;
-  case CMD_READ: // read
+  case cmd_t::READ: // read
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to read!");
@@ -661,7 +662,7 @@ int board(Character *ch, class Object *obj, int cmd, const char *arg, Character 
     }
     board_display_msg(ch, arg, board);
     return eSUCCESS;
-  case CMD_ERASE: /* erase */
+  case cmd_t::ERASE: /* erase */
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to read them!\r\nDon't erase them they might be important!");

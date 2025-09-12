@@ -280,7 +280,7 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
 
   fwrite("QST", sizeof(char), 3, fpsave);
   fwrite(&(quest_points), sizeof(quest_points), 1, fpsave);
-  for (int j = 0; j < QUEST_CANCEL; j++)
+  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
     fwrite(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
     fwrite(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
@@ -413,7 +413,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   char typeflag[4] = {};
   golem = 0;
   quest_points = 0;
-  for (int j = 0; j < QUEST_CANCEL; j++)
+  for (int j = 0; j < QUEST_MAX_CANCEL; j++)
     quest_cancel[j] = 0;
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
     quest_complete[j] = 0;
@@ -493,7 +493,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   if (!strcmp("QST", typeflag))
   {
     fread(&(quest_points), sizeof(quest_points), 1, fpsave);
-    for (int j = 0; j < QUEST_CANCEL; j++)
+    for (int j = 0; j < QUEST_MAX_CANCEL; j++)
       fread(&(quest_cancel[j]), sizeof(quest_cancel[j]), 1, fpsave);
     for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
       fread(&(quest_complete[j]), sizeof(quest_complete[j]), 1, fpsave);
@@ -1043,8 +1043,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
 
   if (IS_PC(ch) && ch->player->time.logon < 1117527906)
   {
-    extern int do_clearaff(Character * ch, char *argument, int cmd);
-    do_clearaff(ch, "", 9);
+    do_clearaff(ch, "");
     ch->affected_by[0] = ch->affected_by[1] = 0;
   }
 

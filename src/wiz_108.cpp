@@ -17,7 +17,7 @@
 
 int get_number(char **name);
 
-int do_zoneexits(Character *ch, char *argument, int cmd)
+int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
 {
   //  try
   // {
@@ -146,7 +146,7 @@ int do_zoneexits(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_purloin(Character *ch, char *argument, int cmd)
+int do_purloin(Character *ch, char *argument, cmd_t cmd)
 {
   char bufName[200], *pBuf;
   class Object *k;
@@ -258,10 +258,10 @@ int do_purloin(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_set(Character *ch, char *argument, int cmd)
+int do_set(Character *ch, char *argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
-  //    void do_mortal_set(Character *ch, char *argument, int cmd);
+  //    void do_mortal_set(Character *ch, char *argument, cmd_t cmd);
   //
   //    if(!ch->isImmortalPlayer() || IS_NPC(ch)) {
   //      do_mortal_set(ch, argument, cmd);

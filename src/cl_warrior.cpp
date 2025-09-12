@@ -33,7 +33,7 @@
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
-int do_kick(Character *ch, char *argument, int cmd)
+int do_kick(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   Character *next_victim;
@@ -115,7 +115,7 @@ int do_kick(Character *ch, char *argument, int cmd)
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
     if (DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
+      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], cmd_t::UNDEFINED, "", ch));
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -146,7 +146,7 @@ int do_kick(Character *ch, char *argument, int cmd)
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
       if (DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], 0, "", ch));
+        retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], cmd_t::UNDEFINED, "", ch));
       }
     }
   }
@@ -154,7 +154,7 @@ int do_kick(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_deathstroke(Character *ch, char *argument, int cmd)
+int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -270,7 +270,7 @@ int do_deathstroke(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_retreat(Character *ch, char *argument, int cmd)
+int do_retreat(Character *ch, char *argument, cmd_t cmd)
 {
   int attempt;
   char buf[MAX_INPUT_LENGTH];
@@ -342,11 +342,12 @@ int do_retreat(Character *ch, char *argument, int cmd)
     ch->sendln("You try to beat a hasty retreat....");
 
     // check for any spec procs
-    retval = ch->special("", attempt + 1);
+    retval = ch->special("", static_cast<cmd_t>(attempt + 1));
     if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
       return retval;
 
-    retval = attempt_move(ch, attempt + 1, 1);
+    auto dir_cmd = static_cast<cmd_t>(attempt + 1);
+    retval = attempt_move(ch, dir_cmd, 1);
     if (isSet(retval, eSUCCESS))
     {
       // They got away.  Stop fighting for everyone not in the new room from fighting
@@ -373,7 +374,7 @@ int do_retreat(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_hitall(Character *ch, char *argument, int cmd)
+int do_hitall(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_PC(ch) && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
@@ -435,7 +436,7 @@ int do_hitall(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_bash(Character *ch, char *argument, int cmd)
+int do_bash(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -612,14 +613,14 @@ int do_bash(Character *ch, char *argument, int cmd)
   {
     if (DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], 0, "", ch));
+      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
     }
   }
 
   return retval;
 }
 
-int do_redirect(Character *ch, char *argument, int cmd)
+int do_redirect(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char name[256];
@@ -684,7 +685,7 @@ int do_redirect(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_disarm(Character *ch, char *argument, int cmd)
+int do_disarm(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   class Object *wielded;
@@ -811,7 +812,7 @@ int do_disarm(Character *ch, char *argument, int cmd)
 | NON-OFFENSIVE commands.  Below here are commands that should -not-
 |   require the victim to retaliate.
 */
-int Character::do_rescue(QStringList arguments, int cmd)
+int Character::do_rescue(QStringList arguments, cmd_t cmd)
 {
   Character *victim{}, *tmp_ch{};
   QString victim_name = arguments.value(0);
@@ -900,7 +901,7 @@ int Character::do_rescue(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_bladeshield(Character *ch, char *argument, int cmd)
+int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
   int duration = 12;
@@ -1066,7 +1067,7 @@ void stop_guarding_me(Character *victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-int do_guard(Character *ch, char *argument, int cmd)
+int do_guard(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
   Character *victim = nullptr;
@@ -1116,7 +1117,7 @@ int do_guard(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_tactics(Character *ch, char *argument, int cmd)
+int do_tactics(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type af;
 
@@ -1193,7 +1194,7 @@ int do_tactics(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_make_camp(Character *ch, char *argument, int cmd)
+int do_make_camp(Character *ch, char *argument, cmd_t cmd)
 {
   Character *i, *next_i;
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
@@ -1298,7 +1299,7 @@ int do_make_camp(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_triage(Character *ch, char *argument, int cmd)
+int do_triage(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_TRIAGE);
   struct affected_type af;
@@ -1355,7 +1356,7 @@ int do_triage(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_battlesense(Character *ch, char *argument, int cmd)
+int do_battlesense(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_BATTLESENSE);
   struct affected_type af;
@@ -1395,7 +1396,7 @@ int do_battlesense(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_smite(Character *ch, char *argument, int cmd)
+int do_smite(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict = nullptr;
   char name[MAX_STRING_LENGTH];
@@ -1481,7 +1482,7 @@ int do_smite(Character *ch, char *argument, int cmd)
   return ch->fighting ? eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-int do_leadership(Character *ch, char *argument, int cmd)
+int do_leadership(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_LEADERSHIP);
   struct affected_type af;
@@ -1540,7 +1541,7 @@ int do_leadership(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_perseverance(Character *ch, char *argument, int cmd)
+int do_perseverance(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
   struct affected_type af;
@@ -1580,7 +1581,7 @@ int do_perseverance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_defenders_stance(Character *ch, char *argument, int cmd)
+int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict = nullptr;
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
@@ -1625,7 +1626,7 @@ int do_defenders_stance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_onslaught(Character *ch, char *argument, int cmd)
+int do_onslaught(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_ONSLAUGHT);
   struct affected_type af;

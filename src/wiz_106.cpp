@@ -15,7 +15,7 @@
 
 #include <fmt/format.h>
 
-int do_plats(Character *ch, char *argument, int cmd)
+int do_plats(Character *ch, char *argument, cmd_t cmd)
 {
   Character *i;
   class Connection *d;
@@ -51,7 +51,7 @@ int do_plats(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_force(Character *ch, std::string argument, int cmd)
+int do_force(Character *ch, std::string argument, cmd_t cmd)
 {
   class Connection *i = {};
   class Connection *next_i = {};
@@ -63,7 +63,7 @@ int do_force(Character *ch, std::string argument, int cmd)
     return eFAILURE;
   }
 
-  if (!ch->has_skill(COMMAND_FORCE) && cmd != CMD_FORCE)
+  if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
     ch->send("Huh?\r\n");
     return eFAILURE;
@@ -232,7 +232,7 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(Character *ch, command_return_t *rc, auto *function, char *arguments = nullptr, int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, auto *function, char *arguments = nullptr, cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -254,7 +254,7 @@ void run_check(Character *ch, command_return_t *rc, auto *function, char *argume
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -276,7 +276,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -298,7 +298,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_special_t function, QString arguments = "", int cmd = CMD_DEFAULT)
+void run_check(Character *ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -332,17 +332,17 @@ command_return_t test_casino(Character *ch)
   run_check(ch, &max_rc, &Character::do_goto, {"1"});
   run_check(ch, &max_rc, &Character::do_goto, {"21900"});
 
-  run_check(ch, &max_rc, do_look, "sign", CMD_LOOK);
-  run_check(ch, &max_rc, do_examine, "sign", CMD_EXAMINE);
+  run_check(ch, &max_rc, do_look, "sign", cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, "sign", cmd_t::EXAMINE);
 
-  run_check(ch, &max_rc, do_move, "", CMD_NORTH);
+  run_check(ch, &max_rc, do_move, "", cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, "fountain", CMD_LOOK);
-  run_check(ch, &max_rc, do_examine, "fountain", CMD_EXAMINE);
+  run_check(ch, &max_rc, do_look, "fountain", cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, "fountain", cmd_t::EXAMINE);
   run_check(ch, &max_rc, do_drink, "fountain");
 
-  run_check(ch, &max_rc, do_look, "machine", CMD_LOOK);
-  run_check(ch, &max_rc, do_examine, "machine", CMD_EXAMINE);
+  run_check(ch, &max_rc, do_look, "machine", cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, "machine", cmd_t::EXAMINE);
 
   // saving the player's finances and giving them a consistent
   // amount of cash in bank to be withdrawn
@@ -352,57 +352,57 @@ command_return_t test_casino(Character *ch)
   ch->setGold(0);
 
   // These are special code procedures that should be on the objects in this room
-  run_check(ch, &max_rc, &Character::special, "", CMD_BALANCE);
-  run_check(ch, &max_rc, &Character::special, "", CMD_WITHDRAW);
-  run_check(ch, &max_rc, &Character::special, "1000000", CMD_WITHDRAW);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::BALANCE);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::WITHDRAW);
+  run_check(ch, &max_rc, &Character::special, "1000000", cmd_t::WITHDRAW);
 
-  run_check(ch, &max_rc, do_move, "", CMD_NORTH);
+  run_check(ch, &max_rc, do_move, "", cmd_t::NORTH);
 
-  run_check(ch, &max_rc, do_look, "table", CMD_LOOK);
-  run_check(ch, &max_rc, do_examine, "table", CMD_EXAMINE);
+  run_check(ch, &max_rc, do_look, "table", cmd_t::LOOK);
+  run_check(ch, &max_rc, do_examine, "table", cmd_t::EXAMINE);
 
   auto original_random = DC::getInstance()->random_;
   DC::getInstance()->random_ = QRandomGenerator(1);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "-1", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "0", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "1", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "1000001", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "100000111111111111111111111111111111111", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "500", CMD_BET);
-  run_check(ch, &max_rc, &Character::special, "500", CMD_BET);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "-1", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "0", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "1", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "1000001", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "100000111111111111111111111111111111111", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "500", cmd_t::BET);
+  run_check(ch, &max_rc, &Character::special, "500", cmd_t::BET);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_HIT);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::HIT);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_STAY);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::STAY);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
   process_output(ch->desc);
 
-  run_check(ch, &max_rc, &Character::special, "", CMD_DOUBLE);
+  run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
@@ -422,7 +422,7 @@ command_return_t test_casino(Character *ch)
 
 tests_t tests = {{"casino", Test("casino", test_casino)}};
 
-command_return_t Character::do_test(QStringList arguments, int cmd)
+command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
 {
   QString arg1 = arguments.value(0);
 

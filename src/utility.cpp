@@ -1217,7 +1217,7 @@ bool check_blind(Character *ch)
   return false;
 }
 
-int do_order(Character *ch, char *argument, int cmd)
+int do_order(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   char buf[256];
@@ -1295,7 +1295,7 @@ int do_order(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_idea(Character *ch, char *argument, int cmd)
+int do_idea(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1330,7 +1330,7 @@ int do_idea(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_typo(Character *ch, char *argument, int cmd)
+int do_typo(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1366,7 +1366,7 @@ int do_typo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_bug(Character *ch, char *argument, int cmd)
+int do_bug(Character *ch, char *argument, cmd_t cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1401,7 +1401,7 @@ int do_bug(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_recall(QStringList arguments, int cmd)
+command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 {
   int location = {}, level = {}, cost = {}, x = {};
   Character *victim = {};
@@ -1609,18 +1609,18 @@ command_return_t Character::do_recall(QStringList arguments, int cmd)
   if (!is_mob && !isSet(retval, eCH_DIED))
   { // if it was a mob, we might have died moving
     act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    do_look(victim, "", 0);
+    do_look(victim, "");
   }
   return retval;
 }
 
-int do_qui(Character *ch, char *argument, int cmd)
+int do_qui(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
   return eSUCCESS;
 }
 
-int do_quit(Character *ch, char *argument, int cmd)
+int do_quit(Character *ch, char *argument, cmd_t cmd)
 {
   int iWear;
   struct follow_type *k;
@@ -1644,7 +1644,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != 666 && !ch->isImmortalPlayer())
+  if (!isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
   {
     ch->sendln("This room doesn't feel...SAFE enough to do that.");
     return eFAILURE;
@@ -1656,7 +1656,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   // we'll end up with a fully equipped char with huge stats reset to level
   // 1
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
   {
     for (k = ch->followers; k; k = k->next)
     {
@@ -1673,7 +1673,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_POS(ch) == position_t::FIGHTING && cmd != 666)
+    if (GET_POS(ch) == position_t::FIGHTING && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("No way! You are fighting.");
       return eFAILURE;
@@ -1685,7 +1685,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if ((ch->isPlayerCantQuit() && cmd != 666) ||
+    if ((ch->isPlayerCantQuit() && cmd != cmd_t::SAVE_SILENTLY) ||
         ch->isPlayerObjectThief() ||
         ch->isPlayerGoldThief())
     {
@@ -1693,7 +1693,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln("Something about this room makes it seem like a bad place to quit.");
       return eFAILURE;
@@ -1705,7 +1705,7 @@ int do_quit(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != 666)
+    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1728,7 +1728,7 @@ int do_quit(Character *ch, char *argument, int cmd)
 
   // Finish off any performances
   if (IS_SINGING(ch))
-    do_sing(ch, "stop", CMD_DEFAULT);
+    do_sing(ch, "stop");
 
   extractFamiliar(ch);
   struct follow_type *fol, *fol_next;
@@ -1781,7 +1781,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
     clan_logout(ch);
 
   DC::getInstance()->update_wizlist(ch);
@@ -1816,7 +1816,7 @@ int do_quit(Character *ch, char *argument, int cmd)
   return eSUCCESS | eCH_DIED;
 }
 
-command_return_t Character::save(int cmd)
+command_return_t Character::save(cmd_t cmd)
 {
   // With the cmd numbers
   // 666 = save quietly
@@ -1827,7 +1827,7 @@ command_return_t Character::save(int cmd)
   if (IS_NPC(this) || level_ > IMPLEMENTER)
     return eFAILURE;
 
-  if (cmd != 666)
+  if (cmd != cmd_t::SAVE_SILENTLY)
   {
     send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
   }
@@ -1857,7 +1857,7 @@ command_return_t Character::save(int cmd)
 //        that save after every other kill don't actually do it, but it
 //        pretends that it does.  That way we can start reducing the amount
 //        of writing we're doing.
-command_return_t Character::do_save(QStringList arguments, int cmd)
+command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
 {
   if (IS_IMMORTAL(this))
   {
@@ -1875,7 +1875,7 @@ command_return_t Character::do_save(QStringList arguments, int cmd)
   return save(cmd);
 }
 
-int do_home(Character *ch, char *argument, int cmd)
+int do_home(Character *ch, char *argument, cmd_t cmd)
 {
   clan_data *clan;
   struct clan_room_data *room;
@@ -1930,14 +1930,14 @@ int do_home(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::generic_command(QStringList argument, int cmd)
+command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
 {
   switch (cmd)
   {
-  case CMD_SELL:
+  case cmd_t::SELL:
     send("You can't sell anything here!\r\n");
     break;
-  case CMD_ERASE:
+  case cmd_t::ERASE:
     send("You can't erase anything here!\r\n");
     break;
   default:
@@ -1948,7 +1948,7 @@ command_return_t Character::generic_command(QStringList argument, int cmd)
   return eFAILURE;
 }
 
-int do_beep(Character *ch, char *argument, int cmd)
+int do_beep(Character *ch, char *argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
   return eSUCCESS;

@@ -77,9 +77,7 @@ const auto SOUTH = 2;
 const auto WEST = 3;
 const auto UP = 4;
 const auto DOWN = 5;
-const auto MAX_DIRS = 6
-
-    ;
+const auto MAX_DIRS = 6;
 const auto EX_ISDOOR = 1;
 const auto EX_CLOSED = 2;
 const auto EX_LOCKED = 4;
@@ -197,7 +195,7 @@ public:
     uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light = {};            // Light factor of room
 
-    int (*funct)(Character *, int, const char *) = {}; // special procedure
+    int (*funct)(Character *, cmd_t, const char *) = {}; // special procedure
 
     class Object *contents = {}; // List of items in room
     Character *people = nullptr; // List of NPC / PC in room

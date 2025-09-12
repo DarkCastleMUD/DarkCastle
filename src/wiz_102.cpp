@@ -97,7 +97,7 @@ void rebuild_rnum_references(int startAt, int type)
   }
 }
 
-int do_check(Character *ch, char *arg, int cmd)
+int do_check(Character *ch, char *arg, cmd_t cmd)
 {
   class Connection d;
   Character *vict;
@@ -216,7 +216,7 @@ int do_check(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_find(Character *ch, char *arg, int cmd)
+int do_find(Character *ch, char *arg, cmd_t cmd)
 {
   char type[MAX_INPUT_LENGTH];
   char name[MAX_INPUT_LENGTH];
@@ -264,13 +264,13 @@ int do_find(Character *ch, char *arg, int cmd)
     logentry(QStringLiteral("Default in do_find...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
-    return do_mlocate(ch, name, CMD_DEFAULT);
+    return do_mlocate(ch, name);
   case 1: // pc
     break;
   case 2: // character
-    return do_mlocate(ch, name, 18);
+    return do_mlocate(ch, name, cmd_t::MLOCATE_CHARACTER);
   case 3: // object
-    return do_olocate(ch, name, CMD_DEFAULT);
+    return do_olocate(ch, name);
   }
 
   if (!(vict = get_pc_vis(ch, name)))
@@ -285,7 +285,7 @@ int do_find(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_stat(Character *ch, char *arg, int cmd)
+int do_stat(Character *ch, char *arg, cmd_t cmd)
 {
   class Connection d;
   Character *vict;
@@ -396,7 +396,7 @@ int do_stat(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_mpstat(Character *ch, char *arg, int cmd)
+int do_mpstat(Character *ch, char *arg, cmd_t cmd)
 {
   Character *vict;
   char name[MAX_INPUT_LENGTH];
@@ -976,7 +976,7 @@ command_return_t zedit_help(Character *ch)
   return eSUCCESS;
 }
 
-int do_zedit(Character *ch, char *argument, int cmd)
+int do_zedit(Character *ch, char *argument, cmd_t cmd)
 {
   QString buf, text, arg;
   uint64_t i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
@@ -1173,7 +1173,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
             {
               str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
-            do_zedit(ch, str, 1);
+            do_zedit(ch, str);
             free(str);
           }
           break;
@@ -1192,7 +1192,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
               str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
-            do_zedit(ch, str, 1);
+            do_zedit(ch, str);
             free(str);
           }
           break;
@@ -1210,7 +1210,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
               str = strdup(QStringLiteral(" %1 list %2 1\r\n").arg(z_key).arg(i + 1).toStdString().c_str());
             }
 
-            do_zedit(ch, str, 1);
+            do_zedit(ch, str);
             free(str);
           }
           break;
@@ -1353,7 +1353,7 @@ int do_zedit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sedit(Character *ch, char *argument, int cmd)
+int do_sedit(Character *ch, char *argument, cmd_t cmd)
 {
   std::string buf;
   std::string select;
@@ -1558,7 +1558,7 @@ int do_sedit(Character *ch, char *argument, int cmd)
   }
 
   // make sure the changes stick
-  vict->save(666);
+  vict->save(cmd_t::SAVE_SILENTLY);
 
   return eSUCCESS;
 }
@@ -1997,7 +1997,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
   return eSUCCESS;
 }
 
-int do_oedit(Character *ch, char *argument, int cmd)
+int do_oedit(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH] = {};
   char buf2[MAX_INPUT_LENGTH] = {};
@@ -2637,7 +2637,7 @@ void update_mobprog_bits(int mob_num)
   }
 }
 
-int do_procedit(Character *ch, char *argument, int cmd)
+int do_procedit(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH]{};
   char buf2[MAX_INPUT_LENGTH]{};
@@ -3026,7 +3026,7 @@ int do_procedit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mscore(Character *ch, char *argument, int cmd)
+int do_mscore(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH];
   int mob_num = -1;
@@ -3055,7 +3055,7 @@ int do_mscore(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_medit(Character *ch, char *argument, int cmd)
+int do_medit(Character *ch, char *argument, cmd_t cmd)
 {
   if (!ch || !argument)
   {
@@ -4127,7 +4127,7 @@ int do_medit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_redit(Character *ch, char *argument, int cmd)
+int do_redit(Character *ch, char *argument, cmd_t cmd)
 {
   std::string buf, remainder_args;
   int x, a, b, c, d = 0;
@@ -4438,7 +4438,7 @@ int do_redit(Character *ch, char *argument, int cmd)
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
         char *tmp = strdup(buf.c_str());
-        do_at(ch, tmp, CMD_DEFAULT);
+        do_at(ch, tmp);
         free(tmp);
         REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
       }
@@ -4560,7 +4560,7 @@ int do_redit(Character *ch, char *argument, int cmd)
     if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
     {
       // There's already an existing extra description so let's show it
-      parse_action(PARSE_LIST_NUM, "", ch->desc);
+      parse_action(parse_t::LIST_NUM, "", ch->desc);
     }
   }
   break;
@@ -4733,7 +4733,7 @@ int do_redit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_rdelete(Character *ch, char *arg, int cmd)
+int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 {
   int x;
   char buf[50], buf2[50];
@@ -4860,12 +4860,12 @@ int do_rdelete(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_oneway(Character *ch, char *arg, int cmd)
+int do_oneway(Character *ch, char *arg, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (cmd == 1)
+  if (cmd == cmd_t::ONEWAY)
   {
     if (!isSet(ch->player->toggles, Player::PLR_ONEWAY))
       SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
@@ -4880,7 +4880,7 @@ int do_oneway(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_zsave(QStringList arguments, int cmd)
+command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 {
   zone_t zone_key{};
   auto &zones = DC::getInstance()->zones;
@@ -4943,7 +4943,7 @@ command_return_t Character::do_zsave(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_rsave(Character *ch, char *arg, int cmd)
+int do_rsave(Character *ch, char *arg, cmd_t cmd)
 {
   world_file_list_item *curr;
 
@@ -4986,7 +4986,7 @@ int do_rsave(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_msave(Character *ch, char *arg, int cmd)
+int do_msave(Character *ch, char *arg, cmd_t cmd)
 {
   world_file_list_item *curr;
   char buf[180];
@@ -5041,7 +5041,7 @@ int do_msave(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_osave(Character *ch, char *arg, int cmd)
+int do_osave(Character *ch, char *arg, cmd_t cmd)
 {
   world_file_list_item *curr;
   char buf[180];
@@ -5093,7 +5093,7 @@ int do_osave(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_instazone(Character *ch, char *arg, int cmd)
+int do_instazone(Character *ch, char *arg, cmd_t cmd)
 {
   FILE *fl;
   char buf[200], bufl[200] /*,buf2[200],buf3[200]*/;
@@ -5397,7 +5397,7 @@ int do_instazone(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_rstat(Character *ch, char *argument, int cmd)
+int do_rstat(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH * 2];
@@ -5537,7 +5537,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_possess(Character *ch, char *argument, int cmd)
+int do_possess(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   Character *victim;
@@ -5607,7 +5607,7 @@ int do_possess(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_return(Character *ch, char *argument, int cmd)
+int do_return(Character *ch, char *argument, cmd_t cmd)
 {
 
   //    if(IS_NPC(ch))
@@ -5633,7 +5633,7 @@ int do_return(Character *ch, char *argument, int cmd)
     ch->desc = 0;
     if (IS_NPC(ch) && DC::getInstance()->mob_index[ch->mobdata->nr].virt > 90 &&
         DC::getInstance()->mob_index[ch->mobdata->nr].virt < 100 &&
-        cmd != 12)
+        cmd != cmd_t::LOOK)
     {
       act("$n evaporates.", ch, 0, 0, TO_ROOM, 0);
       extract_char(ch, true);
@@ -5643,7 +5643,7 @@ int do_return(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_sockets(QStringList arguments, int cmd)
+command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
 {
   QString searchkey;
   if (!arguments.isEmpty())
@@ -5678,7 +5678,7 @@ command_return_t Character::do_sockets(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_setvote(Character *ch, char *arg, int cmd)
+int do_setvote(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -5736,7 +5736,7 @@ int do_setvote(Character *ch, char *arg, int cmd)
   return eFAILURE;
 }
 
-int do_punish(Character *ch, char *arg, int cmd)
+int do_punish(Character *ch, char *arg, cmd_t cmd)
 {
   char name[100], buf[150];
   Character *vict;
@@ -6020,7 +6020,7 @@ void display_punishes(Character *ch, Character *vict)
   ch->sendln("");
 }
 
-int do_colors(Character *ch, char *argument, int cmd)
+int do_colors(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[200];
 

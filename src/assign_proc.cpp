@@ -18,8 +18,8 @@
 #include "DC/player.h"
 #include "DC/utility.h"
 
-typedef int SPEC_FUN(Character *ch, Object *obj, int cmd, const char *argument, Character *owner);
-typedef int ROOM_PROC(Character *ch, int cmd, const char *argument);
+typedef int SPEC_FUN(Character *ch, Object *obj, cmd_t cmd, const char *argument, Character *owner);
+typedef int ROOM_PROC(Character *ch, cmd_t cmd, const char *argument);
 
 void boot_the_shops();
 void boot_player_shops();

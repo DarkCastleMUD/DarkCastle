@@ -465,7 +465,7 @@ void Character::do_on_login_stuff(void)
    if (this->player->time.logon < 1151506181)
    {
       this->player->quest_points = 0;
-      for (int i = 0; i < QUEST_CANCEL; i++)
+      for (int i = 0; i < QUEST_MAX_CANCEL; i++)
          this->player->quest_cancel[i] = 0;
       for (int i = 0; i < QUEST_TOTAL / ASIZE; i++)
          this->player->quest_complete[i] = 0;
@@ -828,7 +828,7 @@ void DC::nanny(class Connection *d, std::string arg)
         STATE(d) == Connection::states::GET_STATS))
    {
       arg.erase(0, 4);
-      do_new_help(d->character, arg.data(), 88);
+      do_new_help(d->character, arg.data(), cmd_t::PAGING_HELP);
       return;
    }
 
@@ -1786,9 +1786,9 @@ void DC::nanny(class Connection *d, std::string arg)
          if (ch->getLevel() == 0)
          {
             do_start(ch);
-            do_new_help(ch, "new", 0);
+            do_new_help(ch, "new");
          }
-         do_look(ch, "", 8);
+         do_look(ch, "");
          {
             if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
             {
@@ -2183,7 +2183,7 @@ void update_characters()
       {
          if (!charge_moves(i, SKILL_BATTERBRACE, 0.5) || !is_bracing(i, i->brace_at))
          {
-            do_brace(i, "", 0);
+            do_brace(i, "");
          }
          else
          {
@@ -2860,7 +2860,7 @@ bool handle_get_stats(Connection *d, std::string arg)
       else if (arg.find("help") == 0)
       {
          arg.erase(0, 5);
-         do_help(d->character, arg.data(), CMD_DEFAULT);
+         do_help(d->character, arg.data());
          return false;
       }
       else if (arg == "confirm")

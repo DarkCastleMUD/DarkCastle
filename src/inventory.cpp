@@ -35,7 +35,7 @@
 extern int rev_dir[];
 
 /* procedures related to get */
-void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, int cmd)
+void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
 {
   std::string buffer;
 
@@ -83,7 +83,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     buffer = fmt::format("{}_consent", GET_NAME(ch));
     if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      if ((cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
+      if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
       {
         SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
@@ -113,7 +113,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
     else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name))
     {
-      if (cmd == CMD_LOOT && isexact("lootable", sub_object->name))
+      if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name))
       {
         struct affected_type pthiefaf;
 
@@ -196,7 +196,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
   }
   if (sub_object && sub_object->obj_flags.value[3] == 1 &&
       isexact("pc", sub_object->name))
-    ch->save(666);
+    ch->save(cmd_t::SAVE_SILENTLY);
 
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
       (obj_object->obj_flags.value[0] >= 1))
@@ -284,7 +284,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
-int do_get(Character *ch, char *argument, int cmd)
+int do_get(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -360,14 +360,14 @@ int do_get(Character *ch, char *argument, int cmd)
     }
   }
 
-  if ((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
+  if ((cmd == cmd_t::PALM) && (GET_CLASS(ch) != CLASS_THIEF) &&
       (!ch->isImmortalPlayer()))
   {
     ch->sendln("I bet you think you're a thief.");
     return eFAILURE;
   }
 
-  if (cmd == 10 && type != 2 && type != 6 && type != 0)
+  if (cmd == cmd_t::PALM && type != 2 && type != 6 && type != 0)
   {
     send_to_char("You can only palm objects that are in the same room, "
                  "one at a time.\r\n",
@@ -375,7 +375,7 @@ int do_get(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (cmd == CMD_LOOT && type != 0 && type != 6)
+  if (cmd == cmd_t::LOOT && type != 0 && type != 6)
   {
     ch->sendln("You can only loot 1 item from a non-consented corpse.");
     return eFAILURE;
@@ -388,10 +388,10 @@ int do_get(Character *ch, char *argument, int cmd)
   {
     switch (cmd)
     {
-    case 10:
+    case cmd_t::PALM:
       ch->sendln("Palm what?");
       break;
-    case CMD_LOOT:
+    case cmd_t::LOOT:
       ch->sendln("Loot what?");
       break;
     default:
@@ -518,7 +518,7 @@ int do_get(Character *ch, char *argument, int cmd)
     if (found)
     {
       //		ch->sendln("OK.");
-      ch->save(666);
+      ch->save(cmd_t::SAVE_SILENTLY);
     }
     else
     {
@@ -592,18 +592,18 @@ int do_get(Character *ch, char *argument, int cmd)
         {
           ch->send(QStringLiteral("The aura of the donation room allows you to pick up %1.\r\n").arg(obj_object->short_description));
           get(ch, obj_object, sub_object, 0, cmd);
-          ch->save(666);
+          ch->save(cmd_t::SAVE_SILENTLY);
           found = true;
         }
       }
       else if (CAN_WEAR(obj_object, ITEM_TAKE))
       {
-        if (cmd == 10)
+        if (cmd == cmd_t::PALM)
           palm(ch, obj_object, sub_object, 0);
         else
           get(ch, obj_object, sub_object, 0, cmd);
 
-        ch->save(666);
+        ch->save(cmd_t::SAVE_SILENTLY);
         found = true;
       }
       else
@@ -806,7 +806,7 @@ int do_get(Character *ch, char *argument, int cmd)
                                      DC::getInstance()->world[ch->in_room].contents);
     if (!sub_object)
     {
-      if (cmd == CMD_LOOT)
+      if (cmd == cmd_t::LOOT)
       {
         ch->sendln("You can only loot 1 item from a non-consented corpse.");
         return eFAILURE;
@@ -824,9 +824,9 @@ int do_get(Character *ch, char *argument, int cmd)
       {
         sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-        if ((cmd != CMD_LOOT && (isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name))) || isexact(buffer, sub_object->name))
+        if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name) && !isexact(GET_NAME(ch), sub_object->name))) || isexact(buffer, sub_object->name))
           has_consent = true;
-        if (!isexact(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(GET_NAME(ch), sub_object->name) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
         if (!has_consent && !isexact(GET_NAME(ch), sub_object->name))
         {
@@ -884,7 +884,7 @@ int do_get(Character *ch, char *argument, int cmd)
               // the other of the corpse, has_consent will be false.
               if (!ch->isImmortalPlayer())
               {
-                if (isexact("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isexact("lootable", sub_object->name)))
+                if (isexact("thiefcorpse", sub_object->name) || (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)))
                 {
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
@@ -901,7 +901,7 @@ int do_get(Character *ch, char *argument, int cmd)
                   fail = true;
                   sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-                  if ((cmd == CMD_LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
+                  if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name)) && !isexact(buffer, sub_object->name))
                   {
                     SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
                     struct affected_type pthiefaf;
@@ -932,7 +932,7 @@ int do_get(Character *ch, char *argument, int cmd)
             }
             else if (CAN_WEAR(obj_object, ITEM_TAKE))
             {
-              if (cmd == 10)
+              if (cmd == cmd_t::PALM)
                 palm(ch, obj_object, sub_object, has_consent);
               else
                 get(ch, obj_object, sub_object, has_consent, cmd);
@@ -979,11 +979,11 @@ int do_get(Character *ch, char *argument, int cmd)
   }
   if (fail)
     return eFAILURE;
-  ch->save(666);
+  ch->save(cmd_t::SAVE_SILENTLY);
   return eSUCCESS;
 }
 
-int do_consent(Character *ch, char *arg, int cmd)
+int do_consent(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1], buf2[MAX_STRING_LENGTH + 1];
   class Object *obj;
@@ -1091,7 +1091,7 @@ int contains_no_trade_item(Object *obj)
   return false;
 }
 
-int do_drop(Character *ch, char *argument, int cmd)
+int do_drop(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   int amount;
@@ -1149,7 +1149,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       special_log(QString(QStringLiteral("%1 dropped %2 coins in room %3!")).arg(ch->getName()).arg(amount).arg(ch->in_room));
     }
 
-    ch->save(666);
+    ch->save(cmd_t::SAVE_SILENTLY);
     return eSUCCESS;
   }
 
@@ -1282,14 +1282,14 @@ int do_drop(Character *ch, char *argument, int cmd)
       else
         ch->sendln("You do not have that item.");
     }
-    ch->save(666);
+    ch->save(cmd_t::SAVE_SILENTLY);
   }
   else
     ch->sendln("Drop what?");
   return eFAILURE;
 }
 
-void do_putalldot(Character *ch, char *name, char *target, int cmd)
+void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
 {
   class Object *tmp_object;
   class Object *next_object;
@@ -1332,7 +1332,7 @@ int weight_in(class Object *obj)
   return w;
 }
 
-int do_put(Character *ch, char *argument, int cmd)
+int do_put(Character *ch, char *argument, cmd_t cmd)
 {
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
@@ -1552,7 +1552,7 @@ int do_put(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-void do_givealldot(Character *ch, char *name, char *target, int cmd)
+void do_givealldot(Character *ch, char *name, char *target, cmd_t cmd)
 {
   class Object *tmp_object;
   class Object *next_object;
@@ -1582,7 +1582,7 @@ void do_givealldot(Character *ch, char *name, char *target, int cmd)
     ch->sendln("You don't have one.");
 }
 
-int do_give(Character *ch, char *argument, int cmd)
+int do_give(Character *ch, char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   char obj_name[MAX_INPUT_LENGTH + 1], vict_name[MAX_INPUT_LENGTH + 1], buf[200];
@@ -1695,8 +1695,8 @@ int do_give(Character *ch, char *argument, int cmd)
       SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
     }
 
-    ch->save(10);
-    vict->save(10);
+    ch->save();
+    vict->save();
     // bribe trigger automatically removes any gold given to mob
     mprog_bribe_trigger(vict, ch, amount);
 
@@ -1925,8 +1925,8 @@ int do_give(Character *ch, char *argument, int cmd)
   }
 
   //    ch->sendln("Ok.");
-  ch->save(10);
-  vict->save(10);
+  ch->save();
+  vict->save();
   // if I gave a no_trade item to a mob, the mob needs to destroy it
   // otherwise it defeats the purpose of no_trade:)
 
@@ -1973,7 +1973,7 @@ class Object *bring_type_to_front(Character *ch, int item_type)
     {
       if (GET_ITEM_TYPE(container_item) == item_type)
       {
-        get(ch, container_item, item_carried, 0, CMD_DEFAULT);
+        get(ch, container_item, item_carried, 0, cmd_t::DEFAULT);
         return container_item;
       }
     }
@@ -2197,7 +2197,7 @@ bool is_bracing(Character *bracee, struct room_direction_data *exit)
   return false;
 }
 
-int do_open(Character *ch, char *argument, int cmd)
+int do_open(Character *ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   int door, other_room, retval;
@@ -2246,7 +2246,7 @@ int do_open(Character *ch, char *argument, int cmd)
       }
       else
       {
-        do_brace(EXIT(ch, door)->bracee, "", 0);
+        do_brace(EXIT(ch, door)->bracee, "");
         return do_open(ch, argument, cmd);
       }
     }
@@ -2355,7 +2355,7 @@ int do_open(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_close(Character *ch, char *argument, int cmd)
+int do_close(Character *ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   int door, other_room;
@@ -2464,7 +2464,7 @@ bool has_key(Character *ch, int key)
   return false;
 }
 
-int do_lock(Character *ch, char *argument, int cmd)
+int do_lock(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
@@ -2537,7 +2537,7 @@ int do_lock(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_unlock(Character *ch, char *argument, int cmd)
+int do_unlock(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];

@@ -106,7 +106,7 @@ std::queue<QString> auction_history;
 std::queue<QString> newbie_history;
 std::queue<QString> trivia_history;
 
-command_return_t do_say(Character *ch, std::string argument, int cmd)
+command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
 {
   int i;
   std::string buf;
@@ -177,7 +177,7 @@ command_return_t do_say(Character *ch, std::string argument, int cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-command_return_t do_psay(Character *ch, std::string argument, int cmd)
+command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
 {
   std::string vict = {}, message = {}, buf = {};
   Character *victim = nullptr;
@@ -248,7 +248,7 @@ command_return_t do_psay(Character *ch, std::string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pray(Character *ch, char *arg, int cmd)
+int do_pray(Character *ch, char *arg, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   class Connection *i;
@@ -301,7 +301,7 @@ int do_pray(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_gossip(Character *ch, char *argument, int cmd)
+int do_gossip(Character *ch, char *argument, cmd_t cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
@@ -323,7 +323,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->master)
   {
-    do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    do_say(ch, "Why don't you just do that yourself!");
     return eSUCCESS;
   }
 
@@ -405,7 +405,7 @@ int do_gossip(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_auction(QStringList arguments, int cmd)
+command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 {
   class Connection *i{};
   Object *tmp_obj{};
@@ -426,7 +426,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
 
   if (IS_NPC(this) && this->master)
   {
-    do_say(this, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
+    do_say(this, "That's okay, I'll let you do all the auctioning, master.");
     return eSUCCESS;
   }
 
@@ -500,7 +500,7 @@ command_return_t Character::do_auction(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_shout(Character *ch, char *argument, int cmd)
+int do_shout(Character *ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -523,7 +523,7 @@ int do_shout(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->master)
   {
-    return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
+    return do_say(ch, "Shouting makes my throat hoarse.");
   }
 
   if (IS_PC(ch) && isSet(ch->player->punish, PUNISH_SILENCED))
@@ -577,7 +577,7 @@ int do_shout(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_trivia(Character *ch, char *argument, int cmd)
+int do_trivia(Character *ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -600,7 +600,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->master)
   {
-    return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    return do_say(ch, "Why don't you just do that yourself!");
   }
 
   if (IS_PC(ch))
@@ -679,7 +679,7 @@ int do_trivia(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_dream(Character *ch, char *argument, int cmd)
+int do_dream(Character *ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
@@ -694,7 +694,7 @@ int do_dream(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->master)
   {
-    do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    do_say(ch, "Why don't you just do that yourself!");
     return eSUCCESS;
   }
   if (IS_PC(ch))
@@ -753,7 +753,7 @@ int do_dream(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tellhistory(Character *ch, std::string argument, int cmd)
+command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -789,7 +789,7 @@ command_return_t do_tellhistory(Character *ch, std::string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_tell(QStringList arguments, int cmd)
+command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 {
   Character *vict = nullptr;
   QString name = {}, message = {}, buf = {}, log_buf = {};
@@ -838,14 +838,14 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
     return eSUCCESS;
   }
 
-  if (cmd == 9999)
+  if (cmd == cmd_t::TELL_REPLY)
   {
     if (!(vict = get_active_pc(name)))
     {
       this->sendln("They seem to have left!");
       return eSUCCESS;
     }
-    cmd = CMD_DEFAULT;
+    cmd = cmd_t::DEFAULT;
   }
   else if (!(vict = get_active_pc_vis(name)))
   {
@@ -1000,7 +1000,7 @@ command_return_t Character::do_tell(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_reply(Character *ch, std::string argument, int cmd)
+command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
 {
   std::string buf = {};
   Character *vict = nullptr;
@@ -1037,11 +1037,11 @@ command_return_t do_reply(Character *ch, std::string argument, int cmd)
   }
 
   buf = fmt::format("{} {}", ch->player->last_tell.toStdString().c_str(), argument);
-  ch->do_tell(QString(buf.c_str()).split(' '), CMD_TELL_REPLY);
+  ch->do_tell(QString(buf.c_str()).split(' '), cmd_t::TELL_REPLY);
   return eSUCCESS;
 }
 
-int do_whisper(Character *ch, char *argument, int cmd)
+int do_whisper(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
@@ -1086,7 +1086,7 @@ int do_whisper(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ask(Character *ch, char *argument, int cmd)
+int do_ask(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
@@ -1131,7 +1131,7 @@ int do_ask(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_grouptell(Character *ch, char *argument, int cmd)
+int do_grouptell(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   Character *k;
@@ -1227,7 +1227,7 @@ int do_grouptell(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_newbie(Character *ch, char *argument, int cmd)
+int do_newbie(Character *ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -1250,7 +1250,7 @@ int do_newbie(Character *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->master)
   {
-    return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    return do_say(ch, "Why don't you just do that yourself!");
   }
 
   if (IS_PC(ch))

@@ -310,7 +310,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list = nullptr;
 }
 
-int do_social(Character *ch, char *argument, int cmd)
+int do_social(Character *ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

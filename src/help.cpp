@@ -20,6 +20,7 @@
 #include "DC/returnvals.h"
 #include "DC/help.h"
 #include "DC/fileinfo.h"
+#include "DC/common.h"
 
 #include <map>
 #include <vector>
@@ -44,7 +45,7 @@ void show_help_header(Character *ch);
 void show_help_bar(Character *ch);
 
 // da functions
-int do_mortal_help(Character *ch, char *argument, int cmd)
+int do_mortal_help(Character *ch, char *argument, cmd_t cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
   ch->send(new_help);
@@ -93,7 +94,7 @@ int levenshtein(const char *s, const char *t)
   return d[m][n];
 }
 
-int do_new_help(Character *ch, char *argument, int cmd)
+int do_new_help(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   extern char new_help[MAX_STRING_LENGTH];
@@ -257,7 +258,7 @@ int do_new_help(Character *ch, char *argument, int cmd)
           ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
           this_help->entry, this_help->related);
 
-  if (cmd)
+  if (cmd != cmd_t::UNDEFINED)
     page_string(ch->desc, entry, 1);
   else
     ch->send(entry);
@@ -387,7 +388,7 @@ int load_new_help(FILE *fl, int reload, Character *ch)
   return eSUCCESS;
 }
 
-int do_areas(Character *ch, char *arg, int cmd)
+int do_areas(Character *ch, char *arg, cmd_t cmd)
 {
   strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
@@ -395,7 +396,7 @@ int do_areas(Character *ch, char *arg, int cmd)
 
 char help_buf[MAX_STRING_LENGTH * 4];
 
-int do_hindex(Character *ch, char *argument, int cmd)
+int do_hindex(Character *ch, char *argument, cmd_t cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -540,7 +541,7 @@ int do_hindex(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_index(Character *ch, char *argument, int cmd)
+int do_index(Character *ch, char *argument, cmd_t cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -673,7 +674,7 @@ int strn_cmp(char *arg1, char *arg2, int n)
   return (0);
 }
 
-int do_reload_help(Character *ch, char *argument, int cmd)
+int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 {
 
   FILE *new_help_fl;
@@ -713,7 +714,7 @@ int do_reload_help(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_hedit(Character *ch, char *argument, int cmd)
+int do_hedit(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[200], buf2[200], field[200], buf3[200], value[200];
   struct help_index_element_new new_help;

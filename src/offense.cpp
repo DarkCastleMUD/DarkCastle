@@ -24,7 +24,7 @@
 #include "DC/interp.h"
 #include "DC/const.h"
 
-int do_suicide(Character *ch, char *argument, int cmd)
+int do_suicide(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE; // just in case
@@ -77,7 +77,7 @@ int do_suicide(Character *ch, char *argument, int cmd)
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
-command_return_t Character::do_hit(QStringList arguments, int cmd)
+command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
 {
   Character *victim, *k, *next_char;
   int count = 0;
@@ -138,7 +138,7 @@ command_return_t Character::do_hit(QStringList arguments, int cmd)
   return eFAILURE;
 }
 
-int do_murder(Character *ch, char *argument, int cmd)
+int do_murder(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   Character *victim;
@@ -188,7 +188,7 @@ int do_murder(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_slay(Character *ch, char *argument, int cmd)
+int do_slay(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
@@ -247,7 +247,7 @@ int do_slay(Character *ch, char *argument, int cmd)
   return eSUCCESS; // shouldn't get here
 }
 
-int do_kill(Character *ch, char *argument, int cmd)
+int do_kill(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
@@ -318,7 +318,7 @@ int do_kill(Character *ch, char *argument, int cmd)
 // if you send do_join a number as the argument, ch will attempt to
 // join a mob of that number.  Only works if ch is mob.
 //
-command_return_t Character::do_join(QStringList arguments, int cmd)
+command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 {
   if (fighting)
   {

@@ -160,9 +160,9 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
   {
     return "";
   }
-  if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FORCE))
+  if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
     return "";
-  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
+  if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
   if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";

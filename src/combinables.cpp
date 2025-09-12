@@ -119,7 +119,7 @@ struct thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-int do_poisonmaking(Character *ch, char *argument, int cmd)
+int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_TRADE_POISON);
 
@@ -195,7 +195,7 @@ int do_poisonmaking(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_poisonweapon(Character *ch, char *argument, int cmd)
+int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
@@ -399,7 +399,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
   return retval;
 }
 
-int do_brew(Character *ch, char *argument, int cmd)
+int do_brew(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   Object *herbobj, *liquidobj, *containerobj;
@@ -907,7 +907,7 @@ int Brew::find(Brew::recipe r)
   return spell;
 }
 
-int do_scribe(Character *ch, char *argument, int cmd)
+int do_scribe(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
   Object *inkobj, *dustobj, *penobj, *paperobj;

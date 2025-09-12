@@ -63,7 +63,7 @@ void clear_who_buffer()
   gWhoBufferCurSize = 0; // update the size
 }
 
-int do_whogroup(Character *ch, char *argument, int cmd)
+int do_whogroup(Character *ch, char *argument, cmd_t cmd)
 {
 
   Connection *d;
@@ -189,7 +189,7 @@ int do_whogroup(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_whosolo(Character *ch, char *argument, int cmd)
+int do_whosolo(Character *ch, char *argument, cmd_t cmd)
 {
   Connection *d;
   Character *i;
@@ -250,7 +250,7 @@ int do_whosolo(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_who(QStringList arguments, int cmd)
+command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 {
   const QStringList immortFields = {
       "   Immortal  ",
@@ -564,7 +564,7 @@ command_return_t Character::do_who(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_whoarena(Character *ch, char *argument, int cmd)
+int do_whoarena(Character *ch, char *argument, cmd_t cmd)
 {
   int count = 0;
   clan_data *clan;
@@ -621,7 +621,7 @@ int do_whoarena(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_where(Character *ch, char *argument, int cmd)
+int do_where(Character *ch, char *argument, cmd_t cmd)
 {
   class Connection *d;
   int zonenumber;

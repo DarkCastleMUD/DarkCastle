@@ -16,7 +16,7 @@
  *  10/23/2003   Onager   Commented out effect wear-off stuff in            *
  *                        affect_update() (moved to affect_remove())        *
  *  10/27/2003   Onager   Changed stop_follower() cmd values to be readable *
- *                        #defines, added a BROKE_CHARM cmd                 *
+ *                        #defines, added a cmd_t::BROKE_CHARM cmd                 *
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
@@ -1133,7 +1133,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
   }
   /*
     if(ISSET(ch->affected_by, AFF_FAMILIAR)) {
-      do_emote(ch, "screams in pain as its connection with its master is broken.", CMD_DEFAULT);
+      do_emote(ch, "screams in pain as its connection with its master is broken.");
       extract_char(ch, true);
       return;
     }
@@ -1156,7 +1156,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
     }
     if (ch->fighting && ch->fighting != ch->master)
     {
-      do_say(ch, "Screw this, I'm going home!", 0);
+      do_say(ch, "Screw this, I'm going home!");
       stop_fighting(ch->fighting);
       stop_fighting(ch);
     }
@@ -1280,7 +1280,6 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
     act("You stalk $N.", ch, 0, leader, TO_CHAR, 0);
   else if (reason == follower_reasons_t::CHANGE_LEADER)
     return;
-
   else
   {
     act("You now follow $N.", ch, 0, leader, TO_CHAR, 0);
@@ -1479,7 +1478,7 @@ char *skip_spaces(char *string)
 /*
     Release command.
 */
-int do_release(Character *ch, char *argument, int cmd)
+int do_release(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type *aff, *aff_next;
   bool printed = false;
@@ -1802,7 +1801,7 @@ bool check_conc_loss(Character *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(Character *ch, char *argument, int cmd)
+int do_cast(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *tar_obj;
   Character *tar_char;
@@ -1978,7 +1977,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       int oldroom = 0;
       int dir = -1;
       bool group_spell = false;
-      if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
+      if (spl == SPELL_LIGHTNING_BOLT && ch->has_skill(SKILL_SPELLCRAFT) && cmd != cmd_t::FILTER)
       { // Oh the special cases of spellcraft.
 
         name[0] = '\0';
@@ -2100,7 +2099,7 @@ int do_cast(Character *ch, char *argument, int cmd)
       int fil = 0;
       float rel = 1;
       int fillvl = ch->has_skill(SKILL_ELEMENTAL_FILTER);
-      if (cmd == CMD_FILTER && fillvl)
+      if (cmd == cmd_t::FILTER && fillvl)
       {
         if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM ||
             spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
@@ -2377,7 +2376,7 @@ int do_cast(Character *ch, char *argument, int cmd)
         }
       }
 
-      if (cmd == CMD_FILTER && fillvl)
+      if (cmd == cmd_t::FILTER && fillvl)
       {
         ch->skill_increase_check(SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
       }
@@ -2704,7 +2703,7 @@ int do_cast(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_skills(Character *ch, char *arg, int cmd)
+int do_skills(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -2925,7 +2924,7 @@ int do_skills(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_songs(Character *ch, char *arg, int cmd)
+int do_songs(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
 
@@ -2952,7 +2951,7 @@ int do_songs(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_spells(Character *ch, char *arg, int cmd)
+int do_spells(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];

@@ -2421,7 +2421,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 
 	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty()))
 	{
-		do_sing(ch, "stop", CMD_DEFAULT);
+		do_sing(ch, "stop");
 	}
 
 	return (1);
@@ -3730,7 +3730,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	if (IS_PC(ch) && !ch->desc)
 		for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
 			if (t_desc->original == ch)
-				ret = do_return(t_desc->character, "", 0);
+				ret = do_return(t_desc->character, "");
 	if (SOMEONE_DIED(ret))
 	{ // already taken care of
 		return;
@@ -3844,7 +3844,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	}
 	if (isGolem && omast)
 	{
-		omast->save(666);
+		omast->save(cmd_t::SAVE_SILENTLY);
 		omast->player->golem = 0; // Reset the golem flag.
 	}
 	/*
@@ -3909,7 +3909,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 	GET_AC(ch) -= GET_AC_METAS(ch);
 
 	if (ch->desc && ch->desc->original)
-		do_return(ch, "", 12);
+		do_return(ch, "", cmd_t::LOOK);
 
 	if (IS_NPC(ch) && ch->mobdata->nr > -1)
 		DC::getInstance()->mob_index[ch->mobdata->nr].number--;

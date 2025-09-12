@@ -51,7 +51,7 @@
 
 #define SKILL_HIDE 337
 
-int clan_guard(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner);
+int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner);
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 const char *fillwords[] =
     {
@@ -64,7 +64,7 @@ const char *fillwords[] =
         "to",
         "\n"};
 
-int do_motd(Character *ch, char *arg, int cmd)
+int do_motd(Character *ch, char *arg, cmd_t cmd)
 {
   extern char motd[];
 
@@ -72,7 +72,7 @@ int do_motd(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_imotd(Character *ch, char *arg, int cmd)
+int do_imotd(Character *ch, char *arg, cmd_t cmd)
 {
   extern char imotd[];
 
@@ -246,8 +246,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       // Paralysis stops everything but ...
       if (IS_AFFECTED(this, AFF_PARALYSIS) &&
-          found->getNumber() != CMD_GTELL && // gtell
-          found->getNumber() != CMD_CTELL    // ctell
+          found->getNumber() != cmd_t::GTELL && // gtell
+          found->getNumber() != cmd_t::CTELL    // ctell
       )
       {
         sendln("You've been paralyzed and are unable to move.");
@@ -297,7 +297,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         if ((IS_AFFECTED(this, AFF_FAMILIAR) || IS_AFFECTED(this, AFF_CHARM)) && !found->isCharmieAllowed())
         {
-          retval = do_say(this, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
+          retval = do_say(this, "I'm sorry master, I cannot do that.");
           return logcmd.setReturn(retval, QStringLiteral("familiar/charmie not allowed"));
         }
       }
@@ -586,7 +586,7 @@ int search_blocknolow(char *arg, const char **list, bool exact)
   return (-1);
 }
 
-int do_boss(Character *ch, char *arg, int cmd)
+int do_boss(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[200];
   int x;
@@ -1117,7 +1117,7 @@ void chop_half(char *str, char *arg1, char *arg2)
   arg2[i] = '\0';
 }
 
-command_return_t Character::special(QString arguments, int cmd)
+command_return_t Character::special(QString arguments, cmd_t cmd)
 {
   class Object *i;
   Character *k;
@@ -1185,7 +1185,7 @@ command_return_t Character::special(QString arguments, int cmd)
   return eFAILURE;
 }
 
-void Character::add_command_lag(int cmdnum, int lag)
+void Character::add_command_lag(cmd_t cmd, int lag)
 {
   command_lag *cmdl;
 #ifdef LEAK_CHECK
@@ -1198,17 +1198,17 @@ void Character::add_command_lag(int cmdnum, int lag)
   cmdl->next = DC::getInstance()->getCommandLag();
   DC::getInstance()->setCommandLag(cmdl);
   cmdl->ch = this;
-  cmdl->cmd_number = cmdnum;
+  cmdl->cmd_number = cmd;
   cmdl->lag = lag;
 }
 
-bool Character::can_use_command(int cmdnum)
+bool Character::can_use_command(cmd_t cmd)
 {
   command_lag *cmdl;
   for (cmdl = DC::getInstance()->getCommandLag(); cmdl; cmdl = cmdl->next)
   {
 
-    if (cmdl->ch == this && cmdl->cmd_number == cmdnum)
+    if (cmdl->ch == this && cmdl->cmd_number == cmd)
       return false;
   }
   return true;

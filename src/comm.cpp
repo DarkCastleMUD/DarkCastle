@@ -454,8 +454,8 @@ void finish_hotboot()
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    do_look(d->character, "", 8);
-    d->character->save(666);
+    do_look(d->character, "");
+    d->character->save(cmd_t::SAVE_SILENTLY);
   }
 }
 
@@ -1031,30 +1031,30 @@ void game_test_init(void)
 
   update_max_who();
 
-  do_restore(ch, "debugimp", CMD_DEFAULT);
+  do_restore(ch, "debugimp");
 
-  do_stand(ch, "", CMD_DEFAULT);
+  do_stand(ch, "");
   process_output(d);
 
   char_to_room(ch, 3001);
   process_output(d);
-  ch->do_toggle({"pager"}, CMD_DEFAULT);
-  ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  ch->do_toggle({}, CMD_DEFAULT);
+  ch->do_toggle({"pager"}, cmd_t::DEFAULT);
+  ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
+  ch->do_toggle({}, cmd_t::DEFAULT);
   ch->do_goto({"23"});
-  do_score(ch, "", CMD_DEFAULT);
+  do_score(ch, "");
   process_output(d);
 
-  do_load(ch, "m 23", CMD_DEFAULT);
+  do_load(ch, "m 23");
   process_output(d);
 
-  do_look(ch, "debugimp", CMD_LOOK);
+  do_look(ch, "debugimp");
   process_output(d);
 
   ch->do_bestow({"debugimp", "load"});
   process_output(d);
 
-  do_load(ch, "m 23", CMD_DEFAULT);
+  do_load(ch, "m 23");
   process_output(d);
 
   ch->do_test({"all"});
@@ -1290,7 +1290,7 @@ void telnet_ga(Connection *d)
   SEND_TO_Q(QByteArray(go_ahead), d);
 }
 
-int do_lastprompt(Character *ch, char *arg, int cmd)
+int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
 {
   if (GET_LAST_PROMPT(ch))
     csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
@@ -1300,7 +1300,7 @@ int do_lastprompt(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_prompt(Character *ch, char *arg, int cmd)
+int do_prompt(Character *ch, char *arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -2273,7 +2273,7 @@ int close_socket(class Connection *d)
 
       // end any performances
       if (IS_SINGING(d->character))
-        do_sing(d->character, "stop", CMD_DEFAULT);
+        do_sing(d->character, "stop");
 
       act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
 
@@ -2334,7 +2334,7 @@ int close_socket(class Connection *d)
        next_i = i->next;
        if(IS_NPC(i))
          continue;
-       do_quit(i, "", 666);
+       do_quit(i, "", cmd_t::SAVE_SILENTLY);
     }
     return 0;
   }*/
@@ -2609,7 +2609,7 @@ void record_msg(QString messg, Character *ch)
   }
 }
 
-int do_awaymsgs(Character *ch, char *argument, int cmd)
+int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 {
   int lines = 0;
   QString tmp;
@@ -2910,7 +2910,7 @@ void warn_if_duplicate_ip(Character *ch)
   }
 }
 
-int do_editor(Character *ch, char *argument, int cmd)
+int do_editor(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)

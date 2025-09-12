@@ -117,7 +117,7 @@ void mobile_activity(void)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, 0, "", ch));
+      retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || isNowhere(ch))
@@ -225,7 +225,7 @@ void mobile_activity(void)
       {
         // This should get rid of all the "gold coins" in mobs inventories.
         // -Pirahna 12/11/00
-        get(ch, best_obj, 0, 0, CMD_DEFAULT);
+        get(ch, best_obj, 0, 0, cmd_t::DEFAULT);
         //        move_obj( best_obj, ch );
         //        act( "$n gets $p.",  ch, best_obj, 0, TO_ROOM, 0);
       }
@@ -254,9 +254,13 @@ void mobile_activity(void)
                                                                  !DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(ch, door)->to_room].zone).isTown()))
           {
             ch->mobdata->last_direction = door;
-            retval = attempt_move(ch, ++door);
-            if (isSet(retval, eCH_DIED))
-              continue;
+            auto cmd_dir = getCommandFromDirection(door);
+            if (cmd_dir)
+            {
+              retval = attempt_move(ch, *cmd_dir);
+              if (isSet(retval, eCH_DIED))
+                continue;
+            }
           }
         }
       }
@@ -320,7 +324,7 @@ void mobile_activity(void)
         }
         else if (GET_POS(ch) < position_t::FIGHTING)
         {
-          do_stand(ch, "", CMD_DEFAULT);
+          do_stand(ch, "");
           continue;
         }
       }
@@ -399,7 +403,7 @@ void mobile_activity(void)
           if (ch->mobdata->hated != nullptr)
             remove_memory(ch, 'h');
           act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
-          do_flee(ch, "", 0);
+          do_flee(ch, "");
           continue;
         }
 
@@ -574,7 +578,7 @@ void mobile_activity(void)
               {
                 sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
                 act(buf, ch, 0, 0, TO_ROOM, 0);
-                do_flee(ch, "", CMD_DEFAULT);
+                do_flee(ch, "");
               }
               break;
             }
@@ -597,26 +601,26 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
   switch (number(0, 6))
   {
   case 0:
-    do_say(ch, "What do you think you are doing?!", CMD_DEFAULT);
+    do_say(ch, "What do you think you are doing?!");
     break;
   case 1:
-    do_say(ch, "Mess with the best?  Die like the rest!", CMD_DEFAULT);
+    do_say(ch, "Mess with the best?  Die like the rest!");
     break;
   case 2:
-    do_emote(ch, " looks around for a moment, confused.", CMD_DEFAULT);
-    do_say(ch, "YOU!!", CMD_DEFAULT);
+    do_emote(ch, " looks around for a moment, confused.");
+    do_say(ch, "YOU!!");
     break;
   case 3:
-    do_say(ch, "Foolish.", CMD_DEFAULT);
+    do_say(ch, "Foolish.");
     break;
   case 4:
-    do_say(ch, "I'm going to treat you like a baby treats a diaper.", CMD_DEFAULT);
+    do_say(ch, "I'm going to treat you like a baby treats a diaper.");
     break;
   case 5:
-    do_say(ch, "Here comes the pain baby!", CMD_DEFAULT);
+    do_say(ch, "Here comes the pain baby!");
     break;
   case 6:
-    do_emote(ch, " wiggles its bottom.", CMD_DEFAULT);
+    do_emote(ch, " wiggles its bottom.");
     break;
   }
 }

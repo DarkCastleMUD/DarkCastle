@@ -44,6 +44,8 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 
+int FOUNTAINisPresent(Character *ch);
+
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
 /* When age in 30..44 calculate the line between p2 & p3 */
@@ -453,7 +455,7 @@ void advance_level(Character *ch, int is_conversion)
 	case CLASS_CLERIC:
 		add_ki += (effective_level % 2);
 		add_hp += number(4, 8);
-		add_mana += number(4, 9);
+		add_mana += number(4, 0);
 		add_moves += number(1, (effective_con / 2));
 		break;
 
@@ -725,11 +727,6 @@ void gain_condition(Character *ch, int condition, int value)
 
 void food_update(void)
 {
-	class Object *bring_type_to_front(Character * ch, int item_type);
-	int do_eat(Character * ch, char *argument, int cmd);
-	int do_drink(Character * ch, char *argument, int cmd);
-	int FOUNTAINisPresent(Character * ch);
-
 	class Object *food = nullptr;
 
 	const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
@@ -748,9 +745,9 @@ void food_update(void)
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see what's safe to eat!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
+					do_drink(i, "fountain");
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-					do_eat(i, food->name, CMD_DEFAULT);
+					do_eat(i, food->name);
 				else
 					i->sendln("You are out of food.");
 			}
@@ -764,9 +761,9 @@ void food_update(void)
 				if (IS_DARK(i->in_room) && !IS_NPC(i) && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
 					i->sendln("It's too dark to see if there's any potable liquid around!");
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", CMD_DEFAULT);
+					do_drink(i, "fountain");
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-					do_drink(i, food->name, CMD_DEFAULT);
+					do_drink(i, food->name);
 				else
 					i->sendln("You are out of drink.");
 			}
@@ -828,7 +825,7 @@ void point_update(void)
 		else if (!IS_NPC(i) && i->getLevel() < 1 && !i->desc)
 		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
-			do_quit(i, "", 666);
+			do_quit(i, "", cmd_t::SAVE_SILENTLY);
 		}
 	} /* for */
 }

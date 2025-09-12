@@ -60,7 +60,7 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
   }
 }
 
-int do_sacrifice(Character *ch, char *argument, int cmd)
+int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -150,7 +150,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_visible(Character *ch, char *argument, int cmd)
+int do_visible(Character *ch, char *argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -171,7 +171,7 @@ int do_visible(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_donate(Character *ch, char *argument, int cmd)
+int do_donate(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -247,7 +247,7 @@ int do_donate(Character *ch, char *argument, int cmd)
         move_char(ch, origin);
         move_obj(obj, location);
 
-        ch->save(0);
+        ch->save();
         return eSUCCESS;
       }
       else
@@ -328,11 +328,11 @@ int do_donate(Character *ch, char *argument, int cmd)
   move_char(ch, origin, false);
   move_obj(obj, location);
 
-  ch->save(0);
+  ch->save();
   return eSUCCESS;
 }
 
-int do_title(Character *ch, char *argument, int cmd)
+int do_title(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   int ctr;
@@ -383,7 +383,7 @@ int do_title(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
   {
@@ -438,13 +438,13 @@ command_return_t Character::do_toggle(QStringList arguments, int cmd)
 
   if (found_toggle.function_)
   {
-    return (this->*(found_toggle.function_))({}, CMD_DEFAULT);
+    return (this->*(found_toggle.function_))({}, cmd_t::DEFAULT);
   }
 
   return eSUCCESS;
 }
 
-int Character::do_config(QStringList arguments, int cmd)
+int Character::do_config(QStringList arguments, cmd_t cmd)
 {
   if (player->config == nullptr)
   {
@@ -610,7 +610,7 @@ int Character::do_config(QStringList arguments, int cmd)
   return eFAILURE;
 }
 
-command_return_t Character::do_brief(QStringList arguments, int cmd)
+command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -628,7 +628,7 @@ command_return_t Character::do_brief(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_ansi(QStringList arguments, int cmd)
+command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -646,7 +646,7 @@ command_return_t Character::do_ansi(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_vt100(QStringList arguments, int cmd)
+command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -664,7 +664,7 @@ command_return_t Character::do_vt100(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_compact(QStringList arguments, int cmd)
+command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -682,7 +682,7 @@ command_return_t Character::do_compact(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -702,7 +702,7 @@ command_return_t Character::do_summon_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -720,7 +720,7 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -744,7 +744,7 @@ command_return_t Character::do_guide_toggle(QStringList arguments, int cmd)
 
   return eSUCCESS;
 }
-command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -763,7 +763,7 @@ command_return_t Character::do_news_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -782,7 +782,7 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -801,7 +801,7 @@ command_return_t Character::do_damage_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -820,7 +820,7 @@ command_return_t Character::do_notax_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -839,7 +839,7 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, int cmd
   return eSUCCESS;
 }
 
-command_return_t Character::do_autoeat(QStringList arguments, int cmd)
+command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -857,7 +857,7 @@ command_return_t Character::do_autoeat(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_anonymous(QStringList arguments, int cmd)
+command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
 {
   if (level_ < 40)
   {
@@ -877,7 +877,7 @@ command_return_t Character::do_anonymous(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_wimpy(QStringList arguments, int cmd)
+command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_WIMPY))
   {
@@ -893,7 +893,7 @@ command_return_t Character::do_wimpy(QStringList arguments, int cmd)
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-command_return_t Character::do_pager(QStringList arguments, int cmd)
+command_return_t Character::do_pager(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_PAGER))
   {
@@ -907,7 +907,7 @@ command_return_t Character::do_pager(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
@@ -921,7 +921,7 @@ command_return_t Character::do_bard_song_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
+command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
@@ -935,7 +935,7 @@ command_return_t Character::do_nodupekeys_toggle(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_beep_set(QStringList arguments, int cmd)
+command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
   if (IS_NPC(this))
     return eFAILURE;
@@ -952,7 +952,7 @@ command_return_t Character::do_beep_set(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_stand(Character *ch, char *argument, int cmd)
+int do_stand(Character *ch, char *argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1004,7 +1004,7 @@ int do_stand(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sit(Character *ch, char *argument, int cmd)
+int do_sit(Character *ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1058,7 +1058,7 @@ int do_sit(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_rest(Character *ch, char *argument, int cmd)
+int do_rest(Character *ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1110,7 +1110,7 @@ int do_rest(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sleep(Character *ch, char *argument, int cmd)
+int do_sleep(Character *ch, char *argument, cmd_t cmd)
 {
   struct affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1199,7 +1199,7 @@ command_return_t Character::wake(Character *victim)
   return eSUCCESS;
 }
 
-command_return_t Character::do_wake(QStringList arguments, int cmd)
+command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 {
   Character *tmp_char{};
   QString arg1 = arguments.value(0);
@@ -1291,7 +1291,7 @@ command_return_t Character::do_wake(QStringList arguments, int cmd)
 // global tag var
 Character *tagged_person;
 
-int do_tag(Character *ch, char *argument, int cmd)
+int do_tag(Character *ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
   Character *victim;
@@ -1646,7 +1646,7 @@ CVoteData::~CVoteData()
 {
 }
 
-int do_vote(Character *ch, char *arg, int cmd)
+int do_vote(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vote;
@@ -1682,7 +1682,7 @@ int do_vote(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_random(Character *ch, char *argument, int cmd)
+int do_random(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;

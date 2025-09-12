@@ -1694,7 +1694,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   return;
 }
 
-int do_vend(Character *ch, char *argument, int cmd)
+int do_vend(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   Object *obj;

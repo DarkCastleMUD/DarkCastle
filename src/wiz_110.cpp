@@ -80,7 +80,7 @@ int get_max_stat_bonus(Character *ch, int attrs)
 }
 
 // List skill maxes.
-int do_maxes(Character *ch, char *argument, int cmd)
+int do_maxes(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   class_skill_defines *classskill;
@@ -132,7 +132,7 @@ int do_maxes(Character *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-command_return_t Character::do_bestow(QStringList arguments, int cmd)
+command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 {
   QString name = arguments.value(0);
   QString command = arguments.value(1);
@@ -205,7 +205,7 @@ command_return_t Character::do_bestow(QStringList arguments, int cmd)
 }
 
 // take away a command from a god
-int do_revoke(Character *ch, char *arg, int cmd)
+int do_revoke(Character *ch, char *arg, cmd_t cmd)
 {
   Character *vict = nullptr;
   char buf[MAX_INPUT_LENGTH];
@@ -279,7 +279,7 @@ int do_revoke(Character *ch, char *arg, int cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-int do_wizlock(Character *ch, char *argument, int cmd)
+int do_wizlock(Character *ch, char *argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
@@ -307,7 +307,7 @@ int do_wizlock(Character *ch, char *argument, int cmd)
 | Side effects: None
 | Returns: None
 */
-int do_chpwd(Character *ch, char *arg, int cmd)
+int do_chpwd(Character *ch, char *arg, cmd_t cmd)
 {
   Character *victim;
   char name[100], buf[50];
@@ -346,7 +346,7 @@ int do_chpwd(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_fakelog(Character *ch, char *argument, int cmd)
+int do_fakelog(Character *ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   char lev_str[MAX_INPUT_LENGTH];
@@ -377,7 +377,7 @@ int do_fakelog(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t Character::do_rename_char(QStringList arguments, int cmd)
+command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 {
   if (arguments.size() < 2)
   {
@@ -524,7 +524,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   auto rights = plr_rights(victim);
   victim->do_outcast(victim->getName().split(' '));
 
-  do_fsave(this, victim->getNameC(), CMD_DEFAULT);
+  do_fsave(this, victim->getNameC());
 
   // Copy the pfile
   QString buffer;
@@ -566,17 +566,17 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
   DC::getInstance()->TheAuctionHouse.HandleRename(this, victim->getNameC(), newname);
 
   // Get rid of the existing one
-  do_zap(victim->getName().split(' '), 10);
+  do_zap(victim->getName().split(' '), cmd_t::TRACK);
 
   // load the new guy
-  do_linkload(newname.split(' '), CMD_DEFAULT);
+  do_linkload(newname.split(' '), cmd_t::DEFAULT);
 
   if (!(victim = get_pc(newname)))
   {
     this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
     return eFAILURE;
   }
-  do_name(victim, " %", CMD_DEFAULT);
+  do_name(victim, " %");
 
   ClanMember *pmember = nullptr;
 
@@ -594,7 +594,7 @@ command_return_t Character::do_rename_char(QStringList arguments, int cmd)
 
   return eSUCCESS;
 }
-int do_install(Character *ch, char *arg, int cmd)
+int do_install(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[256], type[256], arg1[256], err[256], arg2[256];
   int range = 0, type_ok = 0, numrooms = 0;
@@ -695,7 +695,7 @@ int do_install(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_range(Character *ch, char *arg, int cmd)
+int do_range(Character *ch, char *arg, cmd_t cmd)
 {
   Character *victim;
   char name[160], buf[160];
@@ -802,7 +802,7 @@ int do_range(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_metastat(Character *ch, char *argument, int cmd)
+int do_metastat(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -848,7 +848,7 @@ int do_metastat(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_acfinder(Character *ch, char *argument, int cmdnum)
+int do_acfinder(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument, arg);
@@ -896,7 +896,7 @@ int do_acfinder(Character *ch, char *argument, int cmdnum)
   return eSUCCESS;
 }
 
-int do_testhit(Character *ch, char *argument, int cmd)
+int do_testhit(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -956,7 +956,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-int do_export(Character *ch, char *args, int cmdnum)
+int do_export(Character *ch, char *args, cmd_t cmd)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
   world_file_list_item *curr = DC::getInstance()->obj_file_list;
@@ -1010,7 +1010,7 @@ int do_export(Character *ch, char *args, int cmdnum)
   return eSUCCESS;
 }
 
-command_return_t do_world(Character *ch, std::string args, int cmd)
+command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
 {
 
   if (args == "rename")

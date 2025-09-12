@@ -196,7 +196,7 @@ void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
 
 AreaData areaData;
 
-int do_areastats(Character *ch, char *argument, int cmd)
+int do_areastats(Character *ch, char *argument, cmd_t cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 

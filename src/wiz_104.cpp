@@ -46,7 +46,7 @@ int count_rooms(int start, int end)
 	return count;
 }
 
-int do_thunder(Character *ch, char *argument, int cmd)
+int do_thunder(Character *ch, char *argument, cmd_t cmd)
 {
 	char buf1[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
@@ -65,7 +65,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 		ch->sendln("It's not gonna look that impressive...");
 	else
 	{
-		if (cmd == CMD_DEFAULT)
+		if (cmd == cmd_t::DEFAULT)
 			sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
 		else
 			sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
@@ -79,7 +79,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 				else
 					sprintf(buf3, "%s", GET_SHORT(ch));
 
-				if (cmd == CMD_DEFAULT)
+				if (cmd == cmd_t::DEFAULT)
 				{
 					sprintf(buf1, "$B$4%s thunders '%s'$R\n\r", buf3, argument);
 				}
@@ -94,7 +94,7 @@ int do_thunder(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_incognito(Character *ch, char *argument, int cmd)
+int do_incognito(Character *ch, char *argument, cmd_t cmd)
 {
 	if (IS_NPC(ch))
 		return eFAILURE;
@@ -114,7 +114,7 @@ int do_incognito(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_load(Character *ch, char *arg, int cmd)
+int do_load(Character *ch, char *arg, cmd_t cmd)
 {
 	char type[MAX_INPUT_LENGTH] = {0};
 	char name[MAX_INPUT_LENGTH] = {0};
@@ -135,12 +135,12 @@ int do_load(Character *ch, char *arg, int cmd)
 	if (IS_NPC(ch))
 		return eFAILURE;
 
-	if (!ch->has_skill(COMMAND_LOAD) && cmd == CMD_DEFAULT)
+	if (!ch->has_skill(COMMAND_LOAD) && cmd == cmd_t::DEFAULT)
 	{
 		ch->sendln("Huh?");
 		return eFAILURE;
 	}
-	if (!ch->has_skill(COMMAND_PRIZE) && cmd == CMD_PRIZE)
+	if (!ch->has_skill(COMMAND_PRIZE) && cmd == cmd_t::PRIZE)
 	{
 		ch->sendln("Huh?");
 		return eFAILURE;
@@ -148,13 +148,13 @@ int do_load(Character *ch, char *arg, int cmd)
 
 	half_chop(arg, type, arg2);
 
-	if (cmd == CMD_DEFAULT && (!*type || !*arg2))
+	if (cmd == cmd_t::DEFAULT && (!*type || !*arg2))
 	{
 		ch->sendln("Usage:  load <mob> <name|vnum> [qty]");
 		ch->sendln("        load <obj> <name|vnum> [qty] [random]");
 		return eFAILURE;
 	}
-	if (cmd == CMD_PRIZE && !*type)
+	if (cmd == cmd_t::PRIZE && !*type)
 	{
 
 		*buf = '\0';
@@ -183,7 +183,7 @@ int do_load(Character *ch, char *arg, int cmd)
 		return eFAILURE;
 	}
 
-	if (cmd == CMD_DEFAULT)
+	if (cmd == cmd_t::DEFAULT)
 	{
 		half_chop(arg2, name, arg3);
 
@@ -200,12 +200,12 @@ int do_load(Character *ch, char *arg, int cmd)
 		}
 	}
 
-	if (cmd == CMD_DEFAULT)
+	if (cmd == cmd_t::DEFAULT)
 		c = name;
 	else
 		c = type;
 
-	if (cmd == CMD_DEFAULT)
+	if (cmd == cmd_t::DEFAULT)
 	{
 		for (x = 0; x <= 2; x++)
 		{
@@ -268,12 +268,12 @@ int do_load(Character *ch, char *arg, int cmd)
 				ch->sendln("Why would you want to load that?");
 				return eFAILURE;
 			}
-			else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->name))
+			else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->name))
 			{
 				ch->sendln("This command can only load prize items.");
 				return eFAILURE;
 			}
-			else if (cmd != CMD_PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
+			else if (cmd != cmd_t::PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
 			{
 				ch->sendln("You may only load objects inside of your range.");
 				return eFAILURE;
@@ -314,7 +314,7 @@ int do_load(Character *ch, char *arg, int cmd)
 			ch->sendln("Why would you want to load that?");
 			return eFAILURE;
 		}
-		else if (cmd == CMD_PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
+		else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->name))
 		{
 			ch->sendln("This command can only load prize items.");
 			return eFAILURE;
@@ -326,7 +326,7 @@ int do_load(Character *ch, char *arg, int cmd)
 	return eSUCCESS;
 }
 
-int do_purge(Character *ch, char *argument, int cmd)
+int do_purge(Character *ch, char *argument, cmd_t cmd)
 {
 	Character *vict, *next_v;
 	class Object *obj, *next_o;
@@ -795,7 +795,7 @@ void show_legacy_files(Character *ch, world_file_list_item *head)
 	}
 }
 
-int do_show(Character *ch, char *argument, int cmd)
+int do_show(Character *ch, char *argument, cmd_t cmd)
 {
 	char name[MAX_INPUT_LENGTH], buf[200];
 	char beginrange[MAX_INPUT_LENGTH];
@@ -1783,7 +1783,7 @@ int do_show(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
+command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
 {
 	if (IS_NPC(ch) || ch == nullptr)
 	{
@@ -1821,7 +1821,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
-				do_look(victim, "", 15);
+				do_look(victim, "");
 			}
 		}
 
@@ -1848,13 +1848,13 @@ command_return_t do_transfer(Character *ch, std::string arguments, int cmd)
 	move_char(victim, destination_room);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
-	do_look(victim, "", 15);
+	do_look(victim, "");
 	ch->sendln("Ok.");
 
 	return eSUCCESS;
 }
 
-int do_teleport(Character *ch, char *argument, int cmd)
+int do_teleport(Character *ch, char *argument, cmd_t cmd)
 {
 	Character *victim, *target_mob, *pers;
 	char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
@@ -1943,13 +1943,13 @@ int do_teleport(Character *ch, char *argument, int cmd)
 	move_char(victim, target);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has teleported you!", ch, 0, (char *)victim, TO_VICT, 0);
-	do_look(victim, "", 15);
+	do_look(victim, "");
 	ch->sendln("Teleport completed.");
 
 	return eSUCCESS;
 } /* do_teleport */
 
-int do_gtrans(Character *ch, char *argument, int cmd)
+int do_gtrans(Character *ch, char *argument, cmd_t cmd)
 {
 	// class Connection *i;
 	Character *victim;
@@ -1983,7 +1983,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 		act("$n arrives from a puff of smoke.",
 			victim, 0, 0, TO_ROOM, 0);
 		act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
-		do_look(victim, "", 15);
+		do_look(victim, "");
 
 		if (victim->followers)
 			for (k = victim->followers; k; k = next_dude)
@@ -2000,7 +2000,7 @@ int do_gtrans(Character *ch, char *argument, int cmd)
 					act("$n arrives from a puff of smoke.",
 						k->follower, 0, 0, TO_ROOM, 0);
 					act("$n has transferred you!", ch, 0, k->follower, TO_VICT, 0);
-					do_look(k->follower, "", 15);
+					do_look(k->follower, "");
 				}
 			} /* for */
 		ch->sendln("Ok.");
@@ -2078,7 +2078,7 @@ void opstat(Character *ch, int vnum)
 	}
 }
 
-int do_opstat(Character *ch, char *argument, int cmd)
+int do_opstat(Character *ch, char *argument, cmd_t cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 	int vnum = -1;
@@ -2120,7 +2120,7 @@ void update_objprog_bits(int num)
 	}
 }
 
-int do_opedit(Character *ch, char *argument, int cmd)
+int do_opedit(Character *ch, char *argument, cmd_t cmd)
 {
 	int num = -1, vnum = -1, i = -1, a = -1;
 	char arg[MAX_INPUT_LENGTH];
@@ -2378,7 +2378,7 @@ int do_opedit(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_oclone(Character *ch, char *argument, int cmd)
+int do_oclone(Character *ch, char *argument, cmd_t cmd)
 {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	argument = one_argument(argument, arg1);
@@ -2407,7 +2407,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	{
 		char buf[30];
 		sprintf(buf, "new %d", v2);
-		int retval = do_oedit(ch, buf, CMD_DEFAULT);
+		int retval = do_oedit(ch, buf);
 		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
 		r1 = real_object(v1);
@@ -2455,7 +2455,7 @@ int do_oclone(Character *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_mclone(Character *ch, char *argument, int cmd)
+int do_mclone(Character *ch, char *argument, cmd_t cmd)
 {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	argument = one_argument(argument, arg1);
@@ -2484,7 +2484,7 @@ int do_mclone(Character *ch, char *argument, int cmd)
 	{
 		char buf[30];
 		sprintf(buf, "new %d", vdst);
-		int retval = do_medit(ch, buf, CMD_DEFAULT);
+		int retval = do_medit(ch, buf);
 		if (!isSet(retval, eSUCCESS))
 			return eFAILURE;
 		dst = real_mobile(vdst);

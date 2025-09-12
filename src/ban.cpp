@@ -115,7 +115,7 @@ void write_ban_list(void)
   return;
 }
 
-int do_ban(Character *ch, char *argument, int cmd)
+int do_ban(Character *ch, char *argument, cmd_t cmd)
 {
   char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
   int i;
@@ -213,7 +213,7 @@ int do_ban(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_unban(Character *ch, char *argument, int cmd)
+int do_unban(Character *ch, char *argument, cmd_t cmd)
 {
   char site[MAX_INPUT_LENGTH + 1];
   struct ban_list_element *ban_node, *temp;

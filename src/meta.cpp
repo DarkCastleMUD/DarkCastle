@@ -642,7 +642,7 @@ quint64 Character::meta_get_ki_plat_cost(void)
 	return static_cast<uint64_t>(cost * 0.9);
 }
 
-int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
+int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 			  Character *owner)
 {
 	char argument[MAX_INPUT_LENGTH];
@@ -656,7 +656,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 	int8_t *pstat = 0;
 	int pprice = 0;
 
-	if ((cmd != CMD_LIST) && (cmd != CMD_BUY) && (cmd != CMD_ESTIMATE))
+	if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY) && (cmd != cmd_t::ESTIMATE))
 		return eFAILURE;
 
 	if (IS_AFFECTED(ch, AFF_BLIND))
@@ -688,7 +688,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		ki_cost = ch->meta_get_ki_plat_cost();
 	}
 
-	if (cmd == CMD_ESTIMATE)
+	if (cmd == cmd_t::ESTIMATE)
 	{
 		// Estimate costs
 		char arg2[MAX_INPUT_LENGTH];
@@ -736,7 +736,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 		csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \n\r", platcost, expcost);
 		return eSUCCESS;
 	}
-	else if (cmd == CMD_LIST)
+	else if (cmd == cmd_t::LIST)
 	{ /* List */
 		ch->sendln("$B$2The Meta-physician tells you, 'This is what I can do for you...'$R ");
 
@@ -815,7 +815,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 
 		return eSUCCESS;
 	}
-	else if (cmd == CMD_BUY)
+	else if (cmd == cmd_t::BUY)
 	{ /* buy  */
 		one_argument(arg, argument);
 		if ((choice = atoi(argument)) == 0 || choice < 0)
@@ -1266,7 +1266,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
-			ch->save(10);
+			ch->save();
 
 			return eSUCCESS;
 		}
@@ -1288,7 +1288,7 @@ int meta_dude(Character *ch, class Object *obj, int cmd, const char *arg,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
-			ch->save(10);
+			ch->save();
 
 			return eSUCCESS;
 		}
@@ -1587,9 +1587,9 @@ char *Character::race_message(int race)
 	return &buf[0];
 }
 
-int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Character *owner)
+int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, Character *owner)
 {
-	if (cmd == 59) // list
+	if (cmd == cmd_t::LIST) // list
 	{
 		ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n");
 		ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
@@ -1629,7 +1629,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 
 		return eSUCCESS;
 	}
-	else if (cmd == 56) // buy
+	else if (cmd == cmd_t::BUY) // buy
 	{
 		char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 		argument = one_argument(argument, arg);
@@ -1844,7 +1844,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
-			ch->save(10);
+			ch->save();
 
 			return eSUCCESS;
 		}
@@ -1871,7 +1871,7 @@ int cardinal(Character *ch, class Object *obj, int cmd, const char *argument, Ch
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, DC::LogChannel::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
-			ch->save(10);
+			ch->save();
 
 			return eSUCCESS;
 		}

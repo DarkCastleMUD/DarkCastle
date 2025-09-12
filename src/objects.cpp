@@ -164,7 +164,7 @@ void object_activity(uint64_t pulse_type)
 
     if (DC::getInstance()->obj_index[item_number].non_combat_func)
     {
-      DC::getInstance()->obj_index[item_number].non_combat_func(nullptr, obj, 0, "", nullptr);
+      DC::getInstance()->obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
@@ -206,7 +206,7 @@ void name_from_drinkcon(class Object *obj)
   }
 }
 
-int do_switch(Character *ch, char *arg, int cmd)
+int do_switch(Character *ch, char *arg, cmd_t cmd)
 {
   class Object *between;
 
@@ -249,7 +249,7 @@ int do_switch(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_quaff(Character *ch, char *argument, int cmd)
+int do_quaff(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -350,7 +350,7 @@ int do_quaff(Character *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_recite(Character *ch, char *argument, int cmd)
+int do_recite(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *scroll, *obj;
@@ -583,7 +583,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   for (int i = 0; i < 4; i++)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
-  do_say(ch, "Fire in the hole!", CMD_DEFAULT);
+  do_say(ch, "Fire in the hole!");
   act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
   ch->sendln("You set off the device with a loud bang.");
 
@@ -674,7 +674,7 @@ void set_utility_item(Character *ch, class Object *obj, char *argument)
   extract_obj(obj);
 }
 
-int do_mortal_set(Character *ch, char *argument, int cmd)
+int do_mortal_set(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *obj = nullptr;
   char arg[MAX_INPUT_LENGTH];
@@ -710,7 +710,7 @@ int do_mortal_set(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_use(Character *ch, char *argument, int cmd)
+int do_use(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   char targ[MAX_INPUT_LENGTH + 1];
@@ -820,7 +820,7 @@ int do_use(Character *ch, char *argument, int cmd)
 }
 
 // Allows a player to change his "name" (short_desc) (Sadus)
-int do_name(Character *ch, char *arg, int cmd)
+int do_name(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[200];
   char _convert[2];
@@ -912,7 +912,7 @@ int do_name(Character *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_drink(Character *ch, char *argument, int cmd)
+int do_drink(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -1064,7 +1064,7 @@ int do_drink(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_eat(Character *ch, char *argument, int cmd)
+int do_eat(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
   class Object *temp;
@@ -1129,7 +1129,7 @@ int do_eat(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pour(Character *ch, char *argument, int cmd)
+int do_pour(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -1247,7 +1247,7 @@ int do_pour(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sip(Character *ch, char *argument, int cmd)
+int do_sip(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -1310,7 +1310,7 @@ int do_sip(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_taste(Character *ch, char *argument, int cmd)
+int do_taste(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   class Object *temp;
@@ -1331,7 +1331,7 @@ int do_taste(Character *ch, char *argument, int cmd)
 
   if (temp->obj_flags.type_flag == ITEM_DRINKCON)
   {
-    return do_sip(ch, argument, 0);
+    return do_sip(ch, argument);
   }
 
   if (!(temp->obj_flags.type_flag == ITEM_FOOD))
@@ -2005,7 +2005,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
         ch->sendln("Sorry, charmies can't wield stuff anymore:(");
-        do_say(ch, "I'm sorry my master, I lack the dexterity.", 0);
+        do_say(ch, "I'm sorry my master, I lack the dexterity.");
       }
       else
       {
@@ -2246,7 +2246,7 @@ int Object::keywordfind(void)
   return keyword;
 }
 
-int do_wear(Character *ch, char *argument, int cmd)
+int do_wear(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2343,7 +2343,7 @@ int do_wear(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wield(Character *ch, char *argument, int cmd)
+int do_wield(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2393,7 +2393,7 @@ int do_wield(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_grab(Character *ch, char *argument, int cmd)
+int do_grab(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2487,7 +2487,7 @@ int Character::hands_are_free(int number)
     return (0);
 }
 
-int do_remove(Character *ch, char *argument, int cmd)
+int do_remove(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   class Object *obj_object;

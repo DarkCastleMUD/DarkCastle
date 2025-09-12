@@ -1359,7 +1359,7 @@ int Leaderboard::pdscore(Character *ch)
  things, otherwise renames will crash the server hard.
  */
 
-int do_leaderboard(Character *ch, char *argument, int cmd)
+int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 {
 	class Connection *d;
 	FILE *fl;

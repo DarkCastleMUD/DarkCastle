@@ -646,7 +646,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 
       if (tmp_char->fighting)
       {
-        do_say(tmp_char, "Screw this! I'm going home!", CMD_DEFAULT);
+        do_say(tmp_char, "Screw this! I'm going home!");
         if (tmp_char->fighting->fighting == tmp_char)
           stop_fighting(tmp_char->fighting);
 
@@ -1140,13 +1140,13 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
       "from Above.",
       "\n"};
 
-  int to_charge[6] = {
-      3,
-      4,
-      1,
-      2,
-      6,
-      5};
+  cmd_t to_charge[6] = {
+      cmd_t::SOUTH,
+      cmd_t::WEST,
+      cmd_t::NORTH,
+      cmd_t::EAST,
+      cmd_t::DOWN,
+      cmd_t::UP};
 
   // do room caster is in
   ch->sendln("A Bright light comes down from the heavens.");
@@ -1746,7 +1746,7 @@ int spell_teleport(uint8_t level, Character *ch, Character *victim, class Object
   move_char(victim, to_room);
   act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
 
-  do_look(victim, "", 0);
+  do_look(victim, "");
   return eSUCCESS;
 }
 
@@ -1911,7 +1911,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
 
   // Finish off any singing performances (bard)
   if (IS_SINGING(victim))
-    do_sing(victim, "stop", CMD_DEFAULT);
+    do_sing(victim, "stop");
 
   act("$n seems to be paralyzed!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   victim->sendln("Your entire body rebels against you and you are paralyzed!");
@@ -4303,7 +4303,7 @@ int spell_word_of_recall(uint8_t level, Character *ch, Character *victim, class 
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   move_char(victim, location);
   act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  do_look(victim, "", 15);
+  do_look(victim, "");
   return eSUCCESS;
 }
 
@@ -4349,7 +4349,7 @@ int spell_wizard_eye(uint8_t level, Character *ch, Character *victim, class Obje
 
   move_char(ch, target, false);
   ch->sendln("A vision forms in your mind... ");
-  do_look(ch, "", 15);
+  do_look(ch, "");
   move_char(ch, original_loc);
   return eSUCCESS;
 }
@@ -4398,7 +4398,7 @@ int spell_eagle_eye(uint8_t level, Character *ch, Character *victim, class Objec
 
   move_char(ch, target, false);
   ch->sendln("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...");
-  do_look(ch, "", 15);
+  do_look(ch, "");
   move_char(ch, original_loc);
   return eSUCCESS;
 }
@@ -4488,7 +4488,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   move_char(victim, target);
   act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
-  do_look(victim, "", 15);
+  do_look(victim, "");
 
   if (IS_NPC(victim) && victim->getLevel() >= ch->getLevel())
   {
@@ -4501,7 +4501,7 @@ int spell_summon(uint8_t level, Character *ch, Character *victim, class Object *
   {
     act("$n freaks shit.", victim, 0, 0, TO_ROOM, 0);
     victim->add_memory(GET_NAME(ch), 'f');
-    do_flee(victim, "", 0);
+    do_flee(victim, "");
   }
   return eSUCCESS;
 }
@@ -5139,7 +5139,7 @@ int spell_fear(uint8_t level, Character *ch, Character *victim,
   }
 
   victim->sendln("You suddenly feel very frightened, and you attempt to flee!");
-  do_flee(victim, "", 151);
+  do_flee(victim, "", cmd_t::FEAR);
 
   return eSUCCESS;
 }
@@ -11744,7 +11744,7 @@ int cast_call_follower(uint8_t level, Character *ch, char *arg, int type, Charac
   move_char(victim, ch->in_room);
   act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
-  do_look(victim, "", 15);
+  do_look(victim, "");
 
   if (!OUTSIDE(ch))
   {
@@ -12560,13 +12560,13 @@ int spell_beacon(uint8_t level, Character *ch, char *arg, int type, Character *v
     ch->sendln("Failure in move_char.  Major fuckup.  Contact a god.");
     return eFAILURE;
   }
-  do_look(ch, "", CMD_DEFAULT);
+  do_look(ch, "");
 
   act("$n steps out from a dimensional rip.", ch, 0, 0, TO_ROOM, 0);
   return eSUCCESS;
 }
 
-int do_beacon(Character *ch, char *argument, int cmd)
+int do_beacon(Character *ch, char *argument, cmd_t cmd)
 {
   class Object *new_obj = nullptr;
   if (IS_NPC(ch))

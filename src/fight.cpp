@@ -282,7 +282,7 @@ void perform_violence(void)
       {
         if ((DC::getInstance()->mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
         {
-          retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, 0, "", ch));
+          retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval))
             continue;
           // Check if we're still fighting someone
@@ -584,8 +584,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       remove_memory(vict, 't');
       stop_fighting(vict);
     }
-    do_say(ch, std::string("I'm sorry my fellow mob, I have seen the error of my ways."), 0);
-    do_say(vict, std::string("It is okay my friend, let's go have a beer."), 0);
+    do_say(ch, std::string("I'm sorry my fellow mob, I have seen the error of my ways."));
+    do_say(vict, std::string("It is okay my friend, let's go have a beer."));
     return eFAILURE;
   }
 
@@ -1459,7 +1459,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (ch == vict)
   {
-    do_say(ch, "What the hell am I DOING?!?!", CMD_DEFAULT);
+    do_say(ch, "What the hell am I DOING?!?!");
     stop_fighting(ch);
     return eFAILURE;
   }
@@ -1626,7 +1626,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
       if (ch->equipment[weapon] && DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
+        retval = ((*DC::getInstance()->obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], cmd_t::UNDEFINED, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1644,7 +1644,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
         if (DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
-          retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
+          retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], cmd_t::UNDEFINED, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1662,7 +1662,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         if (ch->equipment[HOLD]->item_number >= 0)
         {
           if (DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func != nullptr)
-            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -1682,7 +1682,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
         if (ch->equipment[HOLD2]->item_number >= 0)
         {
           if (DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func != nullptr)
-            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
+            retval = ((*DC::getInstance()->obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval) || !ch->fighting)
           {
             return debug_retval(ch, vict, retval) | eSUCCESS;
@@ -5666,7 +5666,7 @@ void raw_kill(Character *ch, Character *victim)
                      victim);
         char name[100];
         strncpy(name, victim->getNameC(), 100);
-        do_quit(victim, "", 666);
+        do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
         remove_vault(name, CONDEATH);
@@ -5713,7 +5713,7 @@ void raw_kill(Character *ch, Character *victim)
 
         char name[100];
         strncpy(name, victim->getNameC(), 100);
-        do_quit(victim, "", 666);
+        do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
         remove_vault(name, CONDEATH);
@@ -5740,7 +5740,7 @@ void raw_kill(Character *ch, Character *victim)
 
         char name[100];
         strncpy(name, victim->getNameC(), 100);
-        do_quit(victim, "", 666);
+        do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
         remove_vault(name, CONDEATH);
@@ -5773,7 +5773,7 @@ void raw_kill(Character *ch, Character *victim)
                      victim);
         char name[100];
         strncpy(name, victim->getNameC(), 100);
-        do_quit(victim, "", 666);
+        do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
         remove_vault(name, CONDEATH);
@@ -5817,7 +5817,7 @@ void raw_kill(Character *ch, Character *victim)
 
         char name[100];
         strncpy(name, victim->getNameC(), 100);
-        do_quit(victim, "", 666);
+        do_quit(victim, "", cmd_t::SAVE_SILENTLY);
 
         remove_familiars(name, CONDEATH);
         remove_vault(name, CONDEATH);
@@ -7091,7 +7091,7 @@ int can_be_attacked(Character *ch, Character *vict)
       return false;
     if (vict->getLevel() < 5)
     {
-      do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
+      do_say(ch, "I'm sorry master, I cannot do that.");
       return eFAILURE;
     }
   }
@@ -7438,7 +7438,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
               (!isSet(victim->combat, COMBAT_BASH1)) &&
               (!isSet(victim->combat, COMBAT_BASH2)) &&
               (dam > 0))
-            do_flee(victim, "", 0);
+            do_flee(victim, "");
           return;
         } // end of if ACT_WIMPY
       } // end of if npc
@@ -7452,7 +7452,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
               (!isSet(victim->combat, COMBAT_BASH1)) &&
               (!isSet(victim->combat, COMBAT_BASH2)) &&
               (dam > 0))
-            do_flee(victim, "", 0);
+            do_flee(victim, "");
           return;
         }
       } // end else
@@ -7481,7 +7481,7 @@ int is_fighting_mob(Character *ch)
   return 0;
 }
 
-int do_flee(Character *ch, char *argument, int cmd)
+int do_flee(Character *ch, char *argument, cmd_t cmd)
 {
   int i, attempt, retval, escape = 0;
   Character *chTemp, *loop_ch, *vict = nullptr;
@@ -7489,7 +7489,7 @@ int do_flee(Character *ch, char *argument, int cmd)
   if (is_stunned(ch))
     return eFAILURE;
 
-  if (cmd == CMD_ESCAPE)
+  if (cmd == cmd_t::ESCAPE)
   {
     if (IS_PC(ch) && !(escape = ch->has_skill(SKILL_ESCAPE)))
     {
@@ -7524,7 +7524,7 @@ int do_flee(Character *ch, char *argument, int cmd)
   }
 
   if (GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
-    do_sing(ch, "stop", CMD_DEFAULT);
+    do_sing(ch, "stop");
 
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
@@ -7577,7 +7577,7 @@ int do_flee(Character *ch, char *argument, int cmd)
 
           // Since the move stops the fight between ch and ch->fighting we have to check_pursuit
           // against it separate than the combat_list loop
-          if (cmd == CMD_FLEE && last_fighting)
+          if (cmd == cmd_t::FLEE && last_fighting)
           {
             last_fighting->check_pursuit(ch, tempcommand);
           }
@@ -7589,7 +7589,7 @@ int do_flee(Character *ch, char *argument, int cmd)
             if (chTemp->fighting == ch && chTemp->in_room != ch->in_room)
             {
               stop_fighting(chTemp);
-              if (cmd == CMD_FLEE)
+              if (cmd == cmd_t::FLEE)
                 chTemp->check_pursuit(ch, tempcommand);
             }
           } // for
@@ -7848,7 +7848,7 @@ command_return_t Character::tell(Character *victim, QString message)
 {
   if (victim && !message.isEmpty())
   {
-    return do_tell((victim->getName() + " " + message).split(' '), CMD_TELL);
+    return do_tell((victim->getName() + " " + message).split(' '), cmd_t::TELL);
   }
   return eFAILURE;
 }

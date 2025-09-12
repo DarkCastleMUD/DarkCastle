@@ -11,7 +11,7 @@
 #include "DC/returnvals.h"
 #include "DC/interp.h"
 
-command_return_t Character::do_alias(QStringList arguments, int cmd)
+command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 {
   if (!player)
   {

@@ -92,7 +92,7 @@ void free_player(player_data *plr)
    }
    if (plr->ch && charExists(plr->ch) && IS_PC(plr->ch))
    {
-      plr->ch->save(666);
+      plr->ch->save(cmd_t::SAVE_SILENTLY);
    }
    if (tbl->cr == plr)
    {
@@ -1121,7 +1121,7 @@ void blackjack_prompt(Character *ch, std::string &prompt, bool ascii)
    }
 }
 
-int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
+int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                     Character *invoker)
 {
    bool showColor = false;
@@ -1132,7 +1132,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
 
    char arg1[MAX_INPUT_LENGTH];
    arg = one_argument(arg, arg1);
-   if (cmd < 189 || cmd > 194)
+   if (!isCommandTypeCasino(cmd))
    {
       return eFAILURE;
    }
@@ -1150,7 +1150,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
 
    player_data *plr = getPlayer(ch, obj->table);
 
-   if (cmd == 189) // bet
+   if (cmd == cmd_t::BET) // bet
    {
       if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
       {
@@ -1245,7 +1245,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       }
       return eSUCCESS;
    }
-   else if (cmd == 190) // insurance
+   else if (cmd == cmd_t::INSURANCE) // insurance
    {
       if (!plr)
       {
@@ -1279,7 +1279,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       ch->sendln("You make an insurance bet.");
       return eSUCCESS;
    }
-   else if (cmd == 191) // doubledown
+   else if (cmd == cmd_t::DOUBLE) // doubledown
    {
       if (!plr)
       {
@@ -1340,7 +1340,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       //     pulse_table_bj(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 192) // stand
+   else if (cmd == cmd_t::STAY) // stand
    {
       if (!plr)
       {
@@ -1359,7 +1359,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       nextturn(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 193) // split
+   else if (cmd == cmd_t::SPLIT) // split
    {
       if (!plr)
       {
@@ -1396,7 +1396,7 @@ int blackjack_table(Character *ch, class Object *obj, int cmd, const char *arg,
       pulse_table_bj(plr->table);
       return eSUCCESS;
    }
-   else if (cmd == 194) // hit
+   else if (cmd == cmd_t::HIT) // hit
    {
       if (!plr)
       {
@@ -1795,7 +1795,7 @@ int handcompare(int hand1[5], int hand2[5])
    return -1;
 }
 
-int do_testhand(Character *ch, char *argument, int cmd)
+int do_testhand(Character *ch, char *argument, cmd_t cmd)
 {
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);
@@ -2231,11 +2231,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
    save_slot_machines();
 }
 
-int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character *invoker)
+int slot_machine(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
    char buf[MAX_STRING_LENGTH];
 
-   if (cmd != 186 && cmd != 189 && cmd != 185) // pull or bet or push
+   if (cmd != cmd_t::PULL && cmd != cmd_t::BET && cmd != cmd_t::PUSH) // pull or bet or push
       return eFAILURE;
    if (!ch || IS_NPC(ch))
       return eFAILURE;
@@ -2248,7 +2248,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
 
    one_argument(arg, buf);
 
-   if (cmd == 186 && strcmp(buf, "handle"))
+   if (cmd == cmd_t::PULL && strcmp(buf, "handle"))
    {
       ch->sendln("Try pulling the handle.");
       return eSUCCESS;
@@ -2263,7 +2263,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eSUCCESS;
    }
 
-   if (cmd == 189)
+   if (cmd == cmd_t::BET)
    {
       if (atoi(buf) >= 1 && atoi(buf) <= 5)
       {
@@ -2284,7 +2284,7 @@ int slot_machine(Character *ch, Object *obj, int cmd, const char *arg, Character
       return eSUCCESS;
    }
 
-   if (cmd == 185)
+   if (cmd == cmd_t::PUSH)
    {
       if (obj->slot->button)
       {
@@ -2656,7 +2656,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
    }
 }
 
-int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int roulette_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32_t bet = 0;
@@ -2664,7 +2664,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
    bool playing = false;
    arg = one_argument(arg, arg1);
    arg = one_argument(arg, arg2);
-   if (cmd != 189)
+   if (cmd != cmd_t::BET)
       return eFAILURE;
    if (!ch || IS_NPC(ch))
       return eFAILURE; // craziness
@@ -2716,7 +2716,7 @@ int roulette_table(Character *ch, class Object *obj, int cmd, const char *arg, C
       }
    }
 
-   if (cmd == 189) // bet
+   if (cmd == cmd_t::BET) // bet
    {
       if (!*arg2)
       {

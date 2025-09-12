@@ -17,8 +17,9 @@
 #include "DC/fileinfo.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
+#include "DC/common.h"
 
-int do_clearaff(Character *ch, char *argument, int cmd)
+int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
@@ -63,7 +64,7 @@ int do_clearaff(Character *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_reloadhelp(Character *ch, char *argument, int cmd)
+int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
 {
   extern FILE *help_fl;
   extern struct help_index_element *help_index;
@@ -80,7 +81,7 @@ int do_reloadhelp(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_log(Character *ch, char *argument, int cmd)
+int do_log(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   class Object *dummy;
@@ -122,7 +123,7 @@ int do_log(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_showbits(Character *ch, char *argument, int cmd)
+int do_showbits(Character *ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   Character *victim;
@@ -229,7 +230,7 @@ int do_showbits(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_debug(Character *ch, char *args, int cmd)
+int do_debug(Character *ch, char *args, cmd_t cmd)
 {
   std::string arg1, arg2, arg3;
   std::string remainder;
@@ -372,7 +373,7 @@ int do_debug(Character *ch, char *args, int cmd)
   return eSUCCESS;
 }
 
-int do_pardon(Character *ch, char *argument, int cmd)
+int do_pardon(Character *ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   char flag[MAX_INPUT_LENGTH];
@@ -437,7 +438,7 @@ int do_pardon(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_dmg_eq(Character *ch, char *argument, int cmd)
+int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *obj_object;
@@ -506,7 +507,7 @@ struct skill_quest *find_sq(int sq)
   return nullptr;
 }
 
-int do_sqedit(Character *ch, char *argument, int cmd)
+int do_sqedit(Character *ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument, command);
@@ -748,7 +749,7 @@ int wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-int do_eqmax(Character *ch, char *argument, int cmd)
+int do_eqmax(Character *ch, char *argument, cmd_t cmd)
 {
   Character *vict;
   char arg[MAX_INPUT_LENGTH];
@@ -865,9 +866,8 @@ int do_eqmax(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_reload(Character *ch, char *argument, int cmd)
+int do_reload(Character *ch, char *argument, cmd_t cmd)
 {
-  int do_reload_help(Character * ch, char *argument, int cmd);
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
   extern char new_help[MAX_STRING_LENGTH];
@@ -918,7 +918,7 @@ int do_reload(Character *ch, char *argument, int cmd)
     file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
   else if (!str_cmp(arg, "xhelp"))
   {
-    do_reload_help(ch, 0, 0);
+    do_reload_help(ch, str_hsh(""));
     ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "greetings"))
@@ -942,7 +942,7 @@ int do_reload(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listproc(Character *ch, char *argument, int a)
+int do_listproc(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int start, i, end, tot;

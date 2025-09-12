@@ -241,7 +241,7 @@ char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
 
 char *imm_vault_usage = "        vault <stats> [name]\r\n";
 
-int do_vault(Character *ch, char *argument, int cmd)
+int do_vault(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
@@ -2381,10 +2381,10 @@ void logvault(QString message, QString name)
   // system(cmd);
 }
 
-int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
+int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                      Character *owner)
 {
-  if (cmd != 59 && cmd != 56)
+  if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return eFAILURE;
   if (IS_NPC(ch))
     return eFAILURE;
@@ -2393,7 +2393,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, int cmd, const char *arg,
 
   struct vault_data *vault = has_vault(GET_NAME(ch));
   struct vault_data *cvault = ch->clan ? has_vault(clanVName(ch->clan).toStdString().c_str()) : 0;
-  if (cmd == 59)
+  if (cmd == cmd_t::LIST)
   {
     if (!vault)
     {

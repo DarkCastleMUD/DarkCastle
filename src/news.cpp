@@ -147,7 +147,7 @@ const char *newsify(char *string)
   //  return str_dup(tmp);
 }
 
-int do_news(Character *ch, char *argument, int cmd)
+int do_news(Character *ch, char *argument, cmd_t cmd)
 {
   bool up;
   if (IS_NPC(ch))
@@ -189,7 +189,7 @@ int do_news(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_addnews(Character *ch, char *argument, int cmd)
+int do_addnews(Character *ch, char *argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))
@@ -220,7 +220,7 @@ int do_addnews(Character *ch, char *argument, int cmd)
     struct tm tmptime;
     if (strptime(arg, "%d/%m/%y", &tmptime) == nullptr)
     {
-      do_addnews(ch, "", 9);
+      do_addnews(ch, "");
       return eFAILURE;
     }
     tmptime.tm_sec = 0;

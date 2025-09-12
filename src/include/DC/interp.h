@@ -48,7 +48,7 @@ void update_max_who(void);
 bool is_abbrev(QString abbrev, QString word);
 // bool is_abbrev(const std::string &abbrev, const std::string &word);
 // bool is_abbrev(const char *arg1, const char *arg2);
-void add_command_lag(Character *ch, int cmdnum, int lag);
+void add_command_lag(Character *ch, cmd_t cmd, int lag);
 std::string ltrim(std::string str);
 std::string rtrim(std::string str);
 
@@ -60,7 +60,7 @@ std::string rtrim(std::string str);
 /*
  * Command functions.
  */
-typedef int DO_FUN(Character *ch, char *argument, int cmd);
+typedef int DO_FUN(Character *ch, char *argument, cmd_t cmd);
 typedef int command_return_t;
 
 #endif

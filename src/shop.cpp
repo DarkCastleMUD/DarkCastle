@@ -61,9 +61,9 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   // If not, let's use the AFF bit for something useful....
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
-    do_say(keeper, "Go away before I call the guards!!", 0);
+    do_say(keeper, "Go away before I call the guards!!");
     sprintf(buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch));
-    do_shout(keeper, buf, 0);
+    do_shout(keeper, buf);
     return false;
   }
 
@@ -72,7 +72,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
    */
   if (!CAN_SEE(keeper, ch))
   {
-    do_say(keeper, "I don't trade with someone I can't see!", 0);
+    do_say(keeper, "I don't trade with someone I can't see!");
     return false;
   }
 
@@ -81,7 +81,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
    */
   if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open1)
   {
-    do_say(keeper, "Come back later!", 0);
+    do_say(keeper, "Come back later!");
     return false;
   }
 
@@ -91,7 +91,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   }
   else if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open2)
   {
-    do_say(keeper, "Come back later!", 0);
+    do_say(keeper, "Come back later!");
     return false;
   }
   else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close2)
@@ -100,7 +100,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   }
   else
   {
-    do_say(keeper, "Sorry, come back tomorrow.", 0);
+    do_say(keeper, "Sorry, come back tomorrow.");
     return false;
   }
 
@@ -257,7 +257,7 @@ void shopping_buy(const char *arg, Character *ch,
     obj_from_char(obj);
 
   obj_to_char(obj, ch);
-  ch->save(666);
+  ch->save(cmd_t::SAVE_SILENTLY);
 
   return;
 }
@@ -362,7 +362,7 @@ void shopping_sell(const char *arg, Character *ch,
   else
     move_obj(obj, keeper);
 
-  ch->save(666);
+  ch->save(cmd_t::SAVE_SILENTLY);
 
   return;
 }
@@ -412,7 +412,7 @@ void shopping_value(const char *arg, Character *ch,
     {
       act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
       act("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, TO_ROOM, 0);
-      do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
+      do_emote(keeper, "looks carefully at the item.");
     }
     if (GET_ITEM_TYPE(obj) == ITEM_WEAPON)
     {
@@ -421,34 +421,34 @@ void shopping_value(const char *arg, Character *ch,
         sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "and it can be wielded by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
           }
           if (obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
           }
         }
       }
       else
-        do_say(keeper, "This weapon is unknown to me.", CMD_DEFAULT);
+        do_say(keeper, "This weapon is unknown to me.");
     }
     else
-      do_say(keeper, "I'm a weapons expert, that is all.", CMD_DEFAULT);
+      do_say(keeper, "I'm a weapons expert, that is all.");
   }
   if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3004)
   { // if the armourer in town
@@ -461,7 +461,7 @@ void shopping_value(const char *arg, Character *ch,
     {
       act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
       act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
-      do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
+      do_emote(keeper, "looks carefully at the item.");
     }
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     {
@@ -470,29 +470,29 @@ void shopping_value(const char *arg, Character *ch,
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
             if (obj->affected[i].modifier < 0)
-              do_say(keeper, "Don't worry, this is a good thing.", CMD_DEFAULT);
+              do_say(keeper, "Don't worry, this is a good thing.");
           }
         }
       }
       else
-        do_say(keeper, "This armor is crafted using too advanced techniques for me.", CMD_DEFAULT);
+        do_say(keeper, "This armor is crafted using too advanced techniques for me.");
     }
     else
-      do_say(keeper, "I deal with armor exclusively.", CMD_DEFAULT);
+      do_say(keeper, "I deal with armor exclusively.");
   }
   if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3000)
   { // if the wizard in town
@@ -505,14 +505,14 @@ void shopping_value(const char *arg, Character *ch,
     {
       act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
       act("$n holds up $p for the Wizard to examine.", ch, obj, 0, TO_ROOM, 0);
-      do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
+      do_emote(keeper, "looks carefully at the item.");
     }
     if (GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF)
     {
       if (obj->obj_flags.value[0] < 20)
       {
         sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
           if (obj->obj_flags.value[3] >= 1)
@@ -520,14 +520,14 @@ void shopping_value(const char *arg, Character *ch,
             sprintf(buf, "It is eminating the aura of ");
             sprinttype(obj->obj_flags.value[3] - 1, spells, buf2);
             strcat(buf, buf2);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
           }
           if (obj->obj_flags.value[1] == obj->obj_flags.value[2])
-            do_say(keeper, "It's fully charged as well.", CMD_DEFAULT);
+            do_say(keeper, "It's fully charged as well.");
           else if (obj->obj_flags.value[2] == 0)
-            do_say(keeper, "Though unfortunately, there are no more charges left.", CMD_DEFAULT);
+            do_say(keeper, "Though unfortunately, there are no more charges left.");
           else
-            do_say(keeper, "It looks like it has been used some.", CMD_DEFAULT);
+            do_say(keeper, "It looks like it has been used some.");
         }
         else
         {
@@ -536,19 +536,19 @@ void shopping_value(const char *arg, Character *ch,
             sprintf(buf, "I can easily identify the signatures of ");
             sprinttype(obj->obj_flags.value[1] - 1, spells, buf2);
             strcat(buf, buf2);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
           }
           if (obj->obj_flags.value[2] >= 1)
           {
-            do_say(keeper, "There are more enchantments held within, but I'm rather busy.", CMD_DEFAULT);
+            do_say(keeper, "There are more enchantments held within, but I'm rather busy.");
           }
         }
       }
       else
-        do_say(keeper, "This item contains magics too powerful for me to discern.", CMD_DEFAULT);
+        do_say(keeper, "This item contains magics too powerful for me to discern.");
     }
     else
-      do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", CMD_DEFAULT);
+      do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
   if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
@@ -562,29 +562,29 @@ void shopping_value(const char *arg, Character *ch,
         sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-        do_say(keeper, buf, CMD_DEFAULT);
+        do_say(keeper, buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf, CMD_DEFAULT);
+            do_say(keeper, buf);
             if (obj->affected[i].modifier < 0)
-              do_say(keeper, "Don't worry, this is a good thing.", CMD_DEFAULT);
+              do_say(keeper, "Don't worry, this is a good thing.");
           }
         }
       }
       else
-        do_say(keeper, "This armor is crafted using too advanced techniques for me.", CMD_DEFAULT);
+        do_say(keeper, "This armor is crafted using too advanced techniques for me.");
     }
     else
-      do_say(keeper, "I don't know anything about this item, actually.", CMD_DEFAULT);
+      do_say(keeper, "I don't know anything about this item, actually.");
   }
 
   if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
@@ -679,7 +679,7 @@ void shopping_list(const char *arg, Character *ch,
 
 // Spec proc for shop keepers.
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
-int shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
   Character *keeper;
   int shop_nr;
@@ -720,16 +720,16 @@ LFound2:
   {
   default:
     return eFAILURE;
-  case 56:
+  case cmd_t::BUY:
     shopping_buy(arg, ch, keeper, shop_nr);
     break;
-  case 57:
+  case cmd_t::SELL:
     shopping_sell(arg, ch, keeper, shop_nr);
     break;
-  case 58:
+  case cmd_t::VALUE:
     shopping_value(arg, ch, keeper, shop_nr);
     break;
-  case 59:
+  case cmd_t::LIST:
     shopping_list(arg, ch, keeper, shop_nr);
     break;
   }
@@ -1407,7 +1407,7 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
     ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(QString::number(shop->money_on_hand)));
 }
 
-int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *invoker)
+int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
   Character *keeper;
 
@@ -1422,25 +1422,25 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
 
   switch (cmd)
   {
-  case 174:
+  case cmd_t::WITHDRAW:
     player_shopping_withdraw(arg, ch, keeper);
     break;
-  case 62:
+  case cmd_t::DESIGN:
     player_shopping_design(arg, ch, keeper);
     break;
-  case 61:
+  case cmd_t::STOCK:
     player_shopping_stock(arg, ch, keeper);
     break;
-  case 56:
+  case cmd_t::BUY:
     player_shopping_buy(arg, ch, keeper);
     break;
-  case 57:
+  case cmd_t::SELL:
     player_shopping_sell(arg, ch, keeper);
     break;
-  case 58:
+  case cmd_t::VALUE:
     player_shopping_value(arg, ch, keeper);
     break;
-  case 59:
+  case cmd_t::LIST:
     player_shopping_list(arg, ch, keeper);
     break;
   default:
@@ -1450,7 +1450,7 @@ int player_shop_keeper(Character *ch, class Object *obj, int cmd, const char *ar
   return eSUCCESS;
 }
 /*
-int do_pshopedit(Character * ch, char * arg, int cmd)
+int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
@@ -1614,9 +1614,9 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
     {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0, 0},
     {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0, 0}};
 
-int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg, Character *owner)
+int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  if (cmd != CMD_LIST && cmd != CMD_BUY)
+  if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
@@ -1628,7 +1628,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (cmd == CMD_LIST)
+  if (cmd == cmd_t::LIST)
   {
     csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
     ch->sendln("  | Item                              | Cost                                   |");
@@ -1718,7 +1718,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
     */
     return eSUCCESS;
   }
-  else if (cmd == CMD_BUY)
+  else if (cmd == cmd_t::BUY)
   {
     char arg1[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -1800,7 +1800,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
         else
         {
           ch->sendln("An error occured.");
-          ch->save(666);
+          ch->save(cmd_t::SAVE_SILENTLY);
           return eSUCCESS;
         }
       }
@@ -1824,17 +1824,17 @@ int eddie_shopkeeper(Character *ch, class Object *obj, int cmd, const char *arg,
       else
       {
         ch->sendln("An error occured.");
-        ch->save(666);
+        ch->save(cmd_t::SAVE_SILENTLY);
         return eSUCCESS;
       }
     }
-    ch->save(0);
+    ch->save();
   }
 
   return eSUCCESS;
 }
 
-int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Character *owner)
+int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
   if (ch == nullptr || IS_NPC(ch))
   {
@@ -1853,7 +1853,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
   obj_list_t obj_list = {};
   switch (cmd)
   {
-  case CMD_LIST:
+  case cmd_t::LIST:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
@@ -1868,7 +1868,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     return eSUCCESS;
     break;
 
-  case CMD_REROLL:
+  case cmd_t::REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
@@ -1938,7 +1938,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     }
     break;
 
-  case CMD_CONFIRM:
+  case cmd_t::CONFIRM:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
@@ -2002,7 +2002,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
 
     break;
 
-  case CMD_CHOOSE:
+  case cmd_t::CHOOSE:
     if (r.state != reroll_t::reroll_states_t::REROLLED)
     {
       return eFAILURE;
@@ -2068,7 +2068,7 @@ int reroll_trader(Character *ch, Object *obj, int cmd, const char *arg, Characte
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
-  case CMD_CANCEL:
+  case cmd_t::CANCEL:
     owner->tell(ch, "I'm canceling this reroll.");
 
     obj_from(r.choice1_obj);

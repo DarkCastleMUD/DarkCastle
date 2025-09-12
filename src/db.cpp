@@ -455,7 +455,7 @@ void funny_boot_message()
  It checks if ch exists everywhere it is used,
  so this can be called from other places without
  a character attached. */
-int do_write_skillquest(Character *ch, char *argument, int cmd)
+int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
 {
 	struct skill_quest *curr;
 	FILE *fl;
@@ -695,7 +695,7 @@ void DC::boot_db(void)
 }
 
 /*
- int do_motdload(Character *ch, char *argument, int cmd)
+ int do_motdload(Character *ch, char *argument, cmd_t cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -815,7 +815,7 @@ void DC::update_wizlist(Character *ch)
 	write_wizlist(ssbuffer.str().c_str());
 }
 
-int do_wizlist(Character *ch, char *argument, int cmd)
+int do_wizlist(Character *ch, char *argument, cmd_t cmd)
 {
 	char buf[MAX_STRING_LENGTH], lines[500], space[80];
 	int x{}, z{1};
@@ -1280,7 +1280,7 @@ void DC::remove_all_mobs_from_world(void)
 				 if (IS_NPC(curr))
 					 extract_char(curr, true, QStringLiteral("DC::remove_all_mobs_from_world"));
 				 else
-					 do_quit(curr, "", 666);
+					 do_quit(curr, "", cmd_t::SAVE_SILENTLY);
 			 });
 	DC::getInstance()->removeDead();
 }
@@ -2498,7 +2498,7 @@ zone_t DC::read_one_zone(FILE *fl)
 			continue;
 		}
 
-		tmp = fread_int(fl, 0, CMD_DEFAULT);
+		tmp = fread_int(fl, 0, 9);
 		reset->if_flag = tmp;
 		reset->last = time(nullptr) - number(0, 12 * 3600);
 		// randomize last repop on boot
@@ -4736,7 +4736,7 @@ void Zone::reset(ResetType reset_type)
 		last_full_reset = QDateTime::currentDateTimeUtc();
 	}
 
-	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
+	int reset_cmd_index, last_cmd, last_mob, last_obj, last_percent;
 	Character *mob = nullptr;
 	class Object *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
@@ -4758,45 +4758,45 @@ void Zone::reset(ResetType reset_type)
 	num_mob_on_repop = 0;
 	// find last command in zone
 
-	for (cmd_no = 0; cmd_no < cmd.size(); cmd_no++)
+	for (reset_cmd_index = 0; reset_cmd_index < cmd.size(); reset_cmd_index++)
 	{
-		if (cmd_no < 0 || cmd_no > cmd.size())
+		if (reset_cmd_index < 0 || reset_cmd_index > cmd.size())
 		{
 			sprintf(buf,
-					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
-					id_, cmd_no);
+					"Trapped zone error, Command is null, zone: %d reset_cmd_index: %d",
+					id_, reset_cmd_index);
 			logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 			break;
 		}
-		if (cmd[cmd_no]->active == 0)
+		if (cmd[reset_cmd_index]->active == 0)
 			continue;
 
-		cmd[cmd_no]->last = time(nullptr);
-		cmd[cmd_no]->attempts++;
-		if (cmd[cmd_no]->if_flag == 0 ||									// always
-			(last_cmd == 1 && cmd[cmd_no]->if_flag == 1) ||					// if last command true
-			(last_cmd == 0 && cmd[cmd_no]->if_flag == 2) ||					// if last command false
-			(reset_type == ResetType::full && cmd[cmd_no]->if_flag == 3) || // full reset (onboot)
-			(last_mob == 1 && cmd[cmd_no]->if_flag == 4) ||					// if-last-mob-true
-			(last_mob == 0 && cmd[cmd_no]->if_flag == 5) ||					// if-last-mob-false
-			(last_obj == 1 && cmd[cmd_no]->if_flag == 6) ||					// if-last-obj-true
-			(last_obj == 0 && cmd[cmd_no]->if_flag == 7) ||					// if-last-obj-false
-			(last_percent == 1 && cmd[cmd_no]->if_flag == 8) ||				// if-last-percent-true
-			(last_percent == 0 && cmd[cmd_no]->if_flag == 9)				// if-last-percent-false
+		cmd[reset_cmd_index]->last = time(nullptr);
+		cmd[reset_cmd_index]->attempts++;
+		if (cmd[reset_cmd_index]->if_flag == 0 ||									 // always
+			(last_cmd == 1 && cmd[reset_cmd_index]->if_flag == 1) ||				 // if last command true
+			(last_cmd == 0 && cmd[reset_cmd_index]->if_flag == 2) ||				 // if last command false
+			(reset_type == ResetType::full && cmd[reset_cmd_index]->if_flag == 3) || // full reset (onboot)
+			(last_mob == 1 && cmd[reset_cmd_index]->if_flag == 4) ||				 // if-last-mob-true
+			(last_mob == 0 && cmd[reset_cmd_index]->if_flag == 5) ||				 // if-last-mob-false
+			(last_obj == 1 && cmd[reset_cmd_index]->if_flag == 6) ||				 // if-last-obj-true
+			(last_obj == 0 && cmd[reset_cmd_index]->if_flag == 7) ||				 // if-last-obj-false
+			(last_percent == 1 && cmd[reset_cmd_index]->if_flag == 8) ||			 // if-last-percent-true
+			(last_percent == 0 && cmd[reset_cmd_index]->if_flag == 9)				 // if-last-percent-false
 		)
 		{
-			cmd[cmd_no]->lastSuccess = cmd[cmd_no]->last;
-			cmd[cmd_no]->successes++;
-			switch (cmd[cmd_no]->command)
+			cmd[reset_cmd_index]->lastSuccess = cmd[reset_cmd_index]->last;
+			cmd[reset_cmd_index]->successes++;
+			switch (cmd[reset_cmd_index]->command)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[cmd_no]->arg2 == -1 || cmd[cmd_no]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[cmd_no]->arg1].virt) < cmd[cmd_no]->arg2 && (mob = clone_mobile(cmd[cmd_no]->arg1)))
+				if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].virt) < cmd[reset_cmd_index]->arg2 && (mob = clone_mobile(cmd[reset_cmd_index]->arg1)))
 				{
-					char_to_room(mob, cmd[cmd_no]->arg3);
-					cmd[cmd_no]->lastPop = mob;
-					mob->mobdata->reset = cmd[cmd_no];
-					GET_HOME(mob) = DC::getInstance()->world[cmd[cmd_no]->arg3].number;
+					char_to_room(mob, cmd[reset_cmd_index]->arg3);
+					cmd[reset_cmd_index]->lastPop = mob;
+					mob->mobdata->reset = cmd[reset_cmd_index];
+					GET_HOME(mob) = DC::getInstance()->world[cmd[reset_cmd_index]->arg3].number;
 					num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
@@ -4817,16 +4817,16 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'O': /* Load object on the ground */
-				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
+				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2)
 				{
-					if (cmd[cmd_no]->arg3 >= 0)
+					if (cmd[reset_cmd_index]->arg3 >= 0)
 					{
-						if (!get_obj_in_list_num(cmd[cmd_no]->arg1,
-												 DC::getInstance()->world[cmd[cmd_no]->arg3].contents) &&
+						if (!get_obj_in_list_num(cmd[reset_cmd_index]->arg1,
+												 DC::getInstance()->world[cmd[reset_cmd_index]->arg3].contents) &&
 							(obj =
-								 clone_object(cmd[cmd_no]->arg1)))
+								 clone_object(cmd[reset_cmd_index]->arg1)))
 						{
-							obj_to_room(obj, cmd[cmd_no]->arg3);
+							obj_to_room(obj, cmd[reset_cmd_index]->arg3);
 							last_cmd = 1;
 							last_obj = 1;
 						}
@@ -4844,7 +4844,7 @@ void Zone::reset(ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to DC::NOWHERE. Zone %d Cmd %d",
-									DC::getInstance()->obj_index[cmd[cmd_no]->arg1].virt, id_, cmd_no);
+									DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].virt, id_, reset_cmd_index);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
 						last_cmd = 0;
@@ -4860,19 +4860,19 @@ void Zone::reset(ResetType reset_type)
 
 			case 'P': /* object to object */
 
-				if (cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2)
+				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2)
 				{
 					obj_to = 0;
 					obj = 0;
-					if ((obj_to = get_obj_num(cmd[cmd_no]->arg3)) && (obj =
-																		  clone_object(cmd[cmd_no]->arg1)))
+					if ((obj_to = get_obj_num(cmd[reset_cmd_index]->arg3)) && (obj =
+																				   clone_object(cmd[reset_cmd_index]->arg1)))
 						obj_to_obj(obj, obj_to);
 					else
 						logf(
 							IMMORTAL,
 							DC::LogChannel::LOG_WORLD,
 							"Null container obj in P command Zone: %d, Cmd: %d",
-							id_, cmd_no);
+							id_, reset_cmd_index);
 
 					last_cmd = 1;
 					last_obj = 1;
@@ -4887,22 +4887,22 @@ void Zone::reset(ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == nullptr)
 				{
-					// sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, cmd_no + 1);
+					// sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id_, reset_cmd_index + 1);
 					// logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
 				// Never load the same totem as long as it exists in the world
-				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
-					cmd[cmd_no]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].item)->isTotem() &&
+					cmd[reset_cmd_index]->arg2 != -1 &&
+					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number >= cmd[reset_cmd_index]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[cmd_no]->arg2 == -1 || DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number < cmd[cmd_no]->arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2 || number(0, 1)) && (obj = clone_object(cmd[reset_cmd_index]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4917,17 +4917,17 @@ void Zone::reset(ResetType reset_type)
 
 			case '%': /* percent chance of next command happening */
 				// We can't send a number less than one to number() otherwise a debug coredump occurs
-				if (cmd[cmd_no]->arg2 < 1)
+				if (cmd[reset_cmd_index]->arg2 < 1)
 				{
-					logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, cmd_no, cmd[cmd_no]->arg1, cmd[cmd_no]->arg2);
+					logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id_, reset_cmd_index, cmd[reset_cmd_index]->arg1, cmd[reset_cmd_index]->arg2);
 					last_cmd = 0;
 					last_percent = 0;
 				}
 				else
 				{
-					if (number(1, cmd[cmd_no]->arg2) <= cmd[cmd_no]->arg1)
+					if (number(1, cmd[reset_cmd_index]->arg2) <= cmd[reset_cmd_index]->arg1)
 					{
-						cmd[cmd_no]->last = time(nullptr);
+						cmd[reset_cmd_index]->last = time(nullptr);
 						last_percent = 1;
 						last_cmd = 1;
 					}
@@ -4942,22 +4942,22 @@ void Zone::reset(ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == nullptr)
 				{
-					// sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, cmd_no + 1);
+					// sprintf(buf, "Null mob in E reseting zone %d cmd %d", id_, reset_cmd_index + 1);
 					// logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
 				// Never load the same totem as long as it exists in the world
-				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[cmd_no]->arg1].item)->isTotem() &&
-					cmd[cmd_no]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[cmd_no]->arg1].number >= cmd[cmd_no]->arg2)
+				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].item)->isTotem() &&
+					cmd[reset_cmd_index]->arg2 != -1 &&
+					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number >= cmd[reset_cmd_index]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((obj = clone_object(cmd[cmd_no]->arg1)))
+				if ((obj = clone_object(cmd[reset_cmd_index]->arg1)))
 				{
 					randomize_object(obj);
 
@@ -4969,15 +4969,15 @@ void Zone::reset(ResetType reset_type)
 					{
 						logentry(QStringLiteral("nullptr mob in reset_zone()!"), ANGEL, DC::LogChannel::LOG_BUG);
 					}
-					else if (cmd[cmd_no]->arg3 < 0 || cmd[cmd_no]->arg3 >= MAX_WEAR)
+					else if (cmd[reset_cmd_index]->arg3 < 0 || cmd[reset_cmd_index]->arg3 >= MAX_WEAR)
 					{
 						logentry(QStringLiteral("Invalid eq position in Zone::reset()!"), ANGEL, DC::LogChannel::LOG_BUG);
 					}
-					else if (mob->equipment[cmd[cmd_no]->arg3] == 0)
+					else if (mob->equipment[cmd[reset_cmd_index]->arg3] == 0)
 					{
-						if (!equip_char(mob, obj, cmd[cmd_no]->arg3))
+						if (!equip_char(mob, obj, cmd[reset_cmd_index]->arg3))
 						{
-							sprintf(buf, "Bad equip_char zone %d cmd %d", id_, cmd_no + 1);
+							sprintf(buf, "Bad equip_char zone %d cmd %d", id_, reset_cmd_index + 1);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 						}
 					}
@@ -5003,64 +5003,64 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'D': /* set state of door */
-				if (cmd[cmd_no]->arg1 < 0 || cmd[cmd_no]->arg1 > DC::getInstance()->top_of_world)
+				if (cmd[reset_cmd_index]->arg1 < 0 || cmd[reset_cmd_index]->arg1 > DC::getInstance()->top_of_world)
 				{
-					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_, cmd_no + 1);
+					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id_, reset_cmd_index + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
-				if (cmd[cmd_no]->arg2 < 0 || cmd[cmd_no]->arg2 >= 6)
+				if (cmd[reset_cmd_index]->arg2 < 0 || cmd[reset_cmd_index]->arg2 >= 6)
 				{
-					sprintf(log_buf, "Illegal direction %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg2, id_, cmd_no + 1);
+					sprintf(log_buf, "Illegal direction %d doesn't exist Z: %d cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
-				if (!DC::getInstance()->rooms.contains(cmd[cmd_no]->arg1))
+				if (!DC::getInstance()->rooms.contains(cmd[reset_cmd_index]->arg1))
 				{
-					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d", cmd[cmd_no]->arg1, id_, cmd_no + 1);
+					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
 
-				if (DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2] == 0)
+				if (DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2] == 0)
 				{
 					sprintf(
 						log_buf,
 						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
-						cmd[cmd_no]->arg2, DC::getInstance()->world[cmd[cmd_no]->arg1].number, id_, cmd_no);
+						cmd[reset_cmd_index]->arg2, DC::getInstance()->world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
 					logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 					break;
 				}
-				switch (cmd[cmd_no]->arg3)
+				switch (cmd[reset_cmd_index]->arg3)
 				{
 				case 0:
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_BROKEN);
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_LOCKED);
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_CLOSED);
 					break;
 				case 1:
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 							EX_CLOSED);
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_LOCKED);
 					break;
 				case 2:
 					REMOVE_BIT(
-						DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+						DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 							EX_LOCKED);
-					SET_BIT(DC::getInstance()->world[cmd[cmd_no]->arg1].dir_option[cmd[cmd_no]->arg2]->exit_info,
+					SET_BIT(DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2]->exit_info,
 							EX_CLOSED);
 					break;
 				}
@@ -5068,7 +5068,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'X':
-				switch (cmd[cmd_no]->arg1)
+				switch (cmd[reset_cmd_index]->arg1)
 				{
 				case 0:
 					last_cmd = -1;
@@ -5099,7 +5099,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'K': // skip
-				cmd_no += cmd[cmd_no]->arg1;
+				reset_cmd_index += cmd[reset_cmd_index]->arg1;
 				break;
 
 			case '*': // ignore *
@@ -5107,7 +5107,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			default:
-				sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .", id_, cmd_no + 1, cmd[cmd_no]->command);
+				sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
 				logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
 				age = 0;
 				return;
@@ -5116,7 +5116,7 @@ void Zone::reset(ResetType reset_type)
 		}
 		else
 		{
-			switch (cmd[cmd_no]->command)
+			switch (cmd[reset_cmd_index]->command)
 			{
 
 			case 'M':
@@ -6274,7 +6274,7 @@ void init_char(Character *ch)
 	ch->player->toggles = 0;
 	ch->player->golem = 0;
 	ch->player->quest_points = 0;
-	for (int j = 0; j < QUEST_CANCEL; j++)
+	for (int j = 0; j < QUEST_MAX_CANCEL; j++)
 		ch->player->quest_cancel[j] = 0;
 	for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
 		ch->player->quest_complete[j] = 0;

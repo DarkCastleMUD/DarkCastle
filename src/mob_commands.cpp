@@ -167,7 +167,7 @@ void mpstat(Character *ch, Character *victim)
 
 /* prints the argument to all the rooms aroud the mobile */
 
-int do_mpasound(Character *ch, char *argument, int cmd)
+int do_mpasound(Character *ch, char *argument, cmd_t cmd)
 {
 
   int32_t was_in_room;
@@ -206,7 +206,7 @@ int do_mpasound(Character *ch, char *argument, int cmd)
 
 /* lets the mobile kill any player or mobile without murder*/
 
-int do_mpkill(Character *ch, char *argument, int cmd)
+int do_mpkill(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -252,7 +252,7 @@ int do_mpkill(Character *ch, char *argument, int cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_mphit(Character *ch, char *argument, int cmd)
+int do_mphit(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -298,7 +298,7 @@ int do_mphit(Character *ch, char *argument, int cmd)
   return one_hit(ch, victim, TYPE_UNDEFINED, FIRST);
 }
 
-int do_mpaddlag(Character *ch, char *argument, int cmd)
+int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
@@ -337,7 +337,7 @@ int do_mpaddlag(Character *ch, char *argument, int cmd)
    it can also destroy a worn object and it can destroy
    just plain everything  */
 
-int do_mpjunk(Character *ch, char *argument, int cmd)
+int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Object *obj;
@@ -395,7 +395,7 @@ int do_mpjunk(Character *ch, char *argument, int cmd)
 
 /* prints the message to everyone in the room other than the mob and victim */
 
-int do_mpechoaround(Character *ch, char *argument, int cmd)
+int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -424,7 +424,7 @@ int do_mpechoaround(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpechoaroundnotbad(Character *ch, char *argument, int cmd)
+int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
   Character *victim, *victim2;
@@ -461,7 +461,7 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, int cmd)
 
 /* prints the message to only the victim */
 
-int do_mpechoat(Character *ch, char *argument, int cmd)
+int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -492,7 +492,7 @@ int do_mpechoat(Character *ch, char *argument, int cmd)
 
 /* prints the message to the room at large */
 
-int do_mpecho(Character *ch, char *argument, int cmd)
+int do_mpecho(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_PC(ch))
   {
@@ -514,7 +514,7 @@ int do_mpecho(Character *ch, char *argument, int cmd)
 are loaded into inventory.  you can specify a level with
 the load object portion as well. */
 
-int do_mpmload(Character *ch, char *argument, int cmd)
+int do_mpmload(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int realnum;
@@ -548,7 +548,7 @@ int do_mpmload(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpoload(Character *ch, char *argument, int cmd)
+int do_mpoload(Character *ch, char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   char arg1[MAX_INPUT_LENGTH] = {0};
@@ -605,7 +605,7 @@ int do_mpoload(Character *ch, char *argument, int cmd)
    itself, but this had best be the last command in the MOBprogram
    otherwise ugly stuff will happen */
 
-int do_mppurge(Character *ch, char *argument, int cmd)
+int do_mppurge(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
@@ -690,7 +690,7 @@ int do_mppurge(Character *ch, char *argument, int cmd)
 
 /* lets the mobile goto any location it wishes that is not private */
 
-int do_mpgoto(Character *ch, char *argument, int cmd)
+int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int32_t location = -1;
@@ -775,7 +775,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
 
 /* lets the mobile do a command at another location. Very useful */
 
-int do_mpat(Character *ch, char *argument, int cmd)
+int do_mpat(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int32_t location;
@@ -841,7 +841,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
 
 // Reward the player with some XP
 // Also works with -xp to penalize
-int do_mpxpreward(Character *ch, char *argument, int cmd)
+int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
@@ -886,7 +886,7 @@ int do_mpxpreward(Character *ch, char *argument, int cmd)
 /* lets the mobile transfer people.  the all argument transfers
    everyone in the current room to the specified location */
 
-int do_mptransfer(Character *ch, char *argument, int cmd)
+int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -971,7 +971,7 @@ int do_mptransfer(Character *ch, char *argument, int cmd)
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
 
-int do_mpforce(Character *ch, char *argument, int cmd)
+int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
 
@@ -1041,7 +1041,7 @@ int do_mpforce(Character *ch, char *argument, int cmd)
 // "Throw" a message to another mob.  Right now, it's only an int specifying which
 // 'catch' should handle it
 // argument should be <mob> <catchnum> <delay>
-int do_mpthrow(Character *ch, char *argument, int cmd)
+int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
 {
   struct mprog_throw_type *throwitem = nullptr;
   int mob_num;
@@ -1118,7 +1118,7 @@ int do_mpthrow(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpteachskill(Character *ch, char *argument, int cmd)
+int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char skill[MAX_INPUT_LENGTH];
@@ -1218,10 +1218,10 @@ QString Character::getTemp(QString name)
   return nullptr;
 }
 
-command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
+command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 {
   Character *victim;
-  if (IS_PC(this) && cmd != CMD_OTHER)
+  if (IS_PC(this) && cmd != cmd_t::OTHER)
   {
     this->sendln("Huh?");
     return eFAILURE;
@@ -1294,7 +1294,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_mpsetalign(Character *ch, char *argument, int cmd)
+int do_mpsetalign(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
@@ -1365,7 +1365,7 @@ void add_dmg(Character *ch, int dmg)
   dmg_list = c;
 }
 
-int do_mpdamage(Character *ch, char *argument, int cmd)
+int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char temp[MAX_INPUT_LENGTH];
@@ -1577,7 +1577,7 @@ int do_mpdamage(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpothrow(Character *ch, char *argument, int cmd)
+int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
 {
   struct mprog_throw_type *throwitem = nullptr;
   int mob_num;
@@ -1662,7 +1662,7 @@ int skill_aff[] =
         SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-int do_mpbestow(Character *ch, char *argument, int cmd)
+int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
@@ -1753,7 +1753,7 @@ int do_mpbestow(Character *ch, char *argument, int cmd)
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
-int do_mppause(Character *ch, char *argument, int cmd)
+int do_mppause(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_PC(ch))
   {
@@ -1839,7 +1839,7 @@ int do_mppause(Character *ch, char *argument, int cmd)
   return eSUCCESS | eDELAYED_EXEC;
 }
 
-int do_mpteleport(Character *ch, char *argument, int cmd)
+int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
@@ -1917,11 +1917,11 @@ int do_mpteleport(Character *ch, char *argument, int cmd)
   move_char(victim, to_room);
   act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
 
-  do_look(victim, "", 0);
+  do_look(victim, "");
   return eSUCCESS;
 }
 
-int do_mppeace(Character *ch, char *argument, int cmd)
+int do_mppeace(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_PC(ch))
   {
@@ -1957,7 +1957,7 @@ int do_mppeace(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpretval(Character *ch, char *argument, int cmd)
+int do_mpretval(Character *ch, char *argument, cmd_t cmd)
 {
   if (IS_PC(ch))
   {
@@ -2151,7 +2151,7 @@ char *expand_data(Character *ch, char *orig)
 char *allowedData[] = {
     "hitpoints", "mana", "move", nullptr};
 
-int do_mpsetmath(Character *ch, char *arg, int cmd)
+int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
 {
   if (IS_PC(ch))
   {

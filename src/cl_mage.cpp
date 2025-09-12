@@ -91,7 +91,7 @@ int spellcraft(Character *ch, int spell)
   return false;
 }
 
-int do_focused_repelance(Character *ch, char *argument, int cmd)
+int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 {
   // uint8_t percent;
   struct affected_type af;
@@ -138,7 +138,7 @@ int do_focused_repelance(Character *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_imbue(Character *ch, char *argument, int cmd)
+int do_imbue(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int lvl = ch->has_skill(SKILL_IMBUE);
@@ -330,18 +330,18 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
-      do_say(i, buf, CMD_DEFAULT);
+      do_say(i, buf);
       break;
     }
 
     if (i == ch)
     {
-      do_say(i, "Wait, I didn't mean to move .... crap.", CMD_DEFAULT);
+      do_say(i, "Wait, I didn't mean to move .... crap.");
     }
     else
     {
       sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
-      do_say(i, buf, CMD_DEFAULT);
+      do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
@@ -381,7 +381,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         {
           // Get um!
           sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
-          do_say(ally, buf, CMD_DEFAULT);
+          do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED);

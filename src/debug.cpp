@@ -294,21 +294,21 @@ int main(int argc, char **argv)
 
   update_max_who();
 
-  do_stand(ch, "", CMD_DEFAULT);
+  do_stand(ch, "");
   process_output(d);
 
   char_to_room(ch, 3001);
   process_output(d);
-  // ch->do_toggle({"pager"}, CMD_DEFAULT);
-  // ch->do_toggle({"ansi"}, CMD_DEFAULT);
-  // ch->do_toggle({}, CMD_DEFAULT);
-  //  do_goto(ch, "23", CMD_DEFAULT);
-  // do_score(ch, "", CMD_DEFAULT);
+  // ch->do_toggle({"pager"}, cmd_t::DEFAULT);
+  // ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
+  // ch->do_toggle({}, cmd_t::DEFAULT);
+  //  do_goto(ch, "23");
+  // do_score(ch, "");
   // process_output(d);
 
-  // do_load(ch, "m 23", CMD_DEFAULT);
+  // do_load(ch, "m 23");
   // process_output(d);
-  do_look(ch, "debugimp", CMD_LOOK);
+  do_look(ch, "debugimp");
   process_output(d);
 
   ch->do_bestow({"debugimp", "load"});
@@ -396,9 +396,9 @@ int main(int argc, char **argv)
             if (path.isEmpty() == false && path[0] != '.')
             {
               // std::cerr << pfile.path().c_str() << std::endl;
-              ch->do_linkload(path.split(' '), CMD_DEFAULT);
+              ch->do_linkload(path.split(' '), cmd_t::DEFAULT);
               process_output(d);
-              do_fsave(ch, path.toStdString().c_str(), CMD_DEFAULT);
+              do_fsave(ch, path.toStdString().c_str());
               process_output(d);
             }
             else
@@ -467,9 +467,9 @@ int main(int argc, char **argv)
 
     if (argv[1] == QStringLiteral("leaderboard"))
     {
-      do_leaderboard(ch, "scan", CMD_DEFAULT);
+      do_leaderboard(ch, "scan");
       process_output(d);
-      do_leaderboard(ch, "", CMD_DEFAULT);
+      do_leaderboard(ch, "");
       process_output(d);
     }
     /*
@@ -504,7 +504,7 @@ int main(int argc, char **argv)
 
     // leaderboard.check_offline();
     // // std::cerr <<  DC::getInstance()->character_list.size() << std::endl;
-    // do_leaderboard(ch, "", CMD_DEFAULT);
+    // do_leaderboard(ch, "");
     // process_output(d);
 
     struct vault_data *vault;
@@ -520,7 +520,7 @@ int main(int argc, char **argv)
         }
       }
     }
-    do_look(ch, "", CMD_LOOK);
+    do_look(ch, "");
     process_output(d);
     do_force(ch, "all save");
     process_output(d);
