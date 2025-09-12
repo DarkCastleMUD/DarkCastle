@@ -288,7 +288,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/testDC",
             "args": [
-                "test_immortal_object_commands"
+                "test_legacy_prompts"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
