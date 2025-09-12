@@ -339,7 +339,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     SET_BIT(golem->resist, golem_list[i].special_res);
   }
   char_to_room(golem, ch->in_room);
-  add_follower(golem, ch, 0);
+  add_follower(golem, ch);
   SETBIT(golem->affected_by, AFF_CHARM);
   //  struct affected_type af;
   send_to_char(golem_list[i].creation_message, ch);

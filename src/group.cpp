@@ -511,7 +511,7 @@ int do_promote(Character *ch, char *argument, int cmd)
   else
     new_new_leader->group_name = str_dup("I am a dork");
 
-  stop_follower(new_new_leader, stop_follower_reasons_t::CHANGE_LEADER);
+  stop_follower(new_new_leader, follower_reasons_t::CHANGE_LEADER);
 
   for (f = ch->followers; f; f = next_f)
   {
@@ -519,14 +519,14 @@ int do_promote(Character *ch, char *argument, int cmd)
     if (IS_PC(f->follower))
     {
       k = f->follower;
-      stop_follower(k, stop_follower_reasons_t::CHANGE_LEADER);
-      add_follower(k, new_new_leader, 2);
+      stop_follower(k, follower_reasons_t::CHANGE_LEADER);
+      add_follower(k, new_new_leader, follower_reasons_t::CHANGE_LEADER);
     }
     else
       REMBIT(f->follower->affected_by, AFF_GROUP);
   }
 
-  add_follower(ch, new_new_leader, 2);
+  add_follower(ch, new_new_leader, follower_reasons_t::CHANGE_LEADER);
   return eSUCCESS;
 }
 
@@ -639,8 +639,6 @@ int do_follow(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH + 1];
   Character *leader;
 
-  void add_follower(Character * ch, Character * leader, int cmd);
-
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
@@ -701,23 +699,23 @@ int do_follow(Character *ch, char *argument, int cmd)
       if (ch->master)
       {
         if (cmd == 10)
-          stop_follower(ch, stop_follower_reasons_t::END_STALK); /* stalk  */
+          stop_follower(ch, follower_reasons_t::END_STALK); /* stalk  */
         else
           stop_follower(ch); /* follow */
       }
 
       //	    if((abs(ch->getLevel()-leader->getLevel())<60) || ch->getLevel()>=IMMORTAL) {
       if (cmd == 10)
-        add_follower(ch, leader, 1); /* stalk  */
+        add_follower(ch, leader, follower_reasons_t::END_STALK); /* stalk  */
       else
-        add_follower(ch, leader, 0); /* follow */
-                                     //          }
-                                     //	    else
-                                     //	      {
-                                     //		act("Sorry, but you are not of the right caliber to follow.",
-                                     //		ch, 0, 0, TO_CHAR, 0);
-                                     //		return eFAILURE;
-                                     //	      }
+        add_follower(ch, leader); /* follow */
+                                  //          }
+                                  //	    else
+                                  //	      {
+                                  //		act("Sorry, but you are not of the right caliber to follow.",
+                                  //		ch, 0, 0, TO_CHAR, 0);
+                                  //		return eFAILURE;
+                                  //	      }
     }
   }
   return eSUCCESS;

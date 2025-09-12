@@ -4513,8 +4513,6 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   struct affected_type af;
   class Object *tempobj;
 
-  void add_follower(Character * ch, Character * leader, int cmd);
-
   ch->sendln("Disabled currently.");
   return eFAILURE;
 
@@ -4562,7 +4560,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   if (victim->master)
     stop_follower(victim);
 
-  add_follower(victim, ch, 0);
+  add_follower(victim, ch);
 
   af.type = SPELL_CHARM_PERSON;
 
@@ -5379,7 +5377,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
   affect_to_char(mob, &af);
   if (isSet(mob->immune, ISR_PIERCE))
     REMOVE_BIT(mob->immune, ISR_PIERCE);
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   extract_obj(corpse);
 
@@ -12090,7 +12088,7 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
   af.modifier = 0;
   af.location = 0;
   af.bitvector = AFF_CHARM;
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
   affect_join(mob, &af, false, false);
 
   // The mob should have zero xp
@@ -12371,7 +12369,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
     else
       k = k->next;
 
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   // add random abilities
   if (number(1, 3) > 1)
@@ -12792,7 +12790,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
   IS_CARRYING_N(mob) = 0;
 
   familiar_creation_message(ch, fam_type);
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   return eSUCCESS;
 }
@@ -14566,7 +14564,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
   SETBIT(mob->affected_by, AFF_ELEMENTAL);
   SETBIT(mob->affected_by, AFF_CHARM);
 
-  add_follower(mob, ch, 0);
+  add_follower(mob, ch);
 
   return eSUCCESS;
 }

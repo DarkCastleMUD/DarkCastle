@@ -221,7 +221,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   /* make charmie stop hating tamer */
   remove_memory(victim, 'h', ch);
 
-  add_follower(victim, ch, 0);
+  add_follower(victim, ch);
 
   af.type = SPELL_CHARM_PERSON;
 

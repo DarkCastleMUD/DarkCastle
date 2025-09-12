@@ -2261,7 +2261,7 @@ int pet_shops(Character *ch, int cmd, char const *arg)
     }
 
     char_to_room(pet, ch->in_room);
-    add_follower(pet, ch, 0);
+    add_follower(pet, ch);
 
     /* Be certain that pet's can't get/carry/use/weild/wear items */
     IS_CARRYING_W(pet) = 1000;

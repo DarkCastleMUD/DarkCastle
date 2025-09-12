@@ -919,7 +919,7 @@ int attempt_move(Character *ch, int cmd, int is_retreat)
 			/*
 			 if (GET_KI(ch->master) < 5) {
 			 ch->add_memory(GET_NAME(ch->master), 'h');
-			 stop_follower(ch, stop_follower_reasons_t::BROKE_CHARM);
+			 stop_follower(ch, follower_reasons_t::BROKE_CHARM);
 			 //ch->add_memory(GET_NAME(ch->master), 'h');
 			 do_say(ch, "Hey! You tricked me!", CMD_DEFAULT);
 			 ch->master->sendln("You lose control.");

@@ -592,7 +592,6 @@ void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
-void add_follower(Character *ch, Character *leader, int cmd);
 void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
@@ -611,15 +610,16 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
 bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void check_idling(Character *ch);
 
-enum class stop_follower_reasons_t
+enum class follower_reasons_t
 {
-   STOP_FOLLOW,       // 0
+   DEFAULT,           // 0
    END_STALK,         // 1
    CHANGE_LEADER,     // 2
    BROKE_CHARM,       // 3
    BROKE_CHARM_LILITH // 4
 };
-void stop_follower(Character *ch, stop_follower_reasons_t reason = stop_follower_reasons_t::STOP_FOLLOW);
+void stop_follower(Character *ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+void add_follower(Character *ch, Character *leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
 bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);

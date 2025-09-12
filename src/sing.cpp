@@ -959,7 +959,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 
 	remove_memory(victim, 'h');
 
-	add_follower(victim, ch, 0);
+	add_follower(victim, ch);
 
 	af.type = SPELL_CHARM_PERSON;
 	af.duration = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12);

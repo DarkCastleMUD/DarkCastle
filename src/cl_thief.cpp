@@ -692,7 +692,7 @@ int do_stalk(Character *ch, char *argument, int cmd)
     else if (IS_AFFECTED(ch, AFF_GROUP))
       ch->sendln("You must first abandon your group.");
     else
-      stop_follower(ch, stop_follower_reasons_t::END_STALK);
+      stop_follower(ch, follower_reasons_t::END_STALK);
     return eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))

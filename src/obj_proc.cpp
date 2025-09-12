@@ -536,7 +536,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
   remove_memory(victim, 'h');
 
-  add_follower(victim, ch, 0);
+  add_follower(victim, ch);
   struct affected_type af;
 
   af.type = OBJ_LILITHRING;
