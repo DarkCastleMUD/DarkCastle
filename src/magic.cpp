@@ -4514,7 +4514,6 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   class Object *tempobj;
 
   void add_follower(Character * ch, Character * leader, int cmd);
-  void stop_follower(Character * ch, int cmd);
 
   ch->sendln("Disabled currently.");
   return eFAILURE;
@@ -4561,7 +4560,7 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   }
 
   if (victim->master)
-    stop_follower(victim, STOP_FOLLOW);
+    stop_follower(victim);
 
   add_follower(victim, ch, 0);
 

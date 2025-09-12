@@ -1950,7 +1950,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 		{
 			if (!(flags & SUPPRESS_CONSEQUENCES) && GET_CLASS(ch->master) != CLASS_RANGER)
 				ch->add_memory(ch->master->getName(), 'h');
-			stop_follower(ch, BROKE_CHARM);
+			stop_follower(ch, stop_follower_reasons_t::BROKE_CHARM);
 		}
 		break;
 	case SKILL_TACTICS:
@@ -2126,7 +2126,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				}
 				if (!(flags & SUPPRESS_CONSEQUENCES))
 					ch->add_memory(ch->master->getName(), 'h');
-				stop_follower(ch, BROKE_CHARM_LILITH);
+				stop_follower(ch, stop_follower_reasons_t::BROKE_CHARM_LILITH);
 			}
 		}
 	default:

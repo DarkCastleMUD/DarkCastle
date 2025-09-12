@@ -76,7 +76,6 @@ int do_free_animal(Character *ch, char *arg, int cmd)
 {
   Character *victim = nullptr;
   char buf[MAX_INPUT_LENGTH];
-  void stop_follower(Character * ch, int cmd);
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
@@ -116,7 +115,7 @@ int do_free_animal(Character *ch, char *arg, int cmd)
   act("With a gentle pat to the head, $n sets $N free to roam the wilds again.",
       ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
-  stop_follower(victim, 0);
+  stop_follower(victim);
 
   return eSUCCESS;
 }
@@ -217,7 +216,7 @@ int do_tame(Character *ch, char *arg, int cmd)
   }
 
   if (victim->master)
-    stop_follower(victim, 0);
+    stop_follower(victim);
 
   /* make charmie stop hating tamer */
   remove_memory(victim, 'h', ch);

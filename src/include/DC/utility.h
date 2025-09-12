@@ -610,7 +610,16 @@ void unique_scan(Character *victim);
 void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage);
 bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void check_idling(Character *ch);
-void stop_follower(Character *ch, int cmd);
+
+enum class stop_follower_reasons_t
+{
+   STOP_FOLLOW,       // 0
+   END_STALK,         // 1
+   CHANGE_LEADER,     // 2
+   BROKE_CHARM,       // 3
+   BROKE_CHARM_LILITH // 4
+};
+void stop_follower(Character *ch, stop_follower_reasons_t reason = stop_follower_reasons_t::STOP_FOLLOW);
 bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);

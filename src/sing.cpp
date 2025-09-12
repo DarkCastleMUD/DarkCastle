@@ -955,7 +955,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
 	}
 
 	if (victim->master)
-		stop_follower(victim, 0);
+		stop_follower(victim);
 
 	remove_memory(victim, 'h');
 

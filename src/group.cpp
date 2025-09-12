@@ -70,7 +70,7 @@ int do_abandon(Character *ch, char *argument, int cmd)
     ch->player->group_kills = 0;
   }
 
-  stop_follower(ch, STOP_FOLLOW);
+  stop_follower(ch);
   return eSUCCESS;
 }
 
@@ -511,7 +511,7 @@ int do_promote(Character *ch, char *argument, int cmd)
   else
     new_new_leader->group_name = str_dup("I am a dork");
 
-  stop_follower(new_new_leader, CHANGE_LEADER);
+  stop_follower(new_new_leader, stop_follower_reasons_t::CHANGE_LEADER);
 
   for (f = ch->followers; f; f = next_f)
   {
@@ -519,7 +519,7 @@ int do_promote(Character *ch, char *argument, int cmd)
     if (IS_PC(f->follower))
     {
       k = f->follower;
-      stop_follower(k, CHANGE_LEADER);
+      stop_follower(k, stop_follower_reasons_t::CHANGE_LEADER);
       add_follower(k, new_new_leader, 2);
     }
     else
@@ -588,7 +588,7 @@ int do_disband(Character *ch, char *argument, int cmd)
       if (IS_PC(f->follower))
       {
         stop_grouped_bards(f->follower, 1);
-        stop_follower(f->follower, STOP_FOLLOW);
+        stop_follower(f->follower);
       }
       else
         REMBIT(f->follower->affected_by, AFF_GROUP);
@@ -630,7 +630,7 @@ int do_disband(Character *ch, char *argument, int cmd)
     adios->player->group_pkills = 0;
     adios->player->group_kills = 0;
   }
-  stop_follower(adios, STOP_FOLLOW);
+  stop_follower(adios);
   return eSUCCESS;
 }
 
@@ -639,7 +639,6 @@ int do_follow(Character *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH + 1];
   Character *leader;
 
-  void stop_follower(Character * ch, int cmd);
   void add_follower(Character * ch, Character * leader, int cmd);
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -689,7 +688,7 @@ int do_follow(Character *ch, char *argument, int cmd)
         ch->sendln("You are already following yourself.");
         return eFAILURE;
       }
-      stop_follower(ch, STOP_FOLLOW);
+      stop_follower(ch);
     }
     else
     {
@@ -702,9 +701,9 @@ int do_follow(Character *ch, char *argument, int cmd)
       if (ch->master)
       {
         if (cmd == 10)
-          stop_follower(ch, END_STALK); /* stalk  */
+          stop_follower(ch, stop_follower_reasons_t::END_STALK); /* stalk  */
         else
-          stop_follower(ch, STOP_FOLLOW); /* follow */
+          stop_follower(ch); /* follow */
       }
 
       //	    if((abs(ch->getLevel()-leader->getLevel())<60) || ch->getLevel()>=IMMORTAL) {

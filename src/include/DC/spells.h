@@ -740,16 +740,6 @@ struct attack_hit_type
 #define FILTER_ACID 5
 #define FILTER_POISON 6
 
-/*
- * reasons for stopping following
- * passed as the cmd arg to stop_follow()
- */
-#define STOP_FOLLOW 0
-#define END_STALK 1
-#define CHANGE_LEADER 2
-#define BROKE_CHARM 3
-#define BROKE_CHARM_LILITH 4
-
 #define DETECT_GOOD_VNUM 6302
 #define DETECT_EVIL_VNUM 6301
 #define DETECT_INVISIBLE_VNUM 6306

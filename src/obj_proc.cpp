@@ -532,7 +532,7 @@ int lilithring(Character *ch, class Object *obj, int cmd, const char *arg, Chara
 
   addTimer(ch, OBJ_LILITHRING, 24);
   if (victim->master)
-    stop_follower(victim, 0);
+    stop_follower(victim);
 
   remove_memory(victim, 'h');
 

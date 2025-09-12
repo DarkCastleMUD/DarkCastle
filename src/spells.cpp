@@ -1122,7 +1122,7 @@ bool circle_follow(Character *ch, Character *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(Character *ch, int cmd)
+void stop_follower(Character *ch, stop_follower_reasons_t reason)
 {
   struct follow_type *j, *k;
 
@@ -1139,10 +1139,10 @@ void stop_follower(Character *ch, int cmd)
     }
   */
   //  if(IS_AFFECTED(ch, AFF_CHARM)) {
-  if (cmd == BROKE_CHARM || cmd == BROKE_CHARM_LILITH)
+  if (reason == stop_follower_reasons_t::BROKE_CHARM || reason == stop_follower_reasons_t::BROKE_CHARM_LILITH)
   {
 
-    if (GET_CLASS(ch->master) != CLASS_RANGER || cmd == BROKE_CHARM_LILITH)
+    if (GET_CLASS(ch->master) != CLASS_RANGER || reason == stop_follower_reasons_t::BROKE_CHARM_LILITH)
     {
       act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
       act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
@@ -1163,7 +1163,7 @@ void stop_follower(Character *ch, int cmd)
   }
   else
   {
-    if (cmd == END_STALK)
+    if (reason == stop_follower_reasons_t::END_STALK)
     {
       act("You sneakily stop following $N.",
           ch, 0, ch->master, TO_CHAR, 0);
@@ -1211,7 +1211,7 @@ void stop_follower(Character *ch, int cmd)
 
   /* do this after setting master to nullptr, to prevent endless loop */
   /* between affect_remove() and stop_follower()                   */
-  if (cmd != CHANGE_LEADER)
+  if (reason != stop_follower_reasons_t::CHANGE_LEADER)
   {
     if (ch->affected_by_spell(SPELL_CHARM_PERSON))
       affect_from_char(ch, SPELL_CHARM_PERSON);
@@ -1227,7 +1227,7 @@ void die_follower(Character *ch)
   Character *zombie;
 
   if (ch->master)
-    stop_follower(ch, STOP_FOLLOW);
+    stop_follower(ch);
 
   for (k = ch->followers; k; k = j)
   {
@@ -1237,7 +1237,7 @@ void die_follower(Character *ch)
     {
       if (zombie->affected_by_spell(SPELL_CHARM_PERSON))
         affect_from_char(zombie, SPELL_CHARM_PERSON);
-      stop_follower(zombie, STOP_FOLLOW);
+      stop_follower(zombie);
     }
     if (GET_RACE(zombie) == RACE_UNDEAD)
     {
