@@ -3339,6 +3339,8 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
     act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
     act("You feel better.", victim, 0, 0, TO_CHAR, 0);
     affect_from_char(victim, SPELL_CURSE);
+    if (!mana_cost)
+      return eSUCCESS;
     curses_removed++;
   }
 
@@ -3365,6 +3367,8 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         act("$p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0);
         act("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        if (!mana_cost)
+          return eSUCCESS;
       }
     }
   }
@@ -3391,6 +3395,8 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
           act("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, TO_CHAR, 0);
         }
         REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        if (!mana_cost)
+          return eSUCCESS;
       }
     }
   }
@@ -3404,6 +3410,8 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
       act("$n briefly glows $4red$R, then $3blue$R.", victim, 0, 0, TO_ROOM, 0);
       act("The curse of attrition afflicting you has been lifted!", victim, 0, 0, TO_CHAR, 0);
       affect_from_char(victim, SPELL_ATTRITION);
+      if (!mana_cost)
+        return eSUCCESS;
     }
   }
 
