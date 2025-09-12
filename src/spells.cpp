@@ -1485,7 +1485,6 @@ int do_release(Character *ch, char *argument, int cmd)
   struct affected_type *aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
-  bool done = false;
   int learned = ch->has_skill(SKILL_RELEASE);
 
   if (!learned)
@@ -1494,9 +1493,15 @@ int do_release(Character *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (!ch->affected)
+  {
+    ch->sendln("You have no spell effects to release.");
+    return eSUCCESS;
+  }
+
   if (!*argument)
   {
-    ch->sendln("Release what spell?");
+    ch->sendln("Specify the spell to release or 'all' to release all spells.");
     for (aff = ch->affected; aff; aff = aff_next)
     {
       aff_next = aff->next;
@@ -1514,54 +1519,46 @@ int do_release(Character *ch, char *argument, int cmd)
           aff->type != SPELL_IMMUNITY)
       { // Spells that default to self seems a good measure of
         // allow to release spells..
-        QString aff_name = get_skill_name(aff->type);
-        ch->send(aff_name);
-        ch->sendln("");
+        ch->sendln(get_skill_name(aff->type));
       }
     }
     return eSUCCESS;
   }
   else
   {
-    if (ch->getMove() < 25)
-    {
-      ch->sendln("You don't have enough moves.");
-      return eFAILURE;
-    }
-
+    bool found = false;
     for (aff = ch->affected; aff; aff = aff_next)
     {
       aff_next = aff->next;
       while (aff_next && aff_next->type == aff->type)
         aff_next = aff_next->next;
 
-      if (get_skill_name(aff->type).isEmpty())
-        continue;
-      if (str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
-        continue;
       if (aff->type > MAX_SPL_LIST)
         continue;
-      if (!isSet(spell_info[aff->type].targets(),
-                 TAR_SELF_DEFAULT) &&
-          aff->type != SPELL_HOLY_AURA)
+      if (!isSet(spell_info[aff->type].targets(), TAR_SELF_DEFAULT) && aff->type != SPELL_HOLY_AURA)
         continue;
-      if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
-        if (!done && !skill_success(ch, nullptr, SKILL_RELEASE))
-        {
-          ch->sendln("You failed to release the spell, and are left momentarily dazed.");
-          act(
-              "$n fails to release the magic surrounding $m and is left momentarily dazed.",
-              ch, 0, 0, TO_ROOM, INVIS_NULL);
-          WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
-          ch->decrementMove(10);
-          return eFAILURE;
-        }
+      if (get_skill_name(aff->type).isEmpty())
+        continue;
+      if (QString(argument) != "all" && str_prefix(argument, get_skill_name(aff->type).toStdString().c_str()))
+        continue;
 
-      if (!done)
+      if (ch->getMove() < 25)
       {
-        ch->decrementMove(25);
+        ch->sendln(QStringLiteral("You don't have enough movement points to release the spell effect '%1'.").arg(get_skill_name(aff->type)));
+        return eFAILURE;
       }
-      ch->sendln("You release the spell.");
+
+      if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
+      {
+        ch->sendln(QStringLiteral("You failed to release the spell effect '%1', and are left momentarily dazed.").arg(get_skill_name(aff->type)));
+        act("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
+        ch->decrementMove(10);
+        return eFAILURE;
+      }
+
+      ch->decrementMove(25);
+      ch->sendln(QStringLiteral("You release the spell effect '%1'.").arg(get_skill_name(aff->type)));
       char buffer[255];
       int aftype = aff->type;
 
@@ -1572,14 +1569,14 @@ int do_release(Character *ch, char *argument, int cmd)
       }
       affect_from_char(ch, aftype);
       //	  affect_remove(ch,aff,0);
-      snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype).toStdString().c_str());
-      act(buffer, ch, 0, 0, TO_ROOM, INVIS_NULL);
-
-      done = true;
+      act(QStringLiteral("$n concentrates for a moment and releases their %1.").arg(get_skill_name(aftype)), ch, 0, 0, TO_ROOM, INVIS_NULL);
+      found = true;
     }
+
+    if (!found)
+      ch->sendln(QStringLiteral("No such spell effect '%1' found to be released.").arg(argument));
   }
-  if (!done)
-    ch->sendln("No such spell to release.");
+
   return eSUCCESS;
 }
 
