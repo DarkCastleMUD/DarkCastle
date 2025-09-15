@@ -357,12 +357,44 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   Character *master = ch;
   if (IS_NPC(ch))
     return eFAILURE;
-  if (!ch->player->golem)
+
+  if (cmd == cmd_t::GOLEMSCORE)
   {
-    ch->sendln("But you don't have a golem!");
+    if (!ch->player->golem)
+    {
+      ch->sendln("But you don't have a golem!");
+      return eFAILURE;
+    }
+    else
+    {
+      ch = ch->player->golem;
+    }
+  }
+  else if (cmd == cmd_t::FSCORE)
+  {
+    follow_type *folnext;
+    for (auto fol = ch->followers; fol; fol = folnext)
+    {
+      folnext = fol->next;
+      if (IS_AFFECTED(fol->follower, AFF_CHARM))
+      {
+        ch = fol->follower;
+        break;
+      }
+    }
+
+    if (ch == master)
+    {
+      ch->sendln("But you don't have any non-player followers!");
+      return eFAILURE;
+    }
+  }
+  else
+  {
+    logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
     return eFAILURE;
   }
-  ch = ch->player->golem;
+
   struct affected_type *aff;
 
   int64_t exp_needed;
@@ -371,7 +403,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   std::string isrString;
 
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
-  if (ch->getLevel() + 19 > 60)
+  if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
     logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");

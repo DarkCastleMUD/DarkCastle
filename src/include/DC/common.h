@@ -149,7 +149,9 @@ enum class cmd_t
     QUEST_CANCEL,
     QUEST_START,
     QUEST_FINISH,
-    QUEST_LIST
+    QUEST_LIST,
+    GOLEMSCORE,
+    FSCORE
 };
 
 enum class search_error
