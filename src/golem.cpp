@@ -373,13 +373,52 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   else if (cmd == cmd_t::FSCORE)
   {
     follow_type *folnext;
+    uint_fast8_t charmies_found = 0;
     for (auto fol = ch->followers; fol; fol = folnext)
     {
       folnext = fol->next;
       if (IS_AFFECTED(fol->follower, AFF_CHARM))
+        charmies_found++;
+    }
+
+    if (charmies_found > 1)
+    {
+      if (QString(argument).isEmpty())
       {
-        ch = fol->follower;
-        break;
+        ch->sendln(QStringLiteral("Specify which non-player follower you want to fscore."));
+        return eFAILURE;
+      }
+      else
+      {
+        auto vict = get_mob_room_vis(ch, argument);
+        if (!vict)
+        {
+          ch->sendln("No mob by that name here.");
+          return eFAILURE;
+        }
+        if (!IS_AFFECTED(vict, AFF_CHARM))
+        {
+          ch->sendln(QStringLiteral("%1 is not a charmie.").arg(GET_SHORT(vict)));
+          return eFAILURE;
+        }
+        if (vict->master != ch)
+        {
+          ch->sendln(QStringLiteral("%1 is not your charmie.").arg(GET_SHORT(vict)));
+          return eFAILURE;
+        }
+        ch = vict;
+      }
+    }
+    else
+    {
+      for (auto fol = ch->followers; fol; fol = folnext)
+      {
+        folnext = fol->next;
+        if (IS_AFFECTED(fol->follower, AFF_CHARM))
+        {
+          ch = fol->follower;
+          break;
+        }
       }
     }
 
