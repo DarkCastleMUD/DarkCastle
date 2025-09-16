@@ -232,7 +232,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("leave"), do_leave, position_t::STANDING, 0, cmd_t::LEAVE, true, 20, CommandType::all),
         Command(QStringLiteral("name"), do_name, position_t::DEAD, 1, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("pick"), do_pick, position_t::STANDING, 0, cmd_t::PICK, 0, 20, CommandType::all),
-        Command(QStringLiteral("quest"), do_quest, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
+        Command(QStringLiteral("quest"), do_quest, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::players_only),
         Command(QStringLiteral("qui"), do_qui, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("levels"), do_levels, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("quit"), do_quit, position_t::DEAD, 0, cmd_t::QUIT, 0, 1, CommandType::all),

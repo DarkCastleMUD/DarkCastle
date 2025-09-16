@@ -811,7 +811,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
    char buf[MAX_STRING_LENGTH];
    struct quest_info *quest;
 
-   if (cmd != cmd_t::NORTH)
+   if (cmd != cmd_t::QUEST_LIST)
    {
       quest = get_quest_struct(name);
       if (quest == 0)
