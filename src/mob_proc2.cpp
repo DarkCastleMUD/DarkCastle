@@ -413,7 +413,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 	int count = 0;
 	char buf[100];
 
-	if (cmd != cmd_t::STOCK && cmd != cmd_t::LIST && cmd != cmd_t::VALUE)
+	if (cmd != cmd_t::BUY && cmd != cmd_t::LIST && cmd != cmd_t::VALUE)
 		return eFAILURE;
 
 	// TODO - when determining price, it WILL NOT work if we ever institute

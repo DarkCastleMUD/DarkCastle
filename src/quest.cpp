@@ -924,7 +924,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
    int choice;
    char buf[MAX_STRING_LENGTH];
 
-   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::STOCK))
+   if ((cmd != cmd_t::LIST) && (cmd != cmd_t::BUY))
       return eFAILURE;
 
    if (IS_AFFECTED(ch, AFF_BLIND))
