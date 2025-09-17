@@ -119,8 +119,10 @@ public:
     Commands(void);
     void add(Command cmd);
     auto find(QString arg) -> std::expected<Command, search_error>;
+    auto find(cmd_t cmd) -> std::expected<Command, search_error>;
     const static QList<Command> commands_;
-    static QMap<QString, Command> map_;
+    static QMap<QString, Command> qstring_command_map_;
+    static QMap<cmd_t, Command> cmd_t_command_map_;
 };
 
 bool isCommandTypeDirection(cmd_t cmd);

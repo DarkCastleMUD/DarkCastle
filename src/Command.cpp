@@ -2,7 +2,8 @@
 #include "DC/character.h"
 #include "DC/common.h"
 
-QMap<QString, Command> Commands::map_ = {};
+QMap<QString, Command> Commands::qstring_command_map_ = {};
+QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};
 
 // The last integer will affect a char being removed from hide when they perform the command.
 // 0  - char will always become visibile.
@@ -317,6 +318,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("choose"), &Character::generic_command, position_t::RESTING, 0, cmd_t::CHOOSE, 0, 0, CommandType::players_only),
         Command(QStringLiteral("confirm"), &Character::generic_command, position_t::RESTING, 0, cmd_t::CONFIRM, 0, 0, CommandType::players_only),
         Command(QStringLiteral("cancel"), &Character::generic_command, position_t::RESTING, 0, cmd_t::CANCEL, 0, 0, CommandType::players_only),
+        Command(QStringLiteral("redeem"), &Character::generic_command, position_t::RESTING, 0, cmd_t::REDEEM, 0, 0, CommandType::players_only),
 
         // Immortal commands
         Command(QStringLiteral("voteset"), do_setvote, position_t::DEAD, 108, cmd_t::SETVOTE, 0, 1, CommandType::immortals_only),
@@ -500,10 +502,16 @@ const QList<Command> Commands::commands_ =
 
 auto Commands::find(QString arg) -> std::expected<Command, search_error>
 {
-        if (map_.contains(arg))
+        if (qstring_command_map_.contains(arg))
         {
-                return map_.value(arg);
+                return qstring_command_map_.value(arg);
         }
+
+        return std::unexpected(search_error::not_found);
+}
+
+auto Commands::find(cmd_t cmd) -> std::expected<Command, search_error>
+{
 
         return std::unexpected(search_error::not_found);
 }
@@ -512,14 +520,27 @@ Commands::Commands(void)
 {
         for (const auto &command : commands_)
         {
-                map_[command.getName()] = command;
+                qstring_command_map_[command.getName()] = command;
                 for (qsizetype position = 1; position < command.getName().length(); position++)
                 {
                         auto keyword = command.getName();
                         keyword.truncate(position);
-                        if (!map_.contains(keyword))
+                        if (!qstring_command_map_.contains(keyword))
                         {
-                                map_[keyword] = command;
+                                qstring_command_map_[keyword] = command;
+                        }
+                }
+
+                if (command.getNumber() != cmd_t::DEFAULT &&
+                    command.getNumber() != cmd_t::UNDEFINED)
+                {
+                        if (cmd_t_command_map_.contains(command.getNumber()))
+                        {
+                                logentry(QStringLiteral("Commands::cmd_t_command_map_ already contains cmd_t %1").arg(static_cast<quint64>(command.getNumber())));
+                        }
+                        else
+                        {
+                                cmd_t_command_map_[command.getNumber()] = command;
                         }
                 }
         }
