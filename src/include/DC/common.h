@@ -151,7 +151,8 @@ enum class cmd_t
     QUEST_FINISH,
     QUEST_LIST,
     GOLEMSCORE,
-    FSCORE
+    FSCORE,
+    REDEEM
 };
 
 enum class search_error
