@@ -755,8 +755,7 @@ void DC::game_loop(void)
   {
     if (d->character != nullptr)
     {
-      QString locale = d->character->getSetting("locale", "en_US");
-      QLocale::setDefault(QLocale(locale));
+      QLocale::setDefault(QLocale(d->character->getSetting("locale", "en_US")));
     }
 
     next_d = d->next;

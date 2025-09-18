@@ -66,6 +66,7 @@ QDebug operator<<(QDebug debug, const songInfo &song);
 char *skip_spaces(char *string);
 void stop_grouped_bards(Character *ch, int action);
 void update_character_singing(Character *ch);
+void get_instrument_bonus(Character *ch, int &comb, int &non_comb);
 
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;

@@ -127,7 +127,10 @@ PlayerConfig::PlayerConfig(QObject *parent)
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const
 {
-    return config.value(key, defaultValue);
+    if (config.contains(key) && config.value(key).isEmpty())
+        return defaultValue;
+    else
+        return config.value(key, defaultValue);
 }
 
 player_config_key_t PlayerConfig::key(const player_config_value_t &value, const player_config_key_t &defaultKey) const

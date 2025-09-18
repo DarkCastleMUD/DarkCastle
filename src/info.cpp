@@ -52,6 +52,7 @@
 #include "DC/handler.h"
 #include "DC/const.h"
 #include "DC/vault.h"
+#include "DC/sing.h"
 
 /* extern variables */
 
@@ -1989,25 +1990,44 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
          experience_needed = QStringLiteral("%L1").arg(exp_needed);
       }
 
-      sprintf(buf,
-              "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
-              "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
-              "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
-              "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
-              "|~|  $3BonusDam$7: %+4d   $3SplDam$7:  %+5d  |o|  $3Experience$7:   %-18s |\\|\n\r"
-              "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7: %-18s |o|\n\r"
-              "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-25s  |/|\n\r"
-              "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-25s  |-|\n\r"
-              "|-|                                   |o|  $3Platinum$7: %-6d  $3QPoints$7: %-6d|/|\r\n"
-              "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
-              GET_ARMOR(ch), GET_PKILLS(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch),
-              to_hit, GET_PDEATHS(ch), IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-              to_dam, spell_dam, QStringLiteral("%L1").arg(GET_EXP(ch)).toStdString().c_str(),
-              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), experience_needed.toStdString().c_str(),
-              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QStringLiteral("%L1").arg(ch->getGold()).toStdString().c_str(),
-              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QStringLiteral("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
-
-      ch->send(buf);
+      int instrument_combat{}, instrument_non_combat{};
+      get_instrument_bonus(ch, instrument_combat, instrument_non_combat);
+      ch->sendln(QStringLiteral("($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
+                                "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
+                                "|o|  $3Armor$7:   %1   $3Pkills$7:  %2  |~|  $3Items Carried$7:  %3 |/|\n\r"
+                                "|\\|  $3BonusHit$7: %4   $3PDeaths$7: %5  |/|  $3Weight Carried$7: %6 |~|\n\r"
+                                "|~|  $3BonusDam$7: %7   $3SplDam$7:  %8  |o|  $3Experience$7:   %L9 |\\|\n\r"
+                                "|/|  $3InstrCom$7: %10   $3InstrNon$7:%11  |\\|  $3ExpTillLevel$7: %L12 |/|\r\n"
+                                "|o|  $B$4FIRE$R[%13]  $B$3COLD$R[%14]  $B$5NRGY$R[%15]  |\\|  $3Gold$7: %L16 |o|\n\r"
+                                "|\\|  $B$2ACID$R[%17]  $B$7MAGK$R[%18]  $2POIS$7[%19]  |~|  $3Bank$7: %L20 |/|\n\r"
+                                "|-|  $3MELE$R[%21]  $3SPEL$R[%22]   $3KI$R [%23]  |/|  $3QPoints$7: %L24 $3Platinum$7: %L25 |-|\n\r"
+                                "|/|                                   |o|                                   |/|\r\n"
+                                "($5:$7)===================================($5:$7)===================================($5:$7)")
+                     .arg(GET_ARMOR(ch), 5)
+                     .arg(GET_PKILLS(ch), 5)
+                     .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_N(ch)).arg(CAN_CARRY_N(ch)), 16)
+                     .arg(QStringLiteral("%1%2").arg(to_hit > 0 ? "+" : "").arg(to_hit), 4)
+                     .arg(QString::number(GET_PDEATHS(ch)), 5)
+                     .arg(QStringLiteral("%1/%2").arg(IS_CARRYING_W(ch)).arg(CAN_CARRY_W(ch)), 16)
+                     .arg(QStringLiteral("%1%2").arg(to_dam > 0 ? "+" : "").arg(to_dam), 4)                                                   // +4d
+                     .arg(QStringLiteral("%1%2").arg(spell_dam > 0 ? "+" : "").arg(spell_dam), 5)                                             //+5d
+                     .arg(GET_EXP(ch), 18)                                                                                                    // -18s
+                     .arg(QStringLiteral("%1%2").arg(instrument_combat > 0 ? "+" : "").arg(instrument_combat), 4)                             //+4
+                     .arg(QStringLiteral("%1%2").arg(instrument_non_combat > 0 ? "+" : "").arg(instrument_non_combat), 5)                     //+5
+                     .arg(experience_needed, 18)                                                                                              // -18s
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_FIRE) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_FIRE)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_COLD) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_COLD)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ENERGY) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ENERGY)), 3) //+3
+                     .arg(ch->getGold(), 26)
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_ACID) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_ACID)), 3)     //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_MAGIC) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_MAGIC)), 3)   //+3
+                     .arg(QStringLiteral("%1%2").arg(get_saves(ch, SAVE_TYPE_POISON) > 0 ? "+" : "").arg(get_saves(ch, SAVE_TYPE_POISON)), 3) //+3
+                     .arg(GET_BANK(ch), 26)                                                                                                   // -25s
+                     .arg(QStringLiteral("%1%2").arg(ch->melee_mitigation > 0 ? "+" : "").arg(ch->melee_mitigation), 3)                       // +3
+                     .arg(QStringLiteral("%1%2").arg(ch->spell_mitigation > 0 ? "+" : "").arg(ch->spell_mitigation), 3)                       // +3
+                     .arg(QStringLiteral("%1%2").arg(ch->song_mitigation > 0 ? "+" : "").arg(ch->song_mitigation), 3)                         // +3
+                     .arg(GET_QPOINTS(ch), 5)                                                                                                 // -25s
+                     .arg(GET_PLATINUM(ch), 7));                                                                                              // -6d
    }
    else
       ch->sendln("($5:$7)===================================($5:$7)==================================($5:$7)");
