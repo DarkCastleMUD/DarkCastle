@@ -1279,7 +1279,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
 
 void Character::tell_history(Character *ch, QString message)
 {
-  if (!player)
+  if (!isPlayer())
   {
     return;
   }
@@ -1287,7 +1287,7 @@ void Character::tell_history(Character *ch, QString message)
   ChannelMessage cm(ch, DC::LogChannel::CHANNEL_TELL, message);
 
   player->tell_history.enqueue(cm);
-  if (player->tell_history.size() > 100)
+  if (player->tell_history.size() > 1000)
   {
     player->tell_history.dequeue();
   }
