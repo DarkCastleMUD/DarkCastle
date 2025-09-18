@@ -280,7 +280,6 @@ command_return_t do_equipment(Character *ch, char *argument, cmd_t cmd = cmd_t::
 command_return_t do_eyegouge(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_examine(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_exits(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_experience(Character *ch, QStringList arguments, cmd_t cmd);
 command_return_t do_export(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_ferocity(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_fighting(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
