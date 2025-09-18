@@ -1119,3 +1119,28 @@ QString Character::calc_name(bool use_color)
 
     return name;
 }
+
+void ChannelMessage::set_wizinvis(const class Character *sender)
+{
+    if (sender && sender->isPlayer())
+    {
+        wizinvis_ = sender->player->wizinvis;
+    }
+    else
+    {
+        wizinvis_ = 0;
+    }
+}
+
+    void ChannelMessage::set_name(const class Character *sender)
+    {
+        if (sender)
+        {
+            sender_name_ = GET_SHORT(sender);
+        }
+        else
+        {
+            sender_name_ = QStringLiteral("Unknown");
+            logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+        }
+    }

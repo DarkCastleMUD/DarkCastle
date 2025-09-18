@@ -31,91 +31,6 @@
 #include "DC/returnvals.h"
 #include "DC/obj.h"
 
-class ChannelMessage
-{
-  QString sender_name_;
-  level_t wizinvis_;
-  DC::LogChannel type_;
-  QString msg_;
-  QDateTime timestamp_;
-
-public:
-  ChannelMessage(const Character *sender, const DC::LogChannel type, const char *msg)
-      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
-  {
-    set_wizinvis(sender);
-    set_name(sender);
-  }
-
-  ChannelMessage(const Character *sender, const DC::LogChannel type, const QString &msg)
-      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
-  {
-    set_wizinvis(sender);
-    set_name(sender);
-  }
-
-  QString getMessage(const level_t receiver_level, bool show_timestamps = false)
-  {
-    QString msg;
-    QTextStream output(&msg);
-    QString sender_name;
-
-    if (receiver_level < wizinvis_)
-    {
-      sender_name = "Someone";
-    }
-    else
-    {
-      sender_name = sender_name_;
-    }
-
-    switch (type_)
-    {
-    case DC::LogChannel::CHANNEL_GOSSIP:
-      if (show_timestamps)
-        output << "$5$B" << getTimestamp() << ":" << sender_name << " gossips '" << msg_ << "$5$B'$R";
-      else
-        output << "$5$B" << sender_name << " gossips '" << msg_ << "$5$B'$R";
-      break;
-    default:
-      output << "$5$B" << sender_name << " " << type_ << " '" << msg << "$5$B'$R";
-      break;
-    }
-
-    return msg;
-  }
-
-  QString getTimestamp(void) const
-  {
-    return timestamp_.toString();
-  }
-
-  inline void set_wizinvis(const Character *sender)
-  {
-    if (sender && sender->isPlayer())
-    {
-      wizinvis_ = sender->player->wizinvis;
-    }
-    else
-    {
-      wizinvis_ = 0;
-    }
-  }
-
-  inline void set_name(const Character *sender)
-  {
-    if (sender)
-    {
-      sender_name_ = GET_SHORT(sender);
-    }
-    else
-    {
-      sender_name_ = QStringLiteral("Unknown");
-      logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
-    }
-  }
-};
-
 QQueue<ChannelMessage> gossip_history;
 std::queue<QString> auction_history;
 std::queue<QString> newbie_history;
@@ -860,10 +775,27 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       return eSUCCESS;
     }
 
-    this->sendln("Here are the last 10 tell messages:");
+    auto showtimestamps = getSetting("tell.history.timestamp");
+
+    if (player->tell_history.isEmpty())
+    {
+      sendln("There have been no tell messages.");
+      return eSUCCESS;
+    }
+    else if (player->tell_history.count() == 1)
+    {
+      sendln("Here is the only tell message:");
+    }
+    else
+    {
+      sendln(QStringLiteral("Here are the last %1 tell messages:").arg(player->tell_history.count()));
+    }
     for (const auto &c : player->tell_history)
     {
-      sendln(c.message);
+      if (showtimestamps == "1" || showtimestamps.startsWith('t', Qt::CaseInsensitive))
+        sendln(c.getMessage(getLevel(), true));
+      else
+        sendln(c.getMessage(getLevel(), false));
     }
 
     return eSUCCESS;
@@ -1347,17 +1279,17 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
 
 void Character::tell_history(Character *ch, QString message)
 {
-  if (this->player == nullptr)
+  if (!player)
   {
     return;
   }
 
-  communication c(ch, message);
+  ChannelMessage cm(ch, DC::LogChannel::CHANNEL_TELL, message);
 
-  this->player->tell_history.push_back(c);
-  if (this->player->tell_history.size() > 10)
+  player->tell_history.enqueue(cm);
+  if (player->tell_history.size() > 100)
   {
-    this->player->tell_history.pop_front();
+    player->tell_history.dequeue();
   }
 }
 
