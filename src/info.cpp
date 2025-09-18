@@ -3355,7 +3355,6 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 
    level_t next_level = level_;
    qint64 experience_remaining = 0;
-   QLocale::setDefault(QLocale::English);
 
    do
    {
