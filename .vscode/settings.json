@@ -64,7 +64,13 @@
         "system_error": "cpp",
         "regex": "cpp",
         "ratio": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "bitset": "cpp",
+        "stack": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "locale": "cpp",
+        "execution": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
