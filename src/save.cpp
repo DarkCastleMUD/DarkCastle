@@ -548,7 +548,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale" || key == "mode" || key == "fighting.showdps")
+    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps)$").match(key).hasMatch())
     {
       config->insert(key, value);
     }

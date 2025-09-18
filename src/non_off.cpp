@@ -589,13 +589,39 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
         return eFAILURE;
       }
     }
-    else if (key != "tell.history.timestamp" && key != "locale" && key != "fighting.showdps")
+    else if (key == "locale")
+    {
+      QList<QLocale> locales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyTerritory);
+      bool found_locale = false;
+      for (const auto &locale : locales)
+        if (locale.name() == value)
+        {
+          found_locale = true;
+          break;
+        }
+
+      if (!found_locale)
+      {
+        if (value != QStringLiteral("?"))
+        {
+          sendln(QStringLiteral("'%1' is an invalid locale. Type config locale=? to see a list of valid locales.").arg(value));
+          return eSUCCESS;
+        }
+        sendln(QStringLiteral("Here's a list of valid locales:"));
+        for (const auto &locale : locales)
+        {
+          sendln(locale.name());
+        }
+        return eSUCCESS;
+      }
+    }
+    else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps)$").match(key).hasMatch())
     {
       send("Invalid config option.\r\n");
       return eFAILURE;
     }
 
-    if (key == "fighting.showdps" && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
+    if (QRegularExpression("^((tell|gossip).history.timestamp|fighting.showdps)$").match(key).hasMatch() && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
     {
       sendln("Invalid config option. Valid options are: 0, 1, t, f, true and false.");
       return eFAILURE;

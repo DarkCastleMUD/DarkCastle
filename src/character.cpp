@@ -123,6 +123,7 @@ PlayerConfig::PlayerConfig(QObject *parent)
     config["locale"] = "en_US";
     config["mode"] = "line";
     config["fighting.showdps"] = "0";
+    config["gossip.history.timestamp"] = "0";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const

@@ -13,6 +13,9 @@
 #include <tuple>
 #include <fmt/format.h>
 
+#include <QQueue>
+#include <QDateTime>
+
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/room.h"
@@ -28,56 +31,74 @@
 #include "DC/returnvals.h"
 #include "DC/obj.h"
 
-class channel_msg
+class ChannelMessage
 {
+  QString sender_name_;
+  level_t wizinvis_;
+  DC::LogChannel type_;
+  QString msg_;
+  QDateTime timestamp_;
+
 public:
-  channel_msg(const Character *sender, const DC::LogChannel type, const char *msg)
-      : type_(type), msg(std::string(msg))
+  ChannelMessage(const Character *sender, const DC::LogChannel type, const char *msg)
+      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const Character *sender, const DC::LogChannel type, const std::string &msg)
-      : type_(type), msg(msg)
+  ChannelMessage(const Character *sender, const DC::LogChannel type, const QString &msg)
+      : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  std::string get_msg(const int receiver_level)
+  QString getMessage(const level_t receiver_level, bool show_timestamps = false)
   {
-    std::stringstream output;
-    std::string sender;
+    QString msg;
+    QTextStream output(&msg);
+    QString sender_name;
 
-    if (receiver_level < wizinvis)
+    if (receiver_level < wizinvis_)
     {
-      sender = "Someone";
+      sender_name = "Someone";
     }
     else
     {
-      sender = name;
+      sender_name = sender_name_;
     }
 
     switch (type_)
     {
     case DC::LogChannel::CHANNEL_GOSSIP:
-      output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
+      if (show_timestamps)
+        output << "$5$B" << getTimestamp() << ":" << sender_name << " gossips '" << msg_ << "$5$B'$R";
+      else
+        output << "$5$B" << sender_name << " gossips '" << msg_ << "$5$B'$R";
+      break;
+    default:
+      output << "$5$B" << sender_name << " " << type_ << " '" << msg << "$5$B'$R";
       break;
     }
 
-    return output.str();
+    return msg;
+  }
+
+  QString getTimestamp(void) const
+  {
+    return timestamp_.toString();
   }
 
   inline void set_wizinvis(const Character *sender)
   {
-    if (sender && IS_PC(sender))
+    if (sender && sender->isPlayer())
     {
-      wizinvis = sender->player->wizinvis;
+      wizinvis_ = sender->player->wizinvis;
     }
     else
     {
-      wizinvis = 0;
+      wizinvis_ = 0;
     }
   }
 
@@ -85,23 +106,17 @@ public:
   {
     if (sender)
     {
-      name = std::string(GET_SHORT(sender));
+      sender_name_ = GET_SHORT(sender);
     }
     else
     {
-      name = std::string("Unknown");
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type_, msg.c_str());
+      sender_name_ = QStringLiteral("Unknown");
+      logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
     }
   }
-
-private:
-  std::string name;
-  int32_t wizinvis;
-  DC::LogChannel type_;
-  std::string msg;
 };
 
-std::queue<channel_msg> gossip_history;
+QQueue<ChannelMessage> gossip_history;
 std::queue<QString> auction_history;
 std::queue<QString> newbie_history;
 std::queue<QString> trivia_history;
@@ -359,27 +374,43 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    std::queue<channel_msg> msgs = gossip_history;
-    ch->sendln("Here are the last 10 gossips:");
-    while (!msgs.empty())
+    QQueue<ChannelMessage> msgs = gossip_history;
+    if (msgs.isEmpty())
     {
-      act(msgs.front().get_msg(ch->getLevel()), ch, 0, ch, TO_VICT, 0);
-      msgs.pop();
+      ch->sendln("There have not been any player gossips.");
+      return eSUCCESS;
+    }
+    else if (msgs.count() == 1)
+      ch->sendln(QStringLiteral("Here is the only gossip so far:").arg(msgs.size()));
+    else
+      ch->sendln(QStringLiteral("Here are the last %1 gossips:").arg(msgs.size()));
+
+    auto showtimestamps = ch->getSetting("gossip.history.timestamp");
+    while (!msgs.isEmpty())
+    {
+      auto msg = msgs.dequeue();
+      if (showtimestamps == "1" || showtimestamps.startsWith('t', Qt::CaseInsensitive))
+        act(msg.getMessage(ch->getLevel(), true), ch, 0, ch, TO_VICT, 0);
+      else
+        act(msg.getMessage(ch->getLevel(), false), ch, 0, ch, TO_VICT, 0);
     }
   }
   else
   {
     ch->decrementMove(5);
 
-    channel_msg msg(ch, DC::LogChannel::CHANNEL_GOSSIP, argument);
+    ChannelMessage msg(ch, DC::LogChannel::CHANNEL_GOSSIP, argument);
 
     sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
-    gossip_history.push(msg);
-    if (gossip_history.size() > 10)
+    if (ch->isPlayer())
     {
-      gossip_history.pop();
+      gossip_history.enqueue(msg);
+      if (gossip_history.size() > 1000)
+      {
+        gossip_history.dequeue();
+      }
     }
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
@@ -397,7 +428,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
         if (!silence)
         {
-          act(msg.get_msg(i->character->getLevel()), ch, 0, i->character, TO_VICT, 0);
+          act(msg.getMessage(i->character->getLevel()), ch, 0, i->character, TO_VICT, 0);
         }
       }
     }
