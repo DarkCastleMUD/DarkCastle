@@ -337,6 +337,10 @@ public:
     bool isQuest(void);
     bool isTest(void);
     bool isGodload(void);
+    bool isCustom(void)
+    {
+        return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
+    }
 
     int32_t getPortalLeaveZone(void)
     {

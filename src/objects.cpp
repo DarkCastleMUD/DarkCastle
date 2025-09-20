@@ -2767,7 +2767,15 @@ uint64_t Object::getLevel(void)
 
 bool Object::isQuest(void)
 {
-  return isexact(QStringLiteral("quest"), getName());
+  return isexact("quest", name) ||
+         DC::getInstance()->obj_index[item_number].virt == 3124 ||
+         DC::getInstance()->obj_index[item_number].virt == 3125 ||
+         DC::getInstance()->obj_index[item_number].virt == 3126 ||
+         DC::getInstance()->obj_index[item_number].virt == 3127 ||
+         DC::getInstance()->obj_index[item_number].virt == 3128 ||
+         DC::getInstance()->obj_index[item_number].virt == 27997 ||
+         DC::getInstance()->obj_index[item_number].virt == 27998 ||
+         DC::getInstance()->obj_index[item_number].virt == 27999;
 }
 
 bool Object::isTest(void)

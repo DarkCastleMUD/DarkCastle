@@ -1906,22 +1906,19 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
           return eSUCCESS;
         }
 
-        if (isexact("godload", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            isexact("gl", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (obj->isGodload())
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            DC::getInstance()->obj_index[obj->item_number].virt >= 3124 && DC::getInstance()->obj_index[obj->item_number].virt <= 3128)
+        if (obj->isQuest())
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
           return eSUCCESS;
         }
 
-        if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+        if (obj->isCustom())
         {
           owner->tell(ch, "I can't reroll objects with the NO_CUSTOM flag set on them.");
           return eSUCCESS;
@@ -2168,17 +2165,13 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         if (GET_OBJ_TYPE(obj) != ITEM_WEAPON &&
             GET_OBJ_TYPE(obj) != ITEM_ARMOR &&
             GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT &&
-            GET_OBJ_TYPE(obj) != ITEM_WAND &&
-            GET_OBJ_TYPE(obj) != ITEM_STAFF &&
             GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
-          owner->tell(ch, "I can only redeem Apocalypse tokens for weapons, armor, instruments, wands, staffs and containers.");
+          owner->tell(ch, "I can only redeem Apocalypse tokens for weapons, armor, instruments and containers.");
           return eSUCCESS;
         }
 
-        if (isexact("godload", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            isexact("gl", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (obj->isGodload())
         {
           owner->tell(ch, "I can't redeem for GL items.");
           return eSUCCESS;

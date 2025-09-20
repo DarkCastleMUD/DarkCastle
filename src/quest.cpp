@@ -1655,15 +1655,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          return eSUCCESS;
       }
 
-      if (!isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 3124 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 3125 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 3126 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 3127 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 3128 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 27997 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 27998 &&
-          DC::getInstance()->obj_index[obj->item_number].virt != 27999)
+      if (!obj->isQuest())
       {
          owner->do_tell(QStringLiteral("%1 I only buy quest equipment.").arg(GET_NAME(ch)).split(' '));
          return eSUCCESS;
