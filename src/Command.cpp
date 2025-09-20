@@ -512,6 +512,10 @@ auto Commands::find(QString arg) -> std::expected<Command, search_error>
 
 auto Commands::find(cmd_t cmd) -> std::expected<Command, search_error>
 {
+        if (cmd_t_command_map_.contains(cmd))
+        {
+                return cmd_t_command_map_.value(cmd);
+        }
 
         return std::unexpected(search_error::not_found);
 }

@@ -114,6 +114,7 @@ typedef QList<QString> hints_t;
 #include "DC/room.h"
 #include "DC/Database.h"
 #include "DC/Command.h"
+#include "DC/shop.h"
 
 class Connection;
 class index_data;
@@ -476,6 +477,7 @@ public:
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
   QList<wizlist_info> wizlist;
+  QMap<QString, redeem_t> redeem_sessions = {};
 
   static QString getBuildVersion();
   static QString getBuildTime();

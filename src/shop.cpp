@@ -2095,3 +2095,166 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
 
   return eSUCCESS;
 }
+
+int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
+{
+  switch (cmd)
+  {
+  case cmd_t::REDEEM:
+  case cmd_t::LIST:
+  case cmd_t::CANCEL:
+  case cmd_t::CONFIRM:
+    break;
+  default:
+    return eFAILURE;
+  }
+
+  if (!ch || !ch->isPlayer() || !arg)
+  {
+    return eFAILURE;
+  }
+
+  QStringList arguments = QString(arg).split(' ');
+  QString arg1 = arguments.value(0);
+  QString arg2 = arguments.value(1);
+  QString arg3 = arguments.value(2);
+  redeem_t r = DC::getInstance()->redeem_sessions.value(ch->getName());
+
+  switch (r.state)
+  {
+  case redeem_t::state_t::BEGIN:
+    switch (cmd)
+    {
+    case cmd_t::REDEEM:
+      if (!arg1.isEmpty())
+        break;
+    case cmd_t::LIST:
+    case cmd_t::CANCEL:
+    case cmd_t::CONFIRM:
+      owner->tell(ch, "Type 'redeem v#' or 'redeem v# random' to redeem Apocalypse tokens "
+                      "for the item with vnum v#. I will then ask you to confirm the item "
+                      "you want redeemed. The cost will be 3 Apocalypse tokens for a level "
+                      "50 or under item or 6 Apocalypse tokens for a level 51 to 59 item.");
+      return eSUCCESS;
+      break;
+    default:
+      return eFAILURE;
+      break;
+    }
+
+    if (!arg1.isEmpty())
+    {
+      r = {};
+
+      if (arg1.contains("random", Qt::CaseInsensitive))
+      {
+        r.random = true;
+        arg1 = arg2;
+      }
+      if (arg2.contains("random", Qt::CaseInsensitive))
+      {
+        r.random = true;
+      }
+
+      // needs to lookup world by vnum
+      obj = get_objindex_vnum(arg1);
+      if (obj == nullptr)
+      {
+        owner->tell(ch, QStringLiteral("I can't find an object with vnum \'%1\'").arg(arg1));
+        return eSUCCESS;
+      }
+      else
+      {
+        if (GET_OBJ_TYPE(obj) != ITEM_WEAPON &&
+            GET_OBJ_TYPE(obj) != ITEM_ARMOR &&
+            GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT &&
+            GET_OBJ_TYPE(obj) != ITEM_WAND &&
+            GET_OBJ_TYPE(obj) != ITEM_STAFF &&
+            GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
+        {
+          owner->tell(ch, "I can only redeem Apocalypse tokens for weapons, armor, instruments, wands, staffs and containers.");
+          return eSUCCESS;
+        }
+
+        if (isexact("godload", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
+            isexact("gl", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
+            isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        {
+          owner->tell(ch, "I can't redeem for GL items.");
+          return eSUCCESS;
+        }
+
+        if (isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
+            DC::getInstance()->obj_index[obj->item_number].virt >= 3124 && DC::getInstance()->obj_index[obj->item_number].virt <= 3128)
+        {
+          owner->tell(ch, "I can't redeem for quest items.");
+          return eSUCCESS;
+        }
+
+        if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM) && r.random)
+        {
+          owner->tell(ch, "I can't redeem randomized versions of items with NO_CUSTOM flag set.");
+          return eSUCCESS;
+        }
+
+        if (obj->getLevel() >= 60)
+        {
+          owner->tell(ch, "You can't redeem Apocalypse tokens for a level 60 item.");
+          return eSUCCESS;
+        }
+
+        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].virt).split(' '));
+
+        r.orig_obj = obj;
+        r.orig_rnum = GET_OBJ_RNUM(obj);
+        r.state = redeem_t::state_t::PICKED_OBJ_TO_REDEEM;
+        if (obj->getLevel() >= 51)
+          r.token_count = 6;
+        else
+          r.token_count = 3;
+        DC::getInstance()->redeem_sessions[GET_NAME(ch)] = r;
+
+        auto random_str = r.random ? "randomized" : "default";
+        owner->tell(ch, QStringLiteral("Type 'confirm' if you want me to redeem %1 Apocalypse tokens for one %2 '%3'? Type "
+                                       "'cancel' if not.")
+                            .arg(QString::number(r.token_count))
+                            .arg(random_str)
+                            .arg(GET_OBJ_SHORT(obj)));
+        return eSUCCESS;
+      }
+    }
+    break;
+  case redeem_t::state_t::PICKED_OBJ_TO_REDEEM:
+    switch (cmd)
+    {
+    case cmd_t::REDEEM:
+    case cmd_t::LIST:
+      owner->tell(ch, QStringLiteral("You need to confirm or cancel redeeming %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
+      return eSUCCESS;
+      break;
+    case cmd_t::CONFIRM:
+      break;
+    }
+
+    return eSUCCESS;
+    break;
+  case redeem_t::state_t::REDEEM:
+    owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
+    return eSUCCESS;
+    break;
+  }
+
+  /*
+        if (r.orig_obj->getLevel() <= 50)
+        {
+          token_count = 3;
+        }
+        else if (r.orig_obj->getLevel() <= 59)
+        {
+          token_count = 6;
+        }
+
+  */
+
+  return eFAILURE;
+}

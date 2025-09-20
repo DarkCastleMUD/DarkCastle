@@ -47,6 +47,24 @@ struct reroll_t
     CHOSEN
   } state = {};
 };
+struct redeem_t
+{
+  class Object *choice1_obj = nullptr;
+  Object *choice2_obj = nullptr;
+  uint64_t orig_rnum = {};
+  vnum_t orig_vnum = {};
+  Object *orig_obj = nullptr;
+  uint8_t token_count = {};
+  bool random = false;
+
+  enum state_t
+  {
+    BEGIN,
+    PICKED_OBJ_TO_REDEEM,
+    REDEEM,
+    CHOSEN
+  } state = {};
+};
 
 extern std::map<std::string, reroll_t> reroll_sessions;
 

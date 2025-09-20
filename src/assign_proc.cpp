@@ -158,6 +158,7 @@ void assign_non_combat_procs()
   SPEC_FUN cardinal;
   SPEC_FUN eddie_shopkeeper;
   SPEC_FUN reroll_trader;
+  SPEC_FUN redeem_trader;
 
   assign_one_mob_non(3071, cardinal);
 
@@ -296,6 +297,7 @@ void assign_non_combat_procs()
   assign_one_mob_non(32047, repair_shop);
   assign_one_mob_non(10031, eddie_shopkeeper);
   assign_one_mob_non(10032, reroll_trader);
+  assign_one_mob_non(23006, redeem_trader);
 
   return;
 }
