@@ -899,6 +899,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
+    ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "credits"))
     file_to_string(CREDITS_FILE, credits);
@@ -927,6 +928,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
+    ch->sendln("Done!");
   }
   else if (!str_cmp(arg, "vaults"))
   {
