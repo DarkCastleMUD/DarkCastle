@@ -1183,11 +1183,11 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
             ch->sendln("(This item is cursed, BTW.)");
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
-            ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
+            ch->sendln(QStringLiteral("You drop the %1.").arg(tmp_object->short_description));
           }
           else if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
+            ch->sendln(QStringLiteral("You drop the %1.").arg(tmp_object->short_description));
             blindlag = true;
           }
           else
@@ -1196,7 +1196,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
+            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
@@ -1215,7 +1215,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         {
           if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            sprintf(buffer, "You can't drop the %s, it must be CURSED!\r\n", fname(tmp_object->name).toStdString().c_str());
+            sprintf(buffer, "You can't drop %s, it must be CURSED!\r\n", tmp_object->short_description);
             ch->send(buffer);
             test = true;
           }
@@ -1251,7 +1251,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
 
         if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          ch->sendln("Don't be a dork.");
+          ch->sendln("You can't drop godload items.");
           return eFAILURE;
         }
         else if (!isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
@@ -1259,12 +1259,12 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         {
           if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
-          ch->sendln(QStringLiteral("You drop the %1.").arg(fname(tmp_object->name)));
+          ch->sendln(QStringLiteral("You drop the %1.").arg(tmp_object->short_description));
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
+            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].virt, ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
