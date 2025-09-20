@@ -75,20 +75,21 @@ class ChannelMessage
 
 public:
     ChannelMessage(const Character *sender, const DC::LogChannel type, const char *msg)
-        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
+        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
     {
         set_wizinvis(sender);
         set_name(sender);
     }
 
     ChannelMessage(const Character *sender, const DC::LogChannel type, const QString &msg)
-        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTimeUtc())
+        : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
     {
         set_wizinvis(sender);
         set_name(sender);
     }
 
-    QString getMessage(const level_t receiver_level, bool show_timestamps = false) const
+    QString getMessage(Character *ch) const;
+    QString getMessage(const level_t receiver_level, bool show_timestamps = false, QTimeZone timezone = {}, Qt::DateFormat timestamp_format = {}) const
     {
         QString msg;
         QTextStream output(&msg);
@@ -107,13 +108,13 @@ public:
         {
         case DC::LogChannel::CHANNEL_GOSSIP:
             if (show_timestamps)
-                output << "$5$B" << getTimestamp() << ":" << sender_name << " gossips '" << msg_ << "$5$B'$R";
+                output << "$5$B" << getTimestamp(timezone, timestamp_format) << ": " << sender_name << " gossips '" << msg_ << "$5$B'$R";
             else
                 output << "$5$B" << sender_name << " gossips '" << msg_ << "$5$B'$R";
             break;
         case DC::LogChannel::CHANNEL_TELL:
             if (show_timestamps)
-                output << "$2$B" << getTimestamp() << ":" << msg_ << "$R";
+                output << "$2$B" << getTimestamp(timezone, timestamp_format) << ": " << msg_ << "$R";
             else
                 output << "$2$B" << msg_ << "$R";
             break;
@@ -128,6 +129,11 @@ public:
     QString getTimestamp(void) const
     {
         return timestamp_.toString();
+    }
+
+    QString getTimestamp(const QTimeZone &timezone, const Qt::DateFormat format = Qt::DateFormat::ISODate) const
+    {
+        return timestamp_.toTimeZone(timezone).toString(format);
     }
 
     void set_wizinvis(const class Character *sender);

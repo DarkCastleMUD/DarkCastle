@@ -1,5 +1,6 @@
 #include <QStringTokenizer>
 #include <QFile>
+#include <QMetaEnum>
 
 #include "DC/character.h"
 #include "DC/db.h"
@@ -120,10 +121,12 @@ PlayerConfig::PlayerConfig(QObject *parent)
     config["color.good"] = "green";
     config["color.bad"] = "red";
     config["tell.history.timestamp"] = "0";
+    config["gossip.history.timestamp"] = "0";
     config["locale"] = "en_US";
+    config["timezone"] = "America/Chicago";
     config["mode"] = "line";
     config["fighting.showdps"] = "0";
-    config["gossip.history.timestamp"] = "0";
+    config["dateformat"] = "ISODate";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const
@@ -1132,15 +1135,45 @@ void ChannelMessage::set_wizinvis(const class Character *sender)
     }
 }
 
-    void ChannelMessage::set_name(const class Character *sender)
+void ChannelMessage::set_name(const class Character *sender)
+{
+    if (sender)
     {
-        if (sender)
-        {
-            sender_name_ = GET_SHORT(sender);
-        }
-        else
-        {
-            sender_name_ = QStringLiteral("Unknown");
-            logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
-        }
+        sender_name_ = GET_SHORT(sender);
     }
+    else
+    {
+        sender_name_ = QStringLiteral("Unknown");
+        logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+    }
+}
+
+QString ChannelMessage::getMessage(Character *ch) const
+{
+    if (!ch)
+        return {};
+
+    QString prefix;
+    switch (type_)
+    {
+    case DC::LogChannel::CHANNEL_TELL:
+        prefix = "tell";
+        break;
+    case DC::LogChannel::CHANNEL_GOSSIP:
+        prefix = "gossip";
+        break;
+    default:
+        prefix = "unknown";
+        break;
+    }
+
+    QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
+    QString timestamp = ch->getSetting(QStringLiteral("%1.history.timestamp").arg(prefix));
+    QString dateformat_str = ch->getSetting("dateformat", "ISODate");
+    Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
+
+    if (timestamp == "1" || timestamp.startsWith('t', Qt::CaseInsensitive))
+        return getMessage(ch->getLevel(), true, timezone, dateformat);
+    else
+        return getMessage(ch->getLevel(), false, timezone, dateformat);
+}

@@ -537,8 +537,9 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
   {
     if (player->config->find(key) != player->config->end())
     {
-      send(QStringLiteral("%1 unset.\r\n").arg(key));
+      sendln(QStringLiteral("%1 unset.").arg(key));
       player->config->insert(key, QString());
+      save(cmd_t::SAVE_SILENTLY);
       return eSUCCESS;
     }
     send(QStringLiteral("%1 not found.\r\n").arg(key));
@@ -615,7 +616,48 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
         return eSUCCESS;
       }
     }
-    else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps)$").match(key).hasMatch())
+    else if (key == "timezone")
+    {
+      bool found = false;
+      for (const auto &tz : QTimeZone::availableTimeZoneIds())
+      {
+        if (value == "?")
+          sendln(tz);
+        else if (value == tz)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (value != "?")
+      {
+        if (!found)
+        {
+          sendln(QStringLiteral("Invalid timezone '%1' specified. Type config timezone=? to see the full list.").arg(value));
+          return eSUCCESS;
+        }
+      }
+      else
+        return eSUCCESS;
+    }
+    else if (key == "dateformat")
+    {
+      if (QStringLiteral("TextDate").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("ISODateWithMs").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("ISODate").compare(value, Qt::CaseInsensitive) &&
+          QStringLiteral("RFC2822Date").compare(value, Qt::CaseInsensitive))
+      {
+        sendln("Valid timestamp formats are:");
+        auto timezone_str = getSetting("timezone", "America/Chicago");
+        auto timezone = QTimeZone(timezone_str.toLatin1());
+        sendln(QStringLiteral("%1 %2").arg("TextDate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::TextDate)));
+        sendln(QStringLiteral("%1 %2").arg("ISODateWithMs", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODateWithMs)));
+        sendln(QStringLiteral("%1 %2").arg("ISODate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::ISODate)));
+        sendln(QStringLiteral("%1 %2").arg("RFC2822Date", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::RFC2822Date)));
+        return eSUCCESS;
+      }
+    }
+    else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
       send("Invalid config option.\r\n");
       return eFAILURE;
@@ -630,6 +672,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     player->config->insert(key, value);
 
     send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
+    save(cmd_t::SAVE_SILENTLY);
     return eSUCCESS;
   }
 

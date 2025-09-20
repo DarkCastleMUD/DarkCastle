@@ -296,19 +296,12 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
       return eSUCCESS;
     }
     else if (msgs.count() == 1)
-      ch->sendln(QStringLiteral("Here is the only gossip so far:").arg(msgs.size()));
+      ch->sendln(QStringLiteral("Here is the only gossip so far:"));
     else
       ch->sendln(QStringLiteral("Here are the last %1 gossips:").arg(msgs.size()));
 
-    auto showtimestamps = ch->getSetting("gossip.history.timestamp");
     while (!msgs.isEmpty())
-    {
-      auto msg = msgs.dequeue();
-      if (showtimestamps == "1" || showtimestamps.startsWith('t', Qt::CaseInsensitive))
-        act(msg.getMessage(ch->getLevel(), true), ch, 0, ch, TO_VICT, 0);
-      else
-        act(msg.getMessage(ch->getLevel(), false), ch, 0, ch, TO_VICT, 0);
-    }
+      act(msgs.dequeue().getMessage(ch), ch, 0, ch, TO_VICT, 0);
   }
   else
   {
@@ -775,8 +768,6 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       return eSUCCESS;
     }
 
-    auto showtimestamps = getSetting("tell.history.timestamp");
-
     if (player->tell_history.isEmpty())
     {
       sendln("There have been no tell messages.");
@@ -792,10 +783,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     }
     for (const auto &c : player->tell_history)
     {
-      if (showtimestamps == "1" || showtimestamps.startsWith('t', Qt::CaseInsensitive))
-        sendln(c.getMessage(getLevel(), true));
-      else
-        sendln(c.getMessage(getLevel(), false));
+      sendln(c.getMessage(this));
     }
 
     return eSUCCESS;

@@ -331,9 +331,12 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
       if (setting.key() == "color.good" ||
           setting.key() == "color.bad" ||
           setting.key() == "tell.history.timestamp" ||
+          setting.key() == "gossip.history.timestamp" ||
           setting.key() == "locale" ||
           setting.key() == "mode" ||
-          setting.key() == "fighting.showdps")
+          setting.key() == "timezone" ||
+          setting.key() == "fighting.showdps" ||
+          setting.key() == "dateformat")
       {
         fwrite("OPT", sizeof(char), 3, fpsave);
         fwrite_var_string(setting.key(), fpsave);
@@ -548,7 +551,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps)$").match(key).hasMatch())
+    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
       config->insert(key, value);
     }
