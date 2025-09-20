@@ -173,12 +173,12 @@ int do_visible(Character *ch, char *argument, cmd_t cmd)
 
 int do_donate(Character *ch, char *argument, cmd_t cmd)
 {
-  class Object *obj;
-  char name[MAX_INPUT_LENGTH + 1];
-  char buf[MAX_STRING_LENGTH];
-  int location;
+  class Object *obj{};
+  char name[MAX_INPUT_LENGTH + 1]{};
+  char buf[MAX_STRING_LENGTH]{};
+  int location{};
   int room = 3099;
-  int origin;
+  int origin{};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -223,8 +223,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
-                GET_NAME(ch));
+        sprintf(buf, "\n\r##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
         send_info(buf);
 
         struct affected_type af;
@@ -252,15 +251,14 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
-                GET_NAME(ch));
+        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), obj->short_description);
         logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return eFAILURE;
       }
     }
     else
     {
-      ch->sendln("You can only yield the Champion flag from a safe room.");
+      ch->sendln(QStringLiteral("You can only yield %1 from a safe room.").arg(obj->short_description));
       return eFAILURE;
     }
   }

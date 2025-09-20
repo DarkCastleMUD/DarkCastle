@@ -94,7 +94,7 @@ void do_champ_flag_death(Character *victim)
     obj_to_room(obj, CFLAG_HOME);
     snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], victim->getNameC());
     send_info(buf);
-    snprintf(buf, 200, "##%s has just died with the Champion flag, watch for it to reappear!\n\r", victim->getNameC());
+    snprintf(buf, 200, "##%s has just died with %s, watch for it to reappear!\n\r", victim->getNameC(), obj->short_description);
     send_info(buf);
   }
   else

@@ -919,7 +919,11 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 }
                 else if (IS_AFFECTED(ch, AFF_CHAMPION))
                 {
-                    ch->sendln("Despite having the Champion flag, the guard allows you to go through because you're an immortal.\r\n");
+                    auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+                    if (obj)
+                        ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
+                    else
+                        ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
                     return eFAILURE;
                 }
                 else if (GET_CLASS(ch) != clas)
@@ -948,8 +952,17 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 }
                 else if (IS_AFFECTED(ch, AFF_CHAMPION))
                 {
-                    act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
-                    ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
+                    auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+                    if (obj)
+                    {
+                        act("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, TO_ROOM, 0);
+                        ch->sendln(QStringLiteral("The guard humiliates you, and blocks your way because you have %1.").arg(obj->short_description));
+                    }
+                    else
+                    {
+                        act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
+                        ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
+                    }
                     return eSUCCESS;
                 }
                 else if (GET_CLASS(ch) != clas)

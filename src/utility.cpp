@@ -1775,7 +1775,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     af.location = APPLY_NONE;
     af.bitvector = -1;
     affect_to_char(ch, &af);
-    sprintf(buf, "\n\r##%s has just logged out, watch for the Champion flag to reappear!\n\r", GET_NAME(ch));
+    sprintf(buf, "\n\r##%s has just logged out, watch for %s to reappear!\n\r", GET_NAME(ch), obj->short_description);
     send_info(buf);
   }
   find_and_remove_player_portal(ch);
