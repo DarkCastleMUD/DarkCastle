@@ -4613,7 +4613,7 @@ void randomize_object(Object *obj)
 	}
 
 	// NO_CUSTOM, QUEST or SPECIAL ("godload") items cannot be randomized
-	if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM) || isSet(obj->obj_flags.extra_flags, ITEM_QUEST) || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	if (obj->isCustom() || obj->isQuest() || obj->isGodload())
 	{
 		return;
 	}

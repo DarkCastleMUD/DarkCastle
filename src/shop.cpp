@@ -2177,14 +2177,13 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
           return eSUCCESS;
         }
 
-        if (isexact("quest", ((Object *)(DC::getInstance()->obj_index[obj->item_number].item))->name) ||
-            DC::getInstance()->obj_index[obj->item_number].virt >= 3124 && DC::getInstance()->obj_index[obj->item_number].virt <= 3128)
+        if (obj->isQuest())
         {
           owner->tell(ch, "I can't redeem for quest items.");
           return eSUCCESS;
         }
 
-        if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM) && r.random)
+        if (obj->isCustom() && r.random)
         {
           owner->tell(ch, "I can't redeem randomized versions of items with NO_CUSTOM flag set.");
           return eSUCCESS;
