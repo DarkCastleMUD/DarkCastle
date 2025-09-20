@@ -368,7 +368,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
     return;
   }
 
-  if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(GET_NAME(ch)))
+  if (!Item_it->buyer.isEmpty() && Item_it->buyer.compare(GET_NAME(ch)) && Item_it->seller.compare(GET_NAME(ch)))
   {
     ch->send(QStringLiteral("Ticket number %1 is private.\r\n").arg(ticket));
     return;
