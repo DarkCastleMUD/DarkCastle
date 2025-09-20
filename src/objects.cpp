@@ -2765,6 +2765,21 @@ uint64_t Object::getLevel(void)
   return obj_flags.eq_level;
 }
 
+bool Object::isQuest(void)
+{
+  return isexact(QStringLiteral("quest"), getName());
+}
+
+bool Object::isTest(void)
+{
+  return isexact(QStringLiteral("test"), getName());
+}
+
+bool Object::isGodload(void)
+{
+  return isexact(QStringLiteral("gl"), getName()) || isexact(QStringLiteral("godload"), getName()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
+}
+
 bool Object::hasPortalFlagNoLeave(void)
 {
   return isSet(getPortalFlags(), Object::portal_flags_t::No_Leave);

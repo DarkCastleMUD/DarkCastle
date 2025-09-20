@@ -334,6 +334,9 @@ public:
     {
         return getPortalType() == portal_types_t::PermanentNoLook;
     }
+    bool isQuest(void);
+    bool isTest(void);
+    bool isGodload(void);
 
     int32_t getPortalLeaveZone(void)
     {
