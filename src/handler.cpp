@@ -2973,76 +2973,20 @@ Character *get_mob(char *name)
 /* search all over the world for a char num, and return a pointer if found */
 Character *get_char_num(int nr)
 {
- 	const auto &character_list = DC::getInstance()->character_list;
- 	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
- 						  {
+	const auto &character_list = DC::getInstance()->character_list;
+	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
+						  {
  		if (IS_NPC(i) && i->mobdata->nr == nr) {
  			return true;
  		}
  		return false; });
-
- 	if (result != end(character_list))
- 	{
- 		return *result;
- 	}
-
- 	return 0;
-}
-
-/* Search for a player character for clan operations */
-Character *get_pc_clan(QString name)
-{
-	Character *partial_match = nullptr;
-	int j = 0, number = 0;
-	QString tmpname = {}, tmp = {};
-
-	tmpname = name;
-	tmp = tmpname;
-	if ((number = get_number(tmp)) < 0)
-		return nullptr;
-
-	const auto &character_list = DC::getInstance()->character_list;
-
-	auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](Character *const &i)
-						  {
-		// Only consider player characters for clan operations
-		if (!IS_PC(i))
-			return false;
-
-		if (number == 0 && IS_NPC(i))
-			return false;
-		if (number == 1 || number == 0)
-		{
-			if (isexact(tmp, GET_NAME(i)))
-				return true;
-			else if (isprefix(tmp.toStdString().c_str(), GET_NAME(i)))
-			{
-				if (partial_match)
-				{
-					if (strlen(GET_NAME(partial_match)) > strlen(GET_NAME(i)))
-						partial_match = i;
-				}
-				else
-					partial_match = i;
-			}
-		}
-		else
-		{
-			if (isexact(tmp, GET_NAME(i)))
-			{
-				j++;
-				if (j == number)
-					return true;
-			}
-		}
-		return false; });
 
 	if (result != end(character_list))
 	{
 		return *result;
 	}
 
-	return partial_match;
+	return 0;
 }
 
 // move an object from its current location into the room
@@ -4450,7 +4394,7 @@ Character *get_pc(QString name)
 		return *result;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 Character *get_active_pc(QString name)

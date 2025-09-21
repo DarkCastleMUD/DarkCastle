@@ -83,8 +83,6 @@ Character *get_char_room(const char *name, room_t room, bool careful = false);
 Character *get_char_num(int nr);
 Character *get_char(QString name);
 Character *get_mob(char *name);
-Character *get_pc_clan(QString name);
-
 Character *get_pc(QString name);
 
 int char_from_room(Character *ch, bool stop_all_fighting);
