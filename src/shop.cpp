@@ -2189,6 +2189,12 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
           return eSUCCESS;
         }
 
+        if (obj->isTest())
+        {
+          owner->tell(ch, "You can't redeem for test items.");
+          return eSUCCESS;
+        }
+
         if (obj->getLevel() >= 60)
         {
           owner->tell(ch, "You can't redeem Apocalypse tokens for a level 60 item.");
