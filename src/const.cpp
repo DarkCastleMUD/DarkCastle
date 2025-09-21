@@ -1986,11 +1986,11 @@ struct race_data races[] =
         {"NPC", "npc", "NPC", false, 63, 0, 0, 0, 0, 0, 150, 150, 72, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hit"},
         {"Human", "human", "Humans", true, 63, 0, 0, 0, 1 << 22 | 1 << 29, 0, 125, 175, 66, 78, 0, 25, 0, 0, 25, 0, 0, 25, 0, 0, 25, 0, 0, 25, 0, AFF_IGNORE_WEAPON_WEIGHT, "punch"},
         {"Elf", "elf", "Elves", true, 63, 0, 264, 0, 1 << 7 | 1 << 2, 0, 176, 215, 85, 102, 0, 24, -1, 10, 27, 1, 0, 23, -1, 10, 27, 1, 0, 24, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "hook"},
-        {"Dwarf", "dwarf", "Dwarves", true, 63, 0, 128, 0, 1 << 1 | 1 << 5, 0, 85, 124, 48, 65, 0, 27, 2, 0, 22, -2, 10, 28, 1, 0, 22, -1, 10, 26, 1, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "uppercut"},
+        {"Dwarf", "dwarf", "Dwarves", true, 63, 0, 128, 0, 1 << 1 | 1 << 5, 0, 85, 124, 48, 65, 0, 27, 2, 0, 22, -2, 10, 28, 1, 0, 22, -2, 10, 26, 1, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "uppercut"},
         {"Hobbit", "hobbit", "Hobbits", true, 63, 0, 0, 0, 1 << 7 | 1 << 8, 0, 35, 74, 24, 41, 0, 22, -2, 12, 30, 3, 0, 23, -1, 0, 25, 0, 0, 25, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_HIDE, "jab"},
         {"Pixie", "pixie", "Pixies", true, 63, 0, 0, 0, 1 << 5 | 1 << 8, 0, 25, 64, 18, 35, 0, 20, -4, 0, 28, 2, 0, 20, -2, 12, 30, 3, 0, 27, 1, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_FLYING, "bite"},
         {"Ogre", "ogre", "Ogres", true, 63, 0, 0, 0, 1 << 2 | 1 << 4, 0, 236, 275, 103, 120, 12, 30, 3, 0, 23, -2, 0, 27, 1, 0, 22, -2, 0, 23, 0, AFF_IGNORE_WEAPON_WEIGHT, "smash"},
-        {"Gnome", "gnome", "Gnomes", true, 63, 0, 0, 0, 1 << 9 | 1 << 11, 0, 75, 114, 42, 59, 0, 22, -2, 0, 22, -2, 0, 24, 0, 0, 27, 1, 12, 30, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "cuff"},
+        {"Gnome", "gnome", "Gnomes", true, 63, 0, 0, 0, 1 << 9 | 1 << 11, 0, 75, 114, 42, 59, 0, 22, -2, 0, 22, -2, 0, 24, 0, 0, 27, 1, 12, 30, 3, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "cuff"},
         {"Orc", "orc", "Orcs", true, 63, 0, 0, 0, 1 << 1 | 1 << 3, 0, 186, 225, 79, 96, 10, 27, 1, 0, 25, 0, 10, 26, 1, 0, 24, 0, 0, 23, -2, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "punch"},
         {"Troll", "troll", "Trolls", true, 63, 0, 128, 80, 1 << 3 | 1 << 4, 0, 226, 265, 109, 126, 0, 28, 2, 0, 25, 0, 12, 30, 3, 0, 20, -3, 0, 22, -2, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "claw"},
 
