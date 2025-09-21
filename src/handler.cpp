@@ -3639,7 +3639,7 @@ void extract_obj(class Object *obj)
 
 	if (obj->item_number >= 0)
 	{
-		(DC::getInstance()->obj_index[obj->item_number].number)--;
+		(DC::getInstance()->obj_index[obj->item_number].qty)--;
 	}
 
 	for (auto &r : reroll_sessions)
@@ -3912,7 +3912,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		do_return(ch, "", cmd_t::LOOK);
 
 	if (IS_NPC(ch) && ch->mobdata->nr > -1)
-		DC::getInstance()->mob_index[ch->mobdata->nr].number--;
+		DC::getInstance()->mob_index[ch->mobdata->nr].qty--;
 
 	if (pull || isGolem)
 	{
@@ -4265,7 +4265,7 @@ Object *get_objindex_vnum(QString vnum_str)
 Character *get_random_mob_vnum(int vnum)
 {
 	int num = real_mobile(vnum);
-	int total = DC::getInstance()->mob_index[num].number;
+	int total = DC::getInstance()->mob_index[num].qty;
 	int which = number(1, total);
 
 	const auto &character_list = DC::getInstance()->character_list;

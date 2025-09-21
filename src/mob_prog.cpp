@@ -1755,7 +1755,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		break;
 
 	case eAMTITEMS:
-		return mprog_veval(DC::getInstance()->obj_index[real_object(atoi(arg))].number, opr, atoi(val));
+		return mprog_veval(DC::getInstance()->obj_index[real_object(atoi(arg))].qty, opr, atoi(val));
 		break;
 
 	case eNUMPCS:

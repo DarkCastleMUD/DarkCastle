@@ -147,7 +147,7 @@ class index_data
 {
 public:
   vnum_t virt{};                                                                           /* virt number of ths mob/obj           */
-  vnum_t number{};                                                                         /* number of existing units of ths mob/obj */
+  quint64 qty{};                                                                           /* number of existing units of ths mob/obj */
   int (*non_combat_func)(Character *, class Object *, cmd_t, const char *, Character *){}; // non Combat special proc
   int (*combat_func)(Character *, class Object *, cmd_t, const char *, Character *){};     // combat special proc
   void *item{};                                                                            /* the mobile/object itself                 */

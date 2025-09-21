@@ -2411,7 +2411,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
     break;
   case 29203:
-    if (DC::getInstance()->obj_index[real_object(29202)].number > 0)
+    if (DC::getInstance()->obj_index[real_object(29202)].qty > 0)
     {
       send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
       break;

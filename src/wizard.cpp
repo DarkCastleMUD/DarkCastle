@@ -1923,7 +1923,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
       }
 
-      if (DC::getInstance()->mob_index[mob].number <= 0)
+      if (DC::getInstance()->mob_index[mob].qty <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;

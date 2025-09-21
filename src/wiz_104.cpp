@@ -2442,7 +2442,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
 	obj->item_number = r2;
 	DC::getInstance()->obj_index[r2].item = (void *)obj;
 	DC::getInstance()->obj_index[r2].non_combat_func = 0;
-	DC::getInstance()->obj_index[r2].number = 0;
+	DC::getInstance()->obj_index[r2].qty = 0;
 	DC::getInstance()->obj_index[r2].virt = v2;
 	DC::getInstance()->obj_index[r2].mobprogs = nullptr;
 	DC::getInstance()->obj_index[r2].combat_func = 0;
@@ -2504,7 +2504,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 
 	// clone_mobile assigns the start of character_list to be mob
 	// This undos the change
-	DC::getInstance()->mob_index[src].number--;
+	DC::getInstance()->mob_index[src].qty--;
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.erase(mob);
@@ -2530,7 +2530,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 
 	// Overwrite old mob with new mob
 	DC::getInstance()->mob_index[dst].item = (void *)mob;
-	DC::getInstance()->mob_index[dst].number = 0;
+	DC::getInstance()->mob_index[dst].qty = 0;
 	DC::getInstance()->mob_index[dst].non_combat_func = 0;
 	DC::getInstance()->mob_index[dst].combat_func = 0;
 	DC::getInstance()->mob_index[dst].mobprogs = nullptr;

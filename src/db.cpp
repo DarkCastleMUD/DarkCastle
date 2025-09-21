@@ -1051,7 +1051,7 @@ index_data *generate_mob_indices(int *top, index_data *index)
 						abort();
 					}
 					sscanf(buf, "#%d", &index[i].virt);
-					index[i].number = 0;
+					index[i].qty = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].mobprogs = nullptr;
@@ -1355,7 +1355,7 @@ index_data *generate_obj_indices(int *top,
 						abort();
 					}
 					sscanf(buf, "#%d", &index[i].virt);
-					index[i].number = 0;
+					index[i].qty = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].progtypes = 0;
@@ -3329,7 +3329,7 @@ Character *clone_mobile(int nr)
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.insert(mob);
-	DC::getInstance()->mob_index[nr].number++;
+	DC::getInstance()->mob_index[nr].qty++;
 	mob->next_in_room = 0;
 
 	handle_automatic_mob_settings(mob);
@@ -3421,7 +3421,7 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 
 	// insert
 	DC::getInstance()->obj_index[cur_index].virt = nr;
-	DC::getInstance()->obj_index[cur_index].number = 0;
+	DC::getInstance()->obj_index[cur_index].qty = 0;
 	DC::getInstance()->obj_index[cur_index].non_combat_func = 0;
 	DC::getInstance()->obj_index[cur_index].combat_func = 0;
 	DC::getInstance()->obj_index[cur_index].item = obj;
@@ -3535,7 +3535,7 @@ int create_blank_mobile(int nr)
 
 	// insert
 	DC::getInstance()->mob_index[cur_index].virt = nr;
-	DC::getInstance()->mob_index[cur_index].number = 0;
+	DC::getInstance()->mob_index[cur_index].qty = 0;
 	if (DC::getInstance()->mob_non_combat_functions.contains(nr))
 	{
 		DC::getInstance()->mob_index[cur_index].non_combat_func = DC::getInstance()->mob_non_combat_functions[nr];
@@ -4495,7 +4495,7 @@ class Object *clone_object(int nr)
 	obj->next_content = 0;
 	obj->next = DC::getInstance()->object_list;
 	DC::getInstance()->object_list = obj;
-	DC::getInstance()->obj_index[nr].number++;
+	DC::getInstance()->obj_index[nr].qty++;
 	obj->save_expiration = 0;
 	obj->no_sell_expiration = 0;
 
@@ -4817,7 +4817,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'O': /* Load object on the ground */
-				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2)
+				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2)
 				{
 					if (cmd[reset_cmd_index]->arg3 >= 0)
 					{
@@ -4860,7 +4860,7 @@ void Zone::reset(ResetType reset_type)
 
 			case 'P': /* object to object */
 
-				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2)
+				if (cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2)
 				{
 					obj_to = 0;
 					obj = 0;
@@ -4896,13 +4896,13 @@ void Zone::reset(ResetType reset_type)
 				// Never load the same totem as long as it exists in the world
 				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].item)->isTotem() &&
 					cmd[reset_cmd_index]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number >= cmd[reset_cmd_index]->arg2)
+					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].qty >= cmd[reset_cmd_index]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number < cmd[reset_cmd_index]->arg2 || number(0, 1)) && (obj = clone_object(cmd[reset_cmd_index]->arg1)))
+				if ((cmd[reset_cmd_index]->arg2 == -1 || DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2 || number(0, 1)) && (obj = clone_object(cmd[reset_cmd_index]->arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4951,7 +4951,7 @@ void Zone::reset(ResetType reset_type)
 				// Never load the same totem as long as it exists in the world
 				if (reinterpret_cast<Object *>(DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].item)->isTotem() &&
 					cmd[reset_cmd_index]->arg2 != -1 &&
-					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].number >= cmd[reset_cmd_index]->arg2)
+					DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].qty >= cmd[reset_cmd_index]->arg2)
 				{
 					last_cmd = 0;
 					last_obj = 0;
