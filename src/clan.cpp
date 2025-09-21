@@ -1029,7 +1029,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   //   arg1 = arg1.toUpper();
   // }
 
-  Character *victim = get_char(arg1);
+  Character *victim = get_pc_clan(arg1);
   bool victim_connected = true;
   if (!victim)
   {
