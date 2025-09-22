@@ -1483,13 +1483,9 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
   struct affected_type *aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
-  int learned = ch->has_skill(SKILL_RELEASE);
 
-  if (!learned)
-  {
-    ch->sendln("You don't know how!");
+  if (!ch->canPerform(SKILL_RELEASE, "You don't know how!"))
     return eFAILURE;
-  }
 
   if (!ch->affected)
   {
