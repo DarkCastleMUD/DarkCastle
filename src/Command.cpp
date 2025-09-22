@@ -538,11 +538,7 @@ Commands::Commands(void)
                 if (command.getNumber() != cmd_t::DEFAULT &&
                     command.getNumber() != cmd_t::UNDEFINED)
                 {
-                        if (cmd_t_command_map_.contains(command.getNumber()))
-                        {
-                                logentry(QStringLiteral("Commands::cmd_t_command_map_ already contains cmd_t %1").arg(static_cast<quint64>(command.getNumber())));
-                        }
-                        else
+                        if (!cmd_t_command_map_.contains(command.getNumber()))
                         {
                                 cmd_t_command_map_[command.getNumber()] = command;
                         }
