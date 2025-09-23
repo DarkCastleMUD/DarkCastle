@@ -71,7 +71,8 @@
         "clocale": "cpp",
         "locale": "cpp",
         "execution": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "__locale": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
