@@ -72,7 +72,9 @@
         "locale": "cpp",
         "execution": "cpp",
         "thread": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "cstdarg": "cpp",
+        "cinttypes": "cpp"
     },
     "editor.renderWhitespace": "all",
     "C_Cpp.default.cppStandard": "c++23",
