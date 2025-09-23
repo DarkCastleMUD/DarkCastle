@@ -271,91 +271,71 @@ int DC::write_hotboot_file(void)
 // links to the mud.
 int DC::load_hotboot_descs(void)
 {
-  if (!QFile("hotboot").exists())
+  QFile hotboot_file{QStringLiteral("hotboot")};
+  if (!hotboot_file.exists())
   {
-    return 0;
+    return {};
   }
 
-  std::string chr = {};
-  char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
-  int desc = {};
-  class Connection *d = nullptr;
-  std::ifstream ifs;
-
-  ifs.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);
-
-  try
+  if (hotboot_file.open(QFile::ReadOnly))
   {
-    ifs.open("hotboot");
     unlink("hotboot");
-    logverbose(QStringLiteral("Hotboot, reloading characters."), 0, DC::LogChannel::LOG_MISC);
+    logmisc(QStringLiteral("Hotboot, reloading characters."));
 
-    for_each(cf.ports.begin(), cf.ports.end(), [this, &ifs](in_port_t &port)
+    QTextStream out(&hotboot_file);
+    for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
              {
              int fd;
-            ifs >> fd;
-            qDebug("Read %d for port %d", fd, port);
-            this->server_descriptor_list.insert(fd); });
+            out >> fd;
+            //qDebug("Read %d for port %d", fd, port);
+            server_descriptor_list.insert(fd); });
 
-    while (ifs.good())
+    while (!out.atEnd())
     {
-      desc = 0;
-      chr.clear();
-      *host = '\0';
-      try
-      {
-        ifs >> desc;
-        ifs >> chr;
-        ifs >> host;
-      }
-      catch (std::ifstream::failure::runtime_error)
-      {
+      int descriptor;
+      out >> descriptor;
+      if (out.atEnd())
         break;
-      }
+      QString character_name;
+      out >> character_name;
+      if (out.atEnd())
+        break;
+      QString address;
+      out >> address;
+      if (out.atEnd())
+        break;
+      // qDebug("Read %d as descriptor for character '%s' from %s", descriptor, qPrintable(character_name), qPrintable(address));
 
-      // fscanf(fp, "%d\n%s\n%s\n", &desc, chr.data(), host);
-      d = new Connection;
-
+      auto d = new Connection;
       d->idle_time = 0;
       d->idle_tics = 0;
       d->wait = 1;
       d->prompt_mode = 1;
       d->output = {};
       d->input = std::queue<std::string>();
-      d->output = chr.c_str(); // store it for later
+      d->output = qPrintable(character_name); // store it for later
       d->login_time = time(0);
+      d->setPeerAddress(QHostAddress(address));
+      d->descriptor = descriptor;
 
-      if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
+      for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"})
       {
-        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
-        CLOSE_SOCKET(desc);
-        delete d;
-        d = nullptr;
-        continue;
+        if (write_to_descriptor(descriptor, str) == -1)
+        {
+          logentry(QStringLiteral("Address: %1 Character: %2 Descriptor: %3 failed to recover from hotboot.").arg(address).arg(character_name).arg(descriptor));
+          CLOSE_SOCKET(descriptor);
+          delete d;
+          d = {};
+          break;
+        }
       }
-
-      d->setPeerAddress(QHostAddress(host));
-      d->descriptor = desc;
-
-      // we need a second to be sure
-      if (write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n") == -1)
-      {
-        logentry(QStringLiteral("Host %1 Char %2 Desc %3 failed to recover from hotboot.").arg(host).arg(chr.c_str()).arg(desc));
-        CLOSE_SOCKET(desc);
-        delete d;
-        d = nullptr;
+      if (!d)
         continue;
-      }
 
       d->next = DC::getInstance()->descriptor_list;
       DC::getInstance()->descriptor_list = d;
     }
-    ifs.close();
-  }
-  catch (...)
-  {
-    logverbose(QStringLiteral("Hotboot file missing/unopenable."));
-    return false;
+    hotboot_file.close();
   }
 
   unlink("hotboot"); // if the above unlink failed somehow(?),
@@ -430,7 +410,7 @@ void finish_hotboot()
 
     if (!load_char_obj(d, d->output))
     {
-      logentry(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output), 0, DC::LogChannel::LOG_MISC);
+      logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -725,9 +705,7 @@ void DC::game_loop(void)
       {
         if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
         {
-          sprintf(buf, "Connection attempt bailed from %s", d->getPeerOriginalAddress().toString().toStdString().c_str());
-          printf(buf);
-          logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
+          logsocket(QStringLiteral("Connection attempt bailed from %1").arg(d->getPeerOriginalAddress().toString()));
         }
         close_socket(d);
       }
@@ -1292,7 +1270,7 @@ int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
   else
-    ch->sendln(QStringLiteral("Last prompt: %1)").arg(ch->getLastPrompt()));
+    ch->sendln(QStringLiteral("Last prompt: %1").arg(ch->getLastPrompt()));
 
   return eSUCCESS;
 }
@@ -1330,12 +1308,8 @@ int do_prompt(Character *ch, char *arg, cmd_t cmd)
     return eSUCCESS;
   }
 
-  if (!ch->getPrompt().isEmpty())
-  {
-    ch->setLastPrompt(ch->getPrompt());
-  }
+  ch->setLastPrompt(ch->getPrompt());
   ch->setPrompt(arg);
-
   ch->sendln("Ok.");
   return eSUCCESS;
 }
