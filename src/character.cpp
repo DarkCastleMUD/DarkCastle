@@ -1046,7 +1046,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     return QStringLiteral("%1%2%3").arg(color).arg(value).arg(NTEXT);
 }
 
-QString Character::generate_prompt(void)
+QString Character::createPrompt(void)
 {
     QString source{};
     if (IS_NPC(this))
@@ -1055,7 +1055,7 @@ QString Character::generate_prompt(void)
     }
     else
     {
-        source = GET_PROMPT(this);
+        source = getPrompt();
     }
 
     // Searching for %{variable} like %{hp}

@@ -229,8 +229,6 @@ bool IS_DARK(int room);
 #define GET_ROOM_VNUM(rnum) \
    ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
 
-#define GET_PROMPT(ch) ((ch)->player->prompt)
-#define GET_LAST_PROMPT(ch) ((ch)->player->last_prompt)
 #define GET_TOGGLES(ch) ((ch)->player->toggles)
 
 #define GET_CLASS(ch) ((ch)->c_class)
@@ -595,7 +593,6 @@ void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
-int process_output(class Connection *t);
 int file_to_string(const char *name, char *buf);
 load_status_t load_char_obj(class Connection *d, QString name);
 void save_char_obj(Character *ch);
@@ -638,7 +635,6 @@ void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, int room, bool awakeonly = false, Character *nta = nullptr);
 void record_track_data(Character *ch, cmd_t cmd);
-int write_to_descriptor(int desc, std::string txt);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const std::string txt, std::queue<std::string> &queue);
 int use_mana(Character *ch, int sn);
@@ -926,7 +922,6 @@ QByteArray handle_ansi(QByteArray, Character *ch);
 QString handle_ansi(QString, Character *ch);
 std::string handle_ansi(std::string s, Character *ch);
 char *handle_ansi_(char *s, Character *ch);
-void blackjack_prompt(Character *ch, std::string &prompt, bool ascii);
 void show_string(class Connection *d, const char *input);
 void special_log(QString message);
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);

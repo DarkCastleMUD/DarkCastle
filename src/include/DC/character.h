@@ -299,7 +299,26 @@ public:
 // first, or you will probably end up corrupting all the pfiles
 class Player
 {
+    QString prompt_;
+    QString last_prompt_;
+
 public:
+    void setPrompt(QString prompt)
+    {
+        prompt_ = prompt;
+    }
+    QString getPrompt(void) const
+    {
+        return prompt_;
+    }
+    void setLastPrompt(QString last_prompt)
+    {
+        last_prompt_ = last_prompt;
+    }
+    QString getLastPrompt(void) const
+    {
+        return last_prompt_;
+    }
     /************************************************************************
     | Player vectors
     | Character->player->toggles
@@ -307,7 +326,6 @@ public:
     QString last_site;        /* Last login from.. */
     QString poofin;           /* poofin message */
     QString poofout;          /* poofout message */
-    char *prompt = {};        /* Sadus' disguise.. unused */
     Object *skillchange = {}; /* Skill changing equipment. */
     Character *golem = {};    // CURRENT golem.
 
@@ -442,7 +460,6 @@ public:
     uint32_t quest_current_ticksleft[QUEST_MAX] = {};
     int16_t quest_cancel[QUEST_MAX_CANCEL] = {};
     uint32_t quest_complete[QUEST_TOTAL / ASIZE + 1] = {};
-    char *last_prompt = {};
     std::multimap<int, std::pair<timeval, timeval>> *lastseen = {};
     uint8_t profession = {};
     bool multi = {};
@@ -1130,10 +1147,36 @@ public:
     bool isPlayerGoldThief(void) { return affected_by_spell(PLAYER_GOLD_THIEF); }
     bool isPlayerCantQuit(void) { return affected_by_spell(PLAYER_CANTQUIT); }
     bool allowColor(void);
-    QString generate_prompt(void);
+
     QString parse_prompt_variable(QString variable, PromptVariableType type = PromptVariableType::Advanced);
     QString get_parsed_legacy_prompt_variable(QString var);
     QString calc_name(bool use_color = false);
+
+    QString getPrompt(void) const
+    {
+        if (player)
+            return player->getPrompt();
+        return {};
+    }
+    void setPrompt(QString prompt)
+    {
+        if (player)
+            player->setPrompt(prompt);
+    }
+    QString getLastPrompt(void) const
+    {
+        if (player)
+            return player->getLastPrompt();
+        return {};
+    }
+    void setLastPrompt(QString prompt)
+    {
+        if (player)
+            player->setLastPrompt(prompt);
+    }
+    QString createPrompt(void);
+    QString createBlackjackPrompt(void);
+    void sendBlackjackPrompt(void);
 
 private:
     Type type_ = Type::Undefined;

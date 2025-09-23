@@ -240,7 +240,7 @@ void Player::save(FILE *fpsave, struct time_data tmpage)
   fwrite_var_string(last_site, fpsave);
   fwrite_var_string(poofin, fpsave);
   fwrite_var_string(poofout, fpsave);
-  fwrite_var_string(prompt, fpsave);
+  fwrite_var_string(getPrompt(), fpsave);
   fwrite_var_string("NewSaveType", fpsave);
 
   // Quest bitvector one
@@ -444,7 +444,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   last_site = fread_var_string(fpsave);
   poofin = fread_var_string(fpsave);
   poofout = fread_var_string(fpsave);
-  prompt = fread_var_string(fpsave);
+  setPrompt(fread_var_string(fpsave));
 
   char *tmp = fread_var_string(fpsave);
   if (!tmp || str_cmp(tmp, "NewSaveType"))

@@ -295,24 +295,24 @@ int main(int argc, char **argv)
   update_max_who();
 
   do_stand(ch, "");
-  process_output(d);
+  d->process_output();
 
   char_to_room(ch, 3001);
-  process_output(d);
+  d->process_output();
   // ch->do_toggle({"pager"}, cmd_t::DEFAULT);
   // ch->do_toggle({"ansi"}, cmd_t::DEFAULT);
   // ch->do_toggle({}, cmd_t::DEFAULT);
   //  do_goto(ch, "23");
   // do_score(ch, "");
-  // process_output(d);
+  // d->process_output();
 
   // do_load(ch, "m 23");
-  // process_output(d);
+  // d->process_output();
   do_look(ch, "debugimp");
-  process_output(d);
+  d->process_output();
 
   ch->do_bestow({"debugimp", "load"});
-  process_output(d);
+  d->process_output();
 
   /*
     qDebug("\n");
@@ -397,9 +397,9 @@ int main(int argc, char **argv)
             {
               // std::cerr << pfile.path().c_str() << std::endl;
               ch->do_linkload(path.split(' '), cmd_t::DEFAULT);
-              process_output(d);
+              d->process_output();
               do_fsave(ch, path.toStdString().c_str());
-              process_output(d);
+              d->process_output();
             }
             else
             {
@@ -455,9 +455,9 @@ int main(int argc, char **argv)
     {
       c->desc = d;
       do_score(c, "");
-      process_output(d);
+      d->process_output();
       do_vault(c, "list");
-      process_output(d);
+      d->process_output();
 
       if (c->isImmortalPlayer())
       {
@@ -468,9 +468,9 @@ int main(int argc, char **argv)
     if (argv[1] == QStringLiteral("leaderboard"))
     {
       do_leaderboard(ch, "scan");
-      process_output(d);
+      d->process_output();
       do_leaderboard(ch, "");
-      process_output(d);
+      d->process_output();
     }
     /*
         std::multimap<int32_t, QString> hp_leaders;
@@ -505,7 +505,7 @@ int main(int argc, char **argv)
     // leaderboard.check_offline();
     // // std::cerr <<  DC::getInstance()->character_list.size() << std::endl;
     // do_leaderboard(ch, "");
-    // process_output(d);
+    // d->process_output();
 
     struct vault_data *vault;
 
@@ -521,9 +521,9 @@ int main(int argc, char **argv)
       }
     }
     do_look(ch, "");
-    process_output(d);
+    d->process_output();
     do_force(ch, "all save");
-    process_output(d);
+    d->process_output();
   }
   else
   {

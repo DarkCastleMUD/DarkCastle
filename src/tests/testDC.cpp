@@ -14,7 +14,6 @@
 #include "DC/vault.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
-#include "DC/handler.h"
 
 using namespace std::literals;
 
@@ -33,12 +32,11 @@ using namespace std::literals;
 
 QString Character::get_parsed_legacy_prompt_variable(QString var)
 {
-    char *saved_prompt = GET_PROMPT(this);
+    auto saved_prompt = getPrompt();
 
-    GET_PROMPT(this) = strdup(qPrintable(var));
-    QString str = generate_prompt();
-    free(GET_PROMPT(this));
-    GET_PROMPT(this) = saved_prompt;
+    setPrompt(var);
+    QString str = createPrompt();
+    setPrompt(saved_prompt);
     return str;
 }
 
@@ -1058,8 +1056,7 @@ private slots:
                               "Exits: south \r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("list");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("list"), eSUCCESS);
         QCOMPARE(conn.output, "[Amt] [ Price ] [ VNUM ] Item\r\n"
                               "[  1] [     55] [  3011] a delicious DONUT.\r\n"
                               "[  1] [    165] [  3010] a chewy salted fish.\r\n"
@@ -1135,8 +1132,7 @@ private slots:
                               "Exits: south \r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("list");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("list"), eSUCCESS);
         QCOMPARE(conn.output, "Sorry, but you cannot do that here!\r\n"
                               "\x1B[1m\x1B[0m\x1B[37m");
         conn.output = {};
@@ -1206,18 +1202,21 @@ private slots:
         QCOMPARE(conn.output, "ANSI COLOR on.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
                               "\r\n"
                               "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m5h\x1B[0m\x1B[37m \x1B[1m\x1B[30m3s\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m:  \x1B[1m\x1B[31m6h\x1B[0m\x1B[37m \x1B[1mDC\x1B[0m\x1B[37m\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, true);
+        SET_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: \x1B[1m\x1B[36mHIT STAY DOUBLE \x1B[0m\x1B[37m\r\n"
                               "\r\n"
                               "      \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m               \x1B[1m,---,\x1B[0m\x1B[37m\x1B[1m,---,\x1B[0m\x1B[37m\r\n"
                               "\x1B[1m\x1B[32mTest\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m5\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30m3\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m = 8   \x1B[1m\x1B[33mDealer\x1B[0m\x1B[37m: \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31m6\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| D |\x1B[0m\x1B[37m\r\n"
-                              "      \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30ms\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m               \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| C |\x1B[0m\x1B[37m\r\n      \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m               \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m\r\n");
+                              "      \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[30ms\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m               \x1B[1m|\x1B[0m\x1B[37m \x1B[1m\x1B[31mh\x1B[0m\x1B[37m \x1B[1m|\x1B[0m\x1B[37m\x1B[1m| C |\x1B[0m\x1B[37m\r\n"
+                              "      \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m               \x1B[1m'---'\x1B[0m\x1B[37m\x1B[1m'---'\x1B[0m\x1B[37m\r\n");
         conn.output = {};
 
         ch.do_toggle({"ansi"});
@@ -1225,13 +1224,15 @@ private slots:
         QCOMPARE(conn.output, "ANSI COLOR \x1B[1m\x1B[31moff\x1B[0m\x1B[37m.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "Test:  5h 3s = 8   Dealer:  6h DC\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, true);
+        SET_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "      ,---,,---,               ,---,,---,\r\n"
@@ -1240,20 +1241,18 @@ private slots:
                               "      '---''---'               '---''---'\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("hit");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("hit"), eSUCCESS);
         QCOMPARE(conn.output, "You hit and receive a Qc.\r\n"
                               "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
         conn.output = {};
-
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY \r\n"
                               "\r\n"
                               "Test:  5h 3s Qc = 18   Dealer:  6h DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("hit");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("hit"), eSUCCESS);
         QCOMPARE(conn.output, "You hit and receive a 5d.\r\n"
                               "You BUSTED!\r\n"
                               "The dealer takes your bet.\r\n");
@@ -1288,14 +1287,14 @@ private slots:
                               "The dealer says 'It's your turn, Test, what would you like to do?'\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: HIT STAY DOUBLE \r\n"
                               "\r\n"
                               "Test:  7d Jh = 17   Dealer:  Qs DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("stay");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("stay"), eSUCCESS);
         QCOMPARE(conn.output, "Test stays.\r\n");
         conn.output = {};
 
@@ -1331,24 +1330,24 @@ private slots:
                               "The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "You can: INSURANCE \r\n"
                               "\r\n"
                               "Test:  Qd 4s = 14   Dealer:  As DC\r\n");
         conn.output = {};
 
-        rc = ch.command_interpreter("insurance");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("insurance"), eSUCCESS);
         QCOMPARE(conn.output, "You cannot afford an insurance bet right now.\r\n");
         conn.output = {};
 
         ch.plat = 5;
-        rc = ch.command_interpreter("insurance");
-        QCOMPARE(rc, eSUCCESS);
+        QCOMPARE(ch.command_interpreter("insurance"), eSUCCESS);
         QCOMPARE(conn.output, "You make an insurance bet.\r\n");
         conn.output = {};
 
-        blackjack_prompt(&ch, conn.output, false);
+        REMOVE_BIT(ch.player->toggles, Player::PLR_ASCII);
+        conn.setOutput(ch.createBlackjackPrompt());
         QCOMPARE(conn.output, "\r\nTest:  Qd 4s = 14   Dealer:  As DC\r\n");
         conn.output = {};
 
@@ -1436,8 +1435,6 @@ private slots:
             prompt_variables.append(c);
 
         QMap<QString, QString> parsed_prompt_variables;
-        if (GET_PROMPT(&p1))
-            dc_free(GET_PROMPT(&p1));
         weather_info.sky = SKY_CLOUDLESS;
         weather_info.sunlight = 0;
         QCOMPARE(p1.get_parsed_legacy_prompt_variable("%y"), " ");
