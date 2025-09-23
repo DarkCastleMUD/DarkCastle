@@ -1735,16 +1735,12 @@ int write_to_descriptor(int desc, QByteArray txt)
       if (errno == EWOULDBLOCK)
         errno = EAGAIN;
 #endif /* EWOULDBLOCK */
-      if (errno == EAGAIN)
+      if (errno != EAGAIN)
       {
-        logmisc(QStringLiteral("process_output: socket write would block"));
+        logmisc(QStringLiteral("write(%1,%2,%3) returned %4 and errno=%5").arg(desc).arg(txtPtr).arg(total).arg(bytes_written).arg(errno));
+        return -1;
       }
-      else
-      {
-        perror("Write to socket");
-        return (-1);
-      }
-      return (0);
+      return 0;
     }
     else
     {
