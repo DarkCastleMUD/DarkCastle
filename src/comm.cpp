@@ -1577,7 +1577,7 @@ void write_to_output(QByteArray txt, class Connection *t)
   {
     txt = scramble_text(txt.toStdString().c_str()).toStdString().c_str();
   }
-  t->output += txt.toStdString();
+  t->output.append(txt);
 }
 
 /* ******************************************************************
@@ -1622,10 +1622,9 @@ int new_descriptor(int s)
   /* determine if the site is banned */
   if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
   {
-    write_to_descriptor(desc,
-                        "Your site has been banned from Dark Castle. If you have any\n\r"
-                        "Questions, please email us at:\n\r"
-                        "imps@dcastle.org\n\r");
+    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\n\r"
+                              "Questions, please email us at:\n\r"
+                              "imps@dcastle.org\n\r");
 
     CLOSE_SOCKET(desc);
     logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
@@ -1677,10 +1676,9 @@ QByteArray Connection::getOutput(void) const
 
 int Connection::process_output(void)
 {
-  QByteArray i;
+  QByteArray i = output;
 
   /* now, append the 'real' output */
-  i += qUtf8Printable(output);
   i += qUtf8Printable(createBlackjackPrompt());
   i += qUtf8Printable(createPrompt());
 
@@ -1725,6 +1723,7 @@ int write_to_descriptor(int desc, QByteArray txt)
     return 0;
 
   auto txtPtr = txt.constData();
+
   auto total = txt.size();
   do
   {
