@@ -94,8 +94,11 @@ void do_champ_flag_death(Character *victim)
     obj_to_room(obj, CFLAG_HOME);
     snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], victim->getNameC());
     send_info(buf);
-    snprintf(buf, 200, "##%s has just died with %s, watch for it to reappear!\n\r", victim->getNameC(), obj->short_description);
-    send_info(buf);
+
+    if (obj && obj->short_description)
+      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\n\r").arg(victim->getName()).arg(obj->short_description));
+    else
+      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\n\r").arg(victim->getName()));
   }
   else
   {

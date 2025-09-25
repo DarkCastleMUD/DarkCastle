@@ -2644,8 +2644,13 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     if (IS_NPC(ch) || ch->getLevel() <= 5)
       return eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
-    sprintf(buffer, "\n\r##%s has just picked up %s!\n\r", GET_NAME(ch), static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description);
-    send_info(buffer);
+
+    Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item);
+
+    if (o && o->short_description)
+      send_info(QStringLiteral("\n\r##%1 has just picked up %2!\n\r").arg(GET_NAME(ch)).arg(o->short_description));
+    else
+      send_info(QStringLiteral("\n\r##%1 has just picked up the Champion Flag!\n\r").arg(GET_NAME(ch)));
   }
 
   if (sub_object)

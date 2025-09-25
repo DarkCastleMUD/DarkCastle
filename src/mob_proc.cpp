@@ -920,7 +920,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 else if (IS_AFFECTED(ch, AFF_CHAMPION))
                 {
                     auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
-                    if (obj)
+                    if (obj && obj->short_description)
                         ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
                     else
                         ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
@@ -953,7 +953,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                 else if (IS_AFFECTED(ch, AFF_CHAMPION))
                 {
                     auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
-                    if (obj)
+                    if (obj && obj->short_description)
                     {
                         act("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, TO_ROOM, 0);
                         ch->sendln(QStringLiteral("The guard humiliates you, and blocks your way because you have %1.").arg(obj->short_description));
