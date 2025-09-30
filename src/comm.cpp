@@ -703,10 +703,6 @@ void DC::game_loop(void)
     {
       if (process_input(d) < 0)
       {
-        if (d->getPeerOriginalAddress() != QHostAddress("127.0.0.1"))
-        {
-          logsocket(QStringLiteral("Connection attempt bailed from %1").arg(d->getPeerOriginalAddress().toString()));
-        }
         close_socket(d);
       }
     }
@@ -1737,7 +1733,8 @@ int write_to_descriptor(int desc, QByteArray txt)
       if (errno != EAGAIN)
       {
         logmisc(QStringLiteral("write(%1,%2,%3) returned %4 and errno=%5").arg(desc).arg(txtPtr).arg(total).arg(bytes_written).arg(errno));
-        return -1;
+        if (errno != EPIPE)
+          return -1;
       }
       return 0;
     }
