@@ -1726,13 +1726,9 @@ int write_to_descriptor(int desc, QByteArray txt)
     auto bytes_written = write(desc, txtPtr, total);
     if (bytes_written < 0)
     {
-#ifdef EWOULDBLOCK
-      if (errno == EWOULDBLOCK)
-        errno = EAGAIN;
-#endif /* EWOULDBLOCK */
-      if (errno != EAGAIN)
+      if (errno != EAGAIN && errno != EWOULDBLOCK)
       {
-        logmisc(QStringLiteral("write(%1,%2,%3) returned %4 and errno=%5").arg(desc).arg(txtPtr).arg(total).arg(bytes_written).arg(errno));
+        logmisc(QStringLiteral("write(%1,-,%2) returned %3 and errno=%4").arg(desc).arg(total).arg(bytes_written).arg(errno));
         if (errno != EPIPE)
           return -1;
       }
