@@ -186,6 +186,15 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
       break;
   }
   page_string(ch->desc, buf, 1);
+  if (QString(buf).isEmpty())
+  {
+    if (QString(argument) == QStringLiteral("all"))
+      ch->sendln("There's been no news recorded ever.");
+    else
+      ch->sendln("There's been no recent news. Type 'news all' to see all news.");
+
+    return eSUCCESS;
+  }
   return eSUCCESS;
 }
 
