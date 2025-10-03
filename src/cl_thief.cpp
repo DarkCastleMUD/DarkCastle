@@ -1557,13 +1557,11 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
       {
-        act("$n skillfully picks the lock of the $F.", ch, 0,
-            EXIT(ch, door)->keyword, TO_ROOM, 0);
+        act("$n skillfully picks the lock of the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       }
       else
       {
-        act("$n picks the lock of the.", ch, 0, 0, TO_ROOM,
-            INVIS_NULL);
+        act("$n picks the lock of the.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       }
 
       ch->sendln("The lock quickly yields to your skills.");
@@ -1579,6 +1577,17 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
           }
         }
       }
+
+      QString door_keyword = QStringLiteral("door");
+      if (EXIT(ch, door)->keyword)
+      {
+        door_keyword = fname(EXIT(ch, door)->keyword);
+      }
+
+      ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
+      auto copy_of_door_keyword = strdup(qPrintable(door_keyword));
+      auto rc = do_open(ch, copy_of_door_keyword);
+      free(copy_of_door_keyword);
     }
   }
   else
