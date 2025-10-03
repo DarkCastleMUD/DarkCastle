@@ -2607,7 +2607,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
       QString door_keyword = QStringLiteral("door");
       if (EXIT(ch, door)->keyword)
       {
-        door_keyword = EXIT(ch, door)->keyword;
+        door_keyword = fname(EXIT(ch, door)->keyword);
       }
 
       ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
