@@ -2594,8 +2594,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
     {
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
-        act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword,
-            TO_ROOM, 0);
+        act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       else
         act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
       ch->sendln("*click*");
@@ -2604,6 +2603,18 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
         if ((back = DC::getInstance()->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
             REMOVE_BIT(back->exit_info, EX_LOCKED);
+
+      QString door_keyword = QStringLiteral("door");
+      if (EXIT(ch, door)->keyword)
+      {
+        door_keyword = EXIT(ch, door)->keyword;
+      }
+
+      ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
+      auto copy_of_door_keyword = strdup(qPrintable(door_keyword));
+      auto rc = do_open(ch, copy_of_door_keyword);
+      free(copy_of_door_keyword);
+      return rc;
     }
   }
   else
