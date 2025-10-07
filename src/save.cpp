@@ -830,7 +830,7 @@ void save_char_obj_db(Character *ch)
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
-  char_to_store(ch, &uchar, tmpage);
+  char_to_store(&uchar, tmpage);
 
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
@@ -883,7 +883,7 @@ void save_char_obj_db(Character *ch)
 
 // save a character and inventory.
 // maybe modify it to save mobs for quest purposes too
-void save_char_obj(Character *ch)
+void Character::save_char_obj(void)
 {
   char_file_u4 uchar = {};
   time_data tmpage;
@@ -893,31 +893,31 @@ void save_char_obj(Character *ch)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (IS_NPC(ch) || ch->getLevel() < 1)
+  if (IS_NPC(this) || getLevel() < 1)
   {
     return;
   }
 
-  if (ch->getName().isEmpty())
+  if (getName().isEmpty())
   {
-    ch->setName("Unknown");
+    setName("Unknown");
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::getInstance()->cf.bport)
   {
-    sprintf(name, "%s/%c/%s", BSAVE_DIR, ch->getNameC()[0], ch->getNameC());
+    sprintf(name, "%s/%c/%s", BSAVE_DIR, getNameC()[0], getNameC());
   }
   else
   {
-    sprintf(name, "%s/%c/%s", SAVE_DIR, ch->getNameC()[0], ch->getNameC());
+    sprintf(name, "%s/%c/%s", SAVE_DIR, getNameC()[0], getNameC());
   }
 
   sprintf(strsave, "%s.back", name);
 
   if (!(fpsave = fopen(strsave, "wb")))
   {
-    ch->sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
+    sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
@@ -925,31 +925,31 @@ void save_char_obj(Character *ch)
     return;
   }
 
-  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+  SETBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
-  char_to_store(ch, &uchar, tmpage);
+  char_to_store(&uchar, tmpage);
 
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
 
-  if (ch->in_room < 1)
+  if (in_room < 1)
   {
     uchar.load_room = START_ROOM;
   }
   else
   {
-    if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
-      uchar.load_room = DC::getInstance()->world[ch->in_room].number;
+    if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
+      uchar.load_room = DC::getInstance()->world[in_room].number;
     else
-      uchar.load_room = real_room(GET_HOME(ch));
+      uchar.load_room = real_room(GET_HOME(this));
   }
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
-      (ch->char_to_store_variable_data(fpsave)) &&
-      (ch->save_pc_or_mob_data(fpsave, tmpage)) &&
-      (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
-      (store_worn_eq(ch, fpsave)))
+      (char_to_store_variable_data(fpsave)) &&
+      (save_pc_or_mob_data(fpsave, tmpage)) &&
+      (obj_to_store(carrying, this, fpsave, -1)) &&
+      (store_worn_eq(this, fpsave)))
   {
     if (fpsave != nullptr)
       fclose(fpsave);
@@ -964,14 +964,14 @@ void save_char_obj(Character *ch)
       fclose(fpsave);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
-    ch->send("WARNING: file problem. You did not save!");
+    send("WARNING: file problem. You did not save!");
     perror(log_buf);
     logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
-  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   struct vault_data *vault;
-  if ((vault = has_vault(GET_NAME(ch))))
+  if ((vault = has_vault(getName())))
     save_vault(vault->owner);
 }
 
@@ -986,7 +986,7 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 }
 
 // Load a char and inventory into a new_new ch structure.
-load_status_t load_char_obj(class Connection *d, QString name)
+load_status_t DC::load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
   QString strsave;
@@ -998,7 +998,7 @@ load_status_t load_char_obj(class Connection *d, QString name)
     return load_status_t::bad_input;
   name[0] = name[0].toUpper();
 
-  ch = new Character;
+  ch = new Character(this);
   auto &free_list = DC::getInstance()->free_list;
   free_list.erase(ch);
 
@@ -1264,12 +1264,12 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   // Handle worn EQ
   if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos]))
   {
-    equip_char(ch, obj, wear_pos, 1);
+    ch->equip_char(obj, wear_pos, 1);
     return obj;
   }
   else if ((wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos + 1]) && CAN_WEAR(obj, Character::wear_to_item_wear[wear_pos + 1]))
   {
-    equip_char(ch, obj, wear_pos + 1, 1);
+    ch->equip_char(obj, wear_pos + 1, 1);
     return obj;
   }
   else if (object.container_depth == 1 && last_cont)
@@ -1671,7 +1671,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
 // copy vital data from a players char-structure to the file structure
 // return 'age' of character unmodified
-void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage)
+void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
 {
   int i;
   int x;
@@ -1681,84 +1681,84 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   // Remove all the eq and store it in temp storage
   for (i = 0; i < MAX_WEAR; i++)
   {
-    if (ch->equipment[i])
-      char_eq[i] = unequip_char(ch, i, 1);
+    if (equipment[i])
+      char_eq[i] = unequip_char(i, true);
     else
       char_eq[i] = 0;
   }
 
   // Unaffect everything a character can be affected by spell-wise
-  for (af = ch->affected; af; af = af->next)
+  for (af = affected; af; af = af->next)
   {
-    affect_modify(ch, af->location, af->modifier, af->bitvector, false);
+    affect_modify(this, af->location, af->modifier, af->bitvector, false);
   }
 
-  st->sex = GET_SEX(ch);
-  st->c_class = GET_CLASS(ch);
-  st->race = GET_RACE(ch);
-  st->level = ch->getLevel();
+  st->sex = GET_SEX(this);
+  st->c_class = GET_CLASS(this);
+  st->race = GET_RACE(this);
+  st->level = getLevel();
 
-  st->raw_str = GET_RAW_STR(ch);
-  st->raw_intel = GET_RAW_INT(ch);
-  st->raw_wis = GET_RAW_WIS(ch);
-  st->raw_dex = GET_RAW_DEX(ch);
-  st->raw_con = GET_RAW_CON(ch);
+  st->raw_str = GET_RAW_STR(this);
+  st->raw_intel = GET_RAW_INT(this);
+  st->raw_wis = GET_RAW_WIS(this);
+  st->raw_dex = GET_RAW_DEX(this);
+  st->raw_con = GET_RAW_CON(this);
 
-  st->mana = GET_MANA(ch);
-  st->raw_mana = GET_RAW_MANA(ch);
-  st->hit = ch->getHP();
-  st->raw_hit = GET_RAW_HIT(ch);
-  st->move = GET_MOVE(ch);
-  st->raw_move = GET_RAW_MOVE(ch);
-  st->ki = GET_KI(ch);
-  st->raw_ki = GET_RAW_KI(ch);
+  st->mana = GET_MANA(this);
+  st->raw_mana = GET_RAW_MANA(this);
+  st->hit = getHP();
+  st->raw_hit = GET_RAW_HIT(this);
+  st->move = GET_MOVE(this);
+  st->raw_move = GET_RAW_MOVE(this);
+  st->ki = GET_KI(this);
+  st->raw_ki = GET_RAW_KI(this);
 
-  st->weight = GET_WEIGHT(ch);
-  st->height = GET_HEIGHT(ch);
+  st->weight = GET_WEIGHT(this);
+  st->height = GET_HEIGHT(this);
   for (i = 0; i < 3; i++)
-    st->conditions[i] = GET_COND(ch, i);
+    st->conditions[i] = GET_COND(this, i);
 
-  st->hometown = ch->hometown;
+  st->hometown = hometown;
 
   //  gets set outside
-  //  st->load_room = DC::getInstance()->world[ch->in_room].number;
+  //  st->load_room = DC::getInstance()->world[in_room].number;
 
-  //  st->gold      = ch->getGold();
+  //  st->gold      = getGold();
   st->gold = 0; // Moved
-  st->plat = GET_PLATINUM(ch);
-  st->exp = GET_EXP(ch);
-  st->immune = ch->immune;
-  st->resist = ch->resist;
-  st->suscept = ch->suscept;
-  st->alignment = ch->alignment;
-  st->misc = ch->misc;
+  st->plat = GET_PLATINUM(this);
+  st->exp = GET_EXP(this);
+  st->immune = immune;
+  st->resist = resist;
+  st->suscept = suscept;
+  st->alignment = alignment;
+  st->misc = misc;
 
-  st->hpmetas = GET_HP_METAS(ch);
-  st->manametas = GET_MANA_METAS(ch);
-  st->movemetas = GET_MOVE_METAS(ch);
-  st->clan = ch->clan;
+  st->hpmetas = GET_HP_METAS(this);
+  st->manametas = GET_MANA_METAS(this);
+  st->movemetas = GET_MOVE_METAS(this);
+  st->clan = clan;
 
   // make sure rest of unused are set to 0
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_NPC(ch))
+  if (IS_NPC(this))
   {
-    st->armor = ch->armor;
-    st->hitroll = ch->hitroll;
-    st->damroll = ch->damroll;
-    st->afected_by = ch->affected_by[0];
-    st->afected_by2 = ch->affected_by[1];
+    st->armor = armor;
+    st->hitroll = hitroll;
+    st->damroll = damroll;
+    st->afected_by = affected_by[0];
+    st->afected_by2 = affected_by[1];
     //  x=0;
-    //  while(ch->afected_by[x] != -1) {
-    //     st->afected_by[x] = ch->affected_by[x];
+    //  while(afected_by[x] != -1) {
+    //     st->afected_by[x] = affected_by[x];
     //     x++;
     //  }
     //  st->afected_by[x] = -1;
   }
   else
   {
-    switch (GET_CLASS(ch))
+    switch (GET_CLASS(this))
     {
     case CLASS_MAGE:
       st->armor = 150;
@@ -1801,21 +1801,21 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
     st->damroll = 0;
     st->afected_by = 0;
     st->afected_by2 = 0;
-    st->acmetas = GET_AC_METAS(ch);
-    st->agemetas = GET_AGE_METAS(ch);
-    tmpage = ch->player->time;
+    st->acmetas = GET_AC_METAS(this);
+    st->agemetas = GET_AGE_METAS(this);
+    tmpage = player->time;
   }
 
   // re-affect the character with spells
-  for (af = ch->affected; af; af = af->next)
+  for (af = affected; af; af = af->next)
   {
-    affect_modify(ch, af->location, af->modifier, af->bitvector, true);
+    affect_modify(this, af->location, af->modifier, af->bitvector, true);
   }
 
   // re-equip the character with his eq
   for (i = 0; i < MAX_WEAR; i++)
   {
     if (char_eq[i])
-      equip_char(ch, char_eq[i], i, 1);
+      equip_char(char_eq[i], i, 1);
   }
 }

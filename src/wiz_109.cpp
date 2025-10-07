@@ -49,7 +49,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  if (!(load_char_obj(&d, arg1)))
+  if (!(dc_->load_char_obj(&d, arg1)))
   {
     this->sendln("Unable to load! (Character might not exist...)");
     return eFAILURE;

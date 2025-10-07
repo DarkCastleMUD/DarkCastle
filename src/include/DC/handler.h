@@ -62,9 +62,6 @@ int obj_from_room(class Object *object);
 int obj_to_obj(class Object *obj, class Object *obj_to);
 int obj_from_obj(class Object *obj);
 
-int equip_char(Character *ch, class Object *obj, int pos, int flag = 0);
-class Object *unequip_char(Character *ch, int pos, int flag = 0);
-
 class Object *get_obj_in_list(char *name, class Object *list);
 class Object *get_obj_in_list_num(int num, class Object *list);
 class Object *get_obj(char *name);

@@ -97,7 +97,7 @@ command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
     if (IS_PC(ch))
     {
       MOBtrigger = true;
-      retval = oprog_speech_trigger(argument.c_str(), ch);
+      retval = ch->oprog_speech_trigger(argument.c_str());
       if (SOMEONE_DIED(retval))
         return SWAP_CH_VICT(retval);
     }

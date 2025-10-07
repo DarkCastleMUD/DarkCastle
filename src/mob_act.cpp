@@ -74,7 +74,7 @@ void mobile_activity(void)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &ch : character_list)
   {
-    if (ch->isDead() || isNowhere(ch))
+    if (ch->isDead() || ch->isNowhere())
     {
       continue;
     }
@@ -120,7 +120,7 @@ void mobile_activity(void)
       retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
-      if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || isNowhere(ch))
+      if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
         continue;
     }
 
@@ -143,14 +143,14 @@ void mobile_activity(void)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
-        if (isSet(retval, eCH_DIED) || ch->isDead() || isNowhere(ch))
+        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
         {
           continue;
         }
       }
 
       retval = mprog_arandom_trigger(ch);
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || isNowhere(ch))
+      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
       {
         continue;
       }
@@ -173,10 +173,10 @@ void mobile_activity(void)
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
-        if (isSet(retval, eCH_DIED) || ch->isDead() || isNowhere(ch))
+        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
           break; // break so we can continue with the next mob
       }
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || isNowhere(ch))
+      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
         continue; // move on to next mob, this one is dead
 
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
@@ -702,7 +702,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WIELD);
+              ch->equip_char(obj, WIELD);
               break;
             }
             /* damage check */
@@ -712,7 +712,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, SECOND_WIELD);
+              ch->equip_char(obj, SECOND_WIELD);
               break;
             }
           } // GET_OBJ_WEIGHT()
@@ -735,9 +735,9 @@ void scavenge(Character *ch)
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_FINGER_L])
-                equip_char(ch, obj, WEAR_FINGER_L);
+                ch->equip_char(obj, WEAR_FINGER_L);
               else
-                equip_char(ch, obj, WEAR_FINGER_R);
+                ch->equip_char(obj, WEAR_FINGER_R);
               done = 1;
             }
             break;
@@ -751,9 +751,9 @@ void scavenge(Character *ch)
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_NECK_1])
-                equip_char(ch, obj, WEAR_NECK_1);
+                ch->equip_char(obj, WEAR_NECK_1);
               else
-                equip_char(ch, obj, WEAR_NECK_2);
+                ch->equip_char(obj, WEAR_NECK_2);
               done = 1;
             }
             break;
@@ -765,7 +765,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_BODY);
+              ch->equip_char(obj, WEAR_BODY);
               done = 1;
             }
             break;
@@ -777,7 +777,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_HEAD);
+              ch->equip_char(obj, WEAR_HEAD);
               done = 1;
             }
             break;
@@ -789,7 +789,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_LEGS);
+              ch->equip_char(obj, WEAR_LEGS);
               done = 1;
             }
             break;
@@ -801,7 +801,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_FEET);
+              ch->equip_char(obj, WEAR_FEET);
               done = 1;
             }
             break;
@@ -813,7 +813,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_HANDS);
+              ch->equip_char(obj, WEAR_HANDS);
               done = 1;
             }
             break;
@@ -825,7 +825,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_ARMS);
+              ch->equip_char(obj, WEAR_ARMS);
               done = 1;
             }
             break;
@@ -837,7 +837,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_ABOUT);
+              ch->equip_char(obj, WEAR_ABOUT);
               done = 1;
             }
             break;
@@ -849,7 +849,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_WAISTE);
+              ch->equip_char(obj, WEAR_WAISTE);
               done = 1;
             }
             break;
@@ -863,9 +863,9 @@ void scavenge(Character *ch)
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_WRIST_L])
-                equip_char(ch, obj, WEAR_WRIST_L);
+                ch->equip_char(obj, WEAR_WRIST_L);
               else
-                equip_char(ch, obj, WEAR_WRIST_R);
+                ch->equip_char(obj, WEAR_WRIST_R);
               done = 1;
             }
             break;
@@ -877,7 +877,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_FACE);
+              ch->equip_char(obj, WEAR_FACE);
               done = 1;
             }
             break;
@@ -893,7 +893,7 @@ void scavenge(Character *ch)
               act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
-              equip_char(ch, obj, WEAR_SHIELD);
+              ch->equip_char(obj, WEAR_SHIELD);
               done = 1;
             }
             break;
@@ -908,7 +908,7 @@ void scavenge(Character *ch)
                 act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
                 perform_wear(ch, obj, 16);
                 obj_from_char(obj);
-                equip_char(ch, obj, WEAR_LIGHT);
+                ch->equip_char(obj, WEAR_LIGHT);
                 done = 1;
               }
               else if (obj->obj_flags.type_flag != ITEM_LIGHT)
@@ -917,7 +917,7 @@ void scavenge(Character *ch)
                 act("$n gets $p.", ch, obj, 0, TO_ROOM, 0);
                 perform_wear(ch, obj, keyword);
                 obj_from_char(obj);
-                equip_char(ch, obj, HOLD);
+                ch->equip_char(obj, HOLD);
                 done = 1;
               }
             }
@@ -932,9 +932,9 @@ void scavenge(Character *ch)
               perform_wear(ch, obj, keyword);
               obj_from_char(obj);
               if (!ch->equipment[WEAR_EAR_L])
-                equip_char(ch, obj, WEAR_EAR_L);
+                ch->equip_char(obj, WEAR_EAR_L);
               else
-                equip_char(ch, obj, WEAR_EAR_R);
+                ch->equip_char(obj, WEAR_EAR_R);
               done = 1;
             }
             break;

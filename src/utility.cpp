@@ -318,8 +318,8 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
   FILE **f = 0;
   int stream = 1;
   std::stringstream logpath;
-  DC *dc = dynamic_cast<DC *>(DC::instance());
-  DC::config &cf = dc->cf;
+  // DC *dc = dynamic_cast<DC *>(DC::instance());
+  // DC::config &cf = dc->cf;
 
   if (DC::getInstance()->cf.bport)
   {
@@ -470,7 +470,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
 
   if (stream == STDIN_FILENO || type == DC::LogChannel::LOG_BUG)
   {
-    if (cf.stderr_timestamp == true)
+    if (DC::getInstance()->cf.stderr_timestamp == true)
     {
       std::cerr << QStringLiteral("%1 :%2: %3").arg(tmstr).arg(type).arg(str).toStdString() << std::endl;
     }
@@ -503,6 +503,11 @@ void logbug(QString message)
 void logmisc(QString message)
 {
   logentry(message, IMMORTAL, DC::LogChannel::LOG_MISC);
+}
+
+void logworld(QString message)
+{
+  logentry(message, IMMORTAL, DC::LogChannel::LOG_WORLD);
 }
 
 // function for new SETBIT et al. commands
@@ -1072,7 +1077,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 
   if (!noprog && IS_NPC(obj))
   {
-    int prog = mprog_can_see_trigger(sub, obj);
+    int prog = sub->mprog_can_see_trigger(obj);
     if (isSet(prog, eEXTRA_VALUE))
       return true;
     else if (isSet(prog, eEXTRA_VAL2))
@@ -1141,7 +1146,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   if (!IS_NPC(sub) && sub->player->holyLite)
     return true;
 
-  int prog = oprog_can_see_trigger(sub, obj);
+  int prog = sub->oprog_can_see_trigger(obj);
   if (isSet(prog, eEXTRA_VALUE))
     return true;
   else if (isSet(prog, eEXTRA_VAL2))
@@ -1797,20 +1802,20 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->desc)
   {
-    save_char_obj(ch);
+    ch->save_char_obj();
     if (!close_socket(ch->desc)) // if returns 0, then it already quit us out
       return eFAILURE | eCH_DIED;
   }
   else
   {
-    save_char_obj(ch);
+    ch->save_char_obj();
   }
 
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for (iWear = 0; iWear < MAX_WEAR; iWear++)
     if (ch->equipment[iWear])
-      obj_to_char(unequip_char(ch, iWear, 1), ch);
+      obj_to_char(ch->unequip_char(iWear, 1), ch);
 
   while (ch->carrying)
     extract_obj(ch->carrying);
@@ -1837,7 +1842,7 @@ command_return_t Character::save(cmd_t cmd)
 
   if (IS_PC(this))
   {
-    save_char_obj(this);
+    save_char_obj();
 #ifdef USE_SQL
     save_char_obj_db(this);
 #endif
@@ -2977,11 +2982,6 @@ std::string get_isr_string(uint32_t isr, int8_t loc)
   default:
     return "ErCode: Somebodydunfuckedup";
   }
-}
-
-bool isNowhere(Character *ch)
-{
-  return (ch && ch->in_room == DC::NOWHERE);
 }
 
 bool file_exists(std::string filename)

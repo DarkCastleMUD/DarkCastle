@@ -2495,7 +2495,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 			return eFAILURE;
 		}
 	}
-	mob = clone_mobile(src);
+	mob = ch->getDC()->clone_mobile(src);
 	if (!mob)
 	{
 		ch->sendln("Failure. Unable to copy mobile.");

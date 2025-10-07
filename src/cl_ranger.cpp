@@ -1795,7 +1795,7 @@ void check_eq(Character *ch)
   for (pos = 0; pos < MAX_WEAR; pos++)
   {
     if (ch->equipment[pos])
-      equip_char(ch, unequip_char(ch, pos), pos);
+      ch->equip_char(ch->unequip_char(pos), pos);
   }
 }
 

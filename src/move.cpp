@@ -855,10 +855,10 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
 	retval = mprog_entry_trigger(ch);
 	if (SOMEONE_DIED(retval))
 		return retval | eSUCCESS;
-	retval = mprog_greet_trigger(ch);
+	retval = ch->mprog_greet_trigger();
 	if (SOMEONE_DIED(retval))
 		return retval | eSUCCESS;
-	retval = oprog_greet_trigger(ch);
+	retval = ch->oprog_greet_trigger();
 	if (SOMEONE_DIED(retval))
 		return retval | eSUCCESS;
 

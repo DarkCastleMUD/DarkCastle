@@ -221,7 +221,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
         {
           if (vict->equipment[iEq] == k)
           {
-            obj_to_char(unequip_char(vict, iEq), vict);
+            obj_to_char(vict->unequip_char(iEq), vict);
             break;
           }
         } // for

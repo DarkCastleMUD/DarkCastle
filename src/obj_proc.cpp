@@ -2482,7 +2482,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
             for (int l = 0; l < MAX_WEAR; l++)
             {
               if (tmp_victim->equipment[l])
-                extract_obj(unequip_char(tmp_victim, l));
+                extract_obj(tmp_victim->unequip_char(l));
             }
 
             while (tmp_victim->carrying)
@@ -3748,23 +3748,22 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           act("Your $p unequips itself.",
               vict, vict->equipment[WIELD], 0, TO_CHAR, 0);
           act("$n stops using $p.", vict, vict->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-          obj_to_char(unequip_char(vict, WIELD), vict);
+          obj_to_char(vict->unequip_char(WIELD), vict);
           if (vict->equipment[SECOND_WIELD])
           {
             act("You move your $p to be your primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
             act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
             class Object *weapon;
-            weapon = unequip_char(vict, SECOND_WIELD);
-            equip_char(vict, weapon, WIELD);
+            weapon = vict->unequip_char(SECOND_WIELD);
+            vict->equip_char(weapon, WIELD);
           }
         }
         else if (vict->equipment[SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
         {
 
-          act("Your $p unequips itself.",
-              vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
+          act("Your $p unequips itself.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
           act("$n stops using $p.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-          obj_to_char(unequip_char(vict, SECOND_WIELD), vict);
+          obj_to_char(vict->unequip_char(SECOND_WIELD), vict);
         }
       }
     }
@@ -4381,7 +4380,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_ROOM, 0);
   act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_CHAR, 0);
   Character *a, *b, *c;
-  b = initiate_oproc(nullptr, obj);
+  b = ch->getDC()->initiate_oproc(nullptr, obj);
   for (a = DC::getInstance()->world[ch->in_room].people; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed
@@ -4395,8 +4394,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
   return eSUCCESS;
 }
 
-int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                   Character *invoker)
+int godload_phyraz(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   if (cmd != cmd_t::SAY || !is_wearing(ch, obj))

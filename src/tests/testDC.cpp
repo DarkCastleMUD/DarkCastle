@@ -114,7 +114,11 @@ private slots:
 
     void test_handle_ansi()
     {
-        std::unique_ptr<Character> ch = std::make_unique<Character>();
+        DC::config cf;
+        cf.sql = false;
+
+        DC dc(cf);
+        std::unique_ptr<Character> ch = std::make_unique<Character>(&dc);
         std::unique_ptr<Player> player = std::make_unique<Player>();
         ch->player = player.get();
         ch->setType(Character::Type::Player);
@@ -211,7 +215,7 @@ private slots:
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testsing"));
         ch.in_room = 3;
         ch.height = 72;
@@ -342,7 +346,7 @@ private slots:
         dc.boot_db();
         dc.random_ = QRandomGenerator(0);
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testvault"));
         ch.in_room = 3;
         ch.height = 72;
@@ -358,7 +362,7 @@ private slots:
         dc.character_list.insert(&ch);
         ch.do_on_login_stuff();
 
-        auto new_rnum = create_blank_item(1);
+        auto new_rnum = dc.create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
         int rnum = real_object(1);
         Object *o1 = clone_object(rnum);
@@ -794,7 +798,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Testvend"));
         ch.in_room = 3;
         ch.height = 72;
@@ -820,7 +824,7 @@ private slots:
         ch.setMove(GET_MAX_MOVE(&ch));
         conn.output = {};
 
-        Character ch2;
+        Character ch2(&dc);
         ch2.setName(QStringLiteral("Testvend2"));
         ch2.in_room = 3;
         ch2.height = 72;
@@ -865,7 +869,7 @@ private slots:
         auto new_mob_rnum = real_mobile(5258);
         QVERIFY(new_mob_rnum != -1);
 
-        auto new_rnum = create_blank_item(1);
+        auto new_rnum = dc.create_blank_item(1);
         QCOMPARE(new_rnum.error(), create_error::entry_exists);
         int rnum = real_object(1);
         Object *o1 = clone_object(rnum);
@@ -969,7 +973,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         Player player;
         ch.player = &player;
@@ -1023,7 +1027,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         ch.setPosition(position_t::STANDING);
         Player player;
@@ -1100,7 +1104,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character ch;
+        Character ch(&dc);
         ch.setName(QStringLiteral("Test"));
         ch.setPosition(position_t::STANDING);
         Player player;
@@ -1369,7 +1373,7 @@ private slots:
         dc.random_ = QRandomGenerator(0);
         auto base_character_count = dc.character_list.size();
 
-        Character p1, g1, g2, g3, g4;
+        Character p1(&dc), g1(&dc), g2(&dc), g3(&dc), g4(&dc);
 
         auto count = 0;
         QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};

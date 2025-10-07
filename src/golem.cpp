@@ -256,27 +256,27 @@ void set_golem(Character *golem, int golemtype)
   golem->weight = 255; // Was 530, ditto
 }
 
-void load_golem_data(Character *ch, int golemtype)
+void Character::load_golem_data(int golemtype)
 {
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && ch->getLevel() < OVERSEER) || ch->player->golem)
+  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
-    golem = clone_mobile(real_mobile(8));
+    golem = dc_->clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
-    golem->alignment = ch->alignment;
-    ch->player->golem = golem;
+    golem->alignment = this->alignment;
+    this->player->golem = golem;
     return;
   }
-  golem = clone_mobile(real_mobile(8));
+  golem = dc_->clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  ch->player->golem = golem;
+  this->player->golem = golem;
   uint8_t golem_level{};
   fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);
@@ -324,7 +324,7 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
     ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
     return eFAILURE;
   }
-  load_golem_data(ch, i); // Load the golem up;
+  ch->load_golem_data(i); // Load the golem up;
   ch->skill_increase_check(SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
   golem = ch->player->golem;
   if (!golem)

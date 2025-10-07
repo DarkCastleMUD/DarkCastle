@@ -846,7 +846,7 @@ void new_string_add(class Connection *d, char *str)
          else
          {
             if (STATE(d) == Connection::states::EXDSCR)
-               save_char_obj(d->character);
+               d->character->save_char_obj();
             if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
                dc_free(*d->strnew);
             d->backstr = nullptr;

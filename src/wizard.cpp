@@ -89,6 +89,8 @@ int number_or_name(char **name, int *num)
 
 void do_mload(Character *ch, int rnum, int cnt)
 {
+  if (!ch)
+    return;
   Character *mob = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
@@ -96,7 +98,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     cnt = 1;
   for (i = 1; i <= cnt; i++)
   {
-    mob = clone_mobile(rnum);
+    mob = ch->getDC()->clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
     selfpurge = false;
     mprog_load_trigger(mob);
@@ -1469,7 +1471,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
         for (int l = 0; l < MAX_WEAR; l++)
         {
           if (tmp_victim->equipment[l])
-            extract_obj(unequip_char(tmp_victim, l));
+            extract_obj(tmp_victim->unequip_char(l));
         }
         while (tmp_victim->carrying)
           extract_obj(tmp_victim->carrying);

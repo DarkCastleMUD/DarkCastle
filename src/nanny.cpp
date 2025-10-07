@@ -654,7 +654,7 @@ void Character::do_on_login_stuff(void)
    while (!todelete.empty())
    {
       logentry(QStringLiteral("Deleting %1 from %2's vault access list.\n").arg(todelete.front()).arg(GET_NAME(this)), 0, DC::LogChannel::LOG_MORTAL);
-      remove_vault_access(this, todelete.front(), vault);
+      remove_vault_access(todelete.front(), vault);
       todelete.pop();
    }
 
@@ -1041,7 +1041,7 @@ void DC::nanny(class Connection *d, std::string arg)
             else
             {
                d->character->player->bad_pw_tries++;
-               save_char_obj(d->character);
+               d->character->save_char_obj();
             }
          }
          close_socket(d);
@@ -1957,7 +1957,7 @@ void DC::nanny(class Connection *d, std::string arg)
          load_char_obj(d, blah1);
          ch = d->character;
          strcpy(ch->player->pwd, blah2);
-         save_char_obj(ch);
+         ch->save_char_obj();
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
          logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
       }

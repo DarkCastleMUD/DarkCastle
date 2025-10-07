@@ -484,6 +484,7 @@ char *str_dup0(const char *str);
 void logbug(QString message);
 void logsocket(QString message);
 void logmisc(QString message);
+void logworld(QString message);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);
@@ -594,8 +595,6 @@ void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
 int file_to_string(const char *name, char *buf);
-load_status_t load_char_obj(class Connection *d, QString name);
-void save_char_obj(Character *ch);
 
 #ifdef USE_SQL
 void save_char_obj_db(Character *ch);
@@ -629,8 +628,6 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 void send_to_all(QString messg);
 void ansi_color(const char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
-void send_to_char(std::string messg, Character *ch);
-void send_to_char(const char *messg, Character *ch);
 void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, int room, bool awakeonly = false, Character *nta = nullptr);
@@ -716,7 +713,6 @@ int mprog_bribe_trigger(Character *mob, Character *ch,
 int mprog_entry_trigger(Character *mob);
 int mprog_give_trigger(Character *mob, Character *ch,
                        Object *obj);
-int mprog_greet_trigger(Character *mob);
 int mprog_fight_trigger(Character *mob, Character *ch);
 int mprog_hitprcnt_trigger(Character *mob, Character *ch);
 int mprog_death_trigger(Character *mob, Character *killer);
@@ -726,20 +722,13 @@ int mprog_speech_trigger(const char *txt, Character *mob);
 int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
 int mprog_attack_trigger(Character *mob, Character *ch);
 int mprog_load_trigger(Character *mob);
-int mprog_can_see_trigger(Character *ch, Character *mob);
 int mprog_damage_trigger(Character *mob, Character *ch, int amount);
 
 int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
-int oprog_act_trigger(const char *txt, Character *ch);
-int oprog_speech_trigger(const char *txt, Character *ch);
 int oprog_command_trigger(const char *txt, Character *ch, char *arg);
 int oprog_weapon_trigger(Character *ch, Object *item);
 int oprog_armour_trigger(Character *ch, Object *item);
 int oprog_rand_trigger(Object *item);
-int oprog_arand_trigger(Object *item);
-int oprog_greet_trigger(Character *ch);
-int oprog_load_trigger(Object *item);
-int oprog_can_see_trigger(Character *ch, Object *item);
 bool is_in_game(Character *ch);
 int get_stat(Character *ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
@@ -837,10 +826,8 @@ T remove_non_color_codes(T input)
    return output;
 }
 
-void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
 bool str_infix(QString astr, QString bstr);
-Character *initiate_oproc(Character *ch, Object *obj);
 
 extern const char menu[];
 
@@ -907,8 +894,6 @@ const char *find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32_t, int8_t);
 
-bool isDead(Character *ch);
-bool isNowhere(Character *ch);
 bool file_exists(std::string filename);
 bool file_exists(QString filename);
 bool char_file_exists(std::string name);

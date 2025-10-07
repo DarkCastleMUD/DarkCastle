@@ -78,8 +78,12 @@ void boot_clans(void)
 
   if (!(fl = fopen("../lib/clan.txt", "r")))
   {
-    qCritical("Unable to open clan file...\n");
+    qCritical("Unable to open ../lib/clan.txt file for reading...");
     fl = fopen("../lib/clan.txt", "w");
+    if (!fl)
+    {
+      qFatal("Unable to open ../lib/clan.txt for writing.");
+    }
     fprintf(fl, "~\n");
     fclose(fl);
     abort();
@@ -1035,7 +1039,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   {
     bool victim_connected = false;
     Connection d = {};
-    if (!(load_char_obj(&d, arg1)))
+    if (!(dc_->load_char_obj(&d, arg1)))
     {
       if (file_exists(QStringLiteral("../archive/%1.gz").arg(arg1)))
       {

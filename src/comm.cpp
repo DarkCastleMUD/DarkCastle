@@ -132,7 +132,6 @@ Database db;
 #endif
 
 /* functions in this file */
-void update_mprog_throws(void);
 void update_characters(void);
 void short_activity();
 void skip_spaces(char **string);
@@ -165,7 +164,6 @@ void weather_update();
 void send_hint();
 extern void pulse_command_lag();
 void checkConsecrate(int);
-void game_test_init(void);
 
 // extern char greetings1[MAX_STRING_LENGTH];
 // extern char greetings2[MAX_STRING_LENGTH];
@@ -216,7 +214,7 @@ int DC::write_hotboot_file(void)
           d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
           d->original->player->time.logon = time(0);
         }
-        save_char_obj(d->original);
+        d->original->save_char_obj();
       }
       else
       {
@@ -226,7 +224,7 @@ int DC::write_hotboot_file(void)
           d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
           d->character->player->time.logon = time(0);
         }
-        save_char_obj(d->character);
+        d->character->save_char_obj();
       }
       write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
     }
@@ -399,7 +397,7 @@ vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
   return INVALID_VNUM;
 }
 
-void finish_hotboot()
+void DC::finish_hotboot(void)
 {
   class Connection *d;
   char buf[MAX_STRING_LENGTH];
@@ -961,7 +959,7 @@ void DC::game_loop_init(void)
   ssh.close();
 }
 
-void game_test_init(void)
+void DC::game_test_init(void)
 {
   assert(remove_all_codes(QStringLiteral("$B")) == "$$B");
   assert(remove_non_color_codes(QStringLiteral("$B")) == "$B");
@@ -977,7 +975,7 @@ void game_test_init(void)
   assert(!strcmp(name, "1"));
 
   auto d = new Connection;
-  Character *ch = new Character;
+  Character *ch = new Character(this);
   ch->setName("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -1050,9 +1048,8 @@ void init_heartbeat()
   pulse_short = DC::PULSE_SHORT;
 }
 
-void heartbeat()
+void DC::heartbeat(void)
 {
-  DC *dc = DC::getInstance();
   if (--pulse_mobile < 1)
   {
     pulse_mobile = DC::PULSE_MOBILE;
@@ -1128,7 +1125,7 @@ void heartbeat()
     PerfTimers["weather"].stop();
 
     PerfTimers["auctionexp"].start();
-    dc->TheAuctionHouse.CheckExpire();
+    TheAuctionHouse.CheckExpire();
     PerfTimers["auctionexp"].stop();
   }
 
@@ -1143,7 +1140,7 @@ void heartbeat()
     checkConsecrate(DC::PULSE_REGEN);
     if (!number(0, 2))
     {
-      dc->send_hint();
+      send_hint();
     }
     PerfTimers["pulse_regen"].stop();
   }
@@ -1185,7 +1182,7 @@ void heartbeat()
     leaderboard.check(); // good place to put this
     PerfTimers["leaderboard"].stop();
 
-    if (DC::getInstance()->cf.bport == false)
+    if (cf.bport == false)
     {
       PerfTimers["check_champ"].start();
       check_champion_and_website_who_list();
@@ -2229,7 +2226,7 @@ int close_socket(class Connection *d)
     // target_idnum = GET_IDNUM(d->character);
     if (d->isPlaying() || d->isEditing())
     {
-      save_char_obj(d->character);
+      d->character->save_char_obj();
       // clan area stuff
       extern void check_quitter(Character * ch);
       check_quitter(d->character);
@@ -2621,27 +2618,14 @@ void check_for_awaymsgs(Character *ch)
   ch->sendln("Type awaymsgs to view them.");
 }
 
-void send_to_char(const char *mesg, Character *ch)
-{
-  if (mesg)
-  {
-    send_to_char(std::string(mesg), ch);
-  }
-}
-
 void send_to_char(QString messg, Character *ch)
 {
-  send_to_char(messg.toStdString(), ch);
-}
+  if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.isEmpty())
+    mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
+  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.isEmpty())
+    ch->oprog_act_trigger(messg);
 
-void send_to_char(std::string messg, Character *ch)
-{
-  if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.empty())
-    mprog_act_trigger(messg, ch, 0, 0, 0);
-  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.empty())
-    oprog_act_trigger(messg.c_str(), ch);
-
-  if (!selfpurge && (ch->desc && !messg.empty()) && (!is_busy(ch)))
+  if (!selfpurge && (ch->desc && !messg.isEmpty()) && (!is_busy(ch)))
   {
     SEND_TO_Q(messg, ch->desc);
   }

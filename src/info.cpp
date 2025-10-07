@@ -4252,7 +4252,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       uint64_t vaults_searched = 0;
       for (auto vault = vault_table; vault; vault = vault->next)
       {
-         if (vault && !vault->owner.isEmpty() && has_vault_access(GET_NAME(this), vault))
+         if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(GET_NAME(this), vault))
          {
             vaults_searched++;
             struct vault_items_data *items;

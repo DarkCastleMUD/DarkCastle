@@ -324,13 +324,13 @@ void perform_violence(void)
 
       // MOB Progs
       retval = mprog_hitprcnt_trigger(ch, ch->fighting);
-      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || ch->isDead() || isNowhere(ch) || ch->fighting->isDead() || isNowhere(ch->fighting))
+      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || ch->isDead() || ch->isNowhere() || ch->fighting->isDead() || ch->fighting->isNowhere())
       {
         continue;
       }
 
       retval = mprog_fight_trigger(ch, ch->fighting);
-      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || ch->isDead() || isNowhere(ch) || ch->fighting->isDead() || isNowhere(ch->fighting))
+      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || ch->isDead() || ch->isNowhere() || ch->fighting->isDead() || ch->fighting->isNowhere())
       {
         continue;
       }
@@ -1723,7 +1723,7 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
 
   if (pos != -1) // if its not an inventory item, do this
   {
-    unequip_char(ch, pos);
+    ch->unequip_char(pos);
 
     if (pos == WEAR_LIGHT)
     {
@@ -1733,8 +1733,8 @@ void eq_destroyed(Character *ch, Object *obj, int pos)
     else if ((pos == WIELD) && (ch->equipment[SECOND_WIELD]))
     {
       Object *temp;
-      temp = unequip_char(ch, SECOND_WIELD);
-      equip_char(ch, temp, WIELD);
+      temp = ch->unequip_char(SECOND_WIELD);
+      ch->equip_char(temp, WIELD);
     }
     act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
   }
@@ -1871,7 +1871,7 @@ void eq_damage(Character *ch, Character *victim,
     }
   } // end of inventory damage...
 
-  save_char_obj(victim);
+  victim->save_char_obj();
 }
 
 void pir_stat_loss(Character *victim, int chance, bool heh, bool zz)
@@ -4543,7 +4543,7 @@ void make_corpse(Character *ch)
   {
     for (i = 0; i < MAX_WEAR; i++)
       if (ch->equipment[i])
-        obj_to_char(unequip_char(ch, i), ch);
+        obj_to_char(ch->unequip_char(i), ch);
 
     if (ch->getGold() > 0)
     {
@@ -4673,7 +4673,7 @@ void make_dust(Character *ch)
 
   for (i = 0; i < MAX_WEAR; i++)
     if (ch->equipment[i])
-      obj_to_char(unequip_char(ch, i), ch);
+      obj_to_char(ch->unequip_char(i), ch);
 
   if (ch->getGold() > 0)
   {
@@ -4718,7 +4718,7 @@ void zap_eq_check(Character *ch)
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   for (int i = 0; i < MAX_WEAR; i++)
     if (ch->equipment[i])
-      equip_char(ch, unequip_char(ch, i, 1), i, 1);
+      ch->equip_char(ch->unequip_char(i, 1), i, 1);
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 }
 
@@ -5058,9 +5058,9 @@ void make_heart(Character *ch, Character *vict)
   }
 
   if (!ch->equipment[HOLD] && !ch->equipment[WIELD] && !ch->equipment[WEAR_LIGHT])
-    equip_char(ch, corpse, HOLD);
+    ch->equip_char(corpse, HOLD);
   else if (!ch->equipment[HOLD2] && !ch->equipment[SECOND_WIELD])
-    equip_char(ch, corpse, HOLD2);
+    ch->equip_char(corpse, HOLD2);
   else
     extract_obj(corpse);
 
@@ -5529,7 +5529,7 @@ void raw_kill(Character *ch, Character *victim)
       act("$n drops $s stolen booty!", victim, 0, 0, TO_ROOM, 0);
       obj_to_room(create_money(victim->getGold()), victim->in_room);
       victim->setGold(0);
-      save_char_obj(victim);
+      victim->save_char_obj();
     }
   }
 
@@ -5558,7 +5558,7 @@ void raw_kill(Character *ch, Character *victim)
     victim->combat = 0;
   }
 
-  save_char_obj(victim);
+  victim->save_char_obj();
 
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
@@ -6399,12 +6399,12 @@ void disarm(Character *ch, Character *victim)
 
   // all disarms go to inventory right now -pir
   //  if (IS_PC(ch)) {
-  obj = unequip_char(victim, WIELD);
+  obj = victim->unequip_char(WIELD);
   obj_to_char(obj, victim);
   if (victim->equipment[SECOND_WIELD])
   {
-    obj = unequip_char(victim, SECOND_WIELD);
-    equip_char(victim, obj, WIELD);
+    obj = victim->unequip_char(SECOND_WIELD);
+    victim->equip_char(obj, WIELD);
   }
   victim->recheck_height_wears();
   return;
@@ -6412,7 +6412,7 @@ void disarm(Character *ch, Character *victim)
 
   // we never get here cause of above code
 
-  obj = unequip_char(victim, WIELD);
+  obj = victim->unequip_char(WIELD);
   /* If it's gl make it go to inventory. Morc. */
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     obj_to_char(obj, victim);
@@ -6421,8 +6421,8 @@ void disarm(Character *ch, Character *victim)
 
   if (victim->equipment[SECOND_WIELD])
   {
-    obj = unequip_char(victim, SECOND_WIELD);
-    equip_char(victim, obj, WIELD);
+    obj = victim->unequip_char(SECOND_WIELD);
+    victim->equip_char(obj, WIELD);
   }
 }
 
@@ -6500,7 +6500,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
       obj_to_room(create_money(victim->getGold()), victim->in_room);
       victim->setGold(0);
-      save_char_obj(victim);
+      victim->save_char_obj();
     }
   }
   // Make sure barbs get their ac back
@@ -6552,7 +6552,7 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   GET_COND(victim, FULL) = 0;
   GET_COND(victim, THIRST) = 0;
 
-  save_char_obj(victim);
+  victim->save_char_obj();
 
   // have to be level 20 and linkalive to count as a pkill and not yourself
   if (ch != nullptr)
@@ -6948,7 +6948,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     ch->combat = 0; // remove all combat effects
 
   remove_active_potato(victim);
-  save_char_obj(victim);
+  victim->save_char_obj();
 }
 
 int is_stunned(Character *ch)
@@ -7819,17 +7819,17 @@ int debug_retval(Character *ch, Character *victim, int retval)
 
 void Character::send(const char *buffer)
 {
-  send_to_char(std::string(buffer), this);
+  send_to_char(buffer, this);
 }
 
 void Character::send(std::string buffer)
 {
-  send_to_char(buffer, this);
+  send_to_char(buffer.c_str(), this);
 }
 
 void Character::send(QString buffer)
 {
-  send_to_char(buffer.toStdString(), this);
+  send_to_char(buffer, this);
 }
 
 void Character::sendRaw(std::string buffer)

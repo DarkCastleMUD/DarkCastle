@@ -3316,7 +3316,7 @@ int spell_remove_curse(uint8_t level, Character *ch, Character *victim, class Ob
         else
           z = WEAR_FINGER_R;
         if (t)
-          obj_to_char(unequip_char(t, z), t);
+          obj_to_char(t->unequip_char(z), t);
         add_obj_affect(obj, APPLY_MANA_REGEN, 2);
         if (t)
           wear(t, obj, 0);
@@ -4579,10 +4579,10 @@ int spell_charm_person(uint8_t level, Character *ch, Character *victim, class Ob
   {
     if (victim->equipment[SECOND_WIELD])
     {
-      tempobj = unequip_char(victim, SECOND_WIELD);
+      tempobj = victim->unequip_char(SECOND_WIELD);
       obj_to_room(tempobj, victim->in_room);
     }
-    tempobj = unequip_char(victim, WIELD);
+    tempobj = victim->unequip_char(WIELD);
     obj_to_room(tempobj, victim->in_room);
     act("$n's eyes dull and $s hands slacken dropping $s weapons.", victim, 0, 0, TO_ROOM, 0);
   }
@@ -5318,7 +5318,7 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
     return eFAILURE;
   }
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   IS_CARRYING_W(mob) = 0;
@@ -12076,7 +12076,7 @@ int cast_companion(uint8_t level, Character *ch, char *arg, int type, Character 
   }
 
   // Load up the standard fire ruler from elemental canyon (mob #19309) */
-  mob = clone_mobile(number);
+  mob = ch->getDC()->clone_mobile(number);
   char_to_room(mob, ch->in_room);
 
   // I am not sure of a better way to do this, so I just set the duration
@@ -12313,7 +12313,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
 
   // create golem
 
-  mob = clone_mobile(real_mobile(201));
+  mob = ch->getDC()->clone_mobile(real_mobile(201));
   if (!mob)
   {
     ch->sendln("Warning: Load mob not found in create_corpse");
@@ -12774,7 +12774,7 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
     else
       k = k->next;
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
   SETBIT(mob->affected_by, AFF_FAMILIAR);
@@ -14359,6 +14359,9 @@ int cast_blessed_halo(uint8_t level, Character *ch, char *arg, int type, Charact
 
 int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill)
 {
+  if (!ch)
+    return eFAILURE;
+
   if (ch->fighting)
   {
     ch->sendln("You're a bit too distracted by the battle.");
@@ -14425,8 +14428,8 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
   }
 
   Character *mob;
-  mob = clone_mobile(mobile);
-  mob->hometown = DC::getInstance()->world[ch->in_room].number;
+  mob = ch->getDC()->clone_mobile(mobile);
+  mob->hometown = ch->getDC()->world[ch->in_room].number;
   char_to_room(mob, ch->in_room);
 
   ch->sendln("You call upon the spirits of this area, shifting into a trance-state.");
@@ -14457,6 +14460,8 @@ int cast_ghost_walk(uint8_t level, Character *ch, char *arg, int type, Character
 
 int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *victim, class Object *component, int skill)
 {
+  if (!ch)
+    return eFAILURE;
   Character *mob;
   int r_num, liquid, virt;
   // 88 = fire fire
@@ -14552,7 +14557,7 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
     return eFAILURE;
   }
 
-  mob = clone_mobile(r_num);
+  mob = ch->getDC()->clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
   mob->max_hit += skill * 5;
   mob->hit = mob->max_hit;
@@ -15403,7 +15408,7 @@ int spell_spirit_shield(uint8_t level, Character *ch, Character *victim, class O
 
   ssobj->obj_flags.timer = 4 + skill / 5;
 
-  equip_char(ch, ssobj, WEAR_SHIELD);
+  ch->equip_char(ssobj, WEAR_SHIELD);
 
   ch->sendln("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!");
   act("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, TO_ROOM, 0);

@@ -852,13 +852,13 @@ void check_weapon_weights(Character *ch)
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, WIELD), ch);
+		obj_to_char(ch->unequip_char(WIELD), ch);
 		if (ch->equipment[SECOND_WIELD])
 		{
 			act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
 			act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-			weapon = unequip_char(ch, SECOND_WIELD);
-			equip_char(ch, weapon, WIELD);
+			weapon = ch->unequip_char(SECOND_WIELD);
+			ch->equip_char(weapon, WIELD);
 			check_weapon_weights(ch); // Not a loop, since it'll only happen once.
 									  // It'll recheck primary wield.
 		}
@@ -869,7 +869,7 @@ void check_weapon_weights(Character *ch)
 	{
 		act("Being too heavy to wield, you move your $p to your inventory.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, SECOND_WIELD), ch);
+		obj_to_char(ch->unequip_char(SECOND_WIELD), ch);
 	}
 
 	if (ch->equipment[WEAR_SHIELD] && ((ch->equipment[WIELD] &&
@@ -879,7 +879,7 @@ void check_weapon_weights(Character *ch)
 	{
 		act("You shift your shield into your inventory.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
 		act("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, TO_ROOM, INVIS_NULL);
-		obj_to_char(unequip_char(ch, WEAR_SHIELD), ch);
+		obj_to_char(ch->unequip_char(WEAR_SHIELD), ch);
 	}
 }
 
@@ -1822,31 +1822,31 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 			{
 				if ((obj = ch->equipment[SECOND_WIELD]))
 				{
-					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD]))
 				{
-					obj_to_char(unequip_char(ch, HOLD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(HOLD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD2]))
 				{
-					obj_to_char(unequip_char(ch, HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_SHIELD]))
 				{
-					obj_to_char(unequip_char(ch, WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_LIGHT]))
 				{
-					obj_to_char(unequip_char(ch, WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -1858,7 +1858,7 @@ void affect_remove(Character *ch, struct affected_type *af, int flags)
 				obj = ch->equipment[WIELD];
 				if (obj)
 				{
-					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
+					obj_to_char(ch->unequip_char(SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
 						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
@@ -2450,13 +2450,13 @@ int apply_ac(Character *ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-int equip_char(Character *ch, class Object *obj, int pos, int flag)
+bool Character::equip_char(class Object *obj, int pos, bool flag)
 {
 	int j;
 
-	if (!ch || !obj)
+	if (!obj)
 	{
-		logentry(QStringLiteral("Null ch or obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
+		logentry(QStringLiteral("Null obj in equip_char()!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
@@ -2464,16 +2464,16 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		logentry(QStringLiteral("Invalid eq position in equip_char!"), ANGEL, DC::LogChannel::LOG_BUG);
 		return 0;
 	}
-	if (ch->equipment[pos])
+	if (equipment[pos])
 	{
-		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
+		logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(this), pos);
 		produce_coredump();
 		return 0;
 	}
-	if (IS_AFFECTED(ch, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
+	if (IS_AFFECTED(this, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
 	{ // best indentation ever
-		ch->recheck_height_wears();
-		obj_to_char(obj, ch);
+		recheck_height_wears();
+		obj_to_char(obj, this);
 		return 0;
 	}
 
@@ -2489,157 +2489,157 @@ int equip_char(Character *ch, class Object *obj, int pos, int flag)
 		return 0;
 	}
 
-	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) && IS_PC(ch))
+	if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && IS_PC(this))
 	{
-		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || ch->isPlayerObjectThief() || contains_no_trade_item(obj))
+		if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
 		{
-			act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
-			ch->recheck_height_wears();
-			obj_to_char(obj, ch);
-			if (pos == WIELD && ch->equipment[SECOND_WIELD])
+			act("You are zapped by $p but it stays with you.", this, obj, 0, TO_CHAR, 0);
+			this->recheck_height_wears();
+			obj_to_char(obj, this);
+			if (pos == WIELD && this->equipment[SECOND_WIELD])
 			{
-				equip_char(ch, unequip_char(ch, SECOND_WIELD), WIELD);
+				equip_char(unequip_char(SECOND_WIELD), WIELD);
 			}
 			return 1;
 		}
-		if (ch->in_room != DC::NOWHERE)
+		if (this->in_room != DC::NOWHERE)
 		{
-			act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
-			act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
-			ch->recheck_height_wears();
-			obj_to_room(obj, ch->in_room);
-			if (pos == WIELD && ch->equipment[SECOND_WIELD])
+			act("You are zapped by $p and instantly drop it.", this, obj, 0, TO_CHAR, 0);
+			act("$n is zapped by $p and instantly drops it.", this, obj, 0, TO_ROOM, 0);
+			this->recheck_height_wears();
+			obj_to_room(obj, this->in_room);
+			if (pos == WIELD && this->equipment[SECOND_WIELD])
 			{
-				equip_char(ch, unequip_char(ch, SECOND_WIELD), WIELD);
+				equip_char(unequip_char(SECOND_WIELD), WIELD);
 			}
 			return 1;
 		}
 		else
 		{
-			logentry(QStringLiteral("ch->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
+			logentry(QStringLiteral("this->in_room = DC::NOWHERE when equipping char."), 0, DC::LogChannel::LOG_BUG);
 		}
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
-		act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
+		act("$p binds to your skin and won't let go. It hurts!", this, obj, 0, TO_CHAR, 0);
+		act("$p binds to $n's skin!", this, obj, 0, TO_ROOM, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
+		act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
+		act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", ch, obj, 0, TO_CHAR, 0);
+		act("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 5;
 	}
 
-	ch->equipment[pos] = obj;
-	obj->equipped_by = ch;
-	if (IS_PC(ch))
+	this->equipment[pos] = obj;
+	obj->equipped_by = this;
+	if (IS_PC(this))
 		for (int a = 0; a < obj->num_affects; a++)
 		{
 			if (obj->affected[a].location >= 1000)
 			{
-				obj->next_skill = ch->player->skillchange;
-				ch->player->skillchange = obj;
+				obj->next_skill = this->player->skillchange;
+				this->player->skillchange = obj;
 				break;
 			}
 		}
 
 	if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
-		ch->glow_factor++;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light++;
+		this->glow_factor++;
+		if (this->in_room > DC::NOWHERE)
+			DC::getInstance()->world[this->in_room].light++;
 		//  this crashes in a reconnect cause player isn't around yet
 		//  rather than fixing it, i'm leaving it out because it's annoying anyway cause
 		//  it tells you every time you save
 		// TODO - make it not be annoying
-		//      act("The soft glow from $p brightens the area around $n.", ch, obj, 0, TO_ROOM, 0);
-		//      act("The soft glow from $p brightens the area around you.", ch, obj, 0, TO_CHAR, 0);
+		//      act("The soft glow from $p brightens the area around $n.", this, obj, 0, TO_ROOM, 0);
+		//      act("The soft glow from $p brightens the area around you.", this, obj, 0, TO_CHAR, 0);
 	}
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
-		ch->glow_factor++;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light++;
+		this->glow_factor++;
+		if (this->in_room > DC::NOWHERE)
+			DC::getInstance()->world[this->in_room].light++;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
-		GET_AC(ch) -= apply_ac(ch, pos);
+		GET_AC(this) -= apply_ac(this, pos);
 
-	for (j = 0; ch->equipment[pos] && j < ch->equipment[pos]->num_affects; j++)
-		affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
+	for (j = 0; this->equipment[pos] && j < this->equipment[pos]->num_affects; j++)
+		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
 
-	add_set_stats(ch, obj, flag, pos);
+	add_set_stats(this, obj, flag, pos);
 
-	redo_hitpoints(ch);
-	redo_mana(ch);
-	redo_ki(ch);
+	redo_hitpoints(this);
+	redo_mana(this);
+	redo_ki(this);
 
 	return 1;
 }
 
-class Object *unequip_char(Character *ch, int pos, int flag)
+class Object *Character::unequip_char(int pos, bool flag)
 {
 	int j;
 	class Object *obj;
 
 	assert(pos >= 0 && pos < MAX_WEAR);
-	assert(ch->equipment[pos]);
+	assert(equipment[pos]);
 
-	obj = ch->equipment[pos];
+	obj = equipment[pos];
 
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", ch, obj, 0, TO_CHAR, 0);
-		GET_MANA(ch) = GET_MANA(ch) / 2;
+		act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, TO_CHAR, 0);
+		GET_MANA(this) = GET_MANA(this) / 2;
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
-		ch->setHP(ch->getHP() / 2);
+		act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, TO_CHAR, 0);
+		setHP(getHP() / 2);
 	}
-	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	if (DC::getInstance()->obj_index[obj->item_number].virt == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-		act("The spring in your step has subsided.", ch, obj, 0, TO_CHAR, 0);
+		act("The spring in your step has subsided.", this, obj, 0, TO_CHAR, 0);
 		obj->obj_flags.timer = 0;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
-		GET_AC(ch) += apply_ac(ch, pos);
+		GET_AC(this) += apply_ac(this, pos);
 
-	remove_set_stats(ch, obj, flag);
+	remove_set_stats(this, obj, flag);
 	class Object *a, *b = nullptr;
 b: // ew
-	if (IS_PC(ch))
-		for (a = ch->player->skillchange; a; a = a->next_skill)
+	if (IS_PC(this))
+		for (a = player->skillchange; a; a = a->next_skill)
 		{
 			if (a == (Object *)0x95959595)
 			{
 				int i;
-				ch->player->skillchange = nullptr;
+				player->skillchange = nullptr;
 				for (i = 0; i < MAX_WEAR; i++)
 				{
 					int j;
-					if (!ch->equipment[i])
+					if (!equipment[i])
 						continue;
-					for (j = 0; j < ch->equipment[i]->num_affects; j++)
+					for (j = 0; j < equipment[i]->num_affects; j++)
 					{
-						if (ch->equipment[i]->affected[j].location > 1000)
+						if (equipment[i]->affected[j].location > 1000)
 						{
-							ch->equipment[i]->next_skill = ch->player->skillchange;
-							ch->player->skillchange = ch->equipment[i];
+							equipment[i]->next_skill = player->skillchange;
+							player->skillchange = equipment[i];
 							break;
 						}
 					}
@@ -2651,37 +2651,37 @@ b: // ew
 				if (b)
 					b->next_skill = a->next_skill;
 				else
-					ch->player->skillchange = a->next_skill;
+					player->skillchange = a->next_skill;
 				break;
 			}
 			b = a;
 		}
 
-	ch->equipment[pos] = 0;
+	equipment[pos] = 0;
 	obj->equipped_by = 0;
 
 	if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
 	{
-		ch->glow_factor--;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light--;
+		glow_factor--;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light--;
 		// this is just annoying cause it tells you every time you save
 		// TODO - make it not be annoying
-		//      act("The soft glow around $n from $p fades.", ch, obj, 0, TO_ROOM, 0);
-		//      act("The glow around you fades slightly.", ch, obj, 0, TO_CHAR, 0);
+		//      act("The soft glow around $n from $p fades.", this, obj, 0, TO_ROOM, 0);
+		//      act("The glow around you fades slightly.", this, obj, 0, TO_CHAR, 0);
 	}
 	if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
 	{
-		ch->glow_factor--;
-		if (ch->in_room > DC::NOWHERE)
-			DC::getInstance()->world[ch->in_room].light--;
+		glow_factor--;
+		if (in_room > DC::NOWHERE)
+			DC::getInstance()->world[in_room].light--;
 	}
 
 	for (j = 0; j < obj->num_affects; j++)
-		affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, -1, false);
-	redo_hitpoints(ch);
-	redo_mana(ch);
-	redo_ki(ch);
+		affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, false);
+	redo_hitpoints(this);
+	redo_mana(this);
+	redo_ki(this);
 
 	return (obj);
 }
@@ -3219,7 +3219,7 @@ int move_obj(Object *obj, Character *ch)
 	 if(obj->obj_flags.type_flag == ITEM_MONEY &&
 	 obj->obj_flags.value[0] >= 1 ) {
 	 sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
-	 ch->send(buffer);
+	 send(buffer);
 	 GET_GOLD(ch) += obj->obj_flags.value[0];
 	 extract_obj(obj);
 	 return 1;
@@ -3593,7 +3593,7 @@ void extract_obj(class Object *obj)
 		for (iEq = 0; iEq < MAX_WEAR; iEq++)
 			if (vict->equipment[iEq] == obj)
 			{
-				obj_to_char(unequip_char(vict, iEq, 1), vict);
+				obj_to_char(vict->unequip_char(iEq, 1), vict);
 				break;
 			}
 	}
@@ -3828,7 +3828,7 @@ void extract_char(Character *ch, bool pull, Trace t)
 		{
 			if (ch->equipment[l])
 			{
-				obj_to_room(unequip_char(ch, l), was_in);
+				obj_to_room(ch->unequip_char(l), was_in);
 			}
 		}
 		if (ch->carrying)

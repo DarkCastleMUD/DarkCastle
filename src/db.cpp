@@ -120,9 +120,6 @@ world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
-index_data *generate_mob_indices(int *top, index_data *index);
-index_data *generate_obj_indices(int *top, index_data *index);
-
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
@@ -612,7 +609,7 @@ void DC::boot_db(void)
 	generate_mob_indices(&top_of_mobt, mob_index);
 
 	logverbose(QStringLiteral("Generating object indices/loading all objects"));
-	generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
+	generate_obj_indices(&top_of_objt, obj_index);
 
 	funny_boot_message();
 
@@ -982,7 +979,7 @@ void reset_time(void)
 }
 
 /* generate index table for monster file */
-index_data *generate_mob_indices(int *top, index_data *index)
+index_data *DC::generate_mob_indices(int *top, index_data *index)
 {
 	int i = 0;
 	char buf[82];
@@ -1294,8 +1291,7 @@ void DC::remove_all_objs_from_world()
 }
 
 /* generate index table for object file */
-index_data *generate_obj_indices(int *top,
-								 index_data *index)
+index_data *DC::generate_obj_indices(int *top, index_data *index)
 {
 	int i = 0;
 	char buf[82];
@@ -1321,7 +1317,7 @@ index_data *generate_obj_indices(int *top,
 	 }
 	 }
 	 */
-	DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
+	logverbose(QStringLiteral("Opening object files."));
 
 	// note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
 	for (temp = read_next_worldfile_name(flObjIndex);
@@ -1330,14 +1326,12 @@ index_data *generate_obj_indices(int *top,
 	{
 		strcpy(endfile, "objects/");
 		strcat(endfile, temp.toStdString().c_str());
-
-		DC::config &cf = DC::getInstance()->cf;
-		DC::getInstance()->logverbose(temp);
+		logverbose(temp);
 
 		if (!(fl = fopen(endfile, "r")))
 		{
-			logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, DC::LogChannel::LOG_BUG);
-			logentry(temp, 0, DC::LogChannel::LOG_BUG);
+			logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, LogChannel::LOG_BUG);
+			logentry(temp, 0, LogChannel::LOG_BUG);
 			abort();
 		}
 
@@ -1361,9 +1355,8 @@ index_data *generate_obj_indices(int *top,
 					index[i].progtypes = 0;
 					if (!(index[i].item = (class Object *)read_object(i, fl, false)))
 					{
-						sprintf(log_buf, "Unable to load object %d!\n\r",
-								index[i].virt);
-						logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+						sprintf(log_buf, "Unable to load object %d!\n\r", index[i].virt);
+						logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
 					}
 					i++;
 				}
@@ -2625,7 +2618,7 @@ void DC::boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-Character *read_mobile(int nr, FILE *fl)
+Character *DC::read_mobile(int nr, FILE *fl)
 {
 	char buf[200];
 	int i, j;
@@ -2635,7 +2628,7 @@ Character *read_mobile(int nr, FILE *fl)
 
 	i = nr;
 
-	mob = new Character;
+	mob = new Character(this);
 	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
@@ -3299,7 +3292,7 @@ void handle_automatic_mob_settings(Character *mob)
 	mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints + ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-Character *clone_mobile(int nr)
+Character *DC::clone_mobile(int nr)
 {
 	int i;
 	Character *mob, *old;
@@ -3307,7 +3300,7 @@ Character *clone_mobile(int nr)
 	if (nr < 0)
 		return 0;
 
-	mob = new Character;
+	mob = new Character(this);
 	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
@@ -3373,7 +3366,7 @@ Character *clone_mobile(int nr)
 //
 // return index of item on success, -1 on failure
 //
-auto create_blank_item(int nr) -> std::expected<int, create_error>
+auto DC::create_blank_item(int nr) -> std::expected<int, create_error>
 {
 	class Object *obj;
 	class Object *curr;
@@ -3462,7 +3455,7 @@ auto create_blank_item(int nr) -> std::expected<int, create_error>
 //
 // return index of item on success, -1 on failure
 //  Hack of create_blank_item.. Uriz
-int create_blank_mobile(int nr)
+int DC::create_blank_mobile(int nr)
 {
 	Character *mob;
 	int cur_index = 0;
@@ -3486,11 +3479,7 @@ int create_blank_mobile(int nr)
 
 	// create
 
-#ifdef LEAK_CHECK
-	mob = (Character *)calloc(1, sizeof(Character));
-#else
-	mob = (Character *)dc_alloc(1, sizeof(Character));
-#endif
+	mob = new Character(this);
 
 	clear_char(mob);
 	reset_char(mob);
@@ -4791,7 +4780,7 @@ void Zone::reset(ResetType reset_type)
 			{
 
 			case 'M': /* read a mobile */
-				if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].virt) < cmd[reset_cmd_index]->arg2 && (mob = clone_mobile(cmd[reset_cmd_index]->arg1)))
+				if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].virt) < cmd[reset_cmd_index]->arg2 && (mob = DC::getInstance()->clone_mobile(cmd[reset_cmd_index]->arg1)))
 				{
 					char_to_room(mob, cmd[reset_cmd_index]->arg3);
 					cmd[reset_cmd_index]->lastPop = mob;
@@ -4975,7 +4964,7 @@ void Zone::reset(ResetType reset_type)
 					}
 					else if (mob->equipment[cmd[reset_cmd_index]->arg3] == 0)
 					{
-						if (!equip_char(mob, obj, cmd[reset_cmd_index]->arg3))
+						if (!mob->equip_char(obj, cmd[reset_cmd_index]->arg3))
 						{
 							sprintf(buf, "Bad equip_char zone %d cmd %d", id_, reset_cmd_index + 1);
 							logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
@@ -5904,7 +5893,7 @@ void free_char(Character *ch, Trace trace)
 	for (iWear = 0; iWear < MAX_WEAR; iWear++)
 	{
 		if (ch->equipment[iWear])
-			obj_to_char(unequip_char(ch, iWear, 1), ch);
+			obj_to_char(ch->unequip_char(iWear, true), ch);
 	}
 	while (ch->carrying)
 		extract_obj(ch->carrying);
@@ -6138,7 +6127,7 @@ void clear_char(Character *ch)
 		return;
 	}
 
-	*ch = {};
+	*ch = Character(ch->getDC());
 	ch->in_room = DC::NOWHERE;
 	ch->setStanding();
 	GET_HOME(ch) = START_ROOM;

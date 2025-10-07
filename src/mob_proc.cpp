@@ -2256,7 +2256,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
          * Should be some code here to defend against weird monsters
          * getting loaded into the pet shop back room.  -- Furey
          */
-        pet = clone_mobile(pet->mobdata->nr);
+        pet = ch->getDC()->clone_mobile(pet->mobdata->nr);
         GET_EXP(pet) = 0;
         SETBIT(pet->affected_by, AFF_CHARM);
 
@@ -2804,6 +2804,8 @@ int marauder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 int foggy_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
                  Character *owner)
 {
+    if (!ch)
+        return eFAILURE;
     Character *mob = nullptr;
 
     if (cmd != cmd_t::UNDEFINED)
@@ -2823,7 +2825,7 @@ int foggy_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch, 0, 0, TO_ROOM, INVIS_NULL);
 
     // create the mob
-    mob = clone_mobile(real_mobile(22026));
+    mob = ch->getDC()->clone_mobile(real_mobile(22026));
     if (!mob)
     {
         logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);
@@ -3269,7 +3271,7 @@ int arena_only(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         // remove my eq
         for (int i = 0; i < MAX_WEAR; i++)
             if (ch->equipment[i])
-                obj_to_char(unequip_char(ch, i), ch);
+                obj_to_char(ch->unequip_char(i), ch);
 
         while (ch->carrying)
             extract_obj(ch->carrying);

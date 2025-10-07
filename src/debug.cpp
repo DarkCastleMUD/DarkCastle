@@ -40,7 +40,7 @@ bool verbose_mode = false;
 void test_handle_ansi(QString test)
 {
   // std::cerr <<  "Testing '" << test << "'" << std::endl;
-  Character *ch = new Character;
+  Character *ch = new Character(DC::getInstance());
   ch->player = new Player;
   ch->setType(Character::Type::Player);
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
@@ -236,22 +236,22 @@ int main(int argc, char **argv)
   }
 
   logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
-  DC::getInstance()->boot_zones();
+  debug.boot_zones();
 
   logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
 
-  DC::getInstance()->top_of_world_alloc = 2000;
+  debug.top_of_world_alloc = 2000;
 
-  DC::getInstance()->boot_world();
+  debug.boot_world();
 
   logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
   logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
-  generate_obj_indices(&top_of_objt, DC::getInstance()->obj_index);
+  debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
   logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
-  generate_mob_indices(&top_of_mobt, DC::getInstance()->mob_index);
+  debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
   logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
@@ -259,9 +259,9 @@ int main(int argc, char **argv)
   class Connection *d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
-  create_blank_item(1);
+  debug.create_blank_item(1);
 
-  DC::getInstance()->load_vaults();
+  debug.load_vaults();
 
   chdir(orig_cwd.toStdString().c_str());
 
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
   }
 
   d = new Connection;
-  Character *ch = new Character;
+  Character *ch = new Character(&debug);
   ch->setName("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -530,7 +530,7 @@ int main(int argc, char **argv)
     try
     {
       Object *obj;
-      if (load_char_obj(d, argv[1]) != load_status_t::success)
+      if (debug.load_char_obj(d, argv[1]) != load_status_t::success)
       {
         std::cerr << "Unable to load " << argv[1] << std::endl;
         exit(1);

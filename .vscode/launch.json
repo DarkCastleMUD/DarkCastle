@@ -288,7 +288,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/testDC",
             "args": [
-                "test_redeem_trader"
+                // "test_redeem_trader"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",

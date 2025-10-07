@@ -354,6 +354,12 @@ struct world_file_list_item
   int32_t flags;
   world_file_list_item *next;
 };
+enum class create_error
+{
+  unknown_error,
+  index_full,
+  entry_exists
+};
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -594,6 +600,24 @@ public:
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
+  index_data *generate_mob_indices(int *top, index_data *index);
+  index_data *generate_obj_indices(int *top, index_data *index);
+  Character *read_mobile(int nr, FILE *fl);
+  Character *clone_mobile(int nr);
+  auto create_blank_item(int nr) -> std::expected<int, create_error>;
+  int create_blank_mobile(int nr);
+  void game_test_init(void);
+  void heartbeat(void);
+  void finish_hotboot(void);
+  void prog_error(Character *ch, QString error_message);
+  load_status_t load_char_obj(Connection *d, QString name);
+  bool has_vault_access(QString owner, struct vault_data *vault);
+  bool has_vault_access(Character *ch, struct vault_data *vault);
+  void update_mprog_throws(void);
+  Character *initiate_oproc(Character *ch, Object *obj);
+  int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
+  int oprog_rand_trigger(Object *item);
+  int oprog_arand_trigger(Object *item);
 
   ~DC(void)
   {
@@ -646,6 +670,7 @@ private:
   int init_socket(in_port_t port);
   int exceeded_connection_limit(Connection *new_conn);
   void nanny(class Connection *d, std::string arg = "");
+  void object_activity(uint64_t pulse_type);
 };
 void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);

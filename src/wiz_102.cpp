@@ -131,7 +131,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
     }
 
     // must be done to clear out "d" before it is used
-    if (!(load_char_obj(&d, buf)))
+    if (!(ch->getDC()->load_char_obj(&d, buf)))
     {
 
       sprintf(tmp_buf, "../archive/%s.gz", buf);
@@ -367,7 +367,7 @@ int do_stat(Character *ch, char *arg, cmd_t cmd)
     }
 
     // must be done to clear out "d" before it is used
-    if (!(load_char_obj(&d, name)))
+    if (!(ch->getDC()->load_char_obj(&d, name)))
     {
       ch->sendln("Unable to load! (Character might not exist...)");
       return eFAILURE;
@@ -2503,7 +2503,7 @@ int do_oedit(Character *ch, char *argument, cmd_t cmd)
               return eFAILURE;
             }
     */
-    auto x = create_blank_item(intval);
+    auto x = ch->getDC()->create_blank_item(intval);
     if (!x.has_value())
     {
       ch->send(QStringLiteral("Could not create item '%1'.  Max index hit or obj already exists. %2\r\n").arg(intval).arg(QVariant::fromValue(x.error()).toString()));
@@ -3987,7 +3987,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       return eFAILURE;
     }
     mob_num = intval;
-    x = create_blank_mobile(intval);
+    x = ch->getDC()->create_blank_mobile(intval);
     if (x < 0)
     {
       csendf(ch,

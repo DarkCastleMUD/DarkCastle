@@ -206,7 +206,7 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
   if (MOBtrigger && buf.isEmpty() == false)
     retval |= mprog_act_trigger(buf.toStdString(), to, ch, obj, vict_obj);
   if (MOBtrigger && buf.isEmpty() == false)
-    retval |= oprog_act_trigger(buf.toStdString().c_str(), ch);
+    retval |= ch->oprog_act_trigger(buf);
 
   MOBtrigger = true;
   if (buf.isEmpty())

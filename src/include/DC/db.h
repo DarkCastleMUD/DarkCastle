@@ -333,13 +333,6 @@ char *fread_string(FILE *fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
 char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
-enum class create_error
-{
-  index_full,
-  entry_exists
-};
-auto create_blank_item(int nr) -> std::expected<int, create_error>;
-int create_blank_mobile(int nr);
 void delete_item_from_index(int nr);
 void delete_mob_from_index(int nr);
 int real_object(int virt);
@@ -358,9 +351,6 @@ int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
-index_data *generate_obj_indices(int *top, index_data *index);
-index_data *generate_mob_indices(int *top, index_data *index);
-
 extern struct skill_quest *skill_list;
 extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
@@ -368,9 +358,7 @@ extern index_data mob_index_array[MAX_INDEX];
 
 class Object *read_object(int nr, FILE *fl, bool zz);
 class Object *read_object(int nr, QTextStream &fl, bool zz);
-Character *read_mobile(int nr, FILE *fl);
 class Object *clone_object(int nr);
-Character *clone_mobile(int nr);
 void randomize_object(Object *obj);
 void string_to_file(FILE *fl, QString str);
 void string_to_file(QTextStream &fl, QString str);

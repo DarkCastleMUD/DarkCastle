@@ -9,17 +9,12 @@
 extern struct vault_data *vault_table;
 struct vault_data *has_vault(QString name);
 
-void vault_stats(Character *ch, char *name);
 void vault_withdraw(Character *ch, unsigned int amount, char *owner);
 void vault_deposit(Character *ch, unsigned int amount, char *owner);
 void save_vault(QString name);
-void vault_access(Character *ch, const char *who);
 void my_vault_access(Character *ch);
-void add_vault_access(Character *ch, QString name, struct vault_data *vault);
-void remove_vault_access(Character *ch, QString name, struct vault_data *vault);
 void vault_get(Character *ch, QString object, QString owner);
 void vault_put(Character *ch, QString object, QString owner);
-void vault_list(Character *ch, QString owner);
 void add_new_vault(const char *name, int indexonly);
 void vault_cost(Character *ch, char *object, char *arg);
 void remove_vault(QString name, BACKUP_TYPE backup = NONE);
@@ -39,8 +34,6 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
 class Object *get_obj_in_all_vaults(char *object, int num);
 struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
-bool has_vault_access(QString owner, struct vault_data *vault);
-bool has_vault_access(Character *ch, struct vault_data *vault);
 int vault_search(Character *ch, const char *keyword);
 void sort_vault(const vault_data &vault, struct sorted_vault &sv);
 

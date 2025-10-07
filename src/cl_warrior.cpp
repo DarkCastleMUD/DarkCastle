@@ -753,12 +753,12 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
-    obj = unequip_char(ch, WIELD);
+    obj = ch->unequip_char(WIELD);
     obj_to_char(obj, ch);
     if (ch->equipment[SECOND_WIELD])
     {
-      obj = unequip_char(ch, SECOND_WIELD);
-      equip_char(ch, obj, WIELD);
+      obj = ch->unequip_char(SECOND_WIELD);
+      ch->equip_char(obj, WIELD);
     }
 
     return eSUCCESS;

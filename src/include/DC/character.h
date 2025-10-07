@@ -537,6 +537,7 @@ class Character : public Entity
 {
     Q_GADGET
 public:
+    Character(DC *dc) : dc_(dc) {}
     enum Type
     {
         Undefined,
@@ -1177,6 +1178,37 @@ public:
     QString createPrompt(void);
     QString createBlackjackPrompt(void);
     void sendBlackjackPrompt(void);
+    void setDC(DC *dc) { dc_ = dc; }
+    DC *getDC(void) { return dc_; }
+    void prog_error(QString error_message);
+    bool isNowhere(void)
+    {
+        return in_room == DC::NOWHERE;
+    }
+    void vault_access(QString owner);
+    void vault_myaccess(QString owner);
+    void vault_balance(QString owner);
+    void vault_stats(QString owner);
+    void add_vault_access(QString name, vault_data *vault);
+    void remove_vault_access(QString name, vault_data *vault);
+    void vault_list(QString owner);
+    void load_golem_data(int golemtype);
+    int mprog_greet_trigger(void);
+    int mprog_can_see_trigger(Character *mob);
+    int mprog_speech_trigger(const char *txt);
+    int oprog_can_see_trigger(Object *item);
+    int oprog_speech_trigger(const char *txt);
+    int oprog_act_trigger(QString txt);
+    int oprog_greet_trigger(void);
+    int oprog_load_trigger(void);
+    int oprog_weapon_trigger(Object *item);
+    int oprog_armour_trigger(Object *item);
+    bool mprog_seval(const char *lhs, const char *opr, const char *rhs);
+    bool isTank(void);
+    void save_char_obj(void);
+    void char_to_store(struct char_file_u4 *st, time_data &tmpage);
+    bool equip_char(Object *obj, int pos, bool flag = false);
+    Object *unequip_char(int pos, bool flag = false);
 
 private:
     Type type_ = Type::Undefined;
@@ -1186,6 +1218,7 @@ private:
     move_t move_ = {};
     QString name_; // Keyword 'kill X'
     position_t position_ = {};
+    DC *dc_ = DC::getInstance();
 };
 
 class communication

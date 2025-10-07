@@ -716,7 +716,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
         imp_history.pop();
     }
 
-    send_to_char(buf1, ch);
+    send_to_char(buf1.c_str(), ch);
     ansi_color(NTEXT, ch);
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
@@ -728,7 +728,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 
         if (STATE(i) == Connection::states::PLAYING)
         {
-          send_to_char(buf1, i->character);
+          send_to_char(buf1.c_str(), i->character);
         }
         else
         {

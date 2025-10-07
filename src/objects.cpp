@@ -156,19 +156,19 @@ int damage_eq_once(Object *obj)
   return 1;
 }
 
-void object_activity(uint64_t pulse_type)
+void DC::object_activity(uint64_t pulse_type)
 {
-  for (const auto &obj : DC::getInstance()->active_obj_list)
+  for (const auto &obj : active_obj_list)
   {
     int32_t item_number = obj->item_number;
 
-    if (DC::getInstance()->obj_index[item_number].non_combat_func)
+    if (obj_index[item_number].non_combat_func)
     {
-      DC::getInstance()->obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
+      obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((Object *)DC::getInstance()->obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_description->description, obj->in_room, true);
     }
     else
@@ -177,7 +177,7 @@ void object_activity(uint64_t pulse_type)
 
       if (obj->in_room != DC::NOWHERE)
       {
-        if (DC::getInstance()->zones.value(DC::getInstance()->world[obj->in_room].zone).players > 0)
+        if (zones.value(world[obj->in_room].zone).players > 0)
           retval = oprog_rand_trigger(obj);
       }
       else
@@ -187,7 +187,7 @@ void object_activity(uint64_t pulse_type)
     }
   }
 
-  DC::getInstance()->removeDead();
+  removeDead();
   return;
 }
 
@@ -303,7 +303,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
     act("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
     act("During combat, you drop $p which SMASHES!", ch, temp, 0, TO_CHAR, 0);
     if (equipped)
-      unequip_char(ch, pos);
+      ch->unequip_char(pos);
     extract_obj(temp);
     return eSUCCESS;
   }
@@ -344,7 +344,7 @@ int do_quaff(Character *ch, char *argument, cmd_t cmd)
   if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
-      unequip_char(ch, pos, 1);
+      ch->unequip_char(pos, 1);
     extract_obj(temp);
   }
   return retval;
@@ -479,7 +479,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
   if (!is_mob || !isSet(retval, eCH_DIED)) // it's already been free'd when mob died
   {
     if (equipped)
-      unequip_char(ch, pos, 1);
+      ch->unequip_char(pos, 1);
     extract_obj(scroll);
   }
   return eSUCCESS;
@@ -1716,14 +1716,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
           sprintf(buffer, "You put the %s on your right ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_FINGER_R);
+          ch->equip_char(obj_object, WEAR_FINGER_R);
         }
         else
         {
           sprintf(buffer, "You put the %s on your left ring-finger.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_FINGER_L);
+          ch->equip_char(obj_object, WEAR_FINGER_L);
         }
       }
     }
@@ -1748,12 +1748,12 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         if (ch->equipment[WEAR_NECK_1])
         {
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_NECK_2);
+          ch->equip_char(obj_object, WEAR_NECK_2);
         }
         else
         {
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_NECK_1);
+          ch->equip_char(obj_object, WEAR_NECK_1);
         }
       }
     }
@@ -1775,7 +1775,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_BODY);
+        ch->equip_char(obj_object, WEAR_BODY);
       }
     }
     else
@@ -1796,7 +1796,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_HEAD);
+        ch->equip_char(obj_object, WEAR_HEAD);
       }
     }
     else
@@ -1817,7 +1817,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_LEGS);
+        ch->equip_char(obj_object, WEAR_LEGS);
       }
     }
     else
@@ -1838,7 +1838,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_FEET);
+        ch->equip_char(obj_object, WEAR_FEET);
       }
     }
     else
@@ -1859,7 +1859,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_HANDS);
+        ch->equip_char(obj_object, WEAR_HANDS);
       }
     }
     else
@@ -1880,7 +1880,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_ARMS);
+        ch->equip_char(obj_object, WEAR_ARMS);
       }
     }
     else
@@ -1901,7 +1901,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_ABOUT);
+        ch->equip_char(obj_object, WEAR_ABOUT);
       }
     }
     else
@@ -1922,7 +1922,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_WAISTE);
+        ch->equip_char(obj_object, WEAR_WAISTE);
       }
     }
     else
@@ -1948,13 +1948,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           sprintf(buffer, "You wear the %s around your right wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
-          equip_char(ch, obj_object, WEAR_WRIST_R);
+          ch->equip_char(obj_object, WEAR_WRIST_R);
         }
         else
         {
           sprintf(buffer, "You wear the %s around your left wrist.\r\n", fname(obj_object->name).toStdString().c_str());
           ch->send(buffer);
-          equip_char(ch, obj_object, WEAR_WRIST_L);
+          ch->equip_char(obj_object, WEAR_WRIST_L);
         }
       }
     }
@@ -1977,7 +1977,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_FACE);
+        ch->equip_char(obj_object, WEAR_FACE);
       }
     }
     else
@@ -2012,9 +2012,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WIELD])
-          equip_char(ch, obj_object, SECOND_WIELD);
+          ch->equip_char(obj_object, SECOND_WIELD);
         else
-          equip_char(ch, obj_object, WIELD);
+          ch->equip_char(obj_object, WIELD);
       }
     }
     else
@@ -2043,7 +2043,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       {
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
-        equip_char(ch, obj_object, WEAR_SHIELD);
+        ch->equip_char(obj_object, WEAR_SHIELD);
       }
     }
 
@@ -2074,9 +2074,9 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         obj_from_char(obj_object);
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[HOLD])
-          equip_char(ch, obj_object, HOLD2);
+          ch->equip_char(obj_object, HOLD2);
         else
-          equip_char(ch, obj_object, HOLD);
+          ch->equip_char(obj_object, HOLD);
       }
     }
     else
@@ -2101,13 +2101,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         {
           act("You wear $p in your right ear.", ch, obj_object, 0, TO_CHAR, 0);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_EAR_R);
+          ch->equip_char(obj_object, WEAR_EAR_R);
         }
         else
         {
           act("You wear $p in your left ear.", ch, obj_object, 0, TO_CHAR, 0);
           obj_from_char(obj_object);
-          equip_char(ch, obj_object, WEAR_EAR_L);
+          ch->equip_char(obj_object, WEAR_EAR_L);
         }
       }
     }
@@ -2137,7 +2137,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     {
       obj_from_char(obj_object);
       perform_wear(ch, obj_object, keyword);
-      equip_char(ch, obj_object, WEAR_LIGHT);
+      ch->equip_char(obj_object, WEAR_LIGHT);
     }
   }
   break;
@@ -2173,7 +2173,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       }
 
       class Object *obj_temp = ch->equipment[WIELD];
-      obj_to_char(unequip_char(ch, WIELD), ch);
+      obj_to_char(ch->unequip_char(WIELD), ch);
       wear(ch, obj_object, 12);
       wear(ch, obj_temp, 12);
       return;
@@ -2532,7 +2532,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
               continue;
             }
             else
-              obj_to_char(unequip_char(ch, j), ch);
+              obj_to_char(ch->unequip_char(j), ch);
             act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
             act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
           }
@@ -2575,7 +2575,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
           }
           if (j == WIELD)
           {
-            obj_to_char(unequip_char(ch, j), ch);
+            obj_to_char(ch->unequip_char(j), ch);
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
@@ -2586,7 +2586,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             return eSUCCESS;
           }
           else
-            obj_to_char(unequip_char(ch, j), ch);
+            obj_to_char(ch->unequip_char(j), ch);
 
           act("You stop using $p.", ch, obj_object, 0, TO_CHAR, 0);
           act("$n stops using $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
@@ -2629,7 +2629,7 @@ int Character::recheck_height_wears(void)
 
     if (size_restricted(this, this->equipment[j]))
     {
-      obj = unequip_char(this, j);
+      obj = unequip_char(j);
       obj_to_char(obj, this);
       act("$n looks uncomfortable, and shifts $p into $s inventory.", this, obj, nullptr, TO_ROOM, 0);
       act("$p feels uncomfortable and you shift it into your inventory.", this, obj, nullptr, TO_CHAR, 0);

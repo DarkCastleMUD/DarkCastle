@@ -122,8 +122,6 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs);
-
 int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
 int mprog_do_ifchck(char *ifchck, Character *mob,
 					Character *actor, Object *obj,
@@ -182,7 +180,7 @@ char *mprog_next_command(char *clist)
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs)
+bool Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
 {
 	if (!lhs || !rhs)
 		return false;
@@ -195,10 +193,9 @@ int mprog_seval(Character *ch, const char *lhs, const char *opr, const char *rhs
 	if (!str_cmp(opr, "!/"))
 		return (str_infix(rhs, lhs));
 
-	prog_error(ch, "Improper MOBprog operator");
-
-	logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
-	return 0;
+	prog_error(QStringLiteral("Improper MOBprog operator"));
+	logworld(QStringLiteral("Improper MOBprog operator"));
+	return false;
 }
 
 bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
@@ -215,9 +212,8 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
 	if (opr == "!/")
 		return str_infix(rhs, lhs);
 
-	prog_error(this, "Improper MOBprog operator");
-
-	logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	prog_error(QStringLiteral("Improper MOBprog operator"));
+	logworld(QStringLiteral("Improper MOBprog operator"));
 	return false;
 }
 
@@ -296,13 +292,12 @@ int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
 }
 */
 
-bool istank(Character *ch)
+bool Character::isTank(void)
 {
-	Character *t;
-	if (!ch->in_room)
+	if (!in_room)
 		return false;
-	for (t = DC::getInstance()->world[ch->in_room].people; t; t = t->next_in_room)
-		if (t->fighting == ch && t != ch)
+	for (auto victim = dc_->world[in_room].people; victim; victim = victim->next_in_room)
+		if (victim->fighting == this && victim != this)
 			return true;
 	return false;
 }
@@ -1525,7 +1520,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == ' ')
 		{
-			prog_error(mob, "ifchck syntax error: '%s'", ifchck);
+			DC::getInstance()->prog_error(mob, QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
 			return -1;
 		}
 		else if (*point == '.')
@@ -1534,7 +1529,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == '\0')
 		{
-			prog_error(mob, "ifchck syntax error");
+			DC::getInstance()->prog_error(mob, QStringLiteral("ifchck syntax error"));
 			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}
@@ -2213,32 +2208,32 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
 	case eISTANK:
 		if (fvict)
-			return istank(fvict);
+			return fvict->isTank();
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'z':
 			if (mob->beacon)
-				return istank(((Character *)mob->beacon));
+				return reinterpret_cast<Character *>(mob->beacon)->isTank();
 			else
 				return -1;
 
 		case 'i':
-			return istank(mob);
+			return mob->isTank();
 		case 'n':
 			if (actor)
-				return istank(actor);
+				return actor->isTank();
 			else
 				return -1;
 		case 't':
 			if (vict)
-				return istank(vict) ? 1 : 0;
+				return vict->isTank() ? 1 : 0;
 			else
 				return -1;
 		case 'r':
 			if (rndm)
-				return istank(rndm) ? 1 : 0;
+				return rndm->isTank() ? 1 : 0;
 			else
 				return -1;
 		default:
@@ -2617,7 +2612,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			for (i = 0; i < MAX_WEAR; i++)
 				if (obj == take->equipment[i])
 				{
-					obj_from_char(unequip_char(take, i));
+					obj_from_char(take->unequip_char(i));
 				}
 			extract_obj(obj);
 			return 1;
@@ -2687,7 +2682,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 			for (i = 0; i < MAX_WEAR; i++)
 				if (obj == take->equipment[i])
 				{
-					obj_from_char(unequip_char(take, i));
+					obj_from_char(take->unequip_char(i));
 				}
 			extract_obj(obj);
 			return 1;
@@ -4379,20 +4374,16 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 	return mprog_cur_result;
 }
 
-int mprog_greet_trigger(Character *ch)
+int Character::mprog_greet_trigger(void)
 {
-
-	Character *vmob;
-
 	mprog_cur_result = eSUCCESS;
-
-	for (vmob = DC::getInstance()->world[ch->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+	for (auto vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
 		{
-			if (ch != vmob && CAN_SEE(vmob, ch) && (DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
-				mprog_percent_check(vmob, ch, nullptr, nullptr, GREET_PROG);
-			else if ((DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
-				mprog_percent_check(vmob, ch, nullptr, nullptr, ALL_GREET_PROG);
+			if (this != vmob && CAN_SEE(vmob, this) && (dc_->mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
+				mprog_percent_check(vmob, this, nullptr, nullptr, GREET_PROG);
+			else if ((dc_->mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
+				mprog_percent_check(vmob, this, nullptr, nullptr, ALL_GREET_PROG);
 
 			if (SOMEONE_DIED(mprog_cur_result) || selfpurge)
 				break;
@@ -4452,7 +4443,7 @@ int mprog_random_trigger(Character *mob)
 
 int mprog_load_trigger(Character *mob)
 {
-	if (!mob || mob->isDead() || isNowhere(mob))
+	if (!mob || mob->isDead() || mob->isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4465,7 +4456,7 @@ int mprog_load_trigger(Character *mob)
 
 int mprog_arandom_trigger(Character *mob)
 {
-	if (!mob || mob->isDead() || isNowhere(mob))
+	if (!mob || mob->isDead() || mob->isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4475,28 +4466,28 @@ int mprog_arandom_trigger(Character *mob)
 	return mprog_cur_result;
 }
 
-int mprog_can_see_trigger(Character *ch, Character *mob)
+int Character::mprog_can_see_trigger(Character *mob)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
 
-	if (!mob || mob->isDead() || isNowhere(mob))
+	if (!mob || mob->isDead() || mob->isNowhere())
 	{
 		return eFAILURE;
 	}
 
 	mprog_cur_result = eSUCCESS;
-	if ((DC::getInstance()->mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, ch, nullptr, nullptr, CAN_SEE_PROG);
+	if ((dc_->mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, this, nullptr, nullptr, CAN_SEE_PROG);
 
 	return mprog_cur_result;
 }
 
-int mprog_speech_trigger(const char *txt, Character *mob)
+int Character::mprog_speech_trigger(const char *txt)
 {
-	if (!mob || mob->isDead() || isNowhere(mob))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4505,10 +4496,10 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (vmob = DC::getInstance()->world[mob->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+	for (vmob = DC::getInstance()->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (DC::getInstance()->mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
 		{
-			if (mprog_wordlist_check(txt, vmob, mob, nullptr, nullptr, SPEECH_PROG))
+			if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
 				break;
 		}
 
@@ -4517,7 +4508,7 @@ int mprog_speech_trigger(const char *txt, Character *mob)
 
 int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
 {
-	if (!mob || mob->isDead() || isNowhere(mob))
+	if (!mob || mob->isDead() || mob->isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4597,7 +4588,7 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 	return mprog_cur_result;
 }
 
-void update_mprog_throws()
+void DC::update_mprog_throws(void)
 {
 	struct mprog_throw_type *curr;
 	struct mprog_throw_type *action;
@@ -4699,12 +4690,12 @@ void update_mprog_throws()
 	}
 }
 
-Character *initiate_oproc(Character *ch, Object *obj)
+Character *DC::initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
 	Character *temp;
 	temp = clone_mobile(real_mobile(12));
-	DC::getInstance()->mob_index[real_mobile(12)].mobprogs = DC::getInstance()->obj_index[obj->item_number].mobprogs;
-	DC::getInstance()->mob_index[real_mobile(12)].progtypes = DC::getInstance()->obj_index[obj->item_number].progtypes;
+	mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
+	mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
 
 	if (ch)
 		char_to_room(temp, ch->in_room);
@@ -4755,9 +4746,9 @@ void end_oproc(Character *ch, Trace trace)
 	}
 }
 
-int oprog_can_see_trigger(Character *ch, Object *item)
+int Character::oprog_can_see_trigger(Object *item)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (!isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4765,19 +4756,19 @@ int oprog_can_see_trigger(Character *ch, Object *item)
 	Character *vmob;
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & CAN_SEE_PROG)
+	if (dc_->obj_index[item->item_number].progtypes & CAN_SEE_PROG)
 	{
-		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, nullptr, CAN_SEE_PROG);
+		vmob = dc_->initiate_oproc(this, item);
+		mprog_percent_check(vmob, this, item, nullptr, CAN_SEE_PROG);
 		end_oproc(vmob, Trace("oprog_can_see_trigger"));
 		return mprog_cur_result;
 	}
 	return mprog_cur_result;
 }
 
-int oprog_speech_trigger(const char *txt, Character *ch)
+int Character::oprog_speech_trigger(const char *txt)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4787,22 +4778,22 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & SPEECH_PROG)
+	for (item = DC::getInstance()->world[in_room].contents; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & SPEECH_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
+			vmob = dc_->initiate_oproc(this, item);
+			if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_speech_trigger1"));
 				return mprog_cur_result;
 			}
 			end_oproc(vmob, Trace("oprog_speech_trigger2"));
 		}
-	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & SPEECH_PROG)
+	for (item = carrying; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & SPEECH_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
+			vmob = dc_->initiate_oproc(this, item);
+			if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_speech_trigger3"));
 				return mprog_cur_result;
@@ -4811,11 +4802,11 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 		}
 
 	for (int i = 0; i < MAX_WEAR; i++)
-		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
+		if (equipment[i])
+			if (dc_->obj_index[equipment[i]->item_number].progtypes & SPEECH_PROG)
 			{
-				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
+				vmob = dc_->initiate_oproc(this, equipment[i]);
+				if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
 				{
 					end_oproc(vmob, Trace("oprog_speech_trigger5"));
 				}
@@ -4824,16 +4815,16 @@ int oprog_speech_trigger(const char *txt, Character *ch)
 	return mprog_cur_result;
 }
 
-int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
+int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
 {
 	mob_prog_data *mprg{};
 	int curr_catch;
 	mprog_cur_result = eFAILURE;
 	Character *vmob;
 
-	if (DC::getInstance()->obj_index[obj->item_number].progtypes & CATCH_PROG)
+	if (obj_index[obj->item_number].progtypes & CATCH_PROG)
 	{
-		mprg = DC::getInstance()->obj_index[obj->item_number].mobprogs;
+		mprg = obj_index[obj->item_number].mobprogs;
 		mprog_command_num = 0;
 		for (; mprg != nullptr; mprg = mprg->next)
 		{
@@ -4843,8 +4834,7 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 			{
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
-					logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
-						 DC::getInstance()->obj_index[obj->item_number].virt);
+					logf(IMMORTAL, LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d", obj_index[obj->item_number].virt);
 					return eFAILURE;
 				}
 				if (curr_catch == catch_num)
@@ -4855,11 +4845,9 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 						struct tempvariable *eh;
 
 #ifdef LEAK_CHECK
-						eh = (struct tempvariable *)
-							calloc(1, sizeof(struct tempvariable));
+						eh = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
 #else
-						eh = (struct tempvariable *)
-							dc_alloc(1, sizeof(struct tempvariable));
+						eh = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
 #endif
 
 						eh->data = var;
@@ -4880,9 +4868,9 @@ int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Characte
 	return mprog_cur_result;
 }
 
-int oprog_act_trigger(const char *txt, Character *ch)
+int Character::oprog_act_trigger(QString txt)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -4892,26 +4880,25 @@ int oprog_act_trigger(const char *txt, Character *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (ch->in_room == DC::NOWHERE)
+	if (in_room == DC::NOWHERE)
 		return mprog_cur_result;
 
-	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
-																		  item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ACT_PROG)
+	for (item = dc_->world[in_room].contents; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & ACT_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
+			vmob = dc_->initiate_oproc(this, item);
+			if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_act_trigger1"));
 				return mprog_cur_result;
 			}
 			end_oproc(vmob, Trace("oprog_act_trigger2"));
 		}
-	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ACT_PROG)
+	for (item = carrying; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & ACT_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
+			vmob = dc_->initiate_oproc(this, item);
+			if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_act_trigger3"));
 				return mprog_cur_result;
@@ -4920,11 +4907,11 @@ int oprog_act_trigger(const char *txt, Character *ch)
 		}
 
 	for (int i = 0; i < MAX_WEAR; i++)
-		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
+		if (equipment[i])
+			if (dc_->obj_index[equipment[i]->item_number].progtypes & ACT_PROG)
 			{
-				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
+				vmob = dc_->initiate_oproc(this, equipment[i]);
+				if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
 				{
 					end_oproc(vmob, Trace("oprog_act_trigger5"));
 					return mprog_cur_result;
@@ -4934,31 +4921,27 @@ int oprog_act_trigger(const char *txt, Character *ch)
 	return mprog_cur_result;
 }
 
-int oprog_greet_trigger(Character *ch)
+int Character::oprog_greet_trigger(void)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
 
-	Character *vmob;
-	Object *item;
-
 	mprog_cur_result = eSUCCESS;
 
-	for (item = DC::getInstance()->world[ch->in_room].contents; item; item =
-																		  item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & ALL_GREET_PROG)
+	for (auto item = dc_->world[in_room].contents; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & ALL_GREET_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, nullptr, ALL_GREET_PROG);
+			auto vmob = dc_->initiate_oproc(this, item);
+			mprog_percent_check(vmob, this, item, nullptr, ALL_GREET_PROG);
 			end_oproc(vmob, Trace("oprog_greet_trigger"));
 			return mprog_cur_result;
 		}
 	return mprog_cur_result;
 }
 
-int oprog_rand_trigger(Object *item)
+int DC::oprog_rand_trigger(Object *item)
 {
 	Character *vmob;
 	//  Object *item;
@@ -4968,7 +4951,7 @@ int oprog_rand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & RAND_PROG)
+	if (obj_index[item->item_number].progtypes & RAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, RAND_PROG);
@@ -4978,7 +4961,7 @@ int oprog_rand_trigger(Object *item)
 	return mprog_cur_result;
 }
 
-int oprog_arand_trigger(Object *item)
+int DC::oprog_arand_trigger(Object *item)
 {
 	Character *vmob;
 	Character *ch;
@@ -4988,7 +4971,7 @@ int oprog_arand_trigger(Object *item)
 		ch = item->carried_by;
 	else
 		ch = nullptr;
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & ARAND_PROG)
+	if (obj_index[item->item_number].progtypes & ARAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
 		mprog_percent_check(vmob, ch, item, nullptr, ARAND_PROG);
@@ -4998,46 +4981,45 @@ int oprog_arand_trigger(Object *item)
 	return mprog_cur_result;
 }
 
-int oprog_load_trigger(Character *ch)
+int Character::oprog_load_trigger(void)
 {
-
 	Character *vmob;
 	Object *item;
 
 	mprog_cur_result = eSUCCESS;
 
-	for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & LOAD_PROG)
+	for (item = dc_->world[in_room].contents; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
+			vmob = dc_->initiate_oproc(this, item);
+			mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
 			end_oproc(vmob);
 			return mprog_cur_result;
 		}
-	for (item = ch->carrying; item; item = item->next_content)
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & LOAD_PROG)
+	for (item = carrying; item; item = item->next_content)
+		if (dc_->obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
-			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
+			vmob = dc_->initiate_oproc(this, item);
+			mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
 			end_oproc(vmob);
 			return mprog_cur_result;
 		}
 
 	for (int i = 0; i < MAX_WEAR; i++)
-		if (ch->equipment[i])
-			if (DC::getInstance()->obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
+		if (equipment[i])
+			if (dc_->obj_index[equipment[i]->item_number].progtypes & LOAD_PROG)
 			{
-				vmob = initiate_oproc(ch, item);
-				mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
+				vmob = dc_->initiate_oproc(this, item);
+				mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
 				end_oproc(vmob);
 				return mprog_cur_result;
 			}
 	return mprog_cur_result;
 }
 
-int oprog_weapon_trigger(Character *ch, Object *item)
+int Character::oprog_weapon_trigger(Object *item)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -5046,10 +5028,10 @@ int oprog_weapon_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & WEAPON_PROG)
+	if (dc_->obj_index[item->item_number].progtypes & WEAPON_PROG)
 	{
-		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, nullptr, WEAPON_PROG);
+		vmob = dc_->initiate_oproc(this, item);
+		mprog_percent_check(vmob, this, item, nullptr, WEAPON_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -5057,9 +5039,9 @@ int oprog_weapon_trigger(Character *ch, Object *item)
 	return mprog_cur_result;
 }
 
-int oprog_armour_trigger(Character *ch, Object *item)
+int Character::oprog_armour_trigger(Object *item)
 {
-	if (!ch || ch->isDead() || isNowhere(ch))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -5068,10 +5050,10 @@ int oprog_armour_trigger(Character *ch, Object *item)
 
 	mprog_cur_result = eSUCCESS;
 
-	if (DC::getInstance()->obj_index[item->item_number].progtypes & ARMOUR_PROG)
+	if (dc_->obj_index[item->item_number].progtypes & ARMOUR_PROG)
 	{
-		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, nullptr, ARMOUR_PROG);
+		vmob = dc_->initiate_oproc(this, item);
+		mprog_percent_check(vmob, this, item, nullptr, ARMOUR_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -5081,7 +5063,7 @@ int oprog_armour_trigger(Character *ch, Object *item)
 
 command_return_t Character::oprog_command_trigger(QString command, QString arguments)
 {
-	if (isDead() || isNowhere(this))
+	if (isDead() || isNowhere())
 	{
 		return eFAILURE;
 	}
@@ -5092,16 +5074,16 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 	QString buf;
 	if (in_room >= 0)
 	{
-		for (item = DC::getInstance()->world[in_room].contents; item; item = item->next_content)
+		for (item = dc_->world[in_room].contents; item; item = item->next_content)
 		{
-			if (DC::getInstance()->obj_index[item->item_number].progtypes & COMMAND_PROG)
+			if (dc_->obj_index[item->item_number].progtypes & COMMAND_PROG)
 			{
 				if (!arguments.isEmpty())
 				{
 					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
 				}
 
-				vmob = initiate_oproc(this, item);
+				vmob = dc_->initiate_oproc(this, item);
 				if (mprog_wordlist_check(command, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
@@ -5114,13 +5096,13 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 
 	for (item = carrying; item; item = item->next_content)
 	{
-		if (DC::getInstance()->obj_index[item->item_number].progtypes & COMMAND_PROG)
+		if (dc_->obj_index[item->item_number].progtypes & COMMAND_PROG)
 		{
 			if (!arguments.isEmpty())
 			{
 				do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
 			}
-			vmob = initiate_oproc(this, item);
+			vmob = dc_->initiate_oproc(this, item);
 			if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 			{
 				end_oproc(vmob);
@@ -5134,14 +5116,14 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
 	{
 		if (equipment[i])
 		{
-			if (DC::getInstance()->obj_index[equipment[i]->item_number].progtypes & COMMAND_PROG)
+			if (dc_->obj_index[equipment[i]->item_number].progtypes & COMMAND_PROG)
 			{
 				if (!arguments.isEmpty())
 				{
 					do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '), cmd_t::OTHER);
 				}
 
-				vmob = initiate_oproc(this, equipment[i]);
+				vmob = dc_->initiate_oproc(this, equipment[i]);
 				if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);

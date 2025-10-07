@@ -1153,7 +1153,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         act("You remove $p and attempt to steal it.", ch, obj, 0, TO_CHAR, 0);
         ch->sendln("Your victim wakes up before you can complete the theft!");
         act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
-        obj_to_char(unequip_char(victim, eq_pos), victim);
+        obj_to_char(victim->unequip_char(eq_pos), victim);
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
         victim->save(cmd_t::SAVE_SILENTLY);
         set_cantquit(ch, victim);
@@ -1167,7 +1167,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       {
         act("You remove $p and steal it.", ch, obj, 0, TO_CHAR, 0);
         act("$n steals $p from $N.", ch, obj, victim, TO_ROOM, NOTVICT);
-        obj_to_char(unequip_char(victim, eq_pos), ch);
+        obj_to_char(victim->unequip_char(eq_pos), ch);
         if (IS_PC(victim) || (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
@@ -1728,7 +1728,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       }
 
       ch->save();
-      save_char_obj(vict);
+      vict->save_char_obj();
     }
 
     return eFAILURE;
@@ -1906,7 +1906,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS | NOTVICT);
     act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
     ch->save();
-    save_char_obj(vict);
+    vict->save_char_obj();
   }
   return eSUCCESS;
 }
