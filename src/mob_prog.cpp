@@ -1520,7 +1520,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == ' ')
 		{
-			DC::getInstance()->prog_error(mob, QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
+			mob->prog_error(QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
 			return -1;
 		}
 		else if (*point == '.')
@@ -1529,7 +1529,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 		}
 		else if (*point == '\0')
 		{
-			DC::getInstance()->prog_error(mob, QStringLiteral("ifchck syntax error"));
+			mob->prog_error(QStringLiteral("ifchck syntax error"));
 			logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", DC::getInstance()->mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
 			return -1;
 		}

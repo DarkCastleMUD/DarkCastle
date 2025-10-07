@@ -718,7 +718,6 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch);
 int mprog_death_trigger(Character *mob, Character *killer);
 int mprog_random_trigger(Character *mob);
 int mprog_arandom_trigger(Character *mob);
-int mprog_speech_trigger(const char *txt, Character *mob);
 int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
 int mprog_attack_trigger(Character *mob, Character *ch);
 int mprog_load_trigger(Character *mob);

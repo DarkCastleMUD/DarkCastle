@@ -609,7 +609,6 @@ public:
   void game_test_init(void);
   void heartbeat(void);
   void finish_hotboot(void);
-  void prog_error(Character *ch, QString error_message);
   load_status_t load_char_obj(Connection *d, QString name);
   bool has_vault_access(QString owner, struct vault_data *vault);
   bool has_vault_access(Character *ch, struct vault_data *vault);
