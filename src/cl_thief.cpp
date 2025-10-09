@@ -1585,7 +1585,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
       }
 
       ch->sendln(QStringLiteral("You open the %1.").arg(door_keyword));
-      auto copy_of_door_keyword = strdup(qPrintable(door_keyword));
+      auto copy_of_door_keyword = strdup(qPrintable(QStringLiteral("%1 %2").arg(door_keyword).arg(dir)));
       auto rc = do_open(ch, copy_of_door_keyword);
       free(copy_of_door_keyword);
     }
