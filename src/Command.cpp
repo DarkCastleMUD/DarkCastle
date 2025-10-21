@@ -66,6 +66,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("tick"), do_tick, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("time"), do_time, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("title"), do_title, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
+        Command(QStringLiteral("notitle"), &Character::do_notitle, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("typo"), do_typo, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("weather"), do_weather, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),
         Command(QStringLiteral("who"), &Character::do_who, position_t::DEAD, 0, cmd_t::DEFAULT, 0, 1, CommandType::all),

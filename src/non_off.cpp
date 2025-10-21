@@ -330,6 +330,14 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   return eSUCCESS;
 }
 
+auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
+{
+  sendln("You now have no title.");
+  title = str_hsh("");
+  save(cmd_t::SAVE_SILENTLY);
+  return eSUCCESS;
+}
+
 int do_title(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[100];
@@ -337,7 +345,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    ch->sendln("Change your title to what?");
+    ch->sendln("Type \"title message\" to set a title or \"notitle\" to remove your title.");
     return eFAILURE;
   }
 
