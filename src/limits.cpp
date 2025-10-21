@@ -455,7 +455,7 @@ void advance_level(Character *ch, int is_conversion)
 	case CLASS_CLERIC:
 		add_ki += (effective_level % 2);
 		add_hp += number(4, 8);
-		add_mana += number(4, 0);
+		add_mana += number(4, 8);
 		add_moves += number(1, (effective_con / 2));
 		break;
 
