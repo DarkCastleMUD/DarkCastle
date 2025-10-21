@@ -526,11 +526,13 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     auto clanPtr = get_clan(i);
     if (i->clan && clanPtr && i->getLevel() < OVERSEER)
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 %5 $2[%6$R$2] %7$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
+      buf += QStringLiteral("%5 $2[%6$R$2] %7$R\n\r").arg(extraBuf).arg(clanPtr->name).arg(tailBuf);
     }
     else
     {
-      buf = QStringLiteral("[%1] %2$3%3 %4 %5 %6$R\n\r").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(QString(i->title)).arg(extraBuf).arg(tailBuf);
+      buf = QStringLiteral("[%1] %2$3%3 %4 ").arg(infoBuf).arg(preBuf).arg(GET_SHORT(i)).arg(i->title);
+      buf += QStringLiteral("%5 %6$R\n\r").arg(extraBuf).arg(tailBuf);
     }
 
     if (addimmbuf)
