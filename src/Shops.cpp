@@ -18,7 +18,7 @@ Shops::Shops(QObject *parent)
 Legacy::Legacy(QString filename)
 {
     file_.setFileName(filename);
-    file_.open(QIODevice::ReadOnly);
+    open_status_ = file_.open(QIODevice::ReadOnly);
 }
 
 QStringList Legacy::toList(void)

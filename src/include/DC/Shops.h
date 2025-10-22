@@ -17,6 +17,7 @@ public:
 
 private:
     QFile file_;
+    bool open_status_{};
 };
 
 class Shop
