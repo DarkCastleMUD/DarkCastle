@@ -33,120 +33,118 @@
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
-int do_kick(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
 {
-  Character *victim;
-  Character *next_victim;
-  char name[256];
-  int dam;
-  int retval;
+  Character *victim{}, *next_victim{};
+  QString name;
+  int dam{};
+  command_return_t retval{};
 
-  if (!ch->canPerform(SKILL_KICK))
+  if (!canPerform(SKILL_KICK))
   {
-    ch->sendln("You will have to study from a master before you can use this.");
+    sendln("You will have to study from a master before you can use this.");
     return eFAILURE;
   }
 
-  one_argument(argument, name);
+  name = arguments.value(0);
 
-  if (!(victim = ch->get_char_room_vis(name)))
+  if (!(victim = get_char_room_vis(name)))
   {
-    if (ch->fighting)
+    if (fighting)
     {
-      victim = ch->fighting;
+      victim = fighting;
     }
     else
     {
-      ch->sendln("Your foot comes up, but there's nobody there...");
+      sendln("Your foot comes up, but there's nobody there...");
       return eFAILURE;
     }
   }
 
-  if (victim == ch)
+  if (victim == this)
   {
-    ch->sendln("You kick yourself, metaphorically speaking.");
+    sendln("You kick yourself, metaphorically speaking.");
     return eFAILURE;
   }
 
-  if (!can_attack(ch) || !can_be_attacked(ch, victim))
+  if (!can_attack(this) || !can_be_attacked(this, victim))
     return eFAILURE;
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Kicking a bladeshielded opponent would be a good way to lose a leg!");
+    sendln("Kicking a bladeshielded opponent would be a good way to lose a leg!");
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_KICK))
+  if (!charge_moves(SKILL_KICK))
     return eSUCCESS;
 
-  WAIT_STATE(ch, (int)(DC::PULSE_VIOLENCE * 1.5));
+  WAIT_STATE(this, (int)(DC::PULSE_VIOLENCE * 1.5));
 
-  if (!skill_success(ch, victim, SKILL_KICK))
+  if (!skill_success(victim, SKILL_KICK))
   {
     dam = 0;
-    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_KICK, 0);
+    retval = damage(this, victim, 0, TYPE_BLUDGEON, SKILL_KICK, 0);
     if (SOMEONE_DIED(retval))
       return retval;
   }
   else
   {
-    if (victim->affected_by_spell(SKILL_BATTLESENSE) &&
-        number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
+    if (victim->affected_by_spell(SKILL_BATTLESENSE) && number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
     {
-      act("$N's heightened battlesense sees your kick coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's kick coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's kick coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      act("$N's heightened battlesense sees your kick coming from a mile away.", this, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's kick coming from a mile away.", this, 0, victim, TO_ROOM, NOTVICT);
       dam = 0;
     }
     else
-      dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (ch->has_skill(SKILL_KICK));
-    retval = damage(ch, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
+      dam = (GET_DEX(this) * 3) + (GET_STR(this) * 2) + (has_skill(SKILL_KICK));
+    retval = damage(this, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
     if (SOMEONE_DIED(retval))
       return retval;
   }
 
   // if our boots have a combat proc, and we did damage, let'um have it!
-  if (dam && ch->equipment[WEAR_FEET])
+  if (dam && equipment[WEAR_FEET])
   {
-    retval = weapon_spells(ch, victim, WEAR_FEET);
+    retval = weapon_spells(this, victim, WEAR_FEET);
     if (SOMEONE_DIED(retval))
       return retval;
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+    if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], cmd_t::UNDEFINED, "", ch));
+      retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
     }
     if (SOMEONE_DIED(retval))
       return retval;
   }
 
   // Extra kick targeting main opponent for monks
-  if ((GET_CLASS(ch) == CLASS_MONK) && ch->fighting && ch->in_room == ch->fighting->in_room)
+  if ((GET_CLASS(this) == CLASS_MONK) && fighting && in_room == fighting->in_room)
   {
-    next_victim = ch->fighting;
-    if (!skill_success(ch, next_victim, SKILL_KICK))
+    next_victim = fighting;
+    if (!skill_success(next_victim, SKILL_KICK))
     {
       dam = 0;
-      retval = damage(ch, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK, 0);
+      retval = damage(this, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK, 0);
     }
     else
     {
-      dam = (GET_DEX(ch) * 2) + (GET_STR(ch)) + (ch->has_skill(SKILL_KICK) / 2);
-      retval = damage(ch, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
+      dam = (GET_DEX(this) * 2) + (GET_STR(this)) + (has_skill(SKILL_KICK) / 2);
+      retval = damage(this, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
     }
     if (SOMEONE_DIED(retval))
       return retval;
     // if our boots have a combat proc, and we did damage, let'um have it!
-    if (dam && ch->equipment[WEAR_FEET])
+    if (dam && equipment[WEAR_FEET])
     {
-      retval = weapon_spells(ch, next_victim, WEAR_FEET);
+      retval = weapon_spells(this, next_victim, WEAR_FEET);
       if (SOMEONE_DIED(retval))
         return retval;
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-      if (DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+      if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)(ch, ch->equipment[WEAR_FEET], cmd_t::UNDEFINED, "", ch));
+        retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
       }
     }
   }

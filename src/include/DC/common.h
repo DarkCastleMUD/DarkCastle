@@ -337,7 +337,6 @@ command_return_t do_insult(Character *ch, char *argument, cmd_t cmd = cmd_t::DEF
 command_return_t do_inventory(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 auto do_joinarena(Character *ch, char *argument, cmd_t cmd) -> command_return_t;
 command_return_t do_ki(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_kick(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_kill(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_knockback(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 // command_return_t do_land (Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);

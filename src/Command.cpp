@@ -156,7 +156,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("trip"), do_trip, position_t::FIGHTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("deathstroke"), do_deathstroke, position_t::FIGHTING, 1, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("circle"), do_circle, position_t::FIGHTING, 1, cmd_t::DEFAULT, 0, 0, CommandType::all),
-        Command(QStringLiteral("kick"), do_kick, position_t::FIGHTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
+        Command(QStringLiteral("kick"), &Character::do_kick, position_t::FIGHTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("battlecry"), do_battlecry, position_t::FIGHTING, 1, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("behead"), do_behead, position_t::FIGHTING, 1, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("rage"), &Character::do_rage, position_t::FIGHTING, 1, cmd_t::DEFAULT, 0, 0, CommandType::all),

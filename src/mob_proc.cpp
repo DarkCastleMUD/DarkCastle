@@ -345,7 +345,7 @@ int fighter(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
     {
         MOB_WAIT_STATE(ch) = 2;
-        return do_kick(ch, "", cmd_t::DEFAULT);
+        return ch->do_kick();
     }
 
     return eFAILURE;
@@ -2795,7 +2795,7 @@ int marauder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
     if (vict == ch->fighting && ch->getLevel() > 2 && number(0, 1) == 0)
     {
-        return do_kick(ch, "", cmd_t::DEFAULT);
+        return ch->do_kick();
     }
 
     return eFAILURE;
