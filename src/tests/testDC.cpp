@@ -52,7 +52,8 @@ public:
     QByteArray checksumFile(QString filename)
     {
         QFile file(filename);
-        file.open(QIODeviceBase::ReadOnly);
+        if (!file.open(QIODeviceBase::ReadOnly))
+            qFatal("Unable to read %s", filename);
         QCryptographicHash file_hash(QCryptographicHash::Algorithm::Sha512);
         file_hash.addData(file.readAll());
         return file_hash.result();
@@ -615,7 +616,7 @@ private slots:
         DC dc(cf);
 
         QFile testfile(QStringLiteral("fread_tests.txt"));
-        testfile.open(QIODeviceBase::WriteOnly);
+        QVERIFY(testfile.open(QIODeviceBase::WriteOnly));
         testfile.write("3\n");
         testfile.write("-1\n");
         testfile.write("abc\n123~\n");
