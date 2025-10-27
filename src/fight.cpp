@@ -1830,7 +1830,7 @@ void eq_damage(Character *ch, Character *victim,
       return;
 
     if (DC::getInstance()->obj_index[obj->item_number].progtypes & ARMOUR_PROG)
-      oprog_armour_trigger(victim, obj);
+      victim->oprog_armour_trigger(obj);
     // determine if time to scrap it
     if (eqdam >= eq_max_damage(obj))
       eq_destroyed(victim, obj, pos);
@@ -1859,7 +1859,7 @@ void eq_damage(Character *ch, Character *victim,
       return;
 
     if (DC::getInstance()->obj_index[obj->item_number].progtypes & ARMOUR_PROG)
-      oprog_armour_trigger(victim, obj);
+      victim->oprog_armour_trigger(obj);
 
     // determine if time to scrap it
     if (eqdam >= eq_max_damage(obj))
@@ -2528,7 +2528,7 @@ int damage(Character *ch, Character *victim,
             if (victim->equipment[WEAR_SHIELD])
             {
               if (DC::getInstance()->obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
-                oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
+                victim->oprog_armour_trigger(victim->equipment[WEAR_SHIELD]);
               if (eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
                 eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
               else
@@ -7326,7 +7326,7 @@ int weapon_spells(Character *ch, Character *vict, int weapon)
   } /* for loop */
 
   if (DC::getInstance()->obj_index[weap->item_number].progtypes & WEAPON_PROG)
-    oprog_weapon_trigger(ch, weap);
+    ch->oprog_weapon_trigger(weap);
 
   return eSUCCESS;
 } /* spell effects */

@@ -699,20 +699,12 @@ int _parse_name(const char *arg, char *name);
 void mob_suprised_sayings(Character *ch, Character *aggressor);
 
 // MOBProgs prototypes
-int mprog_wordlist_check(QString arg, Character *mob,
-                         Character *actor, Object *object,
-                         void *vo, int type, bool reverse = false);
-void mprog_percent_check(Character *mob, Character *actor,
-                         Object *object, void *vo,
-                         int type);
-int mprog_act_trigger(std::string buf, Character *mob,
-                      Character *ch, Object *obj,
-                      void *vo);
-int mprog_bribe_trigger(Character *mob, Character *ch,
-                        int amount);
+int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *object, void *vo, int type, bool reverse = false);
+void mprog_percent_check(Character *mob, Character *actor, Object *object, void *vo, int type);
+int mprog_act_trigger(std::string buf, Character *mob, Character *ch, Object *obj, void *vo);
+int mprog_bribe_trigger(Character *mob, Character *ch, int amount);
 int mprog_entry_trigger(Character *mob);
-int mprog_give_trigger(Character *mob, Character *ch,
-                       Object *obj);
+int mprog_give_trigger(Character *mob, Character *ch, Object *obj);
 int mprog_fight_trigger(Character *mob, Character *ch);
 int mprog_hitprcnt_trigger(Character *mob, Character *ch);
 int mprog_death_trigger(Character *mob, Character *killer);
@@ -722,12 +714,6 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
 int mprog_attack_trigger(Character *mob, Character *ch);
 int mprog_load_trigger(Character *mob);
 int mprog_damage_trigger(Character *mob, Character *ch, int amount);
-
-int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
-int oprog_command_trigger(const char *txt, Character *ch, char *arg);
-int oprog_weapon_trigger(Character *ch, Object *item);
-int oprog_armour_trigger(Character *ch, Object *item);
-int oprog_rand_trigger(Object *item);
 bool is_in_game(Character *ch);
 int get_stat(Character *ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
