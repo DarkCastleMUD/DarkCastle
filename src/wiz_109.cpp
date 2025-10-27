@@ -620,7 +620,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   }
 
   snprintf(savefile, 255, "../save/%c/%s", UPPER(username[0]), username);
-  snprintf(bsavefile, 255, "/srv/dcastle_test/save/%c/%s", UPPER(username[0]), username);
+  snprintf(bsavefile, 255, "/srv/dcastle3/save/%c/%s", UPPER(username[0]), username);
 
   if (!file_exists(savefile))
   {
